@@ -1,0 +1,201 @@
+/* CSS Document */
+.ui-input-text, .ui-input-search {
+	margin: .2em .05em !important;
+}
+.ui-input-text input, textarea.ui-input-text {
+	padding: 0.2em !important;
+	line-height: 1em !important;
+	min-height: 1em !important;
+}
+.ui-checkbox {
+	margin: .2em 0 !important;
+	display:inline-block;
+}
+.ui-checkbox input {
+    position: relative !important;	
+    margin: 0 10px 0 0 !important;
+}
+.ui-header-fixed .stm_back_on_logo_lnk .logo {
+	margin-left:10px;
+}
+
+.ui-header-fixed .stm_btn_user_lnk {
+	margin-right:3em !important;
+}
+
+.ui-header-fixed .stm_btn_user_lnk, .ui-header-fixed .stm_btn_options_lnk {
+	padding:0 0.1em;
+}
+
+.stm_title {
+	font-weight:bold;
+	text-align:center;
+}
+
+.stm_list .ui-btn {
+	padding: .1em 1em .1em .5em;
+}
+
+.ui-header-fixed .ui-title {
+	text-align:left !important;
+	margin:0 70px 0 117px !important;
+}
+
+.stm_back_on_logo_lnk:after {
+	left: -.5em;
+	top: 50%;
+	margin-top: -11px;
+	content: "";
+	position: absolute;
+	display: block;
+	width: 22px;
+	height: 22px;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.ui-header-fixed a:active {
+	/* Fallback for web browsers that doesn't support RGBa */
+	background: rgb(0, 0, 0);
+	/* RGBa with 0.6 opacity */
+	background: rgba(0, 0, 0, 0.2);
+}
+
+.stm_list_title {
+	font-size:.9em;
+	font-weight:bold;
+}
+
+.camp_title {
+	margin:10px 0;
+}
+
+.user_is_login, .user_is_logout {
+	display:none;
+}
+
+form fieldset {
+	padding: 0 .4em !important;
+}
+
+.ligne-nomenc-parent {
+	font-weight:bold;
+}
+
+#stm_no_camps {
+	display: none;
+}
+
+#new_camp_charge_box {
+	display: none;
+}
+
+#new_camp_charge_msg {
+	height:150px;
+	max-height:170px;
+	overflow-y: scroll;
+	text-align:left;
+	background-color:#FFFFFF;
+	border: 1px solid #DFDADA;
+	padding:5px;
+}
+
+/* CAMP PAGE */
+.log_link {
+	text-decoration:none;
+}
+.camp_save_ok {
+	color:#00CC00 !important;
+}
+.camp_save_nd {
+	color:#996633 !important;
+}
+.camp_save_ko, .camp_save_to, .camp_save_401, .camp_save_404 {
+	color:#FF0000 !important;
+}
+.save_log {
+	border:1px solid #CCCCCC;
+	padding:0 2px;
+}
+.save_log div {
+	margin:2px 0;
+}
+
+/* COLLECT PAGE */
+.survey_page {
+	padding:.2em;
+	overflow-x: scroll;
+}
+.navigate_button {
+	display:inline-block;
+}
+.navigate_button a {
+	text-decoration:none;
+}
+.navigate_button div.ui-select {
+	display:inline-block;
+}
+.btn_save_form {
+	float:right;
+}
+.part_title {
+	font-weight:bold;
+	background-color:#CCCCCC;
+	padding:.4em;
+}
+.page {
+	margin:5px 0;
+}
+.table-questionnaire {
+	border: 0px solid #CCC;
+	border-collapse: collapse;
+}
+.highlight {
+	background-color: #B1DEF0;
+}
+.clear {
+	clear:both;
+}
+#stm_sms_log {
+	display:inline-block;
+	margin-left:2px;
+}
+#stm_sms_log img {
+	margin-right:2px;
+}
+
+/* FORM */
+.form_frm {
+	padding: 15px;
+}
+.grille_ligne .ui-input-text {
+	display:none;
+}
+.error_msg {
+	color: #FF0000;
+	display: none;
+}
+#popupArrow h3 {
+	margin:0;
+	text-align:center;
+}
+
+/* PAGE LOGIN */
+#div_user_re_pin, #div_user_remind_list, #div_user_remind_value, #div_user_pin_forgotten_back {
+	display:none;
+}
+
+/* SETTINGS PAGE */
+#btn_change_pin {
+	font-weight:bold;
+	color:#272727;
+}
+#settings_list li {
+	white-space: normal !important;
+}
+.ligne-nomenc-parent {
+	font-weight: bold;
+}
+.user_prenom {
+	font-style:italic;
+}

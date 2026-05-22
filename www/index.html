@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Page d'identification</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!--meta name="format-detection" content="telephone=no" /-->
+	<!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+	<!--meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /-->
+	
+	<link rel="stylesheet" href="css/style.css" />
+	<link rel="stylesheet" href="css/themes/stateduc/stateduc.min.css" />
+	<link rel="stylesheet" href="css/themes/stateduc/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet" href="css/themes/default/jquery.mobile.structure-1.4.5.min.css" />
+	<script type="text/javascript" src="js/jquery/jquery-1.11.1.min.js" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="js/jquery/mobile-1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	<script type="text/javascript" src="js/jquery/jquery.mobile.dynamic.popup.js"></script>
+</head>
+<body>
+
+	<div id="p_accueil" data-role="page">
+	
+		<div data-role="header" data-position="fixed">
+		 	<img class="logo ui-btn-left" src="img/logo_stateduc.png" alt="StatEduc" />
+			<h1>Identification</h1>
+			<a href="#" class="stm_btn_options_lnk ui-btn-right" data-rel="popup" data-role="none" data-transition="slidedown">				<img class="stm_btn_options" src="img/btn_options.png" alt="Options" /></a>
+		</div><!-- /header -->
+	
+		<div role="main" class="ui-content">
+			
+			<div id="stm_accueil_connexion">
+				<form action="/" method="post" id="pin_frm" class="ui-corner-all form_frm ui-shadow">
+                	<input type="hidden" name="stm_user_op" id="stm_user_op" value="0" />
+					<div class="stm_title">Authentification</div>
+					<div id="pin_frm_error" class="error_msg">Le code saisi est invalide.</div>
+					<div class="ui-field-contain" id="div_user_pin">
+						<label for="stm_user_pin">CODE :</label>
+						<input type="password" name="stm_user_pin" id="stm_user_pin" value="" placeholder="Votre code"/>	
+					</div>
+					<div class="ui-field-contain" id="div_user_re_pin">
+						<label for="stm_user_pin">Re CODE :</label>
+						<input type="password" name="stm_user_re_pin" id="stm_user_re_pin" value="" placeholder="Repeter votre code"/>	
+					</div>	
+                    <div class="ui-field-contain" id="div_user_remind_list">
+						<label for="stm_user_remind_list" class="select">Question de s&eacute;curit&eacute;</label>
+						<select name="stm_user_remind_list" id="stm_user_remind_list" data-native-menu="false" data-mini="true">
+							<option>Choisir</option>
+                        	<option value="1">Endroit de r&ecirc;ve de votre enfance?</option>							
+                        	<option value="2">Le pr&eacute;nom de votre maitre du primaire?</option>							
+                        	<option value="3">Votre nourriture pr&eacute;f&eacute;r&eacute;e &eacute;tant enfant?</option>	
+                            <option value="4">Le h&eacute;ro de votre enfance?</option>						
+						</select>	
+					</div>
+					<div class="ui-field-contain" id="div_user_remind_value">
+						<label for="stm_user_remind_value">Reponse :</label>
+						<input type="text" name="stm_user_remind_value" id="stm_user_remind_value" value="" placeholder="Votre reponse"/>	
+					</div>	
+					<fieldset class="ui-grid-a">
+						<div class="ui-block-a"><a href="javascript:void(0);" onClick="javascript:showConfirm('StatEduc', 'Voulez vous vraiment quiter?', exitFromApp);" data-role="button" data-theme="c">Annuler</a></div>
+						<div class="ui-block-b"><button type="submit" data-theme="b">Valider</button></div>
+					</fieldset>	
+                    <br/>	
+                    <div id="div_user_pin_forgotten"><a href="#" id="stm_user_pin_forgotten">Mot de passe oubli&eacute;?</a></div>	
+                    <div id="div_user_pin_forgotten_back"><a href="#" id="stm_user_pin_forgotten_back">Retour</a></div>
+				</form>		
+			</div>
+			
+		</div><!-- /content -->
+	</div><!-- /page -->
+	
+	<div id="p_acc_settings" data-role="page">
+	
+		<div data-role="header" data-position="fixed" class="ui-nodisc-icon ui-alt-icon">
+		 	<img class="logo ui-btn-left" src="img/logo_stateduc.png" alt="StatEduc" />
+			<h1>Param&eacute;trage</h1>
+			<a href="#" class="stm_btn_user_lnk ui-btn-right" data-rel="popup" data-role="none" data-transition="slidedown"><img class="stm_btn_user" src="img/user_logout.png" alt="Utilisateur" /></a>
+			<a href="#" class="stm_btn_options_lnk ui-btn-right" data-rel="popup" data-role="none" data-transition="slidedown"><img class="stm_btn_options" src="img/btn_options.png" alt="Options" /></a>
+	  </div><!-- /header -->
+	
+		<div role="main" class="ui-content">
+			
+			<ul data-role="listview" data-inset="true" id="settings_list">
+				<li data-role="list-divider">Synchronisation</li>
+				<li>
+					<h2>Url du serveur</h2>
+					<div>Cette url est utilis&eacute;e pour communiquer (envoie et r&eacute;ception de donn&eacute;es) avec le serveur</div>
+					<input type="text" name="server_url" id="server_url" />
+				</li>
+				<!--li>
+					<h2>Sms gateway number</h2>
+					<div>It used on area without internet connection to send collected data to server</div>
+					<input type="text" name="sms_gateway_num" id="sms_gateway_num" />
+					<div>Key to identify server</div>
+					<input type="text" name="sms_gateway_key" id="sms_gateway_key" />
+				</li-->
+			</ul>
+			<button id="stm_btn_settings_ok" class="ui-shadow ui-btn ui-btn-b ui-corner-all ui-btn-inline" data-theme="b">Valider</button>
+			
+		</div><!-- /content -->
+	</div><!-- /page -->
+	
+	<!--  page campaign list -->	
+	<div id="p_lst_camps" data-role="page">
+	
+		<div data-role="header" data-position="fixed" class="ui-nodisc-icon ui-alt-icon">
+		 	<img class="logo ui-btn-left" src="img/logo_stateduc.png" alt="StatEduc" />
+			<h1>Liste des campagnes</h1>
+			<a href="#" class="stm_btn_user_lnk ui-btn-right" data-rel="popup" data-role="none" data-transition="slidedown"><img class="stm_btn_user" src="img/user_logout.png" alt="Utilisateur" /></a>
+			<a href="#" class="stm_btn_options_lnk ui-btn-right" data-rel="popup" data-role="none" data-transition="slidedown"><img class="stm_btn_options" src="img/btn_options.png" alt="Options" /></a>
+		</div><!-- /header -->
+	
+		<div role="main" class="ui-content">
+			
+			<div id="stm_liste_camps">
+			</div>
+			<div id="stm_no_camps">
+				<p>Aucune donn&eacute;e trouv&eacute;e.</p>
+				<a href="new_camp.html?origin=1" data-ajax="false" class="ui-btn ui-btn-b ui-btn-inline" data-theme="b">Charger une nouvelle campagne</a>
+			</div>
+			
+		</div><!-- /content -->
+	</div><!-- /page -->
+
+	<script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/default.js"></script>
+    <script type="text/javascript" src="js/status.js"></script>
+    <script type="text/javascript" src="js/users.js"></script>
+    <script type="text/javascript" src="js/systems.js"></script>
+    <script type="text/javascript" src="js/campagnes.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+    <script type="text/javascript" src="js/start.js"></script>
+	<script type="text/javascript" src="js/page_index.js"></script>
+	<script type="text/javascript" src="js/page_settings.js"></script>
+</body>
+</html>
