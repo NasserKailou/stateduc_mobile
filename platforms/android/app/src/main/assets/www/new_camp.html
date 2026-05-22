@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Page Title</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!--meta name="format-detection" content="telephone=no" /-->
+	<!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+	<!--meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" /-->
+
+	<link rel="stylesheet" href="css/style.css" />
+	<link rel="stylesheet" href="css/jquery.mobile.datepicker.css" />
+	<link rel="stylesheet" href="css/themes/stateduc/stateduc.min.css" />
+	<link rel="stylesheet" href="css/themes/stateduc/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet" href="css/themes/default/jquery.mobile.structure-1.4.5.min.css" />
+	<script type="text/javascript" src="js/jquery/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="js/jquery/jquery-ui/jquery.ui.datepicker.js"></script>
+	<script type="text/javascript" src="js/jquery/mobile-1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	<script type="text/javascript" src="js/jquery/jquery.mobile.dynamic.popup.js"></script>
+	<script type="text/javascript" src="js/jquery/jquery.mobile.datepicker.js"></script>
+</head>
+<body>
+
+	<div id="p_new_camp" data-role="page" data_url="p_new_camp">
+	
+		<div data-role="header" data-position="fixed" class="ui-nodisc-icon ui-alt-icon">
+		 	<a href="#" class="stm_back_on_logo_lnk ui-icon-carat-l" data-role="none">
+				<img class="logo" src="img/logo_stateduc.png" alt="StatEduc" />	
+			</a>
+			<h1>Charger campagne</h1>
+			<a href="#" class="stm_btn_user_lnk ui-btn-right" data-rel="popup" data-role="none" data-transition="slidedown"><img class="stm_btn_user" src="img/user_logout.png" alt="Utilisateur" /></a>
+			<a href="#" class="stm_btn_options_lnk ui-btn-right" data-rel="popup" data-role="none" data-transition="slidedown"><img class="stm_btn_options" src="img/btn_options.png" alt="Options" /></a>
+	  </div><!-- /header -->
+	
+		<div role="main" class="ui-content">
+			
+			<div class="ui-content">
+				<form action="/" method="post" class="ui-corner-all" data-ajax="false" id="new_camp_frm">
+					<div id="new_camp_frm_error"></div>
+					<div class="ui-field-contain">
+						<label for="select-choice-camp" class="select">Charger une campagne</label>
+						<select name="select-choice-camp" id="select-choice-camp" data-native-menu="false">
+							<option>Choisir</option>
+						</select>
+					</div>
+					<!--div class="ui-field-contain">
+						<div><span>Start : </span><span id="new_camp_frm_debut"></span></div>
+						<div><span>End : </span><span id="new_camp_frm_fin"></span></div>
+						<div><span>Status : </span><span id="new_camp_frm_statut"></span></div>
+					</div-->
+					<div class="ui-field-contain">
+						<button type="submit" id="submit_new_camp_frm" class="ui-shadow ui-btn ui-btn-b ui-corner-all ui-btn-inline" data-theme="b">Charger</button>
+					</div>
+				</form>
+				
+				<div id="new_camp_charge_box">
+					<label for="new_camp_charge_msg">Chargement de : <a href="#" id="display_new_camp" data-ajax="false"></a></label> 					
+					<div id="new_camp_charge_msg" class="ui-corner-all ui-shadow"></div>
+				</div>
+			</div>
+			
+			
+		</div><!-- /content -->
+	</div><!-- /page -->
+	
+	<!--  page connexion -->
+	
+	<!--  /page connexion -->
+	<script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/default.js"></script>
+    <script type="text/javascript" src="js/status.js"></script>
+    <script type="text/javascript" src="js/users.js"></script>
+    <script type="text/javascript" src="js/systems.js"></script>
+    <script type="text/javascript" src="js/etabs.js"></script>
+    <script type="text/javascript" src="js/regroups.js"></script>
+    <script type="text/javascript" src="js/campagnes.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+    <script type="text/javascript" src="js/start.js"></script>
+	<script type="text/javascript" src="js/charge_camp.js"></script>
+	<script type="text/javascript" src="js/page_new_camp.js"></script>
+</body>
+</html>
