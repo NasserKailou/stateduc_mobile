@@ -1,0 +1,57 @@
+name: stateduc_mobile
+description: StatEduc Mobile - Application de collecte de données éducatives pour l'Afrique
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP client
+  dio: ^5.4.0
+
+  # State management
+  provider: ^6.1.1
+
+  # Local database
+  sqflite: ^2.3.0
+  path: ^1.9.0
+
+  # Secure storage for passwords/PIN
+  flutter_secure_storage: ^9.0.0
+
+  # Shared preferences for simple settings
+  shared_preferences: ^2.2.2
+
+  # Connectivity
+  connectivity_plus: ^5.0.2
+
+  # HTML rendering for dynamic forms
+  flutter_html: ^3.0.0-beta.2
+
+  # Vibration
+  vibration: ^1.8.4
+
+  # SMS sending
+  telephony: ^0.2.0
+
+  # UUID generation
+  uuid: ^4.3.3
+
+  # Icons
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
