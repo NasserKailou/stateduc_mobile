@@ -1,0 +1,63 @@
+// StatEduc Flutter — app/build.gradle
+// AGP 8.7.0 / Gradle 8.10.2 / Kotlin 2.0.21 / Java 17
+// Flutter 3.35.x compatible.
+
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace "ark.android.stateduc"
+    compileSdkVersion 35
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        // AGP 8.7+ requires Java 17
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+
+    defaultConfig {
+        applicationId "ark.android.stateduc"
+        // flutter_secure_storage requires minSdk 18+; 21 is safe
+        minSdkVersion 21
+        targetSdkVersion 35
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            // Release signing: configure key.properties for production build
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+dependencies {
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
+}
