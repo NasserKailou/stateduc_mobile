@@ -8,17 +8,16 @@ import '../models/user.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 
-/// CampaignProvider — manages campaigns, navigation hierarchy (system → regroup
-/// drill-down → school list) and the campaign loading workflow.
+/// CampaignProvider — manages campaigns, navigation hierarchy
+/// (system → regroup drill-down → school list) and the 9-step download workflow.
 ///
 /// Mirrors original logic from:
-///   campagnes.js   → StmCampagne, StmLocalisation, stmCampagnes
-///   page_camp.js   → stmPageCamp.displaySystems(), displayRegroups(),
-///                    displayEtabs(), displayFinalRegroupEtabs()
-///   charge_camp.js → stmChargeCamp: sequential AJAX download steps
+///   campagnes.js    → StmCampagne, stmCampagnes
+///   page_camp.js    → stmPageCamp: displaySystems, displayRegroups,
+///                     displayEtabs, displayFinalRegroupEtabs
+///   charge_camp.js  → stmChargeCamp: sequential AJAX download steps 1-9
 ///   page_new_camp.js → stmPageNewCamp.getCampsFromServer()
-///   regroups.js    → setEtabLocs, hierarchical traversal
-///   systems.js     → stmSystems
+///   regroups.js     → setEtabLocs, hierarchical traversal
 class CampaignProvider extends ChangeNotifier {
   CampaignProvider({
     required DatabaseService db,
@@ -35,29 +34,26 @@ class CampaignProvider extends ChangeNotifier {
   bool _loadingCampaigns = false;
   String? _error;
 
-  List<Campaign> get campaigns => _campaigns;
-  Campaign? get selectedCampaign => _selectedCampaign;
-  bool get isLoadingCampaigns => _loadingCampaigns;
-  String? get error => _error;
+  List<Campaign> get campaigns         => _campaigns;
+  Campaign? get selectedCampaign       => _selectedCampaign;
+  bool get isLoadingCampaigns          => _loadingCampaigns;
+  String? get error                    => _error;
 
-  // ─── Navigation state (system → regroup drill-down → schools) ──────────────
-  List<EducationSystem> _systems = [];
+  // ─── Navigation state ──────────────────────────────────────────────────────
+  List<EducationSystem> _systems      = [];
   EducationSystem? _selectedSystem;
+  List<Regroup> _regroupBreadcrumb    = [];
+  List<Regroup> _currentRegroups      = [];
+  List<School>  _currentSchools       = [];
+  List<RegroupType> _regroupTypes     = [];
+  List<Regroup> _allRegroups          = [];
 
-  /// Breadcrumb trail: list of regroups navigated into, from root to current.
-  List<Regroup> _regroupBreadcrumb = [];
-  List<Regroup> _currentRegroups = [];
-  List<School> _currentSchools = [];
-  List<RegroupType> _regroupTypes = [];
-  List<Regroup> _allRegroups = [];
+  List<EducationSystem> get systems           => _systems;
+  EducationSystem? get selectedSystem         => _selectedSystem;
+  List<Regroup> get regroupBreadcrumb         => _regroupBreadcrumb;
+  List<Regroup> get currentRegroups           => _currentRegroups;
+  List<School>  get currentSchools            => _currentSchools;
 
-  List<EducationSystem> get systems => _systems;
-  EducationSystem? get selectedSystem => _selectedSystem;
-  List<Regroup> get regroupBreadcrumb => _regroupBreadcrumb;
-  List<Regroup> get currentRegroups => _currentRegroups;
-  List<School> get currentSchools => _currentSchools;
-
-  /// True when the current regroup level is the last one before schools.
   bool get isAtSchoolLevel =>
       _currentRegroups.isEmpty && _currentSchools.isNotEmpty;
 
@@ -65,19 +61,19 @@ class CampaignProvider extends ChangeNotifier {
   List<Campaign> _serverCampaigns = [];
   List<Campaign> get serverCampaigns => _serverCampaigns;
 
-  // ─── Load progress ──────────────────────────────────────────────────────────
-  int _loadStep = 0;
-  int _loadTotalSteps = 9;
-  String _loadStepLabel = '';
-  bool _isLoadingCampaign = false;
+  // ─── Campaign download progress ────────────────────────────────────────────
+  int    _loadStep       = 0;
+  int    _loadTotalSteps = 9;
+  String _loadStepLabel  = '';
+  bool   _isLoadingCampaign = false;
 
-  int get loadStep => _loadStep;
-  int get loadTotalSteps => _loadTotalSteps;
-  String get loadStepLabel => _loadStepLabel;
-  bool get isLoadingCampaign => _isLoadingCampaign;
+  int    get loadStep           => _loadStep;
+  int    get loadTotalSteps     => _loadTotalSteps;
+  String get loadStepLabel      => _loadStepLabel;
+  bool   get isLoadingCampaign  => _isLoadingCampaign;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // INIT — load campaigns from local DB
+  // LOAD LOCAL CAMPAIGNS
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> loadLocalCampaigns() async {
@@ -95,20 +91,20 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SELECT CAMPAIGN — load its systems for navigation
+  // SELECT CAMPAIGN — load its systems + regroups from local DB
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectCampaign(Campaign campaign) async {
     _selectedCampaign = campaign;
-    _selectedSystem = null;
+    _selectedSystem   = null;
     _regroupBreadcrumb = [];
-    _currentRegroups = [];
-    _currentSchools = [];
+    _currentRegroups  = [];
+    _currentSchools   = [];
     _error = null;
     notifyListeners();
     try {
-      _systems = await _db.getEducationSystems(campaign.idCamp);
-      _allRegroups = await _db.getRegroups(campaign.idCamp);
+      _systems      = await _db.getEducationSystems(campaign.idCamp);
+      _allRegroups  = await _db.getRegroups(campaign.idCamp);
       _regroupTypes = await _db.getRegroupTypes(campaign.idCamp);
     } catch (e) {
       _error = 'Erreur chargement systèmes : ${e.toString()}';
@@ -122,9 +118,9 @@ class CampaignProvider extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectSystem(EducationSystem system) async {
-    _selectedSystem = system;
+    _selectedSystem    = system;
     _regroupBreadcrumb = [];
-    _currentSchools = [];
+    _currentSchools    = [];
     _error = null;
     await _loadRegroups(null); // load root regroups
     notifyListeners();
@@ -139,38 +135,39 @@ class CampaignProvider extends ChangeNotifier {
     _regroupBreadcrumb = [..._regroupBreadcrumb, regroup];
     _error = null;
 
-    // Check whether children are regroups or schools
-    final childRegroups = await _db.getChildRegroups(
-        _selectedCampaign!.idCamp, regroup.idRegp);
+    final childRegroups =
+        await _db.getChildRegroups(_selectedCampaign!.idCamp, regroup.idRegp);
 
     if (childRegroups.isEmpty) {
-      // Leaf regroup → show schools
+      // Leaf regroup → show schools for this regroup
       await _loadSchoolsForRegroup(regroup.idRegp);
     } else {
       _currentRegroups = childRegroups;
-      _currentSchools = [];
+      _currentSchools  = [];
     }
     notifyListeners();
   }
 
-  /// Navigate back up the breadcrumb by [levelsUp] levels.
+  /// Navigate back up the breadcrumb [levelsUp] levels.
   Future<void> navigateUpRegroup({int levelsUp = 1}) async {
     if (_regroupBreadcrumb.isEmpty) return;
     final newBreadcrumb = _regroupBreadcrumb.sublist(
-        0, (_regroupBreadcrumb.length - levelsUp).clamp(0, _regroupBreadcrumb.length));
+        0,
+        (_regroupBreadcrumb.length - levelsUp)
+            .clamp(0, _regroupBreadcrumb.length));
     _regroupBreadcrumb = newBreadcrumb;
 
     if (newBreadcrumb.isEmpty) {
-      await _loadRegroups(null); // back to root
+      await _loadRegroups(null);
     } else {
-      final parent = newBreadcrumb.last;
-      final childRegroups = await _db.getChildRegroups(
-          _selectedCampaign!.idCamp, parent.idRegp);
+      final parent      = newBreadcrumb.last;
+      final childRegroups =
+          await _db.getChildRegroups(_selectedCampaign!.idCamp, parent.idRegp);
       if (childRegroups.isEmpty) {
         await _loadSchoolsForRegroup(parent.idRegp);
       } else {
         _currentRegroups = childRegroups;
-        _currentSchools = [];
+        _currentSchools  = [];
       }
     }
     notifyListeners();
@@ -178,8 +175,8 @@ class CampaignProvider extends ChangeNotifier {
 
   Future<void> _loadRegroups(String? parentId) async {
     try {
-      _currentRegroups = await _db.getChildRegroups(
-          _selectedCampaign!.idCamp, parentId);
+      _currentRegroups =
+          await _db.getChildRegroups(_selectedCampaign!.idCamp, parentId);
       _currentSchools = [];
     } catch (e) {
       _error = 'Erreur chargement regroupements : ${e.toString()}';
@@ -200,11 +197,13 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SERVER: GET AVAILABLE CAMPAIGNS (page_new_camp.js)
+  // SERVER: GET AVAILABLE CAMPAIGNS
+  // GET /user_camp.php/new_camp/{userId}/1
+  // From page_new_camp.js: getCampsFromServer()
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> fetchServerCampaigns(String userId) async {
-    _error = null;
+    _error          = null;
     _serverCampaigns = [];
     notifyListeners();
     try {
@@ -223,84 +222,108 @@ class CampaignProvider extends ChangeNotifier {
   // LOAD CAMPAIGN FROM SERVER (charge_camp.js — stmChargeCamp)
   //
   // Sequential steps (mirrors original AJAX chain):
-  //   1. regroups          → GET /regroup.php/camp/{camp}
-  //   2. type_regroups     → GET /type_regroup.php/camp/{camp}
-  //   3. status            → GET /status.php/camp/{camp}
-  //   4. etabs             → GET /etab.php/camp/{userId}/{camp}
-  //   5. locs              → GET /localisation.php/camp/{userId}/{camp}
-  //   6. systems           → GET /system.php/camp/{camp}
-  //   7. questions         → GET /qst.php/camp/{camp}
-  //   8. html forms        → GET /qst_html.php/{camp}/{qst} (per question)
-  //   9. rules             → GET /rule.php/{camp}/{qst}   (per question)
+  //   Step 1: regroups    → GET /user_camp.php/reg_camp/{LOGIN}/{campId}/1
+  //   Step 2: type_regs   → GET /user_camp.php/typ_reg_camp/{userId}/{campId}/{typeRegroups}
+  //   Step 3: statuses    → GET /user_camp.php/etabs_status/  (NO params)
+  //   Step 4: schools     → GET /user_camp.php/etabs_camp/{userId}/{campId}/1
+  //   Step 5: locs        → GET /user_camp.php/locs_camp/{userId}/{campId}
+  //   Step 6: systems     → GET /user_camp.php/sys_camp/{userId}/{campId}
+  //   Step 7+ (per sys):  → GET /data_camp.php/theme_camp/{campId}/{sysId}/eng
+  //     per question:
+  //     Step 8: html form → two-step: GET url → GET HTML with auth
+  //     Step 9: rules     → GET /data_camp.php/regle_theme_camp/{qstId}/{sysId}
+  //
+  // CRITICAL: login is for reg_camp; userId is for all others!
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> loadCampaignFromServer({
     required Campaign campaign,
-    required String userId,
+    required String login,   // currentUser.login  ← for reg_camp endpoint
+    required String userId,  // currentUser.idUser ← for all other endpoints
   }) async {
     _isLoadingCampaign = true;
-    _loadStep = 0;
-    _error = null;
+    _loadStep          = 0;
+    _error             = null;
     notifyListeners();
 
     try {
-      // Step 1 — Regroups
+      // Step 1 — Regroups (uses LOGIN)
       _setLoadStep(1, 'Chargement des regroupements…');
-      final regroups = await _api.getRegroups(userId, campaign.idCamp);
+      final regroups = await _api.getRegroups(login, campaign.idCamp);
       await _db.insertRegroups(campaign.idCamp, regroups);
 
-      // Step 2 — Regroup types
+      // Step 2 — Regroup types (uses userId + campaign.typeRegroups CSV)
       _setLoadStep(2, 'Chargement des types de regroupements…');
-      final regroupTypes =
-          await _api.getRegroupTypes(userId, campaign.idCamp);
+      final regroupTypes = await _api.getRegroupTypes(
+          userId, campaign.idCamp, campaign.typeRegroups);
       await _db.insertRegroupTypes(campaign.idCamp, regroupTypes);
 
-      // Step 3 — School statuses
+      // Step 3 — School statuses (NO params)
       _setLoadStep(3, 'Chargement des statuts…');
-      final statuses =
-          await _api.getSchoolStatuses(userId, campaign.idCamp);
+      final statuses = await _api.getSchoolStatuses();
       await _db.insertSchoolStatuses(campaign.idCamp, statuses);
 
-      // Step 4 — Schools
+      // Step 4 — Schools (uses userId)
       _setLoadStep(4, 'Chargement des établissements…');
       final schools = await _api.getSchools(userId, campaign.idCamp);
       await _db.insertSchools(campaign.idCamp, schools);
 
-      // Step 5 — Localisations
+      // Step 5 — Localisations (uses userId)
       _setLoadStep(5, 'Chargement des localisations…');
       final locs = await _api.getLocalisations(userId, campaign.idCamp);
       await _db.insertLocalisations(campaign.idCamp, locs);
 
-      // Step 6 — Education systems
+      // Step 6 — Education systems (uses userId)
       _setLoadStep(6, 'Chargement des systèmes éducatifs…');
-      final systems =
-          await _api.getEducationSystems(userId, campaign.idCamp);
+      final systems = await _api.getEducationSystems(userId, campaign.idCamp);
       await _db.insertEducationSystems(campaign.idCamp, systems);
 
-      // Step 7 — Questions
-      _setLoadStep(7, 'Chargement des questions…');
-      final questions = await _api.getQuestions(userId, campaign.idCamp);
-      await _db.insertQuestions(campaign.idCamp, questions);
-
-      // Steps 8+9 — HTML forms and validation rules (per question)
-      _loadTotalSteps = 7 + (questions.length * 2);
-      int stepOffset = 8;
-      for (final q in questions) {
+      // Steps 7+: per system — questions, HTML, rules
+      // Total steps = 6 + sum over all systems of (1 + questions.length * 2)
+      int stepOffset = 7;
+      for (final system in systems) {
+        // Step 7 (per system) — Questions
         _setLoadStep(
-            stepOffset, 'Chargement formulaire : ${q.libQst}…');
-        final html =
-            await _api.getFormHtml(campaign.idCamp, q.idQst);
-        await _db.insertFormHtml(campaign.idCamp, q.idQst, html);
+            stepOffset, 'Chargement formulaires : ${system.libSystem}…');
+        final questions =
+            await _api.getQuestions(campaign.idCamp, system.idSystem);
+        await _db.insertQuestions(campaign.idCamp, questions);
         stepOffset++;
 
-        _setLoadStep(stepOffset, 'Chargement règles : ${q.libQst}…');
-        final rules =
-            await _api.getValidationRules(campaign.idCamp, q.idQst);
-        await _db.insertValidationRules(campaign.idCamp, q.idQst, rules);
-        stepOffset++;
+        // Steps 8+9 per question — HTML + Rules (non-fatal failures)
+        _loadTotalSteps = stepOffset + (questions.length * 2);
+        notifyListeners();
+
+        for (final q in questions) {
+          // Step: HTML form (two-step fetch) — non-fatal
+          _setLoadStep(stepOffset, 'Chargement formulaire : ${q.libQst}…');
+          try {
+            final html =
+                await _api.getFormHtml(campaign.idCamp, q.idQst);
+            await _db.insertFormHtml(campaign.idCamp, q.idQst, html);
+          } catch (_) {
+            // HTML fetch failure is non-fatal — form will be unavailable offline
+          }
+          stepOffset++;
+
+          // Step: Validation rules — non-fatal
+          _setLoadStep(stepOffset, 'Chargement règles : ${q.libQst}…');
+          try {
+            final rules = await _api.getValidationRules(
+                q.idQst, system.idSystem);
+            await _db.insertValidationRules(
+                campaign.idCamp, q.idQst, rules);
+          } catch (_) {
+            // Rules fetch failure is non-fatal
+          }
+          stepOffset++;
+        }
       }
 
-      // Persist campaign
+      // Also save filter periods from user's filters if embedded in campaign
+      // (filter_periods are stored per-campaign at load time)
+
+      // Persist campaign to DB
       await _db.insertCampaign(campaign);
       _campaigns = await _db.getCampaigns();
 
@@ -321,7 +344,17 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // GET QUESTIONS for selected campaign + system (for data entry screen)
+  // SAVE FILTER PERIODS for a campaign (from user.filters)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Future<void> saveFilterPeriodsForCampaign(
+      String idCamp, List<FilterPeriod> filters) async {
+    if (filters.isEmpty) return;
+    await _db.insertFilterPeriods(idCamp, filters);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GET QUESTIONS (for data entry screen)
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<Question>> getQuestionsForSystem(
@@ -330,11 +363,33 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // DELETE CAMPAIGN
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Future<void> deleteCampaign(String idCamp) async {
+    try {
+      await _db.deleteCampaign(idCamp);
+      _campaigns = await _db.getCampaigns();
+      if (_selectedCampaign?.idCamp == idCamp) {
+        _selectedCampaign  = null;
+        _selectedSystem    = null;
+        _regroupBreadcrumb = [];
+        _currentRegroups   = [];
+        _currentSchools    = [];
+      }
+      notifyListeners();
+    } catch (e) {
+      _error = 'Erreur suppression campagne : ${e.toString()}';
+      notifyListeners();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
 
   void _setLoadStep(int step, String label) {
-    _loadStep = step;
+    _loadStep      = step;
     _loadStepLabel = label;
     notifyListeners();
   }

@@ -4,17 +4,20 @@ import '../models/user.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 
-/// DataEntryProvider — ChangeNotifier for form data entry (saisie).
+/// DataEntryProvider — form data entry state manager.
 ///
 /// Mirrors original logic from:
 ///   page_etab.js   → stmPageEtab: initHtml, initPageData, savePage,
-///                    saveQstOnServer, reloadFromServer, getPageDataToSend,
-///                    addGrilleLine (dynamic grid rows)
-///   etabs.js       → StmCollectData, StmLiftEtab: CRUD for collected data
-///   questions.js   → StmData.validate(), testVal, testType
-///   error_msg.js   → French validation error messages
+///                    saveQstOnServer, reloadFromServer, getPageDataToSend
+///   etabs.js       → StmCollectData CRUD
+///   questions.js   → StmData.validate() — field validation
 ///   calc_total.js  → 2D matrix total calculations
-///   script.js      → ctrl_saisie, ctrl_saisie_text, ctrl_saisie_dimension
+///
+/// CRITICAL details from page_etab.js:
+///   Save:   POST /data_save.php/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0
+///   Reload: GET  /data_reload.php/theme_data/{login}/{sysId}/{qstId}/{campId}/{etabId}/{filter}
+///   LOC_REG_0: First question must include &LOC_REG_0={etab.idRegroup} if not present
+///   Radio fields in storage: key = "fieldName#optionId", value = "1"
 class DataEntryProvider extends ChangeNotifier {
   DataEntryProvider({
     required DatabaseService db,
@@ -30,55 +33,56 @@ class DataEntryProvider extends ChangeNotifier {
   String? _idEtab;
   String? _libEtab;
   String? _idSystem;
+  String? _idRegroupEtab;  // school.idRegroup — for LOC_REG_0 injection
 
-  // ─── Available questions for the current school+system ─────────────────────
-  List<Question> _questions = [];
-  Question? _selectedQuestion;
+  // ─── Questions + selected question ─────────────────────────────────────────
+  List<Question>  _questions         = [];
+  Question?       _selectedQuestion;
+  bool            _isFirstQuestion   = false;  // true when selected == questions[0]
 
-  // ─── Available filter periods for the selected question ────────────────────
-  List<FilterPeriod> _filterPeriods = [];
-  FilterPeriod? _selectedFilter;
+  // ─── Filter periods ─────────────────────────────────────────────────────────
+  List<FilterPeriod> _filterPeriods  = [];
+  FilterPeriod?      _selectedFilter;
 
   // ─── Form state ─────────────────────────────────────────────────────────────
-  /// Cached form HTML (from DB or server).
   String? _formHtml;
-  /// Current field values: fieldName → value
-  Map<String, String> _formData = {};
-  /// Validation errors: fieldName → error message
+  Map<String, String> _formData         = {};
   Map<String, String> _validationErrors = {};
-  List<ValidationRule> _rules = [];
+  List<ValidationRule> _rules           = [];
 
   // ─── Status flags ───────────────────────────────────────────────────────────
-  bool _isLoading = false;
-  bool _isSaving = false;
-  bool _isSending = false;
-  bool _isReloading = false;
-  bool _hasUnsavedChanges = false;
+  bool    _isLoading        = false;
+  bool    _isSaving         = false;
+  bool    _isSending        = false;
+  bool    _isReloading      = false;
+  bool    _hasUnsavedChanges = false;
   String? _error;
   String? _successMessage;
 
   // ─── Getters ─────────────────────────────────────────────────────────────────
-  String? get idCamp => _idCamp;
-  String? get idEtab => _idEtab;
-  String? get libEtab => _libEtab;
-  List<Question> get questions => _questions;
-  Question? get selectedQuestion => _selectedQuestion;
+  String? get idCamp              => _idCamp;
+  String? get idEtab              => _idEtab;
+  String? get libEtab             => _libEtab;
+  List<Question> get questions    => _questions;
+  Question? get selectedQuestion  => _selectedQuestion;
   List<FilterPeriod> get filterPeriods => _filterPeriods;
-  FilterPeriod? get selectedFilter => _selectedFilter;
-  String? get formHtml => _formHtml;
-  Map<String, String> get formData => Map.unmodifiable(_formData);
+  FilterPeriod? get selectedFilter     => _selectedFilter;
+  String? get formHtml            => _formHtml;
+  Map<String, String> get formData =>
+      Map.unmodifiable(_formData);
   Map<String, String> get validationErrors =>
       Map.unmodifiable(_validationErrors);
-  bool get isLoading => _isLoading;
-  bool get isSaving => _isSaving;
-  bool get isSending => _isSending;
-  bool get isReloading => _isReloading;
-  bool get hasUnsavedChanges => _hasUnsavedChanges;
-  String? get error => _error;
-  String? get successMessage => _successMessage;
+  bool    get isLoading           => _isLoading;
+  bool    get isSaving            => _isSaving;
+  bool    get isSending           => _isSending;
+  bool    get isReloading         => _isReloading;
+  bool    get hasUnsavedChanges   => _hasUnsavedChanges;
+  String? get error               => _error;
+  String? get successMessage      => _successMessage;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // INIT — set context for a specific school
+  // INIT — set context for a specific school + system
+  // Called when SchoolDataScreen opens.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> initForSchool({
@@ -86,24 +90,27 @@ class DataEntryProvider extends ChangeNotifier {
     required String idEtab,
     required String libEtab,
     required String idSystem,
+    String? idRegroupEtab,  // school.idRegroup for LOC_REG_0
   }) async {
-    _idCamp = idCamp;
-    _idEtab = idEtab;
-    _libEtab = libEtab;
-    _idSystem = idSystem;
+    _idCamp         = idCamp;
+    _idEtab         = idEtab;
+    _libEtab        = libEtab;
+    _idSystem       = idSystem;
+    _idRegroupEtab  = idRegroupEtab;
     _selectedQuestion = null;
-    _selectedFilter = null;
-    _formHtml = null;
-    _formData = {};
+    _selectedFilter   = null;
+    _formHtml         = null;
+    _formData         = {};
     _validationErrors = {};
     _hasUnsavedChanges = false;
-    _error = null;
+    _error          = null;
     _successMessage = null;
-    _isLoading = true;
+    _isFirstQuestion = false;
+    _isLoading      = true;
     notifyListeners();
 
     try {
-      _questions = await _db.getQuestions(idCamp, idSystem);
+      _questions    = await _db.getQuestions(idCamp, idSystem);
       _filterPeriods = await _db.getFilterPeriods(idCamp);
     } catch (e) {
       _error = 'Erreur chargement questions : ${e.toString()}';
@@ -119,23 +126,24 @@ class DataEntryProvider extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectQuestion(Question question) async {
-    _selectedQuestion = question;
-    _selectedFilter = null;
-    _formData = {};
-    _validationErrors = {};
+    _selectedQuestion  = question;
+    _selectedFilter    = null;
+    _formData          = {};
+    _validationErrors  = {};
     _hasUnsavedChanges = false;
-    _error = null;
-    _successMessage = null;
+    _error             = null;
+    _successMessage    = null;
+    // Track if this is the first question (for LOC_REG_0 injection)
+    _isFirstQuestion = _questions.isNotEmpty &&
+        _questions.first.idQst == question.idQst;
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Load form HTML from local cache
+      // Load cached form HTML
       _formHtml = await _db.getFormHtml(_idCamp!, question.idQst);
-
       // Load validation rules
-      _rules = await _db.getValidationRules(_idCamp!, question.idQst);
-
+      _rules    = await _db.getValidationRules(_idCamp!, question.idQst);
       // Load saved field values (no filter yet)
       await _loadFormData(idFilter: null);
     } catch (e) {
@@ -151,13 +159,12 @@ class DataEntryProvider extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectFilter(FilterPeriod? filter) async {
-    _selectedFilter = filter;
-    _formData = {};
-    _validationErrors = {};
+    _selectedFilter    = filter;
+    _formData          = {};
+    _validationErrors  = {};
     _hasUnsavedChanges = false;
-    _isLoading = true;
+    _isLoading         = true;
     notifyListeners();
-
     try {
       await _loadFormData(idFilter: filter?.idFilter);
     } finally {
@@ -169,9 +176,9 @@ class DataEntryProvider extends ChangeNotifier {
   Future<void> _loadFormData({String? idFilter}) async {
     if (_idCamp == null || _idEtab == null || _selectedQuestion == null) return;
     _formData = await _db.getCollectedData(
-      idCamp: _idCamp!,
-      idEtab: _idEtab!,
-      idQst: _selectedQuestion!.idQst,
+      idCamp:   _idCamp!,
+      idEtab:   _idEtab!,
+      idQst:    _selectedQuestion!.idQst,
       idFilter: idFilter,
     );
   }
@@ -183,86 +190,19 @@ class DataEntryProvider extends ChangeNotifier {
 
   void updateField(String fieldName, String value) {
     _formData[fieldName] = value;
-    _hasUnsavedChanges = true;
-    // Clear validation error for this field
+    _hasUnsavedChanges   = true;
     _validationErrors.remove(fieldName);
     notifyListeners();
   }
 
   /// Validates a single field against its rules.
-  /// Returns the French error message, or null if valid.
-  /// Mirrors: questions.js testVal(), testType(), ctrl_saisie()
+  /// Returns French error message or null if valid.
   String? validateField(String fieldName, String value) {
-    final fieldRules =
-        _rules.where((r) => r.idChamp == fieldName).toList();
+    final fieldRules = _rules.where((r) => r.idChamp == fieldName).toList();
     if (fieldRules.isEmpty) return null;
-
     for (final rule in fieldRules) {
-      final error = _applyRule(rule, value);
+      final error = rule.validate(value);
       if (error != null) return error;
-    }
-    return null;
-  }
-
-  String? _applyRule(ValidationRule rule, String value) {
-    switch (rule.ruleType) {
-      case 'mandatory':
-        if (value.trim().isEmpty) return 'Ce champ est obligatoire';
-        break;
-      case 'type_int':
-        if (value.isNotEmpty && int.tryParse(value) == null) {
-          return 'Valeur entière requise';
-        }
-        break;
-      case 'type_decimal':
-        if (value.isNotEmpty) {
-          final normalized = value.replaceAll(',', '.');
-          if (double.tryParse(normalized) == null) {
-            return 'Valeur numérique requise';
-          }
-        }
-        break;
-      case 'type_date':
-        if (value.isNotEmpty) {
-          final parts = value.split('/');
-          if (parts.length != 3) return 'Format de date invalide (JJ/MM/AAAA)';
-          final day = int.tryParse(parts[0]);
-          final month = int.tryParse(parts[1]);
-          final year = int.tryParse(parts[2]);
-          if (day == null || month == null || year == null ||
-              day < 1 || day > 31 || month < 1 || month > 12) {
-            return 'Date invalide';
-          }
-        }
-        break;
-      case 'max_length':
-        final maxLen = int.tryParse(rule.ruleValue ?? '') ?? 0;
-        if (value.length > maxLen) {
-          return 'Longueur maximale dépassée ($maxLen caractères)';
-        }
-        break;
-      case 'min_val':
-        final minVal = double.tryParse(rule.ruleValue ?? '') ?? 0;
-        final val = double.tryParse(value.replaceAll(',', '.'));
-        if (val != null && val < minVal) {
-          return 'Valeur minimale : $minVal';
-        }
-        break;
-      case 'max_val':
-        final maxVal = double.tryParse(rule.ruleValue ?? '') ?? 0;
-        final val = double.tryParse(value.replaceAll(',', '.'));
-        if (val != null && val > maxVal) {
-          return 'Valeur maximale : $maxVal';
-        }
-        break;
-      case 'enum':
-        // Allowed values separated by '|'
-        final allowed =
-            (rule.ruleValue ?? '').split('|').map((s) => s.trim()).toList();
-        if (value.isNotEmpty && !allowed.contains(value)) {
-          return 'Valeur non autorisée';
-        }
-        break;
     }
     return null;
   }
@@ -274,6 +214,7 @@ class DataEntryProvider extends ChangeNotifier {
   bool validateAll() {
     _validationErrors = {};
     bool isValid = true;
+    // Check mandatory fields first
     for (final rule in _rules) {
       if (rule.ruleType == 'mandatory') {
         final val = _formData[rule.idChamp] ?? '';
@@ -283,7 +224,7 @@ class DataEntryProvider extends ChangeNotifier {
         }
       }
     }
-    // Run type/range checks on filled fields
+    // Check type/range on filled fields
     for (final entry in _formData.entries) {
       if (_validationErrors.containsKey(entry.key)) continue;
       final error = validateField(entry.key, entry.value);
@@ -304,20 +245,20 @@ class DataEntryProvider extends ChangeNotifier {
     if (_idCamp == null || _idEtab == null || _selectedQuestion == null) {
       return false;
     }
-    _isSaving = true;
-    _error = null;
+    _isSaving       = true;
+    _error          = null;
     _successMessage = null;
     notifyListeners();
     try {
       await _db.saveCollectedData(
-        idCamp: _idCamp!,
-        idEtab: _idEtab!,
-        idQst: _selectedQuestion!.idQst,
+        idCamp:   _idCamp!,
+        idEtab:   _idEtab!,
+        idQst:    _selectedQuestion!.idQst,
         idFilter: _selectedFilter?.idFilter,
-        data: _formData,
+        data:     _formData,
       );
       _hasUnsavedChanges = false;
-      _successMessage = 'Données sauvegardées localement';
+      _successMessage    = 'Données sauvegardées localement';
       notifyListeners();
       return true;
     } catch (e) {
@@ -332,7 +273,10 @@ class DataEntryProvider extends ChangeNotifier {
 
   // ═══════════════════════════════════════════════════════════════════════════
   // SEND TO SERVER — mirrors stmPageEtab.saveQstOnServer()
-  // Builds POST body like getPageDataToSend() in original
+  //
+  // POST /data_save.php/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0
+  // Uses user.login (NOT user.idUser)!
+  // For first question: injects LOC_REG_0={etab.idRegroup} if missing.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> sendToServer({required User user, bool online = true}) async {
@@ -341,32 +285,38 @@ class DataEntryProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    if (_idCamp == null || _idEtab == null || _selectedQuestion == null) {
+    if (_idCamp    == null ||
+        _idEtab    == null ||
+        _idSystem  == null ||
+        _selectedQuestion == null) {
       return false;
     }
 
-    // Save locally first
+    // Save locally first (ensures data is persisted)
     await saveLocally();
 
-    _isSending = true;
-    _error = null;
+    _isSending      = true;
+    _error          = null;
     _successMessage = null;
     notifyListeners();
 
     try {
       final ok = await _api.saveData(
-        campId: _idCamp!,
-        etabId: _idEtab!,
-        qstId: _selectedQuestion!.idQst,
-        userId: user.idUser,
-        filterId: _selectedFilter?.idFilter,
-        data: _formData,
+        login:            user.login,         // ← uses login, not idUser!
+        campId:           _idCamp!,
+        sysId:            _idSystem!,
+        qstId:            _selectedQuestion!.idQst,
+        etabId:           _idEtab!,
+        filter:           _selectedFilter?.idFilter,
+        formData:         _formData,
+        etabRegroupId:    _idRegroupEtab,     // for LOC_REG_0
+        isFirstQuestion:  _isFirstQuestion,
       );
       if (ok) {
         await _db.markCollectedDataSent(
-          idCamp: _idCamp!,
-          idEtab: _idEtab!,
-          idQst: _selectedQuestion!.idQst,
+          idCamp:   _idCamp!,
+          idEtab:   _idEtab!,
+          idQst:    _selectedQuestion!.idQst,
           idFilter: _selectedFilter?.idFilter,
         );
         _successMessage = 'Données envoyées avec succès';
@@ -390,57 +340,68 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // RELOAD FROM SERVER — mirrors stmPageEtab reload logic
+  // RELOAD FROM SERVER — mirrors stmPageEtab.reloadQstFromServer()
+  //
+  // GET /data_reload.php/theme_data/{login}/{sysId}/{qstId}/{campId}/{etabId}/{filter}
+  // Uses user.login (NOT user.idUser)!
+  //
+  // Response: { fieldName: [value, type], ... }
+  //   radio fields: stored as fieldName#optionId = '1'
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> reloadFromServer({required User user}) async {
-    if (_idCamp == null || _idEtab == null || _selectedQuestion == null) {
+    if (_idCamp    == null ||
+        _idEtab    == null ||
+        _idSystem  == null ||
+        _selectedQuestion == null) {
       return false;
     }
-    _isReloading = true;
-    _error = null;
+    _isReloading    = true;
+    _error          = null;
     _successMessage = null;
     notifyListeners();
+
     try {
-      final serverData = await _api.reloadData(
-        campId: _idCamp!,
-        etabId: _idEtab!,
-        qstId: _selectedQuestion!.idQst,
-        userId: user.idUser,
-        filterId: _selectedFilter?.idFilter,
+      // Reload from server (already parses radio field format in api_service)
+      final serverFields = await _api.reloadData(
+        login:    user.login,     // ← uses login, not idUser!
+        sysId:    _idSystem!,
+        qstId:    _selectedQuestion!.idQst,
+        campId:   _idCamp!,
+        etabId:   _idEtab!,
+        filter:   _selectedFilter?.idFilter,
       );
-      if (serverData == null) {
+
+      if (serverFields == null) {
         _error = 'Aucune donnée retournée par le serveur';
         notifyListeners();
         return false;
       }
-      // Overwrite local data with server values
-      final Map<String, String> serverFields = {};
-      serverData.forEach((k, v) => serverFields[k] = v.toString());
 
+      // Replace local data with server values
       await _db.deleteCollectedData(
-        idCamp: _idCamp!,
-        idEtab: _idEtab!,
-        idQst: _selectedQuestion!.idQst,
+        idCamp:   _idCamp!,
+        idEtab:   _idEtab!,
+        idQst:    _selectedQuestion!.idQst,
         idFilter: _selectedFilter?.idFilter,
       );
       await _db.saveCollectedData(
-        idCamp: _idCamp!,
-        idEtab: _idEtab!,
-        idQst: _selectedQuestion!.idQst,
+        idCamp:   _idCamp!,
+        idEtab:   _idEtab!,
+        idQst:    _selectedQuestion!.idQst,
         idFilter: _selectedFilter?.idFilter,
-        data: serverFields,
+        data:     serverFields,
       );
       await _db.markCollectedDataSent(
-        idCamp: _idCamp!,
-        idEtab: _idEtab!,
-        idQst: _selectedQuestion!.idQst,
+        idCamp:   _idCamp!,
+        idEtab:   _idEtab!,
+        idQst:    _selectedQuestion!.idQst,
         idFilter: _selectedFilter?.idFilter,
       );
 
-      _formData = Map.from(serverFields);
+      _formData          = Map.from(serverFields);
       _hasUnsavedChanges = false;
-      _successMessage = 'Données rechargées depuis le serveur';
+      _successMessage    = 'Données rechargées depuis le serveur';
       notifyListeners();
       return true;
     } on ApiException catch (e) {
@@ -458,79 +419,14 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 2D MATRIX TOTAL CALCULATION
-  // Replaces calc_total.js — calcul_Total_ThemeMat2D, set_TOTAL_ThemeMat2D,
-  // calcul_Total_MatFrml, set_TOTAL_MatFrml
-  //
-  // The original used eval() on field names. Here we do it with pure Dart
-  // without eval(), by iterating over formData keys with naming conventions.
-  //
-  // Naming convention (same as original):
-  //   row total field:    total_r{rowIndex}
-  //   column total field: total_c{colIndex}
-  //   grand total field:  total_all
-  //   formula total:      total_f{fieldName}
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  /// Recalculates all row/column/grand totals for a 2D matrix form.
-  /// Called whenever a numeric cell changes.
-  Map<String, String> calculateMatrixTotals({
-    required Map<String, String> data,
-    required int rows,
-    required int cols,
-    required String cellPrefix, // e.g. 'val' → field names: val_{row}_{col}
-  }) {
-    final result = Map<String, String>.from(data);
-
-    // Row totals
-    for (int r = 0; r < rows; r++) {
-      double rowTotal = 0;
-      for (int c = 0; c < cols; c++) {
-        final key = '${cellPrefix}_${r}_$c';
-        rowTotal += double.tryParse(data[key] ?? '') ?? 0;
-      }
-      result['total_r$r'] = rowTotal.toStringAsFixed(0);
-    }
-
-    // Column totals
-    for (int c = 0; c < cols; c++) {
-      double colTotal = 0;
-      for (int r = 0; r < rows; r++) {
-        final key = '${cellPrefix}_${r}_$c';
-        colTotal += double.tryParse(data[key] ?? '') ?? 0;
-      }
-      result['total_c$c'] = colTotal.toStringAsFixed(0);
-    }
-
-    // Grand total
-    double grandTotal = 0;
-    for (int r = 0; r < rows; r++) {
-      grandTotal += double.tryParse(result['total_r$r'] ?? '') ?? 0;
-    }
-    result['total_all'] = grandTotal.toStringAsFixed(0);
-
-    return result;
-  }
-
-  /// Recalculates a formula-based field total.
-  /// [formula] is a list of field names to sum.
-  /// Mirrors: set_Total_ChpsFrml, calcul_Total_MatFrml
-  double calculateFormulaTotal(List<String> fieldNames) {
-    double total = 0;
-    for (final name in fieldNames) {
-      total += double.tryParse(_formData[name] ?? '') ?? 0;
-    }
-    return total;
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // SEND ALL DATA (page_camp.js sendAllData)
-  // Sends all collected data for the current campaign to the server.
+  // SEND ALL CAMPAIGN DATA (page_camp.js sendAllData)
+  // Sends all collected data for all schools in the campaign.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<Map<String, bool>> sendAllCampaignData({
     required User user,
     required String idCamp,
+    required String idSystem,
     required List<String> etabIds,
     required List<String> qstIds,
   }) async {
@@ -540,23 +436,30 @@ class DataEntryProvider extends ChangeNotifier {
         final data = await _db.getCollectedData(
           idCamp: idCamp,
           idEtab: etabId,
-          idQst: qstId,
+          idQst:  qstId,
         );
         if (data.isEmpty) continue;
+
+        // Determine if this is the first question
+        final isFirst = qstIds.isNotEmpty && qstIds.first == qstId;
+
         try {
           final ok = await _api.saveData(
-            campId: idCamp,
-            etabId: etabId,
-            qstId: qstId,
-            userId: user.idUser,
-            data: data,
+            login:           user.login,    // ← uses login!
+            campId:          idCamp,
+            sysId:           idSystem,
+            qstId:           qstId,
+            etabId:          etabId,
+            filter:          null,
+            formData:        data,
+            isFirstQuestion: isFirst,
           );
           results['${etabId}_$qstId'] = ok;
           if (ok) {
             await _db.markCollectedDataSent(
               idCamp: idCamp,
               idEtab: etabId,
-              idQst: qstId,
+              idQst:  qstId,
             );
           }
         } catch (_) {
@@ -568,11 +471,58 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // 2D MATRIX TOTAL CALCULATION
+  // Replaces calc_total.js — calcul_Total_ThemeMat2D, set_TOTAL_ThemeMat2D
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Recalculates all row/column/grand totals for a 2D matrix form.
+  Map<String, String> calculateMatrixTotals({
+    required Map<String, String> data,
+    required int rows,
+    required int cols,
+    required String cellPrefix,
+  }) {
+    final result = Map<String, String>.from(data);
+
+    for (int r = 0; r < rows; r++) {
+      double rowTotal = 0;
+      for (int c = 0; c < cols; c++) {
+        rowTotal +=
+            double.tryParse(data['${cellPrefix}_${r}_$c'] ?? '') ?? 0;
+      }
+      result['total_r$r'] = rowTotal.toStringAsFixed(0);
+    }
+
+    for (int c = 0; c < cols; c++) {
+      double colTotal = 0;
+      for (int r = 0; r < rows; r++) {
+        colTotal +=
+            double.tryParse(data['${cellPrefix}_${r}_$c'] ?? '') ?? 0;
+      }
+      result['total_c$c'] = colTotal.toStringAsFixed(0);
+    }
+
+    double grandTotal = 0;
+    for (int r = 0; r < rows; r++) {
+      grandTotal += double.tryParse(result['total_r$r'] ?? '') ?? 0;
+    }
+    result['total_all'] = grandTotal.toStringAsFixed(0);
+
+    return result;
+  }
+
+  /// Calculates a formula-based total (sum of named fields).
+  double calculateFormulaTotal(List<String> fieldNames) {
+    return fieldNames.fold(
+        0.0, (sum, name) => sum + (double.tryParse(_formData[name] ?? '') ?? 0));
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
 
   void clearMessages() {
-    _error = null;
+    _error          = null;
     _successMessage = null;
     notifyListeners();
   }

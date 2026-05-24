@@ -43,7 +43,7 @@ class DatabaseService {
       path,
       version: 1,
       onCreate: _onCreate,
-      onForeignKeys: (db) async {
+      onOpen: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
     );
@@ -63,14 +63,15 @@ class DatabaseService {
     // ─── Campaigns (stm_Campagnes) ─────────────────────────────────────────
     await db.execute('''
       CREATE TABLE campaigns (
-        id_camp     TEXT PRIMARY KEY,
-        lib_camp    TEXT NOT NULL,
-        date_debut  TEXT,
-        date_fin    TEXT,
-        id_year     TEXT,
-        lib_year    TEXT,
-        years_json  TEXT,
-        synced      INTEGER NOT NULL DEFAULT 0
+        id_camp         TEXT PRIMARY KEY,
+        lib_camp        TEXT NOT NULL,
+        date_debut      TEXT,
+        date_fin        TEXT,
+        statut          INTEGER NOT NULL DEFAULT 0,
+        type_regroups   TEXT NOT NULL DEFAULT '',
+        id_year         TEXT,
+        lib_year        TEXT,
+        synced          INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -126,7 +127,9 @@ class DatabaseService {
         id_camp     TEXT NOT NULL,
         id_etab     TEXT NOT NULL,
         lib_etab    TEXT NOT NULL,
+        code_etab   TEXT,
         id_status   TEXT,
+        id_regroup  TEXT,
         PRIMARY KEY (id_camp, id_etab)
       )
     ''');
@@ -260,12 +263,14 @@ class DatabaseService {
     final db = await database;
     final rows = await db.query('campaigns', orderBy: 'lib_camp ASC');
     return rows.map((r) => Campaign(
-      idCamp: r['id_camp'] as String,
-      libCamp: r['lib_camp'] as String,
-      dateDebut: r['date_debut'] as String?,
-      dateFin: r['date_fin'] as String?,
-      idYear: r['id_year'] as String?,
-      libYear: r['lib_year'] as String?,
+      idCamp:       r['id_camp']       as String,
+      libCamp:      r['lib_camp']      as String,
+      dateDebut:    r['date_debut']    as String?,
+      dateFin:      r['date_fin']      as String?,
+      statut:       (r['statut'] as int?) ?? 0,
+      typeRegroups: (r['type_regroups'] as String?) ?? '',
+      idYear:       r['id_year']       as String?,
+      libYear:      r['lib_year']      as String?,
     )).toList();
   }
 
@@ -279,12 +284,14 @@ class DatabaseService {
     if (rows.isEmpty) return null;
     final r = rows.first;
     return Campaign(
-      idCamp: r['id_camp'] as String,
-      libCamp: r['lib_camp'] as String,
-      dateDebut: r['date_debut'] as String?,
-      dateFin: r['date_fin'] as String?,
-      idYear: r['id_year'] as String?,
-      libYear: r['lib_year'] as String?,
+      idCamp:       r['id_camp']       as String,
+      libCamp:      r['lib_camp']      as String,
+      dateDebut:    r['date_debut']    as String?,
+      dateFin:      r['date_fin']      as String?,
+      statut:       (r['statut'] as int?) ?? 0,
+      typeRegroups: (r['type_regroups'] as String?) ?? '',
+      idYear:       r['id_year']       as String?,
+      libYear:      r['lib_year']      as String?,
     );
   }
 
@@ -293,12 +300,14 @@ class DatabaseService {
     await db.insert(
       'campaigns',
       {
-        'id_camp': c.idCamp,
-        'lib_camp': c.libCamp,
-        'date_debut': c.dateDebut,
-        'date_fin': c.dateFin,
-        'id_year': c.idYear,
-        'lib_year': c.libYear,
+        'id_camp':       c.idCamp,
+        'lib_camp':      c.libCamp,
+        'date_debut':    c.dateDebut,
+        'date_fin':      c.dateFin,
+        'statut':        c.statut,
+        'type_regroups': c.typeRegroups,
+        'id_year':       c.idYear,
+        'lib_year':      c.libYear,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -504,9 +513,11 @@ class DatabaseService {
       orderBy: 'lib_etab ASC',
     );
     return rows.map((r) => School(
-      idEtab: r['id_etab'] as String,
-      libEtab: r['lib_etab'] as String,
-      idStatus: r['id_status'] as String?,
+      idEtab:    r['id_etab']    as String,
+      libEtab:   r['lib_etab']   as String,
+      codeEtab:  r['code_etab']  as String?,
+      idStatus:  r['id_status']  as String?,
+      idRegroup: r['id_regroup'] as String?,
     )).toList();
   }
 
@@ -536,9 +547,11 @@ class DatabaseService {
       orderBy: 'lib_etab ASC',
     );
     return rows.map((r) => School(
-      idEtab: r['id_etab'] as String,
-      libEtab: r['lib_etab'] as String,
-      idStatus: r['id_status'] as String?,
+      idEtab:    r['id_etab']    as String,
+      libEtab:   r['lib_etab']   as String,
+      codeEtab:  r['code_etab']  as String?,
+      idStatus:  r['id_status']  as String?,
+      idRegroup: r['id_regroup'] as String?,
     )).toList();
   }
 
@@ -549,10 +562,12 @@ class DatabaseService {
       batch.insert(
         'schools',
         {
-          'id_camp': idCamp,
-          'id_etab': s.idEtab,
-          'lib_etab': s.libEtab,
-          'id_status': s.idStatus,
+          'id_camp':    idCamp,
+          'id_etab':    s.idEtab,
+          'lib_etab':   s.libEtab,
+          'code_etab':  s.codeEtab,
+          'id_status':  s.idStatus,
+          'id_regroup': s.idRegroup,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -716,7 +731,7 @@ class DatabaseService {
       whereArgs: [idCamp],
     );
     return rows.map((r) => FilterPeriod(
-      idFilter: r['id_filter'] as String,
+      idFilter:  r['id_filter']  as String,
       libFilter: r['lib_filter'] as String,
     )).toList();
   }

@@ -1,188 +1,188 @@
-// Question (Form/Theme) and validation rule models
+/// Question (Formulaire/Thème) model — unified field names matching:
+///   - JS source:  StmQst(id, title, idcamp, idsys, filter)
+///   - DB schema:  questions (id_camp, id_qst, lib_qst, id_system, has_filter)
+///   - Server JSON from /data_camp.php/theme_camp/{campId}/{sysId}/eng:
+///       { id, title, idcamp, idsys, filter }  — filter: 1 = filtered by period
+///
+/// From charge_camp.js addQsts():
+///   window.localStorage.setItem('stm_ChargedQst_'+id_camp+'_'+id_sys, JSON.stringify(qsts));
 
 class Question {
-  final String id;
-  final String title;
-  final String idcamp;
-  final String idsys;
-  final int filter; // 1 = filtered by period, 0 = not filtered
-  String? html; // HTML content of the form
+  final String idQst;     // server: id,     DB: id_qst
+  final String libQst;    // server: title,  DB: lib_qst
+  final String idSystem;  // server: idsys,  DB: id_system
+  final bool hasFilter;   // server: filter, DB: has_filter (1=yes)
 
   Question({
-    required this.id,
-    required this.title,
-    required this.idcamp,
-    required this.idsys,
-    this.filter = 0,
-    this.html,
+    required this.idQst,
+    required this.libQst,
+    required this.idSystem,
+    this.hasFilter = false,
   });
 
+  /// Parses server JSON from /data_camp.php/theme_camp/{campId}/{sysId}/eng
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
-      id: json['id']?.toString() ?? '',
-      title: json['title'] ?? '',
-      idcamp: json['idcamp']?.toString() ?? '',
-      idsys: json['idsys']?.toString() ?? '',
-      filter: int.tryParse(json['filter']?.toString() ?? '0') ?? 0,
+      idQst:     (json['id'] ?? json['id_qst'] ?? '').toString(),
+      libQst:    (json['title'] ?? json['lib_qst'] ?? '').toString(),
+      idSystem:  (json['idsys'] ?? json['id_system'] ?? '').toString(),
+      hasFilter: (int.tryParse((json['filter'] ?? '0').toString()) ?? 0) == 1,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'idcamp': idcamp,
-        'idsys': idsys,
-        'filter': filter,
-      };
+    'id_qst':    idQst,
+    'lib_qst':   libQst,
+    'id_system': idSystem,
+    'has_filter': hasFilter ? 1 : 0,
+  };
 
-  bool get isFiltered => filter == 1;
+  bool get isFiltered => hasFilter;
 }
 
-// Validation rule for a form field
+/// ValidationRule for a form field.
+///
+/// From charge_camp.js getRules():
+///   /data_camp.php/regle_theme_camp/{qstId}/{sysId}
+///   Server JSON: { champ, type, taille, format, inter, min_val, max_val,
+///                  pres, paru, obli, int_ref, edits, enums, uniq }
+///
+/// DB schema: validation_rules (id_camp, id_qst, id_champ, rule_type, rule_value)
 class ValidationRule {
-  final String champ; // field name
-  final String type; // int, date, decimal, text
-  final int taille; // max length
-  final String format;
-  final int inter; // interval check enabled
-  final int minVal;
-  final int maxVal;
-  final String pres;
-  final String paru;
-  final int obli; // mandatory
-  final String intRef;
-  final String edits;
-  final String enums; // comma-separated allowed values
-  final String uniq;
+  final String idChamp;    // server: champ,   DB: id_champ
+  final String ruleType;   // derived from type/obli/inter etc., DB: rule_type
+  final String? ruleValue; // derived value, DB: rule_value
+
+  // Original server fields (kept for full fidelity)
+  final String type;    // 'int', 'decimal', 'date', 'text'
+  final int taille;     // max length
+  final int inter;      // interval check enabled
+  final int minVal;     // min value
+  final int maxVal;     // max value
+  final int obli;       // mandatory (1 = required)
+  final String enums;   // comma-separated allowed values
 
   late final List<String> enumsArray;
 
   ValidationRule({
-    required this.champ,
-    required this.type,
-    required this.taille,
-    required this.format,
-    required this.inter,
-    required this.minVal,
-    required this.maxVal,
-    required this.pres,
-    required this.paru,
-    required this.obli,
-    required this.intRef,
-    required this.edits,
-    required this.enums,
-    required this.uniq,
+    required this.idChamp,
+    required this.ruleType,
+    this.ruleValue,
+    this.type = 'text',
+    this.taille = 0,
+    this.inter = 0,
+    this.minVal = 0,
+    this.maxVal = 0,
+    this.obli = 0,
+    this.enums = '',
   }) {
     enumsArray = enums.split(',').where((s) => s.isNotEmpty).toList();
   }
 
+  /// Parses server JSON from /data_camp.php/regle_theme_camp/{qstId}/{sysId}
   factory ValidationRule.fromJson(Map<String, dynamic> json) {
+    final champ   = (json['champ'] ?? json['id_champ'] ?? '').toString();
+    final type    = (json['type'] ?? 'text').toString();
+    final taille  = int.tryParse((json['taille'] ?? '0').toString()) ?? 0;
+    final inter   = int.tryParse((json['inter'] ?? '0').toString()) ?? 0;
+    final minVal  = int.tryParse((json['min_val'] ?? '0').toString()) ?? 0;
+    final maxVal  = int.tryParse((json['max_val'] ?? '0').toString()) ?? 0;
+    final obli    = int.tryParse((json['obli'] ?? '0').toString()) ?? 0;
+    final enums   = (json['enums'] ?? '').toString();
+
+    // Derive simplified ruleType for DB storage / validation logic
+    String ruleType = 'type_$type';
+    String? ruleValue;
+
+    if (obli == 1) {
+      ruleType = 'mandatory';
+    } else if (inter != 0) {
+      ruleType = 'range';
+      ruleValue = '$minVal,$maxVal';
+    } else if (taille > 0) {
+      ruleType = 'max_length';
+      ruleValue = taille.toString();
+    } else if (enums.isNotEmpty) {
+      ruleType = 'enum';
+      ruleValue = enums;
+    }
+
     return ValidationRule(
-      champ: json['champ'] ?? '',
-      type: json['type'] ?? 'text',
-      taille: int.tryParse(json['taille']?.toString() ?? '0') ?? 0,
-      format: json['format'] ?? '',
-      inter: int.tryParse(json['inter']?.toString() ?? '0') ?? 0,
-      minVal: int.tryParse(json['min_val']?.toString() ?? '0') ?? 0,
-      maxVal: int.tryParse(json['max_val']?.toString() ?? '0') ?? 0,
-      pres: json['pres'] ?? '',
-      paru: json['paru'] ?? '',
-      obli: int.tryParse(json['obli']?.toString() ?? '0') ?? 0,
-      intRef: json['int_ref'] ?? '',
-      edits: json['edits'] ?? '',
-      enums: json['enums'] ?? '',
-      uniq: json['uniq'] ?? '',
+      idChamp:   champ,
+      ruleType:  ruleType,
+      ruleValue: ruleValue,
+      type:      type,
+      taille:    taille,
+      inter:     inter,
+      minVal:    minVal,
+      maxVal:    maxVal,
+      obli:      obli,
+      enums:     enums,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'champ': champ,
-        'type': type,
-        'taille': taille,
-        'format': format,
-        'inter': inter,
-        'min_val': minVal,
-        'max_val': maxVal,
-        'pres': pres,
-        'paru': paru,
-        'obli': obli,
-        'int_ref': intRef,
-        'edits': edits,
-        'enums': enums,
-        'uniq': uniq,
-      };
+    'id_champ':   idChamp,
+    'rule_type':  ruleType,
+    'rule_value': ruleValue,
+  };
 
-  /// Validates a value, returns null if valid, or error code string if invalid
+  /// Validates a value against this rule.
+  /// Returns a French error message or null if valid.
   String? validate(String value) {
-    if (value.isNotEmpty) {
-      // Type check
-      if (!_checkType(value)) {
-        return 'type_$type';
-      }
-      // Length check
-      if (taille > 0 && value.length > taille) {
-        return 'taille_$taille';
-      }
-      // Interval check
-      if (inter != 0) {
-        final numVal = int.tryParse(value);
-        if (numVal == null || numVal < minVal || numVal > maxVal) {
-          return 'inter_[$minVal - $maxVal]';
+    switch (ruleType) {
+      case 'mandatory':
+        if (value.trim().isEmpty) return 'Ce champ est obligatoire';
+        break;
+      case 'type_int':
+        if (value.isNotEmpty && int.tryParse(value) == null) {
+          return 'Valeur entière requise';
         }
-      }
+        break;
+      case 'type_decimal':
+        if (value.isNotEmpty) {
+          final normalized = value.replaceAll(',', '.');
+          if (double.tryParse(normalized) == null) {
+            return 'Valeur numérique requise';
+          }
+        }
+        break;
+      case 'type_date':
+        if (value.isNotEmpty) {
+          final parts = value.split('/');
+          if (parts.length != 3) return 'Format de date invalide (JJ/MM/AAAA)';
+          final day   = int.tryParse(parts[0]);
+          final month = int.tryParse(parts[1]);
+          final year  = int.tryParse(parts[2]);
+          if (day == null || month == null || year == null ||
+              day < 1 || day > 31 || month < 1 || month > 12) {
+            return 'Date invalide';
+          }
+        }
+        break;
+      case 'max_length':
+        final maxLen = int.tryParse(ruleValue ?? '') ?? 0;
+        if (maxLen > 0 && value.length > maxLen) {
+          return 'Longueur maximale dépassée ($maxLen caractères)';
+        }
+        break;
+      case 'range':
+        final parts = (ruleValue ?? '0,0').split(',');
+        final minV = double.tryParse(parts[0]) ?? 0;
+        final maxV = double.tryParse(parts.length > 1 ? parts[1] : '0') ?? 0;
+        final val  = double.tryParse(value.replaceAll(',', '.'));
+        if (val != null) {
+          if (val < minV) return 'Valeur minimale : $minV';
+          if (val > maxV) return 'Valeur maximale : $maxV';
+        }
+        break;
+      case 'enum':
+        final allowed = (ruleValue ?? '').split(',').map((s) => s.trim()).toList();
+        if (value.isNotEmpty && !allowed.contains(value)) {
+          return 'Valeur non autorisée';
+        }
+        break;
     }
-    // Mandatory check
-    if (obli != 0 && value.isEmpty) {
-      return 'obli';
-    }
-    return null; // valid
+    return null;
   }
-
-  bool _checkType(String value) {
-    switch (type) {
-      case 'int':
-        return int.tryParse(value) != null;
-      case 'decimal':
-        return double.tryParse(value) != null;
-      case 'date':
-        return true; // Date format validated by picker
-      default:
-        return true;
-    }
-  }
-}
-
-// Collected data entry
-class CollectedData {
-  final String qst; // question/form ID
-  final String key; // field name (or name#id for radio)
-  String value;
-  final String type; // text, radio, checkbox, select, hidden
-
-  CollectedData({
-    required this.qst,
-    required this.key,
-    required this.value,
-    required this.type,
-  });
-
-  factory CollectedData.fromJson(Map<String, dynamic> json) {
-    return CollectedData(
-      qst: json['qst']?.toString() ?? '',
-      key: json['key'] ?? '',
-      value: json['value']?.toString() ?? '',
-      type: json['type'] ?? 'text',
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'qst': qst,
-        'key': key,
-        'value': value,
-        'type': type,
-      };
-
-  bool inQuestion(String qstId) => qst == qstId;
-
-  bool isEqual(CollectedData other) => qst == other.qst && key == other.key;
 }
