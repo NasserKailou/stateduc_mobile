@@ -15,7 +15,7 @@ import '../../models/question.dart';
 ///   1. The raw HTML is passed in (cached in SQLite from server).
 ///   2. flutter_html renders the static structure (tables, labels, etc.).
 ///   3. We post-process the HTML to identify form fields and replace them
-///      with native Flutter widgets using CustomRender callbacks.
+///      with native Flutter widgets using TagExtension (flutter_html 3.x API).
 ///   4. All field changes are reported up via onFieldChanged.
 ///   5. Dynamic grid rows (grilleContainer) use addGrilleLine.
 ///
@@ -23,6 +23,19 @@ import '../../models/question.dart';
 ///   Numeric input:  name="val_{row}_{col}" or name="{fieldName}"
 ///   Select:         name="{fieldName}"
 ///   Total display:  id="total_r{row}", id="total_c{col}", id="total_all"
+///
+/// Radio storage convention (from page_etab.js):
+///   key = "fieldName#optionId", value = "1"
+///   POST body: fieldName=optionId  (built by DataEntryProvider / ApiService)
+///
+/// flutter_html 3.0.0-beta.2 TagExtension API:
+///   TagExtension(
+///     tagsToExtend: {'input'},
+///     builder: (ExtensionContext extensionContext) {
+///       final attrs = extensionContext.attributes;
+///       return WidgetSpan(child: MyWidget(...));
+///     },
+///   )
 class DynamicFormWidget extends StatefulWidget {
   const DynamicFormWidget({
     super.key,
@@ -114,48 +127,79 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
           ),
         },
         extensions: [
-          // ── Text / number inputs ────────────────────────────────────────
+          // ── Text / number / radio / checkbox / button inputs ────────────
+          // flutter_html 3.x: builder receives ExtensionContext, must return InlineSpan
           TagExtension(
-            tagsToExtend: {'input'},
-            builder: (context, attributes, child) {
-              final type = attributes['type']?.toLowerCase() ?? 'text';
-              final name = attributes['name'] ?? '';
-              if (name.isEmpty) return const SizedBox.shrink();
+            tagsToExtend: const {'input'},
+            builder: (ExtensionContext extensionCtx) {
+              final attrs = extensionCtx.attributes;
+              final type = attrs['type']?.toLowerCase() ?? 'text';
+              final name = attrs['name'] ?? '';
+              if (name.isEmpty) {
+                return const WidgetSpan(child: SizedBox.shrink());
+              }
 
               if (type == 'text' || type == 'number') {
-                return _buildTextInput(name, type, attributes);
+                return WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: _buildTextInput(name, type, attrs),
+                );
               }
               if (type == 'radio') {
-                return _buildRadio(name, attributes);
+                return WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: _buildRadio(name, attrs),
+                );
               }
               if (type == 'checkbox') {
-                return _buildCheckbox(name, attributes);
+                return WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: _buildCheckbox(name, attrs),
+                );
               }
               if (type == 'button' || type == 'submit') {
-                final onclick = attributes['onclick'] ?? '';
-                return _buildButton(
-                    attributes['value'] ?? 'OK', onclick);
+                final onclick = attrs['onclick'] ?? '';
+                return WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: _buildButton(attrs['value'] ?? 'OK', onclick),
+                );
               }
-              return const SizedBox.shrink();
+              return const WidgetSpan(child: SizedBox.shrink());
             },
           ),
+
           // ── Textarea ────────────────────────────────────────────────────
           TagExtension(
-            tagsToExtend: {'textarea'},
-            builder: (context, attributes, child) {
-              final name = attributes['name'] ?? '';
-              if (name.isEmpty) return const SizedBox.shrink();
-              return _buildTextArea(name);
+            tagsToExtend: const {'textarea'},
+            builder: (ExtensionContext extensionCtx) {
+              final name = extensionCtx.attributes['name'] ?? '';
+              if (name.isEmpty) {
+                return const WidgetSpan(child: SizedBox.shrink());
+              }
+              return WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: _buildTextArea(name),
+              );
             },
           ),
+
           // ── Select ──────────────────────────────────────────────────────
+          // flutter_html 3.x exposes element children via extensionCtx.elementChildren
           TagExtension(
-            tagsToExtend: {'select'},
-            builder: (context, attributes, child) {
-              final name = attributes['name'] ?? '';
-              if (name.isEmpty) return const SizedBox.shrink();
-              // Options must be parsed from child HTML
-              return _buildSelectPlaceholder(name);
+            tagsToExtend: const {'select'},
+            builder: (ExtensionContext extensionCtx) {
+              final name = extensionCtx.attributes['name'] ?? '';
+              if (name.isEmpty) {
+                return const WidgetSpan(child: SizedBox.shrink());
+              }
+              // Parse <option> children from element's DOM children
+              final optionElements = extensionCtx.elementChildren
+                  .where((e) => e.localName == 'option')
+                  .toList();
+              return WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: _buildSelect(name, optionElements),
+              );
             },
           ),
         ],
@@ -169,12 +213,12 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     final ctrl = _controllerFor(name);
     final hasError = widget.validationErrors.containsKey(name);
     final isReadOnly =
-        attrs['readonly'] != null || attrs['disabled'] != null;
+        attrs.containsKey('readonly') || attrs.containsKey('disabled');
     final isTotal = name.startsWith('total_') ||
         (attrs['class'] ?? '').contains('total');
 
     if (isTotal) {
-      // Display-only total field
+      // Display-only total field — shows calculated sum
       return Container(
         width: _inputWidth(attrs),
         alignment: Alignment.centerRight,
@@ -188,8 +232,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
           builder: (_, val, __) => Text(
             val.text.isEmpty ? '0' : val.text,
             style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1565C0)),
+                fontWeight: FontWeight.bold, color: Color(0xFF1565C0)),
           ),
         ),
       );
@@ -208,14 +251,12 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
         style: const TextStyle(fontSize: 13),
         decoration: InputDecoration(
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(
-              horizontal: 6, vertical: 6),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           border: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(4)),
           ),
-          errorText: hasError
-              ? widget.validationErrors[name]
-              : null,
+          errorText: hasError ? widget.validationErrors[name] : null,
           errorStyle: const TextStyle(fontSize: 10),
           fillColor: isReadOnly ? Colors.grey.shade100 : null,
           filled: isReadOnly,
@@ -225,17 +266,24 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     );
   }
 
-  // ─── Radio button ───────────────────────────────────────────────────────────
+  // ─── Radio button ──────────────────────────────────────────────────────────
+  // JS convention from page_etab.js:
+  //   key = "fieldName#optionId", value = "1"
+  //   POST body: fieldName=optionId
   Widget _buildRadio(String name, Map<String, String> attrs) {
-    final value = attrs['value'] ?? '';
-    final currentValue = widget.data[name] ?? '';
+    final optionId = attrs['value'] ?? '';
+    final radioKey = '$name#$optionId';
+    final isSelected = widget.data[radioKey] == '1';
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Radio<String>(
-          value: value,
-          groupValue: currentValue,
-          onChanged: (v) => widget.onFieldChanged(name, v ?? ''),
+          value: optionId,
+          groupValue: isSelected ? optionId : null,
+          onChanged: (v) {
+            if (v != null) widget.onFieldChanged(radioKey, '1');
+          },
           visualDensity: VisualDensity.compact,
         ),
         if (attrs['label'] != null)
@@ -272,35 +320,55 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     );
   }
 
-  // ─── Select placeholder ───────────────────────────────────────────────────
-  Widget _buildSelectPlaceholder(String name) {
-    // flutter_html's TagExtension doesn't easily give us <option> children.
-    // We render a simple dropdown with the current value.
-    // In production, options would be pre-parsed from the HTML.
+  // ─── Select (with real option parsing from element DOM) ──────────────────
+  Widget _buildSelect(String name, List<dynamic> optionElements) {
     final currentValue = widget.data[name] ?? '';
+
+    // Build dropdown items from parsed DOM <option> children
+    final items = <DropdownMenuItem<String>>[];
+    for (final opt in optionElements) {
+      try {
+        final val = (opt.attributes['value'] as String?) ?? '';
+        final label = opt.text as String? ?? val;
+        items.add(DropdownMenuItem(
+          value: val,
+          child: Text(label.trim(),
+              style: const TextStyle(fontSize: 13)),
+        ));
+      } catch (_) {
+        // Skip malformed option elements
+      }
+    }
+
+    // Fallback: if no options parsed, show only the current value
+    if (items.isEmpty && currentValue.isNotEmpty) {
+      items.add(DropdownMenuItem(
+        value: currentValue,
+        child: Text(currentValue,
+            style: const TextStyle(fontSize: 13)),
+      ));
+    }
+
+    final validValue =
+        items.any((i) => i.value == currentValue) ? currentValue : null;
+
     return DropdownButton<String>(
-      value: currentValue.isNotEmpty ? currentValue : null,
+      value: validValue,
       hint: const Text('Sélectionner…',
           style: TextStyle(fontSize: 13)),
       isDense: true,
-      items: currentValue.isNotEmpty
-          ? [
-              DropdownMenuItem(
-                  value: currentValue, child: Text(currentValue))
-            ]
-          : [],
+      items: items,
       onChanged: (v) => widget.onFieldChanged(name, v ?? ''),
     );
   }
 
   // ─── Button ───────────────────────────────────────────────────────────────
   Widget _buildButton(String label, String onclick) {
-    // "Ajouter une ligne" button for dynamic grids
+    // "Ajouter une ligne" button for dynamic grids (addGrilleLine in JS)
     if (onclick.contains('addGrilleLine') ||
         label.toLowerCase().contains('ajouter')) {
-      // Extract table id from onclick if possible
       final match =
-          RegExp(r"addGrilleLine\(['\"](\w+)['\"]").firstMatch(onclick);
+          RegExp(r"addGrilleLine\(['\"](\w+)['\"]\)").firstMatch(onclick);
       final tableId = match?.group(1) ?? 'grille';
       return ElevatedButton.icon(
         onPressed: () => widget.onAddGridRow?.call(tableId),
@@ -308,16 +376,14 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
         label: Text(label, style: const TextStyle(fontSize: 13)),
         style: ElevatedButton.styleFrom(
           visualDensity: VisualDensity.compact,
-          padding: const EdgeInsets.symmetric(
-              horizontal: 10, vertical: 6),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         ),
       );
     }
     return ElevatedButton(
       onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        visualDensity: VisualDensity.compact,
-      ),
+      style: ElevatedButton.styleFrom(visualDensity: VisualDensity.compact),
       child: Text(label, style: const TextStyle(fontSize: 13)),
     );
   }
@@ -326,9 +392,9 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   double? _inputWidth(Map<String, String> attrs) {
     final size = int.tryParse(attrs['size'] ?? '');
     if (size != null) {
-      // Approximate: 1 size unit ≈ 8px
+      // Approximate: 1 HTML size unit ≈ 8px
       return (size * 8.0).clamp(40.0, 200.0);
     }
-    return null; // expand naturally
+    return null; // expand to natural width
   }
 }

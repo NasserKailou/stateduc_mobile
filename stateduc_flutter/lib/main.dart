@@ -75,8 +75,11 @@ class StatEducApp extends StatelessWidget {
             selectedColor: const Color(0xFF1565C0),
             secondarySelectedColor: const Color(0xFF1565C0),
             labelStyle: const TextStyle(fontSize: 13),
+            disabledColor: Colors.grey.shade200,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+            shape: const StadiumBorder(),
           ),
-          cardTheme: const CardThemeData(
+          cardTheme: const CardTheme(
             elevation: 2,
             margin: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
           ),

@@ -584,7 +584,7 @@ class _DigitButton extends StatelessWidget {
       child: Material(
         color: isConfirm
             ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.surfaceVariant,
+            : Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: onTap,
