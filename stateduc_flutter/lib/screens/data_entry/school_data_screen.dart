@@ -41,10 +41,11 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DataEntryProvider>().initForSchool(
-        idCamp: widget.campaign.idCamp,
-        idEtab: widget.school.idEtab,
-        libEtab: widget.school.libEtab,
-        idSystem: widget.idSystem,
+        idCamp:        widget.campaign.idCamp,
+        idEtab:        widget.school.idEtab,
+        libEtab:       widget.school.libEtab,
+        idSystem:      widget.idSystem,
+        idRegroupEtab: widget.school.idRegroup,  // for LOC_REG_0 injection
       );
     });
   }

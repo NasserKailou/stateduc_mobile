@@ -1,58 +1,74 @@
-// Administrative entity (Regroupement) model
+/// Regroup (Regroupement administratif) model — unified field names matching:
+///   - JS source:  StmRegroup(id, nom, type, parentid); parentid == -1 means root
+///   - DB schema:  regroups (id_camp, id_regp, lib_regp, id_type_regp, id_parent_regp)
+///   - Server JSON: { id, nom, type, parentid }
+///
+/// From regroups.js:
+///   new StmRegroup(value.id, value.nom, value.type, value.parentid)
+///   parentid = -1 means this is a root (top-level) regroup
 
 class Regroup {
-  final String id;
-  final String nom;
-  final String type;
-  final String parentid;
+  final String idRegp;         // server: id,       DB: id_regp
+  final String libRegp;        // server: nom,      DB: lib_regp
+  final String idTypeRegp;     // server: type,     DB: id_type_regp
+  final String? idParentRegp;  // server: parentid, DB: id_parent_regp
+                               // NULL in DB when parentid was '-1' (root)
 
   Regroup({
-    required this.id,
-    required this.nom,
-    required this.type,
-    required this.parentid,
+    required this.idRegp,
+    required this.libRegp,
+    required this.idTypeRegp,
+    this.idParentRegp,
   });
 
+  /// Parses server JSON from /user_camp.php/reg_camp/{login}/{campId}/1
   factory Regroup.fromJson(Map<String, dynamic> json) {
+    final parentidRaw = json['parentid']?.toString() ?? json['id_parent_regp']?.toString();
+    // Map '-1' (JS root sentinel) → null (DB representation of root)
+    final parentId = (parentidRaw == null || parentidRaw == '-1') ? null : parentidRaw;
     return Regroup(
-      id: json['id']?.toString() ?? '',
-      nom: json['nom'] ?? '',
-      type: json['type']?.toString() ?? '',
-      parentid: json['parentid']?.toString() ?? '-1',
+      idRegp:      (json['id'] ?? json['id_regp'] ?? '').toString(),
+      libRegp:     (json['nom'] ?? json['lib_regp'] ?? '').toString(),
+      idTypeRegp:  (json['type'] ?? json['id_type_regp'] ?? '').toString(),
+      idParentRegp: parentId,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'nom': nom,
-        'type': type,
-        'parentid': parentid,
-      };
+    'id_regp':       idRegp,
+    'lib_regp':      libRegp,
+    'id_type_regp':  idTypeRegp,
+    'id_parent_regp': idParentRegp,
+  };
 
-  bool isChildOf(String parentId) => parentid == parentId;
+  /// True if this is a root-level regroup (no parent).
+  bool get isRoot => idParentRegp == null;
 
-  bool get isRoot => parentid == '-1';
+  bool isChildOf(String parentId) => idParentRegp == parentId;
 }
 
-// Type of administrative entity
+/// RegroupType — type of administrative entity.
+///
+/// From charge_camp.js addTypeRegroup():
+///   /user_camp.php/typ_reg_camp/{userId}/{campId}/{typeRegroups}
+///   Server JSON: { id, nom }
+///
+/// DB schema: regroup_types (id_camp, id_type_regp, lib_type_regp)
 class RegroupType {
-  final String id;
-  final String nom;
+  final String idTypeRegp;   // server: id,  DB: id_type_regp
+  final String libTypeRegp;  // server: nom, DB: lib_type_regp
 
-  RegroupType({
-    required this.id,
-    required this.nom,
-  });
+  RegroupType({required this.idTypeRegp, required this.libTypeRegp});
 
   factory RegroupType.fromJson(Map<String, dynamic> json) {
     return RegroupType(
-      id: json['id']?.toString() ?? '',
-      nom: json['nom'] ?? '',
+      idTypeRegp:  (json['id'] ?? json['id_type_regp'] ?? '').toString(),
+      libTypeRegp: (json['nom'] ?? json['lib_type_regp'] ?? '').toString(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'nom': nom,
-      };
+    'id_type_regp':  idTypeRegp,
+    'lib_type_regp': libTypeRegp,
+  };
 }

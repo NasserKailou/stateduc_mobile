@@ -170,7 +170,8 @@ class _LoadCampaignScreenState extends State<LoadCampaignScreen> {
     if (_selectedCampaign == null || auth.user == null) return;
     final ok = await camps.loadCampaignFromServer(
       campaign: _selectedCampaign!,
-      userId: auth.user!.idUser,
+      login:    auth.user!.login,    // for reg_camp endpoint (uses login!)
+      userId:   auth.user!.idUser,   // for all other endpoints (uses id)
     );
     if (ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
