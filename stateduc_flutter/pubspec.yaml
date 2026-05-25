@@ -38,7 +38,8 @@ dependencies:
   vibration: ^2.0.0
 
   # SMS sending (replaces discontinued telephony package)
-  flutter_sms: ^2.3.3
+  # v3.0.1+ required: AGP 8.x demands namespace in android/build.gradle (missing in 2.3.3)
+  flutter_sms: ^3.0.1
 
   # UUID generation
   uuid: ^4.3.3
