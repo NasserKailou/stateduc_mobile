@@ -31,6 +31,11 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin flutter_secure_storage, com.it_nomads.fluttersecurestorage.FlutterSecureStoragePlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new com.example.flutter_sms.FlutterSmsPlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin flutter_sms, com.example.flutter_sms.FlutterSmsPlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.pathprovider.PathProviderPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin path_provider_android, io.flutter.plugins.pathprovider.PathProviderPlugin", e);
@@ -46,9 +51,9 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin sqflite_android, com.tekartik.sqflite.SqflitePlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new com.shounakmulay.telephony.TelephonyPlugin());
+      flutterEngine.getPlugins().add(new io.flutter.plugins.urllauncher.UrlLauncherPlugin());
     } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin telephony, com.shounakmulay.telephony.TelephonyPlugin", e);
+      Log.e(TAG, "Error registering plugin url_launcher_android, io.flutter.plugins.urllauncher.UrlLauncherPlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new com.benjaminabel.vibration.VibrationPlugin());
