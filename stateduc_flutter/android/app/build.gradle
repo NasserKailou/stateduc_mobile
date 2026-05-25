@@ -1,7 +1,6 @@
 // StatEduc Flutter — app/build.gradle
-// AGP 8.1 / Gradle 8.0 compatible format.
-// Uses the new plugin DSL (plugins { } block) instead of apply plugin:.
-// Kotlin version is declared in settings.gradle.
+// AGP 8.7.0 / Gradle 8.10.2 / Kotlin 2.0.21 / Java 17
+// Flutter 3.35.x compatible.
 
 plugins {
     id "com.android.application"
@@ -11,16 +10,17 @@ plugins {
 
 android {
     namespace "ark.android.stateduc"
-    compileSdkVersion 34
+    compileSdkVersion 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        // AGP 8.7+ requires Java 17
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     sourceSets {
@@ -29,9 +29,9 @@ android {
 
     defaultConfig {
         applicationId "ark.android.stateduc"
-        // flutter_secure_storage requires minSdk 18+; we use flutter default (21)
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 34
+        // flutter_secure_storage requires minSdk 18+; 21 is safe
+        minSdkVersion 21
+        targetSdkVersion 35
         versionCode flutter.versionCode
         versionName flutter.versionName
 
