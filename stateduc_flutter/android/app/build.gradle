@@ -1,15 +1,20 @@
 // StatEduc Flutter — app/build.gradle
-// AGP 8.7.0 / Gradle 8.10.2 / Kotlin 2.0.21 / Java 17
-// Flutter 3.35.x compatible.
+// AGP 8.11.1 / Gradle 8.14.0 / Kotlin 2.2.20 (Built-in, no explicit KGP) / Java 17
+// Flutter 3.35.x: compileSdk 36, targetSdk 36, minSdk 21
 
 plugins {
     id "com.android.application"
-    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
+    // NOTE: "org.jetbrains.kotlin.android" is intentionally omitted here.
+    // Flutter 3.35+ uses Built-in Kotlin support (flutter-gradle-plugin applies KGP internally).
+    // Applying KGP explicitly from app/build.gradle causes build failures in future Flutter versions.
+    // See: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers
 }
 
 android {
     namespace "ark.android.stateduc"
+    // compileSdk 36 required by androidx.core:core:1.17.0 + androidx.browser:browser:1.9.0
+    // Also required by path_provider_android, shared_preferences_android, sqflite_android, url_launcher_android
     compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
@@ -31,7 +36,7 @@ android {
         applicationId "ark.android.stateduc"
         // flutter_secure_storage requires minSdk 18+; 21 is safe
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode flutter.versionCode
         versionName flutter.versionName
 

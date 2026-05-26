@@ -79,7 +79,7 @@ class StatEducApp extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
             shape: const StadiumBorder(),
           ),
-          cardTheme: const CardTheme(
+          cardTheme: const CardThemeData(
             elevation: 2,
             margin: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
           ),

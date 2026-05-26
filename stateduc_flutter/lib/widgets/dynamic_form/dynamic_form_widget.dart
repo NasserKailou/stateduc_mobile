@@ -136,35 +136,35 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
               final type = attrs['type']?.toLowerCase() ?? 'text';
               final name = attrs['name'] ?? '';
               if (name.isEmpty) {
-                return const WidgetSpan(child: SizedBox.shrink());
+                return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
               }
 
               if (type == 'text' || type == 'number') {
                 return WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: _buildTextInput(name, type, attrs),
-                );
+                ) as InlineSpan;
               }
               if (type == 'radio') {
                 return WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: _buildRadio(name, attrs),
-                );
+                ) as InlineSpan;
               }
               if (type == 'checkbox') {
                 return WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: _buildCheckbox(name, attrs),
-                );
+                ) as InlineSpan;
               }
               if (type == 'button' || type == 'submit') {
                 final onclick = attrs['onclick'] ?? '';
                 return WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: _buildButton(attrs['value'] ?? 'OK', onclick),
-                );
+                ) as InlineSpan;
               }
-              return const WidgetSpan(child: SizedBox.shrink());
+              return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
             },
           ),
 
@@ -174,12 +174,12 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
             builder: (ExtensionContext extensionCtx) {
               final name = extensionCtx.attributes['name'] ?? '';
               if (name.isEmpty) {
-                return const WidgetSpan(child: SizedBox.shrink());
+                return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
               }
               return WidgetSpan(
                 alignment: PlaceholderAlignment.middle,
                 child: _buildTextArea(name),
-              );
+              ) as InlineSpan;
             },
           ),
 
@@ -190,7 +190,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
             builder: (ExtensionContext extensionCtx) {
               final name = extensionCtx.attributes['name'] ?? '';
               if (name.isEmpty) {
-                return const WidgetSpan(child: SizedBox.shrink());
+                return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
               }
               // Parse <option> children from element's DOM children
               final optionElements = extensionCtx.elementChildren
@@ -199,7 +199,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
               return WidgetSpan(
                 alignment: PlaceholderAlignment.middle,
                 child: _buildSelect(name, optionElements),
-              );
+              ) as InlineSpan;
             },
           ),
         ],
@@ -368,8 +368,10 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     if (onclick.contains('addGrilleLine') ||
         label.toLowerCase().contains('ajouter')) {
       final match =
-          RegExp(r"addGrilleLine\(['\"](\w+)['\"]\)").firstMatch(onclick);
-      final tableId = match?.group(1) ?? 'grille';
+          RegExp(r"addGrilleLine\(([^)]+)\)").firstMatch(onclick);
+      // Strip surrounding quotes from the captured group: 'grille' → grille
+      final rawId = match?.group(1)?.replaceAll(RegExp(r"[\"']"), '') ?? '';
+      final tableId = rawId.trim().isEmpty ? 'grille' : rawId.trim();
       return ElevatedButton.icon(
         onPressed: () => widget.onAddGridRow?.call(tableId),
         icon: const Icon(Icons.add, size: 16),

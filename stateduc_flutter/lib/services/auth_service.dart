@@ -181,6 +181,8 @@ class AuthService {
       idUser: userId,
       nomUser: userName ?? login,
       login: login,
+      codeyear: '',   // not persisted locally; refreshed on next server login
+      libyear: '',
     );
   }
 

@@ -7,6 +7,7 @@ import '../../models/school.dart';
 import '../../models/question.dart';
 import '../../widgets/dynamic_form/dynamic_form_widget.dart';
 import '../../widgets/common/loading_overlay.dart';
+import '../../models/user.dart';  // FilterPeriod
 
 /// SchoolDataScreen — data entry for a specific school.
 ///
