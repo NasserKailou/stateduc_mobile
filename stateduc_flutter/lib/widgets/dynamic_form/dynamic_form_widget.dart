@@ -127,79 +127,54 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
           ),
         },
         extensions: [
-          // ── Text / number / radio / checkbox / button inputs ────────────
-          // flutter_html 3.x: builder receives ExtensionContext, must return InlineSpan
+          // ── input (text / number / radio / checkbox / button) ───────────
+          // flutter_html 3.x: TagExtension.builder returns a Widget directly
           TagExtension(
             tagsToExtend: const {'input'},
             builder: (ExtensionContext extensionCtx) {
               final attrs = extensionCtx.attributes;
               final type = attrs['type']?.toLowerCase() ?? 'text';
               final name = attrs['name'] ?? '';
-              if (name.isEmpty) {
-                return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
-              }
+              if (name.isEmpty) return const SizedBox.shrink();
 
               if (type == 'text' || type == 'number') {
-                return WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: _buildTextInput(name, type, attrs),
-                ) as InlineSpan;
+                return _buildTextInput(name, type, attrs);
               }
               if (type == 'radio') {
-                return WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: _buildRadio(name, attrs),
-                ) as InlineSpan;
+                return _buildRadio(name, attrs);
               }
               if (type == 'checkbox') {
-                return WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: _buildCheckbox(name, attrs),
-                ) as InlineSpan;
+                return _buildCheckbox(name, attrs);
               }
               if (type == 'button' || type == 'submit') {
                 final onclick = attrs['onclick'] ?? '';
-                return WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: _buildButton(attrs['value'] ?? 'OK', onclick),
-                ) as InlineSpan;
+                return _buildButton(attrs['value'] ?? 'OK', onclick);
               }
-              return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
+              return const SizedBox.shrink();
             },
           ),
 
-          // ── Textarea ────────────────────────────────────────────────────
+          // ── textarea ─────────────────────────────────────────────────────
           TagExtension(
             tagsToExtend: const {'textarea'},
             builder: (ExtensionContext extensionCtx) {
               final name = extensionCtx.attributes['name'] ?? '';
-              if (name.isEmpty) {
-                return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
-              }
-              return WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: _buildTextArea(name),
-              ) as InlineSpan;
+              if (name.isEmpty) return const SizedBox.shrink();
+              return _buildTextArea(name);
             },
           ),
 
-          // ── Select ──────────────────────────────────────────────────────
-          // flutter_html 3.x exposes element children via extensionCtx.elementChildren
+          // ── select ───────────────────────────────────────────────────────
+          // elementChildren gives access to <option> DOM children
           TagExtension(
             tagsToExtend: const {'select'},
             builder: (ExtensionContext extensionCtx) {
               final name = extensionCtx.attributes['name'] ?? '';
-              if (name.isEmpty) {
-                return const WidgetSpan(child: SizedBox.shrink()) as InlineSpan;
-              }
-              // Parse <option> children from element's DOM children
+              if (name.isEmpty) return const SizedBox.shrink();
               final optionElements = extensionCtx.elementChildren
                   .where((e) => e.localName == 'option')
                   .toList();
-              return WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: _buildSelect(name, optionElements),
-              ) as InlineSpan;
+              return _buildSelect(name, optionElements);
             },
           ),
         ],
@@ -370,7 +345,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       final match =
           RegExp(r"addGrilleLine\(([^)]+)\)").firstMatch(onclick);
       // Strip surrounding quotes from the captured group: 'grille' → grille
-      final rawId = match?.group(1)?.replaceAll(RegExp(r"[\"']"), '') ?? '';
+      final rawId = match?.group(1)?.replaceAll("'", '')?.replaceAll('"', '') ?? '';
       final tableId = rawId.trim().isEmpty ? 'grille' : rawId.trim();
       return ElevatedButton.icon(
         onPressed: () => widget.onAddGridRow?.call(tableId),
