@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace "ark.android.stateduc"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
