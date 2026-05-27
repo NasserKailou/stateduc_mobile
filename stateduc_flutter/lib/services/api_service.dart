@@ -30,14 +30,19 @@ class ApiService {
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 120),
         sendTimeout: const Duration(seconds: 60),
-        // CRITICAL: disable auto-redirect so Dio doesn't silently follow
-        // 301/302 redirects and lose the Authorization header in the process.
-        followRedirects: false,
-        // Accept all status codes so we can handle them manually
-        validateStatus: (status) => status != null && status < 500,
+        // Let Dio follow redirects automatically (up to 5 hops).
+        // The Auth header is re-injected on every request by the
+        // _AuthInjectorInterceptor below — so redirects never lose credentials.
+        followRedirects: true,
+        maxRedirects: 5,
+        // Accept all HTTP status codes so we can handle 401/404/etc. inline.
+        validateStatus: (status) => status != null && status < 600,
       ),
     );
-    // Add request/response logger interceptor for debugging
+    // Auth re-injection interceptor: ensures Authorization header is present
+    // on every request including those triggered by redirect chains.
+    _dio.interceptors.add(_AuthInjectorInterceptor(this));
+    // Request/response logger interceptor for adb logcat debugging.
     _dio.interceptors.add(_buildLogInterceptor());
   }
 
@@ -47,7 +52,7 @@ class ApiService {
     return InterceptorsWrapper(
       onRequest: (options, handler) {
         debugPrint('[Dio→] ${options.method} ${options.uri}');
-        debugPrint('[Dio→] Headers: ${options.headers}');
+        debugPrint('[Dio→] Auth: ${options.headers['Authorization']?.toString().substring(0, 20) ?? 'MISSING'}...');
         if (options.data != null) {
           final dataStr = options.data.toString();
           debugPrint('[Dio→] Body: ${dataStr.length > 200 ? dataStr.substring(0, 200) + "…" : dataStr}');
@@ -61,7 +66,7 @@ class ApiService {
         handler.next(response);
       },
       onError: (DioException e, handler) {
-        debugPrint('[Dio✗] ${e.type} ${e.requestOptions.uri}');
+        debugPrint('[Dio✗] type=${e.type} uri=${e.requestOptions.uri}');
         debugPrint('[Dio✗] message=${e.message}');
         if (e.response != null) {
           debugPrint('[Dio✗] status=${e.response?.statusCode} body=${e.response?.data}');
@@ -154,25 +159,11 @@ class ApiService {
       final statusCode = response.statusCode ?? 0;
       debugPrint('[ApiService] authenticate ← HTTP $statusCode');
 
-      // Handle 3xx redirects explicitly (followRedirects: false)
-      if (statusCode >= 300 && statusCode < 400) {
-        final location = response.headers.value('location') ?? '';
-        debugPrint('[ApiService] authenticate: redirect $statusCode → $location');
-        // A redirect here usually means Apache/Nginx auth layer — re-try with
-        // the full redirect URL while preserving our Auth header.
-        if (location.isNotEmpty) {
-          return _authenticateRedirect(location, login, password);
-        }
-        throw ApiException('Redirection inattendue ($statusCode). Vérifiez l\'URL serveur.');
-      }
-
-      // 401 at HTTP level = Apache/Nginx Basic Auth protecting the endpoint
-      // This is DIFFERENT from PHP app-level auth (se_message: log_ko)
+      // 401 = either Apache/Nginx HTTP Basic Auth layer OR PHP app rejected
       if (statusCode == 401) {
-        debugPrint('[ApiService] authenticate: HTTP 401 — Apache/Nginx layer rejected credentials');
+        debugPrint('[ApiService] authenticate: HTTP 401 — credentials rejected');
         throw ApiException(
           'Accès refusé (401).\n'
-          'Le serveur a une protection HTTP (Apache/Nginx).\n'
           'Vérifiez vos identifiants ou contactez l\'administrateur.'
         );
       }
@@ -245,45 +236,7 @@ class ApiService {
     }
   }
 
-  /// Follows a redirect for authenticate(), preserving the Authorization header.
-  Future<User?> _authenticateRedirect(
-      String redirectUrl, String login, String password) async {
-    debugPrint('[ApiService] _authenticateRedirect → $redirectUrl');
-    try {
-      final redirectDio = Dio(BaseOptions(
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        followRedirects: false,
-        validateStatus: (s) => s != null && s < 500,
-        headers: {
-          'Authorization': 'Basic ${base64Encode(utf8.encode('$login:$password'))}',
-          'User-Agent': 'Mozilla/5.0 (Linux; Android 10) StatEduc/1.0',
-          'Accept': 'application/json, text/plain, */*',
-        },
-      ));
-      final r = await redirectDio.get(redirectUrl,
-          options: Options(responseType: ResponseType.plain));
-      final rawBody = r.data?.toString().trim() ?? '';
-      if (rawBody.isEmpty) return null;
-      final parsed = json.decode(rawBody);
-      if (parsed is Map) {
-        if (parsed['se_message'] == 'log_ko') return null;
-        if (parsed['se_status'] == 200) {
-          final ud = parsed['se_data'];
-          if (ud != null) {
-            final userMap = ud is String
-                ? json.decode(ud) as Map<String, dynamic>
-                : ud as Map<String, dynamic>;
-            return User.fromJson(userMap);
-          }
-        }
-      }
-      return null;
-    } catch (e) {
-      debugPrint('[ApiService] _authenticateRedirect error: $e');
-      return null;
-    }
-  }
+
 
   Future<void> logout() async {
     try {
@@ -662,18 +615,9 @@ class ApiService {
       );
       final statusCode = response.statusCode ?? 0;
 
-      // Handle redirects explicitly (followRedirects: false)
-      if (statusCode >= 300 && statusCode < 400) {
-        final location = response.headers.value('location') ?? '';
-        debugPrint('[ApiService] _get: redirect $statusCode → $location for $path');
-        if (location.isNotEmpty) {
-          return _getAbsoluteUrl(location);
-        }
-        throw ApiException('Redirection inattendue ($statusCode)');
-      }
-
       if (statusCode == 401) throw ApiException('Accès refusé (401)');
       if (statusCode == 404) throw ApiException('Endpoint introuvable (404) : $path');
+      if (statusCode >= 300) throw ApiException('Erreur serveur ($statusCode) : $path');
 
       final rawBody = response.data?.toString().trim() ?? '';
       if (rawBody.isEmpty) return [];
@@ -702,32 +646,33 @@ class ApiService {
     }
   }
 
-  /// Fetches an absolute URL (for redirect targets) preserving Authorization header.
-  Future<dynamic> _getAbsoluteUrl(String url) async {
-    try {
-      final redirectDio = Dio(BaseOptions(
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 120),
-        followRedirects: false,
-        validateStatus: (s) => s != null && s < 500,
-        headers: {
-          'Authorization': _dio.options.headers['Authorization'],
-          'User-Agent': _dio.options.headers['User-Agent'] ??
-              'Mozilla/5.0 (Linux; Android 10) StatEduc/1.0',
-          'Accept': 'application/json, text/plain, */*',
-        },
-      ));
-      final r = await redirectDio.get(url,
-          options: Options(responseType: ResponseType.plain));
-      final rawBody = r.data?.toString().trim() ?? '';
-      if (rawBody.isEmpty) return [];
-      final parsed = json.decode(rawBody);
-      if (parsed is Map) return parsed['se_data'] ?? parsed;
-      return parsed ?? [];
-    } catch (e) {
-      debugPrint('[ApiService] _getAbsoluteUrl error: $e');
-      return [];
+
+}
+
+// ─── Auth Injector Interceptor ───────────────────────────────────────────────
+// Ensures the Authorization header is present on EVERY request, including
+// those automatically generated by Dio when following 3xx redirects.
+// Dio's default redirect handler re-uses the original options so headers
+// should be preserved, but this interceptor is a safety net.
+class _AuthInjectorInterceptor extends Interceptor {
+  final ApiService _service;
+  _AuthInjectorInterceptor(this._service);
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // If Authorization header is missing (can happen on redirect re-issue),
+    // re-inject it from the service's current credentials.
+    if (!options.headers.containsKey('Authorization') ||
+        options.headers['Authorization'] == null) {
+      final login = _service._login;
+      final password = _service._password;
+      if (login != null && password != null) {
+        options.headers['Authorization'] =
+            'Basic ${base64Encode(utf8.encode('$login:$password'))}';
+        debugPrint('[AuthInjector] Re-injected Authorization header');
+      }
     }
+    handler.next(options);
   }
 }
 
