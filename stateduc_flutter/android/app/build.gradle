@@ -47,7 +47,7 @@ android {
         applicationId "ark.android.stateduc"
         // flutter_secure_storage requiert minSdk 18+
         // telephony requiert minSdk 21+
-        minSdk 21
+        minSdkVersion flutter.minSdkVersion
         targetSdk 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
