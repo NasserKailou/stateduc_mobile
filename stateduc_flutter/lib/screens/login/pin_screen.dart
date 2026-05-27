@@ -301,9 +301,12 @@ class _PinScreenState extends State<PinScreen> {
             TextField(
               controller: _serverUrlController,
               keyboardType: TextInputType.url,
+              autocorrect: false,
               decoration: const InputDecoration(
                 labelText: 'URL du serveur',
-                hintText: 'http://192.168.1.1',
+                hintText: 'http://192.168.1.100:8083/StatEduc',
+                helperText: 'Ex : http://192.168.1.100:8083/StatEduc_MEN_2025',
+                helperMaxLines: 2,
                 prefixIcon: Icon(Icons.dns_outlined),
                 border: OutlineInputBorder(),
               ),
@@ -353,17 +356,20 @@ class _PinScreenState extends State<PinScreen> {
   }
 
   Future<void> _doServerLogin(AuthProvider auth) async {
-    final url = _serverUrlController.text.trim();
+    // Trim whitespace and update field with cleaned value
+    final rawUrl = _serverUrlController.text.trim();
     final login = _loginController.text.trim();
     final password = _passwordController.text;
-    if (url.isEmpty || login.isEmpty || password.isEmpty) {
+    if (rawUrl.isEmpty || login.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('Veuillez remplir tous les champs')));
       return;
     }
+    // Display the normalized URL in the field so user can see what was used
+    _serverUrlController.text = rawUrl;
     await auth.loginToServer(
-      serverUrl: url,
+      serverUrl: rawUrl,   // ApiService.normalizeServerUrl() handles http://
       login: login,
       password: password,
     );

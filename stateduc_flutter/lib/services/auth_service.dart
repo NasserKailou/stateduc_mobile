@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'api_service.dart';
 import 'database_service.dart';
@@ -142,26 +143,33 @@ class AuthService {
     required String login,
     required String password,
   }) async {
+    // Normalise l'URL avant tout (ajoute http:// si nécessaire)
+    final normalizedUrl = ApiService.normalizeServerUrl(serverUrl);
+    debugPrint('[AuthService] login → url=$normalizedUrl login=$login');
     try {
-      final user = await _api.authenticate(serverUrl, login, password);
+      final user = await _api.authenticate(normalizedUrl, login, password);
       if (user == null) {
-        throw AuthException('Identifiants invalides');
+        throw AuthException(
+            'Identifiants invalides.\nVérifiez votre identifiant et mot de passe.');
       }
       // Persist credentials for offline re-authentication
-      await _storage.write(key: _kServerUrl, value: serverUrl);
+      await _storage.write(key: _kServerUrl, value: normalizedUrl);
       await _storage.write(key: _kLogin, value: login);
       await _storage.write(key: _kPassword, value: password);
       await _storage.write(key: _kUserId, value: user.idUser);
       await _storage.write(key: _kUserName, value: user.nomUser);
-      // Persist server URL in DB too
-      await _db.setSetting('server_url', serverUrl);
+      // Persist server URL in DB too (use normalized URL)
+      await _db.setSetting('server_url', normalizedUrl);
       await _db.setSetting('user_id', user.idUser);
       await _db.setSetting('user_name', user.nomUser);
       _securityQuestionLoaded = true;
       return user;
     } on AuthException {
       rethrow;
+    } on ApiException catch (e) {
+      throw AuthException(e.message);
     } catch (e) {
+      debugPrint('[AuthService] login error: $e');
       throw AuthException('Erreur de connexion : ${e.toString()}');
     }
   }
@@ -178,11 +186,9 @@ class AuthService {
     final password = await _storage.read(key: _kPassword) ?? '';
     _api.configure(serverUrl, login, password);
     return User(
-      idUser: userId,
-      nomUser: userName ?? login,
-      login: login,
-      codeyear: '',   // not persisted locally; refreshed on next server login
-      libyear: '',
+      idUser: userId!,
+      nomUser: userName ?? login!,
+      login: login!,
     );
   }
 
