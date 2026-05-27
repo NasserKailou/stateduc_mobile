@@ -25,3 +25,11 @@ node_modules/
 /plugins/
 /platforms/
 flutter_*.log
+
+# Android release signing — NEVER commit these
+stateduc_flutter/android/key.properties
+stateduc_flutter/android/*.jks
+stateduc_flutter/android/*.keystore
+
+# Kotlin build error logs (auto-generated)
+stateduc_flutter/android/.kotlin/

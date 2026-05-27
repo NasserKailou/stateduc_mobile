@@ -1,5 +1,5 @@
 // StatEduc Mobile — Flutter rewrite
-// Entry point: wires all providers and launches PinScreen.
+// Entry point: Splash → Onboarding (1st launch) → PinScreen
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +10,7 @@ import 'providers/data_entry_provider.dart';
 import 'services/auth_service.dart';
 import 'services/api_service.dart';
 import 'services/database_service.dart';
-import 'screens/login/pin_screen.dart';
+import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,8 +84,12 @@ class StatEducApp extends StatelessWidget {
             margin: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
           ),
         ),
-        // PinScreen handles all initial routing based on AuthState
-        home: const PinScreen(),
+        // ── Routing ──────────────────────────────────────────────────────
+        // SplashScreen handles:
+        //   - Logo display (logo.gif) during app startup
+        //   - First launch detection → OnboardingScreen
+        //   - Returning user → PinScreen
+        home: const SplashScreen(),
       ),
     );
   }
