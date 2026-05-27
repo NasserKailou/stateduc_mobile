@@ -39,10 +39,6 @@ dependencies:
   # Vibration (remplace cordova-plugin-vibration)
   vibration: ^2.0.0
 
-  # SMS (remplace hazems-cordova-plugin-sms)
-  # telephony est discontinued — on utilise flutter_sms
-  flutter_sms: ^2.3.3
-
   # Génération d'identifiants uniques
   uuid: ^4.5.1
 

@@ -1,95 +1,72 @@
-// StatEduc Flutter — app/build.gradle
-// AGP 8.11.1 / Gradle 8.14.1 / Kotlin 2.2.20 (Built-in) / Java 17
-// Flutter 3.35.x: compileSdk 36, targetSdk 36, minSdk 21
+// app/build.gradle — AGP 8.11.1 + Flutter 3.35.x compatible
+// Plugins déclarés via settings.gradle (new plugin DSL), pas de buildscript block.
 
 plugins {
     id "com.android.application"
+    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    // NOTE: "org.jetbrains.kotlin.android" intentionally omitted (Built-in Kotlin Flutter 3.35+)
 }
 
-// ── Release signing from key.properties ──────────────────────────────────────
-// Create android/key.properties (DO NOT commit this file) with:
-//   storePassword=<your_keystore_password>
-//   keyPassword=<your_key_password>
-//   keyAlias=stateduc
-//   storeFile=../stateduc-release.jks
-//
-// Generate the keystore once on your machine:
-//   keytool -genkey -v -keystore android/stateduc-release.jks \
-//           -alias stateduc -keyalg RSA -keysize 2048 -validity 10000 \
-//           -dname "CN=StatEduc, OU=ARK, O=ARK, L=Dakar, S=Dakar, C=SN"
-// ─────────────────────────────────────────────────────────────────────────────
-def keystorePropertiesFile = rootProject.file("key.properties")
-def keystoreProperties = new Properties()
-def hasKeystore = keystorePropertiesFile.exists()
-if (hasKeystore) {
-    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
+if (flutterVersionCode == null) {
+    flutterVersionCode = "1"
+}
+
+def flutterVersionName = localProperties.getProperty("flutter.versionName")
+if (flutterVersionName == null) {
+    flutterVersionName = "1.0"
 }
 
 android {
     namespace "ark.android.stateduc"
-    compileSdkVersion 36
+    compileSdk 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
-    kotlinOptions { jvmTarget = "17" }
-    sourceSets { main.java.srcDirs += "src/main/kotlin" }
 
-    signingConfigs {
-        release {
-            if (hasKeystore) {
-                keyAlias     keystoreProperties['keyAlias']
-                keyPassword  keystoreProperties['keyPassword']
-                storeFile    file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-                // Enable v1 (JAR) + v2 (APK Signature Scheme v2) + v3 signing
-                enableV1Signing true
-                enableV2Signing true
-                enableV3Signing true
-            } else {
-                // Fallback to debug key when key.properties is absent
-                // (CI/CD or fresh clone without keystore)
-                keyAlias keystoreProperties.getProperty('keyAlias', 'androiddebugkey')
-                keyPassword keystoreProperties.getProperty('keyPassword', 'android')
-                storeFile file(System.getProperty('user.home') + '/.android/debug.keystore')
-                storePassword keystoreProperties.getProperty('storePassword', 'android')
-                enableV1Signing true
-                enableV2Signing true
-            }
-        }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
     }
 
     defaultConfig {
         applicationId "ark.android.stateduc"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 36
-        versionCode flutter.versionCode
-        versionName flutter.versionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // flutter_secure_storage requiert minSdk 18+
+        // telephony requiert minSdk 21+
+        minSdk 21
+        targetSdk 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
-        }
-        debug {
-            // Debug keeps its own suffix so both can coexist on the device
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
 }
 
-flutter { source "../.." }
+flutter {
+    source "../.."
+}
 
 dependencies {
-    testImplementation "junit:junit:4.13.2"
-    androidTestImplementation "androidx.test.ext:junit:1.1.5"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
 }
