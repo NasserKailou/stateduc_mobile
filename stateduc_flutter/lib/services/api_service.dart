@@ -391,20 +391,25 @@ class ApiService {
     required String qstId,       // question id
     required String etabId,      // school id
     required String? filter,     // filter period id or null
-    required Map<String, String> formData,
+    required Map<String, dynamic> formData,  // dynamic to accept both String and server data
     String? etabRegroupId,       // school.idRegroup (for LOC_REG_0 in q1)
+    bool isFirstQuestion = false, // true when sending question[0] → includes LOC_REG_0
     bool isLastPage = true,
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
     // Build form body like getPageDataToSend()
     final bodyParts = <String>[];
     formData.forEach((key, value) {
-      final encodedVal = value.replaceAll('/', '_slh_');
+      final strVal = value?.toString() ?? '';
+      final encodedVal = strVal.replaceAll('/', '_slh_');
       bodyParts.add('$key=${Uri.encodeComponent(encodedVal)}');
     });
-    // Add LOC_REG_0 if not present (required for first question submission)
-    if (!formData.containsKey('LOC_REG_0') && etabRegroupId != null) {
-      bodyParts.add('LOC_REG_0=$etabRegroupId');
+    // Add LOC_REG_0 if this is the first question (mirrors page_etab.js LOC_REG_0 logic)
+    if ((isFirstQuestion || !formData.containsKey('LOC_REG_0')) &&
+        etabRegroupId != null) {
+      if (!formData.containsKey('LOC_REG_0')) {
+        bodyParts.add('LOC_REG_0=$etabRegroupId');
+      }
     }
     // Append trailing params (mirrors page_etab.js)
     if (isLastPage) {

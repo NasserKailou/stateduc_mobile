@@ -378,6 +378,11 @@ class DataEntryProvider extends ChangeNotifier {
         return false;
       }
 
+      // Convert Map<String, dynamic> → Map<String, String> for local DB
+      final Map<String, String> serverFieldsStr = serverFields.map(
+        (k, v) => MapEntry(k, v?.toString() ?? ''),
+      );
+
       // Replace local data with server values
       await _db.deleteCollectedData(
         idCamp:   _idCamp!,
@@ -390,7 +395,7 @@ class DataEntryProvider extends ChangeNotifier {
         idEtab:   _idEtab!,
         idQst:    _selectedQuestion!.idQst,
         idFilter: _selectedFilter?.idFilter,
-        data:     serverFields,
+        data:     serverFieldsStr,
       );
       await _db.markCollectedDataSent(
         idCamp:   _idCamp!,
@@ -399,7 +404,7 @@ class DataEntryProvider extends ChangeNotifier {
         idFilter: _selectedFilter?.idFilter,
       );
 
-      _formData          = Map.from(serverFields);
+      _formData          = serverFieldsStr;
       _hasUnsavedChanges = false;
       _successMessage    = 'Données rechargées depuis le serveur';
       notifyListeners();

@@ -186,9 +186,11 @@ class AuthService {
     final password = await _storage.read(key: _kPassword) ?? '';
     _api.configure(serverUrl, login, password);
     return User(
-      idUser: userId!,
-      nomUser: userName ?? login!,
-      login: login!,
+      idUser:   userId!,
+      nomUser:  userName ?? login!,
+      login:    login!,
+      codeyear: '',   // not stored locally — unknown after PIN-only unlock
+      libyear:  '',
     );
   }
 
