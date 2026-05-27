@@ -51,24 +51,29 @@ class ApiService {
     return InterceptorsWrapper(
       onRequest: (options, handler) {
         debugPrint('[Dio→] ${options.method} ${options.uri}');
-        debugPrint('[Dio→] Auth: ${options.headers['Authorization']?.toString().substring(0, 20) ?? 'MISSING'}...');
+        debugPrint(
+            '[Dio→] Auth: ${options.headers['Authorization']?.toString().substring(0, 20) ?? 'MISSING'}...');
         if (options.data != null) {
           final dataStr = options.data.toString();
-          debugPrint('[Dio→] Body: ${dataStr.length > 200 ? dataStr.substring(0, 200) + "…" : dataStr}');
+          debugPrint(
+              '[Dio→] Body: ${dataStr.length > 200 ? dataStr.substring(0, 200) + "…" : dataStr}');
         }
         handler.next(options);
       },
       onResponse: (response, handler) {
-        debugPrint('[Dio←] ${response.statusCode} ${response.requestOptions.uri}');
+        debugPrint(
+            '[Dio←] ${response.statusCode} ${response.requestOptions.uri}');
         final bodyStr = response.data?.toString() ?? '';
-        debugPrint('[Dio←] Body: ${bodyStr.length > 300 ? bodyStr.substring(0, 300) + "…" : bodyStr}');
+        debugPrint(
+            '[Dio←] Body: ${bodyStr.length > 300 ? bodyStr.substring(0, 300) + "…" : bodyStr}');
         handler.next(response);
       },
       onError: (DioException e, handler) {
         debugPrint('[Dio✗] type=${e.type} uri=${e.requestOptions.uri}');
         debugPrint('[Dio✗] message=${e.message}');
         if (e.response != null) {
-          debugPrint('[Dio✗] status=${e.response?.statusCode} body=${e.response?.data}');
+          debugPrint(
+              '[Dio✗] status=${e.response?.statusCode} body=${e.response?.data}');
         }
         handler.next(e);
       },
@@ -113,7 +118,8 @@ class ApiService {
         'Mozilla/5.0 (Linux; Android 10) StatEduc/1.0';
     _dio.options.headers['Accept'] = 'application/json, text/plain, */*';
     debugPrint('[ApiService] configure → baseUrl=$_serverUrl login=$login');
-    debugPrint('[ApiService] Authorization=Basic ${base64Encode(utf8.encode('$login:$password'))}');
+    debugPrint(
+        '[ApiService] Authorization=Basic ${base64Encode(utf8.encode('$login:$password'))}');
   }
 
   void updateCredentials(String login, String password) {
@@ -160,15 +166,15 @@ class ApiService {
 
       // 401 = either Apache/Nginx HTTP Basic Auth layer OR PHP app rejected
       if (statusCode == 401) {
-        debugPrint('[ApiService] authenticate: HTTP 401 — credentials rejected');
-        throw ApiException(
-          'Accès refusé (401).\n'
-          'Vérifiez vos identifiants ou contactez l\'administrateur.'
-        );
+        debugPrint(
+            '[ApiService] authenticate: HTTP 401 — credentials rejected');
+        throw ApiException('Accès refusé (401).\n'
+            'Vérifiez vos identifiants ou contactez l\'administrateur.');
       }
 
       if (statusCode == 404) {
-        throw ApiException('Serveur introuvable (404). Vérifiez l\'URL : $_serverUrl');
+        throw ApiException(
+            'Serveur introuvable (404). Vérifiez l\'URL : $_serverUrl');
       }
 
       // Parse the response body manually
@@ -194,7 +200,8 @@ class ApiService {
 
       // se_message == 'log_ko' means invalid credentials at PHP app level
       if (data['se_message'] == 'log_ko') {
-        debugPrint('[ApiService] authenticate: log_ko → identifiants invalides (PHP level)');
+        debugPrint(
+            '[ApiService] authenticate: log_ko → identifiants invalides (PHP level)');
         return null;
       }
 
@@ -211,31 +218,31 @@ class ApiService {
 
       debugPrint('[ApiService] authenticate: unexpected response → $data');
       return null;
-
     } on DioException catch (e) {
-      debugPrint('[ApiService] authenticate DioException: type=${e.type} status=${e.response?.statusCode} msg=${e.message}');
-      debugPrint('[ApiService] authenticate DioException body=${e.response?.data}');
+      debugPrint(
+          '[ApiService] authenticate DioException: type=${e.type} status=${e.response?.statusCode} msg=${e.message}');
+      debugPrint(
+          '[ApiService] authenticate DioException body=${e.response?.data}');
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout) {
-        throw ApiException('Serveur injoignable (timeout). Vérifiez l\'URL et le réseau.');
+        throw ApiException(
+            'Serveur injoignable (timeout). Vérifiez l\'URL et le réseau.');
       }
       if (e.type == DioExceptionType.connectionError) {
-        throw ApiException('Impossible de joindre le serveur. Vérifiez l\'URL : $_serverUrl');
+        throw ApiException(
+            'Impossible de joindre le serveur. Vérifiez l\'URL : $_serverUrl');
       }
       if (e.response?.statusCode == 401) {
-        throw ApiException(
-          'Accès refusé (401).\n'
-          'Le serveur exige une authentification HTTP supplémentaire.\n'
-          'Contactez l\'administrateur du serveur.'
-        );
+        throw ApiException('Accès refusé (401).\n'
+            'Le serveur exige une authentification HTTP supplémentaire.\n'
+            'Contactez l\'administrateur du serveur.');
       }
-      if (e.response?.statusCode == 404) throw ApiException('Serveur introuvable (404). Vérifiez l\'URL.');
+      if (e.response?.statusCode == 404)
+        throw ApiException('Serveur introuvable (404). Vérifiez l\'URL.');
       throw ApiException('Erreur réseau : ${e.message ?? e.type.name}');
     }
   }
-
-
 
   Future<void> logout() async {
     try {
@@ -276,7 +283,8 @@ class ApiService {
     if (data is List) {
       return data.map((r) => Regroup.fromJson(r)).toList();
     }
-    return [];}
+    return [];
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // REGROUP TYPES (Types d'entités administratives)
@@ -290,8 +298,8 @@ class ApiService {
 
   Future<List<RegroupType>> getRegroupTypes(
       String userId, String campId, String typeRegroups) async {
-    final data = await _get(
-        'user_camp.php/typ_reg_camp/$userId/$campId/$typeRegroups');
+    final data =
+        await _get('user_camp.php/typ_reg_camp/$userId/$campId/$typeRegroups');
     if (data is List) {
       return data.map((t) => RegroupType.fromJson(t)).toList();
     }
@@ -385,8 +393,7 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<Question>> getQuestions(String campId, String sysId) async {
-    final data =
-        await _get('data_camp.php/theme_camp/$campId/$sysId/eng');
+    final data = await _get('data_camp.php/theme_camp/$campId/$sysId/eng');
     if (data is List) {
       return data.map((q) => Question.fromJson(q)).toList();
     }
@@ -460,8 +467,7 @@ class ApiService {
 
   Future<List<ValidationRule>> getValidationRules(
       String qstId, String sysId) async {
-    final data =
-        await _get('data_camp.php/regle_theme_camp/$qstId/$sysId');
+    final data = await _get('data_camp.php/regle_theme_camp/$qstId/$sysId');
     if (data is List) {
       return data.map((r) => ValidationRule.fromJson(r)).toList();
     }
@@ -484,15 +490,17 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> saveData({
-    required String login,       // currentUser.login
-    required String campId,      // stmCamp.id
-    required String sysId,       // stmPageEtab.currSys.id
-    required String qstId,       // question id
-    required String etabId,      // school id
-    required String? filter,     // filter period id or null
-    required Map<String, dynamic> formData,  // dynamic to accept both String and server data
-    String? etabRegroupId,       // school.idRegroup (for LOC_REG_0 in q1)
-    bool isFirstQuestion = false, // true when sending question[0] → includes LOC_REG_0
+    required String login, // currentUser.login
+    required String campId, // stmCamp.id
+    required String sysId, // stmPageEtab.currSys.id
+    required String qstId, // question id
+    required String etabId, // school id
+    required String? filter, // filter period id or null
+    required Map<String, dynamic>
+        formData, // dynamic to accept both String and server data
+    String? etabRegroupId, // school.idRegroup (for LOC_REG_0 in q1)
+    bool isFirstQuestion =
+        false, // true when sending question[0] → includes LOC_REG_0
     bool isLastPage = true,
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
@@ -536,8 +544,7 @@ class ApiService {
       final result = json.decode(responseStr);
       if (result is Map) {
         if (result['se_status'] == 400) {
-          throw ApiException(
-              result['se_data']?.toString() ?? 'Erreur serveur');
+          throw ApiException(result['se_data']?.toString() ?? 'Erreur serveur');
         }
         return result['se_data'] == 'OKSAVE';
       }
@@ -561,12 +568,12 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<Map<String, dynamic>?> reloadData({
-    required String login,    // stmChargeCamp.currUser.login
-    required String sysId,    // stmPageEtab.currSys.id
-    required String qstId,    // question id
-    required String campId,   // stmCamp.id
-    required String etabId,   // school id
-    required String? filter,  // filter period id or null
+    required String login, // stmChargeCamp.currUser.login
+    required String sysId, // stmPageEtab.currSys.id
+    required String qstId, // question id
+    required String campId, // stmCamp.id
+    required String etabId, // school id
+    required String? filter, // filter period id or null
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
     try {
@@ -615,8 +622,10 @@ class ApiService {
       final statusCode = response.statusCode ?? 0;
 
       if (statusCode == 401) throw ApiException('Accès refusé (401)');
-      if (statusCode == 404) throw ApiException('Endpoint introuvable (404) : $path');
-      if (statusCode >= 300) throw ApiException('Erreur serveur ($statusCode) : $path');
+      if (statusCode == 404)
+        throw ApiException('Endpoint introuvable (404) : $path');
+      if (statusCode >= 300)
+        throw ApiException('Erreur serveur ($statusCode) : $path');
 
       final rawBody = response.data?.toString().trim() ?? '';
       if (rawBody.isEmpty) return [];
@@ -626,7 +635,8 @@ class ApiService {
       try {
         parsed = json.decode(rawBody);
       } catch (_) {
-        debugPrint('[ApiService] _get: JSON parse error for $path body=$rawBody');
+        debugPrint(
+            '[ApiService] _get: JSON parse error for $path body=$rawBody');
         return [];
       }
 
@@ -638,15 +648,13 @@ class ApiService {
     } on DioException catch (e) {
       final status = e.response?.statusCode;
       if (status == 401) throw ApiException('Accès refusé (401)');
-      if (status == 404) throw ApiException('Endpoint introuvable (404) : $path');
+      if (status == 404)
+        throw ApiException('Endpoint introuvable (404) : $path');
       // e.message can be null for redirect/unknown errors — provide a useful message
       final msg = e.message ?? e.type.name;
       throw ApiException('Erreur réseau : $msg');
     }
   }
-
-
-}
 }
 
 // ─── Auth Injector Interceptor ───────────────────────────────────────────────
