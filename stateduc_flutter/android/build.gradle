@@ -1,7 +1,6 @@
-// StatEduc Flutter — android/build.gradle (root)
-// AGP 8.1 / Gradle 8.0 compatible.
-// With the new settings.gradle plugin DSL, this file only needs allprojects
-// repository config and the clean task.
+// Top-level build.gradle — Flutter 3.x / AGP 8.x compatible
+// Les plugins sont déclarés dans settings.gradle (nouveau style).
+// Ce fichier ne contient que la config partagée des sous-projets.
 
 allprojects {
     repositories {
@@ -14,11 +13,9 @@ rootProject.buildDir = "../build"
 
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(":app")
 }
 
 tasks.register("clean", Delete) {
-    delete rootProject.layout.buildDirectory
+    delete rootProject.buildDir
 }
