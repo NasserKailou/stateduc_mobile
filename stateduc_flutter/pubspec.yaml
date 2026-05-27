@@ -36,12 +36,6 @@ dependencies:
   # WebView pour rendu fidèle des formulaires HTML serveur
   webview_flutter: ^4.10.0
 
-  # Vibration (remplace cordova-plugin-vibration)
-  vibration: ^2.0.0
-
-  # Génération d'identifiants uniques
-  uuid: ^4.5.1
-
   # Icônes Material
   cupertino_icons: ^1.0.8
 
