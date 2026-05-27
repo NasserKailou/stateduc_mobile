@@ -110,13 +110,18 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _questions    = await _db.getQuestions(idCamp, idSystem);
+      _questions     = await _db.getQuestions(idCamp, idSystem);
       _filterPeriods = await _db.getFilterPeriods(idCamp);
     } catch (e) {
       _error = 'Erreur chargement questions : ${e.toString()}';
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+
+    // Auto-select first question so the form is immediately visible
+    if (_questions.isNotEmpty && _error == null) {
+      await selectQuestion(_questions.first);
     }
   }
 

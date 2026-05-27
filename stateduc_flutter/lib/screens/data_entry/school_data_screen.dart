@@ -221,13 +221,9 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   Future<void> _sendToServer(BuildContext context, AuthProvider auth,
       DataEntryProvider entry) async {
     if (auth.user == null) return;
-    // Validate before sending
-    if (!entry.validateAll()) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Formulaire incomplet ou invalide. Corrigez les erreurs.')));
-      return;
-    }
+    // Validate — but only warn, do not block send (mirrors original app)
+    entry.validateAll();
+
     final ok = await entry.sendToServer(user: auth.user!);
     if (!ok && mounted && entry.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

@@ -41,12 +41,26 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       onOpen: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
     );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // v2: add sort_order column to questions table
+      try {
+        await db.execute(
+          'ALTER TABLE questions ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0',
+        );
+      } catch (_) {
+        // Column may already exist if DB was recreated
+      }
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -165,6 +179,7 @@ class DatabaseService {
         lib_qst     TEXT NOT NULL,
         id_system   TEXT NOT NULL,
         has_filter  INTEGER NOT NULL DEFAULT 0,
+        sort_order  INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (id_camp, id_qst)
       )
     ''');
@@ -624,28 +639,31 @@ class DatabaseService {
       'questions',
       where: 'id_camp = ? AND id_system = ?',
       whereArgs: [idCamp, idSystem],
-      orderBy: 'lib_qst ASC',
+      orderBy: 'sort_order ASC, lib_qst ASC',
     );
     return rows.map((r) => Question(
       idQst: r['id_qst'] as String,
       libQst: r['lib_qst'] as String,
       idSystem: r['id_system'] as String,
       hasFilter: (r['has_filter'] as int) == 1,
+      sortOrder: (r['sort_order'] as int?) ?? 0,
     )).toList();
   }
 
   Future<void> insertQuestions(String idCamp, List<Question> questions) async {
     final db = await database;
     final batch = db.batch();
-    for (final q in questions) {
+    for (int i = 0; i < questions.length; i++) {
+      final q = questions[i];
       batch.insert(
         'questions',
         {
-          'id_camp': idCamp,
-          'id_qst': q.idQst,
-          'lib_qst': q.libQst,
-          'id_system': q.idSystem,
+          'id_camp':    idCamp,
+          'id_qst':     q.idQst,
+          'lib_qst':    q.libQst,
+          'id_system':  q.idSystem,
           'has_filter': q.hasFilter ? 1 : 0,
+          'sort_order': q.sortOrder > 0 ? q.sortOrder : i,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );

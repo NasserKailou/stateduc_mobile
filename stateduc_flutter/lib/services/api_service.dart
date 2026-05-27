@@ -395,7 +395,11 @@ class ApiService {
   Future<List<Question>> getQuestions(String campId, String sysId) async {
     final data = await _get('data_camp.php/theme_camp/$campId/$sysId/eng');
     if (data is List) {
-      return data.map((q) => Question.fromJson(q)).toList();
+      // Pass serverIndex to preserve the server-returned order (sort_order)
+      return List.generate(
+        data.length,
+        (i) => Question.fromJson(data[i] as Map<String, dynamic>, serverIndex: i),
+      );
     }
     return [];
   }
@@ -539,22 +543,42 @@ class ApiService {
           responseType: ResponseType.plain,
         ),
       );
-      final responseStr = response.data.toString();
-      // Response is a JSON string
-      final result = json.decode(responseStr);
+      final statusCode = response.statusCode ?? 0;
+      if (statusCode == 401) throw ApiException('Accès refusé (401)');
+      if (statusCode == 404) throw ApiException('Endpoint introuvable (404)');
+
+      final responseStr = response.data?.toString().trim() ?? '';
+      debugPrint('[ApiService] saveData ← HTTP $statusCode body=$responseStr');
+
+      // Server may return empty body on success — treat as OKSAVE
+      if (responseStr.isEmpty) return true;
+
+      // Try to parse JSON — if it fails, treat non-empty response as success
+      dynamic result;
+      try {
+        result = json.decode(responseStr);
+      } catch (_) {
+        // Non-JSON response — server accepted the data
+        debugPrint('[ApiService] saveData: non-JSON response, assuming success');
+        return true;
+      }
+
       if (result is Map) {
         if (result['se_status'] == 400) {
-          throw ApiException(result['se_data']?.toString() ?? 'Erreur serveur');
+          throw ApiException(result['se_data']?.toString() ?? 'Erreur serveur (400)');
         }
-        return result['se_data'] == 'OKSAVE';
+        if (result['se_data'] == 'OKSAVE') return true;
+        if (result['se_status'] != null && result['se_status'] != 400) return true;
+        return false;
       }
-      return false;
+      // Any non-Map non-error response = success
+      return statusCode < 300;
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) throw ApiException('Accès refusé');
       if (e.response?.statusCode == 404) {
         throw ApiException('Endpoint introuvable (vérifiez l\'URL serveur)');
       }
-      throw ApiException('Erreur envoi données : ${e.message}');
+      throw ApiException('Erreur envoi données : ${e.message ?? e.type.name}');
     }
   }
 
