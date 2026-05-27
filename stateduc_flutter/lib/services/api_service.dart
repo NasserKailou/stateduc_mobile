@@ -515,12 +515,30 @@ class ApiService {
     bool isLastPage = true,
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
-    // Build form body like getPageDataToSend()
+    // Build form body exactly like page_etab.js getPageDataToSend():
+    //   • Radio keys are stored as "fieldName#optionId" = "1"|"0".
+    //     Only checked radios (value == "1") are sent, transformed to
+    //     "fieldName=optionId" (the option id, not "1").
+    //   • All other fields: replace "/" → "_slh_", NO Uri.encodeComponent
+    //     (JS only does replace(/\//g,'_slh_') — no encodeURIComponent).
     final bodyParts = <String>[];
     formData.forEach((key, value) {
       final strVal = value?.toString() ?? '';
-      final encodedVal = strVal.replaceAll('/', '_slh_');
-      bodyParts.add('$key=${Uri.encodeComponent(encodedVal)}');
+      if (key.contains('#')) {
+        // Radio field: key = "fieldName#optionId"
+        // Only include if this option is checked (value == "1")
+        if (strVal == '1' || strVal == 'true') {
+          final hashIdx  = key.indexOf('#');
+          final fieldName = key.substring(0, hashIdx);
+          final optionId  = key.substring(hashIdx + 1).replaceAll('/', '_slh_');
+          bodyParts.add('$fieldName=$optionId');
+        }
+        // Unchecked radio → skip (do not send anything)
+      } else {
+        // Text / number / select / checkbox — only _slh_ substitution
+        final encodedVal = strVal.replaceAll('/', '_slh_');
+        bodyParts.add('$key=$encodedVal');
+      }
     });
     // Add LOC_REG_0 if this is the first question (mirrors page_etab.js LOC_REG_0 logic)
     if ((isFirstQuestion || !formData.containsKey('LOC_REG_0')) &&

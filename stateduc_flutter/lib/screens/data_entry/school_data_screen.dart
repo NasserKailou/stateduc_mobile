@@ -312,9 +312,19 @@ class _QuestionSelector extends StatelessWidget {
               .map((q) => Padding(
                     padding: const EdgeInsets.only(right: 6),
                     child: ChoiceChip(
-                      label: Text(q.libQst,
-                          style: const TextStyle(fontSize: 13)),
+                      label: Text(
+                        q.libQst,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: selected?.idQst == q.idQst
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                      ),
                       selected: selected?.idQst == q.idQst,
+                      selectedColor: Theme.of(context).colorScheme.primary,
+                      backgroundColor: Colors.grey.shade200,
+                      side: BorderSide(color: Colors.grey.shade400),
                       onSelected: (_) => onSelect(q),
                     ),
                   ))

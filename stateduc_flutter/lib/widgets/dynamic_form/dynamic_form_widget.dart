@@ -64,7 +64,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
           _injectBridge();
         },
       ))
-      ..loadHtmlString(_buildHtmlPage(widget.html));
+      ..loadRequest(_buildHtmlUri(widget.html));
   }
 
   @override
@@ -77,6 +77,17 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       _injectData();
       _injectValidationErrors();
     }
+  }
+
+  // ── Convert HTML to a Base64 data-URI so the WebView always uses UTF-8 ──────
+  // loadHtmlString() does not reliably honour the <meta charset="UTF-8"> tag on
+  // Android, causing accented characters (é, è, à …) to display as Mojibake
+  // (Ã©, etc.).  Encoding the bytes as Base64 and loading via a data: URI
+  // forces the engine to decode the content as UTF-8.
+  Uri _buildHtmlUri(String formHtml) {
+    final bytes     = utf8.encode(_buildHtmlPage(formHtml));
+    final base64Html = base64Encode(bytes);
+    return Uri.parse('data:text/html;charset=utf-8;base64,$base64Html');
   }
 
   // ── Build the full HTML page loaded into the WebView ───────────────────────
