@@ -102,6 +102,78 @@ class ValidationRule {
     );
   }
 
+  /// Validates [value] against this rule.
+  /// Returns a French error message, or null if the value is valid.
+  /// Called by DataEntryProvider.validateField().
+  String? validate(String value) {
+    final v = value.trim();
+    switch (ruleType) {
+      case 'mandatory':
+        if (v.isEmpty) return 'Ce champ est obligatoire';
+        return null;
+
+      case 'type_int':
+        if (v.isEmpty) return null; // mandatory handled separately
+        if (int.tryParse(v) == null) return 'Veuillez saisir un nombre entier';
+        return null;
+
+      case 'type_decimal':
+        if (v.isEmpty) return null;
+        // Accept both comma and dot as decimal separator
+        if (double.tryParse(v.replaceAll(',', '.')) == null) {
+          return 'Veuillez saisir un nombre décimal';
+        }
+        return null;
+
+      case 'type_date':
+        if (v.isEmpty) return null;
+        // Accepts DD/MM/YYYY or YYYY-MM-DD
+        final ddmmyyyy = RegExp(r'^\d{2}/\d{2}/\d{4}$');
+        final yyyymmdd = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+        if (!ddmmyyyy.hasMatch(v) && !yyyymmdd.hasMatch(v)) {
+          return 'Format de date invalide (JJ/MM/AAAA)';
+        }
+        return null;
+
+      case 'max_length':
+        if (v.isEmpty) return null;
+        final max = int.tryParse(ruleValue ?? '');
+        if (max != null && v.length > max) {
+          return 'Maximum $max caractères autorisés';
+        }
+        return null;
+
+      case 'min_val':
+        if (v.isEmpty) return null;
+        final num = double.tryParse(v.replaceAll(',', '.'));
+        final min = double.tryParse(ruleValue ?? '');
+        if (num != null && min != null && num < min) {
+          return 'La valeur minimale est $ruleValue';
+        }
+        return null;
+
+      case 'max_val':
+        if (v.isEmpty) return null;
+        final num2 = double.tryParse(v.replaceAll(',', '.'));
+        final max2 = double.tryParse(ruleValue ?? '');
+        if (num2 != null && max2 != null && num2 > max2) {
+          return 'La valeur maximale est $ruleValue';
+        }
+        return null;
+
+      case 'enum':
+        if (v.isEmpty) return null;
+        final allowed = (ruleValue ?? '').split(',').map((e) => e.trim()).toList();
+        if (allowed.isNotEmpty && !allowed.contains(v)) {
+          return 'Valeur non autorisée';
+        }
+        return null;
+
+      default: // 'text' and unknown types — no constraint
+        return null;
+    }
+  }
+
   Map<String, dynamic> toJson() => {
     'id_champ': idChamp,
     'rule_type': ruleType,
