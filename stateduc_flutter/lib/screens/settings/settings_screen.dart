@@ -15,7 +15,10 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
   final _serverUrlController = TextEditingController();
 
   // PIN change
@@ -29,11 +32,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   bool _obscureOldPin = true;
   bool _obscureNewPin = true;
-  int _currentTab = 0;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       if (auth.serverUrl != null) {
@@ -47,6 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _serverUrlController.dispose();
     _oldPinController.dispose();
     _newPinController.dispose();
@@ -63,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         appBar: AppBar(
           title: const Text('Paramètres'),
           bottom: TabBar(
-            onTap: (i) => setState(() => _currentTab = i),
+            controller: _tabController,
             tabs: const [
               Tab(icon: Icon(Icons.dns_outlined), text: 'Serveur'),
               Tab(icon: Icon(Icons.lock_outline), text: 'PIN'),
@@ -71,8 +75,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-        body: IndexedStack(
-          index: _currentTab,
+        body: TabBarView(
+          controller: _tabController,
           children: [
             _buildServerTab(auth),
             _buildPinTab(auth),
@@ -85,39 +89,83 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // ─── Server tab ─────────────────────────────────────────────────────────────
   Widget _buildServerTab(AuthProvider auth) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text('Configuration du serveur',
               style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          const Text(
-              'Adresse du serveur StatEduc (ex: http://192.168.1.1)'),
+          const SizedBox(height: 4),
+          Text(
+            'Adresse complète du serveur StatEduc',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
           const SizedBox(height: 16),
+
+          // ── URL field — explicit high-contrast style ──
           TextField(
             controller: _serverUrlController,
             keyboardType: TextInputType.url,
-            decoration: const InputDecoration(
+            autocorrect: false,
+            enableSuggestions: false,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontFamily: 'monospace',
+              fontSize: 15,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            decoration: InputDecoration(
               labelText: 'URL du serveur',
-              prefixIcon: Icon(Icons.dns_outlined),
-              border: OutlineInputBorder(),
+              labelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+              hintText: 'http://192.168.1.100:8083/StatEduc_MEN_2025',
+              helperText: 'Ex : http://10.52.175.15:8083/StatEduc_MEN_2025',
+              helperMaxLines: 2,
+              prefixIcon: const Icon(Icons.dns_outlined),
+              border: const OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                  width: 1.5,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerLowest,
             ),
           ),
           const SizedBox(height: 16),
+
           if (auth.storedLogin != null)
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: const Text('Utilisateur connecté'),
-              subtitle: Text(auth.storedLogin!),
-              contentPadding: EdgeInsets.zero,
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: const Text('Utilisateur connecté'),
+                subtitle: Text(
+                  auth.storedLogin!,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              ),
             ),
-          const Spacer(),
+
+          const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => _saveServerUrl(auth),
             icon: const Icon(Icons.save_outlined),
-            label: const Text('Enregistrer'),
+            label: const Text('Enregistrer l\'URL'),
           ),
           const SizedBox(height: 12),
           OutlinedButton.icon(
@@ -179,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // ─── PIN tab ─────────────────────────────────────────────────────────────────
   Widget _buildPinTab(AuthProvider auth) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -192,10 +240,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             keyboardType: TextInputType.number,
             obscureText: _obscureOldPin,
             maxLength: 8,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                ),
             decoration: InputDecoration(
               labelText: 'PIN actuel',
               prefixIcon: const Icon(Icons.lock_outline),
               border: const OutlineInputBorder(),
+              filled: true,
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
               suffixIcon: IconButton(
                 icon: Icon(_obscureOldPin
                     ? Icons.visibility_off_outlined
@@ -211,10 +266,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             keyboardType: TextInputType.number,
             obscureText: _obscureNewPin,
             maxLength: 8,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                ),
             decoration: InputDecoration(
               labelText: 'Nouveau PIN',
               prefixIcon: const Icon(Icons.lock),
               border: const OutlineInputBorder(),
+              filled: true,
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
               suffixIcon: IconButton(
                 icon: Icon(_obscureNewPin
                     ? Icons.visibility_off_outlined
@@ -230,10 +292,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             keyboardType: TextInputType.number,
             obscureText: true,
             maxLength: 8,
-            decoration: const InputDecoration(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                ),
+            decoration: InputDecoration(
               labelText: 'Confirmer le nouveau PIN',
-              prefixIcon: Icon(Icons.lock),
-              border: OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.lock),
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
             ),
           ),
           if (auth.error != null) ...[
@@ -279,7 +348,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // ─── Security question tab ──────────────────────────────────────────────────
   Widget _buildSecurityTab(AuthProvider auth) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -292,20 +361,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 16),
           TextField(
             controller: _secQController,
-            decoration: const InputDecoration(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+            decoration: InputDecoration(
               labelText: 'Question',
               hintText: 'Ex: Nom de votre école primaire ?',
-              prefixIcon: Icon(Icons.help_outline),
-              border: OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.help_outline),
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _secAController,
-            decoration: const InputDecoration(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+            decoration: InputDecoration(
               labelText: 'Réponse',
-              prefixIcon: Icon(Icons.question_answer_outlined),
-              border: OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.question_answer_outlined),
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceContainerLowest,
             ),
           ),
           const SizedBox(height: 16),

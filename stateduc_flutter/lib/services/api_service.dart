@@ -656,22 +656,77 @@ class ApiService {
 
   Future<dynamic> _get(String path) async {
     try {
-      final response = await _dio.get(path);
+      final response = await _dio.get(
+        path,
+        options: Options(responseType: ResponseType.plain),
+      );
       final statusCode = response.statusCode ?? 0;
-      if (statusCode == 401) throw ApiException('Accès refusé');
-      if (statusCode == 404) throw ApiException('Endpoint introuvable');
-      final data = response.data;
-      if (data is Map) {
+
+      // Handle redirects explicitly (followRedirects: false)
+      if (statusCode >= 300 && statusCode < 400) {
+        final location = response.headers.value('location') ?? '';
+        debugPrint('[ApiService] _get: redirect $statusCode → $location for $path');
+        if (location.isNotEmpty) {
+          return _getAbsoluteUrl(location);
+        }
+        throw ApiException('Redirection inattendue ($statusCode)');
+      }
+
+      if (statusCode == 401) throw ApiException('Accès refusé (401)');
+      if (statusCode == 404) throw ApiException('Endpoint introuvable (404) : $path');
+
+      final rawBody = response.data?.toString().trim() ?? '';
+      if (rawBody.isEmpty) return [];
+
+      // Parse JSON manually
+      dynamic parsed;
+      try {
+        parsed = json.decode(rawBody);
+      } catch (_) {
+        debugPrint('[ApiService] _get: JSON parse error for $path body=$rawBody');
+        return [];
+      }
+
+      if (parsed is Map) {
         // Unwrap se_data envelope (always present in server responses)
-        return data['se_data'] ?? data;
+        return parsed['se_data'] ?? parsed;
       }
-      return data ?? [];
+      return parsed ?? [];
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) throw ApiException('Accès refusé');
-      if (e.response?.statusCode == 404) {
-        throw ApiException('Endpoint introuvable');
-      }
-      throw ApiException('Erreur réseau : ${e.message}');
+      final status = e.response?.statusCode;
+      if (status == 401) throw ApiException('Accès refusé (401)');
+      if (status == 404) throw ApiException('Endpoint introuvable (404) : $path');
+      // e.message can be null for redirect/unknown errors — provide a useful message
+      final msg = e.message ?? e.type.name;
+      throw ApiException('Erreur réseau : $msg');
+    }
+  }
+
+  /// Fetches an absolute URL (for redirect targets) preserving Authorization header.
+  Future<dynamic> _getAbsoluteUrl(String url) async {
+    try {
+      final redirectDio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 120),
+        followRedirects: false,
+        validateStatus: (s) => s != null && s < 500,
+        headers: {
+          'Authorization': _dio.options.headers['Authorization'],
+          'User-Agent': _dio.options.headers['User-Agent'] ??
+              'Mozilla/5.0 (Linux; Android 10) StatEduc/1.0',
+          'Accept': 'application/json, text/plain, */*',
+        },
+      ));
+      final r = await redirectDio.get(url,
+          options: Options(responseType: ResponseType.plain));
+      final rawBody = r.data?.toString().trim() ?? '';
+      if (rawBody.isEmpty) return [];
+      final parsed = json.decode(rawBody);
+      if (parsed is Map) return parsed['se_data'] ?? parsed;
+      return parsed ?? [];
+    } catch (e) {
+      debugPrint('[ApiService] _getAbsoluteUrl error: $e');
+      return [];
     }
   }
 }
