@@ -24,25 +24,24 @@ class ApiService {
   String? _login;
   String? _password;
 
-  ApiService() {
+  // ─── Singleton ──────────────────────────────────────────────────────────────
+  // CRITICAL: ONE shared instance used by AuthService, CampaignProvider,
+  // DataEntryProvider. configure() called at login immediately visible to all.
+  static final ApiService _instance = ApiService._internal();
+  factory ApiService() => _instance;
+
+  ApiService._internal() {
     _dio = Dio(
       BaseOptions(
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 120),
         sendTimeout: const Duration(seconds: 60),
-        // Let Dio follow redirects automatically (up to 5 hops).
-        // The Auth header is re-injected on every request by the
-        // _AuthInjectorInterceptor below — so redirects never lose credentials.
         followRedirects: true,
         maxRedirects: 5,
-        // Accept all HTTP status codes so we can handle 401/404/etc. inline.
         validateStatus: (status) => status != null && status < 600,
       ),
     );
-    // Auth re-injection interceptor: ensures Authorization header is present
-    // on every request including those triggered by redirect chains.
     _dio.interceptors.add(_AuthInjectorInterceptor(this));
-    // Request/response logger interceptor for adb logcat debugging.
     _dio.interceptors.add(_buildLogInterceptor());
   }
 
