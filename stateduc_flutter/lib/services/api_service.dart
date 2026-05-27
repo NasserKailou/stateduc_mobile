@@ -440,17 +440,24 @@ class ApiService {
         htmlUrl = '${_serverUrl ?? ''}$htmlUrl';
       }
 
-      // Step 2: fetch the HTML content with Basic Auth
-      final step2 = await Dio().get(
+      debugPrint('[ApiService] getFormHtml step2 → GET $htmlUrl');
+
+      // Step 2: fetch HTML content using the SAME _dio instance so that
+      // Basic Auth header is carried automatically.
+      // When htmlUrl is absolute (starts with http), Dio 5.x ignores baseUrl
+      // and uses the absolute URL directly — so no baseUrl conflict.
+      final step2 = await _dio.get(
         htmlUrl,
-        options: Options(
-          responseType: ResponseType.plain,
-          headers: {
-            'Authorization': _dio.options.headers['Authorization'],
-          },
-        ),
+        options: Options(responseType: ResponseType.plain),
       );
-      return step2.data.toString();
+      final html = step2.data?.toString() ?? '';
+      debugPrint('[ApiService] getFormHtml step2 ← ${step2.statusCode} '
+          'bodyLen=${html.length} snippet=${html.length > 120 ? html.substring(0, 120) : html}');
+
+      if (html.isEmpty) {
+        throw ApiException('Formulaire HTML vide (réponse serveur)');
+      }
+      return html;
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) throw ApiException('Accès refusé');
       if (e.response?.statusCode == 404) {

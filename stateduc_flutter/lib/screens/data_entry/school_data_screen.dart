@@ -186,13 +186,33 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   }
 
   Widget _buildForm(BuildContext context, DataEntryProvider entry) {
-    if (entry.formHtml == null) {
+    final html = entry.formHtml;
+    // Show offline message when HTML is missing, empty, or is the error
+    // placeholder stored during a failed campaign download
+    final isUnavailable = html == null ||
+        html.trim().isEmpty ||
+        html.contains('Formulaire non disponible');
+    if (isUnavailable) {
       return const Center(
-        child: Text('Formulaire non disponible hors ligne'),
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.cloud_off_outlined, size: 48, color: Colors.grey),
+              SizedBox(height: 12),
+              Text(
+                'Formulaire non disponible.\nRe-téléchargez la campagne pour récupérer les formulaires.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
       );
     }
     return DynamicFormWidget(
-      html: entry.formHtml!,
+      html: html,
       data: entry.formData,
       validationErrors: entry.validationErrors,
       rules: entry.selectedQuestion != null

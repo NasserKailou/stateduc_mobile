@@ -147,6 +147,9 @@ class DataEntryProvider extends ChangeNotifier {
     try {
       // Load cached form HTML
       _formHtml = await _db.getFormHtml(_idCamp!, question.idQst);
+      debugPrint('[DataEntry] selectQuestion: idQst=${question.idQst} '
+          'formHtml=${_formHtml == null ? "NULL" : "len=${_formHtml!.length} '
+          'snippet=${_formHtml!.length > 80 ? _formHtml!.substring(0, 80) : _formHtml}"}');
       // Load validation rules
       _rules    = await _db.getValidationRules(_idCamp!, question.idQst);
       // Load saved field values (no filter yet)
