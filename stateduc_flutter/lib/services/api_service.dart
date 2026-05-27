@@ -30,7 +30,44 @@ class ApiService {
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 120),
         sendTimeout: const Duration(seconds: 60),
+        // CRITICAL: disable auto-redirect so Dio doesn't silently follow
+        // 301/302 redirects and lose the Authorization header in the process.
+        followRedirects: false,
+        // Accept all status codes so we can handle them manually
+        validateStatus: (status) => status != null && status < 500,
       ),
+    );
+    // Add request/response logger interceptor for debugging
+    _dio.interceptors.add(_buildLogInterceptor());
+  }
+
+  // ─── Log Interceptor ────────────────────────────────────────────────────────
+
+  InterceptorsWrapper _buildLogInterceptor() {
+    return InterceptorsWrapper(
+      onRequest: (options, handler) {
+        debugPrint('[Dio→] ${options.method} ${options.uri}');
+        debugPrint('[Dio→] Headers: ${options.headers}');
+        if (options.data != null) {
+          final dataStr = options.data.toString();
+          debugPrint('[Dio→] Body: ${dataStr.length > 200 ? dataStr.substring(0, 200) + "…" : dataStr}');
+        }
+        handler.next(options);
+      },
+      onResponse: (response, handler) {
+        debugPrint('[Dio←] ${response.statusCode} ${response.requestOptions.uri}');
+        final bodyStr = response.data?.toString() ?? '';
+        debugPrint('[Dio←] Body: ${bodyStr.length > 300 ? bodyStr.substring(0, 300) + "…" : bodyStr}');
+        handler.next(response);
+      },
+      onError: (DioException e, handler) {
+        debugPrint('[Dio✗] ${e.type} ${e.requestOptions.uri}');
+        debugPrint('[Dio✗] message=${e.message}');
+        if (e.response != null) {
+          debugPrint('[Dio✗] status=${e.response?.statusCode} body=${e.response?.data}');
+        }
+        handler.next(e);
+      },
     );
   }
 
@@ -67,7 +104,12 @@ class ApiService {
     _dio.options.baseUrl = _serverUrl!;
     _dio.options.headers['Authorization'] =
         'Basic ${base64Encode(utf8.encode('$login:$password'))}';
+    // Match the User-Agent that a browser/jQuery AJAX would send
+    _dio.options.headers['User-Agent'] =
+        'Mozilla/5.0 (Linux; Android 10) StatEduc/1.0';
+    _dio.options.headers['Accept'] = 'application/json, text/plain, */*';
     debugPrint('[ApiService] configure → baseUrl=$_serverUrl login=$login');
+    debugPrint('[ApiService] Authorization=Basic ${base64Encode(utf8.encode('$login:$password'))}');
   }
 
   void updateCredentials(String login, String password) {
@@ -99,30 +141,90 @@ class ApiService {
       final encodedPassword = Uri.encodeComponent(password);
       final url = 'user_ident.php/user/$login/$encodedPassword';
       debugPrint('[ApiService] authenticate → GET ${_serverUrl}$url');
-      final response = await _dio.get(url);
-      final data = response.data;
-      debugPrint('[ApiService] authenticate ← status=${response.statusCode} data=$data');
-      if (data is Map) {
-        // se_message == 'log_ko' means invalid credentials
-        if (data['se_message'] == 'log_ko') {
-          debugPrint('[ApiService] authenticate: log_ko → identifiants invalides');
-          return null;
+
+      final response = await _dio.get(
+        url,
+        options: Options(
+          // Force plain-text response so we control JSON parsing
+          // This avoids Dio failing when Content-Type is text/html or unusual
+          responseType: ResponseType.plain,
+        ),
+      );
+
+      final statusCode = response.statusCode ?? 0;
+      debugPrint('[ApiService] authenticate ← HTTP $statusCode');
+
+      // Handle 3xx redirects explicitly (followRedirects: false)
+      if (statusCode >= 300 && statusCode < 400) {
+        final location = response.headers.value('location') ?? '';
+        debugPrint('[ApiService] authenticate: redirect $statusCode → $location');
+        // A redirect here usually means Apache/Nginx auth layer — re-try with
+        // the full redirect URL while preserving our Auth header.
+        if (location.isNotEmpty) {
+          return _authenticateRedirect(location, login, password);
         }
-        if (data['se_status'] == 200) {
-          final userData = data['se_data'];
-          if (userData != null) {
-            final userMap = userData is String
-                ? json.decode(userData) as Map<String, dynamic>
-                : userData as Map<String, dynamic>;
-            debugPrint('[ApiService] authenticate: success → $userMap');
-            return User.fromJson(userMap);
-          }
-        }
-        debugPrint('[ApiService] authenticate: unexpected response → $data');
+        throw ApiException('Redirection inattendue ($statusCode). Vérifiez l\'URL serveur.');
       }
+
+      // 401 at HTTP level = Apache/Nginx Basic Auth protecting the endpoint
+      // This is DIFFERENT from PHP app-level auth (se_message: log_ko)
+      if (statusCode == 401) {
+        debugPrint('[ApiService] authenticate: HTTP 401 — Apache/Nginx layer rejected credentials');
+        throw ApiException(
+          'Accès refusé (401).\n'
+          'Le serveur a une protection HTTP (Apache/Nginx).\n'
+          'Vérifiez vos identifiants ou contactez l\'administrateur.'
+        );
+      }
+
+      if (statusCode == 404) {
+        throw ApiException('Serveur introuvable (404). Vérifiez l\'URL : $_serverUrl');
+      }
+
+      // Parse the response body manually
+      final rawBody = response.data?.toString().trim() ?? '';
+      debugPrint('[ApiService] authenticate ← rawBody=$rawBody');
+
+      if (rawBody.isEmpty) {
+        debugPrint('[ApiService] authenticate: empty response body');
+        return null;
+      }
+
+      Map<String, dynamic>? data;
+      try {
+        final parsed = json.decode(rawBody);
+        data = parsed is Map ? Map<String, dynamic>.from(parsed) : null;
+      } catch (e) {
+        debugPrint('[ApiService] authenticate: JSON parse error → $e');
+        debugPrint('[ApiService] authenticate: raw body was → $rawBody');
+        return null;
+      }
+
+      if (data == null) return null;
+
+      // se_message == 'log_ko' means invalid credentials at PHP app level
+      if (data['se_message'] == 'log_ko') {
+        debugPrint('[ApiService] authenticate: log_ko → identifiants invalides (PHP level)');
+        return null;
+      }
+
+      if (data['se_status'] == 200) {
+        final userData = data['se_data'];
+        if (userData != null) {
+          final userMap = userData is String
+              ? json.decode(userData) as Map<String, dynamic>
+              : userData as Map<String, dynamic>;
+          debugPrint('[ApiService] authenticate: success → $userMap');
+          return User.fromJson(userMap);
+        }
+      }
+
+      debugPrint('[ApiService] authenticate: unexpected response → $data');
       return null;
+
     } on DioException catch (e) {
-      debugPrint('[ApiService] authenticate DioException: ${e.type} ${e.message} response=${e.response?.data}');
+      debugPrint('[ApiService] authenticate DioException: type=${e.type} status=${e.response?.statusCode} msg=${e.message}');
+      debugPrint('[ApiService] authenticate DioException body=${e.response?.data}');
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout) {
@@ -131,9 +233,55 @@ class ApiService {
       if (e.type == DioExceptionType.connectionError) {
         throw ApiException('Impossible de joindre le serveur. Vérifiez l\'URL : $_serverUrl');
       }
-      if (e.response?.statusCode == 401) throw ApiException('Accès refusé (401)');
+      if (e.response?.statusCode == 401) {
+        throw ApiException(
+          'Accès refusé (401).\n'
+          'Le serveur exige une authentification HTTP supplémentaire.\n'
+          'Contactez l\'administrateur du serveur.'
+        );
+      }
       if (e.response?.statusCode == 404) throw ApiException('Serveur introuvable (404). Vérifiez l\'URL.');
       throw ApiException('Erreur réseau : ${e.message ?? e.type.name}');
+    }
+  }
+
+  /// Follows a redirect for authenticate(), preserving the Authorization header.
+  Future<User?> _authenticateRedirect(
+      String redirectUrl, String login, String password) async {
+    debugPrint('[ApiService] _authenticateRedirect → $redirectUrl');
+    try {
+      final redirectDio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        followRedirects: false,
+        validateStatus: (s) => s != null && s < 500,
+        headers: {
+          'Authorization': 'Basic ${base64Encode(utf8.encode('$login:$password'))}',
+          'User-Agent': 'Mozilla/5.0 (Linux; Android 10) StatEduc/1.0',
+          'Accept': 'application/json, text/plain, */*',
+        },
+      ));
+      final r = await redirectDio.get(redirectUrl,
+          options: Options(responseType: ResponseType.plain));
+      final rawBody = r.data?.toString().trim() ?? '';
+      if (rawBody.isEmpty) return null;
+      final parsed = json.decode(rawBody);
+      if (parsed is Map) {
+        if (parsed['se_message'] == 'log_ko') return null;
+        if (parsed['se_status'] == 200) {
+          final ud = parsed['se_data'];
+          if (ud != null) {
+            final userMap = ud is String
+                ? json.decode(ud) as Map<String, dynamic>
+                : ud as Map<String, dynamic>;
+            return User.fromJson(userMap);
+          }
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('[ApiService] _authenticateRedirect error: $e');
+      return null;
     }
   }
 
@@ -176,8 +324,7 @@ class ApiService {
     if (data is List) {
       return data.map((r) => Regroup.fromJson(r)).toList();
     }
-    return [];
-  }
+    return [];}
 
   // ═══════════════════════════════════════════════════════════════════════════
   // REGROUP TYPES (Types d'entités administratives)
@@ -510,6 +657,9 @@ class ApiService {
   Future<dynamic> _get(String path) async {
     try {
       final response = await _dio.get(path);
+      final statusCode = response.statusCode ?? 0;
+      if (statusCode == 401) throw ApiException('Accès refusé');
+      if (statusCode == 404) throw ApiException('Endpoint introuvable');
       final data = response.data;
       if (data is Map) {
         // Unwrap se_data envelope (always present in server responses)
