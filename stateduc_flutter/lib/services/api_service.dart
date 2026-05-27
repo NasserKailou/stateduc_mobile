@@ -36,8 +36,16 @@ class ApiService {
 
   // ─── Configuration ──────────────────────────────────────────────────────────
 
-  /// Normalise l'URL serveur : ajoute http:// si aucun schéma n'est présent,
-  /// supprime le slash final.
+  /// Normalise l'URL serveur :
+  /// - ajoute http:// si aucun schéma n'est présent
+  /// - garantit un slash final (nécessaire pour que Dio préserve
+  ///   le chemin complet quand on appelle _dio.get('sous/chemin'))
+  ///
+  /// IMPORTANT — comportement Dio avec baseUrl :
+  ///   baseUrl = 'http://host:port/app'  + get('/endpoint')
+  ///   → Dio résout à 'http://host:port/endpoint'  ← PERD /app !
+  ///   baseUrl = 'http://host:port/app/' + get('endpoint')
+  ///   → Dio résout à 'http://host:port/app/endpoint' ← CORRECT ✓
   static String normalizeServerUrl(String raw) {
     String url = raw.trim();
     if (url.isEmpty) return url;
@@ -45,9 +53,9 @@ class ApiService {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'http://$url';
     }
-    // Supprimer le slash final
-    if (url.endsWith('/')) {
-      url = url.substring(0, url.length - 1);
+    // Garantir un slash final pour que Dio conserve le chemin de base
+    if (!url.endsWith('/')) {
+      url = '$url/';
     }
     return url;
   }
@@ -89,7 +97,7 @@ class ApiService {
     configure(serverUrl, login, password);
     try {
       final encodedPassword = Uri.encodeComponent(password);
-      final url = '/user_ident.php/user/$login/$encodedPassword';
+      final url = 'user_ident.php/user/$login/$encodedPassword';
       debugPrint('[ApiService] authenticate → GET ${_serverUrl}$url');
       final response = await _dio.get(url);
       final data = response.data;
@@ -131,7 +139,7 @@ class ApiService {
 
   Future<void> logout() async {
     try {
-      await _dio.get('/user_ident.php/logout/xxxx/xxxx');
+      await _dio.get('user_ident.php/logout/xxxx/xxxx');
     } catch (_) {
       // Best effort — ignore errors on logout
     }
@@ -146,7 +154,7 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<Campaign>> getAvailableCampaigns(String userId) async {
-    final data = await _get('/user_camp.php/new_camp/$userId/1');
+    final data = await _get('user_camp.php/new_camp/$userId/1');
     if (data is List) {
       return data.map((c) => Campaign.fromJson(c)).toList();
     }
@@ -164,7 +172,7 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<Regroup>> getRegroups(String login, String campId) async {
-    final data = await _get('/user_camp.php/reg_camp/$login/$campId/1');
+    final data = await _get('user_camp.php/reg_camp/$login/$campId/1');
     if (data is List) {
       return data.map((r) => Regroup.fromJson(r)).toList();
     }
@@ -184,7 +192,7 @@ class ApiService {
   Future<List<RegroupType>> getRegroupTypes(
       String userId, String campId, String typeRegroups) async {
     final data = await _get(
-        '/user_camp.php/typ_reg_camp/$userId/$campId/$typeRegroups');
+        'user_camp.php/typ_reg_camp/$userId/$campId/$typeRegroups');
     if (data is List) {
       return data.map((t) => RegroupType.fromJson(t)).toList();
     }
@@ -200,7 +208,7 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<SchoolStatus>> getSchoolStatuses() async {
-    final data = await _get('/user_camp.php/etabs_status/');
+    final data = await _get('user_camp.php/etabs_status/');
     if (data is List) {
       return data.map((s) => SchoolStatus.fromJson(s)).toList();
     }
@@ -218,7 +226,7 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<School>> getSchools(String userId, String campId) async {
-    final data = await _get('/user_camp.php/etabs_camp/$userId/$campId/1');
+    final data = await _get('user_camp.php/etabs_camp/$userId/$campId/1');
     if (data is List) {
       return data.map((s) => School.fromJson(s)).toList();
     }
@@ -237,7 +245,7 @@ class ApiService {
 
   Future<List<Localisation>> getLocalisations(
       String userId, String campId) async {
-    final data = await _get('/user_camp.php/locs_camp/$userId/$campId');
+    final data = await _get('user_camp.php/locs_camp/$userId/$campId');
     if (data is List) {
       // Each row may contain multiple etab IDs → expand
       final result = <Localisation>[];
@@ -261,7 +269,7 @@ class ApiService {
 
   Future<List<EducationSystem>> getEducationSystems(
       String userId, String campId) async {
-    final data = await _get('/user_camp.php/sys_camp/$userId/$campId');
+    final data = await _get('user_camp.php/sys_camp/$userId/$campId');
     if (data is List) {
       return data.map((s) => EducationSystem.fromJson(s)).toList();
     }
@@ -279,7 +287,7 @@ class ApiService {
 
   Future<List<Question>> getQuestions(String campId, String sysId) async {
     final data =
-        await _get('/data_camp.php/theme_camp/$campId/$sysId/eng');
+        await _get('data_camp.php/theme_camp/$campId/$sysId/eng');
     if (data is List) {
       return data.map((q) => Question.fromJson(q)).toList();
     }
@@ -299,7 +307,7 @@ class ApiService {
     try {
       // Step 1: get the HTML URL
       final step1 = await _dio.get(
-        '/data_camp.php/html_theme_camp/$campId/$qstId/eng',
+        'data_camp.php/html_theme_camp/$campId/$qstId/eng',
         options: Options(responseType: ResponseType.plain),
       );
       // The response is expected to be a URL string (or wrapped in se_data)
@@ -354,7 +362,7 @@ class ApiService {
   Future<List<ValidationRule>> getValidationRules(
       String qstId, String sysId) async {
     final data =
-        await _get('/data_camp.php/regle_theme_camp/$qstId/$sysId');
+        await _get('data_camp.php/regle_theme_camp/$qstId/$sysId');
     if (data is List) {
       return data.map((r) => ValidationRule.fromJson(r)).toList();
     }
@@ -412,7 +420,7 @@ class ApiService {
 
     try {
       final response = await _dio.post(
-        '/data_save.php/theme_save/$login/$campId/$sysId/$qstId/$etabId/$filterParam/0',
+        'data_save.php/theme_save/$login/$campId/$sysId/$qstId/$etabId/$filterParam/0',
         data: body,
         options: Options(
           contentType: 'application/x-www-form-urlencoded',
@@ -459,7 +467,7 @@ class ApiService {
     final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
     try {
       final response = await _dio.get(
-        '/data_reload.php/theme_data/$login/$sysId/$qstId/$campId/$etabId/$filterParam',
+        'data_reload.php/theme_data/$login/$sysId/$qstId/$campId/$etabId/$filterParam',
         options: Options(responseType: ResponseType.plain),
       );
       final responseStr = response.data.toString().trim();
