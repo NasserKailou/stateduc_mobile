@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Config — replaces usesCleartextTraffic="true" from the
+  original AndroidManifest.
+
+  Security improvement:
+    Original: usesCleartextTraffic="true" globally (HTTP allowed for all hosts)
+    Flutter:  HTTP only allowed for private network ranges.
+              For production, the server URL should be HTTPS.
+              Add your specific server domain to <domain> if needed.
+-->
+<network-security-config>
+    <!-- Allow HTTP for local/private server addresses (field use case) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Local IP ranges used in typical school environments -->
+        <domain includeSubdomains="true">192.168.0.0</domain>
+        <domain includeSubdomains="true">192.168.1.0</domain>
+        <domain includeSubdomains="true">10.0.0.0</domain>
+        <domain includeSubdomains="true">172.16.0.0</domain>
+        <!-- Localhost for development -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+    <!-- All other connections require HTTPS -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>

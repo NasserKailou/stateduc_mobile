@@ -1,0 +1,222 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=17802' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>X. STRUCTURES PEDAGOGIQUES ET EFFECTIFS ELEVES</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<script language='javascript' type='text/javascript'>
+var expression_1780008 	= "";
+var tot_mes_ligne_1780008 	= new Array();
+var tot_mes_col_1780008 	= new Array();
+var affich_vertic_mes_1780008 	= 0;
+var affiche_sous_totaux_1780008 	= 1;
+var tab_mes_1780008 	= new Array ("NBR_GP_COURS_UNIQUE","NBR_GP_COURS_DOUBLE_MULTI");
+var tab_ligne_1780008	= new Array ("1","2","3","4","5","6");
+var tab_col_1780008	= new Array ();
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=7  CLASS='ligne-titre' align='center'>&nbsp;</TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Cours unique</TD>
+		<TD  align='center'>Cours Double</TD>
+		<TD  align='center'>Garçons</TD>
+		<TD  align='center'>Filles</TD>
+		<TD  align='center'>Total Redoublants</TD>
+		<TD  align='center'>Dont fille</TD>
+		<TD  align='center'>Cours unique + Cours Double</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >CI</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GP_COURS_UNIQUE_0_1' NAME='NBR_GP_COURS_UNIQUE_0_1' TYPE='text'  VALUE="$NBR_GP_COURS_UNIQUE_0_1"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GP_COURS_DOUBLE_MULTI_0_1' NAME='NBR_GP_COURS_DOUBLE_MULTI_0_1' TYPE='text'  VALUE="$NBR_GP_COURS_DOUBLE_MULTI_0_1"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GARCONS_0_1' NAME='NBR_GARCONS_0_1' TYPE='text'  VALUE="$NBR_GARCONS_0_1"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_FILLES_0_1' NAME='NBR_FILLES_0_1' TYPE='text'  VALUE="$NBR_FILLES_0_1"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_REDOUBLANTS_0_1' NAME='TOTAL_REDOUBLANTS_0_1' TYPE='text'  VALUE="$TOTAL_REDOUBLANTS_0_1"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_RED_DONT_FILLE_0_1' NAME='NBR_RED_DONT_FILLE_0_1' TYPE='text'  VALUE="$NBR_RED_DONT_FILLE_0_1"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1780008_ALL_MES_LIGNE_0_1' ></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >CP</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GP_COURS_UNIQUE_0_2' NAME='NBR_GP_COURS_UNIQUE_0_2' TYPE='text'  VALUE="$NBR_GP_COURS_UNIQUE_0_2"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GP_COURS_DOUBLE_MULTI_0_2' NAME='NBR_GP_COURS_DOUBLE_MULTI_0_2' TYPE='text'  VALUE="$NBR_GP_COURS_DOUBLE_MULTI_0_2"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GARCONS_0_2' NAME='NBR_GARCONS_0_2' TYPE='text'  VALUE="$NBR_GARCONS_0_2"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_FILLES_0_2' NAME='NBR_FILLES_0_2' TYPE='text'  VALUE="$NBR_FILLES_0_2"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_REDOUBLANTS_0_2' NAME='TOTAL_REDOUBLANTS_0_2' TYPE='text'  VALUE="$TOTAL_REDOUBLANTS_0_2"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_RED_DONT_FILLE_0_2' NAME='NBR_RED_DONT_FILLE_0_2' TYPE='text'  VALUE="$NBR_RED_DONT_FILLE_0_2"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1780008_ALL_MES_LIGNE_0_2' ></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >CE1</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GP_COURS_UNIQUE_0_3' NAME='NBR_GP_COURS_UNIQUE_0_3' TYPE='text'  VALUE="$NBR_GP_COURS_UNIQUE_0_3"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GP_COURS_DOUBLE_MULTI_0_3' NAME='NBR_GP_COURS_DOUBLE_MULTI_0_3' TYPE='text'  VALUE="$NBR_GP_COURS_DOUBLE_MULTI_0_3"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GARCONS_0_3' NAME='NBR_GARCONS_0_3' TYPE='text'  VALUE="$NBR_GARCONS_0_3"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_FILLES_0_3' NAME='NBR_FILLES_0_3' TYPE='text'  VALUE="$NBR_FILLES_0_3"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_REDOUBLANTS_0_3' NAME='TOTAL_REDOUBLANTS_0_3' TYPE='text'  VALUE="$TOTAL_REDOUBLANTS_0_3"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_RED_DONT_FILLE_0_3' NAME='NBR_RED_DONT_FILLE_0_3' TYPE='text'  VALUE="$NBR_RED_DONT_FILLE_0_3"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1780008_ALL_MES_LIGNE_0_3' ></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >CE2</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GP_COURS_UNIQUE_0_4' NAME='NBR_GP_COURS_UNIQUE_0_4' TYPE='text'  VALUE="$NBR_GP_COURS_UNIQUE_0_4"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GP_COURS_DOUBLE_MULTI_0_4' NAME='NBR_GP_COURS_DOUBLE_MULTI_0_4' TYPE='text'  VALUE="$NBR_GP_COURS_DOUBLE_MULTI_0_4"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GARCONS_0_4' NAME='NBR_GARCONS_0_4' TYPE='text'  VALUE="$NBR_GARCONS_0_4"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_FILLES_0_4' NAME='NBR_FILLES_0_4' TYPE='text'  VALUE="$NBR_FILLES_0_4"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_REDOUBLANTS_0_4' NAME='TOTAL_REDOUBLANTS_0_4' TYPE='text'  VALUE="$TOTAL_REDOUBLANTS_0_4"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_RED_DONT_FILLE_0_4' NAME='NBR_RED_DONT_FILLE_0_4' TYPE='text'  VALUE="$NBR_RED_DONT_FILLE_0_4"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1780008_ALL_MES_LIGNE_0_4' ></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >CM1</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GP_COURS_UNIQUE_0_5' NAME='NBR_GP_COURS_UNIQUE_0_5' TYPE='text'  VALUE="$NBR_GP_COURS_UNIQUE_0_5"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GP_COURS_DOUBLE_MULTI_0_5' NAME='NBR_GP_COURS_DOUBLE_MULTI_0_5' TYPE='text'  VALUE="$NBR_GP_COURS_DOUBLE_MULTI_0_5"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_GARCONS_0_5' NAME='NBR_GARCONS_0_5' TYPE='text'  VALUE="$NBR_GARCONS_0_5"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_FILLES_0_5' NAME='NBR_FILLES_0_5' TYPE='text'  VALUE="$NBR_FILLES_0_5"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_REDOUBLANTS_0_5' NAME='TOTAL_REDOUBLANTS_0_5' TYPE='text'  VALUE="$TOTAL_REDOUBLANTS_0_5"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBR_RED_DONT_FILLE_0_5' NAME='NBR_RED_DONT_FILLE_0_5' TYPE='text'  VALUE="$NBR_RED_DONT_FILLE_0_5"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1780008_ALL_MES_LIGNE_0_5' ></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >CM2</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GP_COURS_UNIQUE_0_6' NAME='NBR_GP_COURS_UNIQUE_0_6' TYPE='text'  VALUE="$NBR_GP_COURS_UNIQUE_0_6"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GP_COURS_DOUBLE_MULTI_0_6' NAME='NBR_GP_COURS_DOUBLE_MULTI_0_6' TYPE='text'  VALUE="$NBR_GP_COURS_DOUBLE_MULTI_0_6"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_GARCONS_0_6' NAME='NBR_GARCONS_0_6' TYPE='text'  VALUE="$NBR_GARCONS_0_6"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_FILLES_0_6' NAME='NBR_FILLES_0_6' TYPE='text'  VALUE="$NBR_FILLES_0_6"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_REDOUBLANTS_0_6' NAME='TOTAL_REDOUBLANTS_0_6' TYPE='text'  VALUE="$TOTAL_REDOUBLANTS_0_6"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBR_RED_DONT_FILLE_0_6' NAME='NBR_RED_DONT_FILLE_0_6' TYPE='text'  VALUE="$NBR_RED_DONT_FILLE_0_6"  onchange="set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1780008_ALL_MES_LIGNE_0_6' ></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '   NAME='TOT_1780008_NBR_GP_COURS_UNIQUE_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '   NAME='TOT_1780008_NBR_GP_COURS_DOUBLE_MULTI_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>&nbsp;</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>&nbsp;</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>&nbsp;</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>&nbsp;</TD>
+		<td align='center'  bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1780008_ALL_MES_0' ></TD>
+
+	</TR>
+
+	<TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',1780008, 0, tab_mes_1780008, tab_ligne_1780008, tab_col_1780008);
+</script>

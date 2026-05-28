@@ -1,0 +1,222 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=3904' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B>X/.	ORIGINE SCOLAIRE DES NOUVEAUX ADMIS en 2nde</B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=2 class='ligne-paire' title='Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>N°</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Nom de l'établ. d'où viennent les nouveaux admis en seconde</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=3 class='ligne-paire'>Distance de l'école (km)</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Nb élèves : </br> <b> Garçons </b></TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Nb élèves : </br> <b> Filles </b></TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><5</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>5-10</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>>10</TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,15)'>$NUM_AIRE_RECRUT_0</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='NOM_AIRE_RECRUT_0' NAME=NOM_AIRE_RECRUT_0 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_3' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='CODE_TYPE_DISTANCE_0_5' NAME=CODE_TYPE_DISTANCE_0 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_0_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_4' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='CODE_TYPE_DISTANCE_0_6' NAME=CODE_TYPE_DISTANCE_0 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_0_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_5' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='CODE_TYPE_DISTANCE_0_7' NAME=CODE_TYPE_DISTANCE_0 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_0_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_6' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_0' NAME=NB_ELEV_AIRE_RECRUT_G_0 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_7' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_0' NAME=NB_ELEV_AIRE_RECRUT_F_0 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_0"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,15)'>$NUM_AIRE_RECRUT_1</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='NOM_AIRE_RECRUT_1' NAME=NOM_AIRE_RECRUT_1 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_3' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='CODE_TYPE_DISTANCE_1_5' NAME=CODE_TYPE_DISTANCE_1 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_1_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_4' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='CODE_TYPE_DISTANCE_1_6' NAME=CODE_TYPE_DISTANCE_1 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_1_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_5' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='CODE_TYPE_DISTANCE_1_7' NAME=CODE_TYPE_DISTANCE_1 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_1_7></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_6' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_1' NAME=NB_ELEV_AIRE_RECRUT_G_1 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_7' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_1' NAME=NB_ELEV_AIRE_RECRUT_F_1 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_1"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,15)'>$NUM_AIRE_RECRUT_2</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='NOM_AIRE_RECRUT_2' NAME=NOM_AIRE_RECRUT_2 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_3' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='CODE_TYPE_DISTANCE_2_5' NAME=CODE_TYPE_DISTANCE_2 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_2_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_4' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='CODE_TYPE_DISTANCE_2_6' NAME=CODE_TYPE_DISTANCE_2 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_2_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_5' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='CODE_TYPE_DISTANCE_2_7' NAME=CODE_TYPE_DISTANCE_2 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_2_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_6' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_2' NAME=NB_ELEV_AIRE_RECRUT_G_2 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_7' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_2' NAME=NB_ELEV_AIRE_RECRUT_F_2 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_2"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_3_0' onClick='MiseEvidenceLigneFrame(3,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_3_1' onClick='MiseEvidenceLigneFrame(3,15)'>$NUM_AIRE_RECRUT_3</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_2' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='NOM_AIRE_RECRUT_3' NAME=NOM_AIRE_RECRUT_3 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_3' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='CODE_TYPE_DISTANCE_3_5' NAME=CODE_TYPE_DISTANCE_3 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_3_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_4' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='CODE_TYPE_DISTANCE_3_6' NAME=CODE_TYPE_DISTANCE_3 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_3_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_5' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='CODE_TYPE_DISTANCE_3_7' NAME=CODE_TYPE_DISTANCE_3 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_3_7></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_6' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_3' NAME=NB_ELEV_AIRE_RECRUT_G_3 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_7' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_3' NAME=NB_ELEV_AIRE_RECRUT_F_3 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_3"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_4_0' onClick='MiseEvidenceLigneFrame(4,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_4_1' onClick='MiseEvidenceLigneFrame(4,15)'>$NUM_AIRE_RECRUT_4</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_2' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='NOM_AIRE_RECRUT_4' NAME=NOM_AIRE_RECRUT_4 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_3' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='CODE_TYPE_DISTANCE_4_5' NAME=CODE_TYPE_DISTANCE_4 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_4_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_4' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='CODE_TYPE_DISTANCE_4_6' NAME=CODE_TYPE_DISTANCE_4 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_4_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_5' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='CODE_TYPE_DISTANCE_4_7' NAME=CODE_TYPE_DISTANCE_4 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_4_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_6' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_4' NAME=NB_ELEV_AIRE_RECRUT_G_4 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_7' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_4' NAME=NB_ELEV_AIRE_RECRUT_F_4 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_4"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_5_0' onClick='MiseEvidenceLigneFrame(5,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_5_1' onClick='MiseEvidenceLigneFrame(5,15)'>$NUM_AIRE_RECRUT_5</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_2' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='NOM_AIRE_RECRUT_5' NAME=NOM_AIRE_RECRUT_5 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_3' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='CODE_TYPE_DISTANCE_5_5' NAME=CODE_TYPE_DISTANCE_5 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_5_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_4' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='CODE_TYPE_DISTANCE_5_6' NAME=CODE_TYPE_DISTANCE_5 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_5_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_5' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='CODE_TYPE_DISTANCE_5_7' NAME=CODE_TYPE_DISTANCE_5 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_5_7></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_6' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_5' NAME=NB_ELEV_AIRE_RECRUT_G_5 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_7' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_5' NAME=NB_ELEV_AIRE_RECRUT_F_5 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_5"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_6_0' onClick='MiseEvidenceLigneFrame(6,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_6_1' onClick='MiseEvidenceLigneFrame(6,15)'>$NUM_AIRE_RECRUT_6</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_2' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='NOM_AIRE_RECRUT_6' NAME=NOM_AIRE_RECRUT_6 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_3' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='CODE_TYPE_DISTANCE_6_5' NAME=CODE_TYPE_DISTANCE_6 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_6_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_4' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='CODE_TYPE_DISTANCE_6_6' NAME=CODE_TYPE_DISTANCE_6 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_6_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_5' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='CODE_TYPE_DISTANCE_6_7' NAME=CODE_TYPE_DISTANCE_6 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_6_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_6' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_6' NAME=NB_ELEV_AIRE_RECRUT_G_6 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_7' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_6' NAME=NB_ELEV_AIRE_RECRUT_F_6 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_6"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_7_0' onClick='MiseEvidenceLigneFrame(7,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_7_1' onClick='MiseEvidenceLigneFrame(7,15)'>$NUM_AIRE_RECRUT_7</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_2' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='NOM_AIRE_RECRUT_7' NAME=NOM_AIRE_RECRUT_7 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_3' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='CODE_TYPE_DISTANCE_7_5' NAME=CODE_TYPE_DISTANCE_7 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_7_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_4' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='CODE_TYPE_DISTANCE_7_6' NAME=CODE_TYPE_DISTANCE_7 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_7_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_5' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='CODE_TYPE_DISTANCE_7_7' NAME=CODE_TYPE_DISTANCE_7 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_7_7></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_6' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_7' NAME=NB_ELEV_AIRE_RECRUT_G_7 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_7' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_7' NAME=NB_ELEV_AIRE_RECRUT_F_7 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_7"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_8_0' onClick='MiseEvidenceLigneFrame(8,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_8_1' onClick='MiseEvidenceLigneFrame(8,15)'>$NUM_AIRE_RECRUT_8</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_2' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='NOM_AIRE_RECRUT_8' NAME=NOM_AIRE_RECRUT_8 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_3' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='CODE_TYPE_DISTANCE_8_5' NAME=CODE_TYPE_DISTANCE_8 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_8_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_4' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='CODE_TYPE_DISTANCE_8_6' NAME=CODE_TYPE_DISTANCE_8 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_8_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_5' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='CODE_TYPE_DISTANCE_8_7' NAME=CODE_TYPE_DISTANCE_8 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_8_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_6' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_8' NAME=NB_ELEV_AIRE_RECRUT_G_8 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_7' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_8' NAME=NB_ELEV_AIRE_RECRUT_F_8 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_8"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_9_0' onClick='MiseEvidenceLigneFrame(9,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_9_1' onClick='MiseEvidenceLigneFrame(9,15)'>$NUM_AIRE_RECRUT_9</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_2' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='NOM_AIRE_RECRUT_9' NAME=NOM_AIRE_RECRUT_9 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_3' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='CODE_TYPE_DISTANCE_9_5' NAME=CODE_TYPE_DISTANCE_9 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_9_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_4' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='CODE_TYPE_DISTANCE_9_6' NAME=CODE_TYPE_DISTANCE_9 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_9_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_5' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='CODE_TYPE_DISTANCE_9_7' NAME=CODE_TYPE_DISTANCE_9 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_9_7></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_6' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_9' NAME=NB_ELEV_AIRE_RECRUT_G_9 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_7' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_9' NAME=NB_ELEV_AIRE_RECRUT_F_9 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_9"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_10_0' onClick='MiseEvidenceLigneFrame(10,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_10 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_10_1' onClick='MiseEvidenceLigneFrame(10,15)'>$NUM_AIRE_RECRUT_10</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_2' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='NOM_AIRE_RECRUT_10' NAME=NOM_AIRE_RECRUT_10 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_10"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_3' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='CODE_TYPE_DISTANCE_10_5' NAME=CODE_TYPE_DISTANCE_10 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_10_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_4' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='CODE_TYPE_DISTANCE_10_6' NAME=CODE_TYPE_DISTANCE_10 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_10_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_5' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='CODE_TYPE_DISTANCE_10_7' NAME=CODE_TYPE_DISTANCE_10 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_10_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_6' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_10' NAME=NB_ELEV_AIRE_RECRUT_G_10 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_10"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_7' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_10' NAME=NB_ELEV_AIRE_RECRUT_F_10 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_10"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_11_0' onClick='MiseEvidenceLigneFrame(11,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_11 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_11_1' onClick='MiseEvidenceLigneFrame(11,15)'>$NUM_AIRE_RECRUT_11</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_2' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='NOM_AIRE_RECRUT_11' NAME=NOM_AIRE_RECRUT_11 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_11"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_3' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='CODE_TYPE_DISTANCE_11_5' NAME=CODE_TYPE_DISTANCE_11 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_11_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_4' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='CODE_TYPE_DISTANCE_11_6' NAME=CODE_TYPE_DISTANCE_11 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_11_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_5' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='CODE_TYPE_DISTANCE_11_7' NAME=CODE_TYPE_DISTANCE_11 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_11_7></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_6' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_11' NAME=NB_ELEV_AIRE_RECRUT_G_11 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_11"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_7' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_11' NAME=NB_ELEV_AIRE_RECRUT_F_11 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_11"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_12_0' onClick='MiseEvidenceLigneFrame(12,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_12 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_12_1' onClick='MiseEvidenceLigneFrame(12,15)'>$NUM_AIRE_RECRUT_12</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_2' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='NOM_AIRE_RECRUT_12' NAME=NOM_AIRE_RECRUT_12 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_12"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_3' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='CODE_TYPE_DISTANCE_12_5' NAME=CODE_TYPE_DISTANCE_12 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_12_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_4' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='CODE_TYPE_DISTANCE_12_6' NAME=CODE_TYPE_DISTANCE_12 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_12_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_5' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='CODE_TYPE_DISTANCE_12_7' NAME=CODE_TYPE_DISTANCE_12 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_12_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_6' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_12' NAME=NB_ELEV_AIRE_RECRUT_G_12 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_12"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_7' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_12' NAME=NB_ELEV_AIRE_RECRUT_F_12 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_12"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_13_0' onClick='MiseEvidenceLigneFrame(13,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_13 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_13_1' onClick='MiseEvidenceLigneFrame(13,15)'>$NUM_AIRE_RECRUT_13</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_2' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='NOM_AIRE_RECRUT_13' NAME=NOM_AIRE_RECRUT_13 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_13"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_3' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='CODE_TYPE_DISTANCE_13_5' NAME=CODE_TYPE_DISTANCE_13 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_13_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_4' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='CODE_TYPE_DISTANCE_13_6' NAME=CODE_TYPE_DISTANCE_13 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_13_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_5' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='CODE_TYPE_DISTANCE_13_7' NAME=CODE_TYPE_DISTANCE_13 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_13_7></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_6' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_13' NAME=NB_ELEV_AIRE_RECRUT_G_13 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_13"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_7' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_13' NAME=NB_ELEV_AIRE_RECRUT_F_13 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_13"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_14_0' onClick='MiseEvidenceLigneFrame(14,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_14 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_14_1' onClick='MiseEvidenceLigneFrame(14,15)'>$NUM_AIRE_RECRUT_14</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_2' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='NOM_AIRE_RECRUT_14' NAME=NOM_AIRE_RECRUT_14 TYPE='text'size = 45 VALUE="$NOM_AIRE_RECRUT_14"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_3' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='CODE_TYPE_DISTANCE_14_5' NAME=CODE_TYPE_DISTANCE_14 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_14_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_4' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='CODE_TYPE_DISTANCE_14_6' NAME=CODE_TYPE_DISTANCE_14 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_14_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_5' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='CODE_TYPE_DISTANCE_14_7' NAME=CODE_TYPE_DISTANCE_14 TYPE='radio' VALUE=$CODE_TYPE_DISTANCE_14_7></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_6' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_G_14' NAME=NB_ELEV_AIRE_RECRUT_G_14 TYPE='text'size = 10 VALUE="$NB_ELEV_AIRE_RECRUT_G_14"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_7' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='NB_ELEV_AIRE_RECRUT_F_14' NAME=NB_ELEV_AIRE_RECRUT_F_14 TYPE='text'size =10 VALUE="$NB_ELEV_AIRE_RECRUT_F_14"></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
