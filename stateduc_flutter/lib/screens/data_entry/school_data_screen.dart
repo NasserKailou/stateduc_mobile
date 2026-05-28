@@ -245,10 +245,69 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     entry.validateAll();
 
     final ok = await entry.sendToServer(user: auth.user!);
-    if (!ok && mounted && entry.error != null) {
+    if (!mounted) return;
+
+    if (!ok && entry.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(entry.error!),
           backgroundColor: Theme.of(context).colorScheme.error));
+      return;
+    }
+
+    // ── After successful send: show coherence errors if any ─────────────────
+    if (ok && entry.hasCoherenceErrors) {
+      final errors = entry.coherenceErrors;
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              SizedBox(width: 8),
+              Text('Contrôle de cohérence'),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${errors.length} incohérence(s) détectée(s) :',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                ...errors.map((e) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 16, color: Colors.red),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          e.message.isNotEmpty
+                              ? e.message
+                              : 'Règle ${e.idRegle} ${e.critere} règle ${e.idRegleAssoc}',
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Compris'),
+            ),
+          ],
+        ),
+      );
     }
   }
 

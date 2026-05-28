@@ -59,6 +59,12 @@ class DataEntryProvider extends ChangeNotifier {
   String? _error;
   String? _successMessage;
 
+  // ─── Coherence check results ────────────────────────────────────────────────
+  // Populated after sendToServer() succeeds.
+  // Empty list = no violations (coherence OK).
+  List<CoherenceError> _coherenceErrors = [];
+  bool                 _isCheckingCoherence = false;
+
   // ─── Getters ─────────────────────────────────────────────────────────────────
   String? get idCamp              => _idCamp;
   String? get idEtab              => _idEtab;
@@ -79,6 +85,9 @@ class DataEntryProvider extends ChangeNotifier {
   bool    get hasUnsavedChanges   => _hasUnsavedChanges;
   String? get error               => _error;
   String? get successMessage      => _successMessage;
+  List<CoherenceError> get coherenceErrors    => List.unmodifiable(_coherenceErrors);
+  bool                 get isCheckingCoherence => _isCheckingCoherence;
+  bool get hasCoherenceErrors => _coherenceErrors.isNotEmpty;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INIT — set context for a specific school + system
@@ -321,6 +330,7 @@ class DataEntryProvider extends ChangeNotifier {
         formData:         _formData,
         etabRegroupId:    _idRegroupEtab,     // for LOC_REG_0
         isFirstQuestion:  _isFirstQuestion,
+        yearCode:         user.codeyear,      // inject school year for PHP session bypass
       );
       if (ok) {
         await _db.markCollectedDataSent(
@@ -330,6 +340,31 @@ class DataEntryProvider extends ChangeNotifier {
           idFilter: _selectedFilter?.idFilter,
         );
         _successMessage = 'Données envoyées avec succès';
+        notifyListeners();
+
+        // ── Coherence check (non-blocking) ─────────────────────────────────
+        // Runs automatically after a successful save. The server's
+        // controle_theme_batch executes SQL rules against the now-saved
+        // data in DB and returns any violations.
+        _isCheckingCoherence = true;
+        _coherenceErrors     = [];
+        notifyListeners();
+        try {
+          _coherenceErrors = await _api.checkCoherence(
+            login:    user.login,
+            campId:   _idCamp!,
+            sysId:    _idSystem!,
+            qstId:    _selectedQuestion!.idQst,
+            etabId:   _idEtab!,
+            filter:   _selectedFilter?.idFilter,
+            yearCode: user.codeyear,
+          );
+        } catch (_) {
+          _coherenceErrors = []; // Non-fatal — silently ignore
+        } finally {
+          _isCheckingCoherence = false;
+          notifyListeners();
+        }
       } else {
         _error = 'Échec de l\'envoi. Réessayez.';
       }
@@ -468,6 +503,7 @@ class DataEntryProvider extends ChangeNotifier {
             filter:          null,
             formData:        data,
             isFirstQuestion: isFirst,
+            yearCode:        user.codeyear, // inject school year for PHP session bypass
           );
           results['${etabId}_$qstId'] = ok;
           if (ok) {

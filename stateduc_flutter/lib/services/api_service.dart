@@ -513,6 +513,7 @@ class ApiService {
     bool isFirstQuestion =
         false, // true when sending question[0] → includes LOC_REG_0
     bool isLastPage = true,
+    String yearCode = '', // user.codeyear — school year code for PHP session bypass
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
     // Build form body exactly like page_etab.js getPageDataToSend():
@@ -560,8 +561,12 @@ class ApiService {
     final body = bodyParts.join('&');
 
     try {
+      // Append yearCode as the last segment so PHP server can inject it into
+      // $_SESSION['annee'] and bypass the missing browser session for REST calls.
+      // The server has two routes: one with /:id_annee (mobile) and one without (web).
+      final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '';
       final response = await _dio.post(
-        'data_save.php/theme_save/$login/$campId/$sysId/$qstId/$etabId/$filterParam/0',
+        'data_save.php/theme_save/$login/$campId/$sysId/$qstId/$etabId/$filterParam/0$anneeSegment',
         data: body,
         options: Options(
           contentType: 'application/x-www-form-urlencoded',
@@ -670,6 +675,67 @@ class ApiService {
 
   // ═══════════════════════════════════════════════════════════════════════════
   // PRIVATE HELPER — Generic GET with se_data unwrapping
+  // ═══════════════════════════════════════════════════════════════════════════
+  // COHERENCE CHECK — POST-SAVE CONTROL
+  // Source server: data_controle.php / controle_theme_batch.class.php
+  //   GET /data_controle.php/theme_controle/{login}/{campId}/{sysId}/{qstId}/
+  //        {etabId}/{filter}/{yearCode}
+  //   Response: { se_status:200, se_data: { nb_erreurs: N, erreurs: [...] } }
+  //   erreurs[]: { id_regle, id_regle_assoc, message, regle_1, regle_2, critere }
+  //
+  // Designed to be called AFTER saveData() succeeds.
+  // Returns list of CoherenceError objects (empty list = no violations).
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Future<List<CoherenceError>> checkCoherence({
+    required String login,
+    required String campId,
+    required String sysId,
+    required String qstId,
+    required String etabId,
+    required String? filter,
+    String yearCode = '',
+  }) async {
+    final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
+    final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '/0';
+    final path =
+        'data_controle.php/theme_controle/$login/$campId/$sysId/$qstId/$etabId/$filterParam$anneeSegment';
+    try {
+      final response = await _dio.get(
+        path,
+        options: Options(responseType: ResponseType.plain),
+      );
+      final rawBody = response.data?.toString().trim() ?? '';
+      if (rawBody.isEmpty) return [];
+
+      dynamic parsed;
+      try {
+        parsed = json.decode(rawBody);
+      } catch (_) {
+        return [];
+      }
+
+      if (parsed is! Map) return [];
+      if (parsed['se_status'] == 400) return [];
+
+      final seData = parsed['se_data'];
+      if (seData is! Map) return [];
+
+      final erreurs = seData['erreurs'];
+      if (erreurs is! List) return [];
+
+      return erreurs
+          .whereType<Map>()
+          .map((e) => CoherenceError.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    } on DioException catch (_) {
+      // Non-critical — return empty (no blocking)
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
   // Mirrors: getDataFromServer(servSuffix, params, callBack) in charge_camp.js
   //   success callback receives response.se_data
   // ═══════════════════════════════════════════════════════════════════════════
@@ -752,3 +818,43 @@ class ApiException implements Exception {
   @override
   String toString() => message;
 }
+
+/// Represents a coherence control violation returned by data_controle.php.
+///
+/// Server source: controle_theme_batch.class.php → tab_regles_theme_assoc_not_ok
+/// JSON fields:
+///   id_regle       → rule ID from DICO_REGLE_THEME
+///   id_regle_assoc → associated rule ID
+///   message        → human-readable violation message (translated by server)
+///   regle_1        → label of the first data value
+///   regle_2        → label of the associated data value
+///   critere        → comparison operator (>, <, =, etc.)
+class CoherenceError {
+  final int idRegle;
+  final int idRegleAssoc;
+  final String message;
+  final String regle1;
+  final String regle2;
+  final String critere;
+
+  const CoherenceError({
+    required this.idRegle,
+    required this.idRegleAssoc,
+    required this.message,
+    this.regle1 = '',
+    this.regle2 = '',
+    this.critere = '',
+  });
+
+  factory CoherenceError.fromJson(Map<String, dynamic> json) {
+    return CoherenceError(
+      idRegle:       int.tryParse(json['id_regle']?.toString()       ?? '0') ?? 0,
+      idRegleAssoc:  int.tryParse(json['id_regle_assoc']?.toString() ?? '0') ?? 0,
+      message:       (json['message']  ?? '').toString(),
+      regle1:        (json['regle_1']  ?? '').toString(),
+      regle2:        (json['regle_2']  ?? '').toString(),
+      critere:       (json['critere']  ?? '').toString(),
+    );
+  }
+}
+

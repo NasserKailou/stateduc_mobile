@@ -77,15 +77,15 @@ $app->get('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:
 		return;
 	}
   
-  $survey_curr_status = getSurveyStatus($id_camp, $_SESSION['annee']);
+  $survey_curr_status = getSurveyStatus($id_camp, $id_year);
   if ($survey_curr_status != 2) {
-     $rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"Cette campagne est fermée!");
+     $rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"Cette campagne est fermï¿½e!");
      echo json_encode($rps);
      return;
   }
   
   //return;
-  $curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
+  $curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
   		if (strpos($instance->response, "ISOKSAVEINDATABASE") !== FALSE) {
   			$statut_save = "OKSAVE";
 		} else {
@@ -168,7 +168,19 @@ $app->get('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:
 });
 
 // Sauvegarde les donnees d'un theme
+// Route etendue (app mobile) : inclut id_annee pour fonctionner sans session navigateur
+$app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:start/:id_annee', function ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
+	if (!isset($_SESSION['annee']) || $_SESSION['annee'] == '') { $_SESSION['annee'] = $id_annee; }
+	theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app);
+});
+
+// Route originale (navigateur web) : utilise $_SESSION['annee'] existante
 $app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:start', function ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
+	$id_annee = isset($_SESSION['annee']) ? $_SESSION['annee'] : '';
+	theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app);
+});
+
+function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
 	$msg_ok = $GLOBALS['PARAM_WS']['OK'];
 	$msg_ko = $GLOBALS['PARAM_WS']['KO'];
   
@@ -178,8 +190,8 @@ $app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/
 	if ($id_filter != "null") {
 		$period_query = " AND ID_PERIODE=".$id_filter." "; 
 	}
-	
-	$id_year = $_SESSION['annee'];
+	// Priorite : parametre URL (mobile) > session (navigateur web)
+	$id_year = ($id_annee != '' && $id_annee != '0') ? $id_annee : (isset($_SESSION['annee']) ? $_SESSION['annee'] : '');
   $requete = "SELECT DISTINCT ID_CAMPAGNE
 				FROM DICO_FIXE_REGROUPEMENT DFR, ADMIN_USERS AU
 				WHERE AU.NOM_USER LIKE '".$user."' 
@@ -190,14 +202,14 @@ $app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/
 	$camps = $GLOBALS['conn_dico']->GetAll($requete);
 	 
   if (count($camps) == 0 || $camps[0] == '') {
-		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"L'utilisateur '".$user."' n'a pas accès à cette campagne");
+		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"L'utilisateur '".$user."' n'a pas accï¿½s ï¿½ cette campagne");
 		echo json_encode($rps);
 		return;
 	}
   
 	$data_to_send = $app->request->post();
   
-  $survey_curr_status = getSurveyStatus($id_camp, $_SESSION['annee']);
+  $survey_curr_status = getSurveyStatus($id_camp, $id_year);
   $survey_curr_status = 2;
 	if ($survey_curr_status != 2) {
 		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"Cette campagne n'est pas ouverte!");
@@ -223,7 +235,7 @@ $app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/
 	}
   
  //echo "<pre>"; print_r($data_to_send);   //return;
-	$curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
+	$curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
   		//print_r($instance->response);
 		if (strpos($instance->response, "ISOKSAVEINDATABASE") !== FALSE) {
   			$statut_save = "OKSAVE";
@@ -243,12 +255,12 @@ $app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/
 		$fh = fopen($myFile, 'a');
 		@fwrite($fh, $string);
 		@fclose($fh);	 
-    	saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut_save, $_SESSION['annee']);
+    	saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut_save, $id_year);
 		echo json_encode($rps);
 		//echo 'call to "' . $instance->url . '" was successful. response was' . "<br/>";
 		//echo $instance->response . "\n";
 	});
-	$curl->error(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $data, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+	$curl->error(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $data, $id_year, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
 		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>$instance->error_code." : ".$instance->error_message);	
 		$string = date('Y/m/d H:i:s');
 		$string .= ";".$instance->error_code.":".$instance->error_message;
@@ -396,9 +408,9 @@ function saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_eta
 }
 
 /**
-* Décrompression du fichier compressé contenant les données à importer
+* Dï¿½crompression du fichier compressï¿½ contenant les donnï¿½es ï¿½ importer
 * @access public
-* @param stirng fichier_zip chemin complet du fichier à décompresser
+* @param stirng fichier_zip chemin complet du fichier ï¿½ dï¿½compresser
 */
 function extract_zip($fichier_zip) {
 	include_once($GLOBALS['SISED_PATH_LIB'].'pclzip.lib.php');
