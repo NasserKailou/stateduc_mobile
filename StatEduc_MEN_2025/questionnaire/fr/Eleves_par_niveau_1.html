@@ -1,0 +1,816 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM ACTION='questionnaire.php' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'><CAPTION><B>III/. 	RÉPARTITION DES ÉLÈVES PAR NIVEAU, SEXE ET AGE</B></CAPTION>
+	<TR>
+		<TD COLSPAN='2' class='ligne-impaire'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='1' NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='1001' NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='2001' NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='3001' NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='4001' NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='5001' NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='6001' NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='7001' NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD ROWSPAN='100' style='width: 1px; padding: 1px;'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR CLASS='ligne-impaire'>
+		<TD COLSPAN='2' class='ligne-paire' nowrap>Groupe  pédagogique</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_0</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_1</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_2</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_3</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_4</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_5</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_6</TD>
+		<TD COLSPAN=4 class='ligne-paire'>$NUMERO_GP_7</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-impaire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' class='ligne-impaire'>Nouveau curriculum implanté</TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='2'  ID='NVX_CURRICULUM_IMPLANTE_0' NAME='NVX_CURRICULUM_IMPLANTE_0' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_0></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='1002'  ID='NVX_CURRICULUM_IMPLANTE_1' NAME='NVX_CURRICULUM_IMPLANTE_1' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='2002'  ID='NVX_CURRICULUM_IMPLANTE_2' NAME='NVX_CURRICULUM_IMPLANTE_2' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_2></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='3002'  ID='NVX_CURRICULUM_IMPLANTE_3' NAME='NVX_CURRICULUM_IMPLANTE_3' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='4002'  ID='NVX_CURRICULUM_IMPLANTE_4' NAME='NVX_CURRICULUM_IMPLANTE_4' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_4></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='5002'  ID='NVX_CURRICULUM_IMPLANTE_5' NAME='NVX_CURRICULUM_IMPLANTE_5' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_5></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='6002'  ID='NVX_CURRICULUM_IMPLANTE_6' NAME='NVX_CURRICULUM_IMPLANTE_6' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_6></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='7002'  ID='NVX_CURRICULUM_IMPLANTE_7' NAME='NVX_CURRICULUM_IMPLANTE_7' TYPE='checkbox'  VALUE=$NVX_CURRICULUM_IMPLANTE_7></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD rowspan='3'  class='ligne-paire'>Niveau</TD>
+		<TD nowrap  class='ligne-paire'>Petite section</TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='3'  ID='CODE_TYPE_NIVEAU_0_1' NAME=CODE_TYPE_NIVEAU_0 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_0_1></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='1003'  ID='CODE_TYPE_NIVEAU_1_1' NAME=CODE_TYPE_NIVEAU_1 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_1_1></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='2003'  ID='CODE_TYPE_NIVEAU_2_1' NAME=CODE_TYPE_NIVEAU_2 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_2_1></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='3003'  ID='CODE_TYPE_NIVEAU_3_1' NAME=CODE_TYPE_NIVEAU_3 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_3_1></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='4003'  ID='CODE_TYPE_NIVEAU_4_1' NAME=CODE_TYPE_NIVEAU_4 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_4_1></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='5003'  ID='CODE_TYPE_NIVEAU_5_1' NAME=CODE_TYPE_NIVEAU_5 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_5_1></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='6003'  ID='CODE_TYPE_NIVEAU_6_1' NAME=CODE_TYPE_NIVEAU_6 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_6_1></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='7003'  ID='CODE_TYPE_NIVEAU_7_1' NAME=CODE_TYPE_NIVEAU_7 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_7_1></TD>
+	</TR>
+	<TR>
+		<TD nowrap  class='ligne-paire'>Moyenne section</TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='4'  ID='CODE_TYPE_NIVEAU_0_2' NAME=CODE_TYPE_NIVEAU_0 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_0_2></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='1004'  ID='CODE_TYPE_NIVEAU_1_2' NAME=CODE_TYPE_NIVEAU_1 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_1_2></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='2004'  ID='CODE_TYPE_NIVEAU_2_2' NAME=CODE_TYPE_NIVEAU_2 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_2_2></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='3004'  ID='CODE_TYPE_NIVEAU_3_2' NAME=CODE_TYPE_NIVEAU_3 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_3_2></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='4004'  ID='CODE_TYPE_NIVEAU_4_2' NAME=CODE_TYPE_NIVEAU_4 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_4_2></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='5004'  ID='CODE_TYPE_NIVEAU_5_2' NAME=CODE_TYPE_NIVEAU_5 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_5_2></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='6004'  ID='CODE_TYPE_NIVEAU_6_2' NAME=CODE_TYPE_NIVEAU_6 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_6_2></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='7004'  ID='CODE_TYPE_NIVEAU_7_2' NAME=CODE_TYPE_NIVEAU_7 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_7_2></TD>
+	</TR>
+	<TR>
+		<TD nowrap  class='ligne-paire'>Grande section</TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='5'  ID='CODE_TYPE_NIVEAU_0_3' NAME=CODE_TYPE_NIVEAU_0 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_0_3></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='1005'  ID='CODE_TYPE_NIVEAU_1_3' NAME=CODE_TYPE_NIVEAU_1 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_1_3></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='2005'  ID='CODE_TYPE_NIVEAU_2_3' NAME=CODE_TYPE_NIVEAU_2 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_2_3></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='3005'  ID='CODE_TYPE_NIVEAU_3_3' NAME=CODE_TYPE_NIVEAU_3 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_3_3></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='4005'  ID='CODE_TYPE_NIVEAU_4_3' NAME=CODE_TYPE_NIVEAU_4 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_4_3></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='5005'  ID='CODE_TYPE_NIVEAU_5_3' NAME=CODE_TYPE_NIVEAU_5 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_5_3></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='6005'  ID='CODE_TYPE_NIVEAU_6_3' NAME=CODE_TYPE_NIVEAU_6 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_6_3></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='7005'  ID='CODE_TYPE_NIVEAU_7_3' NAME=CODE_TYPE_NIVEAU_7 TYPE='radio' VALUE=$CODE_TYPE_NIVEAU_7_3></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-impaire'></TD>
+	</TR>
+	<TR>
+		<TD rowspan='2'  class='ligne-impaire'>Fonctionnement</TD>
+		<TD nowrap  class='ligne-impaire'>Simple vacation</TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='6'  ID='CODE_TYPE_FONCTIONNEMENT_GP_0_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_0 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_0_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='1006'  ID='CODE_TYPE_FONCTIONNEMENT_GP_1_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_1 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_1_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='2006'  ID='CODE_TYPE_FONCTIONNEMENT_GP_2_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_2 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_2_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='3006'  ID='CODE_TYPE_FONCTIONNEMENT_GP_3_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_3 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_3_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='4006'  ID='CODE_TYPE_FONCTIONNEMENT_GP_4_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_4 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_4_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='5006'  ID='CODE_TYPE_FONCTIONNEMENT_GP_5_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_5 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_5_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='6006'  ID='CODE_TYPE_FONCTIONNEMENT_GP_6_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_6 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_6_1></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='7006'  ID='CODE_TYPE_FONCTIONNEMENT_GP_7_1' NAME=CODE_TYPE_FONCTIONNEMENT_GP_7 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_7_1></TD>
+	</TR>
+	<TR>
+		<TD nowrap  class='ligne-impaire'>Multigrade</TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='7'  ID='CODE_TYPE_FONCTIONNEMENT_GP_0_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_0 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_0_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='1007'  ID='CODE_TYPE_FONCTIONNEMENT_GP_1_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_1 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_1_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='2007'  ID='CODE_TYPE_FONCTIONNEMENT_GP_2_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_2 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_2_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='3007'  ID='CODE_TYPE_FONCTIONNEMENT_GP_3_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_3 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_3_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='4007'  ID='CODE_TYPE_FONCTIONNEMENT_GP_4_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_4 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_4_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='5007'  ID='CODE_TYPE_FONCTIONNEMENT_GP_5_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_5 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_5_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='6007'  ID='CODE_TYPE_FONCTIONNEMENT_GP_6_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_6 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_6_3></TD>
+		<TD COLSPAN=4 class='ligne-impaire'><INPUT tabindex='7007'  ID='CODE_TYPE_FONCTIONNEMENT_GP_7_3' NAME=CODE_TYPE_FONCTIONNEMENT_GP_7 TYPE='radio' VALUE=$CODE_TYPE_FONCTIONNEMENT_GP_7_3></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' class='ligne-paire'>Nb d'h. hebdo effectivement reçues		</TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='8'  ID='NB_HEURES_HEBDO_RECUES_0' NAME='NB_HEURES_HEBDO_RECUES_0' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_0"size = 5></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='1008'  ID='NB_HEURES_HEBDO_RECUES_1' NAME='NB_HEURES_HEBDO_RECUES_1' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_1"size = 5></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='2008'  ID='NB_HEURES_HEBDO_RECUES_2' NAME='NB_HEURES_HEBDO_RECUES_2' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_2"size = 5></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='3008'  ID='NB_HEURES_HEBDO_RECUES_3' NAME='NB_HEURES_HEBDO_RECUES_3' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_3"size = 5></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='4008'  ID='NB_HEURES_HEBDO_RECUES_4' NAME='NB_HEURES_HEBDO_RECUES_4' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_4"size = 5></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='5008'  ID='NB_HEURES_HEBDO_RECUES_5' NAME='NB_HEURES_HEBDO_RECUES_5' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_5"size = 5></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='6008'  ID='NB_HEURES_HEBDO_RECUES_6' NAME='NB_HEURES_HEBDO_RECUES_6' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_6"size = 5></TD>
+		<TD COLSPAN=4 class='ligne-paire'><INPUT tabindex='7008'  ID='NB_HEURES_HEBDO_RECUES_7' NAME='NB_HEURES_HEBDO_RECUES_7' TYPE='text'  VALUE="$NB_HEURES_HEBDO_RECUES_7"size = 5></TD>
+	</TR>
+<script language='javascript' type='text/javascript'>
+var expression_30017 	= "" ;
+var affiche_sous_totaux_30017 	= 0;
+var tab_mes_30017 	= new Array ("NB_ELEV_AGE_G","NB_ELEV_AGE_F");
+var tab_ligne_30017	= new Array ("0","1","2","3","4","5","6","7");
+var tab_col_30017	= new Array ("1","2","3","4","5");
+
+</script>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR class='ligne-impaire' nowrap>
+		<TD COLSPAN='2' class='ligne-paire'> <b>Age</b></TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-impaire'>Moins de 3 ans</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_0_1' NAME='NB_ELEV_AGE_G_0_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_0_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 0, 1, tab_mes_30017);"  tabindex='8'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_0_1' NAME='NB_ELEV_AGE_F_0_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_0_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 0, 1, tab_mes_30017);"  tabindex='9'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_1_1' NAME='NB_ELEV_AGE_G_1_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 1, 1, tab_mes_30017);"  tabindex='1008'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_1_1' NAME='NB_ELEV_AGE_F_1_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 1, 1, tab_mes_30017);"  tabindex='1009'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_2_1' NAME='NB_ELEV_AGE_G_2_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 2, 1, tab_mes_30017);"  tabindex='2008'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_2_1' NAME='NB_ELEV_AGE_F_2_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 2, 1, tab_mes_30017);"  tabindex='2009'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_3_1' NAME='NB_ELEV_AGE_G_3_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 3, 1, tab_mes_30017);"  tabindex='3008'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_3_1' NAME='NB_ELEV_AGE_F_3_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 3, 1, tab_mes_30017);"  tabindex='3009'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_4_1' NAME='NB_ELEV_AGE_G_4_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 4, 1, tab_mes_30017);"  tabindex='4008'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_4_1' NAME='NB_ELEV_AGE_F_4_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 4, 1, tab_mes_30017);"  tabindex='4009'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_5_1' NAME='NB_ELEV_AGE_G_5_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 5, 1, tab_mes_30017);"  tabindex='5008'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_5_1' NAME='NB_ELEV_AGE_F_5_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 5, 1, tab_mes_30017);"  tabindex='5009'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_6_1' NAME='NB_ELEV_AGE_G_6_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_6_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 6, 1, tab_mes_30017);"  tabindex='6008'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_6_1' NAME='NB_ELEV_AGE_F_6_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_6_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 6, 1, tab_mes_30017);"  tabindex='6009'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_7_1' NAME='NB_ELEV_AGE_G_7_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_7_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 7, 1, tab_mes_30017);"  tabindex='7008'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_7_1' NAME='NB_ELEV_AGE_F_7_1' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_7_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 1, tab_mes_30017);"  tabindex='7009'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-paire'>3 ans</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_0_2' NAME='NB_ELEV_AGE_G_0_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_0_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 0, 2, tab_mes_30017);"  tabindex='10'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_0_2' NAME='NB_ELEV_AGE_F_0_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_0_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 0, 2, tab_mes_30017);"  tabindex='11'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_1_2' NAME='NB_ELEV_AGE_G_1_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 1, 2, tab_mes_30017);"  tabindex='1010'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_1_2' NAME='NB_ELEV_AGE_F_1_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 1, 2, tab_mes_30017);"  tabindex='1011'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_2_2' NAME='NB_ELEV_AGE_G_2_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 2, 2, tab_mes_30017);"  tabindex='2010'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_2_2' NAME='NB_ELEV_AGE_F_2_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 2, 2, tab_mes_30017);"  tabindex='2011'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_3_2' NAME='NB_ELEV_AGE_G_3_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 3, 2, tab_mes_30017);"  tabindex='3010'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_3_2' NAME='NB_ELEV_AGE_F_3_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 3, 2, tab_mes_30017);"  tabindex='3011'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_4_2' NAME='NB_ELEV_AGE_G_4_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 4, 2, tab_mes_30017);"  tabindex='4010'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_4_2' NAME='NB_ELEV_AGE_F_4_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 4, 2, tab_mes_30017);"  tabindex='4011'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_5_2' NAME='NB_ELEV_AGE_G_5_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 5, 2, tab_mes_30017);"  tabindex='5010'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_5_2' NAME='NB_ELEV_AGE_F_5_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 5, 2, tab_mes_30017);"  tabindex='5011'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_6_2' NAME='NB_ELEV_AGE_G_6_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_6_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 6, 2, tab_mes_30017);"  tabindex='6010'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_6_2' NAME='NB_ELEV_AGE_F_6_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_6_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 6, 2, tab_mes_30017);"  tabindex='6011'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_7_2' NAME='NB_ELEV_AGE_G_7_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_7_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 7, 2, tab_mes_30017);"  tabindex='7010'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_7_2' NAME='NB_ELEV_AGE_F_7_2' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_7_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 2, tab_mes_30017);"  tabindex='7011'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-impaire'>4 ans</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_0_3' NAME='NB_ELEV_AGE_G_0_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_0_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 0, 3, tab_mes_30017);"  tabindex='12'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_0_3' NAME='NB_ELEV_AGE_F_0_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_0_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 0, 3, tab_mes_30017);"  tabindex='13'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_1_3' NAME='NB_ELEV_AGE_G_1_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 1, 3, tab_mes_30017);"  tabindex='1012'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_1_3' NAME='NB_ELEV_AGE_F_1_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 1, 3, tab_mes_30017);"  tabindex='1013'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_2_3' NAME='NB_ELEV_AGE_G_2_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 2, 3, tab_mes_30017);"  tabindex='2012'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_2_3' NAME='NB_ELEV_AGE_F_2_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 2, 3, tab_mes_30017);"  tabindex='2013'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_3_3' NAME='NB_ELEV_AGE_G_3_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 3, 3, tab_mes_30017);"  tabindex='3012'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_3_3' NAME='NB_ELEV_AGE_F_3_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 3, 3, tab_mes_30017);"  tabindex='3013'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_4_3' NAME='NB_ELEV_AGE_G_4_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 4, 3, tab_mes_30017);"  tabindex='4012'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_4_3' NAME='NB_ELEV_AGE_F_4_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 4, 3, tab_mes_30017);"  tabindex='4013'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_5_3' NAME='NB_ELEV_AGE_G_5_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 5, 3, tab_mes_30017);"  tabindex='5012'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_5_3' NAME='NB_ELEV_AGE_F_5_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 5, 3, tab_mes_30017);"  tabindex='5013'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_6_3' NAME='NB_ELEV_AGE_G_6_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_6_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 6, 3, tab_mes_30017);"  tabindex='6012'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_6_3' NAME='NB_ELEV_AGE_F_6_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_6_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 6, 3, tab_mes_30017);"  tabindex='6013'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_7_3' NAME='NB_ELEV_AGE_G_7_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_7_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 7, 3, tab_mes_30017);"  tabindex='7012'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_7_3' NAME='NB_ELEV_AGE_F_7_3' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_7_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 3, tab_mes_30017);"  tabindex='7013'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-paire'>5 ans</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_0_4' NAME='NB_ELEV_AGE_G_0_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_0_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 0, 4, tab_mes_30017);"  tabindex='14'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_0_4' NAME='NB_ELEV_AGE_F_0_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_0_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 0, 4, tab_mes_30017);"  tabindex='15'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_1_4' NAME='NB_ELEV_AGE_G_1_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 1, 4, tab_mes_30017);"  tabindex='1014'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_1_4' NAME='NB_ELEV_AGE_F_1_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 1, 4, tab_mes_30017);"  tabindex='1015'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_2_4' NAME='NB_ELEV_AGE_G_2_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 2, 4, tab_mes_30017);"  tabindex='2014'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_2_4' NAME='NB_ELEV_AGE_F_2_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 2, 4, tab_mes_30017);"  tabindex='2015'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_3_4' NAME='NB_ELEV_AGE_G_3_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 3, 4, tab_mes_30017);"  tabindex='3014'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_3_4' NAME='NB_ELEV_AGE_F_3_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 3, 4, tab_mes_30017);"  tabindex='3015'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_4_4' NAME='NB_ELEV_AGE_G_4_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 4, 4, tab_mes_30017);"  tabindex='4014'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_4_4' NAME='NB_ELEV_AGE_F_4_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 4, 4, tab_mes_30017);"  tabindex='4015'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_5_4' NAME='NB_ELEV_AGE_G_5_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 5, 4, tab_mes_30017);"  tabindex='5014'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_5_4' NAME='NB_ELEV_AGE_F_5_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 5, 4, tab_mes_30017);"  tabindex='5015'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_6_4' NAME='NB_ELEV_AGE_G_6_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 6, 4, tab_mes_30017);"  tabindex='6014'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_6_4' NAME='NB_ELEV_AGE_F_6_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 6, 4, tab_mes_30017);"  tabindex='6015'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_G_7_4' NAME='NB_ELEV_AGE_G_7_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 7, 4, tab_mes_30017);"  tabindex='7014'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_AGE_F_7_4' NAME='NB_ELEV_AGE_F_7_4' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 4, tab_mes_30017);"  tabindex='7015'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-impaire'>Plus de 5 ans</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_0_5' NAME='NB_ELEV_AGE_G_0_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_0_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 0, 5, tab_mes_30017);"  tabindex='16'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_0_5' NAME='NB_ELEV_AGE_F_0_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_0_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 0, 5, tab_mes_30017);"  tabindex='17'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_1_5' NAME='NB_ELEV_AGE_G_1_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 1, 5, tab_mes_30017);"  tabindex='1016'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_1_5' NAME='NB_ELEV_AGE_F_1_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 1, 5, tab_mes_30017);"  tabindex='1017'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_2_5' NAME='NB_ELEV_AGE_G_2_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 2, 5, tab_mes_30017);"  tabindex='2016'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_2_5' NAME='NB_ELEV_AGE_F_2_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 2, 5, tab_mes_30017);"  tabindex='2017'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_3_5' NAME='NB_ELEV_AGE_G_3_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 3, 5, tab_mes_30017);"  tabindex='3016'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_3_5' NAME='NB_ELEV_AGE_F_3_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 3, 5, tab_mes_30017);"  tabindex='3017'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_4_5' NAME='NB_ELEV_AGE_G_4_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 4, 5, tab_mes_30017);"  tabindex='4016'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_4_5' NAME='NB_ELEV_AGE_F_4_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 4, 5, tab_mes_30017);"  tabindex='4017'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_5_5' NAME='NB_ELEV_AGE_G_5_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_5_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 5, 5, tab_mes_30017);"  tabindex='5016'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_5_5' NAME='NB_ELEV_AGE_F_5_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_5_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 5, 5, tab_mes_30017);"  tabindex='5017'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_6_5' NAME='NB_ELEV_AGE_G_6_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_6_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 6, 5, tab_mes_30017);"  tabindex='6016'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_6_5' NAME='NB_ELEV_AGE_F_6_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_6_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 6, 5, tab_mes_30017);"  tabindex='6017'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_G_7_5' NAME='NB_ELEV_AGE_G_7_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_G_7_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_G', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7016'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_AGE_F_7_5' NAME='NB_ELEV_AGE_F_7_5' TYPE='text' size = 2 VALUE="$NB_ELEV_AGE_F_7_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7017'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-titre'></TD>
+	</TR>
+	<TR  style='background-color:#CCCCCC; text-align: right; font-weight:bold;'>
+		<TD align='center' COLSPAN='2' nowrap rowspan='2' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'><b><br>TOTAL</b></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_0' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_0' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_1' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_1' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_2' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_2' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_3' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_3' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_4' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_4' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_5' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_5' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_6' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_6' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_G_LIGNE_7' size = 2></TD>
+		<TD  colspan='2'  align='center' bgcolor='#CCCCCC'>  
+																<INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'
+																 NAME='TOT_30017_NB_ELEV_AGE_F_LIGNE_7' size = 2></TD>
+	</TR>
+
+	<TR>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_0' size = 2></TD>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_1' size = 2></TD>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_2' size = 2></TD>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_3' size = 2></TD>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_4' size = 2></TD>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_5' size = 2></TD>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_6' size = 2></TD>
+		<TD align='center' COLSPAN=4 bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' 
+															NAME='TOT_30017_ALL_MES_LIGNE_7' size = 2></TD>
+
+	</TR>
+<script language='javascript' type='text/javascript'>
+var expression_30031 	= "" ;
+var affiche_sous_totaux_30031 	= 0;
+var tab_mes_30031 	= new Array ("NB_ELEV_DEFICIENCE_G","NB_ELEV_DEFICIENCE_F");
+var tab_col_30031	= new Array ("0","1","2","3","4","5","6","7");
+var tab_ligne_30031	= new Array ();
+
+</script>
+	<TR>
+		<TD COLSPAN='34' class='ligne-impaire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-impaire'>Nombre total avec defficiences</TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='19'  ID='NB_ELEV_DEFICIENCE_G_0' NAME='NB_ELEV_DEFICIENCE_G_0' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_0"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='20'  ID='NB_ELEV_DEFICIENCE_F_0' NAME='NB_ELEV_DEFICIENCE_F_0' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_0"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='1019'  ID='NB_ELEV_DEFICIENCE_G_1' NAME='NB_ELEV_DEFICIENCE_G_1' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_1"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='1020'  ID='NB_ELEV_DEFICIENCE_F_1' NAME='NB_ELEV_DEFICIENCE_F_1' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_1"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='2019'  ID='NB_ELEV_DEFICIENCE_G_2' NAME='NB_ELEV_DEFICIENCE_G_2' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_2"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='2020'  ID='NB_ELEV_DEFICIENCE_F_2' NAME='NB_ELEV_DEFICIENCE_F_2' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_2"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='3019'  ID='NB_ELEV_DEFICIENCE_G_3' NAME='NB_ELEV_DEFICIENCE_G_3' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_3"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='3020'  ID='NB_ELEV_DEFICIENCE_F_3' NAME='NB_ELEV_DEFICIENCE_F_3' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_3"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='4019'  ID='NB_ELEV_DEFICIENCE_G_4' NAME='NB_ELEV_DEFICIENCE_G_4' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_4"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='4020'  ID='NB_ELEV_DEFICIENCE_F_4' NAME='NB_ELEV_DEFICIENCE_F_4' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_4"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='5019'  ID='NB_ELEV_DEFICIENCE_G_5' NAME='NB_ELEV_DEFICIENCE_G_5' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_5"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='5020'  ID='NB_ELEV_DEFICIENCE_F_5' NAME='NB_ELEV_DEFICIENCE_F_5' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_5"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='6019'  ID='NB_ELEV_DEFICIENCE_G_6' NAME='NB_ELEV_DEFICIENCE_G_6' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_6"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='6020'  ID='NB_ELEV_DEFICIENCE_F_6' NAME='NB_ELEV_DEFICIENCE_F_6' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_6"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='7019'  ID='NB_ELEV_DEFICIENCE_G_7' NAME='NB_ELEV_DEFICIENCE_G_7' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_G_7"size=2 ></TD>
+		<TD colspan='2' class='ligne-impaire' nowrap><INPUT tabindex='7020'  ID='NB_ELEV_DEFICIENCE_F_7' NAME='NB_ELEV_DEFICIENCE_F_7' TYPE='text'  VALUE="$NB_ELEV_DEFICIENCE_F_7"size=2 ></TD>
+	</TR>
+<script language='javascript' type='text/javascript'>
+var expression_30032 	= "" ;
+var affiche_sous_totaux_30032 	= 0;
+var tab_mes_30032 	= new Array ("NB_ELEV_DEFICIENCE_G","NB_ELEV_DEFICIENCE_F");
+var tab_col_30032	= new Array ("0","1","2","3","4","5","6","7");
+var tab_ligne_30032	= new Array ();
+
+</script>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR class='ligne-impaire' nowrap>
+		<TD COLSPAN='2' class='ligne-paire'> <b>Elève avec defficiences : Type de déficience :</b></TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>G</TD>
+		<TD colspan='2' class='ligne-paire' nowrap>F</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-impaire'>Visuelle</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_0_1' NAME='NB_ELEV_DEFFICIENCE_G_0_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_0_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='20'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_0_1' NAME='NB_ELEV_DEFFICIENCE_F_0_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_0_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='21'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_1_1' NAME='NB_ELEV_DEFFICIENCE_G_1_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1020'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_1_1' NAME='NB_ELEV_DEFFICIENCE_F_1_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1021'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_2_1' NAME='NB_ELEV_DEFFICIENCE_G_2_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2020'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_2_1' NAME='NB_ELEV_DEFFICIENCE_F_2_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2021'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_3_1' NAME='NB_ELEV_DEFFICIENCE_G_3_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3020'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_3_1' NAME='NB_ELEV_DEFFICIENCE_F_3_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3021'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_4_1' NAME='NB_ELEV_DEFFICIENCE_G_4_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4020'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_4_1' NAME='NB_ELEV_DEFFICIENCE_F_4_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4021'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_5_1' NAME='NB_ELEV_DEFFICIENCE_G_5_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5020'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_5_1' NAME='NB_ELEV_DEFFICIENCE_F_5_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5021'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_6_1' NAME='NB_ELEV_DEFFICIENCE_G_6_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_6_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6020'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_6_1' NAME='NB_ELEV_DEFFICIENCE_F_6_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_6_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6021'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_7_1' NAME='NB_ELEV_DEFFICIENCE_G_7_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_7_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7020'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_7_1' NAME='NB_ELEV_DEFFICIENCE_F_7_1' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_7_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7021'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-paire'>Physique</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_0_2' NAME='NB_ELEV_DEFFICIENCE_G_0_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_0_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='22'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_0_2' NAME='NB_ELEV_DEFFICIENCE_F_0_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_0_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='23'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_1_2' NAME='NB_ELEV_DEFFICIENCE_G_1_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1022'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_1_2' NAME='NB_ELEV_DEFFICIENCE_F_1_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1023'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_2_2' NAME='NB_ELEV_DEFFICIENCE_G_2_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2022'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_2_2' NAME='NB_ELEV_DEFFICIENCE_F_2_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2023'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_3_2' NAME='NB_ELEV_DEFFICIENCE_G_3_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3022'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_3_2' NAME='NB_ELEV_DEFFICIENCE_F_3_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3023'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_4_2' NAME='NB_ELEV_DEFFICIENCE_G_4_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4022'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_4_2' NAME='NB_ELEV_DEFFICIENCE_F_4_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4023'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_5_2' NAME='NB_ELEV_DEFFICIENCE_G_5_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5022'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_5_2' NAME='NB_ELEV_DEFFICIENCE_F_5_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5023'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_6_2' NAME='NB_ELEV_DEFFICIENCE_G_6_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_6_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6022'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_6_2' NAME='NB_ELEV_DEFFICIENCE_F_6_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_6_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6023'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_7_2' NAME='NB_ELEV_DEFFICIENCE_G_7_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_7_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7022'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_7_2' NAME='NB_ELEV_DEFFICIENCE_F_7_2' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_7_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7023'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-impaire'>Sourd</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_0_3' NAME='NB_ELEV_DEFFICIENCE_G_0_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_0_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='24'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_0_3' NAME='NB_ELEV_DEFFICIENCE_F_0_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_0_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='25'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_1_3' NAME='NB_ELEV_DEFFICIENCE_G_1_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1024'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_1_3' NAME='NB_ELEV_DEFFICIENCE_F_1_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1025'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_2_3' NAME='NB_ELEV_DEFFICIENCE_G_2_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2024'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_2_3' NAME='NB_ELEV_DEFFICIENCE_F_2_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2025'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_3_3' NAME='NB_ELEV_DEFFICIENCE_G_3_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3024'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_3_3' NAME='NB_ELEV_DEFFICIENCE_F_3_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3025'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_4_3' NAME='NB_ELEV_DEFFICIENCE_G_4_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4024'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_4_3' NAME='NB_ELEV_DEFFICIENCE_F_4_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4025'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_5_3' NAME='NB_ELEV_DEFFICIENCE_G_5_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5024'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_5_3' NAME='NB_ELEV_DEFFICIENCE_F_5_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5025'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_6_3' NAME='NB_ELEV_DEFFICIENCE_G_6_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_6_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6024'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_6_3' NAME='NB_ELEV_DEFFICIENCE_F_6_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_6_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6025'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_7_3' NAME='NB_ELEV_DEFFICIENCE_G_7_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_7_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7024'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_7_3' NAME='NB_ELEV_DEFFICIENCE_F_7_3' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_7_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7025'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-paire'>Muet</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_0_4' NAME='NB_ELEV_DEFFICIENCE_G_0_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_0_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='26'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_0_4' NAME='NB_ELEV_DEFFICIENCE_F_0_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_0_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='27'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_1_4' NAME='NB_ELEV_DEFFICIENCE_G_1_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1026'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_1_4' NAME='NB_ELEV_DEFFICIENCE_F_1_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1027'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_2_4' NAME='NB_ELEV_DEFFICIENCE_G_2_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2026'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_2_4' NAME='NB_ELEV_DEFFICIENCE_F_2_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2027'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_3_4' NAME='NB_ELEV_DEFFICIENCE_G_3_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3026'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_3_4' NAME='NB_ELEV_DEFFICIENCE_F_3_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3027'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_4_4' NAME='NB_ELEV_DEFFICIENCE_G_4_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4026'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_4_4' NAME='NB_ELEV_DEFFICIENCE_F_4_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4027'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_5_4' NAME='NB_ELEV_DEFFICIENCE_G_5_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5026'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_5_4' NAME='NB_ELEV_DEFFICIENCE_F_5_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5027'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_6_4' NAME='NB_ELEV_DEFFICIENCE_G_6_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6026'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_6_4' NAME='NB_ELEV_DEFFICIENCE_F_6_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6027'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_7_4' NAME='NB_ELEV_DEFFICIENCE_G_7_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7026'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_7_4' NAME='NB_ELEV_DEFFICIENCE_F_7_4' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7027'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-impaire'>Multiple deficiences</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_0_5' NAME='NB_ELEV_DEFFICIENCE_G_0_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_0_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='28'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_0_5' NAME='NB_ELEV_DEFFICIENCE_F_0_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_0_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='29'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_1_5' NAME='NB_ELEV_DEFFICIENCE_G_1_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1028'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_1_5' NAME='NB_ELEV_DEFFICIENCE_F_1_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1029'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_2_5' NAME='NB_ELEV_DEFFICIENCE_G_2_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2028'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_2_5' NAME='NB_ELEV_DEFFICIENCE_F_2_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2029'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_3_5' NAME='NB_ELEV_DEFFICIENCE_G_3_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3028'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_3_5' NAME='NB_ELEV_DEFFICIENCE_F_3_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3029'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_4_5' NAME='NB_ELEV_DEFFICIENCE_G_4_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4028'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_4_5' NAME='NB_ELEV_DEFFICIENCE_F_4_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4029'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_5_5' NAME='NB_ELEV_DEFFICIENCE_G_5_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_5_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5028'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_5_5' NAME='NB_ELEV_DEFFICIENCE_F_5_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_5_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5029'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_6_5' NAME='NB_ELEV_DEFFICIENCE_G_6_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_6_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6028'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_6_5' NAME='NB_ELEV_DEFFICIENCE_F_6_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_6_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6029'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_7_5' NAME='NB_ELEV_DEFFICIENCE_G_7_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_7_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7028'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_7_5' NAME='NB_ELEV_DEFFICIENCE_F_7_5' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_7_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7029'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-paire'>Autres</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_0_6' NAME='NB_ELEV_DEFFICIENCE_G_0_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_0_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='30'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_0_6' NAME='NB_ELEV_DEFFICIENCE_F_0_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_0_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='31'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_1_6' NAME='NB_ELEV_DEFFICIENCE_G_1_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_1_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1030'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_1_6' NAME='NB_ELEV_DEFFICIENCE_F_1_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_1_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='1031'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_2_6' NAME='NB_ELEV_DEFFICIENCE_G_2_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_2_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2030'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_2_6' NAME='NB_ELEV_DEFFICIENCE_F_2_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_2_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='2031'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_3_6' NAME='NB_ELEV_DEFFICIENCE_G_3_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_3_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3030'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_3_6' NAME='NB_ELEV_DEFFICIENCE_F_3_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_3_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='3031'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_4_6' NAME='NB_ELEV_DEFFICIENCE_G_4_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_4_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4030'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_4_6' NAME='NB_ELEV_DEFFICIENCE_F_4_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_4_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='4031'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_5_6' NAME='NB_ELEV_DEFFICIENCE_G_5_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_5_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5030'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_5_6' NAME='NB_ELEV_DEFFICIENCE_F_5_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_5_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='5031'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_6_6' NAME='NB_ELEV_DEFFICIENCE_G_6_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_6_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6030'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_6_6' NAME='NB_ELEV_DEFFICIENCE_F_6_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_6_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='6031'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_G_7_6' NAME='NB_ELEV_DEFFICIENCE_G_7_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_G_7_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7030'>
+</TD>
+		<TD  colspan='2' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_ELEV_DEFFICIENCE_F_7_6' NAME='NB_ELEV_DEFFICIENCE_F_7_6' TYPE='text' size = 2 VALUE="$NB_ELEV_DEFFICIENCE_F_7_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 30017, '', 'NB_ELEV_AGE_F', tab_ligne_30017, tab_col_30017, 7, 5, tab_mes_30017);"  tabindex='7031'>
+</TD>
+	</TR>
+<script language='javascript' type='text/javascript'>
+var expression_30006 	= "" ;
+var affiche_sous_totaux_30006 	= 0;
+var tab_mes_30006 	= new Array ("NB_ELEV_AVEC_NIS_G","NB_ELEV_AVEC_NIS_F");
+var tab_col_30006	= new Array ("0","1","2","3","4","5","6","7");
+var tab_ligne_30006	= new Array ();
+
+</script>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-paire'>Nombre d'enfant avec NIS</TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='33'  ID='NB_ELEV_AVEC_NIS_G_0' NAME='NB_ELEV_AVEC_NIS_G_0' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_0"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='34'  ID='NB_ELEV_AVEC_NIS_F_0' NAME='NB_ELEV_AVEC_NIS_F_0' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_0"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='1033'  ID='NB_ELEV_AVEC_NIS_G_1' NAME='NB_ELEV_AVEC_NIS_G_1' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_1"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='1034'  ID='NB_ELEV_AVEC_NIS_F_1' NAME='NB_ELEV_AVEC_NIS_F_1' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_1"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='2033'  ID='NB_ELEV_AVEC_NIS_G_2' NAME='NB_ELEV_AVEC_NIS_G_2' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_2"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='2034'  ID='NB_ELEV_AVEC_NIS_F_2' NAME='NB_ELEV_AVEC_NIS_F_2' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_2"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='3033'  ID='NB_ELEV_AVEC_NIS_G_3' NAME='NB_ELEV_AVEC_NIS_G_3' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_3"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='3034'  ID='NB_ELEV_AVEC_NIS_F_3' NAME='NB_ELEV_AVEC_NIS_F_3' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_3"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='4033'  ID='NB_ELEV_AVEC_NIS_G_4' NAME='NB_ELEV_AVEC_NIS_G_4' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_4"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='4034'  ID='NB_ELEV_AVEC_NIS_F_4' NAME='NB_ELEV_AVEC_NIS_F_4' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_4"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='5033'  ID='NB_ELEV_AVEC_NIS_G_5' NAME='NB_ELEV_AVEC_NIS_G_5' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_5"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='5034'  ID='NB_ELEV_AVEC_NIS_F_5' NAME='NB_ELEV_AVEC_NIS_F_5' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_5"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='6033'  ID='NB_ELEV_AVEC_NIS_G_6' NAME='NB_ELEV_AVEC_NIS_G_6' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_6"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='6034'  ID='NB_ELEV_AVEC_NIS_F_6' NAME='NB_ELEV_AVEC_NIS_F_6' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_6"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='7033'  ID='NB_ELEV_AVEC_NIS_G_7' NAME='NB_ELEV_AVEC_NIS_G_7' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_G_7"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='7034'  ID='NB_ELEV_AVEC_NIS_F_7' NAME='NB_ELEV_AVEC_NIS_F_7' TYPE='text'  VALUE="$NB_ELEV_AVEC_NIS_F_7"size = 2 ></TD>
+	</TR>
+<script language='javascript' type='text/javascript'>
+var expression_30007 	= "" ;
+var affiche_sous_totaux_30007 	= 0;
+var tab_mes_30007 	= new Array ("NB_ELEV_AVEC_NIS_G","NB_ELEV_AVEC_NIS_F");
+var tab_col_30007	= new Array ("0","1","2","3","4","5","6","7");
+var tab_ligne_30007	= new Array ();
+
+</script>
+<script language='javascript' type='text/javascript'>
+var expression_30008 	= "" ;
+var affiche_sous_totaux_30008 	= 0;
+var tab_mes_30008 	= new Array ("NB_ELEV_AUTRE_LOCALITE_G","NB_ELEV_AUTRE_LOCALITE_F");
+var tab_col_30008	= new Array ("0","1","2","3","4","5","6","7");
+var tab_ligne_30008	= new Array ();
+
+</script>
+	<TR>
+		<TD COLSPAN='34' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='2' nowrap class='ligne-paire'>Nb. d'élèves provenant d'autres localités</TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='35'  ID='NB_ELEV_AUTRE_LOCALITE_G_0' NAME='NB_ELEV_AUTRE_LOCALITE_G_0' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_0"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='36'  ID='NB_ELEV_AUTRE_LOCALITE_F_0' NAME='NB_ELEV_AUTRE_LOCALITE_F_0' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_0"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='1035'  ID='NB_ELEV_AUTRE_LOCALITE_G_1' NAME='NB_ELEV_AUTRE_LOCALITE_G_1' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_1"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='1036'  ID='NB_ELEV_AUTRE_LOCALITE_F_1' NAME='NB_ELEV_AUTRE_LOCALITE_F_1' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_1"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='2035'  ID='NB_ELEV_AUTRE_LOCALITE_G_2' NAME='NB_ELEV_AUTRE_LOCALITE_G_2' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_2"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='2036'  ID='NB_ELEV_AUTRE_LOCALITE_F_2' NAME='NB_ELEV_AUTRE_LOCALITE_F_2' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_2"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='3035'  ID='NB_ELEV_AUTRE_LOCALITE_G_3' NAME='NB_ELEV_AUTRE_LOCALITE_G_3' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_3"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='3036'  ID='NB_ELEV_AUTRE_LOCALITE_F_3' NAME='NB_ELEV_AUTRE_LOCALITE_F_3' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_3"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='4035'  ID='NB_ELEV_AUTRE_LOCALITE_G_4' NAME='NB_ELEV_AUTRE_LOCALITE_G_4' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_4"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='4036'  ID='NB_ELEV_AUTRE_LOCALITE_F_4' NAME='NB_ELEV_AUTRE_LOCALITE_F_4' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_4"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='5035'  ID='NB_ELEV_AUTRE_LOCALITE_G_5' NAME='NB_ELEV_AUTRE_LOCALITE_G_5' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_5"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='5036'  ID='NB_ELEV_AUTRE_LOCALITE_F_5' NAME='NB_ELEV_AUTRE_LOCALITE_F_5' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_5"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='6035'  ID='NB_ELEV_AUTRE_LOCALITE_G_6' NAME='NB_ELEV_AUTRE_LOCALITE_G_6' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_6"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='6036'  ID='NB_ELEV_AUTRE_LOCALITE_F_6' NAME='NB_ELEV_AUTRE_LOCALITE_F_6' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_6"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='7035'  ID='NB_ELEV_AUTRE_LOCALITE_G_7' NAME='NB_ELEV_AUTRE_LOCALITE_G_7' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_G_7"size = 2 ></TD>
+		<TD colspan='2' class='ligne-paire' nowrap><INPUT tabindex='7036'  ID='NB_ELEV_AUTRE_LOCALITE_F_7' NAME='NB_ELEV_AUTRE_LOCALITE_F_7' TYPE='text'  VALUE="$NB_ELEV_AUTRE_LOCALITE_F_7"size = 2 ></TD>
+	</TR>
+<script language='javascript' type='text/javascript'>
+var expression_30009 	= "" ;
+var affiche_sous_totaux_30009 	= 0;
+var tab_mes_30009 	= new Array ("NB_ELEV_AUTRE_LOCALITE_G","NB_ELEV_AUTRE_LOCALITE_F");
+var tab_col_30009	= new Array ("0","1","2","3","4","5","6","7");
+var tab_ligne_30009	= new Array ();
+
+</script>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+<!--
+document.form1.elements[0].focus();
+ set_TOTAL_MatFrml('form1',30017, '', tab_mes_30017, tab_ligne_30017, tab_col_30017);
+//-->
+</script>

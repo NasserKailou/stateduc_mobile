@@ -1,0 +1,601 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=7002' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>V. EQUIPEMENTS DIDACTIQUES</B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<br>5.1 Equipements et matériels didactiques &nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='4'  valign=top class='police_gras'>&nbsp;&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Dictionnaire Français&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_1' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_1' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Compas Tableau&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_5' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_5' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_5>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Dictionnaire arabe&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_9' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_9' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_9>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Atlas&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_2' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_2' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_2>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Equerre Tableau&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_6' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_6' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_6>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Balance&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_10' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_10' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_10>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Cartes murales&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_3' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_3' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_3>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Règle Tableau&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_7' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_7' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_7>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Compendium&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_11' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_11' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_11>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Rapporteur Tableau&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_4' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_4' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_4>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Globe terreste&nbsp;<INPUT NAME='NOMBRE_TYPE_EQUIPEMENT_0_8' TYPE='text' size=5  ID='NOMBRE_TYPE_EQUIPEMENT_0_8' VALUE=$NOMBRE_TYPE_EQUIPEMENT_0_8>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b><br>5.2 Guides du maître (utilisables)<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>CI</TD>
+		<TD   CLASS='ligne-titre' align='center'>CP</TD>
+		<TD   CLASS='ligne-titre' align='center'>CE1</TD>
+		<TD   CLASS='ligne-titre' align='center'>CE2</TD>
+		<TD   CLASS='ligne-titre' align='center'>CM1</TD>
+		<TD   CLASS='ligne-titre' align='center'>CM2</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Lecture</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_1_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_1_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_1_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_1_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_1_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_1_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_1_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_1_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_1_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_1_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_1_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_1_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_1_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_1_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_1_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_1_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_1_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_1_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Grammaire</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_2_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_2_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_2_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_2_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_2_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_2_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_2_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_2_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_2_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_2_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_2_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_2_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_2_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_2_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_2_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_2_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_2_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_2_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Conjugaison</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_3_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_3_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_3_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_3_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_3_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_3_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_3_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_3_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_3_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_3_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_3_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_3_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_3_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_3_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_3_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_3_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_3_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_3_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Grammaire-Conjugaison-Ortho</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_35_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_35_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_35_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_35_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_35_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_35_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_35_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_35_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_35_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_35_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_35_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_35_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_35_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_35_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_35_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_35_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_35_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_35_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Maths</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_4_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_4_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_4_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_4_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_4_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_4_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_4_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_4_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_4_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_4_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_4_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_4_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_4_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_4_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_4_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_4_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_4_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_4_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Histoire</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_5_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_5_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_5_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_5_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_5_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_5_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_5_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_5_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_5_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_5_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_5_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_5_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_5_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_5_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_5_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_5_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_5_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_5_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Géographie</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_6_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_6_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_6_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_6_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_6_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_6_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_6_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_6_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_6_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_6_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_6_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_6_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_6_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_6_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_6_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_6_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_6_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_6_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Sciences</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_8_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_8_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_8_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_8_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_8_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_8_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_8_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_8_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_8_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_8_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_8_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_8_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_8_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_8_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_8_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_8_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_8_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_8_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Guide Arabe (Manhadj)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_36_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_36_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_36_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_36_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_36_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_36_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_36_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_36_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_36_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_36_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_36_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_36_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_36_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_36_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_36_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_36_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_36_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_36_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Langues nationales</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_31_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_31_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_31_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_31_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_31_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_31_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_31_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_31_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_31_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_31_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_31_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_31_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_31_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_31_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_31_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_31_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_31_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_31_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Guide APP</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_32_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_32_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_32_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_32_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_32_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_32_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_32_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_32_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_32_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_32_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_32_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_32_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_32_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_32_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_32_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_32_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_32_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_32_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Etude du milieu</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_33_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_33_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_33_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_33_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_33_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_33_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_33_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_33_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_33_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_33_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_33_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_33_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_33_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_33_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_33_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_33_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_33_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_33_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Autres</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_34_1' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_34_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_34_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_34_2' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_34_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_34_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_34_3' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_34_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_34_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_34_4' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_34_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_34_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_34_5' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_34_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_34_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUEL_ENSEIGNANT_0_34_6' NAME='NOMBRE_MANUEL_ENSEIGNANT_0_34_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUEL_ENSEIGNANT_0_34_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b><br>5.3 Manuels élèves  (utilisables)<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>CI</TD>
+		<TD   CLASS='ligne-titre' align='center'>CP</TD>
+		<TD   CLASS='ligne-titre' align='center'>CE1</TD>
+		<TD   CLASS='ligne-titre' align='center'>CE2</TD>
+		<TD   CLASS='ligne-titre' align='center'>CM1</TD>
+		<TD   CLASS='ligne-titre' align='center'>CM2</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Coran</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_9_1' NAME='NOMBRE_MANUELS_ELEVES_0_9_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_9_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_9_2' NAME='NOMBRE_MANUELS_ELEVES_0_9_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_9_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_9_3' NAME='NOMBRE_MANUELS_ELEVES_0_9_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_9_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_9_4' NAME='NOMBRE_MANUELS_ELEVES_0_9_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_9_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_9_5' NAME='NOMBRE_MANUELS_ELEVES_0_9_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_9_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_9_6' NAME='NOMBRE_MANUELS_ELEVES_0_9_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_9_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Lecture Arabe</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_10_1' NAME='NOMBRE_MANUELS_ELEVES_0_10_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_10_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_10_2' NAME='NOMBRE_MANUELS_ELEVES_0_10_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_10_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_10_3' NAME='NOMBRE_MANUELS_ELEVES_0_10_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_10_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_10_4' NAME='NOMBRE_MANUELS_ELEVES_0_10_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_10_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_10_5' NAME='NOMBRE_MANUELS_ELEVES_0_10_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_10_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_10_6' NAME='NOMBRE_MANUELS_ELEVES_0_10_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_10_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Grammaire Arabe</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_11_1' NAME='NOMBRE_MANUELS_ELEVES_0_11_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_11_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_11_2' NAME='NOMBRE_MANUELS_ELEVES_0_11_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_11_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_11_3' NAME='NOMBRE_MANUELS_ELEVES_0_11_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_11_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_11_4' NAME='NOMBRE_MANUELS_ELEVES_0_11_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_11_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_11_5' NAME='NOMBRE_MANUELS_ELEVES_0_11_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_11_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_11_6' NAME='NOMBRE_MANUELS_ELEVES_0_11_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_11_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Histoire Arabe</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_13_1' NAME='NOMBRE_MANUELS_ELEVES_0_13_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_13_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_13_2' NAME='NOMBRE_MANUELS_ELEVES_0_13_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_13_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_13_3' NAME='NOMBRE_MANUELS_ELEVES_0_13_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_13_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_13_4' NAME='NOMBRE_MANUELS_ELEVES_0_13_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_13_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_13_5' NAME='NOMBRE_MANUELS_ELEVES_0_13_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_13_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_13_6' NAME='NOMBRE_MANUELS_ELEVES_0_13_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_13_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Géographie Arabe</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_14_1' NAME='NOMBRE_MANUELS_ELEVES_0_14_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_14_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_14_2' NAME='NOMBRE_MANUELS_ELEVES_0_14_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_14_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_14_3' NAME='NOMBRE_MANUELS_ELEVES_0_14_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_14_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_14_4' NAME='NOMBRE_MANUELS_ELEVES_0_14_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_14_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_14_5' NAME='NOMBRE_MANUELS_ELEVES_0_14_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_14_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_14_6' NAME='NOMBRE_MANUELS_ELEVES_0_14_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_14_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Lecture</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_1_1' NAME='NOMBRE_MANUELS_ELEVES_0_1_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_1_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_1_2' NAME='NOMBRE_MANUELS_ELEVES_0_1_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_1_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_1_3' NAME='NOMBRE_MANUELS_ELEVES_0_1_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_1_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_1_4' NAME='NOMBRE_MANUELS_ELEVES_0_1_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_1_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_1_5' NAME='NOMBRE_MANUELS_ELEVES_0_1_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_1_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_1_6' NAME='NOMBRE_MANUELS_ELEVES_0_1_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_1_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Grammaire-Conjugaison-Ortho</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_15_1' NAME='NOMBRE_MANUELS_ELEVES_0_15_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_15_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_15_2' NAME='NOMBRE_MANUELS_ELEVES_0_15_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_15_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_15_3' NAME='NOMBRE_MANUELS_ELEVES_0_15_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_15_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_15_4' NAME='NOMBRE_MANUELS_ELEVES_0_15_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_15_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_15_5' NAME='NOMBRE_MANUELS_ELEVES_0_15_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_15_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_15_6' NAME='NOMBRE_MANUELS_ELEVES_0_15_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_15_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Maths</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_2_1' NAME='NOMBRE_MANUELS_ELEVES_0_2_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_2_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_2_2' NAME='NOMBRE_MANUELS_ELEVES_0_2_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_2_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_2_3' NAME='NOMBRE_MANUELS_ELEVES_0_2_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_2_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_2_4' NAME='NOMBRE_MANUELS_ELEVES_0_2_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_2_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_2_5' NAME='NOMBRE_MANUELS_ELEVES_0_2_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_2_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_2_6' NAME='NOMBRE_MANUELS_ELEVES_0_2_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_2_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Etude du Milieu</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_3_1' NAME='NOMBRE_MANUELS_ELEVES_0_3_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_3_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_3_2' NAME='NOMBRE_MANUELS_ELEVES_0_3_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_3_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_3_3' NAME='NOMBRE_MANUELS_ELEVES_0_3_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_3_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_3_4' NAME='NOMBRE_MANUELS_ELEVES_0_3_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_3_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_3_5' NAME='NOMBRE_MANUELS_ELEVES_0_3_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_3_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_3_6' NAME='NOMBRE_MANUELS_ELEVES_0_3_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_3_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Sciences</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_4_1' NAME='NOMBRE_MANUELS_ELEVES_0_4_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_4_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_4_2' NAME='NOMBRE_MANUELS_ELEVES_0_4_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_4_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_4_3' NAME='NOMBRE_MANUELS_ELEVES_0_4_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_4_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_4_4' NAME='NOMBRE_MANUELS_ELEVES_0_4_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_4_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_4_5' NAME='NOMBRE_MANUELS_ELEVES_0_4_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_4_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_4_6' NAME='NOMBRE_MANUELS_ELEVES_0_4_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_4_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Hist-Géo</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_5_1' NAME='NOMBRE_MANUELS_ELEVES_0_5_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_5_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_5_2' NAME='NOMBRE_MANUELS_ELEVES_0_5_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_5_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_5_3' NAME='NOMBRE_MANUELS_ELEVES_0_5_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_5_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_5_4' NAME='NOMBRE_MANUELS_ELEVES_0_5_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_5_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_5_5' NAME='NOMBRE_MANUELS_ELEVES_0_5_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_5_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_5_6' NAME='NOMBRE_MANUELS_ELEVES_0_5_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_5_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Histoire</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_6_1' NAME='NOMBRE_MANUELS_ELEVES_0_6_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_6_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_6_2' NAME='NOMBRE_MANUELS_ELEVES_0_6_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_6_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_6_3' NAME='NOMBRE_MANUELS_ELEVES_0_6_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_6_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_6_4' NAME='NOMBRE_MANUELS_ELEVES_0_6_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_6_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_6_5' NAME='NOMBRE_MANUELS_ELEVES_0_6_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_6_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_6_6' NAME='NOMBRE_MANUELS_ELEVES_0_6_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_6_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Géographie</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_7_1' NAME='NOMBRE_MANUELS_ELEVES_0_7_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_7_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_7_2' NAME='NOMBRE_MANUELS_ELEVES_0_7_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_7_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_7_3' NAME='NOMBRE_MANUELS_ELEVES_0_7_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_7_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_7_4' NAME='NOMBRE_MANUELS_ELEVES_0_7_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_7_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_7_5' NAME='NOMBRE_MANUELS_ELEVES_0_7_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_7_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_7_6' NAME='NOMBRE_MANUELS_ELEVES_0_7_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_7_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Autre</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_17_1' NAME='NOMBRE_MANUELS_ELEVES_0_17_1' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_17_1"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_17_2' NAME='NOMBRE_MANUELS_ELEVES_0_17_2' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_17_2"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_17_3' NAME='NOMBRE_MANUELS_ELEVES_0_17_3' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_17_3"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_17_4' NAME='NOMBRE_MANUELS_ELEVES_0_17_4' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_17_4"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_17_5' NAME='NOMBRE_MANUELS_ELEVES_0_17_5' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_17_5"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_MANUELS_ELEVES_0_17_6' NAME='NOMBRE_MANUELS_ELEVES_0_17_6' TYPE='text' size=5 VALUE="$NOMBRE_MANUELS_ELEVES_0_17_6"  tabindex='9023'>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

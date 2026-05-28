@@ -1,0 +1,367 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=8202' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>IX. AIRE DE RECRUTEMENT DE L'ÉCOLE</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br/> Distance estimée<br /> des localités de<br /> provenance des<br>  élèves à l'école en km                             &nbspNombre total d'élèves par niveau<br/><br></b><script language='javascript' type='text/javascript'>
+var expression_820013 	= "";
+var tot_mes_ligne_820013 	= new Array();
+var tot_mes_col_820013 	= new Array();
+var affich_vertic_mes_820013 	= 0;
+var affiche_sous_totaux_820013 	= 0;
+var tab_mes_820013 	= new Array ("POPULATION_GARCONS","POPULATION_FILLES");
+var tab_ligne_820013	= new Array ("1","2","3","4");
+var tab_col_820013	= new Array ("1","2","3","4","5","6");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>CI</TD>
+		<TD CLASS='ligne-titre' align='center'>CP</TD>
+		<TD CLASS='ligne-titre' align='center'>CE1</TD>
+		<TD CLASS='ligne-titre' align='center'>CE2</TD>
+		<TD CLASS='ligne-titre' align='center'>CM1</TD>
+		<TD CLASS='ligne-titre' align='center'>CM2</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' size=10>< 1</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[0]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>G</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_1_1' NAME='POPULATION_GARCONS_0_1_1' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 1, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_1_2' NAME='POPULATION_GARCONS_0_1_2' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 1, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_1_3' NAME='POPULATION_GARCONS_0_1_3' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 1, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_1_4' NAME='POPULATION_GARCONS_0_1_4' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 1, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_1_5' NAME='POPULATION_GARCONS_0_1_5' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 1, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_1_6' NAME='POPULATION_GARCONS_0_1_6' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_1_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 1, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_LIGNE_0_1' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[0][1]	= "TOT_820013_POPULATION_GARCONS_LIGNE_0_1";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_ALL_MES_LIGNE_0_1' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_1_1' NAME='POPULATION_FILLES_0_1_1' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 1, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_1_2' NAME='POPULATION_FILLES_0_1_2' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 1, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_1_3' NAME='POPULATION_FILLES_0_1_3' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 1, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_1_4' NAME='POPULATION_FILLES_0_1_4' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 1, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_1_5' NAME='POPULATION_FILLES_0_1_5' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 1, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_1_6' NAME='POPULATION_FILLES_0_1_6' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_1_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 1, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_LIGNE_0_1' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[0][2]	= "TOT_820013_POPULATION_FILLES_LIGNE_0_1";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' size=10>1 - 3 </TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[1]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>G</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_2_1' NAME='POPULATION_GARCONS_0_2_1' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 2, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_2_2' NAME='POPULATION_GARCONS_0_2_2' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 2, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_2_3' NAME='POPULATION_GARCONS_0_2_3' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 2, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_2_4' NAME='POPULATION_GARCONS_0_2_4' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 2, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_2_5' NAME='POPULATION_GARCONS_0_2_5' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 2, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_2_6' NAME='POPULATION_GARCONS_0_2_6' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_2_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 2, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_LIGNE_0_2' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[1][1]	= "TOT_820013_POPULATION_GARCONS_LIGNE_0_2";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_ALL_MES_LIGNE_0_2' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_2_1' NAME='POPULATION_FILLES_0_2_1' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 2, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_2_2' NAME='POPULATION_FILLES_0_2_2' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 2, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_2_3' NAME='POPULATION_FILLES_0_2_3' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 2, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_2_4' NAME='POPULATION_FILLES_0_2_4' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 2, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_2_5' NAME='POPULATION_FILLES_0_2_5' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 2, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_2_6' NAME='POPULATION_FILLES_0_2_6' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_2_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 2, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_LIGNE_0_2' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[1][2]	= "TOT_820013_POPULATION_FILLES_LIGNE_0_2";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' size=10>3 - 5</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[2]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>G</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_3_1' NAME='POPULATION_GARCONS_0_3_1' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 3, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_3_2' NAME='POPULATION_GARCONS_0_3_2' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 3, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_3_3' NAME='POPULATION_GARCONS_0_3_3' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 3, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_3_4' NAME='POPULATION_GARCONS_0_3_4' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 3, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_3_5' NAME='POPULATION_GARCONS_0_3_5' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 3, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_GARCONS_0_3_6' NAME='POPULATION_GARCONS_0_3_6' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_3_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 3, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_LIGNE_0_3' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[2][1]	= "TOT_820013_POPULATION_GARCONS_LIGNE_0_3";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_ALL_MES_LIGNE_0_3' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_3_1' NAME='POPULATION_FILLES_0_3_1' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 3, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_3_2' NAME='POPULATION_FILLES_0_3_2' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 3, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_3_3' NAME='POPULATION_FILLES_0_3_3' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 3, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_3_4' NAME='POPULATION_FILLES_0_3_4' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 3, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_3_5' NAME='POPULATION_FILLES_0_3_5' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 3, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='POPULATION_FILLES_0_3_6' NAME='POPULATION_FILLES_0_3_6' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_3_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 3, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_LIGNE_0_3' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[2][2]	= "TOT_820013_POPULATION_FILLES_LIGNE_0_3";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' size=10>>= 5</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[3]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>G</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_4_1' NAME='POPULATION_GARCONS_0_4_1' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 4, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_4_2' NAME='POPULATION_GARCONS_0_4_2' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 4, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_4_3' NAME='POPULATION_GARCONS_0_4_3' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 4, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_4_4' NAME='POPULATION_GARCONS_0_4_4' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 4, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_4_5' NAME='POPULATION_GARCONS_0_4_5' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 4, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_GARCONS_0_4_6' NAME='POPULATION_GARCONS_0_4_6' TYPE='text' size=1 VALUE="$POPULATION_GARCONS_0_4_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_GARCONS', tab_ligne_820013, tab_col_820013, 4, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_LIGNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[3][1]	= "TOT_820013_POPULATION_GARCONS_LIGNE_0_4";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_ALL_MES_LIGNE_0_4' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_4_1' NAME='POPULATION_FILLES_0_4_1' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 4, 1, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_4_2' NAME='POPULATION_FILLES_0_4_2' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 4, 2, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_4_3' NAME='POPULATION_FILLES_0_4_3' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 4, 3, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_4_4' NAME='POPULATION_FILLES_0_4_4' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 4, 4, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_4_5' NAME='POPULATION_FILLES_0_4_5' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 4, 5, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='POPULATION_FILLES_0_4_6' NAME='POPULATION_FILLES_0_4_6' TYPE='text' size=1 VALUE="$POPULATION_FILLES_0_4_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 820013, 0, 'POPULATION_FILLES', tab_ligne_820013, tab_col_820013, 4, 6, tab_mes_820013);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_LIGNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_820013[3][2]	= "TOT_820013_POPULATION_FILLES_LIGNE_0_4";
+</script>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='3' style='vertical-align:middle' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>G</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_COLONNE_0_1' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[1][0]	= "TOT_820013_POPULATION_GARCONS_COLONNE_0_1";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_COLONNE_0_2' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[1][1]	= "TOT_820013_POPULATION_GARCONS_COLONNE_0_2";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_COLONNE_0_3' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[1][2]	= "TOT_820013_POPULATION_GARCONS_COLONNE_0_3";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_COLONNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[1][3]	= "TOT_820013_POPULATION_GARCONS_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_COLONNE_0_5' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[1][4]	= "TOT_820013_POPULATION_GARCONS_COLONNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_COLONNE_0_6' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[1][5]	= "TOT_820013_POPULATION_GARCONS_COLONNE_0_6";
+</script>
+		<td colspan='2' align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_GARCONS_COLONNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center' bgcolor='#CCCCCC'>F</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_COLONNE_0_1' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[2][0]	= "TOT_820013_POPULATION_FILLES_COLONNE_0_1";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_COLONNE_0_2' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[2][1]	= "TOT_820013_POPULATION_FILLES_COLONNE_0_2";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_COLONNE_0_3' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[2][2]	= "TOT_820013_POPULATION_FILLES_COLONNE_0_3";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_COLONNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[2][3]	= "TOT_820013_POPULATION_FILLES_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_COLONNE_0_5' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[2][4]	= "TOT_820013_POPULATION_FILLES_COLONNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_COLONNE_0_6' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_820013[2][5]	= "TOT_820013_POPULATION_FILLES_COLONNE_0_6";
+</script>
+		<td colspan='2' align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_POPULATION_FILLES_COLONNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center' bgcolor='#CCCCCC'>G + F</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_820013_ALL_MES_COLONNE_0_1' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_820013_ALL_MES_COLONNE_0_2' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_820013_ALL_MES_COLONNE_0_3' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_820013_ALL_MES_COLONNE_0_4' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_820013_ALL_MES_COLONNE_0_5' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_820013_ALL_MES_COLONNE_0_6' ></TD>
+		<td colspan='2' align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_820013_ALL_MES_0' ></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',820013, 0, tab_mes_820013, tab_ligne_820013, tab_col_820013);
+</script>

@@ -1,0 +1,131 @@
+<?php
+require_once 'common_ws.php';
+
+$app = new \Slim\Slim();
+
+$lib_status =  $GLOBALS['PARAM_WS']['LIB_STATUS'];
+$lib_message = $GLOBALS['PARAM_WS']['LIB_MESSAGE'];
+$lib_data = $GLOBALS['PARAM_WS']['LIB_DATA'];
+
+$status_ok = $GLOBALS['PARAM_WS']['STATUS_OK'];
+$status_ko = $GLOBALS['PARAM_WS']['STATUS_KO'];
+
+$app->add(new \HttpAuth());
+
+ // renvoie les thèmes pour une campagne
+$app->get('/theme_camp/:id_camp/:id_sys/:code_lang', function ($id_camp, $id_sys, $code_lang) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+	$status = $GLOBALS['PARAM_WS']['OK'];	
+	$qst_list = array();
+	
+	/*$requete = "SELECT DICO_THEME_SYSTEME.ID_THEME_SYSTEME AS id, DICO_THEME_SYSTEME.ID AS id_theme, DICO_TRADUCTION.LIBELLE AS title, DICO_THEME_SYSTEME.APPARTENANCE AS idcamp, DICO_THEME_SYSTEME.ID_SYSTEME AS idsys, DICO_THEME_SYSTEME.PRECEDENT AS pre
+				FROM DICO_TRADUCTION INNER JOIN DICO_THEME_SYSTEME ON DICO_TRADUCTION.CODE_NOMENCLATURE = DICO_THEME_SYSTEME.ID_THEME_SYSTEME
+				WHERE (((DICO_THEME_SYSTEME.APPARTENANCE)=".$id_camp.") AND ((DICO_THEME_SYSTEME.ID_SYSTEME)=".$id_sys.") AND ((DICO_TRADUCTION.NOM_TABLE)='DICO_THEME_LIB_MENU') AND ((DICO_TRADUCTION.CODE_LANGUE)='".$code_lang."')) AND (DICO_THEME_SYSTEME.FRAME <> '');";*/
+   
+   $requete = "SELECT DICO_THEME_SYSTEME.ID_THEME_SYSTEME AS id, DICO_THEME_SYSTEME.ID AS id_theme, DICO_TRADUCTION.LIBELLE AS title, DICO_THEME_SYSTEME.APPARTENANCE AS idcamp, DICO_THEME_SYSTEME.ID_SYSTEME AS idsys, DICO_THEME_SYSTEME.PRECEDENT AS pre
+				FROM DICO_TRADUCTION INNER JOIN DICO_THEME_SYSTEME ON DICO_TRADUCTION.CODE_NOMENCLATURE = DICO_THEME_SYSTEME.ID_THEME_SYSTEME
+				WHERE (((DICO_THEME_SYSTEME.APPARTENANCE)=".$id_camp.") AND ((DICO_THEME_SYSTEME.ID_SYSTEME)=".$id_sys.") AND ((DICO_TRADUCTION.NOM_TABLE)='DICO_THEME_LIB_MENU') AND ((DICO_TRADUCTION.CODE_LANGUE)='fr')) AND (DICO_THEME_SYSTEME.FRAME <> '');";
+				
+	$qst_list = $GLOBALS['conn_dico']->GetAll($requete);
+	$qst_list =	array_change_key_case_recursive($qst_list);	
+	//echo "<pre>"; print_r($qst_list);
+	$qst_ord = array();
+	$nb = count($qst_list);
+	$idx_curr = 0;
+	if ($nb > 0) {
+		for ($i = 0; $i < $nb; $i++) {
+			$qst = $qst_list[$i];
+			$requete = "SELECT CHAMP_PERE FROM DICO_ZONE WHERE ID_THEME=".$qst["id_theme"];
+			$result = $GLOBALS['conn_dico']->GetAll($requete); 
+			$theme_periodique = false;
+			if (is_array($result)) {
+				foreach ($result as $rs) {
+					if ($GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_FILTRE']==$rs['CHAMP_PERE']) {
+						$theme_periodique=true;
+						break;
+					}
+				}
+			}
+			if ($theme_periodique) {
+				$qst_list[$i]['filter'] = 1;
+			} else {
+				$qst_list[$i]['filter'] = 0;
+			}
+			if ($qst["pre"] == 0) {
+				$qst = $qst_list[$i];
+				unset($qst["pre"]);
+				//$qst['title'] = htmlEncode($qst['title']);
+				$qst['title'] = utf8_encode($qst['title']);
+				$qst_ord[0] = $qst;
+				$idx_curr = $i;
+			}
+		}
+		unset($qst_list[$idx_curr]);
+		$nbo = 0;//echo "<br/><br/><br/>";print_r($qst_list);
+		while ($nb > $nbo) {
+			$id_curr = $qst_ord[$nbo]['id'];
+			$nbo++;
+			for ($j = 0; $j < $nb; $j++) {
+				$qst = $qst_list[$j];
+				if ($qst["pre"] == $id_curr) {
+					unset($qst["pre"]);
+					//$qst['title'] = htmlEncode($qst['title']);
+					$qst['title'] = utf8_encode($qst['title']);
+					$qst_ord[$nbo] = $qst;
+					$idx_curr = $j;
+					break;
+				}
+			}
+		}
+	} //echo "<br/><br/><pre>";print_r($qst_ord);
+	$rps = array($lib_status=>$status_ok,$lib_message=>$status,$lib_data=>$qst_ord); 
+	echo json_encode($rps);
+});
+
+ // renvoie les règles associés aux zones d'un thème pour une campagne
+$app->get('/regle_theme_camp/:id_theme/:id_sys', function ($id_theme, $id_sys) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+	$status = $GLOBALS['PARAM_WS']['OK'];	
+	$regle_theme_list = array();
+	// Il faut vérifier s'il existe des fils dans DICO_THEME_SYSTEME
+	$requete = "SELECT DICO_REGLE_ZONE.*, DICO_ZONE.CHAMP_PERE
+FROM DICO_THEME_SYSTEME INNER JOIN ((DICO_REGLE_ZONE_ASSOC INNER JOIN DICO_ZONE ON DICO_REGLE_ZONE_ASSOC.ID_ZONE = DICO_ZONE.ID_ZONE) INNER JOIN DICO_REGLE_ZONE ON DICO_REGLE_ZONE_ASSOC.ID_REGLE_ZONE = DICO_REGLE_ZONE.ID_REGLE_ZONE) ON DICO_THEME_SYSTEME.ID = DICO_ZONE.ID_THEME
+WHERE DICO_THEME_SYSTEME.ID_THEME_SYSTEME=".$id_theme.";";
+   
+	//print $requete;
+	$theme_regles    = $GLOBALS['conn_dico']->GetAll($requete); 
+	if (count($theme_regles) > 0) {
+		foreach ($theme_regles as $row) {
+			$regle_theme_list[] = array("champ"=>$row["CHAMP_PERE"], "type"=>$row["TYPE_DONNEES"]==null?"":$row["TYPE_DONNEES"], "taille"=>$row["TAILLE_DONNEES"]==null?"":$row["TYPE_DONNEES"], "format"=>$row["FORMAT_DONNEES"]==null?"":$row["TYPE_DONNEES"], "inter"=>$row["INTERVALLE_VALEURS"], "min_val"=>$row["VALEUR_MINIMALE"]==null?"":$row["VALEUR_MINIMALE"], "max_val"=>$row["VALEUR_MAXIMALE"]==null?"":$row["VALEUR_MAXIMALE"], "pres"=>$row["CONTROLE_PRESENCE"], "paru"=>$row["CONTROLE_PARUTION"], "obli"=>$row["CONTROLE_OBLIGATION"], "int_ref"=>$row["CONTROLE_INTEGRITE_REF"], "edits"=>$row["CONTROLE_EDITION"], "enums"=>$row["VALEURS_ENUM"]==null?"":$row["VALEURS_ENUM"], "uniq"=>$row["CONTROLE_UNICITE"]);
+		}
+	}
+
+	$rps = array($lib_status=>$status_ok,$lib_message=>$status,$lib_data=>$regle_theme_list);
+	//recherche les questions pour une campagne
+	echo json_encode($rps);
+});
+
+// renvoie le formulaire html pour une question
+$app->get('/html_theme_camp/:id_camp/:id_theme/:code_lang', function ($id_camp, $id_theme, $code_lang) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+	$status = $GLOBALS['PARAM_WS']['OK'];	
+	$html = "";
+	
+	$requete = "SELECT DICO_THEME_SYSTEME.FRAME
+				FROM DICO_THEME_SYSTEME
+				WHERE DICO_THEME_SYSTEME.ID_THEME_SYSTEME=".$id_theme.";";
+
+	$frame    = $GLOBALS['conn_dico']->GetAll($requete); 
+	
+	//$path = 'questionnaire/'.$code_lang.'/ws_mob_'.$frame[0]['FRAME'];
+	$path = 'questionnaire/fr/ws_mob_'.$frame[0]['FRAME'];
+	
+	//$html = file_get_contents($GLOBALS['SISED_PATH'] .$path);
+	
+	$html = $GLOBALS['SISED_AURL'].$path;
+
+	$rps = array($lib_status=>$status_ok,$lib_message=>$status,$lib_data=>$html);
+	// recherche formulaire html
+	echo json_encode($rps);
+});
+
+$app->run();
+ 
+?>

@@ -1,0 +1,194 @@
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=2101' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.1&amp;lt;/b&amp;gt; Milieu&nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_MILIEU_0_1'>Urbain</LABEL><INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_1' VALUE='CODE_TYPE_MILIEU_0_1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_MILIEU_0_2'>Rural</LABEL><INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_2' VALUE='CODE_TYPE_MILIEU_0_2' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.2&amp;lt;/b&amp;gt; Coordonn&eacute;es g&eacute;ographiques :             Longitude&nbsp;&nbsp;&nbsp;<INPUT NAME='LONGITUDE_0' TYPE='text'   ID='LONGITUDE_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Latitude&nbsp;&nbsp;&nbsp;<INPUT NAME='LATITUDE_0' TYPE='text'   ID='LATITUDE_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='5'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.3&amp;lt;/b&amp;gt; Type d&apos;&eacute;tablissement :&nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_1'>LETP</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_1' VALUE='CODE_TYPE_ETABLISSEMENT_0_1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_2'>CRETFP</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_2' VALUE='CODE_TYPE_ETABLISSEMENT_0_2' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_3'>CET</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_3' VALUE='CODE_TYPE_ETABLISSEMENT_0_3' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_4'>CFTP</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_4' VALUE='CODE_TYPE_ETABLISSEMENT_0_4' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_5'>CC</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_5' VALUE='CODE_TYPE_ETABLISSEMENT_0_5' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_6'>IFAD</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_6' VALUE='CODE_TYPE_ETABLISSEMENT_0_6' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_7'>CEAA</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_7' VALUE='CODE_TYPE_ETABLISSEMENT_0_7' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_8'>INFPP</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_8' VALUE='CODE_TYPE_ETABLISSEMENT_0_8' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_9'>INFA</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_9' VALUE='CODE_TYPE_ETABLISSEMENT_0_9' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETABLISSEMENT_0_10'>Autres</LABEL><INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_10' VALUE='CODE_TYPE_ETABLISSEMENT_0_10' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.4&amp;lt;/b&amp;gt; Type enseignement :&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Enseignement Technique &nbsp;<INPUT NAME='CODE_TYPE_ENSEIGNEMENT_0_1' TYPE='checkbox'   ID='CODE_TYPE_ENSEIGNEMENT_0_1' VALUE='CODE_TYPE_ENSEIGNEMENT_0_1' data-mini='true'></TD>
+		<TD class='td_right' nowrap>&nbsp;Formation Professionnelle&nbsp;<INPUT NAME='CODE_TYPE_ENSEIGNEMENT_0_2' TYPE='checkbox'   ID='CODE_TYPE_ENSEIGNEMENT_0_2' VALUE='CODE_TYPE_ENSEIGNEMENT_0_2' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.5&amp;lt;/b&amp;gt; Type de formation  dispens&eacute;e :&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Formation Diplomante&nbsp;<INPUT NAME='CODE_TYPE_FORMATION_DISPENSE_0_1' TYPE='checkbox'   ID='CODE_TYPE_FORMATION_DISPENSE_0_1' VALUE='CODE_TYPE_FORMATION_DISPENSE_0_1' data-mini='true'></TD>
+		<TD class='td_right' nowrap>&nbsp;Formation Qualifiante&nbsp;<INPUT NAME='CODE_TYPE_FORMATION_DISPENSE_0_2' TYPE='checkbox'   ID='CODE_TYPE_FORMATION_DISPENSE_0_2' VALUE='CODE_TYPE_FORMATION_DISPENSE_0_2' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='2'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.6&amp;lt;/b&amp;gt; Section :&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Section Industrielle &nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_3' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_3' VALUE='CODE_TYPE_SECTION_0_3' data-mini='true'></TD>
+		<TD class='td_right' nowrap>&nbsp;Section Tertiaire &nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_4' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_4' VALUE='CODE_TYPE_SECTION_0_4' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;Section Agro-sylvo-pastorale&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_5' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_5' VALUE='CODE_TYPE_SECTION_0_5' data-mini='true'></TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.7&amp;lt;/b&amp;gt; L&apos;&eacute;tablissement utilise t-il de curicula non officiels de formation ?&nbsp;&nbsp;&nbsp;<label for="EXISTE_CURICULA_NON_OFFICIELS_0_1">Oui</label><INPUT NAME='EXISTE_CURICULA_NON_OFFICIELS_0' TYPE='radio'   ID='EXISTE_CURICULA_NON_OFFICIELS_0_1' VALUE='EXISTE_CURICULA_NON_OFFICIELS_0_1' data-mini='true'>
+<label for="EXISTE_CURICULA_NON_OFFICIELS_0_0">Non</label><INPUT NAME='EXISTE_CURICULA_NON_OFFICIELS_0' TYPE='radio'   ID='EXISTE_CURICULA_NON_OFFICIELS_0_0' VALUE='EXISTE_CURICULA_NON_OFFICIELS_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Si oui, pr&eacute;ciser les mati&egrave;res concern&eacute;es :&nbsp;&nbsp;&nbsp;<INPUT NAME='MATIERES_CONCERNEES_0' TYPE='text'   ID='MATIERES_CONCERNEES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.8&amp;lt;/b&amp;gt; L&apos;&eacute;tablissement dispose-t-il d&apos;un syst&egrave;me de gestion informatis&eacute; ? &nbsp;&nbsp;&nbsp;<label for="EXISTE_SYSTEM_GEST_INFO_0_1">Oui</label><INPUT NAME='EXISTE_SYSTEM_GEST_INFO_0' TYPE='radio'   ID='EXISTE_SYSTEM_GEST_INFO_0_1' VALUE='EXISTE_SYSTEM_GEST_INFO_0_1' data-mini='true'>
+<label for="EXISTE_SYSTEM_GEST_INFO_0_0">Non</label><INPUT NAME='EXISTE_SYSTEM_GEST_INFO_0' TYPE='radio'   ID='EXISTE_SYSTEM_GEST_INFO_0_0' VALUE='EXISTE_SYSTEM_GEST_INFO_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp; Si oui, pr&eacute;ciser le nom de l&apos;application ou du logiciel  &nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_APPLICATION_0' TYPE='text'   ID='NOM_APPLICATION_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.9&amp;lt;/b&amp;gt;  L&apos;&eacute;tablisement dispose t-il d&apos;une salle informatique ?&nbsp;&nbsp;&nbsp;<label for="EXISTE_SALLE_INFO_0_1">Oui</label><INPUT NAME='EXISTE_SALLE_INFO_0' TYPE='radio'   ID='EXISTE_SALLE_INFO_0_1' VALUE='EXISTE_SALLE_INFO_0_1' data-mini='true'>
+<label for="EXISTE_SALLE_INFO_0_0">Non</label><INPUT NAME='EXISTE_SALLE_INFO_0' TYPE='radio'   ID='EXISTE_SALLE_INFO_0_0' VALUE='EXISTE_SALLE_INFO_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.10&amp;lt;/b&amp;gt; Si oui, La salle est-elle connect&eacute;e &agrave; l&apos;internet ?&nbsp;&nbsp;&nbsp;<label for="EXISTE_SALLE_CONNECTEE_0_1">Oui</label><INPUT NAME='EXISTE_SALLE_CONNECTEE_0' TYPE='radio'   ID='EXISTE_SALLE_CONNECTEE_0_1' VALUE='EXISTE_SALLE_CONNECTEE_0_1' data-mini='true'>
+<label for="EXISTE_SALLE_CONNECTEE_0_0">Non</label><INPUT NAME='EXISTE_SALLE_CONNECTEE_0' TYPE='radio'   ID='EXISTE_SALLE_CONNECTEE_0_0' VALUE='EXISTE_SALLE_CONNECTEE_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.11&amp;lt;/b&amp;gt; Nombre de postes disponibles  &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_POSTE_DISPO_0' TYPE='text'   ID='NB_POSTE_DISPO_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;dont Nombre de postes fonctionnels &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_POSTE_FONC_0' TYPE='text'   ID='NB_POSTE_FONC_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.12&amp;lt;/b&amp;gt; La salle est- elle accessible aux apprenants?&nbsp;&nbsp;&nbsp;<label for="EXISTE_SALLE_ACCES_APPR_0_1">Oui</label><INPUT NAME='EXISTE_SALLE_ACCES_APPR_0' TYPE='radio'   ID='EXISTE_SALLE_ACCES_APPR_0_1' VALUE='EXISTE_SALLE_ACCES_APPR_0_1' data-mini='true'>
+<label for="EXISTE_SALLE_ACCES_APPR_0_0">Non</label><INPUT NAME='EXISTE_SALLE_ACCES_APPR_0' TYPE='radio'   ID='EXISTE_SALLE_ACCES_APPR_0_0' VALUE='EXISTE_SALLE_ACCES_APPR_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.13&amp;lt;/b&amp;gt; L&apos;&eacute;tablissement dispose t-il d&apos;un site  web ?&nbsp;&nbsp;&nbsp;<label for="EXISTE_SITE_WEB_0_1">Oui</label><INPUT NAME='EXISTE_SITE_WEB_0' TYPE='radio'   ID='EXISTE_SITE_WEB_0_1' VALUE='EXISTE_SITE_WEB_0_1' data-mini='true'>
+<label for="EXISTE_SITE_WEB_0_0">Non</label><INPUT NAME='EXISTE_SITE_WEB_0' TYPE='radio'   ID='EXISTE_SITE_WEB_0_0' VALUE='EXISTE_SITE_WEB_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.14&amp;lt;/b&amp;gt;  Des cours pratiques en informatique sont-ils dispens&eacute;s dans l&apos;&eacute;tablissement?&nbsp;&nbsp;&nbsp;<label for="EXISTE_COURS_INFO_0_1">Oui</label><INPUT NAME='EXISTE_COURS_INFO_0' TYPE='radio'   ID='EXISTE_COURS_INFO_0_1' VALUE='EXISTE_COURS_INFO_0_1' data-mini='true'>
+<label for="EXISTE_COURS_INFO_0_0">Non</label><INPUT NAME='EXISTE_COURS_INFO_0' TYPE='radio'   ID='EXISTE_COURS_INFO_0_0' VALUE='EXISTE_COURS_INFO_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.15&amp;lt;/b&amp;gt; Effectif total des apprenants&nbsp;&nbsp;&nbsp;<INPUT NAME='EFFECT_TOT_APPRENANT_0' TYPE='text'   ID='EFFECT_TOT_APPRENANT_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;dont Filles&nbsp;&nbsp;&nbsp;<INPUT NAME='EFFECT_FILLE_APPRENANT_0' TYPE='text'   ID='EFFECT_FILLE_APPRENANT_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.16&amp;lt;/b&amp;gt;   Effectif total des filles enceintes l&apos;ann&eacute;e pr&eacute;c&eacute;dente&nbsp;&nbsp;&nbsp;<INPUT NAME='EFFECT_FILLE_ENCEINTE_0' TYPE='text'   ID='EFFECT_FILLE_ENCEINTE_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;dont abandon&nbsp;&nbsp;&nbsp;<INPUT NAME='EFFECT_FILLE_ENCEINTE_ABAND_0' TYPE='text'   ID='EFFECT_FILLE_ENCEINTE_ABAND_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.17&amp;lt;/b&amp;gt; Effectif total du personnel enseignant&nbsp;&nbsp;&nbsp;<INPUT NAME='EFFECT_TOT_PERS_ENSEIG_0' TYPE='text'   ID='EFFECT_TOT_PERS_ENSEIG_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp; dont Femme&nbsp;&nbsp;&nbsp;<INPUT NAME='EFFECT_PERS_ENSEIG_FEMME_0' TYPE='text'   ID='EFFECT_PERS_ENSEIG_FEMME_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.18&amp;lt;/b&amp;gt; Effectif total du personnel administratif&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_PERS_TOT_ADMIN_0' TYPE='text'   ID='NB_PERS_TOT_ADMIN_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;dont femme&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_PERS_ADMIN_FEMME_0' TYPE='text'   ID='NB_PERS_ADMIN_FEMME_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.19&amp;lt;/b&amp;gt; Des enseigants ont -t-ils fait l&apos;objet d&apos;une visite d&apos;inspection de soutien l&apos;ann&eacute;e scolaire derni&egrave;re?  &nbsp;&nbsp;&nbsp;<label for="EXISTE_INSPECT_SOUTIEN_0_1">Oui</label><INPUT NAME='EXISTE_INSPECT_SOUTIEN_0' TYPE='radio'   ID='EXISTE_INSPECT_SOUTIEN_0_1' VALUE='EXISTE_INSPECT_SOUTIEN_0_1' data-mini='true'>
+<label for="EXISTE_INSPECT_SOUTIEN_0_0">Non</label><INPUT NAME='EXISTE_INSPECT_SOUTIEN_0' TYPE='radio'   ID='EXISTE_INSPECT_SOUTIEN_0_0' VALUE='EXISTE_INSPECT_SOUTIEN_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.21&amp;lt;/b&amp;gt; Des enseigants ont -t-ils fait l&apos;objet d&apos;une inspection de titularisation  l&apos;ann&eacute;e scolaire derni&egrave;re? &nbsp;&nbsp;&nbsp;<label for="EXISTE_INSPECT_TITULARISATION_0_1">Oui</label><INPUT NAME='EXISTE_INSPECT_TITULARISATION_0' TYPE='radio'   ID='EXISTE_INSPECT_TITULARISATION_0_1' VALUE='EXISTE_INSPECT_TITULARISATION_0_1' data-mini='true'>
+<label for="EXISTE_INSPECT_TITULARISATION_0_0">Non</label><INPUT NAME='EXISTE_INSPECT_TITULARISATION_0' TYPE='radio'   ID='EXISTE_INSPECT_TITULARISATION_0_0' VALUE='EXISTE_INSPECT_TITULARISATION_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.20&amp;lt;/b&amp;gt; Si oui pr&eacute;ciser le nombre d&apos;enseignants inspect&eacute;s en soutien l&apos;ann&eacute;e scolaire derni&egrave;re &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIG_INSPECT_SOUTIEN_0' TYPE='text'   ID='NB_ENSEIG_INSPECT_SOUTIEN_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.22&amp;lt;/b&amp;gt; Si oui pr&eacute;ciser le nombre d&apos;enseignants inspect&eacute;s pour la titularisation l&apos;ann&eacute;e scolaire derni&egrave;re&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIG_INSPECT_TITU_0' TYPE='text'   ID='NB_ENSEIG_INSPECT_TITU_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.23&amp;lt;/b&amp;gt; Pr&eacute;ciser le nombre d&apos;enseignants qui devraient &ecirc;tre inspect&eacute;s pour la titularisation l&apos;ann&eacute;e scolaire derni&egrave;re &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_TOT_ENSEIG_INSPECT_TITU_0' TYPE='text'   ID='NB_TOT_ENSEIG_INSPECT_TITU_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.24&amp;lt;/b&amp;gt; L&apos;&eacute;tablissement est- il cl&ocirc;tur&eacute; ?                      &nbsp;&nbsp;&nbsp;<label for="EXISTE_CLOTURE_ETAB_0_1">Oui</label><INPUT NAME='EXISTE_CLOTURE_ETAB_0' TYPE='radio'   ID='EXISTE_CLOTURE_ETAB_0_1' VALUE='EXISTE_CLOTURE_ETAB_0_1' data-mini='true'>
+<label for="EXISTE_CLOTURE_ETAB_0_0">Non</label><INPUT NAME='EXISTE_CLOTURE_ETAB_0' TYPE='radio'   ID='EXISTE_CLOTURE_ETAB_0_0' VALUE='EXISTE_CLOTURE_ETAB_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.25&amp;lt;/b&amp;gt; Etat de la cl&ocirc;ture   &nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETAT_0_1'>Bon (en nombre)</LABEL><INPUT NAME='CODE_TYPE_ETAT_0' TYPE='radio'   ID='CODE_TYPE_ETAT_0_1' VALUE='CODE_TYPE_ETAT_0_1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ETAT_0_2'>Mauvais (en nombre)</LABEL><INPUT NAME='CODE_TYPE_ETAT_0' TYPE='radio'   ID='CODE_TYPE_ETAT_0_2' VALUE='CODE_TYPE_ETAT_0_2' data-mini='true'></TD>
+	</TR>
+</TABLE></FORM></div>

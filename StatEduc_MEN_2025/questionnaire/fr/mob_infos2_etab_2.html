@@ -1,0 +1,154 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+				ctrlSaisieLst[0] = new Array(1580048, "PRESENCE_LATRINES", "booleen", "si", "1;NOMBRE_LATRINES,NB_LATRINES_FONC_ELEVES,NB_LATRINES_FONC_FILLES,NB_LATRINES_FONC_PERSONNEL,EXISTENCE_LATRINE_SEPAREE", "NULL");
+				ctrlSaisieLst[1] = new Array(1580017, "NOMBRE_LATRINES", "text", ">=", "NB_LATRINES_FONC_ELEVES+NB_LATRINES_FONC_PERSONNEL", "Le nombre total de latrines doit être supérieur ou égal au nombre de Latrines élève + personnel");
+				ctrlSaisieLst[2] = new Array(1580032, "DISPO_LAVAGE_MAINS", "booleen", "si", "1;LAVAGE_MAINS_FONC", "NULL");
+				ctrlSaisieLst[3] = new Array(1580020, "PRESENCE_COGES", "booleen", "si", "1;APPUI_COGES", "NULL");
+				ctrlSaisieLst[4] = new Array(1580035, "APPUI_COGES", "booleen", "si", "1;COGES_ETAT,COGES_AUTRE,COGES_FINANCEMENT_AUTRE", "NULL");
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=15802' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>II/. INFORMATIONS GENERALES SUR L'ECOLE (2)</B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.11  L'école a-t-elle un espace réservé pour l'éducation physique?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_TERRAIN_SPORT_0' TYPE='radio'   ID='PRESENCE_TERRAIN_SPORT_0_1' VALUE=$PRESENCE_TERRAIN_SPORT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_TERRAIN_SPORT_0' TYPE='radio'   ID='PRESENCE_TERRAIN_SPORT_0_0' VALUE=$PRESENCE_TERRAIN_SPORT_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.12 L'école pratique t-elle des Activités Pratiques et Productives (Jardinage, élevage, couture, etc.) ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_JARDIN_SCOLAIRE_0' TYPE='radio'   ID='PRESENCE_JARDIN_SCOLAIRE_0_1' VALUE=$PRESENCE_JARDIN_SCOLAIRE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_JARDIN_SCOLAIRE_0' TYPE='radio'   ID='PRESENCE_JARDIN_SCOLAIRE_0_0' VALUE=$PRESENCE_JARDIN_SCOLAIRE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.13 L'école dispose-t-elle de latrines ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_LATRINES_0' TYPE='radio'   ID='PRESENCE_LATRINES_0_1' VALUE=$PRESENCE_LATRINES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_LATRINES_0' TYPE='radio'   ID='PRESENCE_LATRINES_0_0' VALUE=$PRESENCE_LATRINES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.13.1 Si oui, dispose-t-elle de latrines séparées pour les garçons et pour les filles ? :&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='EXISTENCE_LATRINE_SEPAREE_0' TYPE='radio'   ID='EXISTENCE_LATRINE_SEPAREE_0_1' VALUE=$EXISTENCE_LATRINE_SEPAREE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='EXISTENCE_LATRINE_SEPAREE_0' TYPE='radio'   ID='EXISTENCE_LATRINE_SEPAREE_0_0' VALUE=$EXISTENCE_LATRINE_SEPAREE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD   valign=top >&nbsp;2.13.2 Si oui, quel est le nombre<br/> total de latrines ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NOMBRE_LATRINES_0' TYPE='text' size = 2  ID='NOMBRE_LATRINES_0' VALUE="$NOMBRE_LATRINES_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b) les filles uniquement<br/>&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FONC_FILLES_0' TYPE='text' size = 1  ID='NB_LATRINES_FONC_FILLES_0' VALUE="$NB_LATRINES_FONC_FILLES_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>c) le personnel<br/>&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FONC_PERSONNEL_0' TYPE='text' size = 1  ID='NB_LATRINES_FONC_PERSONNEL_0' VALUE="$NB_LATRINES_FONC_PERSONNEL_0" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.14  Est-ce que votre école a un dispositif de lavage des mains ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DISPO_LAVAGE_MAINS_0' TYPE='radio'   ID='DISPO_LAVAGE_MAINS_0_1' VALUE=$DISPO_LAVAGE_MAINS_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DISPO_LAVAGE_MAINS_0' TYPE='radio'   ID='DISPO_LAVAGE_MAINS_0_0' VALUE=$DISPO_LAVAGE_MAINS_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.14.1 Si oui, ce dispositif est-t-il fonctionnel ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='LAVAGE_MAINS_FONC_0' TYPE='radio'   ID='LAVAGE_MAINS_FONC_0_1' VALUE=$LAVAGE_MAINS_FONC_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='LAVAGE_MAINS_FONC_0' TYPE='radio'   ID='LAVAGE_MAINS_FONC_0_0' VALUE=$LAVAGE_MAINS_FONC_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.15  Est-ce que votre école dispose d'un dispositif de collecte des ordures ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DISPO_COLLECTE_ORDURES_0' TYPE='radio'   ID='DISPO_COLLECTE_ORDURES_0_1' VALUE=$DISPO_COLLECTE_ORDURES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DISPO_COLLECTE_ORDURES_0' TYPE='radio'   ID='DISPO_COLLECTE_ORDURES_0_0' VALUE=$DISPO_COLLECTE_ORDURES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.16 Est-ce que votre école dispose d'infrastructures adaptées aux élèves en situation de handicap (salle de classe, latrines, etc.) ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='INFRAST_HANDICAP_0' TYPE='radio'   ID='INFRAST_HANDICAP_0_1' VALUE=$INFRAST_HANDICAP_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='INFRAST_HANDICAP_0' TYPE='radio'   ID='INFRAST_HANDICAP_0_0' VALUE=$INFRAST_HANDICAP_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.17 Est-ce que votre école dispose de matériels adaptés aux élèves en situation de handicaps (table banc, tableau, manuel et autres) ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='MATERIEL_HANDICAP_0' TYPE='radio'   ID='MATERIEL_HANDICAP_0_1' VALUE=$MATERIEL_HANDICAP_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='MATERIEL_HANDICAP_0' TYPE='radio'   ID='MATERIEL_HANDICAP_0_0' VALUE=$MATERIEL_HANDICAP_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.18 Le CGDES de l'école est-il fonctionnel ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_COGES_0' TYPE='radio'   ID='PRESENCE_COGES_0_1' VALUE=$PRESENCE_COGES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_COGES_0' TYPE='radio'   ID='PRESENCE_COGES_0_0' VALUE=$PRESENCE_COGES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD   valign=top >&nbsp;2.18.1 Le CGDES est-il appuyé ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='APPUI_COGES_0' TYPE='radio'   ID='APPUI_COGES_0_1' VALUE=$APPUI_COGES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='APPUI_COGES_0' TYPE='radio'   ID='APPUI_COGES_0_0' VALUE=$APPUI_COGES_0_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>2.18.1.1 Si Oui, indiquer la source :     a) Etat&nbsp;&nbsp;&nbsp;<INPUT NAME='COGES_ETAT_0' TYPE='checkbox'   ID='COGES_ETAT_0' VALUE=$COGES_ETAT_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b) Autre &nbsp;&nbsp;&nbsp;<INPUT NAME='COGES_AUTRE_0' TYPE='text'   ID='COGES_AUTRE_0' VALUE="$COGES_AUTRE_0" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.19 Est-ce que les membres de votre CGDES ont été formés sur leurs rôles et responsabilités?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='FOMATION_MEMBRES_COGES_0' TYPE='radio'   ID='FOMATION_MEMBRES_COGES_0_1' VALUE=$FOMATION_MEMBRES_COGES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='FOMATION_MEMBRES_COGES_0' TYPE='radio'   ID='FOMATION_MEMBRES_COGES_0_0' VALUE=$FOMATION_MEMBRES_COGES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.20 Quel est le nombre de réunions tenues par le CGDES l'année précédente ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNIONS_COGES_0' TYPE='text' size=1  ID='NB_REUNIONS_COGES_0' VALUE="$NB_REUNIONS_COGES_0" >
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

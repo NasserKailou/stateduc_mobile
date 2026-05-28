@@ -1,0 +1,71 @@
+<script language="JavaScript" src="<?php echo $GLOBALS['SISED_URL_JSC']; ?>js.js"></script>
+<script type="text/Javascript">
+	function fermer() {
+		window.close();
+	}
+</script>
+<?php
+		set_time_limit(0);
+		ini_set("memory_limit", "512M");
+		//require_once 'common.php';
+		include_once $GLOBALS['SISED_PATH_CLS'] . 'metier/export.class.php'; 
+				
+		$export	= new export() ;
+		
+		$chemin_output = $SISED_PATH.'server-side/import_export/';
+		$export->chemin_output	=	$chemin_output ;
+		
+		$tab_filtres 	= 	array();
+		
+		$tab_annees		=	array();
+		if($GLOBALS['PARAM']['FILTRE']){
+			$tab_filtres		=	array();
+		}
+		$tab_regs		=	array();
+		
+		// A interfacer
+		
+		$secteur				= $_SESSION['cfg_exp']['id_systeme']; 
+		$chaine					= $_SESSION['cfg_exp']['id_chaine']; 
+		
+		for( $i = 0 ; $i < $_SESSION['cfg_exp']['nb_annees_dispo'] ; $i++ ){
+				if(isset($_SESSION['cfg_exp']['ANN_'.$i]) and trim($_SESSION['cfg_exp']['ANN_'.$i]) <> ''){
+						$tab_annees[]	= array($GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'] => $_SESSION['cfg_exp']['ANN_'.$i]);
+				}
+		}
+		if($GLOBALS['PARAM']['FILTRE']){
+			for( $i = 0 ; $i < $_SESSION['cfg_exp']['nb_filtres_dispo'] ; $i++ ){
+					if(isset($_SESSION['cfg_exp']['PERIOD_'.$i]) and trim($_SESSION['cfg_exp']['PERIOD_'.$i]) <> ''){
+							$tab_filtres[]	= array($GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_FILTRE'] => $_SESSION['cfg_exp']['PERIOD_'.$i]);
+					}
+			}
+		}
+		for( $i = 0 ; $i < $_SESSION['cfg_exp']['nb_regs_dispo'] ; $i++ ){
+				if(isset($_SESSION['cfg_exp']['REGS_'.$i]) and trim($_SESSION['cfg_exp']['REGS_'.$i]) <> ''){
+						$tab_regs[]			= $_SESSION['cfg_exp']['REGS_'.$i];
+				}
+		}
+		// Fin A interfacer
+		
+		$tab_filtres['annees'] 		= $tab_annees;
+		if($GLOBALS['PARAM']['FILTRE']){
+			$tab_filtres['filtres'] 	= $tab_filtres;
+		}
+		$tab_filtres['secteur'] 	= $secteur;
+		$tab_filtres['regs'] 		= $tab_regs;
+		$tab_filtres['chaine']		= $chaine;
+		$export->tab_filtres	=	$tab_filtres ;
+		
+		if( isset($_SESSION['cfg_exp']['all_sectors']) and $_SESSION['cfg_exp']['all_sectors'] == 1 ){
+			$all_sectors = true ;
+		}else{
+			$all_sectors = false ;
+		}		
+		$export->all_sectors	=	$all_sectors ;
+		
+		$export->fichier_zip	=	$_SESSION['cfg_exp']['fichier_zip'] ;
+
+		$export->export_xml();
+		echo "<pre>";
+		print_r($_SESSION['req_table']);
+?>

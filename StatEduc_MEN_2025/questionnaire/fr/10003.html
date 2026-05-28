@@ -1,0 +1,179 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM ACTION='questionnaire.php' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'><CAPTION><B>IV/. CARACTERISTIQUES DU MOBILIER ET DES EQUIPEMENTS<br/><br/>Mobilier - élèves : 2nd Cycle</B></CAPTION>
+	<TR>
+		<TD COLSPAN='5' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' class='ligne-paire' nowrap><b></b></TD>
+		<TD COLSPAN=1 class='ligne-paire' ><INPUT TYPE='hidden' tabindex='2'  ID='CODE_TYPE_TABLE_BANC_0_7' NAME='CODE_TYPE_TABLE_BANC_0_7'  VALUE="$CODE_TYPE_TABLE_BANC_0_7" />
+Table-bancs</TD>
+		<TD COLSPAN=1 class='ligne-paire' ><INPUT TYPE='hidden' tabindex='1002'  ID='CODE_TYPE_TABLE_BANC_0_8' NAME='CODE_TYPE_TABLE_BANC_0_8'  VALUE="$CODE_TYPE_TABLE_BANC_0_8" />
+Bancs</TD>
+		<TD COLSPAN=1 class='ligne-paire' ><INPUT TYPE='hidden' tabindex='2002'  ID='CODE_TYPE_TABLE_BANC_0_9' NAME='CODE_TYPE_TABLE_BANC_0_9'  VALUE="$CODE_TYPE_TABLE_BANC_0_9" />
+Tables</TD>
+		<TD COLSPAN=1 class='ligne-paire' ><INPUT TYPE='hidden' tabindex='3002'  ID='CODE_TYPE_TABLE_BANC_0_10' NAME='CODE_TYPE_TABLE_BANC_0_10'  VALUE="$CODE_TYPE_TABLE_BANC_0_10" />
+Tabourets</TD>
+	</TR>
+<script language='javascript' type='text/javascript'>
+var expression_1000014 	= "" ;
+var affiche_sous_totaux_1000014 	= 0;
+var tab_mes_1000014 	= new Array ("NOMBRE_TABLE_BANC");
+var tab_col_1000014	= new Array ("7","8","9","10");
+var tab_ligne_1000014	= new Array ();
+
+</script>
+	<TR>
+		<TD COLSPAN='5' class='ligne-paire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' class='ligne-paire'>Nombre total</TD>
+		<TD COLSPAN=1 class='ligne-paire'><INPUT tabindex='3'  ID='NOMBRE_TABLE_BANC_0_7' NAME='NOMBRE_TABLE_BANC_0_7' TYPE='text'  VALUE="$NOMBRE_TABLE_BANC_0_7"size=10  ></TD>
+		<TD COLSPAN=1 class='ligne-paire'><INPUT tabindex='1003'  ID='NOMBRE_TABLE_BANC_0_8' NAME='NOMBRE_TABLE_BANC_0_8' TYPE='text'  VALUE="$NOMBRE_TABLE_BANC_0_8"size=10  ></TD>
+		<TD COLSPAN=1 class='ligne-paire'><INPUT tabindex='2003'  ID='NOMBRE_TABLE_BANC_0_9' NAME='NOMBRE_TABLE_BANC_0_9' TYPE='text'  VALUE="$NOMBRE_TABLE_BANC_0_9"size=10  ></TD>
+		<TD COLSPAN=1 class='ligne-paire'><INPUT tabindex='3003'  ID='NOMBRE_TABLE_BANC_0_10' NAME='NOMBRE_TABLE_BANC_0_10' TYPE='text'  VALUE="$NOMBRE_TABLE_BANC_0_10"size=10  ></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='5' class='ligne-impaire'></TD>
+	</TR>
+	<TR class='ligne-impaire' nowrap>
+		<TD COLSPAN='1' class='ligne-impaire'> <b>Origine du Financement</b></TD>
+		<TD colspan='1' class='ligne-impaire' nowrap></TD>
+		<TD colspan='1' class='ligne-impaire' nowrap></TD>
+		<TD colspan='1' class='ligne-impaire' nowrap></TD>
+		<TD colspan='1' class='ligne-impaire' nowrap></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='5' class='ligne-impaire'></TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' nowrap class='ligne-paire'>Etat</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_1_7' NAME='NB_TABLE_BANC_FINANC_0_1_7' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_1_7"  tabindex='3'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_1_8' NAME='NB_TABLE_BANC_FINANC_0_1_8' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_1_8"  tabindex='1003'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_1_9' NAME='NB_TABLE_BANC_FINANC_0_1_9' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_1_9"  tabindex='2003'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_1_10' NAME='NB_TABLE_BANC_FINANC_0_1_10' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_1_10"  tabindex='3003'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' nowrap class='ligne-impaire'>Col. locale	</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_14_7' NAME='NB_TABLE_BANC_FINANC_0_14_7' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_14_7"  tabindex='4'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_14_8' NAME='NB_TABLE_BANC_FINANC_0_14_8' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_14_8"  tabindex='1004'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_14_9' NAME='NB_TABLE_BANC_FINANC_0_14_9' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_14_9"  tabindex='2004'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_14_10' NAME='NB_TABLE_BANC_FINANC_0_14_10' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_14_10"  tabindex='3004'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' nowrap class='ligne-paire'>Aide ext (PTFs/ONG/Projet)</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_16_7' NAME='NB_TABLE_BANC_FINANC_0_16_7' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_16_7"  tabindex='5'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_16_8' NAME='NB_TABLE_BANC_FINANC_0_16_8' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_16_8"  tabindex='1005'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_16_9' NAME='NB_TABLE_BANC_FINANC_0_16_9' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_16_9"  tabindex='2005'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_16_10' NAME='NB_TABLE_BANC_FINANC_0_16_10' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_16_10"  tabindex='3005'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' nowrap class='ligne-impaire'>COGES</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_15_7' NAME='NB_TABLE_BANC_FINANC_0_15_7' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_15_7"  tabindex='6'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_15_8' NAME='NB_TABLE_BANC_FINANC_0_15_8' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_15_8"  tabindex='1006'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_15_9' NAME='NB_TABLE_BANC_FINANC_0_15_9' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_15_9"  tabindex='2006'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_15_10' NAME='NB_TABLE_BANC_FINANC_0_15_10' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_15_10"  tabindex='3006'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' nowrap class='ligne-paire'>Privé</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_10_7' NAME='NB_TABLE_BANC_FINANC_0_10_7' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_10_7"  tabindex='7'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_10_8' NAME='NB_TABLE_BANC_FINANC_0_10_8' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_10_8"  tabindex='1007'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_10_9' NAME='NB_TABLE_BANC_FINANC_0_10_9' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_10_9"  tabindex='2007'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_10_10' NAME='NB_TABLE_BANC_FINANC_0_10_10' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_10_10"  tabindex='3007'>
+</TD>
+	</TR>
+	<TR>
+		<TD COLSPAN='1' nowrap class='ligne-impaire'>Emprunt</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_18_7' NAME='NB_TABLE_BANC_FINANC_0_18_7' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_18_7"  tabindex='8'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_18_8' NAME='NB_TABLE_BANC_FINANC_0_18_8' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_18_8"  tabindex='1008'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_18_9' NAME='NB_TABLE_BANC_FINANC_0_18_9' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_18_9"  tabindex='2008'>
+</TD>
+		<TD  colspan='1' nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_TABLE_BANC_FINANC_0_18_10' NAME='NB_TABLE_BANC_FINANC_0_18_10' TYPE='text' size=10 VALUE="$NB_TABLE_BANC_FINANC_0_18_10"  tabindex='3008'>
+</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+<!--
+//-->
+</script>

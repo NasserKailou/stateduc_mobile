@@ -1,0 +1,108 @@
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+				ctrlSaisieLst[0] = new Array(1580048, "PRESENCE_LATRINES", "booleen", "si", "1;NOMBRE_LATRINES,NB_LATRINES_FONC_ELEVES,NB_LATRINES_FONC_FILLES,NB_LATRINES_FONC_PERSONNEL,EXISTENCE_LATRINE_SEPAREE", "NULL");
+				ctrlSaisieLst[1] = new Array(1580017, "NOMBRE_LATRINES", "text", ">=", "NB_LATRINES_FONC_ELEVES+NB_LATRINES_FONC_PERSONNEL", "Le nombre total de latrines doit &Atilde;&ordf;tre sup&Atilde;&copy;rieur ou &Atilde;&copy;gal au nombre de Latrines &Atilde;&copy;l&Atilde;&uml;ve + personnel");
+				ctrlSaisieLst[2] = new Array(1580032, "DISPO_LAVAGE_MAINS", "booleen", "si", "1;LAVAGE_MAINS_FONC", "NULL");
+				ctrlSaisieLst[3] = new Array(1580020, "PRESENCE_COGES", "booleen", "si", "1;APPUI_COGES", "NULL");
+				ctrlSaisieLst[4] = new Array(1580035, "APPUI_COGES", "booleen", "si", "1;COGES_ETAT,COGES_AUTRE,COGES_FINANCEMENT_AUTRE", "NULL");
+
+				var do_submit = true;
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=15802' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.11  L&apos;&Atilde;&copy;cole a-t-elle un espace r&Atilde;&copy;serv&Atilde;&copy; pour l&apos;&Atilde;&copy;ducation physique?&nbsp;&nbsp;&nbsp;<label for="PRESENCE_TERRAIN_SPORT_0_1">Oui</label><INPUT NAME='PRESENCE_TERRAIN_SPORT_0' TYPE='radio'   ID='PRESENCE_TERRAIN_SPORT_0_1' VALUE='PRESENCE_TERRAIN_SPORT_0_1' data-mini='true'>
+<label for="PRESENCE_TERRAIN_SPORT_0_0">Non</label><INPUT NAME='PRESENCE_TERRAIN_SPORT_0' TYPE='radio'   ID='PRESENCE_TERRAIN_SPORT_0_0' VALUE='PRESENCE_TERRAIN_SPORT_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.12 L&apos;&Atilde;&copy;cole pratique t-elle des Activit&Atilde;&copy;s Pratiques et Productives (Jardinage, &Atilde;&copy;levage, couture, etc.) ?&nbsp;&nbsp;&nbsp;<label for="PRESENCE_JARDIN_SCOLAIRE_0_1">Oui</label><INPUT NAME='PRESENCE_JARDIN_SCOLAIRE_0' TYPE='radio'   ID='PRESENCE_JARDIN_SCOLAIRE_0_1' VALUE='PRESENCE_JARDIN_SCOLAIRE_0_1' data-mini='true'>
+<label for="PRESENCE_JARDIN_SCOLAIRE_0_0">Non</label><INPUT NAME='PRESENCE_JARDIN_SCOLAIRE_0' TYPE='radio'   ID='PRESENCE_JARDIN_SCOLAIRE_0_0' VALUE='PRESENCE_JARDIN_SCOLAIRE_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.13 L&apos;&Atilde;&copy;cole dispose-t-elle de latrines ?&nbsp;&nbsp;&nbsp;<label for="PRESENCE_LATRINES_0_1">Oui</label><INPUT NAME='PRESENCE_LATRINES_0' TYPE='radio'   ID='PRESENCE_LATRINES_0_1' VALUE='PRESENCE_LATRINES_0_1' data-mini='true'>
+<label for="PRESENCE_LATRINES_0_0">Non</label><INPUT NAME='PRESENCE_LATRINES_0' TYPE='radio'   ID='PRESENCE_LATRINES_0_0' VALUE='PRESENCE_LATRINES_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.13.1 Si oui, dispose-t-elle de latrines s&Atilde;&copy;par&Atilde;&copy;es pour les gar&Atilde;&sect;ons et pour les filles ? :&nbsp;&nbsp;&nbsp;<label for="EXISTENCE_LATRINE_SEPAREE_0_1">Oui</label><INPUT NAME='EXISTENCE_LATRINE_SEPAREE_0' TYPE='radio'   ID='EXISTENCE_LATRINE_SEPAREE_0_1' VALUE='EXISTENCE_LATRINE_SEPAREE_0_1' data-mini='true'>
+<label for="EXISTENCE_LATRINE_SEPAREE_0_0">Non</label><INPUT NAME='EXISTENCE_LATRINE_SEPAREE_0' TYPE='radio'   ID='EXISTENCE_LATRINE_SEPAREE_0_0' VALUE='EXISTENCE_LATRINE_SEPAREE_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD   valign=top >&nbsp;2.13.2 Si oui, quel est le nombre&amp;lt;br/&amp;gt; total de latrines ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NOMBRE_LATRINES_0' TYPE='text' size = 2  ID='NOMBRE_LATRINES_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b) les filles uniquement&amp;lt;br/&amp;gt;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FONC_FILLES_0' TYPE='text' size = 1  ID='NB_LATRINES_FONC_FILLES_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>c) le personnel&amp;lt;br/&amp;gt;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FONC_PERSONNEL_0' TYPE='text' size = 1  ID='NB_LATRINES_FONC_PERSONNEL_0' VALUE="" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.14  Est-ce que votre &Atilde;&copy;cole a un dispositif de lavage des mains&Acirc; ?&nbsp;&nbsp;&nbsp;<label for="DISPO_LAVAGE_MAINS_0_1">Oui</label><INPUT NAME='DISPO_LAVAGE_MAINS_0' TYPE='radio'   ID='DISPO_LAVAGE_MAINS_0_1' VALUE='DISPO_LAVAGE_MAINS_0_1' data-mini='true'>
+<label for="DISPO_LAVAGE_MAINS_0_0">Non</label><INPUT NAME='DISPO_LAVAGE_MAINS_0' TYPE='radio'   ID='DISPO_LAVAGE_MAINS_0_0' VALUE='DISPO_LAVAGE_MAINS_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.14.1 Si oui, ce dispositif est-t-il fonctionnel&Acirc; ?&nbsp;&nbsp;&nbsp;<label for="LAVAGE_MAINS_FONC_0_1">Oui</label><INPUT NAME='LAVAGE_MAINS_FONC_0' TYPE='radio'   ID='LAVAGE_MAINS_FONC_0_1' VALUE='LAVAGE_MAINS_FONC_0_1' data-mini='true'>
+<label for="LAVAGE_MAINS_FONC_0_0">Non</label><INPUT NAME='LAVAGE_MAINS_FONC_0' TYPE='radio'   ID='LAVAGE_MAINS_FONC_0_0' VALUE='LAVAGE_MAINS_FONC_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.15  Est-ce que votre &Atilde;&copy;cole dispose d&apos;un dispositif de collecte des ordures&Acirc; ?&nbsp;&nbsp;&nbsp;<label for="DISPO_COLLECTE_ORDURES_0_1">Oui</label><INPUT NAME='DISPO_COLLECTE_ORDURES_0' TYPE='radio'   ID='DISPO_COLLECTE_ORDURES_0_1' VALUE='DISPO_COLLECTE_ORDURES_0_1' data-mini='true'>
+<label for="DISPO_COLLECTE_ORDURES_0_0">Non</label><INPUT NAME='DISPO_COLLECTE_ORDURES_0' TYPE='radio'   ID='DISPO_COLLECTE_ORDURES_0_0' VALUE='DISPO_COLLECTE_ORDURES_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.16 Est-ce que votre &Atilde;&copy;cole dispose d&apos;infrastructures adapt&Atilde;&copy;es aux &Atilde;&copy;l&Atilde;&uml;ves en situation de handicap (salle de classe, latrines, etc.) ?&nbsp;&nbsp;&nbsp;<label for="INFRAST_HANDICAP_0_1">Oui</label><INPUT NAME='INFRAST_HANDICAP_0' TYPE='radio'   ID='INFRAST_HANDICAP_0_1' VALUE='INFRAST_HANDICAP_0_1' data-mini='true'>
+<label for="INFRAST_HANDICAP_0_0">Non</label><INPUT NAME='INFRAST_HANDICAP_0' TYPE='radio'   ID='INFRAST_HANDICAP_0_0' VALUE='INFRAST_HANDICAP_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.17 Est-ce que votre &Atilde;&copy;cole dispose de mat&Atilde;&copy;riels adapt&Atilde;&copy;s aux &Atilde;&copy;l&Atilde;&uml;ves en situation de handicaps (table banc, tableau, manuel et autres) ?&nbsp;&nbsp;&nbsp;<label for="MATERIEL_HANDICAP_0_1">Oui</label><INPUT NAME='MATERIEL_HANDICAP_0' TYPE='radio'   ID='MATERIEL_HANDICAP_0_1' VALUE='MATERIEL_HANDICAP_0_1' data-mini='true'>
+<label for="MATERIEL_HANDICAP_0_0">Non</label><INPUT NAME='MATERIEL_HANDICAP_0' TYPE='radio'   ID='MATERIEL_HANDICAP_0_0' VALUE='MATERIEL_HANDICAP_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.18 Le CGDES de l&apos;&Atilde;&copy;cole est-il fonctionnel ?&nbsp;&nbsp;&nbsp;<label for="PRESENCE_COGES_0_1">Oui</label><INPUT NAME='PRESENCE_COGES_0' TYPE='radio'   ID='PRESENCE_COGES_0_1' VALUE='PRESENCE_COGES_0_1' data-mini='true'>
+<label for="PRESENCE_COGES_0_0">Non</label><INPUT NAME='PRESENCE_COGES_0' TYPE='radio'   ID='PRESENCE_COGES_0_0' VALUE='PRESENCE_COGES_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD   valign=top >&nbsp;2.18.1 Le CGDES est-il appuy&Atilde;&copy; ?&nbsp;&nbsp;&nbsp;<label for="APPUI_COGES_0_1">Oui</label><INPUT NAME='APPUI_COGES_0' TYPE='radio'   ID='APPUI_COGES_0_1' VALUE='APPUI_COGES_0_1' data-mini='true'>
+<label for="APPUI_COGES_0_0">Non</label><INPUT NAME='APPUI_COGES_0' TYPE='radio'   ID='APPUI_COGES_0_0' VALUE='APPUI_COGES_0_0' data-mini='true'>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>2.18.1.1 Si Oui, indiquer la source :&Acirc; &Acirc; &Acirc; &Acirc;  a) Etat&nbsp;&nbsp;&nbsp;<INPUT NAME='COGES_ETAT_0' TYPE='checkbox'   ID='COGES_ETAT_0' VALUE='COGES_ETAT_0' data-mini='true'>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b) Autre &nbsp;&nbsp;&nbsp;<INPUT NAME='COGES_AUTRE_0' TYPE='text'   ID='COGES_AUTRE_0' VALUE="" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.19 Est-ce que les membres de votre CGDES ont &Atilde;&copy;t&Atilde;&copy; form&Atilde;&copy;s&Acirc; sur leurs r&Atilde;&acute;les et responsabilit&Atilde;&copy;s?&nbsp;&nbsp;&nbsp;<label for="FOMATION_MEMBRES_COGES_0_1">Oui</label><INPUT NAME='FOMATION_MEMBRES_COGES_0' TYPE='radio'   ID='FOMATION_MEMBRES_COGES_0_1' VALUE='FOMATION_MEMBRES_COGES_0_1' data-mini='true'>
+<label for="FOMATION_MEMBRES_COGES_0_0">Non</label><INPUT NAME='FOMATION_MEMBRES_COGES_0' TYPE='radio'   ID='FOMATION_MEMBRES_COGES_0_0' VALUE='FOMATION_MEMBRES_COGES_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.20 Quel est le nombre de r&Atilde;&copy;unions tenues par le CGDES l&apos;ann&Atilde;&copy;e pr&Atilde;&copy;c&Atilde;&copy;dente ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNIONS_COGES_0' TYPE='text' size=1  ID='NB_REUNIONS_COGES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+</TABLE></FORM></div>

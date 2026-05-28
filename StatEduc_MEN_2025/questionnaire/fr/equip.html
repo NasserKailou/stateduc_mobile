@@ -1,0 +1,434 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=1201' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B>XII. EQUIPEMENTS (Machines, outils, petit matériel) </B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=3 class='ligne-paire' title='Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=23 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Filières où ce matériel est utilisé</TD>
+		<TD ROWSPAN=23 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Equipement/Désignation</TD>
+		<TD ROWSPAN=23 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=3 class='ligne-paire'>Type de machine / matériel</TD>
+		<TD ROWSPAN=23 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Marque :</TD>
+		<TD ROWSPAN=23 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Coût unitaire moyen</TD>
+		<TD ROWSPAN=23 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Etat</TD>
+		<TD ROWSPAN=23 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Nouvelles <br/>acquisitions <br/> souhaitées</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=2 nowrap  align='center'>Machines</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=2 nowrap  align='center'>outils</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=2 nowrap  align='center'>petit matériel</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=2 nowrap  align='center'>Bon (en nombre)</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=2 nowrap  align='center'>Mauvais (en nombre)</TD>
+	</TR>
+	<TR></TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,20)'><SELECT   ID='CODE_FILIERE_0' NAME=CODE_FILIERE_0>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_0-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='DESIGNATION_0' NAME=DESIGNATION_0 TYPE='text' VALUE="$DESIGNATION_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_3' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_0_1' NAME=CODE_TYPE_EQUIPEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_4' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_0_2' NAME=CODE_TYPE_EQUIPEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_5' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_0_3' NAME=CODE_TYPE_EQUIPEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_0_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_6' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='MARQUE_0' NAME=MARQUE_0 TYPE='text'size=10 VALUE="$MARQUE_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_7' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='COUT_EQUIP_0' NAME=COUT_EQUIP_0 TYPE='text'size=10 VALUE="$COUT_EQUIP_0"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_0_8' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='NB_EQUIP_0_1' NAME='NB_EQUIP_0_1' TYPE='text' size=3 VALUE="$NB_EQUIP_0_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_0_9' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='NB_EQUIP_0_2' NAME='NB_EQUIP_0_2' TYPE='text' size=3 VALUE="$NB_EQUIP_0_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_10' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='NB_NOUVEL_ACQUI_0' NAME=NB_NOUVEL_ACQUI_0 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_0"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,20)'><SELECT   ID='CODE_FILIERE_1' NAME=CODE_FILIERE_1>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_1-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='DESIGNATION_1' NAME=DESIGNATION_1 TYPE='text' VALUE="$DESIGNATION_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_3' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_1_1' NAME=CODE_TYPE_EQUIPEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_4' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_1_2' NAME=CODE_TYPE_EQUIPEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_5' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_1_3' NAME=CODE_TYPE_EQUIPEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_1_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_6' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='MARQUE_1' NAME=MARQUE_1 TYPE='text'size=10 VALUE="$MARQUE_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_7' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='COUT_EQUIP_1' NAME=COUT_EQUIP_1 TYPE='text'size=10 VALUE="$COUT_EQUIP_1"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_1_8' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='NB_EQUIP_1_1' NAME='NB_EQUIP_1_1' TYPE='text' size=3 VALUE="$NB_EQUIP_1_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_1_9' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='NB_EQUIP_1_2' NAME='NB_EQUIP_1_2' TYPE='text' size=3 VALUE="$NB_EQUIP_1_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_10' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='NB_NOUVEL_ACQUI_1' NAME=NB_NOUVEL_ACQUI_1 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_1"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,20)'><SELECT   ID='CODE_FILIERE_2' NAME=CODE_FILIERE_2>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_2-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='DESIGNATION_2' NAME=DESIGNATION_2 TYPE='text' VALUE="$DESIGNATION_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_3' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_2_1' NAME=CODE_TYPE_EQUIPEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_4' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_2_2' NAME=CODE_TYPE_EQUIPEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_5' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_2_3' NAME=CODE_TYPE_EQUIPEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_2_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_6' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='MARQUE_2' NAME=MARQUE_2 TYPE='text'size=10 VALUE="$MARQUE_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_7' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='COUT_EQUIP_2' NAME=COUT_EQUIP_2 TYPE='text'size=10 VALUE="$COUT_EQUIP_2"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_2_8' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='NB_EQUIP_2_1' NAME='NB_EQUIP_2_1' TYPE='text' size=3 VALUE="$NB_EQUIP_2_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_2_9' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='NB_EQUIP_2_2' NAME='NB_EQUIP_2_2' TYPE='text' size=3 VALUE="$NB_EQUIP_2_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_10' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='NB_NOUVEL_ACQUI_2' NAME=NB_NOUVEL_ACQUI_2 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_2"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_3_0' onClick='MiseEvidenceLigneFrame(3,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_3_1' onClick='MiseEvidenceLigneFrame(3,20)'><SELECT   ID='CODE_FILIERE_3' NAME=CODE_FILIERE_3>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_3-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_2' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='DESIGNATION_3' NAME=DESIGNATION_3 TYPE='text' VALUE="$DESIGNATION_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_3' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_3_1' NAME=CODE_TYPE_EQUIPEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_4' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_3_2' NAME=CODE_TYPE_EQUIPEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_5' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_3_3' NAME=CODE_TYPE_EQUIPEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_3_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_6' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='MARQUE_3' NAME=MARQUE_3 TYPE='text'size=10 VALUE="$MARQUE_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_7' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='COUT_EQUIP_3' NAME=COUT_EQUIP_3 TYPE='text'size=10 VALUE="$COUT_EQUIP_3"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_3_8' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='NB_EQUIP_3_1' NAME='NB_EQUIP_3_1' TYPE='text' size=3 VALUE="$NB_EQUIP_3_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_3_9' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='NB_EQUIP_3_2' NAME='NB_EQUIP_3_2' TYPE='text' size=3 VALUE="$NB_EQUIP_3_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_10' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='NB_NOUVEL_ACQUI_3' NAME=NB_NOUVEL_ACQUI_3 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_3"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_4_0' onClick='MiseEvidenceLigneFrame(4,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_4_1' onClick='MiseEvidenceLigneFrame(4,20)'><SELECT   ID='CODE_FILIERE_4' NAME=CODE_FILIERE_4>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_4-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_2' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='DESIGNATION_4' NAME=DESIGNATION_4 TYPE='text' VALUE="$DESIGNATION_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_3' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_4_1' NAME=CODE_TYPE_EQUIPEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_4' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_4_2' NAME=CODE_TYPE_EQUIPEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_5' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_4_3' NAME=CODE_TYPE_EQUIPEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_4_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_6' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='MARQUE_4' NAME=MARQUE_4 TYPE='text'size=10 VALUE="$MARQUE_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_7' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='COUT_EQUIP_4' NAME=COUT_EQUIP_4 TYPE='text'size=10 VALUE="$COUT_EQUIP_4"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_4_8' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='NB_EQUIP_4_1' NAME='NB_EQUIP_4_1' TYPE='text' size=3 VALUE="$NB_EQUIP_4_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_4_9' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='NB_EQUIP_4_2' NAME='NB_EQUIP_4_2' TYPE='text' size=3 VALUE="$NB_EQUIP_4_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_10' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='NB_NOUVEL_ACQUI_4' NAME=NB_NOUVEL_ACQUI_4 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_4"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_5_0' onClick='MiseEvidenceLigneFrame(5,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_5_1' onClick='MiseEvidenceLigneFrame(5,20)'><SELECT   ID='CODE_FILIERE_5' NAME=CODE_FILIERE_5>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_5-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_2' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='DESIGNATION_5' NAME=DESIGNATION_5 TYPE='text' VALUE="$DESIGNATION_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_3' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_5_1' NAME=CODE_TYPE_EQUIPEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_4' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_5_2' NAME=CODE_TYPE_EQUIPEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_5' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_5_3' NAME=CODE_TYPE_EQUIPEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_5_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_6' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='MARQUE_5' NAME=MARQUE_5 TYPE='text'size=10 VALUE="$MARQUE_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_7' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='COUT_EQUIP_5' NAME=COUT_EQUIP_5 TYPE='text'size=10 VALUE="$COUT_EQUIP_5"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_5_8' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='NB_EQUIP_5_1' NAME='NB_EQUIP_5_1' TYPE='text' size=3 VALUE="$NB_EQUIP_5_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_5_9' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='NB_EQUIP_5_2' NAME='NB_EQUIP_5_2' TYPE='text' size=3 VALUE="$NB_EQUIP_5_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_10' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='NB_NOUVEL_ACQUI_5' NAME=NB_NOUVEL_ACQUI_5 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_5"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_6_0' onClick='MiseEvidenceLigneFrame(6,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_6_1' onClick='MiseEvidenceLigneFrame(6,20)'><SELECT   ID='CODE_FILIERE_6' NAME=CODE_FILIERE_6>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_6-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_2' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='DESIGNATION_6' NAME=DESIGNATION_6 TYPE='text' VALUE="$DESIGNATION_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_3' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_6_1' NAME=CODE_TYPE_EQUIPEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_4' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_6_2' NAME=CODE_TYPE_EQUIPEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_5' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_6_3' NAME=CODE_TYPE_EQUIPEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_6_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_6' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='MARQUE_6' NAME=MARQUE_6 TYPE='text'size=10 VALUE="$MARQUE_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_7' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='COUT_EQUIP_6' NAME=COUT_EQUIP_6 TYPE='text'size=10 VALUE="$COUT_EQUIP_6"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_6_8' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='NB_EQUIP_6_1' NAME='NB_EQUIP_6_1' TYPE='text' size=3 VALUE="$NB_EQUIP_6_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_6_9' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='NB_EQUIP_6_2' NAME='NB_EQUIP_6_2' TYPE='text' size=3 VALUE="$NB_EQUIP_6_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_10' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='NB_NOUVEL_ACQUI_6' NAME=NB_NOUVEL_ACQUI_6 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_6"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_7_0' onClick='MiseEvidenceLigneFrame(7,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_7_1' onClick='MiseEvidenceLigneFrame(7,20)'><SELECT   ID='CODE_FILIERE_7' NAME=CODE_FILIERE_7>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_7-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_2' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='DESIGNATION_7' NAME=DESIGNATION_7 TYPE='text' VALUE="$DESIGNATION_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_3' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_7_1' NAME=CODE_TYPE_EQUIPEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_4' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_7_2' NAME=CODE_TYPE_EQUIPEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_5' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_7_3' NAME=CODE_TYPE_EQUIPEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_7_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_6' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='MARQUE_7' NAME=MARQUE_7 TYPE='text'size=10 VALUE="$MARQUE_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_7' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='COUT_EQUIP_7' NAME=COUT_EQUIP_7 TYPE='text'size=10 VALUE="$COUT_EQUIP_7"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_7_8' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='NB_EQUIP_7_1' NAME='NB_EQUIP_7_1' TYPE='text' size=3 VALUE="$NB_EQUIP_7_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_7_9' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='NB_EQUIP_7_2' NAME='NB_EQUIP_7_2' TYPE='text' size=3 VALUE="$NB_EQUIP_7_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_10' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='NB_NOUVEL_ACQUI_7' NAME=NB_NOUVEL_ACQUI_7 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_7"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_8_0' onClick='MiseEvidenceLigneFrame(8,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_8_1' onClick='MiseEvidenceLigneFrame(8,20)'><SELECT   ID='CODE_FILIERE_8' NAME=CODE_FILIERE_8>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_8-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_2' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='DESIGNATION_8' NAME=DESIGNATION_8 TYPE='text' VALUE="$DESIGNATION_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_3' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_8_1' NAME=CODE_TYPE_EQUIPEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_4' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_8_2' NAME=CODE_TYPE_EQUIPEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_5' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_8_3' NAME=CODE_TYPE_EQUIPEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_8_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_6' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='MARQUE_8' NAME=MARQUE_8 TYPE='text'size=10 VALUE="$MARQUE_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_7' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='COUT_EQUIP_8' NAME=COUT_EQUIP_8 TYPE='text'size=10 VALUE="$COUT_EQUIP_8"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_8_8' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='NB_EQUIP_8_1' NAME='NB_EQUIP_8_1' TYPE='text' size=3 VALUE="$NB_EQUIP_8_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_8_9' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='NB_EQUIP_8_2' NAME='NB_EQUIP_8_2' TYPE='text' size=3 VALUE="$NB_EQUIP_8_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_10' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='NB_NOUVEL_ACQUI_8' NAME=NB_NOUVEL_ACQUI_8 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_8"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_9_0' onClick='MiseEvidenceLigneFrame(9,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_9_1' onClick='MiseEvidenceLigneFrame(9,20)'><SELECT   ID='CODE_FILIERE_9' NAME=CODE_FILIERE_9>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_9-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_2' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='DESIGNATION_9' NAME=DESIGNATION_9 TYPE='text' VALUE="$DESIGNATION_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_3' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_9_1' NAME=CODE_TYPE_EQUIPEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_4' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_9_2' NAME=CODE_TYPE_EQUIPEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_5' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_9_3' NAME=CODE_TYPE_EQUIPEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_9_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_6' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='MARQUE_9' NAME=MARQUE_9 TYPE='text'size=10 VALUE="$MARQUE_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_7' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='COUT_EQUIP_9' NAME=COUT_EQUIP_9 TYPE='text'size=10 VALUE="$COUT_EQUIP_9"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_9_8' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='NB_EQUIP_9_1' NAME='NB_EQUIP_9_1' TYPE='text' size=3 VALUE="$NB_EQUIP_9_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_9_9' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='NB_EQUIP_9_2' NAME='NB_EQUIP_9_2' TYPE='text' size=3 VALUE="$NB_EQUIP_9_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_10' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='NB_NOUVEL_ACQUI_9' NAME=NB_NOUVEL_ACQUI_9 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_9"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_10_0' onClick='MiseEvidenceLigneFrame(10,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_10 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_10_1' onClick='MiseEvidenceLigneFrame(10,20)'><SELECT   ID='CODE_FILIERE_10' NAME=CODE_FILIERE_10>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_10-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_2' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='DESIGNATION_10' NAME=DESIGNATION_10 TYPE='text' VALUE="$DESIGNATION_10"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_3' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_10_1' NAME=CODE_TYPE_EQUIPEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_4' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_10_2' NAME=CODE_TYPE_EQUIPEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_5' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_10_3' NAME=CODE_TYPE_EQUIPEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_10_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_6' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='MARQUE_10' NAME=MARQUE_10 TYPE='text'size=10 VALUE="$MARQUE_10"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_7' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='COUT_EQUIP_10' NAME=COUT_EQUIP_10 TYPE='text'size=10 VALUE="$COUT_EQUIP_10"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_10_8' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='NB_EQUIP_10_1' NAME='NB_EQUIP_10_1' TYPE='text' size=3 VALUE="$NB_EQUIP_10_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_10_9' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='NB_EQUIP_10_2' NAME='NB_EQUIP_10_2' TYPE='text' size=3 VALUE="$NB_EQUIP_10_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_10' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='NB_NOUVEL_ACQUI_10' NAME=NB_NOUVEL_ACQUI_10 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_10"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_11_0' onClick='MiseEvidenceLigneFrame(11,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_11 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_11_1' onClick='MiseEvidenceLigneFrame(11,20)'><SELECT   ID='CODE_FILIERE_11' NAME=CODE_FILIERE_11>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_11-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_2' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='DESIGNATION_11' NAME=DESIGNATION_11 TYPE='text' VALUE="$DESIGNATION_11"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_3' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_11_1' NAME=CODE_TYPE_EQUIPEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_4' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_11_2' NAME=CODE_TYPE_EQUIPEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_5' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_11_3' NAME=CODE_TYPE_EQUIPEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_11_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_6' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='MARQUE_11' NAME=MARQUE_11 TYPE='text'size=10 VALUE="$MARQUE_11"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_7' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='COUT_EQUIP_11' NAME=COUT_EQUIP_11 TYPE='text'size=10 VALUE="$COUT_EQUIP_11"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_11_8' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='NB_EQUIP_11_1' NAME='NB_EQUIP_11_1' TYPE='text' size=3 VALUE="$NB_EQUIP_11_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_11_9' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='NB_EQUIP_11_2' NAME='NB_EQUIP_11_2' TYPE='text' size=3 VALUE="$NB_EQUIP_11_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_10' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='NB_NOUVEL_ACQUI_11' NAME=NB_NOUVEL_ACQUI_11 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_11"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_12_0' onClick='MiseEvidenceLigneFrame(12,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_12 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_12_1' onClick='MiseEvidenceLigneFrame(12,20)'><SELECT   ID='CODE_FILIERE_12' NAME=CODE_FILIERE_12>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_12-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_2' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='DESIGNATION_12' NAME=DESIGNATION_12 TYPE='text' VALUE="$DESIGNATION_12"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_3' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_12_1' NAME=CODE_TYPE_EQUIPEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_4' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_12_2' NAME=CODE_TYPE_EQUIPEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_5' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_12_3' NAME=CODE_TYPE_EQUIPEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_12_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_6' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='MARQUE_12' NAME=MARQUE_12 TYPE='text'size=10 VALUE="$MARQUE_12"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_7' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='COUT_EQUIP_12' NAME=COUT_EQUIP_12 TYPE='text'size=10 VALUE="$COUT_EQUIP_12"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_12_8' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='NB_EQUIP_12_1' NAME='NB_EQUIP_12_1' TYPE='text' size=3 VALUE="$NB_EQUIP_12_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_12_9' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='NB_EQUIP_12_2' NAME='NB_EQUIP_12_2' TYPE='text' size=3 VALUE="$NB_EQUIP_12_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_10' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='NB_NOUVEL_ACQUI_12' NAME=NB_NOUVEL_ACQUI_12 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_12"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_13_0' onClick='MiseEvidenceLigneFrame(13,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_13 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_13_1' onClick='MiseEvidenceLigneFrame(13,20)'><SELECT   ID='CODE_FILIERE_13' NAME=CODE_FILIERE_13>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_13-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_2' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='DESIGNATION_13' NAME=DESIGNATION_13 TYPE='text' VALUE="$DESIGNATION_13"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_3' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_13_1' NAME=CODE_TYPE_EQUIPEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_4' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_13_2' NAME=CODE_TYPE_EQUIPEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_5' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_13_3' NAME=CODE_TYPE_EQUIPEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_13_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_6' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='MARQUE_13' NAME=MARQUE_13 TYPE='text'size=10 VALUE="$MARQUE_13"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_7' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='COUT_EQUIP_13' NAME=COUT_EQUIP_13 TYPE='text'size=10 VALUE="$COUT_EQUIP_13"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_13_8' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='NB_EQUIP_13_1' NAME='NB_EQUIP_13_1' TYPE='text' size=3 VALUE="$NB_EQUIP_13_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_13_9' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='NB_EQUIP_13_2' NAME='NB_EQUIP_13_2' TYPE='text' size=3 VALUE="$NB_EQUIP_13_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_10' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='NB_NOUVEL_ACQUI_13' NAME=NB_NOUVEL_ACQUI_13 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_13"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_14_0' onClick='MiseEvidenceLigneFrame(14,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_14 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_14_1' onClick='MiseEvidenceLigneFrame(14,20)'><SELECT   ID='CODE_FILIERE_14' NAME=CODE_FILIERE_14>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_14-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_2' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='DESIGNATION_14' NAME=DESIGNATION_14 TYPE='text' VALUE="$DESIGNATION_14"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_3' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_14_1' NAME=CODE_TYPE_EQUIPEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_4' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_14_2' NAME=CODE_TYPE_EQUIPEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_5' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_14_3' NAME=CODE_TYPE_EQUIPEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_14_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_6' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='MARQUE_14' NAME=MARQUE_14 TYPE='text'size=10 VALUE="$MARQUE_14"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_7' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='COUT_EQUIP_14' NAME=COUT_EQUIP_14 TYPE='text'size=10 VALUE="$COUT_EQUIP_14"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_14_8' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='NB_EQUIP_14_1' NAME='NB_EQUIP_14_1' TYPE='text' size=3 VALUE="$NB_EQUIP_14_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_14_9' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='NB_EQUIP_14_2' NAME='NB_EQUIP_14_2' TYPE='text' size=3 VALUE="$NB_EQUIP_14_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_10' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='NB_NOUVEL_ACQUI_14' NAME=NB_NOUVEL_ACQUI_14 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_14"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_15_0' onClick='MiseEvidenceLigneFrame(15,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_15 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_15_1' onClick='MiseEvidenceLigneFrame(15,20)'><SELECT   ID='CODE_FILIERE_15' NAME=CODE_FILIERE_15>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_15-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_15_2' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='DESIGNATION_15' NAME=DESIGNATION_15 TYPE='text' VALUE="$DESIGNATION_15"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_3' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_15_1' NAME=CODE_TYPE_EQUIPEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_4' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_15_2' NAME=CODE_TYPE_EQUIPEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_5' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_15_3' NAME=CODE_TYPE_EQUIPEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_15_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_15_6' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='MARQUE_15' NAME=MARQUE_15 TYPE='text'size=10 VALUE="$MARQUE_15"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_15_7' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='COUT_EQUIP_15' NAME=COUT_EQUIP_15 TYPE='text'size=10 VALUE="$COUT_EQUIP_15"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_15_8' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='NB_EQUIP_15_1' NAME='NB_EQUIP_15_1' TYPE='text' size=3 VALUE="$NB_EQUIP_15_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_15_9' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='NB_EQUIP_15_2' NAME='NB_EQUIP_15_2' TYPE='text' size=3 VALUE="$NB_EQUIP_15_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_15_10' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='NB_NOUVEL_ACQUI_15' NAME=NB_NOUVEL_ACQUI_15 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_15"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_16_0' onClick='MiseEvidenceLigneFrame(16,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_16 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_16_1' onClick='MiseEvidenceLigneFrame(16,20)'><SELECT   ID='CODE_FILIERE_16' NAME=CODE_FILIERE_16>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_16-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_16_2' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='DESIGNATION_16' NAME=DESIGNATION_16 TYPE='text' VALUE="$DESIGNATION_16"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_3' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_16_1' NAME=CODE_TYPE_EQUIPEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_4' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_16_2' NAME=CODE_TYPE_EQUIPEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_5' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_16_3' NAME=CODE_TYPE_EQUIPEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_16_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_16_6' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='MARQUE_16' NAME=MARQUE_16 TYPE='text'size=10 VALUE="$MARQUE_16"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_16_7' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='COUT_EQUIP_16' NAME=COUT_EQUIP_16 TYPE='text'size=10 VALUE="$COUT_EQUIP_16"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_16_8' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='NB_EQUIP_16_1' NAME='NB_EQUIP_16_1' TYPE='text' size=3 VALUE="$NB_EQUIP_16_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_16_9' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='NB_EQUIP_16_2' NAME='NB_EQUIP_16_2' TYPE='text' size=3 VALUE="$NB_EQUIP_16_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_16_10' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='NB_NOUVEL_ACQUI_16' NAME=NB_NOUVEL_ACQUI_16 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_16"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_17_0' onClick='MiseEvidenceLigneFrame(17,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_17 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_17_1' onClick='MiseEvidenceLigneFrame(17,20)'><SELECT   ID='CODE_FILIERE_17' NAME=CODE_FILIERE_17>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_17-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_17_2' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='DESIGNATION_17' NAME=DESIGNATION_17 TYPE='text' VALUE="$DESIGNATION_17"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_3' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_17_1' NAME=CODE_TYPE_EQUIPEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_4' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_17_2' NAME=CODE_TYPE_EQUIPEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_5' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_17_3' NAME=CODE_TYPE_EQUIPEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_17_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_17_6' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='MARQUE_17' NAME=MARQUE_17 TYPE='text'size=10 VALUE="$MARQUE_17"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_17_7' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='COUT_EQUIP_17' NAME=COUT_EQUIP_17 TYPE='text'size=10 VALUE="$COUT_EQUIP_17"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_17_8' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='NB_EQUIP_17_1' NAME='NB_EQUIP_17_1' TYPE='text' size=3 VALUE="$NB_EQUIP_17_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_17_9' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='NB_EQUIP_17_2' NAME='NB_EQUIP_17_2' TYPE='text' size=3 VALUE="$NB_EQUIP_17_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_17_10' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='NB_NOUVEL_ACQUI_17' NAME=NB_NOUVEL_ACQUI_17 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_17"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_18_0' onClick='MiseEvidenceLigneFrame(18,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_18 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_18_1' onClick='MiseEvidenceLigneFrame(18,20)'><SELECT   ID='CODE_FILIERE_18' NAME=CODE_FILIERE_18>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_18-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_18_2' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='DESIGNATION_18' NAME=DESIGNATION_18 TYPE='text' VALUE="$DESIGNATION_18"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_3' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_18_1' NAME=CODE_TYPE_EQUIPEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_4' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_18_2' NAME=CODE_TYPE_EQUIPEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_5' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_18_3' NAME=CODE_TYPE_EQUIPEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_18_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_18_6' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='MARQUE_18' NAME=MARQUE_18 TYPE='text'size=10 VALUE="$MARQUE_18"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_18_7' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='COUT_EQUIP_18' NAME=COUT_EQUIP_18 TYPE='text'size=10 VALUE="$COUT_EQUIP_18"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_18_8' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='NB_EQUIP_18_1' NAME='NB_EQUIP_18_1' TYPE='text' size=3 VALUE="$NB_EQUIP_18_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_18_9' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='NB_EQUIP_18_2' NAME='NB_EQUIP_18_2' TYPE='text' size=3 VALUE="$NB_EQUIP_18_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_18_10' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='NB_NOUVEL_ACQUI_18' NAME=NB_NOUVEL_ACQUI_18 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_18"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_19_0' onClick='MiseEvidenceLigneFrame(19,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_19 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_19_1' onClick='MiseEvidenceLigneFrame(19,20)'><SELECT   ID='CODE_FILIERE_19' NAME=CODE_FILIERE_19>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_120003_CODE_FILIERE_19-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_19_2' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='DESIGNATION_19' NAME=DESIGNATION_19 TYPE='text' VALUE="$DESIGNATION_19"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_3' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_19_1' NAME=CODE_TYPE_EQUIPEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_4' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_19_2' NAME=CODE_TYPE_EQUIPEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_5' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_EQUIPEMENT_19_3' NAME=CODE_TYPE_EQUIPEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_EQUIPEMENT_19_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_19_6' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='MARQUE_19' NAME=MARQUE_19 TYPE='text'size=10 VALUE="$MARQUE_19"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_19_7' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='COUT_EQUIP_19' NAME=COUT_EQUIP_19 TYPE='text'size=10 VALUE="$COUT_EQUIP_19"></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_19_8' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='NB_EQUIP_19_1' NAME='NB_EQUIP_19_1' TYPE='text' size=3 VALUE="$NB_EQUIP_19_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_19_9' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='NB_EQUIP_19_2' NAME='NB_EQUIP_19_2' TYPE='text' size=3 VALUE="$NB_EQUIP_19_2"  tabindex=''>
+</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_19_10' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='NB_NOUVEL_ACQUI_19' NAME=NB_NOUVEL_ACQUI_19 TYPE='text'size=6 VALUE="$NB_NOUVEL_ACQUI_19"></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
