@@ -41,7 +41,7 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
@@ -60,6 +60,10 @@ class DatabaseService {
       } catch (_) {
         // Column may already exist if DB was recreated
       }
+    }
+    if (oldVersion < 3) {
+      // v3: coherence_rules table for offline coherence evaluation
+      await _createCoherenceRulesTable(db);
     }
   }
 
@@ -242,6 +246,35 @@ class DatabaseService {
         lib_filter  TEXT NOT NULL,
         PRIMARY KEY (id_camp, id_filter)
       )
+    ''');
+
+    // ─── Coherence rules (offline evaluation) ─────────────────────────────
+    await _createCoherenceRulesTable(db);
+  }
+
+  Future<void> _createCoherenceRulesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS coherence_rules (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_camp         TEXT NOT NULL,
+        id_qst          TEXT NOT NULL,
+        id_etab         TEXT NOT NULL,
+        id_filter       TEXT,
+        id_regle        INTEGER NOT NULL,
+        lib_regle       TEXT NOT NULL DEFAULT '',
+        sql_regle       TEXT NOT NULL,
+        id_assoc        INTEGER NOT NULL,
+        id_regle_assoc  INTEGER NOT NULL,
+        lib_regle_assoc TEXT NOT NULL DEFAULT '',
+        sql_assoc       TEXT NOT NULL,
+        critere         TEXT NOT NULL,
+        message         TEXT NOT NULL DEFAULT '',
+        fetched_at      TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_coherence_rules_ctx
+        ON coherence_rules (id_camp, id_qst, id_etab)
     ''');
   }
 
@@ -947,6 +980,7 @@ class DatabaseService {
     final db = await database;
     await db.transaction((txn) async {
       for (final table in [
+        'coherence_rules',
         'collected_data',
         'filter_periods',
         'validation_rules',

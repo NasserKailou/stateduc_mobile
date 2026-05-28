@@ -623,7 +623,7 @@ if(!(isset($_POST['login']) && isset($_POST['password']))
 			ini_set("display_errors",0);error_reporting(0);
 	      	
 			ini_set("display_errors",1);error_reporting(1);
-	      $conn_dico = ADONewConnection('postgres9');$conn_dico->debug = true;
+	      $conn_dico = ADONewConnection('postgres9');//$conn_dico->debug = true;
 	  		$conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $dico_DB);	
 	  		$GLOBALS['conn_dico'] = $conn_dico;
     	}

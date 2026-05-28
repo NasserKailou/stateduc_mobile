@@ -1,4 +1,6 @@
 <?php
+// Buffer all output so ADOdb debug / PHP warnings cannot corrupt the JSON response
+ob_start();
 
 header('Content-type: application/json');
 require_once '../../../common.php';
@@ -60,23 +62,23 @@ if ($op == 'liste_base') {
 					($base->utilisateur != $active['utilisateur']) ||
 					($base_array["MOT_DE_PASSE"] != $active['mdp']) ||
 					($base->nomBase != $active['base'])) {					
-					//La ligne active est differente de la ligne configurée dans le fichier connexion.php					
+					//La ligne active est differente de la ligne configurï¿½e dans le fichier connexion.php					
 					//On tente de rajouter la ligne active du fichier dans la base	
 					$req = "INSERT INTO DICO_BASE(ID, NOM_SERVEUR,TYPE_SERVEUR,URL_BASE,UTILISATEUR,MOT_DE_PASSE,NOM_BASE,STATUT) VALUES(".$active['id'].",'".$active['nom']."','".$active['type']."','".$url_base."','".$active['utilisateur']."','".$active['mdp']."','".$nom_base."',1)";
 					
 					if ($connexion_dico->Execute($req) === false) {
-						//En cas d'erreur on tente une mise à jour, car l'id de la ligne active peut exister déjà
+						//En cas d'erreur on tente une mise ï¿½ jour, car l'id de la ligne active peut exister dï¿½jï¿½
 						$req = "UPDATE DICO_BASE SET NOM_SERVEUR='".$active['nom']."',TYPE_SERVEUR='".$active['type']."',URL_BASE='".$url_base."',UTILISATEUR='".$active['utilisateur']."',MOT_DE_PASSE='".$active['mdp']."',NOM_BASE='".$nom_base."',STATUT=1 WHERE ID=".$active['id'];
 						if ($connexion_dico->Execute($req) === false) {
-							//Si erreur à ce niveau aussi, alors on retourne le message d'erreur
+							//Si erreur ï¿½ ce niveau aussi, alors on retourne le message d'erreur
 							sendError("Insertion non effectu&eacute;e : ".$req);
 							return;
 						} else {
-							//Si on met à jour la base on modifie la base qui devait etre affichée
+							//Si on met ï¿½ jour la base on modifie la base qui devait etre affichï¿½e
 							$base = $act_base;
 						}
 					} else {
-						//Si on arrive à insérer la ligne on desactive la ligne qui était active dans la base et on rajoute la nouvelle ligne dans la liste des resultats
+						//Si on arrive ï¿½ insï¿½rer la ligne on desactive la ligne qui ï¿½tait active dans la base et on rajoute la nouvelle ligne dans la liste des resultats
 						$req = "UPDATE DICO_BASE SET STATUT=0 WHERE ID=".$base->id;
 						$connexion_dico->Execute($req);
 						$list_bases[] = $act_base;
@@ -93,11 +95,11 @@ if ($op == 'liste_base') {
 			if ($connexion_dico->Execute($req) === false) {
 				$req = "UPDATE DICO_BASE SET NOM_SERVEUR='".$active['nom']."',TYPE_SERVEUR='".$active['type']."',URL_BASE='".$url_base."',UTILISATEUR='".$active['utilisateur']."',MOT_DE_PASSE='".$active['mdp']."',NOM_BASE='".$nom_base."',STATUT=1 WHERE ID=".$active['id'];
 				if ($connexion_dico->Execute($req) === false) {
-					//Si erreur à ce niveau aussi, alors on retourne le message d'erreur
+					//Si erreur ï¿½ ce niveau aussi, alors on retourne le message d'erreur
 					sendError("Insertion non effectu&eacute;e : ".$req);
 					return;
 				} else {
-					//Si on met à jour la base on modifie la base qui devait etre affichée
+					//Si on met ï¿½ jour la base on modifie la base qui devait etre affichï¿½e
 					$i = 0;
 					$found = false;
 					while (!$found) {
@@ -176,16 +178,19 @@ function sql($requete, $connexion_dico) {
 }
 
 function sendList($liste) {
+	ob_clean(); // discard any debug/warning output before the JSON
 	$posts = array('se_statut'=>200,'se_message'=>'ok','se_datas'=>$liste);	
 	echo json_encode($posts);
 }
 
 function sendError($message) {
+	ob_clean();
 	$posts = array('se_statut'=>101,'se_message'=>$message,'se_datas'=>NULL);	
 	echo json_encode($posts);
 }
 
 function sendOk() {
+	ob_clean();
 	$posts = array('se_statut'=>200,'se_message'=>'ok','se_datas'=>'ok');	
 	echo json_encode($posts);
 }
