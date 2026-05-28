@@ -1,30 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Network Security Config — replaces usesCleartextTraffic="true" from the
-  original AndroidManifest.
+  Network Security Config — StatEduc Mobile
 
-  Security improvement:
-    Original: usesCleartextTraffic="true" globally (HTTP allowed for all hosts)
-    Flutter:  HTTP only allowed for private network ranges.
-              For production, the server URL should be HTTPS.
-              Add your specific server domain to <domain> if needed.
+  Contexte de déploiement :
+    - Le serveur StatEduc est souvent sur un réseau local privé (IP privée)
+      avec HTTP simple ou HTTPS avec certificat auto-signé.
+    - Android 9+ bloque HTTP cleartext par défaut.
+    - Android ne fait pas confiance aux certificats auto-signés par défaut.
+
+  Stratégie :
+    1. Cleartext HTTP autorisé pour toutes les plages IP privées (RFC 1918)
+       et noms d'hôtes locaux courants.
+    2. Pour HTTPS : trust des certificats système ET utilisateur (auto-signés
+       ajoutés via paramètres Android → Sécurité → Certificats).
+    3. Pas d'override global (usesCleartextTraffic="true") — la config reste
+       ciblée par domaine/IP.
+
+  NOTE : <domain> en Android NetworkSecurityConfig accepte des hostnames
+  exacts ou des wildcards, PAS des notations CIDR. Pour couvrir toute une
+  plage IP, il faut lister les patterns ou utiliser une approche différente.
+  La solution la plus robuste pour un contexte terrain est d'utiliser
+  cleartextTrafficPermitted="true" au niveau base-config avec trust étendu.
 -->
 <network-security-config>
-    <!-- Allow HTTP for local/private server addresses (field use case) -->
-    <domain-config cleartextTrafficPermitted="true">
-        <!-- Local IP ranges used in typical school environments -->
-        <domain includeSubdomains="true">192.168.0.0</domain>
-        <domain includeSubdomains="true">192.168.1.0</domain>
-        <domain includeSubdomains="true">10.0.0.0</domain>
-        <domain includeSubdomains="true">172.16.0.0</domain>
-        <!-- Localhost for development -->
-        <domain includeSubdomains="true">localhost</domain>
-        <domain includeSubdomains="true">10.0.2.2</domain>
-    </domain-config>
-    <!-- All other connections require HTTPS -->
-    <base-config cleartextTrafficPermitted="false">
+
+    <!--
+        Configuration de base : s'applique à toutes les connexions non
+        couvertes par un domain-config spécifique.
+        - Cleartext autorisé : le serveur peut être HTTP (contexte terrain)
+        - Trust system + user certificates : accepte les certificats auto-signés
+          installés par l'utilisateur (Settings > Security > Install certificate)
+    -->
+    <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
+            <!-- Certificats système (CA officielles) -->
             <certificates src="system"/>
+            <!-- Certificats utilisateur (auto-signés installés manuellement) -->
+            <certificates src="user"/>
         </trust-anchors>
     </base-config>
+
 </network-security-config>

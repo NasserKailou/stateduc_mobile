@@ -1,6 +1,7 @@
 // StatEduc Mobile — Flutter rewrite
 // Entry point: Splash → Onboarding (1st launch) → PinScreen
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,8 +13,25 @@ import 'services/api_service.dart';
 import 'services/database_service.dart';
 import 'screens/splash/splash_screen.dart';
 
+// ─── Global SSL override ─────────────────────────────────────────────────────
+// Le serveur StatEduc est déployé sur un intranet MEN avec des certificats
+// auto-signés ou sans HTTPS. Cet override permet à tous les HttpClient créés
+// dans l'application d'accepter ces certificats.
+// NOTE : n'affecte que les connexions via dart:io HttpClient.
+//        Dio est configuré séparément dans ApiService._internal().
+class _TrustAllCertificates extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Accept all SSL certificates (self-signed servers on private networks)
+  HttpOverrides.global = _TrustAllCertificates();
   // Touch the database singleton to run _onCreate if first launch
   await DatabaseService().database;
   runApp(const StatEducApp());

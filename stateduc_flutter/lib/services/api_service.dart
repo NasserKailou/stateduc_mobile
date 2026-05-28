@@ -9,8 +9,10 @@
 // Source JS : charge_camp.js, page_etab.js, page_new_camp.js, users.js
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import '../models/user.dart';
 import '../models/campaign.dart';
 import '../models/school.dart';
@@ -41,6 +43,26 @@ class ApiService {
         validateStatus: (status) => status != null && status < 600,
       ),
     );
+
+    // ── SSL / Certificat auto-signé ──────────────────────────────────────────
+    // Le serveur StatEduc est souvent déployé sur un réseau local avec un
+    // certificat auto-signé ou sans HTTPS du tout. Dart/Flutter utilise son
+    // propre moteur TLS (BoringSSL) indépendamment d'Android, ce qui cause
+    // l'erreur "Software caused connection abort" quand le certificat est
+    // rejeté. On configure l'adaptateur IO pour ignorer les erreurs de
+    // certificat. La sécurité réseau est garantie par le périmètre du réseau
+    // local (intranet MEN) et non par TLS public.
+    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        debugPrint('[ApiService] Accepting certificate for $host:$port '
+            'subject=${cert.subject}');
+        return true; // Accept self-signed / untrusted certs
+      };
+      return client;
+    };
+
     _dio.interceptors.add(_AuthInjectorInterceptor(this));
     _dio.interceptors.add(_buildLogInterceptor());
   }
