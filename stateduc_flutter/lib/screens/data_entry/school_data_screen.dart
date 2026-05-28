@@ -8,6 +8,7 @@ import '../../models/question.dart';
 import '../../widgets/dynamic_form/dynamic_form_widget.dart';
 import '../../widgets/common/loading_overlay.dart';
 import '../../models/user.dart';  // FilterPeriod
+import '../../services/coherence_evaluator.dart';  // OfflineCoherenceError
 
 /// SchoolDataScreen — data entry for a specific school.
 ///
@@ -141,6 +142,12 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
           _MessageBanner(
             message: entry.successMessage!,
             isError: false,
+            onDismiss: entry.clearMessages,
+          ),
+        // ── Offline coherence violations ─────────────────────────────────
+        if (entry.hasOfflineCoherenceErrors)
+          _OfflineCoherenceBanner(
+            errors: entry.offlineCoherenceErrors,
             onDismiss: entry.clearMessages,
           ),
         // ── Question selector ────────────────────────────────────────────
@@ -429,6 +436,77 @@ class _FilterSelector extends StatelessWidget {
             onChanged: onSelect,
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Offline coherence banner ────────────────────────────────────────────────
+class _OfflineCoherenceBanner extends StatelessWidget {
+  const _OfflineCoherenceBanner({
+    required this.errors,
+    required this.onDismiss,
+  });
+  final List<OfflineCoherenceError> errors;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade50,
+        border: Border.all(color: Colors.orange.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ExpansionTile(
+        leading: const Icon(Icons.warning_amber_rounded,
+            color: Colors.orange, size: 22),
+        title: Text(
+          '${errors.length} incohérence(s) locale(s)',
+          style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.deepOrange),
+        ),
+        subtitle: const Text(
+          'Contrôle offline — non envoyé au serveur',
+          style: TextStyle(fontSize: 11, color: Colors.grey),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close, size: 16),
+              onPressed: onDismiss,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              tooltip: 'Fermer',
+            ),
+          ],
+        ),
+        children: errors
+            .map((e) => Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 14, color: Colors.deepOrange),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          e.message.isNotEmpty
+                              ? e.message
+                              : '${e.libRegle} doit être ${e.critere} ${e.libRegleAssoc} '
+                                  '(valeurs : ${e.value1.toStringAsFixed(0)} / ${e.value2.toStringAsFixed(0)})',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ))
+            .toList(),
       ),
     );
   }

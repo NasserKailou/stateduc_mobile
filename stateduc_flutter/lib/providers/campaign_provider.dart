@@ -47,12 +47,16 @@ class CampaignProvider extends ChangeNotifier {
   List<School>  _currentSchools       = [];
   List<RegroupType> _regroupTypes     = [];
   List<Regroup> _allRegroups          = [];
+  /// True while _loadSchoolsForRegroup() or _loadRegroups() is in flight.
+  bool _isNavigating                   = false;
 
   List<EducationSystem> get systems           => _systems;
   EducationSystem? get selectedSystem         => _selectedSystem;
   List<Regroup> get regroupBreadcrumb         => _regroupBreadcrumb;
   List<Regroup> get currentRegroups           => _currentRegroups;
   List<School>  get currentSchools            => _currentSchools;
+  /// True while navigating (loading regroups or schools from DB).
+  bool get isNavigating                       => _isNavigating;
 
   bool get isAtSchoolLevel =>
       _currentRegroups.isEmpty && _currentSchools.isNotEmpty;
@@ -121,8 +125,12 @@ class CampaignProvider extends ChangeNotifier {
     _selectedSystem    = system;
     _regroupBreadcrumb = [];
     _currentSchools    = [];
-    _error = null;
+    _currentRegroups   = [];
+    _error             = null;
+    _isNavigating      = true;
+    notifyListeners();
     await _loadRegroups(null); // load root regroups
+    _isNavigating = false;
     notifyListeners();
   }
 
@@ -133,7 +141,11 @@ class CampaignProvider extends ChangeNotifier {
 
   Future<void> navigateIntoRegroup(Regroup regroup) async {
     _regroupBreadcrumb = [..._regroupBreadcrumb, regroup];
-    _error = null;
+    _error             = null;
+    _isNavigating      = true;
+    _currentRegroups   = [];
+    _currentSchools    = [];
+    notifyListeners();
 
     final childRegroups =
         await _db.getChildRegroups(_selectedCampaign!.idCamp, regroup.idRegp);
@@ -145,6 +157,7 @@ class CampaignProvider extends ChangeNotifier {
       _currentRegroups = childRegroups;
       _currentSchools  = [];
     }
+    _isNavigating = false;
     notifyListeners();
   }
 
@@ -156,6 +169,10 @@ class CampaignProvider extends ChangeNotifier {
         (_regroupBreadcrumb.length - levelsUp)
             .clamp(0, _regroupBreadcrumb.length));
     _regroupBreadcrumb = newBreadcrumb;
+    _isNavigating      = true;
+    _currentRegroups   = [];
+    _currentSchools    = [];
+    notifyListeners();
 
     if (newBreadcrumb.isEmpty) {
       await _loadRegroups(null);
@@ -170,6 +187,7 @@ class CampaignProvider extends ChangeNotifier {
         _currentSchools  = [];
       }
     }
+    _isNavigating = false;
     notifyListeners();
   }
 

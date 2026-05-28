@@ -50,11 +50,19 @@ class CampaignDetailScreen extends StatelessWidget {
     if (camps.selectedSystem == null) {
       return _buildSystemSelector(context, camps);
     }
+    // Navigation in progress → real loading spinner (controlled by isNavigating)
+    if (camps.isNavigating) {
+      return const Center(child: CircularProgressIndicator());
+    }
     // System selected, no regroups left, schools available → school list
     if (camps.currentRegroups.isEmpty && camps.currentSchools.isNotEmpty) {
       return _buildSchoolList(context, camps);
     }
-    // Loading or regroup drill-down
+    // Both lists empty after navigation finished → show empty/error state (no infinite spinner)
+    if (camps.currentRegroups.isEmpty && camps.currentSchools.isEmpty) {
+      return _buildEmptyState(context, camps);
+    }
+    // Regroup drill-down list
     return _buildRegroupList(context, camps);
   }
 
@@ -89,13 +97,43 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
+  // ─── Empty state (no regroups and no schools after navigation) ──────────
+  Widget _buildEmptyState(BuildContext context, CampaignProvider camps) {
+    final errorMsg = camps.error;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.folder_open_outlined,
+                size: 56, color: Theme.of(context).colorScheme.outline),
+            const SizedBox(height: 16),
+            Text(
+              errorMsg ?? 'Aucun établissement trouvé pour ce regroupement.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: errorMsg != null
+                        ? Theme.of(context).colorScheme.error
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 24),
+            if (camps.regroupBreadcrumb.isNotEmpty)
+              TextButton.icon(
+                icon: const Icon(Icons.arrow_back),
+                label: const Text('Revenir en arrière'),
+                onPressed: () => camps.navigateUpRegroup(levelsUp: 1),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ─── Regroup drill-down ──────────────────────────────────────────────────
   Widget _buildRegroupList(
       BuildContext context, CampaignProvider camps) {
-    if (camps.currentRegroups.isEmpty &&
-        camps.currentSchools.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
     return ListView.builder(
       padding: const EdgeInsets.all(8),
       itemCount: camps.currentRegroups.length,

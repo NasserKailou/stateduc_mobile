@@ -676,6 +676,93 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
   // PRIVATE HELPER — Generic GET with se_data unwrapping
   // ═══════════════════════════════════════════════════════════════════════════
+  // COHERENCE RULES — FETCH FOR OFFLINE EVALUATION
+  // Source server: data_rules.php
+  //   GET /theme_rules/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/{yearCode}
+  //   Response se_data: { id_theme, nb_regles, regles: [
+  //     { id_regle, lib_regle, sql_regle, associations: [
+  //       { id_assoc, id_regle_assoc, lib_regle_assoc, sql_assoc, critere, message }
+  //     ]}
+  //   ]}
+  //
+  // Each (rule, association) pair becomes one CoherenceRule row in SQLite.
+  // Called once per question during campaign download (non-fatal failure).
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Future<List<CoherenceRule>> fetchRules({
+    required String login,
+    required String campId,
+    required String sysId,
+    required String qstId,
+    required String etabId,
+    required String? filter,
+    String yearCode = '',
+  }) async {
+    final filterParam  = (filter == null || filter.isEmpty) ? 'null' : filter;
+    final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? yearCode : '0';
+    final path =
+        'data_rules.php/theme_rules/$login/$campId/$sysId/$qstId/$etabId/$filterParam/$anneeSegment';
+    try {
+      final response = await _dio.get(
+        path,
+        options: Options(responseType: ResponseType.plain),
+      );
+      final rawBody = response.data?.toString().trim() ?? '';
+      if (rawBody.isEmpty) return [];
+
+      dynamic parsed;
+      try {
+        parsed = json.decode(rawBody);
+      } catch (_) {
+        return [];
+      }
+
+      if (parsed is! Map) return [];
+      if (parsed['se_status'] != 200) return [];
+
+      final seData = parsed['se_data'];
+      if (seData is! Map) return [];
+
+      final regles = seData['regles'];
+      if (regles is! List) return [];
+
+      final now    = DateTime.now().toIso8601String();
+      final result = <CoherenceRule>[];
+
+      for (final regle in regles.whereType<Map>()) {
+        final idRegle   = int.tryParse(regle['id_regle']?.toString() ?? '0') ?? 0;
+        final libRegle  = (regle['lib_regle'] ?? '').toString();
+        final sqlRegle  = (regle['sql_regle'] ?? '').toString();
+        final assocs    = regle['associations'];
+        if (assocs is! List || assocs.isEmpty) continue;
+
+        for (final assoc in assocs.whereType<Map>()) {
+          result.add(CoherenceRule(
+            idCamp:        campId,
+            idQst:         qstId,
+            idEtab:        etabId,
+            idFilter:      (filter == null || filter.isEmpty) ? null : filter,
+            idRegle:       idRegle,
+            libRegle:      libRegle,
+            sqlRegle:      sqlRegle,
+            idAssoc:       int.tryParse(assoc['id_assoc']?.toString()       ?? '0') ?? 0,
+            idRegleAssoc:  int.tryParse(assoc['id_regle_assoc']?.toString() ?? '0') ?? 0,
+            libRegleAssoc: (assoc['lib_regle_assoc'] ?? '').toString(),
+            sqlAssoc:      (assoc['sql_assoc'] ?? '').toString(),
+            critere:       (assoc['critere']  ?? '').toString(),
+            message:       (assoc['message']  ?? '').toString(),
+            fetchedAt:     now,
+          ));
+        }
+      }
+      return result;
+    } on DioException catch (_) {
+      return []; // Non-fatal — offline rules unavailable
+    } catch (_) {
+      return [];
+    }
+  }
+
   // COHERENCE CHECK — POST-SAVE CONTROL
   // Source server: data_controle.php / controle_theme_batch.class.php
   //   GET /data_controle.php/theme_controle/{login}/{campId}/{sysId}/{qstId}/
@@ -809,6 +896,45 @@ class _AuthInjectorInterceptor extends Interceptor {
     }
     handler.next(options);
   }
+}
+
+/// A single coherence rule downloaded from data_rules.php for offline evaluation.
+///
+/// The server returns (rule, associated-rule, critere, message) pairs.
+/// Stored flat in the SQLite coherence_rules table keyed by context
+/// (id_camp, id_qst, id_etab, id_filter).
+class CoherenceRule {
+  final String idCamp;
+  final String idQst;
+  final String idEtab;
+  final String? idFilter;
+  final int    idRegle;
+  final String libRegle;
+  final String sqlRegle;
+  final int    idAssoc;
+  final int    idRegleAssoc;
+  final String libRegleAssoc;
+  final String sqlAssoc;
+  final String critere;
+  final String message;
+  final String fetchedAt;
+
+  const CoherenceRule({
+    required this.idCamp,
+    required this.idQst,
+    required this.idEtab,
+    this.idFilter,
+    required this.idRegle,
+    required this.libRegle,
+    required this.sqlRegle,
+    required this.idAssoc,
+    required this.idRegleAssoc,
+    required this.libRegleAssoc,
+    required this.sqlAssoc,
+    required this.critere,
+    required this.message,
+    required this.fetchedAt,
+  });
 }
 
 class ApiException implements Exception {

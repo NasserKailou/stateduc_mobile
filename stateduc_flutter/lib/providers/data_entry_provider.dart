@@ -3,6 +3,7 @@ import '../models/question.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
+import '../services/coherence_evaluator.dart';
 
 /// DataEntryProvider — form data entry state manager.
 ///
@@ -23,10 +24,12 @@ class DataEntryProvider extends ChangeNotifier {
     required DatabaseService db,
     required ApiService api,
   })  : _db = db,
-        _api = api;
+        _api = api,
+        _evaluator = CoherenceEvaluator(db: db);
 
   final DatabaseService _db;
   final ApiService _api;
+  final CoherenceEvaluator _evaluator;
 
   // ─── Current context ────────────────────────────────────────────────────────
   String? _idCamp;
@@ -59,11 +62,17 @@ class DataEntryProvider extends ChangeNotifier {
   String? _error;
   String? _successMessage;
 
-  // ─── Coherence check results ────────────────────────────────────────────────
+  // ─── Server-side coherence check results ────────────────────────────────────
   // Populated after sendToServer() succeeds.
   // Empty list = no violations (coherence OK).
   List<CoherenceError> _coherenceErrors = [];
   bool                 _isCheckingCoherence = false;
+
+  // ─── Offline coherence check results ────────────────────────────────────────
+  // Populated after saveLocally() or immediately on field update (non-blocking).
+  // Empty list = no violations detected locally.
+  List<OfflineCoherenceError> _offlineCoherenceErrors = [];
+  bool                        _isCheckingOffline       = false;
 
   // ─── Getters ─────────────────────────────────────────────────────────────────
   String? get idCamp              => _idCamp;
@@ -88,6 +97,10 @@ class DataEntryProvider extends ChangeNotifier {
   List<CoherenceError> get coherenceErrors    => List.unmodifiable(_coherenceErrors);
   bool                 get isCheckingCoherence => _isCheckingCoherence;
   bool get hasCoherenceErrors => _coherenceErrors.isNotEmpty;
+
+  List<OfflineCoherenceError> get offlineCoherenceErrors  => List.unmodifiable(_offlineCoherenceErrors);
+  bool                        get isCheckingOffline        => _isCheckingOffline;
+  bool get hasOfflineCoherenceErrors => _offlineCoherenceErrors.isNotEmpty;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INIT — set context for a specific school + system
@@ -131,7 +144,51 @@ class DataEntryProvider extends ChangeNotifier {
     // Auto-select first question so the form is immediately visible
     if (_questions.isNotEmpty && _error == null) {
       await selectQuestion(_questions.first);
+      // Fetch coherence rules for this school (non-blocking, best-effort)
+      // Run in parallel for all questions so they are available for offline evaluation.
+      _fetchAndStoreCoherenceRulesBackground(
+        idCamp:  idCamp,
+        idEtab:  idEtab,
+        idSystem: idSystem,
+        questions: _questions,
+      );
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FETCH COHERENCE RULES (background, non-blocking)
+  // Downloads rules from server and stores them in coherence_rules SQLite.
+  // Called once when a school is opened. Silently fails if offline.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  void _fetchAndStoreCoherenceRulesBackground({
+    required String idCamp,
+    required String idEtab,
+    required String idSystem,
+    required List<Question> questions,
+  }) {
+    // Fire and forget — errors are non-fatal
+    Future(() async {
+      for (final q in questions) {
+        try {
+          final rules = await _api.fetchRules(
+            login:    _api.login ?? '',
+            campId:   idCamp,
+            sysId:    idSystem,
+            qstId:    q.idQst,
+            etabId:   idEtab,
+            filter:   null,
+          );
+          if (rules.isNotEmpty) {
+            await _db.insertCoherenceRules(rules);
+            debugPrint('[DataEntry] stored ${rules.length} offline coherence rules '
+                'for qst=${q.idQst} etab=$idEtab');
+          }
+        } catch (_) {
+          // Non-fatal — no coherence rules available offline for this question
+        }
+      }
+    });
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -279,6 +336,8 @@ class DataEntryProvider extends ChangeNotifier {
       _hasUnsavedChanges = false;
       _successMessage    = 'Données sauvegardées localement';
       notifyListeners();
+      // Run offline coherence check in background after save
+      Future(() => checkCoherenceOffline());
       return true;
     } catch (e) {
       _error = 'Erreur sauvegarde : ${e.toString()}';
@@ -380,6 +439,51 @@ class DataEntryProvider extends ChangeNotifier {
       return false;
     } finally {
       _isSending = false;
+      notifyListeners();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // OFFLINE COHERENCE CHECK
+  // Evaluates locally stored coherence rules against collected_data.
+  // Can be called after saveLocally() or triggered manually from the UI.
+  // Non-blocking: errors are surfaced through offlineCoherenceErrors getter.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Future<void> checkCoherenceOffline() async {
+    if (_idCamp == null || _idEtab == null || _selectedQuestion == null) return;
+    _isCheckingOffline      = true;
+    _offlineCoherenceErrors = [];
+    notifyListeners();
+
+    try {
+      final rules = await _db.getCoherenceRules(
+        idCamp: _idCamp!,
+        idQst:  _selectedQuestion!.idQst,
+        idEtab: _idEtab!,
+      );
+
+      if (rules.isEmpty) {
+        debugPrint('[DataEntry] checkCoherenceOffline: no rules stored for this context');
+        return;
+      }
+
+      _offlineCoherenceErrors = await _evaluator.evaluate(
+        rules:    rules,
+        formData: _formData,
+        idCamp:   _idCamp!,
+        idQst:    _selectedQuestion!.idQst,
+        idEtab:   _idEtab!,
+        idFilter: _selectedFilter?.idFilter,
+      );
+
+      debugPrint('[DataEntry] checkCoherenceOffline: '
+          '${_offlineCoherenceErrors.length} violation(s) found');
+    } catch (e) {
+      debugPrint('[DataEntry] checkCoherenceOffline error: $e');
+      _offlineCoherenceErrors = [];
+    } finally {
+      _isCheckingOffline = false;
       notifyListeners();
     }
   }
@@ -573,8 +677,9 @@ class DataEntryProvider extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════════════════════
 
   void clearMessages() {
-    _error          = null;
-    _successMessage = null;
+    _error                  = null;
+    _successMessage         = null;
+    _offlineCoherenceErrors = [];
     notifyListeners();
   }
 

@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/campaign.dart';
+import '../services/api_service.dart';
 import '../models/regroup.dart';
 import '../models/school.dart';
 import '../models/education_system.dart';
@@ -375,6 +377,7 @@ class DatabaseService {
       await txn.delete('form_html', where: 'id_camp = ?', whereArgs: [idCamp]);
       await txn.delete('validation_rules', where: 'id_camp = ?', whereArgs: [idCamp]);
       await txn.delete('filter_periods', where: 'id_camp = ?', whereArgs: [idCamp]);
+      await txn.delete('coherence_rules', where: 'id_camp = ?', whereArgs: [idCamp]);
       // Note: collected_data is kept for safety — call deleteCollectedData separately if needed
     });
   }
@@ -570,10 +573,14 @@ class DatabaseService {
   }
 
   /// Returns schools linked to [idRegp] through localisations.
+  ///
+  /// The server stores regroups_json as a JSON array whose elements may be
+  /// integers (e.g. [123,456]) OR quoted strings (e.g. ["123","456"]).
+  /// We parse the array and compare by string value to handle both formats.
   Future<List<School>> getSchoolsByRegroup(
       String idCamp, String idSystem, String idRegp) async {
     final db = await database;
-    // localisations.regroups_json contains list of regroup IDs
+    // localisations.regroups_json contains a JSON array of regroup IDs
     final locRows = await db.query(
       'localisations',
       where: 'id_camp = ? AND id_system = ?',
@@ -581,9 +588,23 @@ class DatabaseService {
     );
     final etabIds = <String>{};
     for (final loc in locRows) {
-      final json = loc['regroups_json'] as String? ?? '[]';
-      if (json.contains('"$idRegp"') || json.contains("'$idRegp'")) {
-        etabIds.add(loc['id_etab'] as String);
+      final jsonStr = loc['regroups_json'] as String? ?? '[]';
+      try {
+        // Parse the JSON array — elements may be int or String
+        final List<dynamic> regroupIds = jsonDecode(jsonStr) as List<dynamic>;
+        if (regroupIds.any((id) => id.toString() == idRegp)) {
+          etabIds.add(loc['id_etab'] as String);
+        }
+      } catch (_) {
+        // Fallback: raw string search for both quoted and unquoted forms
+        if (jsonStr.contains('"$idRegp"') ||
+            jsonStr.contains("'$idRegp'") ||
+            jsonStr.contains(',$idRegp,') ||
+            jsonStr.contains('[$idRegp,') ||
+            jsonStr.contains(',$idRegp]') ||
+            jsonStr == '[$idRegp]') {
+          etabIds.add(loc['id_etab'] as String);
+        }
       }
     }
     if (etabIds.isEmpty) return [];
@@ -961,6 +982,104 @@ class DatabaseService {
         whereArgs: [idCamp, idEtab, idQst, idFilter],
       );
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // COHERENCE RULES — CRUD for offline evaluation
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Stores a batch of CoherenceRule objects for a given campaign+question+school.
+  /// Replaces any previously stored rules for the same (id_camp, id_qst, id_etab)
+  /// context so that a re-download always reflects the latest server rules.
+  Future<void> insertCoherenceRules(List<CoherenceRule> rules) async {
+    if (rules.isEmpty) return;
+    final db = await database;
+
+    // Determine contexts to replace (unique id_camp + id_qst + id_etab combos)
+    final contexts = <String>{};
+    for (final r in rules) {
+      contexts.add('${r.idCamp}|${r.idQst}|${r.idEtab}');
+    }
+
+    await db.transaction((txn) async {
+      // Delete old rules for each context
+      for (final ctx in contexts) {
+        final parts = ctx.split('|');
+        await txn.delete(
+          'coherence_rules',
+          where: 'id_camp = ? AND id_qst = ? AND id_etab = ?',
+          whereArgs: [parts[0], parts[1], parts[2]],
+        );
+      }
+      // Insert new rules
+      for (final r in rules) {
+        await txn.insert(
+          'coherence_rules',
+          {
+            'id_camp':          r.idCamp,
+            'id_qst':           r.idQst,
+            'id_etab':          r.idEtab,
+            'id_filter':        r.idFilter,
+            'id_regle':         r.idRegle,
+            'lib_regle':        r.libRegle,
+            'sql_regle':        r.sqlRegle,
+            'id_assoc':         r.idAssoc,
+            'id_regle_assoc':   r.idRegleAssoc,
+            'lib_regle_assoc':  r.libRegleAssoc,
+            'sql_assoc':        r.sqlAssoc,
+            'critere':          r.critere,
+            'message':          r.message,
+            'fetched_at':       r.fetchedAt,
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+  }
+
+  /// Returns all coherence rules for a given school+question context.
+  /// Used by CoherenceEvaluator to run offline checks.
+  Future<List<CoherenceRule>> getCoherenceRules({
+    required String idCamp,
+    required String idQst,
+    required String idEtab,
+  }) async {
+    final db = await database;
+    final rows = await db.query(
+      'coherence_rules',
+      where: 'id_camp = ? AND id_qst = ? AND id_etab = ?',
+      whereArgs: [idCamp, idQst, idEtab],
+    );
+    return rows.map((r) => CoherenceRule(
+      idCamp:        r['id_camp']          as String,
+      idQst:         r['id_qst']           as String,
+      idEtab:        r['id_etab']          as String,
+      idFilter:      r['id_filter']        as String?,
+      idRegle:       (r['id_regle'] as int?) ?? 0,
+      libRegle:      (r['lib_regle'] as String?) ?? '',
+      sqlRegle:      r['sql_regle']        as String,
+      idAssoc:       (r['id_assoc'] as int?) ?? 0,
+      idRegleAssoc:  (r['id_regle_assoc'] as int?) ?? 0,
+      libRegleAssoc: (r['lib_regle_assoc'] as String?) ?? '',
+      sqlAssoc:      r['sql_assoc']        as String,
+      critere:       r['critere']          as String,
+      message:       (r['message'] as String?) ?? '',
+      fetchedAt:     r['fetched_at']       as String,
+    )).toList();
+  }
+
+  /// Deletes all coherence rules for a given campaign+question+school context.
+  Future<void> deleteCoherenceRules({
+    required String idCamp,
+    required String idQst,
+    required String idEtab,
+  }) async {
+    final db = await database;
+    await db.delete(
+      'coherence_rules',
+      where: 'id_camp = ? AND id_qst = ? AND id_etab = ?',
+      whereArgs: [idCamp, idQst, idEtab],
+    );
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
