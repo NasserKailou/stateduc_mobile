@@ -1,0 +1,63 @@
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=9303' METHOD='POST' class='grille_ligne'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR  style="height:25px;">
+				<TD ROWSPAN='2' class='ligne-paire'></TD>
+		<TD ROWSPAN='2' class='ligne-paire'>#</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>N&Acirc;&deg; de la salle de classe</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>3.1 Usage de  la salle de  classe</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>3.2 Ann&Atilde;&copy;e mise en service</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>3.3 Surface de la salle en (m2)</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=3 class='ligne-paire'>3.4 Nature des murs</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>3.5 Etat des murs</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=5 class='ligne-paire'>3.6 Source de financement</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Utilis&Atilde;&copy;e</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Non utilis&Atilde;&copy;e</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>en dur</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>semi dur (banco...)</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Paillotes</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>bon</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>mauvais</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Etat</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Collectivit&Atilde;&copy;s</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>APE/COGES-ES</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Aide ext&Atilde;&copy;rieure</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>ONG/PTF/Priv&Atilde;&copy;</TD>
+	</TR>
+	<TR class='data_line'>
+		<TD class='ligne-paire' id='ligne-paire_0_0'><div class='edit_zone'><a href='#' class='ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all ui-btn-inline' id='b_delete_0'>&nbsp;</a></div></TD>
+		<TD class='ligne-paire inc_number' id='ligne-paire_0_1'>1</TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_2' >$NUMERO_LOCAL_0</TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_3'><input name_base='CODE_TYPE_USAGE_LOCAL_#_1' id='CODE_TYPE_USAGE_LOCAL_0_1' name='CODE_TYPE_USAGE_LOCAL_0' type='radio' value='CODE_TYPE_USAGE_LOCAL_0_1' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_4'><input name_base='CODE_TYPE_USAGE_LOCAL_#_2' id='CODE_TYPE_USAGE_LOCAL_0_2' name='CODE_TYPE_USAGE_LOCAL_0' type='radio' value='CODE_TYPE_USAGE_LOCAL_0_2' data-mini='true'></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_5'><div class='input_text'></div><input name_base='ANNEE_MISE_EN_SERVICE_#' id='ANNEE_MISE_EN_SERVICE_0' name='ANNEE_MISE_EN_SERVICE_0' type='text' value=''></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_6'><div class='input_text'></div><input name_base='SURFACE_LOCAL_#' id='SURFACE_LOCAL_0' name='SURFACE_LOCAL_0' type='text' value=''></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_7'><input name_base='CODE_TYPE_NATURE_MUR_#_1' id='CODE_TYPE_NATURE_MUR_0_1' name='CODE_TYPE_NATURE_MUR_0' type='radio' value='CODE_TYPE_NATURE_MUR_0_1' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_8'><input name_base='CODE_TYPE_NATURE_MUR_#_2' id='CODE_TYPE_NATURE_MUR_0_2' name='CODE_TYPE_NATURE_MUR_0' type='radio' value='CODE_TYPE_NATURE_MUR_0_2' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_9'><input name_base='CODE_TYPE_NATURE_MUR_#_3' id='CODE_TYPE_NATURE_MUR_0_3' name='CODE_TYPE_NATURE_MUR_0' type='radio' value='CODE_TYPE_NATURE_MUR_0_3' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_10'><input name_base='ETAT_MUR_#_3' id='ETAT_MUR_0_3' name='ETAT_MUR_0' type='radio' value='ETAT_MUR_0_3' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_11'><input name_base='ETAT_MUR_#_4' id='ETAT_MUR_0_4' name='ETAT_MUR_0' type='radio' value='ETAT_MUR_0_4' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_12'><input name_base='CODE_TYPE_FINANCEMENT_#_1' id='CODE_TYPE_FINANCEMENT_0_1' name='CODE_TYPE_FINANCEMENT_0' type='radio' value='CODE_TYPE_FINANCEMENT_0_1' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_13'><input name_base='CODE_TYPE_FINANCEMENT_#_6' id='CODE_TYPE_FINANCEMENT_0_6' name='CODE_TYPE_FINANCEMENT_0' type='radio' value='CODE_TYPE_FINANCEMENT_0_6' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_14'><input name_base='CODE_TYPE_FINANCEMENT_#_7' id='CODE_TYPE_FINANCEMENT_0_7' name='CODE_TYPE_FINANCEMENT_0' type='radio' value='CODE_TYPE_FINANCEMENT_0_7' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_15'><input name_base='CODE_TYPE_FINANCEMENT_#_8' id='CODE_TYPE_FINANCEMENT_0_8' name='CODE_TYPE_FINANCEMENT_0' type='radio' value='CODE_TYPE_FINANCEMENT_0_8' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_16'><input name_base='CODE_TYPE_FINANCEMENT_#_9' id='CODE_TYPE_FINANCEMENT_0_9' name='CODE_TYPE_FINANCEMENT_0' type='radio' value='CODE_TYPE_FINANCEMENT_0_9' data-mini='true'></TD>
+	</TR>
+	<TR>
+			<td colspan='20' align='left'><a href='#' class='ui-btn ui-icon-plus ui-btn-icon-notext ui-corner-all ui-btn-inline' id='b_add'>&nbsp;</a></td>
+	</TR>
+</TABLE></FORM></div>

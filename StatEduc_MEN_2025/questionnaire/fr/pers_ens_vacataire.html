@@ -1,0 +1,487 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=15303' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B>XII. INFORMATIONS RELATIVES AU PERSONNEL ENSEIGNANTS VACATAIRES SEULEMENT (Craie en main) </B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=2 class='ligne-paire' title='Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=N%C2%B0Ordre%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='N°Ordre+++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=N%C2%B0Matricule%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='N°Matricule+++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=NOM%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='NOM++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=PRENOM%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='PRENOM+++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Sexe</TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Ann%C3%A9e+Naissance%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Année Naissance+++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Ann%C3%A9e+Recrutement%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Année Recrutement+++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=5 class='ligne-paire'>Grade</TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=9 class='ligne-paire'>Diplôme académique le plus élevé</TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=7 class='ligne-paire'>Diplôme professionnel </TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Dicipline+Enseign%C3%A9es%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Dicipline Enseignées++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Dicipline+Formation%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Dicipline Formation++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Nbr+Heure+Hebdomadaire+de+cour%2B%2B%2B' alt='Nbr Heure Hebdomadaire de cour+++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Nbr+Heure+Hebdomadaire+de+cour%2B%2B%2B' alt='Nbr Heure Hebdomadaire de cour+++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Nombre+de+Formations+continues%2B%2B%2B' alt='Nombre de Formations continues+++'></TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Homme%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Homme+++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Femme%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Femme+++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Prof+Ens+Second%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Prof Ens Second+++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Charg%C3%A9+d%27Engt%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Chargé d'Engt++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Prof.CEG%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Prof.CEG++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autres%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Autres++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Aucun%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Aucun+++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=DEA+et+%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='DEA et +++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Master2%2FIng%C3%A9nieur%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Master2/Ingénieur++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Maitrise%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Maitrise++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Licence%2FDTS%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Licence/DTS+++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=DEUG%2FDUEL%2FDUES%2FBTS%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='DEUG/DUEL/DUES/BTS++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Brevet%2FCertifcat+EPS%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Brevet/Certifcat EPS++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Brevet+d%27EF%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Brevet d'EF+++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=BAC%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='BAC+++++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autres%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Autres++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=CAPES%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='CAPES+++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=DAP+CEG%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='DAP CEG+++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Dipl%C3%B4me+Prof.en+EPS%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Diplôme Prof.en EPS++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Dipl%C3%B4me+Prof.en+EF%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Diplôme Prof.en EF+++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Licence+professionnelle+d%27EG%2B%2B' alt='Licence professionnelle d'EG++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autres%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Autres++++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Aucun+%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Aucun ++++++++++++++++++++++++' align='center'></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire'  id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_0' NAME=NUMERO_ORDRE_ENSEIGNANT_0 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_0' NAME=MATRICULE_ENSEIGNANT_0 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_3' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='NOM_ENSEIGNANT_0' NAME=NOM_ENSEIGNANT_0 TYPE='text' VALUE="$NOM_ENSEIGNANT_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_4' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_0' NAME=PRENOMS_ENSEIGNANT_0 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_5' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='SEXE_ENSEIGNANT_0_1' NAME=SEXE_ENSEIGNANT_0 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_6' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='SEXE_ENSEIGNANT_0_2' NAME=SEXE_ENSEIGNANT_0 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_0_2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_7' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_0' NAME=DATE_NAISS_ENSEIGNANT_0 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_8' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='ANNEE_RECRUTEMENT_0' NAME=ANNEE_RECRUTEMENT_0 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_9' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_0_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_0 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_10' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_0_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_0 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_11' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_0_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_0 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_0_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_12' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_0_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_0 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_0_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_13' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_0_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_0 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_0_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_14' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_23></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_15' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_24></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_16' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_25></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_17' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_18' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_27></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_19' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_29></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_20' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_30></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_21' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_31></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_22' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_0_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_0_32></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_23' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_0_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_0_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_24' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_0_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_0_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_25' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_0_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_0_15></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_26' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_0_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_0_16></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_27' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_0_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_0_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_28' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_0_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_0_11></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_29' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_0_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_0 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_0_17></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_30' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_0' NAME=DISCIPLINE_ENSEIGNE_0 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_31' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='DISCIPLINE_FORMATION_0' NAME=DISCIPLINE_FORMATION_0 TYPE='text' VALUE="$DISCIPLINE_FORMATION_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_32' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_0' NAME=NB_HEURES_ASSURES_1C_0 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_33' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_0' NAME=NB_HEURES_ASSURES_2C_0 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_34' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_0' NAME=NBRE_FORM_CONT_RECUE_0 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_0"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire'  id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_1' NAME=NUMERO_ORDRE_ENSEIGNANT_1 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_1' NAME=MATRICULE_ENSEIGNANT_1 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_3' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='NOM_ENSEIGNANT_1' NAME=NOM_ENSEIGNANT_1 TYPE='text' VALUE="$NOM_ENSEIGNANT_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_4' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_1' NAME=PRENOMS_ENSEIGNANT_1 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_5' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='SEXE_ENSEIGNANT_1_1' NAME=SEXE_ENSEIGNANT_1 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_6' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='SEXE_ENSEIGNANT_1_2' NAME=SEXE_ENSEIGNANT_1 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_1_2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_7' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_1' NAME=DATE_NAISS_ENSEIGNANT_1 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_8' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='ANNEE_RECRUTEMENT_1' NAME=ANNEE_RECRUTEMENT_1 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_9' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_1_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_1 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_10' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_1_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_1 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_11' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_1_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_1 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_1_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_12' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_1_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_1 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_1_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_13' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_1_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_1 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_1_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_14' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_23></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_15' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_24></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_16' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_25></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_17' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_18' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_27></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_19' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_29></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_20' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_30></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_21' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_31></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_22' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_1_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_1_32></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_23' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_1_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_1_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_24' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_1_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_1_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_25' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_1_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_1_15></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_26' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_1_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_1_16></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_27' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_1_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_1_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_28' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_1_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_1_11></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_29' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_1_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_1 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_1_17></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_30' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_1' NAME=DISCIPLINE_ENSEIGNE_1 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_31' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='DISCIPLINE_FORMATION_1' NAME=DISCIPLINE_FORMATION_1 TYPE='text' VALUE="$DISCIPLINE_FORMATION_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_32' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_1' NAME=NB_HEURES_ASSURES_1C_1 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_33' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_1' NAME=NB_HEURES_ASSURES_2C_1 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_34' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_1' NAME=NBRE_FORM_CONT_RECUE_1 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_1"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire'  id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_2' NAME=NUMERO_ORDRE_ENSEIGNANT_2 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_2' NAME=MATRICULE_ENSEIGNANT_2 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_3' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='NOM_ENSEIGNANT_2' NAME=NOM_ENSEIGNANT_2 TYPE='text' VALUE="$NOM_ENSEIGNANT_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_4' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_2' NAME=PRENOMS_ENSEIGNANT_2 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_5' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='SEXE_ENSEIGNANT_2_1' NAME=SEXE_ENSEIGNANT_2 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_6' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='SEXE_ENSEIGNANT_2_2' NAME=SEXE_ENSEIGNANT_2 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_2_2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_7' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_2' NAME=DATE_NAISS_ENSEIGNANT_2 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_8' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='ANNEE_RECRUTEMENT_2' NAME=ANNEE_RECRUTEMENT_2 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_9' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_2_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_2 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_10' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_2_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_2 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_11' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_2_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_2 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_2_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_12' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_2_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_2 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_2_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_13' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_2_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_2 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_2_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_14' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_23></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_15' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_24></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_16' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_25></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_17' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_18' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_27></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_19' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_29></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_20' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_30></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_21' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_31></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_22' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_2_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_2_32></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_23' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_2_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_2_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_24' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_2_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_2_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_25' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_2_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_2_15></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_26' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_2_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_2_16></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_27' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_2_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_2_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_28' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_2_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_2_11></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_29' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_2_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_2 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_2_17></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_30' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_2' NAME=DISCIPLINE_ENSEIGNE_2 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_31' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='DISCIPLINE_FORMATION_2' NAME=DISCIPLINE_FORMATION_2 TYPE='text' VALUE="$DISCIPLINE_FORMATION_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_32' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_2' NAME=NB_HEURES_ASSURES_1C_2 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_33' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_2' NAME=NB_HEURES_ASSURES_2C_2 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_34' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_2' NAME=NBRE_FORM_CONT_RECUE_2 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_2"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_3_0' onClick='MiseEvidenceLigneFrame(3,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire'  id='ligne-impaire_3_1' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_3' NAME=NUMERO_ORDRE_ENSEIGNANT_3 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_2' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_3' NAME=MATRICULE_ENSEIGNANT_3 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_3' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='NOM_ENSEIGNANT_3' NAME=NOM_ENSEIGNANT_3 TYPE='text' VALUE="$NOM_ENSEIGNANT_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_4' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_3' NAME=PRENOMS_ENSEIGNANT_3 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_5' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='SEXE_ENSEIGNANT_3_1' NAME=SEXE_ENSEIGNANT_3 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_6' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='SEXE_ENSEIGNANT_3_2' NAME=SEXE_ENSEIGNANT_3 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_3_2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_7' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_3' NAME=DATE_NAISS_ENSEIGNANT_3 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_8' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='ANNEE_RECRUTEMENT_3' NAME=ANNEE_RECRUTEMENT_3 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_9' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_3_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_3 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_10' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_3_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_3 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_11' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_3_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_3 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_3_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_12' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_3_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_3 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_3_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_13' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_3_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_3 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_3_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_14' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_23></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_15' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_24></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_16' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_25></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_17' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_18' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_27></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_19' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_29></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_20' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_30></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_21' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_31></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_22' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_3_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_3_32></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_23' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_3_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_3_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_24' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_3_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_3_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_25' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_3_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_3_15></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_26' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_3_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_3_16></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_27' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_3_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_3_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_28' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_3_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_3_11></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_29' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_3_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_3 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_3_17></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_30' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_3' NAME=DISCIPLINE_ENSEIGNE_3 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_31' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='DISCIPLINE_FORMATION_3' NAME=DISCIPLINE_FORMATION_3 TYPE='text' VALUE="$DISCIPLINE_FORMATION_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_32' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_3' NAME=NB_HEURES_ASSURES_1C_3 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_33' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_3' NAME=NB_HEURES_ASSURES_2C_3 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_34' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_3' NAME=NBRE_FORM_CONT_RECUE_3 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_3"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_4_0' onClick='MiseEvidenceLigneFrame(4,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire'  id='ligne-paire_4_1' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_4' NAME=NUMERO_ORDRE_ENSEIGNANT_4 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_2' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_4' NAME=MATRICULE_ENSEIGNANT_4 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_3' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='NOM_ENSEIGNANT_4' NAME=NOM_ENSEIGNANT_4 TYPE='text' VALUE="$NOM_ENSEIGNANT_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_4' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_4' NAME=PRENOMS_ENSEIGNANT_4 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_5' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='SEXE_ENSEIGNANT_4_1' NAME=SEXE_ENSEIGNANT_4 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_6' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='SEXE_ENSEIGNANT_4_2' NAME=SEXE_ENSEIGNANT_4 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_4_2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_7' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_4' NAME=DATE_NAISS_ENSEIGNANT_4 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_8' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='ANNEE_RECRUTEMENT_4' NAME=ANNEE_RECRUTEMENT_4 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_9' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_4_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_4 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_10' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_4_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_4 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_11' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_4_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_4 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_4_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_12' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_4_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_4 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_4_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_13' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_4_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_4 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_4_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_14' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_23></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_15' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_24></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_16' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_25></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_17' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_18' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_27></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_19' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_29></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_20' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_30></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_21' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_31></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_22' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_4_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_4_32></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_23' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_4_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_4_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_24' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_4_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_4_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_25' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_4_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_4_15></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_26' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_4_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_4_16></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_27' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_4_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_4_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_28' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_4_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_4_11></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_29' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_4_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_4 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_4_17></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_30' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_4' NAME=DISCIPLINE_ENSEIGNE_4 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_31' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='DISCIPLINE_FORMATION_4' NAME=DISCIPLINE_FORMATION_4 TYPE='text' VALUE="$DISCIPLINE_FORMATION_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_32' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_4' NAME=NB_HEURES_ASSURES_1C_4 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_33' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_4' NAME=NB_HEURES_ASSURES_2C_4 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_34' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_4' NAME=NBRE_FORM_CONT_RECUE_4 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_4"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_5_0' onClick='MiseEvidenceLigneFrame(5,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire'  id='ligne-impaire_5_1' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_5' NAME=NUMERO_ORDRE_ENSEIGNANT_5 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_2' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_5' NAME=MATRICULE_ENSEIGNANT_5 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_3' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='NOM_ENSEIGNANT_5' NAME=NOM_ENSEIGNANT_5 TYPE='text' VALUE="$NOM_ENSEIGNANT_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_4' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_5' NAME=PRENOMS_ENSEIGNANT_5 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_5' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='SEXE_ENSEIGNANT_5_1' NAME=SEXE_ENSEIGNANT_5 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_6' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='SEXE_ENSEIGNANT_5_2' NAME=SEXE_ENSEIGNANT_5 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_5_2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_7' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_5' NAME=DATE_NAISS_ENSEIGNANT_5 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_8' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='ANNEE_RECRUTEMENT_5' NAME=ANNEE_RECRUTEMENT_5 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_9' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_5_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_5 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_10' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_5_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_5 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_11' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_5_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_5 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_5_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_12' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_5_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_5 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_5_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_13' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_5_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_5 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_5_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_14' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_23></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_15' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_24></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_16' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_25></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_17' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_18' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_27></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_19' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_29></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_20' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_30></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_21' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_31></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_22' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_5_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_5_32></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_23' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_5_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_5_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_24' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_5_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_5_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_25' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_5_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_5_15></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_26' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_5_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_5_16></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_27' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_5_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_5_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_28' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_5_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_5_11></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_29' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_5_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_5 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_5_17></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_30' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_5' NAME=DISCIPLINE_ENSEIGNE_5 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_31' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='DISCIPLINE_FORMATION_5' NAME=DISCIPLINE_FORMATION_5 TYPE='text' VALUE="$DISCIPLINE_FORMATION_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_32' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_5' NAME=NB_HEURES_ASSURES_1C_5 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_33' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_5' NAME=NB_HEURES_ASSURES_2C_5 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_34' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_5' NAME=NBRE_FORM_CONT_RECUE_5 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_5"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_6_0' onClick='MiseEvidenceLigneFrame(6,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire'  id='ligne-paire_6_1' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_6' NAME=NUMERO_ORDRE_ENSEIGNANT_6 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_2' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_6' NAME=MATRICULE_ENSEIGNANT_6 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_3' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='NOM_ENSEIGNANT_6' NAME=NOM_ENSEIGNANT_6 TYPE='text' VALUE="$NOM_ENSEIGNANT_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_4' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_6' NAME=PRENOMS_ENSEIGNANT_6 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_5' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='SEXE_ENSEIGNANT_6_1' NAME=SEXE_ENSEIGNANT_6 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_6' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='SEXE_ENSEIGNANT_6_2' NAME=SEXE_ENSEIGNANT_6 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_6_2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_7' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_6' NAME=DATE_NAISS_ENSEIGNANT_6 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_8' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='ANNEE_RECRUTEMENT_6' NAME=ANNEE_RECRUTEMENT_6 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_9' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_6_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_6 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_10' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_6_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_6 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_11' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_6_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_6 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_6_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_12' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_6_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_6 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_6_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_13' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_6_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_6 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_6_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_14' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_23></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_15' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_24></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_16' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_25></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_17' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_18' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_27></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_19' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_29></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_20' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_30></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_21' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_31></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_22' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_6_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_6_32></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_23' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_6_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_6_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_24' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_6_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_6_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_25' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_6_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_6_15></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_26' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_6_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_6_16></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_27' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_6_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_6_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_28' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_6_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_6_11></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_29' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_6_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_6 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_6_17></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_30' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_6' NAME=DISCIPLINE_ENSEIGNE_6 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_31' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='DISCIPLINE_FORMATION_6' NAME=DISCIPLINE_FORMATION_6 TYPE='text' VALUE="$DISCIPLINE_FORMATION_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_32' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_6' NAME=NB_HEURES_ASSURES_1C_6 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_33' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_6' NAME=NB_HEURES_ASSURES_2C_6 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_34' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_6' NAME=NBRE_FORM_CONT_RECUE_6 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_6"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_7_0' onClick='MiseEvidenceLigneFrame(7,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire'  id='ligne-impaire_7_1' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_7' NAME=NUMERO_ORDRE_ENSEIGNANT_7 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_2' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_7' NAME=MATRICULE_ENSEIGNANT_7 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_3' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='NOM_ENSEIGNANT_7' NAME=NOM_ENSEIGNANT_7 TYPE='text' VALUE="$NOM_ENSEIGNANT_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_4' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_7' NAME=PRENOMS_ENSEIGNANT_7 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_5' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='SEXE_ENSEIGNANT_7_1' NAME=SEXE_ENSEIGNANT_7 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_6' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='SEXE_ENSEIGNANT_7_2' NAME=SEXE_ENSEIGNANT_7 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_7_2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_7' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_7' NAME=DATE_NAISS_ENSEIGNANT_7 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_8' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='ANNEE_RECRUTEMENT_7' NAME=ANNEE_RECRUTEMENT_7 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_9' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_7_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_7 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_10' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_7_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_7 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_11' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_7_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_7 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_7_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_12' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_7_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_7 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_7_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_13' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_7_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_7 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_7_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_14' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_23></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_15' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_24></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_16' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_25></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_17' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_18' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_27></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_19' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_29></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_20' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_30></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_21' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_31></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_22' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_7_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_7_32></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_23' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_7_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_7_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_24' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_7_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_7_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_25' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_7_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_7_15></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_26' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_7_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_7_16></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_27' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_7_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_7_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_28' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_7_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_7_11></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_29' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_7_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_7 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_7_17></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_30' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_7' NAME=DISCIPLINE_ENSEIGNE_7 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_31' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='DISCIPLINE_FORMATION_7' NAME=DISCIPLINE_FORMATION_7 TYPE='text' VALUE="$DISCIPLINE_FORMATION_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_32' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_7' NAME=NB_HEURES_ASSURES_1C_7 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_33' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_7' NAME=NB_HEURES_ASSURES_2C_7 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_34' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_7' NAME=NBRE_FORM_CONT_RECUE_7 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_7"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_8_0' onClick='MiseEvidenceLigneFrame(8,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire'  id='ligne-paire_8_1' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_8' NAME=NUMERO_ORDRE_ENSEIGNANT_8 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_2' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_8' NAME=MATRICULE_ENSEIGNANT_8 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_3' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='NOM_ENSEIGNANT_8' NAME=NOM_ENSEIGNANT_8 TYPE='text' VALUE="$NOM_ENSEIGNANT_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_4' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_8' NAME=PRENOMS_ENSEIGNANT_8 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_5' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='SEXE_ENSEIGNANT_8_1' NAME=SEXE_ENSEIGNANT_8 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_6' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='SEXE_ENSEIGNANT_8_2' NAME=SEXE_ENSEIGNANT_8 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_8_2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_7' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_8' NAME=DATE_NAISS_ENSEIGNANT_8 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_8' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='ANNEE_RECRUTEMENT_8' NAME=ANNEE_RECRUTEMENT_8 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_9' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_8_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_8 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_10' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_8_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_8 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_11' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_8_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_8 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_8_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_12' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_8_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_8 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_8_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_13' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_8_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_8 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_8_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_14' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_23></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_15' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_24></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_16' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_25></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_17' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_18' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_27></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_19' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_29></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_20' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_30></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_21' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_31></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_22' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_8_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_8_32></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_23' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_8_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_8_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_24' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_8_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_8_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_25' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_8_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_8_15></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_26' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_8_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_8_16></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_27' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_8_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_8_26></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_28' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_8_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_8_11></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_29' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_8_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_8 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_8_17></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_30' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_8' NAME=DISCIPLINE_ENSEIGNE_8 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_31' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='DISCIPLINE_FORMATION_8' NAME=DISCIPLINE_FORMATION_8 TYPE='text' VALUE="$DISCIPLINE_FORMATION_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_32' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_8' NAME=NB_HEURES_ASSURES_1C_8 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_33' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_8' NAME=NB_HEURES_ASSURES_2C_8 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_34' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_8' NAME=NBRE_FORM_CONT_RECUE_8 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_8"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_9_0' onClick='MiseEvidenceLigneFrame(9,10)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire'  id='ligne-impaire_9_1' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='NUMERO_ORDRE_ENSEIGNANT_9' NAME=NUMERO_ORDRE_ENSEIGNANT_9 TYPE='text'size=1 VALUE="$NUMERO_ORDRE_ENSEIGNANT_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_2' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='MATRICULE_ENSEIGNANT_9' NAME=MATRICULE_ENSEIGNANT_9 TYPE='text' VALUE="$MATRICULE_ENSEIGNANT_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_3' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='NOM_ENSEIGNANT_9' NAME=NOM_ENSEIGNANT_9 TYPE='text' VALUE="$NOM_ENSEIGNANT_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_4' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='PRENOMS_ENSEIGNANT_9' NAME=PRENOMS_ENSEIGNANT_9 TYPE='text' VALUE="$PRENOMS_ENSEIGNANT_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_5' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='SEXE_ENSEIGNANT_9_1' NAME=SEXE_ENSEIGNANT_9 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_6' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='SEXE_ENSEIGNANT_9_2' NAME=SEXE_ENSEIGNANT_9 TYPE='radio' VALUE=$SEXE_ENSEIGNANT_9_2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_7' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='DATE_NAISS_ENSEIGNANT_9' NAME=DATE_NAISS_ENSEIGNANT_9 TYPE='text'size=2 VALUE="$DATE_NAISS_ENSEIGNANT_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_8' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='ANNEE_RECRUTEMENT_9' NAME=ANNEE_RECRUTEMENT_9 TYPE='text'size=2 VALUE="$ANNEE_RECRUTEMENT_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_9' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_9_1' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_9 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_10' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_9_2' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_9 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_11' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_9_3' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_9 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_9_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_12' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_9_4' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_9 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_9_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_13' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_STATUT_FONCTIONNAIRE_9_5' NAME=CODE_TYPE_STATUT_FONCTIONNAIRE_9 TYPE='radio' VALUE=$CODE_TYPE_STATUT_FONCTIONNAIRE_9_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_14' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_23' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_23></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_15' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_24' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_24></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_16' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_25' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_25></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_17' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_26' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_18' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_27' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_27></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_19' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_29' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_29></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_20' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_30' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_30></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_21' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_31' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_31></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_22' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_ACADEMIQUE_9_32' NAME=CODE_TYPE_DIPLOME_ACADEMIQUE_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_ACADEMIQUE_9_32></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_23' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_9_8' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_9_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_24' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_9_10' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_9_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_25' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_9_15' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_9_15></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_26' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_9_16' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_9_16></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_27' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_9_26' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_9_26></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_28' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_9_11' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_9_11></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_29' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='CODE_TYPE_DIPLOME_PROFESSIONNEL_9_17' NAME=CODE_TYPE_DIPLOME_PROFESSIONNEL_9 TYPE='radio' VALUE=$CODE_TYPE_DIPLOME_PROFESSIONNEL_9_17></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_30' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='DISCIPLINE_ENSEIGNE_9' NAME=DISCIPLINE_ENSEIGNE_9 TYPE='text'style="width=80px;" VALUE="$DISCIPLINE_ENSEIGNE_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_31' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='DISCIPLINE_FORMATION_9' NAME=DISCIPLINE_FORMATION_9 TYPE='text' VALUE="$DISCIPLINE_FORMATION_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_32' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='NB_HEURES_ASSURES_1C_9' NAME=NB_HEURES_ASSURES_1C_9 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_1C_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_33' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='NB_HEURES_ASSURES_2C_9' NAME=NB_HEURES_ASSURES_2C_9 TYPE='text'size=1 VALUE="$NB_HEURES_ASSURES_2C_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_34' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='NBRE_FORM_CONT_RECUE_9' NAME=NBRE_FORM_CONT_RECUE_9 TYPE='text'size=1 VALUE="$NBRE_FORM_CONT_RECUE_9"></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

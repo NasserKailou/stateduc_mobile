@@ -1,0 +1,895 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=3204' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B>III/. CARACTÉRISTIQUES ET ÉTAT DES LOCAUX</B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=2 class='ligne-paire' title='Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=No+du+local%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='No du local+++++++++++++++++'></TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=6 class='ligne-paire'>Type de local</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Utilisation <br/>(cycle)</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Annee+mise+en+service+du+%2B%2B%2B' alt='Annee mise en service du +++'></TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=Surface+du+local+%28m2%29%2B%2B%2B%2B%2B%2B%2B' alt='Surface du local (m2)+++++++'></TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=4 class='ligne-paire'>Nature des murs</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Etat des murs</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=3 class='ligne-paire'>Nature du toit</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Etat du toit</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=3 class='ligne-paire'>Nature du Sol</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Etat du Sol</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Confort thermique</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Fermetures du local</TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=5 class='ligne-paire'> Qui a financé la construction ?</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Salle+de+classe%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Salle de classe++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Laboratoire%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Laboratoire++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Salle+Enseignants%2FProfess' alt='Salle Enseignants/Profess' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Salle+informatique%2B%2B%2B%2B%2B%2B%2B' alt='Salle informatique+++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Bureau%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Bureau+++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autre%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Autre++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=1+%28secondaire+2nd+cycle%29%2B' alt='1 (secondaire 2nd cycle)+' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=2+%28secondaire+1er+et+2nd+' alt='2 (secondaire 1er et 2nd ' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Dur%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Dur++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Semi-Dur%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Semi-Dur+++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Tole%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Tole+++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autre%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Autre++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Bon+%2F+acceptable%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Bon / acceptable+++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Mauvais%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Mauvais++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Beton%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Beton++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Tole%2FTuiles%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Tole/Tuiles++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autres%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Autres+++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Bon+%2F+acceptable%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Bon / acceptable+++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Mauvais%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Mauvais++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Ciment%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Ciment+++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Carreaux%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Carreaux+++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autre+%28terre%2C+graviers%29%2B%2B' alt='Autre (terre, graviers)++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Bon+%2F+acceptable%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Bon / acceptable+++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Mauvais%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Mauvais++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Bon+%2F+acceptable%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Bon / acceptable+++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Mauvais%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Mauvais++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Bonnes+%2F+acceptables%2B%2B%2B%2B%2B' alt='Bonnes / acceptables+++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Mauvaises%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Mauvaises++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Etat%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Etat+++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=PTF%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='PTF++++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Communaute%2FDiaspora%2B%2B%2B%2B%2B%2B' alt='Communaute/Diaspora++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Prive%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Prive++++++++++++++++++++' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=Autre%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='Autre++++++++++++++++++++' align='center'></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,20)'>$NUM_LOCAL_0</TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_LOCAL_0_5' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_3' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_LOCAL_0_6' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_4' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_LOCAL_0_7' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_5' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_LOCAL_0_8' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_6' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_LOCAL_0_10' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_7' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_LOCAL_0_12' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_8' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_CYCLE_0_2' NAME=CODE_TYPE_CYCLE_0 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_9' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_CYCLE_0_3' NAME=CODE_TYPE_CYCLE_0 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_0_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_10' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='ANNEE_MISE_SERVICE_0' NAME=ANNEE_MISE_SERVICE_0 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_11' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='SURFACE_LOCAL_0' NAME=SURFACE_LOCAL_0 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_12' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_0_1' NAME=CODE_TYPE_NATURE_MUR_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_13' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_0_2' NAME=CODE_TYPE_NATURE_MUR_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_14' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_0_3' NAME=CODE_TYPE_NATURE_MUR_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_0_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_15' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_0_4' NAME=CODE_TYPE_NATURE_MUR_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_0_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_16' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_0_1' NAME=CODE_TYPE_ETAT_MUR_0 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_17' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_0_2' NAME=CODE_TYPE_ETAT_MUR_0 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_18' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_0_1' NAME=CODE_TYPE_NATURE_TOIT_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_19' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_0_2' NAME=CODE_TYPE_NATURE_TOIT_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_20' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_0_3' NAME=CODE_TYPE_NATURE_TOIT_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_0_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_21' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_0_1' NAME=CODE_TYPE_ETAT_TOIT_0 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_22' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_0_2' NAME=CODE_TYPE_ETAT_TOIT_0 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_23' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_0_1' NAME=CODE_TYPE_NATURE_SOL_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_24' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_0_2' NAME=CODE_TYPE_NATURE_SOL_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_25' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_0_3' NAME=CODE_TYPE_NATURE_SOL_0 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_0_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_26' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_0_1' NAME=CODE_TYPE_ETAT_SOL_0 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_27' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_0_2' NAME=CODE_TYPE_ETAT_SOL_0 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_28' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_0_1' NAME=CODE_TYPE_CONFORT_THERMIQ_0 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_29' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_0_2' NAME=CODE_TYPE_CONFORT_THERMIQ_0 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_30' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_FERMETURE_0_1' NAME=CODE_TYPE_FERMETURE_0 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_31' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_FERMETURE_0_2' NAME=CODE_TYPE_FERMETURE_0 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_32' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_0_1' NAME=CODE_TYPE_FINANCEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_0_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_33' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_0_2' NAME=CODE_TYPE_FINANCEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_0_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_34' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_0_3' NAME=CODE_TYPE_FINANCEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_0_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_35' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_0_4' NAME=CODE_TYPE_FINANCEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_0_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_36' onClick='MiseEvidenceLigneFrame(0,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_0_5' NAME=CODE_TYPE_FINANCEMENT_0 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_0_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,20)'>$NUM_LOCAL_1</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_LOCAL_1_5' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_3' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_LOCAL_1_6' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_4' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_LOCAL_1_7' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_5' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_LOCAL_1_8' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_6' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_LOCAL_1_10' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_7' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_LOCAL_1_12' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_8' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_CYCLE_1_2' NAME=CODE_TYPE_CYCLE_1 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_9' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_CYCLE_1_3' NAME=CODE_TYPE_CYCLE_1 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_1_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_10' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='ANNEE_MISE_SERVICE_1' NAME=ANNEE_MISE_SERVICE_1 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_11' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='SURFACE_LOCAL_1' NAME=SURFACE_LOCAL_1 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_12' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_1_1' NAME=CODE_TYPE_NATURE_MUR_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_13' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_1_2' NAME=CODE_TYPE_NATURE_MUR_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_14' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_1_3' NAME=CODE_TYPE_NATURE_MUR_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_1_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_15' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_1_4' NAME=CODE_TYPE_NATURE_MUR_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_1_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_16' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_1_1' NAME=CODE_TYPE_ETAT_MUR_1 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_17' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_1_2' NAME=CODE_TYPE_ETAT_MUR_1 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_18' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_1_1' NAME=CODE_TYPE_NATURE_TOIT_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_19' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_1_2' NAME=CODE_TYPE_NATURE_TOIT_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_20' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_1_3' NAME=CODE_TYPE_NATURE_TOIT_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_1_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_21' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_1_1' NAME=CODE_TYPE_ETAT_TOIT_1 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_22' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_1_2' NAME=CODE_TYPE_ETAT_TOIT_1 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_23' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_1_1' NAME=CODE_TYPE_NATURE_SOL_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_24' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_1_2' NAME=CODE_TYPE_NATURE_SOL_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_25' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_1_3' NAME=CODE_TYPE_NATURE_SOL_1 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_1_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_26' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_1_1' NAME=CODE_TYPE_ETAT_SOL_1 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_27' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_1_2' NAME=CODE_TYPE_ETAT_SOL_1 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_28' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_1_1' NAME=CODE_TYPE_CONFORT_THERMIQ_1 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_29' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_1_2' NAME=CODE_TYPE_CONFORT_THERMIQ_1 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_30' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_FERMETURE_1_1' NAME=CODE_TYPE_FERMETURE_1 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_31' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_FERMETURE_1_2' NAME=CODE_TYPE_FERMETURE_1 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_32' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_1_1' NAME=CODE_TYPE_FINANCEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_1_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_33' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_1_2' NAME=CODE_TYPE_FINANCEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_1_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_34' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_1_3' NAME=CODE_TYPE_FINANCEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_1_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_35' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_1_4' NAME=CODE_TYPE_FINANCEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_1_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_36' onClick='MiseEvidenceLigneFrame(1,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_1_5' NAME=CODE_TYPE_FINANCEMENT_1 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_1_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,20)'>$NUM_LOCAL_2</TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_LOCAL_2_5' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_3' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_LOCAL_2_6' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_4' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_LOCAL_2_7' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_5' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_LOCAL_2_8' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_6' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_LOCAL_2_10' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_7' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_LOCAL_2_12' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_8' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_CYCLE_2_2' NAME=CODE_TYPE_CYCLE_2 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_9' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_CYCLE_2_3' NAME=CODE_TYPE_CYCLE_2 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_2_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_10' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='ANNEE_MISE_SERVICE_2' NAME=ANNEE_MISE_SERVICE_2 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_11' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='SURFACE_LOCAL_2' NAME=SURFACE_LOCAL_2 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_12' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_2_1' NAME=CODE_TYPE_NATURE_MUR_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_13' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_2_2' NAME=CODE_TYPE_NATURE_MUR_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_14' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_2_3' NAME=CODE_TYPE_NATURE_MUR_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_2_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_15' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_2_4' NAME=CODE_TYPE_NATURE_MUR_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_2_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_16' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_2_1' NAME=CODE_TYPE_ETAT_MUR_2 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_17' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_2_2' NAME=CODE_TYPE_ETAT_MUR_2 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_18' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_2_1' NAME=CODE_TYPE_NATURE_TOIT_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_19' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_2_2' NAME=CODE_TYPE_NATURE_TOIT_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_20' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_2_3' NAME=CODE_TYPE_NATURE_TOIT_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_2_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_21' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_2_1' NAME=CODE_TYPE_ETAT_TOIT_2 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_22' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_2_2' NAME=CODE_TYPE_ETAT_TOIT_2 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_23' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_2_1' NAME=CODE_TYPE_NATURE_SOL_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_24' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_2_2' NAME=CODE_TYPE_NATURE_SOL_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_25' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_2_3' NAME=CODE_TYPE_NATURE_SOL_2 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_2_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_26' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_2_1' NAME=CODE_TYPE_ETAT_SOL_2 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_27' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_2_2' NAME=CODE_TYPE_ETAT_SOL_2 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_28' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_2_1' NAME=CODE_TYPE_CONFORT_THERMIQ_2 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_29' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_2_2' NAME=CODE_TYPE_CONFORT_THERMIQ_2 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_30' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_FERMETURE_2_1' NAME=CODE_TYPE_FERMETURE_2 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_31' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_FERMETURE_2_2' NAME=CODE_TYPE_FERMETURE_2 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_32' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_2_1' NAME=CODE_TYPE_FINANCEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_2_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_33' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_2_2' NAME=CODE_TYPE_FINANCEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_2_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_34' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_2_3' NAME=CODE_TYPE_FINANCEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_2_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_35' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_2_4' NAME=CODE_TYPE_FINANCEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_2_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_36' onClick='MiseEvidenceLigneFrame(2,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_2_5' NAME=CODE_TYPE_FINANCEMENT_2 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_2_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_3_0' onClick='MiseEvidenceLigneFrame(3,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_3_1' onClick='MiseEvidenceLigneFrame(3,20)'>$NUM_LOCAL_3</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_2' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_LOCAL_3_5' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_3' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_LOCAL_3_6' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_4' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_LOCAL_3_7' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_5' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_LOCAL_3_8' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_6' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_LOCAL_3_10' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_7' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_LOCAL_3_12' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_8' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_CYCLE_3_2' NAME=CODE_TYPE_CYCLE_3 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_9' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_CYCLE_3_3' NAME=CODE_TYPE_CYCLE_3 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_3_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_10' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='ANNEE_MISE_SERVICE_3' NAME=ANNEE_MISE_SERVICE_3 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_11' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='SURFACE_LOCAL_3' NAME=SURFACE_LOCAL_3 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_12' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_3_1' NAME=CODE_TYPE_NATURE_MUR_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_13' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_3_2' NAME=CODE_TYPE_NATURE_MUR_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_14' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_3_3' NAME=CODE_TYPE_NATURE_MUR_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_3_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_15' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_3_4' NAME=CODE_TYPE_NATURE_MUR_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_3_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_16' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_3_1' NAME=CODE_TYPE_ETAT_MUR_3 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_17' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_3_2' NAME=CODE_TYPE_ETAT_MUR_3 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_18' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_3_1' NAME=CODE_TYPE_NATURE_TOIT_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_19' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_3_2' NAME=CODE_TYPE_NATURE_TOIT_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_20' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_3_3' NAME=CODE_TYPE_NATURE_TOIT_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_3_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_21' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_3_1' NAME=CODE_TYPE_ETAT_TOIT_3 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_22' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_3_2' NAME=CODE_TYPE_ETAT_TOIT_3 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_23' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_3_1' NAME=CODE_TYPE_NATURE_SOL_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_24' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_3_2' NAME=CODE_TYPE_NATURE_SOL_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_25' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_3_3' NAME=CODE_TYPE_NATURE_SOL_3 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_3_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_26' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_3_1' NAME=CODE_TYPE_ETAT_SOL_3 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_27' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_3_2' NAME=CODE_TYPE_ETAT_SOL_3 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_28' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_3_1' NAME=CODE_TYPE_CONFORT_THERMIQ_3 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_29' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_3_2' NAME=CODE_TYPE_CONFORT_THERMIQ_3 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_30' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_FERMETURE_3_1' NAME=CODE_TYPE_FERMETURE_3 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_31' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_FERMETURE_3_2' NAME=CODE_TYPE_FERMETURE_3 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_32' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_3_1' NAME=CODE_TYPE_FINANCEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_3_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_33' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_3_2' NAME=CODE_TYPE_FINANCEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_3_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_34' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_3_3' NAME=CODE_TYPE_FINANCEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_3_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_35' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_3_4' NAME=CODE_TYPE_FINANCEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_3_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_36' onClick='MiseEvidenceLigneFrame(3,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_3_5' NAME=CODE_TYPE_FINANCEMENT_3 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_3_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_4_0' onClick='MiseEvidenceLigneFrame(4,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_4_1' onClick='MiseEvidenceLigneFrame(4,20)'>$NUM_LOCAL_4</TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_2' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_LOCAL_4_5' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_3' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_LOCAL_4_6' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_4' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_LOCAL_4_7' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_5' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_LOCAL_4_8' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_6' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_LOCAL_4_10' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_7' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_LOCAL_4_12' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_8' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_CYCLE_4_2' NAME=CODE_TYPE_CYCLE_4 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_9' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_CYCLE_4_3' NAME=CODE_TYPE_CYCLE_4 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_4_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_10' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='ANNEE_MISE_SERVICE_4' NAME=ANNEE_MISE_SERVICE_4 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_11' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='SURFACE_LOCAL_4' NAME=SURFACE_LOCAL_4 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_12' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_4_1' NAME=CODE_TYPE_NATURE_MUR_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_13' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_4_2' NAME=CODE_TYPE_NATURE_MUR_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_14' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_4_3' NAME=CODE_TYPE_NATURE_MUR_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_4_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_15' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_4_4' NAME=CODE_TYPE_NATURE_MUR_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_4_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_16' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_4_1' NAME=CODE_TYPE_ETAT_MUR_4 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_17' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_4_2' NAME=CODE_TYPE_ETAT_MUR_4 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_18' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_4_1' NAME=CODE_TYPE_NATURE_TOIT_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_19' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_4_2' NAME=CODE_TYPE_NATURE_TOIT_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_20' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_4_3' NAME=CODE_TYPE_NATURE_TOIT_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_4_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_21' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_4_1' NAME=CODE_TYPE_ETAT_TOIT_4 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_22' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_4_2' NAME=CODE_TYPE_ETAT_TOIT_4 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_23' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_4_1' NAME=CODE_TYPE_NATURE_SOL_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_24' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_4_2' NAME=CODE_TYPE_NATURE_SOL_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_25' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_4_3' NAME=CODE_TYPE_NATURE_SOL_4 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_4_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_26' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_4_1' NAME=CODE_TYPE_ETAT_SOL_4 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_27' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_4_2' NAME=CODE_TYPE_ETAT_SOL_4 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_28' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_4_1' NAME=CODE_TYPE_CONFORT_THERMIQ_4 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_29' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_4_2' NAME=CODE_TYPE_CONFORT_THERMIQ_4 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_30' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_FERMETURE_4_1' NAME=CODE_TYPE_FERMETURE_4 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_31' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_FERMETURE_4_2' NAME=CODE_TYPE_FERMETURE_4 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_32' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_4_1' NAME=CODE_TYPE_FINANCEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_4_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_33' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_4_2' NAME=CODE_TYPE_FINANCEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_4_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_34' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_4_3' NAME=CODE_TYPE_FINANCEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_4_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_35' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_4_4' NAME=CODE_TYPE_FINANCEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_4_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_36' onClick='MiseEvidenceLigneFrame(4,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_4_5' NAME=CODE_TYPE_FINANCEMENT_4 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_4_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_5_0' onClick='MiseEvidenceLigneFrame(5,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_5_1' onClick='MiseEvidenceLigneFrame(5,20)'>$NUM_LOCAL_5</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_2' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_LOCAL_5_5' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_3' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_LOCAL_5_6' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_4' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_LOCAL_5_7' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_5' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_LOCAL_5_8' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_6' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_LOCAL_5_10' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_7' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_LOCAL_5_12' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_8' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_CYCLE_5_2' NAME=CODE_TYPE_CYCLE_5 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_9' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_CYCLE_5_3' NAME=CODE_TYPE_CYCLE_5 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_5_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_10' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='ANNEE_MISE_SERVICE_5' NAME=ANNEE_MISE_SERVICE_5 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_11' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='SURFACE_LOCAL_5' NAME=SURFACE_LOCAL_5 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_12' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_5_1' NAME=CODE_TYPE_NATURE_MUR_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_13' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_5_2' NAME=CODE_TYPE_NATURE_MUR_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_14' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_5_3' NAME=CODE_TYPE_NATURE_MUR_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_5_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_15' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_5_4' NAME=CODE_TYPE_NATURE_MUR_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_5_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_16' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_5_1' NAME=CODE_TYPE_ETAT_MUR_5 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_17' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_5_2' NAME=CODE_TYPE_ETAT_MUR_5 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_18' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_5_1' NAME=CODE_TYPE_NATURE_TOIT_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_19' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_5_2' NAME=CODE_TYPE_NATURE_TOIT_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_20' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_5_3' NAME=CODE_TYPE_NATURE_TOIT_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_5_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_21' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_5_1' NAME=CODE_TYPE_ETAT_TOIT_5 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_22' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_5_2' NAME=CODE_TYPE_ETAT_TOIT_5 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_23' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_5_1' NAME=CODE_TYPE_NATURE_SOL_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_24' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_5_2' NAME=CODE_TYPE_NATURE_SOL_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_25' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_5_3' NAME=CODE_TYPE_NATURE_SOL_5 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_5_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_26' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_5_1' NAME=CODE_TYPE_ETAT_SOL_5 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_27' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_5_2' NAME=CODE_TYPE_ETAT_SOL_5 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_28' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_5_1' NAME=CODE_TYPE_CONFORT_THERMIQ_5 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_29' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_5_2' NAME=CODE_TYPE_CONFORT_THERMIQ_5 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_30' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_FERMETURE_5_1' NAME=CODE_TYPE_FERMETURE_5 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_31' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_FERMETURE_5_2' NAME=CODE_TYPE_FERMETURE_5 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_32' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_5_1' NAME=CODE_TYPE_FINANCEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_5_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_33' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_5_2' NAME=CODE_TYPE_FINANCEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_5_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_34' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_5_3' NAME=CODE_TYPE_FINANCEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_5_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_35' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_5_4' NAME=CODE_TYPE_FINANCEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_5_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_36' onClick='MiseEvidenceLigneFrame(5,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_5_5' NAME=CODE_TYPE_FINANCEMENT_5 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_5_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_6_0' onClick='MiseEvidenceLigneFrame(6,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_6_1' onClick='MiseEvidenceLigneFrame(6,20)'>$NUM_LOCAL_6</TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_2' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_LOCAL_6_5' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_3' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_LOCAL_6_6' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_4' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_LOCAL_6_7' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_5' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_LOCAL_6_8' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_6' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_LOCAL_6_10' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_7' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_LOCAL_6_12' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_8' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_CYCLE_6_2' NAME=CODE_TYPE_CYCLE_6 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_9' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_CYCLE_6_3' NAME=CODE_TYPE_CYCLE_6 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_6_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_10' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='ANNEE_MISE_SERVICE_6' NAME=ANNEE_MISE_SERVICE_6 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_11' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='SURFACE_LOCAL_6' NAME=SURFACE_LOCAL_6 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_12' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_6_1' NAME=CODE_TYPE_NATURE_MUR_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_13' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_6_2' NAME=CODE_TYPE_NATURE_MUR_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_14' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_6_3' NAME=CODE_TYPE_NATURE_MUR_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_6_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_15' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_6_4' NAME=CODE_TYPE_NATURE_MUR_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_6_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_16' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_6_1' NAME=CODE_TYPE_ETAT_MUR_6 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_17' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_6_2' NAME=CODE_TYPE_ETAT_MUR_6 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_18' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_6_1' NAME=CODE_TYPE_NATURE_TOIT_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_19' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_6_2' NAME=CODE_TYPE_NATURE_TOIT_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_20' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_6_3' NAME=CODE_TYPE_NATURE_TOIT_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_6_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_21' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_6_1' NAME=CODE_TYPE_ETAT_TOIT_6 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_22' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_6_2' NAME=CODE_TYPE_ETAT_TOIT_6 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_23' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_6_1' NAME=CODE_TYPE_NATURE_SOL_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_24' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_6_2' NAME=CODE_TYPE_NATURE_SOL_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_25' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_6_3' NAME=CODE_TYPE_NATURE_SOL_6 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_6_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_26' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_6_1' NAME=CODE_TYPE_ETAT_SOL_6 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_27' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_6_2' NAME=CODE_TYPE_ETAT_SOL_6 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_28' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_6_1' NAME=CODE_TYPE_CONFORT_THERMIQ_6 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_29' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_6_2' NAME=CODE_TYPE_CONFORT_THERMIQ_6 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_30' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_FERMETURE_6_1' NAME=CODE_TYPE_FERMETURE_6 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_31' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_FERMETURE_6_2' NAME=CODE_TYPE_FERMETURE_6 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_32' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_6_1' NAME=CODE_TYPE_FINANCEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_6_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_33' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_6_2' NAME=CODE_TYPE_FINANCEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_6_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_34' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_6_3' NAME=CODE_TYPE_FINANCEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_6_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_35' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_6_4' NAME=CODE_TYPE_FINANCEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_6_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_36' onClick='MiseEvidenceLigneFrame(6,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_6_5' NAME=CODE_TYPE_FINANCEMENT_6 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_6_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_7_0' onClick='MiseEvidenceLigneFrame(7,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_7_1' onClick='MiseEvidenceLigneFrame(7,20)'>$NUM_LOCAL_7</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_2' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_LOCAL_7_5' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_3' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_LOCAL_7_6' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_4' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_LOCAL_7_7' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_5' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_LOCAL_7_8' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_6' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_LOCAL_7_10' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_7' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_LOCAL_7_12' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_8' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_CYCLE_7_2' NAME=CODE_TYPE_CYCLE_7 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_9' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_CYCLE_7_3' NAME=CODE_TYPE_CYCLE_7 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_7_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_10' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='ANNEE_MISE_SERVICE_7' NAME=ANNEE_MISE_SERVICE_7 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_11' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='SURFACE_LOCAL_7' NAME=SURFACE_LOCAL_7 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_12' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_7_1' NAME=CODE_TYPE_NATURE_MUR_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_13' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_7_2' NAME=CODE_TYPE_NATURE_MUR_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_14' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_7_3' NAME=CODE_TYPE_NATURE_MUR_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_7_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_15' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_7_4' NAME=CODE_TYPE_NATURE_MUR_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_7_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_16' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_7_1' NAME=CODE_TYPE_ETAT_MUR_7 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_17' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_7_2' NAME=CODE_TYPE_ETAT_MUR_7 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_18' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_7_1' NAME=CODE_TYPE_NATURE_TOIT_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_19' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_7_2' NAME=CODE_TYPE_NATURE_TOIT_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_20' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_7_3' NAME=CODE_TYPE_NATURE_TOIT_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_7_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_21' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_7_1' NAME=CODE_TYPE_ETAT_TOIT_7 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_22' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_7_2' NAME=CODE_TYPE_ETAT_TOIT_7 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_23' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_7_1' NAME=CODE_TYPE_NATURE_SOL_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_24' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_7_2' NAME=CODE_TYPE_NATURE_SOL_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_25' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_7_3' NAME=CODE_TYPE_NATURE_SOL_7 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_7_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_26' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_7_1' NAME=CODE_TYPE_ETAT_SOL_7 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_27' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_7_2' NAME=CODE_TYPE_ETAT_SOL_7 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_28' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_7_1' NAME=CODE_TYPE_CONFORT_THERMIQ_7 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_29' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_7_2' NAME=CODE_TYPE_CONFORT_THERMIQ_7 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_30' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_FERMETURE_7_1' NAME=CODE_TYPE_FERMETURE_7 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_31' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_FERMETURE_7_2' NAME=CODE_TYPE_FERMETURE_7 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_32' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_7_1' NAME=CODE_TYPE_FINANCEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_7_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_33' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_7_2' NAME=CODE_TYPE_FINANCEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_7_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_34' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_7_3' NAME=CODE_TYPE_FINANCEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_7_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_35' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_7_4' NAME=CODE_TYPE_FINANCEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_7_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_36' onClick='MiseEvidenceLigneFrame(7,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_7_5' NAME=CODE_TYPE_FINANCEMENT_7 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_7_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_8_0' onClick='MiseEvidenceLigneFrame(8,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_8_1' onClick='MiseEvidenceLigneFrame(8,20)'>$NUM_LOCAL_8</TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_2' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_LOCAL_8_5' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_3' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_LOCAL_8_6' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_4' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_LOCAL_8_7' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_5' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_LOCAL_8_8' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_6' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_LOCAL_8_10' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_7' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_LOCAL_8_12' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_8' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_CYCLE_8_2' NAME=CODE_TYPE_CYCLE_8 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_9' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_CYCLE_8_3' NAME=CODE_TYPE_CYCLE_8 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_8_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_10' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='ANNEE_MISE_SERVICE_8' NAME=ANNEE_MISE_SERVICE_8 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_11' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='SURFACE_LOCAL_8' NAME=SURFACE_LOCAL_8 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_12' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_8_1' NAME=CODE_TYPE_NATURE_MUR_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_13' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_8_2' NAME=CODE_TYPE_NATURE_MUR_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_14' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_8_3' NAME=CODE_TYPE_NATURE_MUR_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_8_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_15' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_8_4' NAME=CODE_TYPE_NATURE_MUR_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_8_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_16' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_8_1' NAME=CODE_TYPE_ETAT_MUR_8 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_17' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_8_2' NAME=CODE_TYPE_ETAT_MUR_8 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_18' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_8_1' NAME=CODE_TYPE_NATURE_TOIT_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_19' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_8_2' NAME=CODE_TYPE_NATURE_TOIT_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_20' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_8_3' NAME=CODE_TYPE_NATURE_TOIT_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_8_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_21' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_8_1' NAME=CODE_TYPE_ETAT_TOIT_8 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_22' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_8_2' NAME=CODE_TYPE_ETAT_TOIT_8 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_23' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_8_1' NAME=CODE_TYPE_NATURE_SOL_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_24' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_8_2' NAME=CODE_TYPE_NATURE_SOL_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_25' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_8_3' NAME=CODE_TYPE_NATURE_SOL_8 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_8_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_26' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_8_1' NAME=CODE_TYPE_ETAT_SOL_8 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_27' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_8_2' NAME=CODE_TYPE_ETAT_SOL_8 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_28' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_8_1' NAME=CODE_TYPE_CONFORT_THERMIQ_8 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_29' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_8_2' NAME=CODE_TYPE_CONFORT_THERMIQ_8 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_30' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_FERMETURE_8_1' NAME=CODE_TYPE_FERMETURE_8 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_31' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_FERMETURE_8_2' NAME=CODE_TYPE_FERMETURE_8 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_32' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_8_1' NAME=CODE_TYPE_FINANCEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_8_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_33' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_8_2' NAME=CODE_TYPE_FINANCEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_8_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_34' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_8_3' NAME=CODE_TYPE_FINANCEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_8_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_35' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_8_4' NAME=CODE_TYPE_FINANCEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_8_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_36' onClick='MiseEvidenceLigneFrame(8,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_8_5' NAME=CODE_TYPE_FINANCEMENT_8 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_8_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_9_0' onClick='MiseEvidenceLigneFrame(9,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_9_1' onClick='MiseEvidenceLigneFrame(9,20)'>$NUM_LOCAL_9</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_2' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_LOCAL_9_5' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_3' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_LOCAL_9_6' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_4' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_LOCAL_9_7' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_5' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_LOCAL_9_8' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_6' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_LOCAL_9_10' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_7' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_LOCAL_9_12' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_8' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_CYCLE_9_2' NAME=CODE_TYPE_CYCLE_9 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_9' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_CYCLE_9_3' NAME=CODE_TYPE_CYCLE_9 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_9_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_10' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='ANNEE_MISE_SERVICE_9' NAME=ANNEE_MISE_SERVICE_9 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_11' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='SURFACE_LOCAL_9' NAME=SURFACE_LOCAL_9 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_12' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_9_1' NAME=CODE_TYPE_NATURE_MUR_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_13' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_9_2' NAME=CODE_TYPE_NATURE_MUR_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_14' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_9_3' NAME=CODE_TYPE_NATURE_MUR_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_9_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_15' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_9_4' NAME=CODE_TYPE_NATURE_MUR_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_9_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_16' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_9_1' NAME=CODE_TYPE_ETAT_MUR_9 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_17' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_9_2' NAME=CODE_TYPE_ETAT_MUR_9 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_18' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_9_1' NAME=CODE_TYPE_NATURE_TOIT_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_19' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_9_2' NAME=CODE_TYPE_NATURE_TOIT_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_20' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_9_3' NAME=CODE_TYPE_NATURE_TOIT_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_9_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_21' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_9_1' NAME=CODE_TYPE_ETAT_TOIT_9 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_22' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_9_2' NAME=CODE_TYPE_ETAT_TOIT_9 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_23' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_9_1' NAME=CODE_TYPE_NATURE_SOL_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_24' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_9_2' NAME=CODE_TYPE_NATURE_SOL_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_25' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_9_3' NAME=CODE_TYPE_NATURE_SOL_9 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_9_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_26' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_9_1' NAME=CODE_TYPE_ETAT_SOL_9 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_27' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_9_2' NAME=CODE_TYPE_ETAT_SOL_9 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_28' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_9_1' NAME=CODE_TYPE_CONFORT_THERMIQ_9 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_29' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_9_2' NAME=CODE_TYPE_CONFORT_THERMIQ_9 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_30' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_FERMETURE_9_1' NAME=CODE_TYPE_FERMETURE_9 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_31' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_FERMETURE_9_2' NAME=CODE_TYPE_FERMETURE_9 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_32' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_9_1' NAME=CODE_TYPE_FINANCEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_9_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_33' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_9_2' NAME=CODE_TYPE_FINANCEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_9_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_34' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_9_3' NAME=CODE_TYPE_FINANCEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_9_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_35' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_9_4' NAME=CODE_TYPE_FINANCEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_9_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_36' onClick='MiseEvidenceLigneFrame(9,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_9_5' NAME=CODE_TYPE_FINANCEMENT_9 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_9_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_10_0' onClick='MiseEvidenceLigneFrame(10,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_10 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_10_1' onClick='MiseEvidenceLigneFrame(10,20)'>$NUM_LOCAL_10</TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_2' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_LOCAL_10_5' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_3' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_LOCAL_10_6' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_4' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_LOCAL_10_7' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_5' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_LOCAL_10_8' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_6' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_LOCAL_10_10' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_7' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_LOCAL_10_12' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_8' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_CYCLE_10_2' NAME=CODE_TYPE_CYCLE_10 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_9' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_CYCLE_10_3' NAME=CODE_TYPE_CYCLE_10 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_10_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_10' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='ANNEE_MISE_SERVICE_10' NAME=ANNEE_MISE_SERVICE_10 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_10"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_11' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='SURFACE_LOCAL_10' NAME=SURFACE_LOCAL_10 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_10"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_12' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_10_1' NAME=CODE_TYPE_NATURE_MUR_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_13' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_10_2' NAME=CODE_TYPE_NATURE_MUR_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_14' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_10_3' NAME=CODE_TYPE_NATURE_MUR_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_10_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_15' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_10_4' NAME=CODE_TYPE_NATURE_MUR_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_10_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_16' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_10_1' NAME=CODE_TYPE_ETAT_MUR_10 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_17' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_10_2' NAME=CODE_TYPE_ETAT_MUR_10 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_18' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_10_1' NAME=CODE_TYPE_NATURE_TOIT_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_19' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_10_2' NAME=CODE_TYPE_NATURE_TOIT_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_20' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_10_3' NAME=CODE_TYPE_NATURE_TOIT_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_10_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_21' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_10_1' NAME=CODE_TYPE_ETAT_TOIT_10 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_22' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_10_2' NAME=CODE_TYPE_ETAT_TOIT_10 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_23' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_10_1' NAME=CODE_TYPE_NATURE_SOL_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_24' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_10_2' NAME=CODE_TYPE_NATURE_SOL_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_25' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_10_3' NAME=CODE_TYPE_NATURE_SOL_10 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_10_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_26' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_10_1' NAME=CODE_TYPE_ETAT_SOL_10 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_27' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_10_2' NAME=CODE_TYPE_ETAT_SOL_10 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_28' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_10_1' NAME=CODE_TYPE_CONFORT_THERMIQ_10 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_29' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_10_2' NAME=CODE_TYPE_CONFORT_THERMIQ_10 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_30' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_FERMETURE_10_1' NAME=CODE_TYPE_FERMETURE_10 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_31' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_FERMETURE_10_2' NAME=CODE_TYPE_FERMETURE_10 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_32' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_10_1' NAME=CODE_TYPE_FINANCEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_10_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_33' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_10_2' NAME=CODE_TYPE_FINANCEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_10_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_34' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_10_3' NAME=CODE_TYPE_FINANCEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_10_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_35' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_10_4' NAME=CODE_TYPE_FINANCEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_10_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_36' onClick='MiseEvidenceLigneFrame(10,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_10_5' NAME=CODE_TYPE_FINANCEMENT_10 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_10_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_11_0' onClick='MiseEvidenceLigneFrame(11,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_11 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_11_1' onClick='MiseEvidenceLigneFrame(11,20)'>$NUM_LOCAL_11</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_2' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_LOCAL_11_5' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_3' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_LOCAL_11_6' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_4' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_LOCAL_11_7' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_5' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_LOCAL_11_8' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_6' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_LOCAL_11_10' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_7' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_LOCAL_11_12' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_8' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_CYCLE_11_2' NAME=CODE_TYPE_CYCLE_11 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_9' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_CYCLE_11_3' NAME=CODE_TYPE_CYCLE_11 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_11_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_10' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='ANNEE_MISE_SERVICE_11' NAME=ANNEE_MISE_SERVICE_11 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_11"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_11' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='SURFACE_LOCAL_11' NAME=SURFACE_LOCAL_11 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_11"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_12' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_11_1' NAME=CODE_TYPE_NATURE_MUR_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_13' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_11_2' NAME=CODE_TYPE_NATURE_MUR_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_14' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_11_3' NAME=CODE_TYPE_NATURE_MUR_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_11_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_15' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_11_4' NAME=CODE_TYPE_NATURE_MUR_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_11_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_16' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_11_1' NAME=CODE_TYPE_ETAT_MUR_11 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_17' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_11_2' NAME=CODE_TYPE_ETAT_MUR_11 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_18' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_11_1' NAME=CODE_TYPE_NATURE_TOIT_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_19' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_11_2' NAME=CODE_TYPE_NATURE_TOIT_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_20' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_11_3' NAME=CODE_TYPE_NATURE_TOIT_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_11_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_21' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_11_1' NAME=CODE_TYPE_ETAT_TOIT_11 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_22' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_11_2' NAME=CODE_TYPE_ETAT_TOIT_11 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_23' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_11_1' NAME=CODE_TYPE_NATURE_SOL_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_24' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_11_2' NAME=CODE_TYPE_NATURE_SOL_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_25' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_11_3' NAME=CODE_TYPE_NATURE_SOL_11 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_11_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_26' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_11_1' NAME=CODE_TYPE_ETAT_SOL_11 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_27' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_11_2' NAME=CODE_TYPE_ETAT_SOL_11 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_28' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_11_1' NAME=CODE_TYPE_CONFORT_THERMIQ_11 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_29' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_11_2' NAME=CODE_TYPE_CONFORT_THERMIQ_11 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_30' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_FERMETURE_11_1' NAME=CODE_TYPE_FERMETURE_11 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_31' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_FERMETURE_11_2' NAME=CODE_TYPE_FERMETURE_11 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_32' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_11_1' NAME=CODE_TYPE_FINANCEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_11_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_33' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_11_2' NAME=CODE_TYPE_FINANCEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_11_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_34' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_11_3' NAME=CODE_TYPE_FINANCEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_11_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_35' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_11_4' NAME=CODE_TYPE_FINANCEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_11_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_36' onClick='MiseEvidenceLigneFrame(11,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_11_5' NAME=CODE_TYPE_FINANCEMENT_11 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_11_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_12_0' onClick='MiseEvidenceLigneFrame(12,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_12 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_12_1' onClick='MiseEvidenceLigneFrame(12,20)'>$NUM_LOCAL_12</TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_2' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_LOCAL_12_5' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_3' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_LOCAL_12_6' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_4' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_LOCAL_12_7' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_5' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_LOCAL_12_8' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_6' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_LOCAL_12_10' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_7' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_LOCAL_12_12' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_8' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_CYCLE_12_2' NAME=CODE_TYPE_CYCLE_12 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_9' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_CYCLE_12_3' NAME=CODE_TYPE_CYCLE_12 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_12_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_10' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='ANNEE_MISE_SERVICE_12' NAME=ANNEE_MISE_SERVICE_12 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_12"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_11' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='SURFACE_LOCAL_12' NAME=SURFACE_LOCAL_12 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_12"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_12' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_12_1' NAME=CODE_TYPE_NATURE_MUR_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_13' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_12_2' NAME=CODE_TYPE_NATURE_MUR_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_14' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_12_3' NAME=CODE_TYPE_NATURE_MUR_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_12_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_15' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_12_4' NAME=CODE_TYPE_NATURE_MUR_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_12_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_16' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_12_1' NAME=CODE_TYPE_ETAT_MUR_12 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_17' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_12_2' NAME=CODE_TYPE_ETAT_MUR_12 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_18' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_12_1' NAME=CODE_TYPE_NATURE_TOIT_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_19' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_12_2' NAME=CODE_TYPE_NATURE_TOIT_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_20' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_12_3' NAME=CODE_TYPE_NATURE_TOIT_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_12_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_21' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_12_1' NAME=CODE_TYPE_ETAT_TOIT_12 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_22' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_12_2' NAME=CODE_TYPE_ETAT_TOIT_12 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_23' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_12_1' NAME=CODE_TYPE_NATURE_SOL_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_24' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_12_2' NAME=CODE_TYPE_NATURE_SOL_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_25' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_12_3' NAME=CODE_TYPE_NATURE_SOL_12 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_12_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_26' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_12_1' NAME=CODE_TYPE_ETAT_SOL_12 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_27' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_12_2' NAME=CODE_TYPE_ETAT_SOL_12 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_28' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_12_1' NAME=CODE_TYPE_CONFORT_THERMIQ_12 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_29' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_12_2' NAME=CODE_TYPE_CONFORT_THERMIQ_12 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_30' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_FERMETURE_12_1' NAME=CODE_TYPE_FERMETURE_12 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_31' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_FERMETURE_12_2' NAME=CODE_TYPE_FERMETURE_12 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_32' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_12_1' NAME=CODE_TYPE_FINANCEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_12_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_33' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_12_2' NAME=CODE_TYPE_FINANCEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_12_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_34' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_12_3' NAME=CODE_TYPE_FINANCEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_12_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_35' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_12_4' NAME=CODE_TYPE_FINANCEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_12_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_36' onClick='MiseEvidenceLigneFrame(12,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_12_5' NAME=CODE_TYPE_FINANCEMENT_12 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_12_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_13_0' onClick='MiseEvidenceLigneFrame(13,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_13 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_13_1' onClick='MiseEvidenceLigneFrame(13,20)'>$NUM_LOCAL_13</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_2' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_LOCAL_13_5' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_3' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_LOCAL_13_6' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_4' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_LOCAL_13_7' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_5' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_LOCAL_13_8' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_6' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_LOCAL_13_10' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_7' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_LOCAL_13_12' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_8' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_CYCLE_13_2' NAME=CODE_TYPE_CYCLE_13 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_9' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_CYCLE_13_3' NAME=CODE_TYPE_CYCLE_13 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_13_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_10' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='ANNEE_MISE_SERVICE_13' NAME=ANNEE_MISE_SERVICE_13 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_13"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_11' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='SURFACE_LOCAL_13' NAME=SURFACE_LOCAL_13 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_13"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_12' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_13_1' NAME=CODE_TYPE_NATURE_MUR_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_13' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_13_2' NAME=CODE_TYPE_NATURE_MUR_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_14' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_13_3' NAME=CODE_TYPE_NATURE_MUR_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_13_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_15' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_13_4' NAME=CODE_TYPE_NATURE_MUR_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_13_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_16' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_13_1' NAME=CODE_TYPE_ETAT_MUR_13 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_17' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_13_2' NAME=CODE_TYPE_ETAT_MUR_13 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_18' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_13_1' NAME=CODE_TYPE_NATURE_TOIT_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_19' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_13_2' NAME=CODE_TYPE_NATURE_TOIT_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_20' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_13_3' NAME=CODE_TYPE_NATURE_TOIT_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_13_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_21' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_13_1' NAME=CODE_TYPE_ETAT_TOIT_13 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_22' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_13_2' NAME=CODE_TYPE_ETAT_TOIT_13 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_23' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_13_1' NAME=CODE_TYPE_NATURE_SOL_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_24' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_13_2' NAME=CODE_TYPE_NATURE_SOL_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_25' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_13_3' NAME=CODE_TYPE_NATURE_SOL_13 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_13_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_26' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_13_1' NAME=CODE_TYPE_ETAT_SOL_13 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_27' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_13_2' NAME=CODE_TYPE_ETAT_SOL_13 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_28' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_13_1' NAME=CODE_TYPE_CONFORT_THERMIQ_13 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_29' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_13_2' NAME=CODE_TYPE_CONFORT_THERMIQ_13 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_30' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_FERMETURE_13_1' NAME=CODE_TYPE_FERMETURE_13 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_31' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_FERMETURE_13_2' NAME=CODE_TYPE_FERMETURE_13 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_32' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_13_1' NAME=CODE_TYPE_FINANCEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_13_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_33' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_13_2' NAME=CODE_TYPE_FINANCEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_13_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_34' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_13_3' NAME=CODE_TYPE_FINANCEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_13_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_35' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_13_4' NAME=CODE_TYPE_FINANCEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_13_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_36' onClick='MiseEvidenceLigneFrame(13,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_13_5' NAME=CODE_TYPE_FINANCEMENT_13 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_13_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_14_0' onClick='MiseEvidenceLigneFrame(14,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_14 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_14_1' onClick='MiseEvidenceLigneFrame(14,20)'>$NUM_LOCAL_14</TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_2' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_LOCAL_14_5' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_3' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_LOCAL_14_6' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_4' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_LOCAL_14_7' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_5' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_LOCAL_14_8' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_6' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_LOCAL_14_10' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_7' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_LOCAL_14_12' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_8' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_CYCLE_14_2' NAME=CODE_TYPE_CYCLE_14 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_9' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_CYCLE_14_3' NAME=CODE_TYPE_CYCLE_14 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_14_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_10' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='ANNEE_MISE_SERVICE_14' NAME=ANNEE_MISE_SERVICE_14 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_14"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_11' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='SURFACE_LOCAL_14' NAME=SURFACE_LOCAL_14 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_14"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_12' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_14_1' NAME=CODE_TYPE_NATURE_MUR_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_13' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_14_2' NAME=CODE_TYPE_NATURE_MUR_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_14' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_14_3' NAME=CODE_TYPE_NATURE_MUR_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_14_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_15' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_14_4' NAME=CODE_TYPE_NATURE_MUR_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_14_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_16' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_14_1' NAME=CODE_TYPE_ETAT_MUR_14 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_17' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_14_2' NAME=CODE_TYPE_ETAT_MUR_14 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_18' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_14_1' NAME=CODE_TYPE_NATURE_TOIT_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_19' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_14_2' NAME=CODE_TYPE_NATURE_TOIT_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_20' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_14_3' NAME=CODE_TYPE_NATURE_TOIT_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_14_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_21' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_14_1' NAME=CODE_TYPE_ETAT_TOIT_14 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_22' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_14_2' NAME=CODE_TYPE_ETAT_TOIT_14 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_23' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_14_1' NAME=CODE_TYPE_NATURE_SOL_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_24' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_14_2' NAME=CODE_TYPE_NATURE_SOL_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_25' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_14_3' NAME=CODE_TYPE_NATURE_SOL_14 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_14_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_26' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_14_1' NAME=CODE_TYPE_ETAT_SOL_14 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_27' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_14_2' NAME=CODE_TYPE_ETAT_SOL_14 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_28' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_14_1' NAME=CODE_TYPE_CONFORT_THERMIQ_14 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_29' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_14_2' NAME=CODE_TYPE_CONFORT_THERMIQ_14 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_30' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_FERMETURE_14_1' NAME=CODE_TYPE_FERMETURE_14 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_31' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_FERMETURE_14_2' NAME=CODE_TYPE_FERMETURE_14 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_32' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_14_1' NAME=CODE_TYPE_FINANCEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_14_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_33' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_14_2' NAME=CODE_TYPE_FINANCEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_14_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_34' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_14_3' NAME=CODE_TYPE_FINANCEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_14_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_35' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_14_4' NAME=CODE_TYPE_FINANCEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_14_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_36' onClick='MiseEvidenceLigneFrame(14,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_14_5' NAME=CODE_TYPE_FINANCEMENT_14 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_14_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_15_0' onClick='MiseEvidenceLigneFrame(15,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_15 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_15_1' onClick='MiseEvidenceLigneFrame(15,20)'>$NUM_LOCAL_15</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_2' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_LOCAL_15_5' NAME=CODE_TYPE_LOCAL_15 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_15_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_3' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_LOCAL_15_6' NAME=CODE_TYPE_LOCAL_15 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_15_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_4' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_LOCAL_15_7' NAME=CODE_TYPE_LOCAL_15 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_15_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_5' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_LOCAL_15_8' NAME=CODE_TYPE_LOCAL_15 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_15_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_6' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_LOCAL_15_10' NAME=CODE_TYPE_LOCAL_15 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_15_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_7' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_LOCAL_15_12' NAME=CODE_TYPE_LOCAL_15 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_15_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_8' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_CYCLE_15_2' NAME=CODE_TYPE_CYCLE_15 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_9' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_CYCLE_15_3' NAME=CODE_TYPE_CYCLE_15 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_15_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_15_10' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='ANNEE_MISE_SERVICE_15' NAME=ANNEE_MISE_SERVICE_15 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_15"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_15_11' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='SURFACE_LOCAL_15' NAME=SURFACE_LOCAL_15 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_15"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_12' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_15_1' NAME=CODE_TYPE_NATURE_MUR_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_13' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_15_2' NAME=CODE_TYPE_NATURE_MUR_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_14' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_15_3' NAME=CODE_TYPE_NATURE_MUR_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_15_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_15' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_15_4' NAME=CODE_TYPE_NATURE_MUR_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_15_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_16' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_15_1' NAME=CODE_TYPE_ETAT_MUR_15 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_17' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_15_2' NAME=CODE_TYPE_ETAT_MUR_15 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_18' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_15_1' NAME=CODE_TYPE_NATURE_TOIT_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_19' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_15_2' NAME=CODE_TYPE_NATURE_TOIT_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_20' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_15_3' NAME=CODE_TYPE_NATURE_TOIT_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_15_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_21' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_15_1' NAME=CODE_TYPE_ETAT_TOIT_15 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_22' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_15_2' NAME=CODE_TYPE_ETAT_TOIT_15 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_23' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_15_1' NAME=CODE_TYPE_NATURE_SOL_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_24' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_15_2' NAME=CODE_TYPE_NATURE_SOL_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_25' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_15_3' NAME=CODE_TYPE_NATURE_SOL_15 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_15_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_26' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_15_1' NAME=CODE_TYPE_ETAT_SOL_15 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_27' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_15_2' NAME=CODE_TYPE_ETAT_SOL_15 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_28' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_15_1' NAME=CODE_TYPE_CONFORT_THERMIQ_15 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_29' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_15_2' NAME=CODE_TYPE_CONFORT_THERMIQ_15 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_30' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_FERMETURE_15_1' NAME=CODE_TYPE_FERMETURE_15 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_31' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_FERMETURE_15_2' NAME=CODE_TYPE_FERMETURE_15 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_32' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_15_1' NAME=CODE_TYPE_FINANCEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_15_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_33' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_15_2' NAME=CODE_TYPE_FINANCEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_15_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_34' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_15_3' NAME=CODE_TYPE_FINANCEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_15_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_35' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_15_4' NAME=CODE_TYPE_FINANCEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_15_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_36' onClick='MiseEvidenceLigneFrame(15,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_15_5' NAME=CODE_TYPE_FINANCEMENT_15 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_15_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_16_0' onClick='MiseEvidenceLigneFrame(16,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_16 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_16_1' onClick='MiseEvidenceLigneFrame(16,20)'>$NUM_LOCAL_16</TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_2' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_LOCAL_16_5' NAME=CODE_TYPE_LOCAL_16 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_16_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_3' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_LOCAL_16_6' NAME=CODE_TYPE_LOCAL_16 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_16_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_4' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_LOCAL_16_7' NAME=CODE_TYPE_LOCAL_16 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_16_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_5' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_LOCAL_16_8' NAME=CODE_TYPE_LOCAL_16 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_16_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_6' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_LOCAL_16_10' NAME=CODE_TYPE_LOCAL_16 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_16_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_7' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_LOCAL_16_12' NAME=CODE_TYPE_LOCAL_16 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_16_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_8' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_CYCLE_16_2' NAME=CODE_TYPE_CYCLE_16 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_9' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_CYCLE_16_3' NAME=CODE_TYPE_CYCLE_16 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_16_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_16_10' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='ANNEE_MISE_SERVICE_16' NAME=ANNEE_MISE_SERVICE_16 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_16"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_16_11' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='SURFACE_LOCAL_16' NAME=SURFACE_LOCAL_16 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_16"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_12' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_16_1' NAME=CODE_TYPE_NATURE_MUR_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_13' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_16_2' NAME=CODE_TYPE_NATURE_MUR_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_14' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_16_3' NAME=CODE_TYPE_NATURE_MUR_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_16_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_15' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_16_4' NAME=CODE_TYPE_NATURE_MUR_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_16_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_16' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_16_1' NAME=CODE_TYPE_ETAT_MUR_16 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_17' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_16_2' NAME=CODE_TYPE_ETAT_MUR_16 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_18' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_16_1' NAME=CODE_TYPE_NATURE_TOIT_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_19' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_16_2' NAME=CODE_TYPE_NATURE_TOIT_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_20' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_16_3' NAME=CODE_TYPE_NATURE_TOIT_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_16_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_21' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_16_1' NAME=CODE_TYPE_ETAT_TOIT_16 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_22' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_16_2' NAME=CODE_TYPE_ETAT_TOIT_16 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_23' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_16_1' NAME=CODE_TYPE_NATURE_SOL_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_24' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_16_2' NAME=CODE_TYPE_NATURE_SOL_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_25' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_16_3' NAME=CODE_TYPE_NATURE_SOL_16 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_16_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_26' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_16_1' NAME=CODE_TYPE_ETAT_SOL_16 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_27' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_16_2' NAME=CODE_TYPE_ETAT_SOL_16 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_28' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_16_1' NAME=CODE_TYPE_CONFORT_THERMIQ_16 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_29' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_16_2' NAME=CODE_TYPE_CONFORT_THERMIQ_16 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_30' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_FERMETURE_16_1' NAME=CODE_TYPE_FERMETURE_16 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_31' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_FERMETURE_16_2' NAME=CODE_TYPE_FERMETURE_16 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_32' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_16_1' NAME=CODE_TYPE_FINANCEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_16_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_33' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_16_2' NAME=CODE_TYPE_FINANCEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_16_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_34' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_16_3' NAME=CODE_TYPE_FINANCEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_16_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_35' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_16_4' NAME=CODE_TYPE_FINANCEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_16_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_36' onClick='MiseEvidenceLigneFrame(16,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_16_5' NAME=CODE_TYPE_FINANCEMENT_16 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_16_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_17_0' onClick='MiseEvidenceLigneFrame(17,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_17 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_17_1' onClick='MiseEvidenceLigneFrame(17,20)'>$NUM_LOCAL_17</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_2' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_LOCAL_17_5' NAME=CODE_TYPE_LOCAL_17 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_17_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_3' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_LOCAL_17_6' NAME=CODE_TYPE_LOCAL_17 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_17_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_4' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_LOCAL_17_7' NAME=CODE_TYPE_LOCAL_17 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_17_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_5' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_LOCAL_17_8' NAME=CODE_TYPE_LOCAL_17 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_17_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_6' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_LOCAL_17_10' NAME=CODE_TYPE_LOCAL_17 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_17_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_7' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_LOCAL_17_12' NAME=CODE_TYPE_LOCAL_17 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_17_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_8' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_CYCLE_17_2' NAME=CODE_TYPE_CYCLE_17 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_9' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_CYCLE_17_3' NAME=CODE_TYPE_CYCLE_17 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_17_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_17_10' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='ANNEE_MISE_SERVICE_17' NAME=ANNEE_MISE_SERVICE_17 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_17"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_17_11' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='SURFACE_LOCAL_17' NAME=SURFACE_LOCAL_17 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_17"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_12' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_17_1' NAME=CODE_TYPE_NATURE_MUR_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_13' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_17_2' NAME=CODE_TYPE_NATURE_MUR_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_14' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_17_3' NAME=CODE_TYPE_NATURE_MUR_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_17_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_15' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_17_4' NAME=CODE_TYPE_NATURE_MUR_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_17_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_16' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_17_1' NAME=CODE_TYPE_ETAT_MUR_17 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_17' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_17_2' NAME=CODE_TYPE_ETAT_MUR_17 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_18' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_17_1' NAME=CODE_TYPE_NATURE_TOIT_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_19' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_17_2' NAME=CODE_TYPE_NATURE_TOIT_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_20' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_17_3' NAME=CODE_TYPE_NATURE_TOIT_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_17_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_21' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_17_1' NAME=CODE_TYPE_ETAT_TOIT_17 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_22' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_17_2' NAME=CODE_TYPE_ETAT_TOIT_17 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_23' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_17_1' NAME=CODE_TYPE_NATURE_SOL_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_24' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_17_2' NAME=CODE_TYPE_NATURE_SOL_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_25' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_17_3' NAME=CODE_TYPE_NATURE_SOL_17 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_17_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_26' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_17_1' NAME=CODE_TYPE_ETAT_SOL_17 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_27' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_17_2' NAME=CODE_TYPE_ETAT_SOL_17 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_28' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_17_1' NAME=CODE_TYPE_CONFORT_THERMIQ_17 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_29' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_17_2' NAME=CODE_TYPE_CONFORT_THERMIQ_17 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_30' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_FERMETURE_17_1' NAME=CODE_TYPE_FERMETURE_17 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_31' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_FERMETURE_17_2' NAME=CODE_TYPE_FERMETURE_17 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_32' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_17_1' NAME=CODE_TYPE_FINANCEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_17_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_33' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_17_2' NAME=CODE_TYPE_FINANCEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_17_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_34' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_17_3' NAME=CODE_TYPE_FINANCEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_17_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_35' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_17_4' NAME=CODE_TYPE_FINANCEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_17_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_36' onClick='MiseEvidenceLigneFrame(17,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_17_5' NAME=CODE_TYPE_FINANCEMENT_17 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_17_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_18_0' onClick='MiseEvidenceLigneFrame(18,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_18 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_18_1' onClick='MiseEvidenceLigneFrame(18,20)'>$NUM_LOCAL_18</TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_2' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_LOCAL_18_5' NAME=CODE_TYPE_LOCAL_18 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_18_5></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_3' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_LOCAL_18_6' NAME=CODE_TYPE_LOCAL_18 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_18_6></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_4' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_LOCAL_18_7' NAME=CODE_TYPE_LOCAL_18 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_18_7></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_5' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_LOCAL_18_8' NAME=CODE_TYPE_LOCAL_18 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_18_8></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_6' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_LOCAL_18_10' NAME=CODE_TYPE_LOCAL_18 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_18_10></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_7' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_LOCAL_18_12' NAME=CODE_TYPE_LOCAL_18 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_18_12></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_8' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_CYCLE_18_2' NAME=CODE_TYPE_CYCLE_18 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_9' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_CYCLE_18_3' NAME=CODE_TYPE_CYCLE_18 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_18_3></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_18_10' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='ANNEE_MISE_SERVICE_18' NAME=ANNEE_MISE_SERVICE_18 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_18"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_18_11' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='SURFACE_LOCAL_18' NAME=SURFACE_LOCAL_18 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_18"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_12' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_18_1' NAME=CODE_TYPE_NATURE_MUR_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_13' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_18_2' NAME=CODE_TYPE_NATURE_MUR_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_14' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_18_3' NAME=CODE_TYPE_NATURE_MUR_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_18_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_15' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_18_4' NAME=CODE_TYPE_NATURE_MUR_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_18_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_16' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_18_1' NAME=CODE_TYPE_ETAT_MUR_18 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_17' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_18_2' NAME=CODE_TYPE_ETAT_MUR_18 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_18' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_18_1' NAME=CODE_TYPE_NATURE_TOIT_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_19' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_18_2' NAME=CODE_TYPE_NATURE_TOIT_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_20' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_18_3' NAME=CODE_TYPE_NATURE_TOIT_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_18_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_21' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_18_1' NAME=CODE_TYPE_ETAT_TOIT_18 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_22' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_18_2' NAME=CODE_TYPE_ETAT_TOIT_18 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_23' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_18_1' NAME=CODE_TYPE_NATURE_SOL_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_24' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_18_2' NAME=CODE_TYPE_NATURE_SOL_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_25' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_18_3' NAME=CODE_TYPE_NATURE_SOL_18 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_18_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_26' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_18_1' NAME=CODE_TYPE_ETAT_SOL_18 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_27' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_18_2' NAME=CODE_TYPE_ETAT_SOL_18 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_28' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_18_1' NAME=CODE_TYPE_CONFORT_THERMIQ_18 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_29' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_18_2' NAME=CODE_TYPE_CONFORT_THERMIQ_18 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_30' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_FERMETURE_18_1' NAME=CODE_TYPE_FERMETURE_18 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_31' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_FERMETURE_18_2' NAME=CODE_TYPE_FERMETURE_18 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_32' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_18_1' NAME=CODE_TYPE_FINANCEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_18_1></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_33' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_18_2' NAME=CODE_TYPE_FINANCEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_18_2></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_34' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_18_3' NAME=CODE_TYPE_FINANCEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_18_3></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_35' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_18_4' NAME=CODE_TYPE_FINANCEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_18_4></TD>
+		<TD  class='ligne-paire' id='ligne-paire_18_36' onClick='MiseEvidenceLigneFrame(18,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_18_5' NAME=CODE_TYPE_FINANCEMENT_18 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_18_5></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_19_0' onClick='MiseEvidenceLigneFrame(19,20)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_19 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_19_1' onClick='MiseEvidenceLigneFrame(19,20)'>$NUM_LOCAL_19</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_2' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_LOCAL_19_5' NAME=CODE_TYPE_LOCAL_19 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_19_5></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_3' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_LOCAL_19_6' NAME=CODE_TYPE_LOCAL_19 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_19_6></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_4' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_LOCAL_19_7' NAME=CODE_TYPE_LOCAL_19 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_19_7></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_5' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_LOCAL_19_8' NAME=CODE_TYPE_LOCAL_19 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_19_8></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_6' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_LOCAL_19_10' NAME=CODE_TYPE_LOCAL_19 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_19_10></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_7' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_LOCAL_19_12' NAME=CODE_TYPE_LOCAL_19 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_19_12></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_8' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_CYCLE_19_2' NAME=CODE_TYPE_CYCLE_19 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_9' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_CYCLE_19_3' NAME=CODE_TYPE_CYCLE_19 TYPE='radio' VALUE=$CODE_TYPE_CYCLE_19_3></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_19_10' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='ANNEE_MISE_SERVICE_19' NAME=ANNEE_MISE_SERVICE_19 TYPE='text'size = 5 VALUE="$ANNEE_MISE_SERVICE_19"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_19_11' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='SURFACE_LOCAL_19' NAME=SURFACE_LOCAL_19 TYPE='text'size = 5 VALUE="$SURFACE_LOCAL_19"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_12' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_19_1' NAME=CODE_TYPE_NATURE_MUR_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_13' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_19_2' NAME=CODE_TYPE_NATURE_MUR_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_14' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_19_3' NAME=CODE_TYPE_NATURE_MUR_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_19_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_15' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_MUR_19_4' NAME=CODE_TYPE_NATURE_MUR_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_MUR_19_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_16' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_19_1' NAME=CODE_TYPE_ETAT_MUR_19 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_17' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_ETAT_MUR_19_2' NAME=CODE_TYPE_ETAT_MUR_19 TYPE='radio' VALUE=$CODE_TYPE_ETAT_MUR_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_18' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_19_1' NAME=CODE_TYPE_NATURE_TOIT_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_19' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_19_2' NAME=CODE_TYPE_NATURE_TOIT_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_20' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_TOIT_19_3' NAME=CODE_TYPE_NATURE_TOIT_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_TOIT_19_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_21' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_19_1' NAME=CODE_TYPE_ETAT_TOIT_19 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_22' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_ETAT_TOIT_19_2' NAME=CODE_TYPE_ETAT_TOIT_19 TYPE='radio' VALUE=$CODE_TYPE_ETAT_TOIT_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_23' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_19_1' NAME=CODE_TYPE_NATURE_SOL_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_24' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_19_2' NAME=CODE_TYPE_NATURE_SOL_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_25' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_NATURE_SOL_19_3' NAME=CODE_TYPE_NATURE_SOL_19 TYPE='radio' VALUE=$CODE_TYPE_NATURE_SOL_19_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_26' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_19_1' NAME=CODE_TYPE_ETAT_SOL_19 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_27' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_ETAT_SOL_19_2' NAME=CODE_TYPE_ETAT_SOL_19 TYPE='radio' VALUE=$CODE_TYPE_ETAT_SOL_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_28' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_19_1' NAME=CODE_TYPE_CONFORT_THERMIQ_19 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_29' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_CONFORT_THERMIQ_19_2' NAME=CODE_TYPE_CONFORT_THERMIQ_19 TYPE='radio' VALUE=$CODE_TYPE_CONFORT_THERMIQ_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_30' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_FERMETURE_19_1' NAME=CODE_TYPE_FERMETURE_19 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_31' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_FERMETURE_19_2' NAME=CODE_TYPE_FERMETURE_19 TYPE='radio' VALUE=$CODE_TYPE_FERMETURE_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_32' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_19_1' NAME=CODE_TYPE_FINANCEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_19_1></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_33' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_19_2' NAME=CODE_TYPE_FINANCEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_19_2></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_34' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_19_3' NAME=CODE_TYPE_FINANCEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_19_3></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_35' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_19_4' NAME=CODE_TYPE_FINANCEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_19_4></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_19_36' onClick='MiseEvidenceLigneFrame(19,20)'><INPUT  ID='CODE_TYPE_FINANCEMENT_19_5' NAME=CODE_TYPE_FINANCEMENT_19 TYPE='radio' VALUE=$CODE_TYPE_FINANCEMENT_19_5></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

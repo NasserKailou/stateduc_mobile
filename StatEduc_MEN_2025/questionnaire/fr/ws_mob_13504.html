@@ -1,0 +1,307 @@
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+				ctrlSaisieLst[0] = new Array(1350020, "PRESENCE_CENTRE_CENTE", "booleen", "si", "1;CODE_TYPE_CENTRE_SANTE", "");
+				ctrlSaisieLst[1] = new Array(1350027, "PRESENCE_DISPO_POST_ALPHA", "booleen", "si", "1;PRESENCE_BIBLIOTHEQUE,PRESENCE_PRESSE_VILLAGEOISE,PRESENCE_CLUB_LECTURE,PRESENCE_AUTRE_ANIMATION", "");
+				ctrlSaisieLst[2] = new Array(1350042, "PRESENCE_GROUPEMENT", "booleen", "si", "1;GROUP_AGRICOLE,GROUP_PASTORAL,GROUP_ARTISANAL,GROUP_AUTRE", "");
+
+				var do_submit = true;
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=13504' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.1  La localit&Atilde;&copy; dispose-t-elle d&apos;un centre de sant&Atilde;&copy; ?&nbsp;&nbsp;&nbsp;<label for="PRESENCE_CENTRE_CENTE_0_1">Oui</label><INPUT NAME='PRESENCE_CENTRE_CENTE_0' TYPE='radio'   ID='PRESENCE_CENTRE_CENTE_0_1' VALUE='PRESENCE_CENTRE_CENTE_0_1' data-mini='true'>
+<label for="PRESENCE_CENTRE_CENTE_0_0">Non</label><INPUT NAME='PRESENCE_CENTRE_CENTE_0' TYPE='radio'   ID='PRESENCE_CENTRE_CENTE_0_0' VALUE='PRESENCE_CENTRE_CENTE_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.1.1 Si Oui &nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='2'  valign=top class='police_gras'>&nbsp;&nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_CENTRE_SANTE_0_1'>a) CSI</LABEL><INPUT NAME='CODE_TYPE_CENTRE_SANTE_0' TYPE='radio'   ID='CODE_TYPE_CENTRE_SANTE_0_1' VALUE='CODE_TYPE_CENTRE_SANTE_0_1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_CENTRE_SANTE_0_2'>b) case de sant&Atilde;&copy;</LABEL><INPUT NAME='CODE_TYPE_CENTRE_SANTE_0' TYPE='radio'   ID='CODE_TYPE_CENTRE_SANTE_0_2' VALUE='CODE_TYPE_CENTRE_SANTE_0_2' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_CENTRE_SANTE_0_3'>c) H&Atilde;&acute;pital</LABEL><INPUT NAME='CODE_TYPE_CENTRE_SANTE_0' TYPE='radio'   ID='CODE_TYPE_CENTRE_SANTE_0_3' VALUE='CODE_TYPE_CENTRE_SANTE_0_3' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_CENTRE_SANTE_0_4'>d) autres services de sant&Atilde;&copy;</LABEL><INPUT NAME='CODE_TYPE_CENTRE_SANTE_0' TYPE='radio'   ID='CODE_TYPE_CENTRE_SANTE_0_4' VALUE='CODE_TYPE_CENTRE_SANTE_0_4' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.1.2 Si non quelle est la distance qui s&Atilde;&copy;pare le centre du centre de sant&Atilde;&copy; le plus proche ?&nbsp;&nbsp;&nbsp;<INPUT NAME='DISTANCE_CENTRE_SANTE_0' TYPE='text'   ID='DISTANCE_CENTRE_SANTE_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.2  La localit&Atilde;&copy; dispose t-elle des dispositifs  de post-Alpha? :&nbsp;&nbsp;&nbsp;<label for="PRESENCE_DISPO_POST_ALPHA_0_1">Oui</label><INPUT NAME='PRESENCE_DISPO_POST_ALPHA_0' TYPE='radio'   ID='PRESENCE_DISPO_POST_ALPHA_0_1' VALUE='PRESENCE_DISPO_POST_ALPHA_0_1' data-mini='true'>
+<label for="PRESENCE_DISPO_POST_ALPHA_0_0">Non</label><INPUT NAME='PRESENCE_DISPO_POST_ALPHA_0' TYPE='radio'   ID='PRESENCE_DISPO_POST_ALPHA_0_0' VALUE='PRESENCE_DISPO_POST_ALPHA_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.2.1 Si  oui,  cocher le(s) type(s) :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;a) Bibliotheque villageoise&nbsp;&nbsp;&nbsp;<INPUT NAME='PRESENCE_BIBLIOTHEQUE_0' TYPE='checkbox'   ID='PRESENCE_BIBLIOTHEQUE_0' VALUE='PRESENCE_BIBLIOTHEQUE_0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;b) une presse villageoise&nbsp;&nbsp;&nbsp;<INPUT NAME='PRESENCE_PRESSE_VILLAGEOISE_0' TYPE='checkbox'   ID='PRESENCE_PRESSE_VILLAGEOISE_0' VALUE='PRESENCE_PRESSE_VILLAGEOISE_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;c) club de lecture&nbsp;&nbsp;&nbsp;<INPUT NAME='PRESENCE_CLUB_LECTURE_0' TYPE='checkbox'   ID='PRESENCE_CLUB_LECTURE_0' VALUE='PRESENCE_CLUB_LECTURE_0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;d) Foyer d&apos;Education Permanente&nbsp;&nbsp;&nbsp;<INPUT NAME='PRESENCE_FEP_ANIMATION_0' TYPE='checkbox'   ID='PRESENCE_FEP_ANIMATION_0' VALUE='PRESENCE_FEP_ANIMATION_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.3 Activit&Atilde;&copy;s &Atilde;&copy;conomiques dominantes de la localit&Atilde;&copy; (choisir les 3 activit&Atilde;&copy;s dominantes en mettant, dans la case correspondante, le code  attribu&Atilde;&copy; par ordre d&apos;importance de l&apos;activit&Atilde;&copy;) :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Activitt&Atilde;&copy;1&nbsp;&nbsp;&nbsp;		<SELECT  ID='CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0'  NAME=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0 data-mini='true'>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_9>1-Cultures vivri&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_10>2-Elevage</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_11>3-Cultures mara&Atilde;&reg;ch&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_12>4-P&Atilde;&ordf;che</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_13>5-Cultures fruiti&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_14>6-Artisanat</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_15>7-Cultures industrielles</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_1_0_16>8-Autres</OPTION>
+		</SELECT>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Activitt&Atilde;&copy;2&nbsp;&nbsp;&nbsp;		<SELECT  ID='CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0'  NAME=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0 data-mini='true'>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_9>1-Cultures vivri&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_10>2-Elevage</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_11>3-Cultures mara&Atilde;&reg;ch&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_12>4-P&Atilde;&ordf;che</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_13>5-Cultures fruiti&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_14>6-Artisanat</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_15>7-Cultures industrielles</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_2_0_16>8-Autres</OPTION>
+		</SELECT>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Activitt&Atilde;&copy;3&nbsp;&nbsp;&nbsp;		<SELECT  ID='CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0'  NAME=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0 data-mini='true'>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_9>1-Cultures vivri&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_10>2-Elevage</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_11>3-Cultures mara&Atilde;&reg;ch&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_12>4-P&Atilde;&ordf;che</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_13>5-Cultures fruiti&Atilde;&uml;res</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_14>6-Artisanat</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_15>7-Cultures industrielles</OPTION>
+			<OPTION VALUE=CODE_TYPE_ACTIVITE_ECONOMIQUE_3_0_16>8-Autres</OPTION>
+		</SELECT>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='2'  valign=top class='police_gras'>&nbsp;2.4 La localit&Atilde;&copy; poss&Atilde;&uml;de un (des) march&Atilde;&copy;(s)&nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_MARCHE_0_1'>a) permanent(s)</LABEL><INPUT NAME='CODE_TYPE_MARCHE_0' TYPE='radio'   ID='CODE_TYPE_MARCHE_0_1' VALUE='CODE_TYPE_MARCHE_0_1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_MARCHE_0_2'>b) hebdomadaire(s)</LABEL><INPUT NAME='CODE_TYPE_MARCHE_0' TYPE='radio'   ID='CODE_TYPE_MARCHE_0_2' VALUE='CODE_TYPE_MARCHE_0_2' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_MARCHE_0_3'>c) pas de march&Atilde;&copy;(s)</LABEL><INPUT NAME='CODE_TYPE_MARCHE_0' TYPE='radio'   ID='CODE_TYPE_MARCHE_0_3' VALUE='CODE_TYPE_MARCHE_0_3' data-mini='true'></TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.5  La localit&Atilde;&copy; poss&Atilde;&uml;de-t-elle une (des) coop&Atilde;&copy;rative(s) ou un groupement  ?&nbsp;&nbsp;&nbsp;<label for="PRESENCE_GROUPEMENT_0_1">Oui</label><INPUT NAME='PRESENCE_GROUPEMENT_0' TYPE='radio'   ID='PRESENCE_GROUPEMENT_0_1' VALUE='PRESENCE_GROUPEMENT_0_1' data-mini='true'>
+<label for="PRESENCE_GROUPEMENT_0_0">Non</label><INPUT NAME='PRESENCE_GROUPEMENT_0' TYPE='radio'   ID='PRESENCE_GROUPEMENT_0_0' VALUE='PRESENCE_GROUPEMENT_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.5.1 Si Oui, cocher le type :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;a) agricole &nbsp;&nbsp;&nbsp;<INPUT NAME='GROUP_AGRICOLE_0' TYPE='checkbox'   ID='GROUP_AGRICOLE_0' VALUE='GROUP_AGRICOLE_0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;b) pastoral&nbsp;&nbsp;&nbsp;<INPUT NAME='GROUP_PASTORAL_0' TYPE='checkbox'   ID='GROUP_PASTORAL_0' VALUE='GROUP_PASTORAL_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;c) artisanal&nbsp;&nbsp;&nbsp;<INPUT NAME='GROUP_ARTINSANAL_0' TYPE='checkbox'   ID='GROUP_ARTINSANAL_0' VALUE='GROUP_ARTINSANAL_0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;d) autres (&Atilde;  pr&Atilde;&copy;ciser)&nbsp;&nbsp;&nbsp;<INPUT NAME='GROUP_AUTRE_0' TYPE='text'   ID='GROUP_AUTRE_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.6  Parmi nos langues nationales, quelles sont les 3 langues les plus couramment parl&Atilde;&copy;es par ordre d&apos;importance dans la localit&Atilde;&copy; ?&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Langue 1&nbsp;&nbsp;&nbsp;		<SELECT  ID='CODE_TYPE_LANGUE_NATINALE_1_0'  NAME=CODE_TYPE_LANGUE_NATINALE_1_0 data-mini='true'>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_14>01-Arabe </OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_15>02-Buduma</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_16>03-Fulfuld&Atilde;&copy;</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_17>04-Gulumantch&Atilde;&copy;ma</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_18>05-Hausa</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_19>06-Kanuri</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_20>07=Tagdalt</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_21>08=Tamajecq</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_22>09=Tassawak</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_23>10=Tubu</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_1_0_24>11=Zarma-Sonrai</OPTION>
+		</SELECT>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Langue 2&nbsp;&nbsp;&nbsp;		<SELECT  ID='CODE_TYPE_LANGUE_NATINALE_2_0'  NAME=CODE_TYPE_LANGUE_NATINALE_2_0 data-mini='true'>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_14>01-Arabe </OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_15>02-Buduma</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_16>03-Fulfuld&Atilde;&copy;</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_17>04-Gulumantch&Atilde;&copy;ma</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_18>05-Hausa</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_19>06-Kanuri</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_20>07=Tagdalt</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_21>08=Tamajecq</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_22>09=Tassawak</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_23>10=Tubu</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_2_0_24>11=Zarma-Sonrai</OPTION>
+		</SELECT>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Langue 3&nbsp;&nbsp;&nbsp;		<SELECT  ID='CODE_TYPE_LANGUE_NATINALE_3_0'  NAME=CODE_TYPE_LANGUE_NATINALE_3_0 data-mini='true'>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_14>01-Arabe </OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_15>02-Buduma</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_16>03-Fulfuld&Atilde;&copy;</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_17>04-Gulumantch&Atilde;&copy;ma</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_18>05-Hausa</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_19>06-Kanuri</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_20>07=Tagdalt</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_21>08=Tamajecq</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_22>09=Tassawak</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_23>10=Tubu</OPTION>
+			<OPTION VALUE=CODE_TYPE_LANGUE_NATINALE_3_0_24>11=Zarma-Sonrai</OPTION>
+		</SELECT>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.7  Existe t-il des projets de d&Atilde;&copy;veloppement socio-&Atilde;&copy;conomique dans la localit&Atilde;&copy; ?&nbsp;&nbsp;&nbsp;<label for="PRESENCE_PROJET_DEV_SOCIO_0_1">Oui</label><INPUT NAME='PRESENCE_PROJET_DEV_SOCIO_0' TYPE='radio'   ID='PRESENCE_PROJET_DEV_SOCIO_0_1' VALUE='PRESENCE_PROJET_DEV_SOCIO_0_1' data-mini='true'>
+<label for="PRESENCE_PROJET_DEV_SOCIO_0_0">Non</label><INPUT NAME='PRESENCE_PROJET_DEV_SOCIO_0' TYPE='radio'   ID='PRESENCE_PROJET_DEV_SOCIO_0_0' VALUE='PRESENCE_PROJET_DEV_SOCIO_0_0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b>2.7.1 Si Oui, remplissez le tableau ci-dessous<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=4  CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Nombre total d&apos;intervenants </TD>
+		<TD  align='center'>1</TD>
+		<TD  align='center'>2</TD>
+		<TD  align='center'>3</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Education</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_1' id='NOMBRE_TOTAL_INTERVENANT_0_1' name='NOMBRE_TOTAL_INTERVENANT_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_1' id='NOM_INTERVENANT1_0_1' name='NOM_INTERVENANT1_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_1' id='NOM_INTERVENANT2_0_1' name='NOM_INTERVENANT2_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_1' id='NOM_INTERVENANT3_0_1' name='NOM_INTERVENANT3_0_1' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Sant&Atilde;&copy;</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_2' id='NOMBRE_TOTAL_INTERVENANT_0_2' name='NOMBRE_TOTAL_INTERVENANT_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_2' id='NOM_INTERVENANT1_0_2' name='NOM_INTERVENANT1_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_2' id='NOM_INTERVENANT2_0_2' name='NOM_INTERVENANT2_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_2' id='NOM_INTERVENANT3_0_2' name='NOM_INTERVENANT3_0_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Agriculture</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_3' id='NOMBRE_TOTAL_INTERVENANT_0_3' name='NOMBRE_TOTAL_INTERVENANT_0_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_3' id='NOM_INTERVENANT1_0_3' name='NOM_INTERVENANT1_0_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_3' id='NOM_INTERVENANT2_0_3' name='NOM_INTERVENANT2_0_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_3' id='NOM_INTERVENANT3_0_3' name='NOM_INTERVENANT3_0_3' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Elevage</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_4' id='NOMBRE_TOTAL_INTERVENANT_0_4' name='NOMBRE_TOTAL_INTERVENANT_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_4' id='NOM_INTERVENANT1_0_4' name='NOM_INTERVENANT1_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_4' id='NOM_INTERVENANT2_0_4' name='NOM_INTERVENANT2_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_4' id='NOM_INTERVENANT3_0_4' name='NOM_INTERVENANT3_0_4' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Environnement</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_5' id='NOMBRE_TOTAL_INTERVENANT_0_5' name='NOMBRE_TOTAL_INTERVENANT_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_5' id='NOM_INTERVENANT1_0_5' name='NOM_INTERVENANT1_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_5' id='NOM_INTERVENANT2_0_5' name='NOM_INTERVENANT2_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_5' id='NOM_INTERVENANT3_0_5' name='NOM_INTERVENANT3_0_5' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Hydraulique</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_6' id='NOMBRE_TOTAL_INTERVENANT_0_6' name='NOMBRE_TOTAL_INTERVENANT_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_6' id='NOM_INTERVENANT1_0_6' name='NOM_INTERVENANT1_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_6' id='NOM_INTERVENANT2_0_6' name='NOM_INTERVENANT2_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_6' id='NOM_INTERVENANT3_0_6' name='NOM_INTERVENANT3_0_6' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Artisanat</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_7' id='NOMBRE_TOTAL_INTERVENANT_0_7' name='NOMBRE_TOTAL_INTERVENANT_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_7' id='NOM_INTERVENANT1_0_7' name='NOM_INTERVENANT1_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_7' id='NOM_INTERVENANT2_0_7' name='NOM_INTERVENANT2_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_7' id='NOM_INTERVENANT3_0_7' name='NOM_INTERVENANT3_0_7' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >P&Atilde;&ordf;che</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOMBRE_TOTAL_INTERVENANT_#_8' id='NOMBRE_TOTAL_INTERVENANT_0_8' name='NOMBRE_TOTAL_INTERVENANT_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT1_#_8' id='NOM_INTERVENANT1_0_8' name='NOM_INTERVENANT1_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT2_#_8' id='NOM_INTERVENANT2_0_8' name='NOM_INTERVENANT2_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NOM_INTERVENANT3_#_8' id='NOM_INTERVENANT3_0_8' name='NOM_INTERVENANT3_0_8' type='text' value=''></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE></FORM></div>

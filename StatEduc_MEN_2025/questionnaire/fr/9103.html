@@ -1,0 +1,532 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+				ctrlSaisieLst[0] = new Array(910078, "TOTAL", "text", "==", "HOMME+FEMME", "Le nombre total d'enseignant permanents craie en main doit être égal la somme de nombre d'hommes plus le nombre de femme");
+				ctrlSaisieLst[1] = new Array(910084, "TOTAL_VACATAIRE", "text", "==", "HOMME_VACATAIRE+FEMME_VACATAIRE", "Le nombre total d'enseignant vacataire craie en main doit être égal la somme de nombre d'hommes plus le nombre de femme");
+				ctrlSaisieLst[2] = new Array(910019, "PRESENCE_ORDINATEUR_FONCTIONNEL", "booleen", "si", "1;NOMBRE_ORDINATEURS,UTILISATEUR_ORDI_ADMIN,UTILISATEUR_ORDI_ENSEIG,UTILISE_ORDI_ENSEIGNAT_AND_ELEVE", "");
+				ctrlSaisieLst[3] = new Array(910015, "PRESENCE_ACCES_INTERNET", "booleen", "si", "1;CODE_TYPE_PROMOTTEUR_INTERNET,UTILISATEUR_INTERNET_ADMIN,UTILISATEUR_INTERNET_ENSEIGN,UTILISATEUR_INTERNET_ELEVE_ENSEIGN", "");
+				ctrlSaisieLst[4] = new Array(910047, "NB_ENSEIG_VISITE_CONS_PEDAG", "text", "<=", "TOTAL+TOTAL_VACATAIRE", "Le nombre d'enseignants ayant reçu la visite d'un CP doit être inferieur ou egal total enseignant craie en main et vacataire");
+				ctrlSaisieLst[5] = new Array(910048, "NB_ENSEIG_VISITE_CHEF_ETAB", "text", "<=", "TOTAL+TOTAL_VACATAIRE", "Le nombre d'enseignants ayant reçu la visite du Chef d'Etablissement doit être inferieur ou egal total enseignant craie en main et vacataire");
+				ctrlSaisieLst[6] = new Array(910040, "VICTIME_ATTAQUE_MAIN_ARME", "booleen", "si", "1;ALERTE_CHEF_VILLAGE,ALERTE_AUTORITE_ACAD,ALERT_MAIRE,ALERT_FDS", "");
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=9103' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>II/.INFORMATIONS GÉNÈRALES SUR L'ÉTABLISSEMENT (suite)</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>2.26 Quel est l'effectif total des élèves (dont des redoublements) de l'établissement par sexe selon le cycle et le niveau ? :<br></b><script language='javascript' type='text/javascript'>
+var expression_910055 	= "";
+var tot_mes_ligne_910055 	= new Array();
+var tot_mes_col_910055 	= new Array();
+var affich_vertic_mes_910055 	= 0;
+var affiche_sous_totaux_910055 	= 0;
+var tab_mes_910055 	= new Array ("NBRE_GARCON","NBRE_FILLE");
+var tab_ligne_910055	= new Array ();
+var tab_col_910055	= new Array ("7","8","9","10");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>Sixième</TD>
+		<TD CLASS='ligne-titre' align='center'>Cinquième</TD>
+		<TD CLASS='ligne-titre' align='center'>Quatrième</TD>
+		<TD CLASS='ligne-titre' align='center'>Troisième</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>Effectif garçons</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_7' NAME='NBRE_GARCON_0_7' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_7"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_8' NAME='NBRE_GARCON_0_8' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_8"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_9' NAME='NBRE_GARCON_0_9' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_9"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_10' NAME='NBRE_GARCON_0_10' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_10"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910055_NBRE_GARCON_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>Effecctif filles</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_7' NAME='NBRE_FILLE_0_7' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_7"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_8' NAME='NBRE_FILLE_0_8' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_8"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_9' NAME='NBRE_FILLE_0_9' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_9"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_10' NAME='NBRE_FILLE_0_10' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_10"  onchange="set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910055_NBRE_FILLE_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD  COLSPAN=2  align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910055_ALL_MES_COLONNE_0_7' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910055_ALL_MES_COLONNE_0_8' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910055_ALL_MES_COLONNE_0_9' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910055_ALL_MES_COLONNE_0_10' ></TD>
+		<td align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910055_ALL_MES_0' ></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br>2.26.2 Effectif des redoublants par sexe selon le niveau et le cycle (CYCLE I):<br></b><script language='javascript' type='text/javascript'>
+var expression_910066 	= "";
+var tot_mes_ligne_910066 	= new Array();
+var tot_mes_col_910066 	= new Array();
+var affich_vertic_mes_910066 	= 0;
+var affiche_sous_totaux_910066 	= 0;
+var tab_mes_910066 	= new Array ("NBRE_GARCON_RED","NBRE_FILLE_RED");
+var tab_ligne_910066	= new Array ();
+var tab_col_910066	= new Array ("7","8","9","10");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>Sixième</TD>
+		<TD CLASS='ligne-titre' align='center'>Cinquième</TD>
+		<TD CLASS='ligne-titre' align='center'>Quatrième</TD>
+		<TD CLASS='ligne-titre' align='center'>Troisième</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>Redoublants garçons</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_7' NAME='NBRE_GARCON_RED_0_7' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_7"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_8' NAME='NBRE_GARCON_RED_0_8' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_8"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_9' NAME='NBRE_GARCON_RED_0_9' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_9"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_10' NAME='NBRE_GARCON_RED_0_10' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_10"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910066_NBRE_GARCON_RED_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>Redoublantes filles</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_7' NAME='NBRE_FILLE_RED_0_7' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_7"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_8' NAME='NBRE_FILLE_RED_0_8' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_8"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_9' NAME='NBRE_FILLE_RED_0_9' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_9"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_10' NAME='NBRE_FILLE_RED_0_10' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_10"  onchange="set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910066_NBRE_FILLE_RED_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD  COLSPAN=2  align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910066_ALL_MES_COLONNE_0_7' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910066_ALL_MES_COLONNE_0_8' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910066_ALL_MES_COLONNE_0_9' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910066_ALL_MES_COLONNE_0_10' ></TD>
+		<td align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910066_ALL_MES_0' ></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br>2.26.3 Effectif total des élèves de l'établissement par sexe selon le niveau et le cycle (CYCLE MOYEN):<br></b><script language='javascript' type='text/javascript'>
+var expression_910067 	= "";
+var tot_mes_ligne_910067 	= new Array();
+var tot_mes_col_910067 	= new Array();
+var affich_vertic_mes_910067 	= 0;
+var affiche_sous_totaux_910067 	= 0;
+var tab_mes_910067 	= new Array ("NBRE_GARCON","NBRE_FILLE");
+var tab_ligne_910067	= new Array ();
+var tab_col_910067	= new Array ("15","16","17","19","18","20","22","21");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>Seconde A</TD>
+		<TD CLASS='ligne-titre' align='center'>Seconde C</TD>
+		<TD CLASS='ligne-titre' align='center'>Premiere A</TD>
+		<TD CLASS='ligne-titre' align='center'>Premiere C</TD>
+		<TD CLASS='ligne-titre' align='center'>Premiere D</TD>
+		<TD CLASS='ligne-titre' align='center'>Terminale A</TD>
+		<TD CLASS='ligne-titre' align='center'>Terminale C</TD>
+		<TD CLASS='ligne-titre' align='center'>Terminale D</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>Effectif garçons</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_15' NAME='NBRE_GARCON_0_15' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_15"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_16' NAME='NBRE_GARCON_0_16' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_16"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_17' NAME='NBRE_GARCON_0_17' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_17"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_19' NAME='NBRE_GARCON_0_19' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_19"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_18' NAME='NBRE_GARCON_0_18' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_18"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_20' NAME='NBRE_GARCON_0_20' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_20"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_22' NAME='NBRE_GARCON_0_22' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_22"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_0_21' NAME='NBRE_GARCON_0_21' TYPE='text' size=5 VALUE="$NBRE_GARCON_0_21"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910067_NBRE_GARCON_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>Effecctif filles</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_15' NAME='NBRE_FILLE_0_15' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_15"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_16' NAME='NBRE_FILLE_0_16' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_16"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_17' NAME='NBRE_FILLE_0_17' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_17"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_19' NAME='NBRE_FILLE_0_19' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_19"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_18' NAME='NBRE_FILLE_0_18' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_18"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_20' NAME='NBRE_FILLE_0_20' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_20"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_22' NAME='NBRE_FILLE_0_22' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_22"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_0_21' NAME='NBRE_FILLE_0_21' TYPE='text' size=5 VALUE="$NBRE_FILLE_0_21"  onchange="set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910067_NBRE_FILLE_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD  COLSPAN=2  align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_15' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_16' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_17' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_19' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_18' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_20' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_22' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_COLONNE_0_21' ></TD>
+		<td align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910067_ALL_MES_0' ></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br>2.26.4 Effectif des redoublants par sexe selon le niveau et le cycle (CYCLE MOYEN):<br></b><script language='javascript' type='text/javascript'>
+var expression_910073 	= "";
+var tot_mes_ligne_910073 	= new Array();
+var tot_mes_col_910073 	= new Array();
+var affich_vertic_mes_910073 	= 0;
+var affiche_sous_totaux_910073 	= 0;
+var tab_mes_910073 	= new Array ("NBRE_GARCON_RED","NBRE_FILLE_RED");
+var tab_ligne_910073	= new Array ();
+var tab_col_910073	= new Array ("15","16","17","19","18","20","22","21");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>Seconde A</TD>
+		<TD CLASS='ligne-titre' align='center'>Seconde C</TD>
+		<TD CLASS='ligne-titre' align='center'>Premiere A</TD>
+		<TD CLASS='ligne-titre' align='center'>Premiere C</TD>
+		<TD CLASS='ligne-titre' align='center'>Premiere D</TD>
+		<TD CLASS='ligne-titre' align='center'>Terminale A</TD>
+		<TD CLASS='ligne-titre' align='center'>Terminale C</TD>
+		<TD CLASS='ligne-titre' align='center'>Terminale D</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>Redoublants garçons</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_15' NAME='NBRE_GARCON_RED_0_15' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_15"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_16' NAME='NBRE_GARCON_RED_0_16' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_16"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_17' NAME='NBRE_GARCON_RED_0_17' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_17"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_19' NAME='NBRE_GARCON_RED_0_19' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_19"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_18' NAME='NBRE_GARCON_RED_0_18' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_18"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_20' NAME='NBRE_GARCON_RED_0_20' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_20"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_22' NAME='NBRE_GARCON_RED_0_22' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_22"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_GARCON_RED_0_21' NAME='NBRE_GARCON_RED_0_21' TYPE='text' size=5 VALUE="$NBRE_GARCON_RED_0_21"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910073_NBRE_GARCON_RED_LIGNE_0' size=5></TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>Redoublantes filles</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_15' NAME='NBRE_FILLE_RED_0_15' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_15"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_16' NAME='NBRE_FILLE_RED_0_16' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_16"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_17' NAME='NBRE_FILLE_RED_0_17' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_17"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_19' NAME='NBRE_FILLE_RED_0_19' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_19"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_18' NAME='NBRE_FILLE_RED_0_18' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_18"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_20' NAME='NBRE_FILLE_RED_0_20' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_20"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_22' NAME='NBRE_FILLE_RED_0_22' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_22"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_FILLE_RED_0_21' NAME='NBRE_FILLE_RED_0_21' TYPE='text' size=5 VALUE="$NBRE_FILLE_RED_0_21"  onchange="set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);"  tabindex='9023'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_910073_NBRE_FILLE_RED_LIGNE_0' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD  COLSPAN=2  align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_15' size=5></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_16' size=5></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_17' size=5></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_19' size=5></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_18' size=5></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_20' size=5></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_22' size=5></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_COLONNE_0_21' size=5></TD>
+		<td align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_910073_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.27 Donnez le nombre total d'enseignants permanents craie en main par sexe :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD   valign=top >&nbsp;Hommes&nbsp;&nbsp;&nbsp;<INPUT NAME='HOMME_0' TYPE='text'   ID='HOMME_0' VALUE="$HOMME_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Femmes&nbsp;&nbsp;&nbsp;<INPUT NAME='FEMME_0' TYPE='text'   ID='FEMME_0' VALUE="$FEMME_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Ensemble&nbsp;&nbsp;&nbsp;<INPUT NAME='TOTAL_0' TYPE='text'   ID='TOTAL_0' VALUE="$TOTAL_0" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.28 Donnez le nombre total d'enseignants vacataires craie en main par sexe :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD   valign=top >&nbsp;Hommes&nbsp;&nbsp;&nbsp;<INPUT NAME='HOMME_VACATAIRE_0' TYPE='text'   ID='HOMME_VACATAIRE_0' VALUE="$HOMME_VACATAIRE_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Femmes&nbsp;&nbsp;&nbsp;<INPUT NAME='FEMME_VACATAIRE_0' TYPE='text'   ID='FEMME_VACATAIRE_0' VALUE="$FEMME_VACATAIRE_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Ensemble&nbsp;&nbsp;&nbsp;<INPUT NAME='TOTAL_VACATAIRE_0' TYPE='text'   ID='TOTAL_VACATAIRE_0' VALUE="$TOTAL_VACATAIRE_0" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.29 Votre établissement est-il doté d'ordinateurs fonctionnels ? : &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_ORDINATEUR_FONCTIONNEL_0' TYPE='radio'   ID='PRESENCE_ORDINATEUR_FONCTIONNEL_0_1' VALUE=$PRESENCE_ORDINATEUR_FONCTIONNEL_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_ORDINATEUR_FONCTIONNEL_0' TYPE='radio'   ID='PRESENCE_ORDINATEUR_FONCTIONNEL_0_0' VALUE=$PRESENCE_ORDINATEUR_FONCTIONNEL_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.29.1 Si oui, Quel est le nombre ? : &nbsp;&nbsp;&nbsp;<INPUT NAME='NOMBRE_ORDINATEURS_0' TYPE='text' size = 2  ID='NOMBRE_ORDINATEURS_0' VALUE="$NOMBRE_ORDINATEURS_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.29.2.Qui les utilise ? (Plusieurs réponses possibles, cas de a et b d'une part ou a et c d'autre part) :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD   valign=top >&nbsp;a) Administration&nbsp;&nbsp;&nbsp;<INPUT NAME='UTILISATEUR_ORDI_ADMIN_0' TYPE='checkbox'   ID='UTILISATEUR_ORDI_ADMIN_0' VALUE=$UTILISATEUR_ORDI_ADMIN_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b) Enseignants&nbsp;&nbsp;&nbsp;<INPUT NAME='UTILISATEUR_ORDI_ENSEIG_0' TYPE='checkbox'   ID='UTILISATEUR_ORDI_ENSEIG_0' VALUE=$UTILISATEUR_ORDI_ENSEIG_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>c) Elèves + Enseignants&nbsp;&nbsp;&nbsp;<INPUT NAME='UTILISE_ORDI_ENSEIGNAT_AND_ELEVE_0' TYPE='checkbox'   ID='UTILISE_ORDI_ENSEIGNAT_AND_ELEVE_0' VALUE=$UTILISE_ORDI_ENSEIGNAT_AND_ELEVE_0>
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.30 Votre établissement dispose t-il d'une salle informatique fonctionnelle ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_SALLE_INFORMATIQUE_FONCTIONNEL_0' TYPE='radio'   ID='PRESENCE_SALLE_INFORMATIQUE_FONCTIONNEL_0_1' VALUE=$PRESENCE_SALLE_INFORMATIQUE_FONCTIONNEL_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_SALLE_INFORMATIQUE_FONCTIONNEL_0' TYPE='radio'   ID='PRESENCE_SALLE_INFORMATIQUE_FONCTIONNEL_0_0' VALUE=$PRESENCE_SALLE_INFORMATIQUE_FONCTIONNEL_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.31 Votre établissement est -il doté d'un accès à Internet?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_ACCES_INTERNET_0' TYPE='radio'   ID='PRESENCE_ACCES_INTERNET_0_1' VALUE=$PRESENCE_ACCES_INTERNET_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_ACCES_INTERNET_0' TYPE='radio'   ID='PRESENCE_ACCES_INTERNET_0_0' VALUE=$PRESENCE_ACCES_INTERNET_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.31.1 Si oui, préciser le principal promoteur :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;a) Administration &nbsp;<INPUT NAME='CODE_TYPE_PROMOTTEUR_INTERNET_0' TYPE='radio'   ID='CODE_TYPE_PROMOTTEUR_INTERNET_0_1' VALUE=$CODE_TYPE_PROMOTTEUR_INTERNET_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;b) Cyber café&nbsp;<INPUT NAME='CODE_TYPE_PROMOTTEUR_INTERNET_0' TYPE='radio'   ID='CODE_TYPE_PROMOTTEUR_INTERNET_0_2' VALUE=$CODE_TYPE_PROMOTTEUR_INTERNET_0_2>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.31.2 Si oui, qui en ont plusieurs réponses possibles, cas de a et b d'une part ou a et c  d'autre part) ?  &nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD   valign=top >&nbsp; a) Administration&nbsp;&nbsp;&nbsp;<INPUT NAME='UTILISATEUR_INTERNET_ADMIN_0' TYPE='checkbox'   ID='UTILISATEUR_INTERNET_ADMIN_0' VALUE=$UTILISATEUR_INTERNET_ADMIN_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b) Enseignants &nbsp;&nbsp;&nbsp;<INPUT NAME='UTILISATEUR_INTERNET_ENSEIGN_0' TYPE='checkbox'   ID='UTILISATEUR_INTERNET_ENSEIGN_0' VALUE=$UTILISATEUR_INTERNET_ENSEIGN_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>c) Elèves + Enseignants  &nbsp;&nbsp;&nbsp;<INPUT NAME='UTILISATEUR_INTERNET_ELEVE_ENSEIGN_0' TYPE='checkbox'   ID='UTILISATEUR_INTERNET_ELEVE_ENSEIGN_0' VALUE=$UTILISATEUR_INTERNET_ELEVE_ENSEIGN_0>
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.32  Votre établissement dispose t-il un bloc  administratif?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_BLOC_ADMINISTRATIF_0' TYPE='radio'   ID='PRESENCE_BLOC_ADMINISTRATIF_0_1' VALUE=$PRESENCE_BLOC_ADMINISTRATIF_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_BLOC_ADMINISTRATIF_0' TYPE='radio'   ID='PRESENCE_BLOC_ADMINISTRATIF_0_0' VALUE=$PRESENCE_BLOC_ADMINISTRATIF_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.33  Votre établissement dispose t-il d'une salle des professeurs?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_SALLE_PROFESSEURS_0' TYPE='radio'   ID='PRESENCE_SALLE_PROFESSEURS_0_1' VALUE=$PRESENCE_SALLE_PROFESSEURS_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_SALLE_PROFESSEURS_0' TYPE='radio'   ID='PRESENCE_SALLE_PROFESSEURS_0_0' VALUE=$PRESENCE_SALLE_PROFESSEURS_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.34  Votre établissement dispose t-il d'un logement de directeur?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_LOGEMENT_DIRECTEUR_0' TYPE='radio'   ID='PRESENCE_LOGEMENT_DIRECTEUR_0_1' VALUE=$PRESENCE_LOGEMENT_DIRECTEUR_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_LOGEMENT_DIRECTEUR_0' TYPE='radio'   ID='PRESENCE_LOGEMENT_DIRECTEUR_0_0' VALUE=$PRESENCE_LOGEMENT_DIRECTEUR_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.35 Votre établissement dispose t-il de logements pour les surveillants?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_LOGEMENT_SURVEILLANT_0' TYPE='radio'   ID='PRESENCE_LOGEMENT_SURVEILLANT_0_1' VALUE=$PRESENCE_LOGEMENT_SURVEILLANT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_LOGEMENT_SURVEILLANT_0' TYPE='radio'   ID='PRESENCE_LOGEMENT_SURVEILLANT_0_0' VALUE=$PRESENCE_LOGEMENT_SURVEILLANT_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.36  Votre établissement dispose t-il de logements pour les professeurs?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PRESENCE_LOGEMENT_PROFESSEUR_0' TYPE='radio'   ID='PRESENCE_LOGEMENT_PROFESSEUR_0_1' VALUE=$PRESENCE_LOGEMENT_PROFESSEUR_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PRESENCE_LOGEMENT_PROFESSEUR_0' TYPE='radio'   ID='PRESENCE_LOGEMENT_PROFESSEUR_0_0' VALUE=$PRESENCE_LOGEMENT_PROFESSEUR_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.37 Quel est le nombre d'enseignants ayant reçu la visite d'un IP l'année précedente ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIG_VISITE_INSPECTEUR_0' TYPE='text' size=2  ID='NB_ENSEIG_VISITE_INSPECTEUR_0' VALUE="$NB_ENSEIG_VISITE_INSPECTEUR_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.38 Quel est le nombre d'enseignants ayant reçu la visite d'un CP?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIG_VISITE_CONS_PEDAG_0' TYPE='text' size = 2  ID='NB_ENSEIG_VISITE_CONS_PEDAG_0' VALUE="$NB_ENSEIG_VISITE_CONS_PEDAG_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.39 Quel est le nombre d'enseignants ayant reçu la visite du Chef d'Etab ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIG_VISITE_CHEF_ETAB_0' TYPE='text' size = 2  ID='NB_ENSEIG_VISITE_CHEF_ETAB_0' VALUE="$NB_ENSEIG_VISITE_CHEF_ETAB_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.40 Est-ce que votre établissement a établi et a communiqué aux parties prenantes (personnel de l'école, élèves, parents) les règlements et  les directives sur les violences en milieu scolaire?<br />&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='COMMUNICATION_VIOLENCE_MILIEU_SCOLAIRE_0' TYPE='radio'   ID='COMMUNICATION_VIOLENCE_MILIEU_SCOLAIRE_0_1' VALUE=$COMMUNICATION_VIOLENCE_MILIEU_SCOLAIRE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='COMMUNICATION_VIOLENCE_MILIEU_SCOLAIRE_0' TYPE='radio'   ID='COMMUNICATION_VIOLENCE_MILIEU_SCOLAIRE_0_0' VALUE=$COMMUNICATION_VIOLENCE_MILIEU_SCOLAIRE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.41 Votre établissement a-t-il été victime d'attaques à mains armées ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='VICTIME_ATTAQUE_MAIN_ARME_0' TYPE='radio'   ID='VICTIME_ATTAQUE_MAIN_ARME_0_1' VALUE=$VICTIME_ATTAQUE_MAIN_ARME_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='VICTIME_ATTAQUE_MAIN_ARME_0' TYPE='radio'   ID='VICTIME_ATTAQUE_MAIN_ARME_0_0' VALUE=$VICTIME_ATTAQUE_MAIN_ARME_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.41.1 Si Oui, quelles sont les autorités alertées ?&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'   valign=top >&nbsp;a) Chef de village/quartier&nbsp;&nbsp;&nbsp;<INPUT NAME='ALERTE_CHEF_VILLAGE_0' TYPE='checkbox'   ID='ALERTE_CHEF_VILLAGE_0' VALUE=$ALERTE_CHEF_VILLAGE_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b) Autorités académiques&nbsp;&nbsp;&nbsp;<INPUT NAME='ALERTE_AUTORITE_ACAD_0' TYPE='checkbox'   ID='ALERTE_AUTORITE_ACAD_0' VALUE=$ALERTE_AUTORITE_ACAD_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>c) Maire&nbsp;&nbsp;&nbsp;<INPUT NAME='ALERT_MAIRE_0' TYPE='checkbox'   ID='ALERT_MAIRE_0' VALUE=$ALERT_MAIRE_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>d) FDS&nbsp;&nbsp;&nbsp;<INPUT NAME='ALERT_FDS_0' TYPE='checkbox'   ID='ALERT_FDS_0' VALUE=$ALERT_FDS_0>
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',910055, 0, tab_mes_910055, tab_ligne_910055, tab_col_910055);
+ set_TOTAL_MatFrml('form1',910066, 0, tab_mes_910066, tab_ligne_910066, tab_col_910066);
+ set_TOTAL_MatFrml('form1',910067, 0, tab_mes_910067, tab_ligne_910067, tab_col_910067);
+ set_TOTAL_MatFrml('form1',910073, 0, tab_mes_910073, tab_ligne_910073, tab_col_910073);
+</script>

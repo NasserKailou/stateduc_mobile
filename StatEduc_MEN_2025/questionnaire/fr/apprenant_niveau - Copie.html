@@ -1,0 +1,170 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+	
+
+	
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=2201' METHOD='POST'>
+  <input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/>
+  <TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B>IV. Effectif des apprenants par Filières et par Niveau de formations</B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=3 class='ligne-paire' title='Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=7 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Diplôme préparé</TD>
+		<TD ROWSPAN=7 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Niveau d'étude (1A/2nde, 2A/1ère, 3A/Tle)</TD>
+		<TD ROWSPAN=7 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Nombre de classes par niveau d'étude</TD>
+		<TD ROWSPAN=7 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Formation par alternance? (Oui/Non)</TD>
+		<TD ROWSPAN=7 style='width: 1px; padding: 1px;'></TD>
+<script language='javascript' type='text/javascript'>
+var expression_220013 	= "";
+var affiche_sous_totaux_220013 = 1;
+var tab_mes_220013 	= new Array ("EFFECTIF_NIVEAU");
+var tab_ligne_220013	= new Array ("0","1","2");
+var tab_col_220013	= new Array ("1","2");
+
+</script>
+		<TD style='height:25px;' COLSPAN=3 class='ligne-paire'>SEXE</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=2 nowrap  align='center'>M</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=2 nowrap  align='center'>F</TD>
+		<TD bgcolor='#CCCCCC'  ROWSPAN=2  align='center' ><b>TOTAL</b></TD>
+	</TR>
+	<TR></TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,3)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,3)'>
+		<input id="adresse" type="text" list="adresse" name="adresse">
+		<datalist id="adresse">
+			<select id="adresse" name="adresse">
+				<option value="http://www.alsacreations.com/">http://www.alsacreations.com/</option>
+				<option value="http://www.bing.com/">http://www.bing.com/</option>
+				<option value="http://www.google.fr/">http://www.google.fr/</option>
+				<option value="http://www.yahoo.fr/">http://www.yahoo.fr/</option>
+			</select>
+		</datalist>
+		</TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,3)'><SELECT   ID='CODE_TYPE_NIVEAU_0' NAME=CODE_TYPE_NIVEAU_0>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220014_CODE_TYPE_NIVEAU_0-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_3' onClick='MiseEvidenceLigneFrame(0,3)'><INPUT  ID='NB_CLASSE_NIVEAU_0' NAME=NB_CLASSE_NIVEAU_0 TYPE='text'size=2 VALUE="$NB_CLASSE_NIVEAU_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_4' onClick='MiseEvidenceLigneFrame(0,3)'><SELECT   ID='FORMATION_ALTERNANCE_0' NAME=FORMATION_ALTERNANCE_0>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220016_FORMATION_ALTERNANCE_0-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_0_5' onClick='MiseEvidenceLigneFrame(0,3)'><INPUT  ID='EFFECTIF_NIVEAU_0_1' NAME='EFFECTIF_NIVEAU_0_1' TYPE='text' size=2 VALUE="$EFFECTIF_NIVEAU_0_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_0_6' onClick='MiseEvidenceLigneFrame(0,3)'><INPUT  ID='EFFECTIF_NIVEAU_0_2' NAME='EFFECTIF_NIVEAU_0_2' TYPE='text' size=2 VALUE="$EFFECTIF_NIVEAU_0_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 220013, '', 'EFFECTIF_NIVEAU', tab_ligne_220013, tab_col_220013, 0, 1, tab_mes_220013);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_220013_ALL_MES_LIGNE_0' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,3)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,3)'><SELECT   ID='CODE_TYPE_DIPLO_SORTANT_1' NAME=CODE_TYPE_DIPLO_SORTANT_1>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220004_CODE_TYPE_DIPLO_SORTANT_1-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,3)'><SELECT   ID='CODE_TYPE_NIVEAU_1' NAME=CODE_TYPE_NIVEAU_1>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220014_CODE_TYPE_NIVEAU_1-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_3' onClick='MiseEvidenceLigneFrame(1,3)'><INPUT  ID='NB_CLASSE_NIVEAU_1' NAME=NB_CLASSE_NIVEAU_1 TYPE='text'size=2 VALUE="$NB_CLASSE_NIVEAU_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_4' onClick='MiseEvidenceLigneFrame(1,3)'><SELECT   ID='FORMATION_ALTERNANCE_1' NAME=FORMATION_ALTERNANCE_1>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220016_FORMATION_ALTERNANCE_1-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_1_5' onClick='MiseEvidenceLigneFrame(1,3)'><INPUT  ID='EFFECTIF_NIVEAU_1_1' NAME='EFFECTIF_NIVEAU_1_1' TYPE='text' size=2 VALUE="$EFFECTIF_NIVEAU_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 220013, '', 'EFFECTIF_NIVEAU', tab_ligne_220013, tab_col_220013, 0, 2, tab_mes_220013);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_1_6' onClick='MiseEvidenceLigneFrame(1,3)'><INPUT  ID='EFFECTIF_NIVEAU_1_2' NAME='EFFECTIF_NIVEAU_1_2' TYPE='text' size=2 VALUE="$EFFECTIF_NIVEAU_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 220013, '', 'EFFECTIF_NIVEAU', tab_ligne_220013, tab_col_220013, 1, 1, tab_mes_220013);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_220013_ALL_MES_LIGNE_1' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,3)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,3)'><SELECT   ID='CODE_TYPE_DIPLO_SORTANT_2' NAME=CODE_TYPE_DIPLO_SORTANT_2>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220004_CODE_TYPE_DIPLO_SORTANT_2-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,3)'><SELECT   ID='CODE_TYPE_NIVEAU_2' NAME=CODE_TYPE_NIVEAU_2>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220014_CODE_TYPE_NIVEAU_2-->
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_3' onClick='MiseEvidenceLigneFrame(2,3)'><INPUT  ID='NB_CLASSE_NIVEAU_2' NAME=NB_CLASSE_NIVEAU_2 TYPE='text'size=2 VALUE="$NB_CLASSE_NIVEAU_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_4' onClick='MiseEvidenceLigneFrame(2,3)'><SELECT   ID='FORMATION_ALTERNANCE_2' NAME=FORMATION_ALTERNANCE_2>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_220016_FORMATION_ALTERNANCE_2-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_2_5' onClick='MiseEvidenceLigneFrame(2,3)'><INPUT  ID='EFFECTIF_NIVEAU_2_1' NAME='EFFECTIF_NIVEAU_2_1' TYPE='text' size=2 VALUE="$EFFECTIF_NIVEAU_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 220013, '', 'EFFECTIF_NIVEAU', tab_ligne_220013, tab_col_220013, 1, 2, tab_mes_220013);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_2_6' onClick='MiseEvidenceLigneFrame(2,3)'><INPUT  ID='EFFECTIF_NIVEAU_2_2' NAME='EFFECTIF_NIVEAU_2_2' TYPE='text' size=2 VALUE="$EFFECTIF_NIVEAU_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 220013, '', 'EFFECTIF_NIVEAU', tab_ligne_220013, tab_col_220013, 2, 1, tab_mes_220013);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_220013_ALL_MES_LIGNE_2' size=2></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center">&nbsp;</TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+  </FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',220013, '', tab_mes_220013, tab_ligne_220013, tab_col_220013);
+</script>

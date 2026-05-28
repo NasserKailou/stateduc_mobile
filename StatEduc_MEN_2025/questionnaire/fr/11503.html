@@ -1,0 +1,246 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=11503' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>Récapitulatif du total des Enseignants</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br/>Récapitulatif du total des Enseignants (Craie en Main) par Statut et Sexe<br/><br></b><script language='javascript' type='text/javascript'>
+var expression_1150010 	= "";
+var tot_mes_ligne_1150010 	= new Array();
+var tot_mes_col_1150010 	= new Array();
+var affich_vertic_mes_1150010 	= 0;
+var affiche_sous_totaux_1150010 	= 0;
+var tab_mes_1150010 	= new Array ("NOMBRE_ENSEIGNANTS");
+var tab_ligne_1150010	= new Array ("1","2");
+var tab_col_1150010	= new Array ("10","11","12","13","14","15","16","17");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>Fonctionnaire </TD>
+		<TD   CLASS='ligne-titre' align='center'>Contractuel au Public</TD>
+		<TD   CLASS='ligne-titre' align='center'>ASCN</TD>
+		<TD   CLASS='ligne-titre' align='center'>Coopérant</TD>
+		<TD   CLASS='ligne-titre' align='center'>Fonctionnaire au Privé</TD>
+		<TD   CLASS='ligne-titre' align='center'>Contractuel de l'Etat au privé</TD>
+		<TD   CLASS='ligne-titre' align='center'>ASCN au privé</TD>
+		<TD   CLASS='ligne-titre' align='center'>Enseignant permanent du privé</TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Homme</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_10' NAME='NOMBRE_ENSEIGNANTS_0_1_10' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 10, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_11' NAME='NOMBRE_ENSEIGNANTS_0_1_11' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 11, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_12' NAME='NOMBRE_ENSEIGNANTS_0_1_12' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 12, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_13' NAME='NOMBRE_ENSEIGNANTS_0_1_13' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_13"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 13, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_14' NAME='NOMBRE_ENSEIGNANTS_0_1_14' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_14"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 14, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_15' NAME='NOMBRE_ENSEIGNANTS_0_1_15' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_15"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 15, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_16' NAME='NOMBRE_ENSEIGNANTS_0_1_16' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_16"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 16, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_1_17' NAME='NOMBRE_ENSEIGNANTS_0_1_17' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_1_17"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 1, 17, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=10 NAME='TOT_1150010_ALL_MES_LIGNE_0_1'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Femme</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_10' NAME='NOMBRE_ENSEIGNANTS_0_2_10' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 10, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_11' NAME='NOMBRE_ENSEIGNANTS_0_2_11' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 11, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_12' NAME='NOMBRE_ENSEIGNANTS_0_2_12' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 12, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_13' NAME='NOMBRE_ENSEIGNANTS_0_2_13' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_13"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 13, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_14' NAME='NOMBRE_ENSEIGNANTS_0_2_14' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_14"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 14, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_15' NAME='NOMBRE_ENSEIGNANTS_0_2_15' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_15"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 15, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_16' NAME='NOMBRE_ENSEIGNANTS_0_2_16' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_16"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 16, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NOMBRE_ENSEIGNANTS_0_2_17' NAME='NOMBRE_ENSEIGNANTS_0_2_17' TYPE='text' size=10 VALUE="$NOMBRE_ENSEIGNANTS_0_2_17"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150010, 0, 'NOMBRE_ENSEIGNANTS', tab_ligne_1150010, tab_col_1150010, 2, 17, tab_mes_1150010);"  tabindex='7029'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=10 NAME='TOT_1150010_ALL_MES_LIGNE_0_2'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_10'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_11'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_12'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_13'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_14'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_15'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_16'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=10 NAME='TOT_1150010_ALL_MES_COLONNE_0_17'></TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1150010_ALL_MES_0' size=10></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br/><br/>Récapitulatif du total des Enseignants (Craie en Main) par diplôme et Sexe<br/><br></b><script language='javascript' type='text/javascript'>
+var expression_1150014 	= "";
+var tot_mes_ligne_1150014 	= new Array();
+var tot_mes_col_1150014 	= new Array();
+var affich_vertic_mes_1150014 	= 0;
+var affiche_sous_totaux_1150014 	= 0;
+var tab_mes_1150014 	= new Array ("NBRE_ENSEIG_DIPL_ACAD");
+var tab_ligne_1150014	= new Array ("1","2");
+var tab_col_1150014	= new Array ("23","24","25","26","27","29","30","31","32");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>DEA et +</TD>
+		<TD   CLASS='ligne-titre' align='center'>Master2/Ingénieur</TD>
+		<TD   CLASS='ligne-titre' align='center'>Maitrise</TD>
+		<TD   CLASS='ligne-titre' align='center'>Licence/DTS</TD>
+		<TD   CLASS='ligne-titre' align='center'>DEUG/DUEL/DUES/BTS</TD>
+		<TD   CLASS='ligne-titre' align='center'>Brevet/Certifcat EPS</TD>
+		<TD   CLASS='ligne-titre' align='center'>Brevet d'EF</TD>
+		<TD   CLASS='ligne-titre' align='center'>BAC</TD>
+		<TD   CLASS='ligne-titre' align='center'>Autres</TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Homme</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_23' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_23' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 23, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_24' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_24' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_24"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 24, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_25' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_25' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_25"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 25, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_26' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_26' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_26"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 26, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_27' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_27' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_27"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 27, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_29' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_29' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_29"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 29, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_30' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_30' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_30"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 30, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_31' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_31' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_31"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 31, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_1_32' NAME='NBRE_ENSEIG_DIPL_ACAD_0_1_32' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_1_32"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 1, 32, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_1150014_ALL_MES_LIGNE_0_1'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Femme</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_23' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_23' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 23, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_24' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_24' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_24"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 24, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_25' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_25' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_25"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 25, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_26' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_26' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_26"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 26, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_27' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_27' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_27"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 27, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_29' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_29' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_29"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 29, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_30' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_30' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_30"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 30, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_31' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_31' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_31"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 31, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NBRE_ENSEIG_DIPL_ACAD_0_2_32' NAME='NBRE_ENSEIG_DIPL_ACAD_0_2_32' TYPE='text' size=5 VALUE="$NBRE_ENSEIG_DIPL_ACAD_0_2_32"  onchange="set_TOTAL_MatFrml_Champ('form1', 1150014, 0, 'NBRE_ENSEIG_DIPL_ACAD', tab_ligne_1150014, tab_col_1150014, 2, 32, tab_mes_1150014);"  tabindex='7029'>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_1150014_ALL_MES_LIGNE_0_2'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_23'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_24'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_25'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_26'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_27'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_29'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_30'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_31'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_1150014_ALL_MES_COLONNE_0_32'></TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_1150014_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',1150010, 0, tab_mes_1150010, tab_ligne_1150010, tab_col_1150010);
+ set_TOTAL_MatFrml('form1',1150014, 0, tab_mes_1150014, tab_ligne_1150014, tab_col_1150014);
+</script>
