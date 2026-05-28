@@ -33,9 +33,9 @@ class ApiService {
   ApiService._internal() {
     _dio = Dio(
       BaseOptions(
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 120),
-        sendTimeout: const Duration(seconds: 60),
+        connectTimeout: const Duration(seconds: 60),   // raised: server/network can be slow
+        receiveTimeout: const Duration(seconds: 180),  // raised: large form data response
+        sendTimeout: const Duration(seconds: 120),     // raised: POST form data on slow link
         followRedirects: true,
         maxRedirects: 5,
         validateStatus: (status) => status != null && status < 600,
@@ -602,6 +602,18 @@ class ApiService {
       if (e.response?.statusCode == 401) throw ApiException('Accès refusé');
       if (e.response?.statusCode == 404) {
         throw ApiException('Endpoint introuvable (vérifiez l\'URL serveur)');
+      }
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw ApiException(
+            'Délai d\'attente dépassé lors de l\'envoi.\n'
+            'Le serveur est lent ou la connexion est instable.\n'
+            'Vérifiez votre réseau et réessayez.');
+      }
+      if (e.type == DioExceptionType.connectionError) {
+        throw ApiException(
+            'Impossible de joindre le serveur. Vérifiez votre réseau.');
       }
       throw ApiException('Erreur envoi données : ${e.message ?? e.type.name}');
     }
