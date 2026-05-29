@@ -4,6 +4,34 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-05-29 — Session 12b : KOSAVE timeout 3min — deadlock Apache self-curl
+
+### 🔴 Fix CRITIQUE — Timeout 3 minutes sur l'envoi + KOSAVE persistant
+
+**Diagnostic complet** :
+
+*Chaîne d'appels du save* :
+```
+Flutter Dio POST → data_save.php (Slim route) → $curl->post() → questionnaire_ws.php
+```
+
+**Problème 1 — Timeout 3 minutes** : `data_save.php` fait un appel curl **HTTP interne** vers `questionnaire_ws.php` sur le même serveur Apache. Aucun timeout n'était configuré sur cet objet curl PHP. Si Apache est saturé (plusieurs requêtes parallèles) ou si `questionnaire_ws.php` est lent (page HTML complète + queries DB), le curl attend **indéfiniment**. Flutter time-out après 180s et renvoie `DioExceptionType.receiveTimeout`.
+
+**Problème 2 — Session deadlock potentiel** : `common_ws.php` (inclus par `data_save.php`) appelle `session_start()`. Sans `session_write_close()` avant l'appel curl interne, la session PHP reste verrouillée pendant tout l'appel. Si `questionnaire_ws.php` tente d'accéder à la même session ID (via cookie ou config partagée), un deadlock de fichier de session peut se produire.
+
+**`StatEduc_MEN_2025/data_save.php`** :
+- `CURLOPT_CONNECTTIMEOUT = 15` : echec rapide si le serveur interne est injoignable
+- `CURLOPT_TIMEOUT = 60` : abort au bout de 60s si questionnaire_ws.php ne répond pas
+- `session_write_close()` avant chaque `$curl->post()` (deux appels : route GET ligne 170, route POST `theme_save_handler` ligne 342)
+- Ces fixes évitent que Flutter attende 3 minutes et reçoive un timeout au lieu d'une réponse
+
+**`stateduc_flutter/lib/services/api_service.dart`** :
+- `receiveTimeout` élevé de 180s → **300s (5 minutes)** : le save est une opération lente (`data_save.php` → curl → `questionnaire_ws.php` = page entière + 2× include grille + queries DB). 5 min = sécurité au cas où le serveur est lent mais répond quand même
+
+**Note** : si KOSAVE persiste après ces fixes, la cause est que `questionnaire_ws.php` ne trouve pas le fichier grille `$curfile` (ACTION_THEME introuvable) ou que la DB write échoue silencieusement. Vérifier les logs XAMPP (`moblogs/test.log`) pour le détail.
+
+---
+
 ## [Unreleased] — 2026-05-29 — Session 12 : données jamais écrites en DB (codeyear vide) + en-tête formulaire enrichi
 
 ### 🔴 Fix CRITIQUE — OKSAVE/KOSAVE : données envoyées mais jamais écrites en base de données

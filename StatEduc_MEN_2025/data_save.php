@@ -11,6 +11,10 @@ $curl->setHeader('Accept', '*/*');
 $curl->setHeader('Accept-Encoding', 'gzip,deflate');
 $curl->setHeader('Accept-Language', 'fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4');
 $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
+// Timeout pour l'appel interne vers questionnaire_ws.php
+// Sans timeout, le curl attend indefiniment si Apache est sature (self-curl deadlock)
+$curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15); // echec rapide si connexion impossible
+$curl->setOpt(CURLOPT_TIMEOUT, 60);         // max 60s pour la sauvegarde (questionnaire_ws.php)
 
 $app = new \Slim\Slim();
 
@@ -163,6 +167,7 @@ $app->get('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:
 		}
 	}
 	//print_r($data_to_send);
+	session_write_close(); // Libere le verrou de session avant l'appel curl interne
 	$curl->post($urlBase, $data_to_send);	
 	
 });
@@ -334,6 +339,7 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
     $urlBase .= '&filtre='.$id_filter;
 	}
   //echo "<pre>".$urlBase; print_r($data_to_send);   return;
+	session_write_close(); // Libere le verrou de session avant l'appel curl interne
 	$curl->post($urlBase, $data_to_send);	
 	
 }

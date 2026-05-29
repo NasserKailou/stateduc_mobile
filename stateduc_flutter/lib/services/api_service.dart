@@ -36,7 +36,7 @@ class ApiService {
     _dio = Dio(
       BaseOptions(
         connectTimeout: const Duration(seconds: 60),   // raised: server/network can be slow
-        receiveTimeout: const Duration(seconds: 180),  // raised: large form data response
+        receiveTimeout: const Duration(seconds: 300),  // 5 min: data_save → questionnaire_ws curl chain can be slow
         sendTimeout: const Duration(seconds: 120),     // raised: POST form data on slow link
         followRedirects: true,
         maxRedirects: 5,
