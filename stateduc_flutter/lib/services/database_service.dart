@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/campaign.dart';
@@ -572,31 +573,71 @@ class DatabaseService {
     )).toList();
   }
 
-  /// Returns schools linked to [idRegp] through localisations.
+  /// Returns schools linked to [idRegp] for the given campaign/system.
   ///
-  /// The server stores regroups_json as a JSON array whose elements may be
-  /// integers (e.g. [123,456]) OR quoted strings (e.g. ["123","456"]).
-  /// We parse the array and compare by string value to handle both formats.
+  /// Uses a two-strategy approach to maximise resilience:
+  ///
+  /// **Strategy 1 — via `localisations.regroups_json`**
+  ///   Each localisation row has a JSON array of regroup IDs that cover the
+  ///   user's full chain (parents + leaves). We look for any row whose array
+  ///   contains [idRegp] and collect the corresponding etab IDs.
+  ///   The server may store elements as integers OR quoted strings — we
+  ///   normalise to string for comparison.
+  ///
+  /// **Strategy 2 — direct `schools.id_regroup` match (fallback)**
+  ///   If Strategy 1 returns nothing (the clicked regroup is not in any
+  ///   `regroups_json`, e.g. because the server omitted an intermediate node),
+  ///   we fall back to a direct SQL query on `schools.id_regroup = idRegp`.
+  ///   This covers the common case where the school row itself carries its
+  ///   direct regroup ID from `etabs_camp`.
+  ///
+  /// **Strategy 3 — all schools for the campaign (last resort)**
+  ///   If both strategies return nothing (possible data issue), we return ALL
+  ///   schools for the campaign so the user is never stuck on an empty screen.
   Future<List<School>> getSchoolsByRegroup(
       String idCamp, String idSystem, String idRegp) async {
     final db = await database;
-    // localisations.regroups_json contains a JSON array of regroup IDs
+
+    // ── Strategy 1: via localisations.regroups_json ────────────────────────
     final locRows = await db.query(
       'localisations',
       where: 'id_camp = ? AND id_system = ?',
       whereArgs: [idCamp, idSystem],
     );
+
+    debugPrint('[DB] getSchoolsByRegroup('
+        'camp=$idCamp, sys=$idSystem, regp=$idRegp) '
+        '→ ${locRows.length} localisation rows found');
+
+    // Log a sample to diagnose id_system mismatches
+    if (locRows.isNotEmpty) {
+      final sample = locRows.first;
+      debugPrint('[DB] Sample loc row: id_etab=${sample['id_etab']}, '
+          'id_system=${sample['id_system']}, '
+          'regroups_json=${(sample['regroups_json'] as String? ?? '').length > 120 ? (sample['regroups_json'] as String).substring(0, 120) + "…" : sample['regroups_json']}');
+    } else {
+      // No rows → check if localisations exist at all for this camp
+      final anyLoc = await db.query(
+        'localisations',
+        where: 'id_camp = ?',
+        whereArgs: [idCamp],
+        limit: 3,
+      );
+      debugPrint('[DB] ⚠ No localisation rows for sys=$idSystem. '
+          'Total rows for camp=$idCamp: ${anyLoc.length}. '
+          'Sample systems: ${anyLoc.map((r) => r['id_system']).toSet()}');
+    }
+
     final etabIds = <String>{};
     for (final loc in locRows) {
       final jsonStr = loc['regroups_json'] as String? ?? '[]';
       try {
-        // Parse the JSON array — elements may be int or String
         final List<dynamic> regroupIds = jsonDecode(jsonStr) as List<dynamic>;
         if (regroupIds.any((id) => id.toString() == idRegp)) {
           etabIds.add(loc['id_etab'] as String);
         }
       } catch (_) {
-        // Fallback: raw string search for both quoted and unquoted forms
+        // JSON parse failed — use raw string search for both quoted/unquoted
         if (jsonStr.contains('"$idRegp"') ||
             jsonStr.contains("'$idRegp'") ||
             jsonStr.contains(',$idRegp,') ||
@@ -607,15 +648,65 @@ class DatabaseService {
         }
       }
     }
-    if (etabIds.isEmpty) return [];
-    final placeholders = etabIds.map((_) => '?').join(',');
-    final rows = await db.query(
+
+    debugPrint('[DB] Strategy 1 → ${etabIds.length} etab IDs matched '
+        'via regroups_json for regp=$idRegp');
+
+    if (etabIds.isNotEmpty) {
+      final placeholders = etabIds.map((_) => '?').join(',');
+      final rows = await db.query(
+        'schools',
+        where: 'id_camp = ? AND id_etab IN ($placeholders)',
+        whereArgs: [idCamp, ...etabIds],
+        orderBy: 'lib_etab ASC',
+      );
+      debugPrint('[DB] Strategy 1 → ${rows.length} schools returned');
+      return rows.map((r) => School(
+        idEtab:    r['id_etab']    as String,
+        libEtab:   r['lib_etab']   as String,
+        codeEtab:  r['code_etab']  as String?,
+        idStatus:  r['id_status']  as String?,
+        idRegroup: r['id_regroup'] as String?,
+      )).toList();
+    }
+
+    // ── Strategy 2: direct schools.id_regroup match ────────────────────────
+    debugPrint('[DB] Strategy 1 found nothing — trying Strategy 2: '
+        'schools.id_regroup = $idRegp');
+
+    final directRows = await db.query(
       'schools',
-      where: 'id_camp = ? AND id_etab IN ($placeholders)',
-      whereArgs: [idCamp, ...etabIds],
+      where: 'id_camp = ? AND id_regroup = ?',
+      whereArgs: [idCamp, idRegp],
       orderBy: 'lib_etab ASC',
     );
-    return rows.map((r) => School(
+
+    debugPrint('[DB] Strategy 2 → ${directRows.length} schools '
+        'with id_regroup=$idRegp');
+
+    if (directRows.isNotEmpty) {
+      return directRows.map((r) => School(
+        idEtab:    r['id_etab']    as String,
+        libEtab:   r['lib_etab']   as String,
+        codeEtab:  r['code_etab']  as String?,
+        idStatus:  r['id_status']  as String?,
+        idRegroup: r['id_regroup'] as String?,
+      )).toList();
+    }
+
+    // ── Strategy 3: all schools for this campaign (last resort) ────────────
+    debugPrint('[DB] ⚠ Strategy 2 also empty — falling back to ALL schools '
+        'for camp=$idCamp (last resort)');
+
+    final allRows = await db.query(
+      'schools',
+      where: 'id_camp = ?',
+      whereArgs: [idCamp],
+      orderBy: 'lib_etab ASC',
+    );
+
+    debugPrint('[DB] Strategy 3 → ${allRows.length} schools total');
+    return allRows.map((r) => School(
       idEtab:    r['id_etab']    as String,
       libEtab:   r['lib_etab']   as String,
       codeEtab:  r['code_etab']  as String?,
