@@ -28,10 +28,12 @@ class SchoolDataScreen extends StatefulWidget {
     required this.campaign,
     required this.school,
     required this.idSystem,
+    this.libSystem,    // e.g. "Education de Base"
   });
   final Campaign campaign;
   final School school;
   final String idSystem;
+  final String? libSystem;
 
   @override
   State<SchoolDataScreen> createState() => _SchoolDataScreenState();
@@ -42,12 +44,19 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthProvider>();
       context.read<DataEntryProvider>().initForSchool(
-        idCamp:        widget.campaign.idCamp,
-        idEtab:        widget.school.idEtab,
-        libEtab:       widget.school.libEtab,
-        idSystem:      widget.idSystem,
-        idRegroupEtab: widget.school.idRegroup,  // for LOC_REG_0 injection
+        idCamp:         widget.campaign.idCamp,
+        idEtab:         widget.school.idEtab,
+        libEtab:        widget.school.libEtab,
+        idSystem:       widget.idSystem,
+        idRegroupEtab:  widget.school.idRegroup,
+        codeEtab:       widget.school.codeEtab,
+        libyear:        auth.user?.libyear,
+        codeyear:       auth.user?.codeyear,
+        libStatus:      widget.school.libStatus,
+        libSubsector:   widget.libSystem ?? widget.school.libStatus,
+        adminHierarchy: widget.school.libHierarchy,
       );
     });
   }
@@ -131,6 +140,13 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
       BuildContext context, AuthProvider auth, DataEntryProvider entry) {
     return Column(
       children: [
+        // ── School identification header ─────────────────────────────────
+        _SchoolInfoHeader(
+          entry: entry,
+          campaign: widget.campaign,
+          school: widget.school,
+          libSystem: widget.libSystem,
+        ),
         // ── Messages ────────────────────────────────────────────────────
         if (entry.error != null)
           _MessageBanner(
@@ -352,6 +368,138 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   void _onAddGridRow(String tableId) {
     // DynamicFormWidget handles this internally;
     // provider can also track extra rows if needed.
+  }
+}
+
+// ─── School identification info header ───────────────────────────────────────
+/// Displays the school identification breadcrumb above each form,
+/// mirroring the server's header:
+///   Année Courante: 2024-2025
+///   AGADEZ / ADERBISANAT / ADEBISSANAT
+///   Nom établissement: ABACHARA  Identifiant: 70  Code Administratif: 101012071
+///   Statut: Public  Sous secteur: Education de Base
+class _SchoolInfoHeader extends StatelessWidget {
+  const _SchoolInfoHeader({
+    required this.entry,
+    required this.campaign,
+    required this.school,
+    this.libSystem,
+  });
+  final DataEntryProvider entry;
+  final Campaign campaign;
+  final School school;
+  final String? libSystem;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final libyear     = entry.libyear ?? '';
+    final adminHier   = entry.adminHierarchy ?? school.libHierarchy ?? '';
+    final libEtab     = school.libEtab;
+    final idEtab      = school.idEtab;
+    final codeEtab    = school.codeEtab ?? '';
+    final libStatus   = entry.libStatus ?? school.libStatus ?? '';
+    final libSubsect  = entry.libSubsector ?? libSystem ?? '';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withOpacity(0.18),
+        border: Border(
+          bottom: BorderSide(color: theme.colorScheme.primary.withOpacity(0.3)),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (libyear.isNotEmpty)
+            _InfoRow(
+              icon: Icons.calendar_today_outlined,
+              text: 'Année Courante : $libyear',
+              bold: true,
+            ),
+          if (adminHier.isNotEmpty)
+            _InfoRow(
+              icon: Icons.location_on_outlined,
+              text: adminHier,
+            ),
+          Wrap(
+            spacing: 16,
+            runSpacing: 2,
+            children: [
+              _InfoChip(label: 'Établissement', value: libEtab),
+              if (idEtab.isNotEmpty)
+                _InfoChip(label: 'ID', value: idEtab),
+              if (codeEtab.isNotEmpty)
+                _InfoChip(label: 'Code Admin', value: codeEtab),
+            ],
+          ),
+          Wrap(
+            spacing: 16,
+            runSpacing: 2,
+            children: [
+              if (libStatus.isNotEmpty)
+                _InfoChip(label: 'Statut', value: libStatus),
+              if (libSubsect.isNotEmpty)
+                _InfoChip(label: 'Sous secteur', value: libSubsect),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.icon, required this.text, this.bold = false});
+  final IconData icon;
+  final String text;
+  final bool bold;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 13,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.7)),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({required this.label, required this.value});
+  final String label;
+  final String value;
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(fontSize: 11, color: Colors.black87),
+        children: [
+          TextSpan(
+            text: '$label: ',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          TextSpan(text: value),
+        ],
+      ),
+    );
   }
 }
 

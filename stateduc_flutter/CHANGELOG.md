@@ -4,9 +4,69 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
-## [Unreleased] — 2026-05-29
+# CHANGELOG — StatEduc Mobile (Flutter)
 
-### Ajouté
+Historique complet de toutes les modifications apportées à l'application Flutter StatEduc Mobile.
+
+---
+
+## [Unreleased] — 2026-05-29 — Session 3 : fixes données serveur + formulaires
+
+### Fix critique — Données non persistées sur le serveur (`data_save.php`)
+
+**Problème** : L'utilisateur voyait « Données envoyées avec succès » mais le serveur ne montrait aucune donnée.
+
+**Cause racine** : `data_save.php` → `theme_save_handler()` — le relais curl interne vers `questionnaire_ws.php` ne transmettait pas le paramètre `annee`. Sans année en session, `questionnaire_ws.php` ne pouvait pas exécuter les requêtes SQL filtrées par année, causant un retour silencieux sans écriture en base.
+
+**Fichier corrigé** : `StatEduc_MEN_2025/data_save.php`
+- Ligne 139 (route web) et ligne 291 (`theme_save_handler`) : ajout de `&annee=$id_year` à l'URL curl vers `questionnaire_ws.php`.
+- Avant : `...&type_ent_stat='.$id_camp`
+- Après  : `...&type_ent_stat='.$id_camp.'&annee='.$id_year`
+
+### Ajouté — En-tête d'identification au-dessus de chaque formulaire
+
+Affiche les informations complètes de l'établissement en haut de chaque formulaire (comme sur le serveur web) :
+- **Année Courante** : ex. « 2024-2025 »
+- **Hiérarchie géographique** : ex. « AGADEZ / ADERBISANAT / ADEBISSANAT »
+- **Établissement** : Nom, Identifiant, Code Administratif
+- **Statut** et **Sous secteur**
+
+Widgets ajoutés dans `school_data_screen.dart` : `_SchoolInfoHeader`, `_InfoRow`, `_InfoChip`.
+
+### Ajouté — Pré-remplissage du formulaire d'identification
+
+Le premier formulaire (thème d'identification) est automatiquement pré-rempli avec les données déjà connues de l'établissement :
+- Nom établissement (`NOM_ETABLISSEMENT`, `NOM_ETAB`, `LIB_ETABLISSEMENT`)
+- Code administratif (`CODE_ETABLISSEMENT`, `COD_ETAB`, `CODE_ADMIN`)
+- Statut (`STATUT`, `LIB_STATUT`)
+- Sous-secteur (`SOUS_SECTEUR`, `LIB_SOUS_SECTEUR`)
+- Année scolaire (`ANNEE_SCOLAIRE`, `LIB_ANNEE`)
+
+Méthode `_prefillIdentificationFields()` ajoutée dans `DataEntryProvider`.
+
+### Modifié — `DataEntryProvider.initForSchool()` (paramètres étendus)
+
+Nouveaux paramètres optionnels : `codeEtab`, `libyear`, `codeyear`, `libStatus`, `libSubsector`, `adminHierarchy`.
+Nouveaux getters publics : `codeEtab`, `libyear`, `codeyear`, `libStatus`, `libSubsector`, `adminHierarchy`.
+
+### Modifié — `School` model
+
+Ajout de deux champs optionnels : `libStatus` (libellé du statut résolu, ex. « Public ») et `libHierarchy` (hiérarchie géographique, ex. « AGADEZ / ADERBISANAT »). Ajout de `copyWith()`.
+
+### Fix — Encodage HTML (ISO-8859-15 → UTF-8)
+
+Correction de l'affichage en Mojibake (« UtilisÃ©e » → « Utilisée »).
+`dynamic_form_widget.dart` : ajout de `_preprocessHtml()` qui détecte et corrige le double-encodage Latin-1/UTF-8 avant rendu WebView.
+
+### Fix — `$NUMERO_LOCAL_N` non résolu
+
+Les templates HTML de grille contiennent `$NUMERO_LOCAL_0`, `$NUMERO_LOCAL_1` etc. au lieu de numéros de lignes.
+`_preprocessHtml()` les remplace par leur numéro d'ordre affiché (1, 2, 3 …).
+
+### Fix — `didUpdateWidget` dans `DynamicFormWidget`
+
+Rechargement automatique de l'URL WebView lorsque le HTML du formulaire change (navigation entre questions).
+
 - **Icône de lancement** : `assets/icon/icon.png` (2048×2048) utilisée pour générer toutes les densités Android mipmap (`mdpi` 48px, `hdpi` 72px, `xhdpi` 96px, `xxhdpi` 144px, `xxxhdpi` 192px) via script Python/Pillow.
 - **Splash screen** : `drawable/splash_logo.png` (512×512) générée depuis `icon.png`. `launch_background.xml` mis à jour pour afficher ce logo centré sur fond bleu `#1565C0`.
 - **`ic_launcher_round`** dans tous les dossiers mipmap (Android 7.1+).

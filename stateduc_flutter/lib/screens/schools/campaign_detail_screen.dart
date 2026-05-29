@@ -184,6 +184,7 @@ class CampaignDetailScreen extends StatelessWidget {
           campaign: campaign,
           school: school,
           idSystem: camps.selectedSystem!.idSystem,
+          libSystem: camps.selectedSystem?.libSystem,
         ),
       ),
     );

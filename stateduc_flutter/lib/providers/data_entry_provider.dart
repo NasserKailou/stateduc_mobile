@@ -38,6 +38,14 @@ class DataEntryProvider extends ChangeNotifier {
   String? _idSystem;
   String? _idRegroupEtab;  // school.idRegroup — for LOC_REG_0 injection
 
+  // ─── School identification info (for header + pre-fill) ────────────────────
+  String? _codeEtab;       // administrative code e.g. "101012071"
+  String? _libyear;        // school year label e.g. "2024-2025"
+  String? _codeyear;       // school year code e.g. "2024"
+  String? _libStatus;      // e.g. "Public", "Privé"
+  String? _libSubsector;   // e.g. "Education de Base"
+  String? _adminHierarchy; // e.g. "AGADEZ / ADERBISANAT / ADEBISSANAT"
+
   // ─── Questions + selected question ─────────────────────────────────────────
   List<Question>  _questions         = [];
   Question?       _selectedQuestion;
@@ -78,6 +86,12 @@ class DataEntryProvider extends ChangeNotifier {
   String? get idCamp              => _idCamp;
   String? get idEtab              => _idEtab;
   String? get libEtab             => _libEtab;
+  String? get codeEtab            => _codeEtab;
+  String? get libyear             => _libyear;
+  String? get codeyear            => _codeyear;
+  String? get libStatus           => _libStatus;
+  String? get libSubsector        => _libSubsector;
+  String? get adminHierarchy      => _adminHierarchy;
   List<Question> get questions    => _questions;
   Question? get selectedQuestion  => _selectedQuestion;
   List<FilterPeriod> get filterPeriods => _filterPeriods;
@@ -113,12 +127,24 @@ class DataEntryProvider extends ChangeNotifier {
     required String libEtab,
     required String idSystem,
     String? idRegroupEtab,  // school.idRegroup for LOC_REG_0
+    String? codeEtab,       // administrative code
+    String? libyear,        // school year label e.g. "2024-2025"
+    String? codeyear,       // school year code e.g. "2024"
+    String? libStatus,      // e.g. "Public"
+    String? libSubsector,   // e.g. "Education de Base"
+    String? adminHierarchy, // e.g. "AGADEZ / ADERBISANAT"
   }) async {
     _idCamp         = idCamp;
     _idEtab         = idEtab;
     _libEtab        = libEtab;
     _idSystem       = idSystem;
     _idRegroupEtab  = idRegroupEtab;
+    _codeEtab       = codeEtab;
+    _libyear        = libyear;
+    _codeyear       = codeyear;
+    _libStatus      = libStatus;
+    _libSubsector   = libSubsector;
+    _adminHierarchy = adminHierarchy;
     _selectedQuestion = null;
     _selectedFilter   = null;
     _formHtml         = null;
@@ -222,12 +248,51 @@ class DataEntryProvider extends ChangeNotifier {
       _rules    = await _db.getValidationRules(_idCamp!, question.idQst);
       // Load saved field values (no filter yet)
       await _loadFormData(idFilter: null);
+
+      // Pre-fill identification form fields for first question
+      // The identification form (theme d'identification) has fields that are
+      // already known: school name, code, admin code, status, subsector.
+      // Pre-filling saves the user from re-entering known data.
+      if (_isFirstQuestion) {
+        _prefillIdentificationFields();
+      }
     } catch (e) {
       _error = 'Erreur chargement formulaire : ${e.toString()}';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PRE-FILL IDENTIFICATION FORM
+  // Injects known school fields into _formData for the identification form
+  // (first question / theme d'identification).
+  // Only sets fields that are not already filled (respects saved values).
+  // Field names mirror the server's DICO_CHAMP values for identification.
+  // ═══════════════════════════════════════════════════════════════════════════
+  void _prefillIdentificationFields() {
+    void fill(String key, String? value) {
+      if (value != null && value.isNotEmpty && !_formData.containsKey(key)) {
+        _formData[key] = value;
+      }
+    }
+    // Standard identification fields used by the StatEduc system
+    fill('NOM_ETABLISSEMENT',   _libEtab);
+    fill('LIB_ETABLISSEMENT',   _libEtab);
+    fill('NOM_ETAB',            _libEtab);
+    fill('CODE_ETABLISSEMENT',  _codeEtab);
+    fill('COD_ETAB',            _codeEtab);
+    fill('CODE_ADMIN',          _codeEtab);
+    fill('STATUT',              _libStatus);
+    fill('LIB_STATUT',          _libStatus);
+    fill('SOUS_SECTEUR',        _libSubsector);
+    fill('LIB_SOUS_SECTEUR',    _libSubsector);
+    fill('ANNEE_SCOLAIRE',      _libyear);
+    fill('LIB_ANNEE',           _libyear);
+    debugPrint('[DataEntry] _prefillIdentificationFields: etab=$_libEtab '
+        'code=$_codeEtab status=$_libStatus subsector=$_libSubsector '
+        'year=$_libyear');
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

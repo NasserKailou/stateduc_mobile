@@ -13,6 +13,8 @@ class School {
   final String libEtab;    // server: nom,        DB: lib_etab
   final String? idStatus;  // server: status,     DB: id_status
   final String? idRegroup; // server: idregroup,  DB: id_regroup (LOWERCASE from server!)
+  final String? libStatus;    // resolved status label e.g. "Public"
+  final String? libHierarchy; // geographic hierarchy e.g. "AGADEZ / ADERBISANAT"
 
   School({
     required this.idEtab,
@@ -20,26 +22,45 @@ class School {
     required this.libEtab,
     this.idStatus,
     this.idRegroup,
+    this.libStatus,
+    this.libHierarchy,
   });
 
   /// Parses server JSON from /user_camp.php/etabs_camp/{userId}/{campId}/1
   factory School.fromJson(Map<String, dynamic> json) {
     return School(
-      idEtab:    (json['id'] ?? json['id_etab'] ?? '').toString(),
-      codeEtab:  json['code']?.toString() ?? json['code_etab']?.toString(),
-      libEtab:   (json['nom'] ?? json['lib_etab'] ?? '').toString(),
-      idStatus:  json['status']?.toString() ?? json['id_status']?.toString(),
+      idEtab:       (json['id'] ?? json['id_etab'] ?? '').toString(),
+      codeEtab:     json['code']?.toString() ?? json['code_etab']?.toString(),
+      libEtab:      (json['nom'] ?? json['lib_etab'] ?? '').toString(),
+      idStatus:     json['status']?.toString() ?? json['id_status']?.toString(),
       // Server sends 'idregroup' (lowercase) — see etabs.js line: value.idregroup
-      idRegroup: json['idregroup']?.toString() ?? json['id_regroup']?.toString(),
+      idRegroup:    json['idregroup']?.toString() ?? json['id_regroup']?.toString(),
+      libStatus:    json['lib_status']?.toString() ?? json['statut']?.toString(),
+      libHierarchy: json['lib_hierarchy']?.toString() ?? json['hierarchy']?.toString(),
+    );
+  }
+
+  /// Returns a copy with libStatus and libHierarchy resolved.
+  School copyWith({String? libStatus, String? libHierarchy}) {
+    return School(
+      idEtab:       idEtab,
+      codeEtab:     codeEtab,
+      libEtab:      libEtab,
+      idStatus:     idStatus,
+      idRegroup:    idRegroup,
+      libStatus:    libStatus ?? this.libStatus,
+      libHierarchy: libHierarchy ?? this.libHierarchy,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id_etab':    idEtab,
-    'code_etab':  codeEtab,
-    'lib_etab':   libEtab,
-    'id_status':  idStatus,
-    'id_regroup': idRegroup,
+    'id_etab':     idEtab,
+    'code_etab':   codeEtab,
+    'lib_etab':    libEtab,
+    'id_status':   idStatus,
+    'id_regroup':  idRegroup,
+    'lib_status':  libStatus,
+    'lib_hierarchy': libHierarchy,
   };
 }
 

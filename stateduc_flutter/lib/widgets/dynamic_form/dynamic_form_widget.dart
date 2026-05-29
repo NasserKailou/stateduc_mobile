@@ -70,6 +70,12 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   @override
   void didUpdateWidget(DynamicFormWidget old) {
     super.didUpdateWidget(old);
+    // Reload HTML when the form changes (question switch)
+    if (old.html != widget.html) {
+      _pageLoaded = false;
+      _controller.loadRequest(_buildHtmlUri(widget.html));
+      return;
+    }
     // Re-inject data when it changes externally (e.g. reload from server)
     if (_pageLoaded &&
         (old.data != widget.data ||
@@ -85,9 +91,65 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   // (Ã©, etc.).  Encoding the bytes as Base64 and loading via a data: URI
   // forces the engine to decode the content as UTF-8.
   Uri _buildHtmlUri(String formHtml) {
-    final bytes     = utf8.encode(_buildHtmlPage(formHtml));
+    final processed  = _preprocessHtml(formHtml);
+    final bytes      = utf8.encode(_buildHtmlPage(processed));
     final base64Html = base64Encode(bytes);
     return Uri.parse('data:text/html;charset=utf-8;base64,$base64Html');
+  }
+
+  // ── Pre-process raw HTML from the server before rendering ─────────────────
+  // 1. ISO-8859-15 → UTF-8 repair:
+  //    Server HTML files are encoded in ISO-8859-15 (French characters like é, è, à).
+  //    When SQLite stores these as TEXT and Dart reads them back as a String,
+  //    the bytes may have been mis-interpreted as Latin-1, producing Mojibake
+  //    (e.g. "UtilisÃ©e" instead of "Utilisée").
+  //    Detection: if the string contains the UTF-8 replacement sequences that
+  //    look like double-encoded Latin-1 (Ã©, Ã , Ã¨ …), re-encode as ISO-8859-1
+  //    bytes then decode as UTF-8.
+  // 2. $NUMERO_LOCAL_N substitution:
+  //    The server's grille HTML files contain template variables "$NUMERO_LOCAL_0",
+  //    "$NUMERO_LOCAL_1" etc. These should display as row numbers (1, 2, 3 …).
+  //    Replace them here before rendering.
+  String _preprocessHtml(String html) {
+    // 1. Detect and fix ISO-8859-15 double-encoding mojibake.
+    //    Signature: "Ã©" = U+00C3 U+00A9 = UTF-8 bytes of U+00E9 (é) mis-read as Latin-1.
+    if (_looksLikeMojibake(html)) {
+      try {
+        // Re-encode as ISO-8859-1 bytes then decode as UTF-8
+        final latin1Bytes = <int>[
+          for (final c in html.codeUnits) if (c <= 0xFF) c,
+        ];
+        final decoded = utf8.decode(latin1Bytes, allowMalformed: true);
+        if (!decoded.contains('\uFFFD')) {
+          html = decoded;
+        }
+      } catch (_) {
+        // Keep original if repair fails
+      }
+    }
+
+    // 2. Replace $NUMERO_LOCAL_N with display row number (N+1, 1-based).
+    //    Server HTML grille templates contain $NUMERO_LOCAL_0, $NUMERO_LOCAL_1 etc.
+    html = html.replaceAllMapped(
+      RegExp(r'\$NUMERO_LOCAL_(\d+)'),
+      (m) {
+        final n = int.tryParse(m.group(1) ?? '0') ?? 0;
+        return (n + 1).toString();
+      },
+    );
+
+    return html;
+  }
+
+  // Returns true if the string likely contains ISO-8859-1 bytes mis-read as UTF-8.
+  bool _looksLikeMojibake(String s) {
+    for (int i = 0; i < s.length - 1; i++) {
+      if (s.codeUnitAt(i) == 0xC3) {
+        final next = s.codeUnitAt(i + 1);
+        if (next >= 0x80 && next <= 0xBF) return true;
+      }
+    }
+    return false;
   }
 
   // ── Build the full HTML page loaded into the WebView ───────────────────────
