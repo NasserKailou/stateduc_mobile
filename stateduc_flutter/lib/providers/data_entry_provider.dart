@@ -262,13 +262,6 @@ class DataEntryProvider extends ChangeNotifier {
       // Load saved field values from local SQLite
       await _loadFormData(idFilter: null);
 
-      // Auto-reload from server when local data is empty (first open).
-      // This fetches previously-saved values including radio selections.
-      // Run in background so it doesn't block the form from rendering.
-      if (_formData.isEmpty && _currentUser != null) {
-        _autoReloadFromServerBackground();
-      }
-
       // Pre-fill identification form fields.
       // The identification form (theme d'identification) has fields that are
       // already known: school name, code, admin code, status, subsector.
@@ -284,6 +277,18 @@ class DataEntryProvider extends ChangeNotifier {
       if (isIdentificationForm) {
         _prefillIdentificationFields();
       }
+
+      // Auto-reload from server:
+      // - Always for identification forms (server may have date fields like
+      //   DATE_CREATION_0, DATE_RECONNAISSANCE_0 not available in local school data).
+      //   Server values only overwrite fields that are currently empty.
+      // - For other forms: only when local data is empty (first open).
+      // Run in background so it doesn't block the form from rendering.
+      if (_currentUser != null) {
+        if (isIdentificationForm || _formData.isEmpty) {
+          _autoReloadFromServerBackground();
+        }
+      }
     } catch (e) {
       _error = 'Erreur chargement formulaire : ${e.toString()}';
     } finally {
@@ -292,9 +297,12 @@ class DataEntryProvider extends ChangeNotifier {
     }
   }
 
-  // ── Background reload from server when local data is empty ──────────────────
-  // Called once per question open when SQLite has no saved data.
-  // On success: updates _formData and notifies listeners → WebView re-injects.
+  // ── Background reload from server ────────────────────────────────────────────
+  // Called on question open when:
+  //   - Local data is empty (first open of any form), OR
+  //   - It's an identification form (server may have date fields not in local data).
+  // On success: merges server data into _formData (server fills empty fields only),
+  //   then notifies listeners so WebView re-injects updated values.
   // On error: silently ignored (offline or no prior save is normal).
   void _autoReloadFromServerBackground() {
     final user      = _currentUser;
@@ -303,6 +311,8 @@ class DataEntryProvider extends ChangeNotifier {
     final idEtab    = _idEtab;
     final idSystem  = _idSystem;
     final idFilter  = _selectedFilter?.idFilter;
+    // Snapshot whether local data was empty at call time
+    final localWasEmpty = _formData.isEmpty;
     if (user == null || question == null || idCamp == null ||
         idEtab == null || idSystem == null) return;
 
@@ -318,11 +328,11 @@ class DataEntryProvider extends ChangeNotifier {
         );
         if (serverFields == null || serverFields.isEmpty) return;
 
-        // Convert and merge with pre-fill (server values take priority)
+        // Convert server values to String map
         final Map<String, String> serverStr = serverFields.map(
           (k, v) => MapEntry(k, v?.toString() ?? ''),
         );
-        // Save to SQLite
+        // Save to SQLite so offline use has the server data
         await _db.saveCollectedData(
           idCamp:   idCamp,
           idEtab:   idEtab,
@@ -332,14 +342,36 @@ class DataEntryProvider extends ChangeNotifier {
         );
         // Only update in-memory if this is still the same question
         if (_selectedQuestion?.idQst == question.idQst) {
-          // Merge: server values override, but keep pre-filled text fields if not in server data
+          // Merge strategy:
+          // - If local was empty: server values populate everything (full reload).
+          // - If local had data (identification form reload for dates etc.):
+          //   server values only fill fields that are currently empty/missing,
+          //   so user-entered unsaved changes are preserved.
+          bool changed = false;
           for (final entry in serverStr.entries) {
-            _formData[entry.key] = entry.value;
+            if (localWasEmpty) {
+              // Full overwrite — local was empty so no user changes to protect
+              _formData[entry.key] = entry.value;
+              changed = true;
+            } else {
+              // Fill-if-empty — preserve any user-entered data
+              final existing = _formData[entry.key];
+              if (existing == null || existing.trim().isEmpty) {
+                if (entry.value.isNotEmpty) {
+                  _formData[entry.key] = entry.value;
+                  changed = true;
+                }
+              }
+            }
           }
-          _hasUnsavedChanges = false;
-          debugPrint('[DataEntry] _autoReloadFromServerBackground: '
-              'loaded ${serverStr.length} fields from server for qst=${question.idQst}');
-          notifyListeners();
+          if (localWasEmpty) {
+            _hasUnsavedChanges = false;
+          }
+          if (changed) {
+            debugPrint('[DataEntry] _autoReloadFromServerBackground: '
+                'loaded ${serverStr.length} fields from server for qst=${question.idQst}');
+            notifyListeners();
+          }
         }
       } catch (_) {
         // Non-fatal — offline or no prior save

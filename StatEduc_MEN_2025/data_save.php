@@ -331,7 +331,7 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
   //echo "<pre>".$urlBase; print_r($data_to_send);   return;
 	$curl->post($urlBase, $data_to_send);	
 	
-});
+}
 
 // Sauvegarde les donnees d'un theme
 $app->post('/theme_info_save', function () use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $app) {
