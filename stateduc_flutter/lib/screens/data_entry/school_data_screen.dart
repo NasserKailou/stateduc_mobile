@@ -59,7 +59,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         libyear:        auth.user?.libyear,
         codeyear:       auth.user?.codeyear,
         libStatus:      widget.school.libStatus,
-        libSubsector:   widget.libSystem ?? widget.school.libStatus,
+        libSubsector:   widget.libSystem,   // type secteur enseignement (ex: "Education de Base")
         adminHierarchy: widget.school.libHierarchy,
       );
     });
@@ -378,10 +378,10 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
 // ─── School identification info header ───────────────────────────────────────
 /// Displays the school identification breadcrumb above each form,
 /// mirroring the server's header:
-///   Année Courante: 2024-2025
+///   Année en session : 2024-2025
 ///   AGADEZ / ADERBISANAT / ADEBISSANAT
 ///   Nom établissement: ABACHARA  Identifiant: 70  Code Administratif: 101012071
-///   Statut: Public  Sous secteur: Education de Base
+///   Statut: Public  Type secteur: Education de Base
 class _SchoolInfoHeader extends StatelessWidget {
   const _SchoolInfoHeader({
     required this.entry,
@@ -403,6 +403,8 @@ class _SchoolInfoHeader extends StatelessWidget {
     final idEtab      = school.idEtab;
     final codeEtab    = school.codeEtab ?? '';
     final libStatus   = entry.libStatus ?? school.libStatus ?? '';
+    // Type secteur enseignement: prefer provider value (set at initForSchool),
+    // then widget.libSystem, never fall back to libStatus (different concept).
     final libSubsect  = entry.libSubsector ?? libSystem ?? '';
 
     return Container(
@@ -420,7 +422,7 @@ class _SchoolInfoHeader extends StatelessWidget {
           if (libyear.isNotEmpty)
             _InfoRow(
               icon: Icons.calendar_today_outlined,
-              text: 'Année Courante : $libyear',
+              text: 'Année en session : $libyear',
               bold: true,
             ),
           if (adminHier.isNotEmpty)
@@ -446,7 +448,7 @@ class _SchoolInfoHeader extends StatelessWidget {
               if (libStatus.isNotEmpty)
                 _InfoChip(label: 'Statut', value: libStatus),
               if (libSubsect.isNotEmpty)
-                _InfoChip(label: 'Sous secteur', value: libSubsect),
+                _InfoChip(label: 'Type secteur', value: libSubsect),
             ],
           ),
         ],

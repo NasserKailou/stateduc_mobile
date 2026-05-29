@@ -4,6 +4,73 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-05-29 — Session 12 : données jamais écrites en DB (codeyear vide) + en-tête formulaire enrichi
+
+### 🔴 Fix CRITIQUE — OKSAVE/KOSAVE : données envoyées mais jamais écrites en base de données
+
+**Cause racine** : `auth_service.dart::getStoredUser()` retournait `codeyear: ''` après un déverrouillage PIN (sans reconnexion réseau). Cette chaîne vide se propageait comme suit :
+- `yearCode = ''` dans `saveData()` d'`api_service.dart`
+- `anneeSegment = ''` → URL 7 segments (sans `/id_annee`)
+- `data_save.php` : pas de paramètre `id_annee` → `$id_year = $_SESSION['annee']` (vide en contexte REST)
+- `questionnaire_ws.php?annee=` → `$_SESSION['annee'] = ''`
+- La grille SQL : `WHERE CODE_TYPE_ANNEE = ''` → 0 lignes → pas d'écriture en DB
+- `questionnaire_ws.php` retourne quand même `ISOKSAVEINDATABASE` (faux positif) → OKSAVE sans écriture
+
+**`stateduc_flutter/lib/services/auth_service.dart`** (fix Flutter — cause racine) :
+- Ajout des constantes `_kCodeyear = 'auth_codeyear'` et `_kLibyear = 'auth_libyear'`
+- `login()` : sauvegarde de `codeyear` et `libyear` dans le stockage sécurisé (`flutter_secure_storage`) ET dans la base SQLite (`_db.setSetting`)
+- `getStoredUser()` : restaure `codeyear`/`libyear` depuis le stockage sécurisé avec fallback DB pour les anciennes installations
+- Correction : `codeyear` est maintenant correctement rétabli après un déverrouillage PIN → `yearCode != ''` → URL 8 segments → `annee` correcte → écriture en DB
+
+**`StatEduc_MEN_2025/data_save.php`** (filet de sécurité PHP) :
+- Ajout du fallback `PARAM_DEFAUT` dans `theme_save_handler()` quand `$id_year` reste vide après résolution URL/session :
+  ```php
+  if ($id_year == '' || $id_year == '0') {
+      $_def = $GLOBALS['conn_dico']->GetOne('SELECT CODE_ANNEE FROM PARAM_DEFAUT');
+      if ($_def && (int)$_def > 0) { $id_year = $_def; $_SESSION['annee'] = $id_year; }
+  }
+  ```
+- Protège contre les appelants legacy qui n'envoient pas `id_annee` dans l'URL
+
+### 🟡 Amélioration — En-tête de chaque formulaire : libellés enrichis
+
+**`stateduc_flutter/lib/screens/data_entry/school_data_screen.dart`** :
+- "Année Courante" renommé en **"Année en session"**
+- "Sous secteur" renommé en **"Type secteur"** (correspond au `libSystem` du système d'enseignement)
+- Correction : `libSubsector` ne prend plus `libStatus` comme fallback (les deux sont des concepts différents)
+- L'en-tête affiche donc : Année en session · Hiérarchie admin · Établissement/ID/Code · **Statut** · **Type secteur**
+
+---
+
+## [Unreleased] — 2026-05-29 — Session 11 : parse error data_save, HTTP 500 contrôle, pré-remplissage dates identification
+
+### 🔴 Fix CRITIQUE — `data_save.php` : erreur de parsing PHP bloquant tous les envois
+
+**Cause racine** : La ligne 334 (comptage PHP via `\n`) contenait `});` — résidu d'une ancienne fermeture de route Slim. La fonction `theme_save_handler()` est une fonction PHP autonome qui se ferme avec `}` seul. Le `)` orphelin causait `Parse error: syntax error, unexpected ')'` → HTTP 500 sur **tous** les envois.
+
+**Note technique** : Le fichier `data_save.php` a des fins de ligne CRLF avec des `\n` Unix intégrés à la ligne 194 (1437 octets, 33 `\n` intégrés). PHP compte les lignes via `\n` uniquement → la "ligne 334" PHP ≠ ligne 334 CRLF. Correction appliquée par analyse octets Python : `lf_lines[333] = b'}\r'`.
+
+**`StatEduc_MEN_2025/data_save.php`** :
+- `});` → `}` à la ligne 334 (comptage PHP/LF)
+
+### 🔴 Fix — `data_controle.php` : HTTP 500 sur tous les contrôles de cohérence
+
+**Cause racine** : `controle_theme_batch.class.php` prend `$ctrl_id = ID_ASSOC_REG_THM` (une règle d'association précise) et non un ID de thème. Passer `15702` comme `ctrl_id` → `WHERE ID_ASSOC_REG_THM = 15702` → 0 lignes → `array_change_key_case_unicode(null)` → fatal PHP 500. De plus, le paramètre `$alert` n'a pas de valeur par défaut → un appel à 5 arguments causait aussi une erreur fatale.
+
+**`StatEduc_MEN_2025/data_controle.php`** — réécriture complète :
+- `controle_strip_theme_id($id_theme, $id_sector)` : décompose l'ID thème composite (ex. `15702` → `1570`) identique à `data_rules.php`
+- `controle_run_for_theme($raw_theme_id, ...)` : requête `SELECT DISTINCT ID_ASSOC_REG_THM FROM DICO_REGLE_THEME_ASSOC WHERE ID_THEME = x AND ACTIVER_CTRL = 1`, puis appel `new controle_theme_batch($ctrl_id, ..., $alert=false)` pour chaque règle d'association, collecte des violations
+
+### 🟡 Fix — Formulaire identification : dates `DATE_CREATION_0` / `DATE_RECONNAISSANCE_0` non pré-remplies
+
+**Cause racine** : Ces champs existent uniquement côté serveur (pas dans le modèle `School` local). Le rechargement auto depuis le serveur ne se déclenchait que si `_formData.isEmpty` → premier chargement seulement. En ré-ouvrant la fiche, les données locales existaient → pas de rechargement → dates absentes.
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** :
+- `_autoReloadFromServerBackground()` se déclenche **toujours** pour les formulaires d'identification (pas seulement si `_formData.isEmpty`)
+- Fusion intelligente : si `localWasEmpty=true` au moment de l'appel → remplacement complet + `_hasUnsavedChanges = false` ; sinon → remplissage conditionnel (ne remplace que les champs vides, préserve les saisies utilisateur)
+
+---
+
 ## [Unreleased] — 2026-05-29 — Session 10 : cohérence nb_regles, grille add-row, pré-remplissage identification
 
 ### 🔴 Fix — Cohérence `nb_regles:0` : `data_rules.php` interrogeait le mauvais `ID_THEME`

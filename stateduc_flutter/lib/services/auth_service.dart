@@ -41,8 +41,10 @@ class AuthService {
   static const _kServerUrl = 'auth_server_url';
   static const _kLogin = 'auth_login';
   static const _kPassword = 'auth_password';
-  static const _kUserId = 'auth_user_id';
-  static const _kUserName = 'auth_user_name';
+  static const _kUserId   = 'auth_user_id';
+  static const _kUserName  = 'auth_user_name';
+  static const _kCodeyear  = 'auth_codeyear';
+  static const _kLibyear   = 'auth_libyear';
 
   // ═══════════════════════════════════════════════════════════════════════════
   // PIN MANAGEMENT
@@ -156,12 +158,16 @@ class AuthService {
       await _storage.write(key: _kServerUrl, value: normalizedUrl);
       await _storage.write(key: _kLogin, value: login);
       await _storage.write(key: _kPassword, value: password);
-      await _storage.write(key: _kUserId, value: user.idUser);
-      await _storage.write(key: _kUserName, value: user.nomUser);
+      await _storage.write(key: _kUserId,    value: user.idUser);
+      await _storage.write(key: _kUserName,  value: user.nomUser);
+      await _storage.write(key: _kCodeyear,  value: user.codeyear);
+      await _storage.write(key: _kLibyear,   value: user.libyear);
       // Persist server URL in DB too (use normalized URL)
       await _db.setSetting('server_url', normalizedUrl);
-      await _db.setSetting('user_id', user.idUser);
-      await _db.setSetting('user_name', user.nomUser);
+      await _db.setSetting('user_id',    user.idUser);
+      await _db.setSetting('user_name',  user.nomUser);
+      await _db.setSetting('codeyear',   user.codeyear);
+      await _db.setSetting('libyear',    user.libyear);
       _securityQuestionLoaded = true;
       return user;
     } on AuthException {
@@ -176,21 +182,29 @@ class AuthService {
 
   /// Returns the currently stored User info (without hitting the server).
   /// Used to restore session after app restart / PIN unlock.
+  /// codeyear and libyear are persisted since session 12 fix so that
+  /// data saves include the correct school year even after a PIN-only unlock.
   Future<User?> getStoredUser() async {
-    final userId = await _storage.read(key: _kUserId);
-    final userName = await _storage.read(key: _kUserName);
-    final login = await _storage.read(key: _kLogin);
+    final userId    = await _storage.read(key: _kUserId);
+    final userName  = await _storage.read(key: _kUserName);
+    final login     = await _storage.read(key: _kLogin);
     final serverUrl = await _storage.read(key: _kServerUrl);
     if (userId == null || login == null || serverUrl == null) return null;
     // Re-configure API service with stored credentials
-    final password = await _storage.read(key: _kPassword) ?? '';
+    final password  = await _storage.read(key: _kPassword) ?? '';
     _api.configure(serverUrl, login, password);
+    // Restore codeyear from secure storage (stored at login since session 12).
+    // Fall back to DB setting for older installs that stored it there.
+    String codeyear = await _storage.read(key: _kCodeyear) ?? '';
+    String libyear  = await _storage.read(key: _kLibyear)  ?? '';
+    if (codeyear.isEmpty) codeyear = await _db.getSetting('codeyear') ?? '';
+    if (libyear.isEmpty)  libyear  = await _db.getSetting('libyear')  ?? '';
     return User(
       idUser:   userId!,
       nomUser:  userName ?? login!,
       login:    login!,
-      codeyear: '',   // not stored locally — unknown after PIN-only unlock
-      libyear:  '',
+      codeyear: codeyear,
+      libyear:  libyear,
     );
   }
 

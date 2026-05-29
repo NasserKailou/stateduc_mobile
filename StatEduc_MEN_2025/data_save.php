@@ -192,6 +192,11 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 	}
 	// Priorite : parametre URL (mobile) > session (navigateur web)
 	$id_year = ($id_annee != '' && $id_annee != '0') ? $id_annee : (isset($_SESSION['annee']) ? $_SESSION['annee'] : '');
+	// Fallback PARAM_DEFAUT : si annee absente (app non reconnectee, PIN-only unlock)
+	if ($id_year == '' || $id_year == '0') {
+		$_def = $GLOBALS['conn_dico']->GetOne('SELECT CODE_ANNEE FROM PARAM_DEFAUT');
+		if ($_def && (int)$_def > 0) { $id_year = $_def; $_SESSION['annee'] = $id_year; }
+	}
 
 	// --- Verification acces campagne ---
 	// Pour les requetes mobiles (id_annee fourni dans l'URL), on effectue d'abord
