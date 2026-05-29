@@ -4,7 +4,38 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
-## [Unreleased] — 2026-05-29 — Session 4 : fix envoi données, mojibake, formulaires grille, identification
+## [Unreleased] — 2026-05-29 — Session 5 : fix VALUE=$VAR dans les formulaires grille + détection grille améliorée
+
+### 🔴 Fix CRITIQUE — Boutons radio/select jamais pré-sélectionnés dans les formulaires grille
+
+**Problème** : Dans tous les formulaires grille (personnel enseignant, locaux, effectifs…), les données précédemment saisies n'étaient pas restaurées sur les boutons radio et listes déroulantes lors du chargement du formulaire.
+
+**Cause racine** : Les fichiers HTML sont des templates PHP servis par le serveur après substitution. L'application mobile cache le HTML brut (non substitué) — les champs texte ont `VALUE="$NOM_0"` et les radios ont `VALUE=$CODE_TYPE_SEXE_0_1` (sans quotes). La fonction `_injectData()` fait `el.checked = (el.value === val)` mais `el.value` vaut le littéral `"$CODE_TYPE_SEXE_0_1"` au lieu de `"1"` → la comparaison échoue toujours.
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- **Étape 4a** dans `_preprocessHtml()` : Remplace `VALUE="$VARNAME"` (texte) → `VALUE=""` (vide)
+  - `_injectData()` remplit ensuite la valeur correcte via JS
+- **Étape 4b** dans `_preprocessHtml()` : Remplace `VALUE=$CODE_TYPE_SEXE_0_1` (non quoté) → `VALUE=1`
+  - Le dernier segment numérique après `_` est la valeur réelle de l'option radio/select
+  - `_injectData()` peut maintenant faire `el.checked = (el.value === "1")` correctement
+- Les deux remplacements sont insensibles à la casse (`(?i)`) pour `value=` / `VALUE=`
+
+### 🔴 Fix — Détection et comptage des formulaires grille incomplets
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+
+**`_detectGridForm()`** :
+- Ajout de `MiseEvidenceLigneFrame` comme signal de détection grille
+  → `Personnel_Enseignant_4.html` n'a ni `NUMERO_LOCAL` ni `addGrilleLine` mais utilise `MiseEvidenceLigneFrame`
+  → Sans ce signal, le bouton « + Ajouter une ligne » n'était pas affiché
+
+**`_countGridRows()`** :
+- Réécriture pour gérer deux conventions de nommage des lignes :
+  1. `$NUMERO_LOCAL_N` — formulaires locaux (9303, Mob1-Locaux, effectif_gp_age)
+  2. `id='ligne-paire_N_0'` / `id='ligne-impaire_N_0'` — formulaires personnel (Personnel_Enseignant_4)
+- Renvoie le nombre de lignes HTML pré-générées pour affichage correct dans le compteur du bouton
+
+---
 
 ### 🔴 Fix CRITIQUE — Envoi données toujours en échec (`data_save.php` + `questionnaire_ws.php`)
 

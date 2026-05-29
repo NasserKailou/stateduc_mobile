@@ -131,6 +131,20 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   // 3. $NUMERO_LOCAL_N substitution:
   //    Grille template rows contain "$NUMERO_LOCAL_0", "$NUMERO_LOCAL_1" etc.
   //    Replace with 1-based display numbers.
+  //
+  // 4. PHP $VAR placeholder substitution in VALUE= attributes:
+  //    All HTML form files are PHP templates served by the server after
+  //    variable substitution.  The mobile app receives the RAW template with
+  //    unresolved $VAR placeholders because it caches the static HTML, not
+  //    the rendered output.
+  //
+  //    Two patterns appear:
+  //    a) Quoted text inputs:  VALUE="$NOM_ETABLISSEMENT_0"
+  //       → Strip to VALUE="" so the input starts empty; _injectData() fills it.
+  //    b) Unquoted radio/select options: VALUE=$CODE_TYPE_SEXE_0_1
+  //       → The last numeric segment IS the actual option value (e.g. 1, 2, 12).
+  //       → Replace with VALUE=1 so _injectData()'s el.checked=(el.value===val)
+  //         comparison works correctly.
   String _preprocessHtml(String html) {
     // ── 1. Mojibake repair ─────────────────────────────────────────────────
     if (_looksLikeMojibake(html)) {
@@ -169,6 +183,28 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       },
     );
 
+    // ── 4a. Quoted VALUE="$VAR" → VALUE="" ────────────────────────────────
+    // Matches: value="$ANY_CAPS_VAR_0" (case-insensitive attribute name)
+    html = html.replaceAllMapped(
+      RegExp(r'(?i)(value=)"(\$[A-Z_][A-Z_0-9]*)"'),
+      (m) => '${m.group(1)!}""',
+    );
+
+    // ── 4b. Unquoted VALUE=$VAR → VALUE=<last-numeric-segment> ────────────
+    // Matches: VALUE=$CODE_TYPE_SEXE_0_1  → VALUE=1
+    //          VALUE=$CODE_DIPLOME_0_12   → VALUE=12
+    // The last underscore-separated segment of the var name is the option value.
+    html = html.replaceAllMapped(
+      RegExp(r'(?i)(value=)\$([A-Z_][A-Z_0-9]*)'),
+      (m) {
+        final varName = m.group(2)!;
+        final lastSeg = varName.contains('_')
+            ? varName.substring(varName.lastIndexOf('_') + 1)
+            : varName;
+        return '${m.group(1)!}$lastSeg';
+      },
+    );
+
     return html;
   }
 
@@ -195,25 +231,41 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   }
 
   // ── Detect whether this is a grid (grille) type form ──────────────────────
-  // Grid forms have multiple row fields with patterns like FIELD_N_col or
-  // contain $NUMERO_LOCAL or have addGrilleLine JS calls.
+  // Grid forms have multiple row fields identified by any of these patterns:
+  //   • $NUMERO_LOCAL_N  — explicit row-number placeholder (locaux forms)
+  //   • addGrilleLine    — JS function that adds a new row
+  //   • NUMERO_LOCAL     — partial match (same class of forms)
+  //   • MiseEvidenceLigneFrame — JS used in all multi-row grille tables
+  //   • NAME='FIELD_N_V'  — double-indexed field name (row index + option value)
   bool _detectGridForm(String html) {
     return html.contains(r'$NUMERO_LOCAL') ||
            html.contains('addGrilleLine') ||
            html.contains('NUMERO_LOCAL') ||
-           RegExp(r'NAME=\'[A-Z_]+_\d+_\d+\'').hasMatch(html);
+           html.contains('MiseEvidenceLigneFrame') ||
+           RegExp(r"NAME='[A-Z_]+_\d+_\d+'").hasMatch(html);
   }
 
   // Count grid rows already in the HTML (for grille forms).
+  // Handles two patterns:
+  //   1. $NUMERO_LOCAL_N  — explicit row number placeholder (locaux, etc.)
+  //   2. ligne-paire_N_0 / ligne-impaire_N_0 — CSS row-id pattern
+  //      (personnel, identification_local, etc.)
   int _countGridRows(String html) {
-    final matches = RegExp(r'\$NUMERO_LOCAL_(\d+)').allMatches(html);
-    if (matches.isEmpty) return 0;
-    int max = 0;
-    for (final m in matches) {
-      final n = int.tryParse(m.group(1) ?? '0') ?? 0;
+    int max = -1;
+
+    // Pattern 1: $NUMERO_LOCAL_N
+    for (final m in RegExp(r'\$NUMERO_LOCAL_(\d+)').allMatches(html)) {
+      final n = int.tryParse(m.group(1) ?? '') ?? 0;
       if (n > max) max = n;
     }
-    return max + 1; // 0-indexed → count
+    if (max >= 0) return max + 1;
+
+    // Pattern 2: id='ligne-paire_N_0' or id='ligne-impaire_N_0'
+    for (final m in RegExp(r"ligne-(?:paire|impaire)_(\d+)_0").allMatches(html)) {
+      final n = int.tryParse(m.group(1) ?? '') ?? 0;
+      if (n > max) max = n;
+    }
+    return max >= 0 ? max + 1 : 0;
   }
 
   // ── Build the full HTML page loaded into the WebView ───────────────────────
