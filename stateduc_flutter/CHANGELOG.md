@@ -4,9 +4,66 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
-# CHANGELOG — StatEduc Mobile (Flutter)
+## [Unreleased] — 2026-05-29 — Session 4 : fix envoi données, mojibake, formulaires grille, identification
 
-Historique complet de toutes les modifications apportées à l'application Flutter StatEduc Mobile.
+### 🔴 Fix CRITIQUE — Envoi données toujours en échec (`data_save.php` + `questionnaire_ws.php`)
+
+**Problème** : Les données n'arrivent toujours pas en base malgré le fix `&annee` de la session 3.
+
+**Cause racine** : `questionnaire_ws.php` est appelé via curl interne depuis `data_save.php`. Ce curl crée une **nouvelle session PHP vide** — `$_SESSION['login']` n'est jamais positionné, or la classe arbre et les requêtes SQL en dépendent pour écrire les données (`UPDATE ... SET login=...`). Sans login, les écritures échouent silencieusement ou sont rejetées.
+
+**Corrections apportées** :
+
+**`StatEduc_MEN_2025/data_save.php`** (lignes 139 + 291) :
+- Ajout de `&login=$user&langue=fr` aux deux URL curl vers `questionnaire_ws.php`
+- Avant : `...&annee='.$id_year`
+- Après  : `...&annee='.$id_year.'&login='.$user.'&langue=fr'`
+
+**`StatEduc_MEN_2025/questionnaire_ws.php`** (après ligne 23, avant `$GLOBALS['lancer_theme_manager']`) :
+- Ajout du bloc "Mobile/curl session bootstrap" :
+  - `$_SESSION['login']` ← `$_GET['login']` (si fourni)
+  - `$_SESSION['langue']` ← `$_GET['langue']` (si fourni, défaut `'fr'`)
+  - `$_SESSION['style']` ← défaut `'stateduc.css'` (évite erreur CSS)
+  - `$_SESSION['valide']` ← `true` (bypass vérification session)
+  - `$_SESSION['code_user']` ← `0`, `$_SESSION['groupe']` ← `1` (bypass restrictions privilèges)
+
+### 🔴 Fix — Splash screen : icône blanche dans le cercle
+
+**`stateduc_flutter/lib/screens/splash/splash_screen.dart`** :
+- Changé `logo.gif` (bannière paysage 370×109) → `icon.png` (carré 2048×2048) avec `ClipOval` + `fit: BoxFit.cover`
+
+### 🔴 Fix — Formulaire d'identification : champs vides
+
+**Cause** : `_prefillIdentificationFields()` utilisait des noms sans suffixe `_0` (ex: `NOM_ETABLISSEMENT`) alors que le formulaire serveur utilise `NOM_ETABLISSEMENT_0`, `CODE_ADMINISTRATIF_0`, etc.
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** :
+- Noms de champs corrigés avec suffixe `_0` : `NOM_ETABLISSEMENT_0`, `CODE_ADMINISTRATIF_0`
+- Logique fill améliorée : remplace aussi les valeurs vides (ne se limite plus aux champs absents)
+- Ajout des variantes sans suffixe en fallback pour les autres formulaires
+
+### 🔴 Fix — Mojibake (`NÂ°`, `attribuÃ©`, `PrÃ©nom`) : correction à la source
+
+**Cause racine** : `getFormHtml()` dans `api_service.dart` utilisait `ResponseType.plain`, laissant Dio décoder les octets ISO-8859-15 avec une interprétation inconsistante selon la locale.
+
+**`stateduc_flutter/lib/services/api_service.dart`** :
+- Changé `ResponseType.plain` → `ResponseType.bytes` pour le téléchargement HTML
+- Décodage explicite `String.fromCharCodes(rawBytes)` = Latin-1 pur (byte → code point)
+- Le pré-processeur `_preprocessHtml()` détecte ensuite le mojibake et répare (Latin-1 → UTF-8)
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- Détection mojibake améliorée : liste de patterns fréquents (`Ã©`, `Â°`, `Nâ`, etc.)
+- Ajout du désentitisation HTML : `&lt;` → `<`, `&gt;` → `>`, `&amp;` → `&`, etc.
+  → Corrige `&lt;b&gt;1.6 Chaine …&lt;/b&gt;` affiché en texte brut
+- `$NUMERO_LOCAL_N` → numéro de ligne (déjà présent, conservé)
+
+### 🔴 Fix — Formulaires de type grille (personnel enseignant, locaux)
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- Détection automatique des formulaires grille (`$NUMERO_LOCAL`, `addGrilleLine`, pattern `FIELD_N_col`)
+- Affichage d'un bouton natif **"+ Ajouter une ligne"** en bas des formulaires grille
+- Le bouton clone la dernière ligne du tableau et incrémente les indices des champs
+- Compatibilité : appelle `addGrilleLine()` JS si disponible, sinon fallback DOM clone
+- Compteur de lignes affiché sur le bouton pour confirmation visuelle
 
 ---
 

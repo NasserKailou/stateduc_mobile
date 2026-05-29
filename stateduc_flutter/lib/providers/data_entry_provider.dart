@@ -272,27 +272,45 @@ class DataEntryProvider extends ChangeNotifier {
   // Field names mirror the server's DICO_CHAMP values for identification.
   // ═══════════════════════════════════════════════════════════════════════════
   void _prefillIdentificationFields() {
+    // Fill a field only if the source value is non-null AND non-empty,
+    // AND the form field is either absent OR currently empty/blank.
+    // This lets saved non-empty values take precedence but fills in blanks.
     void fill(String key, String? value) {
-      if (value != null && value.isNotEmpty && !_formData.containsKey(key)) {
+      if (value == null || value.trim().isEmpty) return;
+      final existing = _formData[key];
+      if (existing == null || existing.trim().isEmpty) {
         _formData[key] = value;
       }
     }
-    // Standard identification fields used by the StatEduc system
-    fill('NOM_ETABLISSEMENT',   _libEtab);
-    fill('LIB_ETABLISSEMENT',   _libEtab);
-    fill('NOM_ETAB',            _libEtab);
-    fill('CODE_ETABLISSEMENT',  _codeEtab);
-    fill('COD_ETAB',            _codeEtab);
-    fill('CODE_ADMIN',          _codeEtab);
-    fill('STATUT',              _libStatus);
-    fill('LIB_STATUT',          _libStatus);
-    fill('SOUS_SECTEUR',        _libSubsector);
-    fill('LIB_SOUS_SECTEUR',    _libSubsector);
-    fill('ANNEE_SCOLAIRE',      _libyear);
-    fill('LIB_ANNEE',           _libyear);
+
+    // ── School name ──────────────────────────────────────────────────────────
+    // Identification form uses _0 suffix (row index 0 for non-grille forms).
+    fill('NOM_ETABLISSEMENT_0',  _libEtab);   // mobile identification form
+    fill('NOM_ETABLISSEMENT',    _libEtab);   // fallback (other forms)
+    fill('LIB_ETABLISSEMENT',    _libEtab);
+    fill('NOM_ETAB',             _libEtab);
+
+    // ── Administrative code ───────────────────────────────────────────────────
+    fill('CODE_ADMINISTRATIF_0', _codeEtab);  // mobile identification form
+    fill('CODE_ETABLISSEMENT',   _codeEtab);
+    fill('COD_ETAB',             _codeEtab);
+    fill('CODE_ADMIN',           _codeEtab);
+
+    // ── Status / type ─────────────────────────────────────────────────────────
+    fill('STATUT',               _libStatus);
+    fill('LIB_STATUT',           _libStatus);
+
+    // ── Sous-secteur ─────────────────────────────────────────────────────────
+    fill('SOUS_SECTEUR',         _libSubsector);
+    fill('LIB_SOUS_SECTEUR',     _libSubsector);
+
+    // ── Année scolaire ────────────────────────────────────────────────────────
+    fill('ANNEE_SCOLAIRE',       _libyear);
+    fill('LIB_ANNEE',            _libyear);
+
     debugPrint('[DataEntry] _prefillIdentificationFields: etab=$_libEtab '
         'code=$_codeEtab status=$_libStatus subsector=$_libSubsector '
-        'year=$_libyear');
+        'year=$_libyear codeyear=$_codeyear');
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

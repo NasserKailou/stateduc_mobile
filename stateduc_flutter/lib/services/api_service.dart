@@ -468,11 +468,29 @@ class ApiService {
       // Basic Auth header is carried automatically.
       // When htmlUrl is absolute (starts with http), Dio 5.x ignores baseUrl
       // and uses the absolute URL directly — so no baseUrl conflict.
+      //
+      // ROOT CAUSE OF MOJIBAKE: The server sends ISO-8859-15 encoded HTML.
+      // Using ResponseType.plain makes Dio decode bytes using its default
+      // charset (often UTF-8 or Latin-1 inconsistently), producing garbled
+      // text for accented characters.
+      // FIX: Fetch as raw bytes (ResponseType.bytes) and decode explicitly
+      // using latin1 (ISO-8859-1 ≈ ISO-8859-15 for French chars).
+      // The pre-processor in DynamicFormWidget then re-encodes to UTF-8
+      // for correct display.
       final step2 = await _dio.get(
         htmlUrl,
-        options: Options(responseType: ResponseType.plain),
+        options: Options(responseType: ResponseType.bytes),
       );
-      final html = step2.data?.toString() ?? '';
+      // Decode as Latin-1 (byte-for-byte: each byte becomes its Unicode code point)
+      // This faithfully preserves the ISO-8859-15 bytes as Dart code units ≤ 0xFF,
+      // which DynamicFormWidget's _preprocessHtml() can then repair to proper UTF-8.
+      final rawBytes = step2.data;
+      final String html;
+      if (rawBytes is List<int>) {
+        html = String.fromCharCodes(rawBytes);
+      } else {
+        html = rawBytes?.toString() ?? '';
+      }
       debugPrint('[ApiService] getFormHtml step2 ← ${step2.statusCode} '
           'bodyLen=${html.length} snippet=${html.length > 120 ? html.substring(0, 120) : html}');
 

@@ -95,10 +95,12 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(16),
-                child: Image.asset(
-                  'assets/icon/logo.gif',
-                  fit: BoxFit.contain,
+                padding: const EdgeInsets.all(12),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/icon/icon.png',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
 

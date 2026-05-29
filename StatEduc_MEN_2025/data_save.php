@@ -136,7 +136,7 @@ $app->get('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:
     $data_to_send[$row_tab[0]] = str_replace("_slh_", "/", $row_tab[1]);
 	}
 
-	$urlBase = $GLOBALS['SISED_AURL'].'questionnaire_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&annee='.$id_year;
+	$urlBase = $GLOBALS['SISED_AURL'].'questionnaire_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&annee='.$id_year.'&login='.$user.'&langue=fr';
 	if ($id_filter != null) {
     $req = "SELECT count(".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_FILTRE'].")AS NB_ELT FROM ".$GLOBALS['PARAM']['TYPE_FILTRE']." WHERE ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_FILTRE']."=".$id_filter;
 		$nbFilt = $GLOBALS['conn']->GetRow($req); 
@@ -288,7 +288,7 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
     	$data_to_send[$key] = str_replace("_slh_", "/", $value);
 	}
 	   
-	$urlBase = $GLOBALS['SISED_AURL'].'questionnaire_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&annee='.$id_year;
+	$urlBase = $GLOBALS['SISED_AURL'].'questionnaire_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&annee='.$id_year.'&login='.$user.'&langue=fr';
 	
   //echo $GLOBALS['SISED_SERVER']."rrrr".$_SESSION['annee']; return; 
   

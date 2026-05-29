@@ -21,6 +21,22 @@ if(isset($_GET['filtre']) && $_GET['filtre']<>'') $_SESSION['filtre']=$_GET['fil
 if(isset($_GET['annee']) && $_GET['annee']<>'') $_SESSION['annee']=$_GET['annee'];
 if(isset($_GET['secteur']) && $_GET['secteur']<>'') $_SESSION['secteur']=$_GET['secteur'];
 if(isset($_GET['sector']) && $_GET['sector']<>'') $_SESSION['sector']=$_GET['sector'];
+
+// --- Mobile/curl session bootstrap -------------------------------------------
+// When called via internal curl from data_save.php (app mobile), there is no
+// browser session. data_save.php passes login and langue as GET params so the
+// arbre class can write data under the correct user account and retrieve labels.
+if(isset($_GET['login']) && $_GET['login']<>'')   $_SESSION['login']=$_GET['login'];
+if(isset($_GET['langue']) && $_GET['langue']<>'') $_SESSION['langue']=$_GET['langue'];
+// Defaults so common.php / CSS / libelle lookups never crash on empty values
+if(!isset($_SESSION['langue'])  || $_SESSION['langue']=='')  $_SESSION['langue']='fr';
+if(!isset($_SESSION['style'])   || $_SESSION['style']=='')   $_SESSION['style']='stateduc.css';
+if(!isset($_SESSION['valide'])  )                            $_SESSION['valide']=true;
+// code_user and groupe must be set so privilege checks in common.php succeed
+if(!isset($_SESSION['code_user'])) $_SESSION['code_user']=0;
+if(!isset($_SESSION['groupe']))    $_SESSION['groupe']=1;  // groupe 1 = admin (bypasses most restrictions)
+// -----------------------------------------------------------------------------
+
 //on lance le theme_manager et on inclue la classe dynamiquement avant d'inclure common.php (pour utilisation en session)
 $GLOBALS['lancer_theme_manager'] 		= true;
 $GLOBALS['lancer_theme_manager_classe'] = true;
