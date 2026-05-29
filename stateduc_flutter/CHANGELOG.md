@@ -4,6 +4,41 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-05-29 — Session 10 : cohérence nb_regles, grille add-row, pré-remplissage identification
+
+### 🔴 Fix — Cohérence `nb_regles:0` : `data_rules.php` interrogeait le mauvais `ID_THEME`
+
+**Cause racine** : L'app mobile envoie un `id_theme` **composite** (ex. `15602` = thème `1560` + secteur `2`). `data_rules.php` utilisait directement `WHERE ID_THEME=15602` alors que la table `DICO_REGLE_THEME` stocke l'ID brut (`1560`). Même décomposition que dans `questionnaire_reload_ws.php` :  
+`str_theme_id = substr(id_theme, 0, len(id_theme) - len(id_sector))`
+
+**`StatEduc_MEN_2025/data_rules.php`** (les deux routes GET) :
+- Ajout de la décomposition du `id_theme` composite avant la requête `DICO_REGLE_THEME`
+- Variables : `$str_theme_id` (route 1) et `$str_theme_id2` (route 2)
+- La requête utilise maintenant `WHERE ID_THEME = (int)$str_theme_id`
+
+### 🔴 Fix — Grille add-row : `maxIdx` calculé sur le mauvais segment numérique
+
+**Cause racine** : La JS utilisait `el.name.match(/_(\d+)(?:_\d+)?$/)` sur les noms de champs pour déduire l'index de ligne. Certains formulaires ont des champs comme `CODE_TYPE_DISCIPLINE_FORM_1_0` où `1` est le numéro de **colonne**, pas de ligne → `maxIdx = 1` au lieu de `0` → la nouvelle ligne est indexée `2` au lieu de `1`.
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- Remplacement de la détection de `maxIdx` par lecture des attributs `id` des `<TR>` (ex. `id='ligne-paire_14_0'` → index 14)
+- La regex de remplacement utilise maintenant `new RegExp('_' + maxRowIdx + '(_\\d+)?$')` (index spécifique) au lieu du pattern générique
+- Fallback : `/(\d+)(_\d+)?$/` si aucun TR id trouvé
+
+### 🟡 Fix — Identification pré-remplissage : boutons radio non cochés au premier ouverture
+
+**Cause racine** : `_prefillIdentificationFields()` ne remplissait que les champs texte (nom, code, statut textuel). Les radios HTML de l'identification (`CODE_TYPE_STATUT_ETABLISSEMENT_0`) ont des VALUE littéraux comme `'CODE_TYPE_STATUT_ETABLISSEMENT_0_1'` — il faut pré-remplir `_formData['CODE_TYPE_STATUT_ETABLISSEMENT_0'] = 'CODE_TYPE_STATUT_ETABLISSEMENT_0_1'` pour que `_injectData()` coche le bon bouton.
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** :
+- Nouveau champ `_idStatus` + paramètre `idStatus` dans `initForSchool()`
+- `_prefillIdentificationFields()` : si `_idStatus != null`, pré-remplit `CODE_TYPE_STATUT_ETABLISSEMENT_0` avec la valeur composite `CODE_TYPE_STATUT_ETABLISSEMENT_0_{idStatus}`
+- Fonctionne car `el.value === val` dans `_injectData()` compare la chaîne complète
+
+**`stateduc_flutter/lib/screens/data_entry/school_data_screen.dart`** :
+- Passage de `idStatus: widget.school.idStatus` à `initForSchool()`
+
+---
+
 ## [Unreleased] — 2026-05-29 — Session 9 : crash FormatException regex, icône splash asset, regroups parentid=0
 
 ### 🔴 Fix CRITIQUE — Crash `FormatException: Invalid group (?i)` dans les formulaires

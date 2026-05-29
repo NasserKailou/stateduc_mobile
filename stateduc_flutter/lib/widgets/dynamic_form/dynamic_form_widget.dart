@@ -506,36 +506,104 @@ $formHtml
           widget.onAddGridRow?.call('native_add');
           setState(() => _gridRowCount++);
           // Also tell the WebView to call addGrilleLine if JS function exists
-          _controller.runJavaScript('''
+          _controller.runJavaScript(r'''
 (function() {
   if (typeof addGrilleLine === 'function') {
     addGrilleLine();
-  } else {
-    // Fallback: clone the last row in any grille table and clear its inputs
-    var tables = document.querySelectorAll('table');
-    tables.forEach(function(tbl) {
-      var rows = tbl.querySelectorAll('tbody tr, tr');
-      if (rows.length > 1) {
-        var lastRow = rows[rows.length - 1];
-        var newRow = lastRow.cloneNode(true);
-        var newIdx = rows.length;
-        // Update field names: replace last numeric segment
-        newRow.querySelectorAll('input, select, textarea').forEach(function(el) {
-          if (el.name) {
-            el.name  = el.name.replace(/(\\d+)(?=[^\\d]*\$)/, newIdx.toString());
-            el.id    = el.id   ? el.id.replace(/(\\d+)(?=[^\\d]*\$)/, newIdx.toString()) : '';
-            el.value = '';
-            if (el.type === 'radio' || el.type === 'checkbox') el.checked = false;
-          }
+    return;
+  }
+  // ── Fallback: find the last DATA row (a row that contains inputs) and clone it.
+  // Grille tables have a complex header (multiple <tr> for column headers) and
+  // then data rows. We must find the last <tr> that actually contains an
+  // <input>, <select> or <textarea> — not a header or spacer row.
+  var tables = document.querySelectorAll('table');
+  tables.forEach(function(tbl) {
+    var allRows = tbl.querySelectorAll('tr');
+    // Find rows that have at least one input/select/textarea
+    var dataRows = [];
+    for (var i = 0; i < allRows.length; i++) {
+      if (allRows[i].querySelectorAll('input, select, textarea').length > 0) {
+        dataRows.push(allRows[i]);
+      }
+    }
+    if (dataRows.length === 0) return;
+
+    // The last data row is our template
+    var templateRow = dataRows[dataRows.length - 1];
+    var newRow = templateRow.cloneNode(true);
+
+    // Determine the new row index.
+    // Strategy: read the row index from TR id attributes across all data rows.
+    //   e.g. id='ligne-paire_14_0' → row index 14; next row = 15.
+    // We do NOT use field names because some forms embed column numbers in
+    // field names (e.g. CODE_TYPE_DISCIPLINE_FORM_1_0 where '1' is the column,
+    // not the row — this would give a wrong maxIdx).
+    var newIdx = dataRows.length; // default fallback
+    var maxRowIdx = -1;
+    for (var ri = 0; ri < dataRows.length; ri++) {
+      var rowId = dataRows[ri].getAttribute('id') || '';
+      var mRow = rowId.match(/[_-](\d+)[_-]\d+$/) || rowId.match(/[_-](\d+)$/);
+      if (mRow) {
+        var n = parseInt(mRow[1], 10);
+        if (n > maxRowIdx) maxRowIdx = n;
+      }
+    }
+    if (maxRowIdx >= 0) { newIdx = maxRowIdx + 1; }
+
+    // Update ALL inputs in the new row:
+    // Replace ONLY the row-index segment in NAME and ID, keep option suffix.
+    //
+    // We replace the SPECIFIC occurrence of _{maxRowIdx} (or _{maxRowIdx}_N)
+    // rather than any /_(\d+)(_\d+)?$/ pattern, because some field names embed
+    // column numbers before the row index:
+    //   CODE_TYPE_DISCIPLINE_FORM_1_14  → replace _14 (row), keep nothing
+    //   CODE_TYPE_SEXE_14_1             → replace _14 (row), keep _1 (option)
+    //   MATRICULE_14                    → replace _14
+    // Using a specific regex avoids matching the wrong numeric segment.
+    // Build a regex that matches _{maxRowIdx} or _{maxRowIdx}_{optSuffix} at end of name.
+    // Fallback: when maxRowIdx<0 (no TR ids found), match generic _{digits} pattern.
+    var oldRowPat = (maxRowIdx >= 0)
+        ? new RegExp('_' + maxRowIdx + '(_\\d+)?$')
+        : /_(\d+)(_\d+)?$/;
+    newRow.querySelectorAll('input, select, textarea').forEach(function(el) {
+      if (el.name) {
+        el.name = el.name.replace(oldRowPat, function(m, optIdx) {
+          return '_' + newIdx + (optIdx || '');
         });
-        // Update row-number display cells
-        newRow.querySelectorAll('td:first-child').forEach(function(td) {
-          if (td.textContent.trim().match(/^\\d+\$/)) td.textContent = (newIdx).toString();
+      }
+      if (el.id) {
+        el.id = el.id.replace(oldRowPat, function(m, optIdx) {
+          return '_' + newIdx + (optIdx || '');
         });
-        lastRow.parentNode.insertBefore(newRow, lastRow.nextSibling);
+      }
+      // Clear value
+      if (el.type === 'radio' || el.type === 'checkbox') {
+        el.checked = false;
+      } else {
+        el.value = '';
       }
     });
-  }
+
+    // Insert the new row right after the template row
+    templateRow.parentNode.insertBefore(newRow, templateRow.nextSibling);
+
+    // Wire the new fields to the FieldChanged bridge
+    newRow.querySelectorAll('input, select, textarea').forEach(function(el) {
+      var name = el.name;
+      if (!name) return;
+      function notify(n, v) {
+        FieldChanged.postMessage(JSON.stringify({name: n, value: v}));
+      }
+      if (el.type === 'radio') {
+        el.addEventListener('change', function() { if (el.checked) notify(name, el.value); });
+      } else if (el.type === 'checkbox') {
+        el.addEventListener('change', function() { notify(name, el.checked ? '1' : '0'); });
+      } else {
+        el.addEventListener('input',  function() { notify(name, el.value); });
+        el.addEventListener('change', function() { notify(name, el.value); });
+      }
+    });
+  });
 })();
 ''');
         },

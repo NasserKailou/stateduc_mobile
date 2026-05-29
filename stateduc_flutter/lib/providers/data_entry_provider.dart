@@ -37,6 +37,8 @@ class DataEntryProvider extends ChangeNotifier {
   String? _libEtab;
   String? _idSystem;
   String? _idRegroupEtab;  // school.idRegroup — for LOC_REG_0 injection
+  String? _idStatus;       // school.idStatus — for identification radio pre-fill
+  User?   _currentUser;    // cached for auto-reload-from-server on form open
 
   // ─── School identification info (for header + pre-fill) ────────────────────
   String? _codeEtab;       // administrative code e.g. "101012071"
@@ -127,6 +129,7 @@ class DataEntryProvider extends ChangeNotifier {
     required String libEtab,
     required String idSystem,
     String? idRegroupEtab,  // school.idRegroup for LOC_REG_0
+    String? idStatus,       // school.idStatus — numeric e.g. "1"=Public, "2"=Privé
     String? codeEtab,       // administrative code
     String? libyear,        // school year label e.g. "2024-2025"
     String? codeyear,       // school year code e.g. "2024"
@@ -139,12 +142,14 @@ class DataEntryProvider extends ChangeNotifier {
     _libEtab        = libEtab;
     _idSystem       = idSystem;
     _idRegroupEtab  = idRegroupEtab;
+    _idStatus       = idStatus;
     _codeEtab       = codeEtab;
     _libyear        = libyear;
     _codeyear       = codeyear;
     _libStatus      = libStatus;
     _libSubsector   = libSubsector;
     _adminHierarchy = adminHierarchy;
+    // NOTE: _currentUser is set via setCurrentUser() called separately from SchoolDataScreen
     _selectedQuestion = null;
     _selectedFilter   = null;
     _formHtml         = null;
@@ -222,6 +227,14 @@ class DataEntryProvider extends ChangeNotifier {
   // Mirrors: stmPageEtab.initHtml() + initPageData()
   // ═══════════════════════════════════════════════════════════════════════════
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SET CURRENT USER — must be called from SchoolDataScreen after initForSchool.
+  // Stored so selectQuestion can auto-reload from server when local data empty.
+  // ═══════════════════════════════════════════════════════════════════════════
+  void setCurrentUser(User? user) {
+    _currentUser = user;
+  }
+
   Future<void> selectQuestion(Question question) async {
     _selectedQuestion  = question;
     _selectedFilter    = null;
@@ -246,8 +259,15 @@ class DataEntryProvider extends ChangeNotifier {
       debugPrint('[DataEntry] selectQuestion: idQst=${question.idQst} formHtml=$_htmlSnippet');
       // Load validation rules
       _rules    = await _db.getValidationRules(_idCamp!, question.idQst);
-      // Load saved field values (no filter yet)
+      // Load saved field values from local SQLite
       await _loadFormData(idFilter: null);
+
+      // Auto-reload from server when local data is empty (first open).
+      // This fetches previously-saved values including radio selections.
+      // Run in background so it doesn't block the form from rendering.
+      if (_formData.isEmpty && _currentUser != null) {
+        _autoReloadFromServerBackground();
+      }
 
       // Pre-fill identification form fields.
       // The identification form (theme d'identification) has fields that are
@@ -270,6 +290,62 @@ class DataEntryProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  // ── Background reload from server when local data is empty ──────────────────
+  // Called once per question open when SQLite has no saved data.
+  // On success: updates _formData and notifies listeners → WebView re-injects.
+  // On error: silently ignored (offline or no prior save is normal).
+  void _autoReloadFromServerBackground() {
+    final user      = _currentUser;
+    final question  = _selectedQuestion;
+    final idCamp    = _idCamp;
+    final idEtab    = _idEtab;
+    final idSystem  = _idSystem;
+    final idFilter  = _selectedFilter?.idFilter;
+    if (user == null || question == null || idCamp == null ||
+        idEtab == null || idSystem == null) return;
+
+    Future(() async {
+      try {
+        final serverFields = await _api.reloadData(
+          login:   user.login,
+          sysId:   idSystem,
+          qstId:   question.idQst,
+          campId:  idCamp,
+          etabId:  idEtab,
+          filter:  idFilter,
+        );
+        if (serverFields == null || serverFields.isEmpty) return;
+
+        // Convert and merge with pre-fill (server values take priority)
+        final Map<String, String> serverStr = serverFields.map(
+          (k, v) => MapEntry(k, v?.toString() ?? ''),
+        );
+        // Save to SQLite
+        await _db.saveCollectedData(
+          idCamp:   idCamp,
+          idEtab:   idEtab,
+          idQst:    question.idQst,
+          idFilter: idFilter,
+          data:     serverStr,
+        );
+        // Only update in-memory if this is still the same question
+        if (_selectedQuestion?.idQst == question.idQst) {
+          // Merge: server values override, but keep pre-filled text fields if not in server data
+          for (final entry in serverStr.entries) {
+            _formData[entry.key] = entry.value;
+          }
+          _hasUnsavedChanges = false;
+          debugPrint('[DataEntry] _autoReloadFromServerBackground: '
+              'loaded ${serverStr.length} fields from server for qst=${question.idQst}');
+          notifyListeners();
+        }
+      } catch (_) {
+        // Non-fatal — offline or no prior save
+        debugPrint('[DataEntry] _autoReloadFromServerBackground: no server data (normal if first entry)');
+      }
+    });
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -308,6 +384,18 @@ class DataEntryProvider extends ChangeNotifier {
     fill('STATUT',               _libStatus);
     fill('LIB_STATUT',           _libStatus);
 
+    // ── Radio: Statut de l'établissement ─────────────────────────────────────
+    // HTML radio VALUE='CODE_TYPE_STATUT_ETABLISSEMENT_0_N' where N = idStatus.
+    // idStatus='1' → Public, '2' → Privé, '3' → Communautaire.
+    // We pre-fill the radio group key with the full option value string so
+    // _injectData() can set: el.checked = (el.value === val) correctly.
+    if (_idStatus != null && _idStatus!.isNotEmpty) {
+      final statusRadioVal = 'CODE_TYPE_STATUT_ETABLISSEMENT_0_$_idStatus';
+      fill('CODE_TYPE_STATUT_ETABLISSEMENT_0', statusRadioVal);
+      // Fallback field names used in other forms
+      fill('CODE_STATUT_ETABLISSEMENT_0', 'CODE_STATUT_ETABLISSEMENT_0_$_idStatus');
+    }
+
     // ── Sous-secteur ─────────────────────────────────────────────────────────
     fill('SOUS_SECTEUR',         _libSubsector);
     fill('LIB_SOUS_SECTEUR',     _libSubsector);
@@ -317,8 +405,8 @@ class DataEntryProvider extends ChangeNotifier {
     fill('LIB_ANNEE',            _libyear);
 
     debugPrint('[DataEntry] _prefillIdentificationFields: etab=$_libEtab '
-        'code=$_codeEtab status=$_libStatus subsector=$_libSubsector '
-        'year=$_libyear codeyear=$_codeyear');
+        'code=$_codeEtab idStatus=$_idStatus status=$_libStatus '
+        'subsector=$_libSubsector year=$_libyear codeyear=$_codeyear');
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

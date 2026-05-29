@@ -107,9 +107,24 @@ $app->get(
         ${$GLOBALS['PARAM']['CODE'] . '_' . $GLOBALS['PARAM']['TYPE_FILTRE']} = $code_filtre;
 
         // ── 4. Lire toutes les règles du thème depuis DICO_REGLE_THEME ───────
+        // The mobile app sends a composite theme ID (id_theme concatenated with id_sector).
+        // Example: sector=2, raw_theme=1560 → composite id_theme=15602.
+        // DICO_REGLE_THEME stores the raw theme ID (1560), so we must strip
+        // the sector suffix — same logic as questionnaire_reload_ws.php:
+        //   $str_theme_id = substr($id_theme, 0, strlen($id_theme)-strlen($id_sector))
+        $str_theme_id = $id_theme;
+        $len_sector   = strlen('' . $id_sector);
+        $len_theme    = strlen('' . $id_theme);
+        if ($len_theme > $len_sector) {
+            $candidate = substr('' . $id_theme, 0, $len_theme - $len_sector);
+            if (is_numeric($candidate) && (int)$candidate > 0) {
+                $str_theme_id = $candidate;
+            }
+        }
+
         $sql_regles_theme = "SELECT *
                               FROM DICO_REGLE_THEME
-                              WHERE ID_THEME = " . (int)$id_theme . "
+                              WHERE ID_THEME = " . (int)$str_theme_id . "
                               AND SQL_REGLE_THEME IS NOT NULL
                               ORDER BY ORDRE_REGLE_THEME";
 
@@ -286,9 +301,20 @@ $app->get(
         ${$GLOBALS['PARAM']['CODE'] . '_' . $GLOBALS['PARAM']['TYPE_ANNEE']}  = $code_annee;
         ${$GLOBALS['PARAM']['CODE'] . '_' . $GLOBALS['PARAM']['TYPE_FILTRE']} = $code_filtre;
 
+        // Strip sector suffix from composite theme ID (same logic as route 1)
+        $str_theme_id2 = $id_theme;
+        $len_sector2   = strlen('' . $id_sector);
+        $len_theme2    = strlen('' . $id_theme);
+        if ($len_theme2 > $len_sector2) {
+            $candidate2 = substr('' . $id_theme, 0, $len_theme2 - $len_sector2);
+            if (is_numeric($candidate2) && (int)$candidate2 > 0) {
+                $str_theme_id2 = $candidate2;
+            }
+        }
+
         $sql_regles_theme = "SELECT *
                               FROM DICO_REGLE_THEME
-                              WHERE ID_THEME = " . (int)$id_theme . "
+                              WHERE ID_THEME = " . (int)$str_theme_id2 . "
                               AND SQL_REGLE_THEME IS NOT NULL
                               ORDER BY ORDRE_REGLE_THEME";
 

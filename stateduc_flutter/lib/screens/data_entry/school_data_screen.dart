@@ -45,12 +45,16 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
-      context.read<DataEntryProvider>().initForSchool(
+      final entry = context.read<DataEntryProvider>();
+      // Store the current user so selectQuestion can auto-reload from server
+      entry.setCurrentUser(auth.user);
+      entry.initForSchool(
         idCamp:         widget.campaign.idCamp,
         idEtab:         widget.school.idEtab,
         libEtab:        widget.school.libEtab,
         idSystem:       widget.idSystem,
         idRegroupEtab:  widget.school.idRegroup,
+        idStatus:       widget.school.idStatus,   // ← numeric status for radio pre-fill
         codeEtab:       widget.school.codeEtab,
         libyear:        auth.user?.libyear,
         codeyear:       auth.user?.codeyear,
