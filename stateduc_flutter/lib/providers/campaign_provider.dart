@@ -129,7 +129,20 @@ class CampaignProvider extends ChangeNotifier {
     _error             = null;
     _isNavigating      = true;
     notifyListeners();
+
     await _loadRegroups(null); // load root regroups
+
+    debugPrint('[Nav] selectSystem ${system.libSystem} → '
+        '${_currentRegroups.length} root regroups after _loadRegroups');
+
+    // If no root regroups found at all, load schools directly
+    // (handles flat configuration or regroup hierarchy issues)
+    if (_currentRegroups.isEmpty) {
+      debugPrint('[Nav] ⚠ No root regroups — loading schools directly '
+          'for system ${system.idSystem}');
+      await _loadSchoolsForRegroup('__all__');
+    }
+
     _isNavigating = false;
     notifyListeners();
   }
@@ -198,10 +211,14 @@ class CampaignProvider extends ChangeNotifier {
 
   Future<void> _loadRegroups(String? parentId) async {
     try {
-      _currentRegroups =
+      final regroups =
           await _db.getChildRegroups(_selectedCampaign!.idCamp, parentId);
+      debugPrint('[Nav] _loadRegroups parentId=$parentId → '
+          '${regroups.length} regroups');
+      _currentRegroups = regroups;
       _currentSchools = [];
     } catch (e) {
+      debugPrint('[Nav] _loadRegroups ERROR: $e');
       _error = 'Erreur chargement regroupements : ${e.toString()}';
     }
   }

@@ -471,6 +471,12 @@ class DatabaseService {
   }
 
   /// Returns direct children of [parentId] for the given camp.
+  ///
+  /// When [parentId] is null → returns ROOT regroups (id_parent_regp IS NULL).
+  ///
+  /// Robustness: if null query returns nothing, also tries matching the string
+  /// '-1' (some servers may store the sentinel as a string instead of NULL)
+  /// and the empty string ''.
   Future<List<Regroup>> getChildRegroups(
       String idCamp, String? parentId) async {
     final db = await database;
@@ -482,6 +488,34 @@ class DatabaseService {
         whereArgs: [idCamp],
         orderBy: 'lib_regp ASC',
       );
+      debugPrint('[DB] getChildRegroups camp=$idCamp parentId=NULL '
+          '→ ${rows.length} rows (IS NULL query)');
+
+      // Fallback: server may have stored '-1' or '' instead of NULL
+      if (rows.isEmpty) {
+        rows = await db.rawQuery(
+          "SELECT * FROM regroups WHERE id_camp = ? AND "
+          "(id_parent_regp = '-1' OR id_parent_regp = '' OR id_parent_regp IS NULL) "
+          "ORDER BY lib_regp ASC",
+          [idCamp],
+        );
+        debugPrint('[DB] getChildRegroups camp=$idCamp parentId=NULL '
+            '→ ${rows.length} rows (fallback -1/empty query)');
+      }
+
+      // Last resort: if still empty, just return ALL regroups for this camp
+      // so the user can at least navigate
+      if (rows.isEmpty) {
+        rows = await db.query(
+          'regroups',
+          where: 'id_camp = ?',
+          whereArgs: [idCamp],
+          orderBy: 'lib_regp ASC',
+          limit: 50,
+        );
+        debugPrint('[DB] ⚠ getChildRegroups camp=$idCamp parentId=NULL '
+            '→ ${rows.length} rows (ALL regroups last resort)');
+      }
     } else {
       rows = await db.query(
         'regroups',
@@ -489,6 +523,8 @@ class DatabaseService {
         whereArgs: [idCamp, parentId],
         orderBy: 'lib_regp ASC',
       );
+      debugPrint('[DB] getChildRegroups camp=$idCamp parentId=$parentId '
+          '→ ${rows.length} rows');
     }
     return rows.map((r) => Regroup(
       idRegp: r['id_regp'] as String,
@@ -597,6 +633,25 @@ class DatabaseService {
   Future<List<School>> getSchoolsByRegroup(
       String idCamp, String idSystem, String idRegp) async {
     final db = await database;
+
+    // Special sentinel: '__all__' → skip strategies 1 & 2, return all schools
+    if (idRegp == '__all__') {
+      debugPrint('[DB] getSchoolsByRegroup __all__ → returning all schools '
+          'for camp=$idCamp');
+      final allRows = await db.query(
+        'schools',
+        where: 'id_camp = ?',
+        whereArgs: [idCamp],
+        orderBy: 'lib_etab ASC',
+      );
+      return allRows.map((r) => School(
+        idEtab:    r['id_etab']    as String,
+        libEtab:   r['lib_etab']   as String,
+        codeEtab:  r['code_etab']  as String?,
+        idStatus:  r['id_status']  as String?,
+        idRegroup: r['id_regroup'] as String?,
+      )).toList();
+    }
 
     // ── Strategy 1: via localisations.regroups_json ────────────────────────
     final locRows = await db.query(

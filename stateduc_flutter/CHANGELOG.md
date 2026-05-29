@@ -1,351 +1,232 @@
-# StatEduc Mobile — Journal des travaux (Flutter)
+# CHANGELOG — StatEduc Mobile (Flutter)
 
-Branche de développement : `ak_main`  
-Dépôt : `https://github.com/NasserKailou/stateduc_mobile`  
-Pull Request ouverte : [PR #1](https://github.com/NasserKailou/stateduc_mobile/pull/1)
+Historique complet de toutes les modifications apportées à l'application Flutter StatEduc Mobile.
 
 ---
 
-## Table des matières
+## [Unreleased] — 2026-05-29
 
-1. [Architecture générale](#1-architecture-générale)
-2. [Authentification et configuration réseau](#2-authentification-et-configuration-réseau)
-3. [Chargement de campagne](#3-chargement-de-campagne)
-4. [Saisie de données — formulaire WebView](#4-saisie-de-données--formulaire-webview)
-5. [Sauvegarde des données](#5-sauvegarde-des-données)
-6. [Contrôle de cohérence côté serveur](#6-contrôle-de-cohérence-côté-serveur)
-7. [Base de données locale SQLite](#7-base-de-données-locale-sqlite)
-8. [Corrections build Android](#8-corrections-build-android)
-9. [Corrections réseau (Dio)](#9-corrections-réseau-dio)
-10. [Corrections UI](#10-corrections-ui)
-11. [Table coherence_rules — schéma réservé](#11-table-coherence_rules--schéma-réservé)
+### Ajouté
+- **Icône de lancement** : `assets/icon/icon.png` (2048×2048) utilisée pour générer toutes les densités Android mipmap (`mdpi` 48px, `hdpi` 72px, `xhdpi` 96px, `xxhdpi` 144px, `xxxhdpi` 192px) via script Python/Pillow.
+- **Splash screen** : `drawable/splash_logo.png` (512×512) générée depuis `icon.png`. `launch_background.xml` mis à jour pour afficher ce logo centré sur fond bleu `#1565C0`.
+- **`ic_launcher_round`** dans tous les dossiers mipmap (Android 7.1+).
+- `android:roundIcon="@mipmap/ic_launcher_round"` dans `AndroidManifest.xml`.
 
----
+### Modifié
+- `drawable/launch_background.xml` : référence `@drawable/splash_logo` (512px) au lieu de `@mipmap/ic_launcher` (trop petit pour un splash).
 
-## 1. Architecture générale
+### Fix supplémentaire — navigation regroups (2e round)
 
-### Principe
-L'application Flutter remplace une application web JavaScript/jQuery originale nommée **StatEduc MEN 2025**. Elle conserve **exactement** la même logique métier, les mêmes endpoints REST PHP, et les mêmes règles de validation, mais dans un contexte mobile Android natif.
+**Problème identifié après tests** : `_buildEmptyState` apparaissait **immédiatement après** le clic sur "Education de Base" (avant même de naviguer dans un sous-regroup).
 
-### Structure des services
-| Fichier | Rôle |
-|---|---|
-| `lib/services/api_service.dart` | Toutes les communications HTTP avec le serveur PHP (Dio) |
-| `lib/services/database_service.dart` | Base SQLite locale via `sqflite` — remplace les 25+ clés localStorage du JS original |
-| `lib/providers/data_entry_provider.dart` | State manager ChangeNotifier — gère l'état du formulaire de saisie |
-| `lib/providers/campaign_provider.dart` | Chargement et persistance des campagnes |
+**Cause** : `getChildRegroups(idCamp, null)` ne retournait aucun regroup racine. Deux sous-cas :
+1. Les regroups racines ont `id_parent_regp = '-1'` (string) au lieu de `NULL` — la requête `IS NULL` ne les trouve pas.
+2. Les regroups racines ont `id_parent_regp = ''` (chaîne vide) — même problème.
 
-### Correspondance localStorage → SQLite
-L'application JS originale stockait toutes ses données dans `localStorage` avec des clés comme `stm_User`, `stm_Campagnes`, `stm_EtabCollectData_*`. Ces données sont maintenant persistées dans des tables SQLite :
+**Corrections — `lib/services/database_service.dart`** :
+- `getChildRegroups()` : si la requête `IS NULL` retourne 0, tente une requête de fallback `OR '-1' OR ''` pour les cas de mauvais stockage.
+- `getChildRegroups()` : si toujours 0, retourne **tous** les regroups de la campagne (last resort).
+- `getSchoolsByRegroup()` : ajout du sentinel `'__all__'` — quand `idRegp == '__all__'`, retourne tous les établissements de la campagne directement (court-circuit Strategy 1 & 2).
+- Logs `[DB]` ajoutés dans `getChildRegroups()` pour chaque chemin (IS NULL, fallback -1/empty, last resort).
 
-| Clé localStorage originale | Table SQLite |
-|---|---|
-| `stm_User`, `stm_Year`, `stm_Filter` | `settings` |
-| `stm_Campagnes` | `campaigns` |
-| `stm_Localisations` | `localisations` |
-| `stm_Systems` | `education_systems` |
-| `stm_TypeRegroups` | `regroup_types` |
-| `stm_Regroups` | `regroups` |
-| `stm_Etabs` | `schools` |
-| `stm_Status` | `school_statuses` |
-| `stm_Questions` | `questions` |
-| `stm_Rules` | `validation_rules` |
-| `stm_EtabCollectData_{etab}_{qst}[_{filter}]` | `collected_data` |
-| *(nouveau)* | `filter_periods` |
-| *(réservé)* | `coherence_rules` |
+**Corrections — `lib/providers/campaign_provider.dart`** :
+- `selectSystem()` : si `_loadRegroups(null)` retourne 0 regroups, bascule automatiquement en `_loadSchoolsForRegroup('__all__')` → affiche tous les établissements de la campagne directement.
+- `_loadRegroups()` : ajout log `[Nav]` avec le nombre de regroups retournés.
 
 ---
 
-## 2. Authentification et configuration réseau
+## [1.0.2] — 2026-05-29 — fix(schools): triple-strategy fallback
 
-### Fichier : `lib/services/api_service.dart`
+### Problème
+Après chargement d'une campagne, cliquer sur un système éducatif (ex : **Education de Base** sous **MOBILE**) affichait `_buildEmptyState` — "Aucun établissement trouvé pour ce regroupement." — même avec ≥ 4 établissements chargés.
 
-#### 2.1 Normalisation de l'URL serveur (`normalizeServerUrl`)
-- Ajoute automatiquement `http://` si l'utilisateur saisit une URL sans schéma
-- Garantit un **slash final** (obligatoire pour que Dio préserve le chemin de base)
-- Raison : Dio 5.x résout `baseUrl='http://host/app'` + `get('/endpoint')` → `http://host/endpoint` (PERD `/app`). Avec slash final + chemin relatif, cela devient correct.
+### Cause racine
+`getSchoolsByRegroup()` cherchait uniquement via `localisations.regroups_json`. Or le serveur `locs_camp` ne stocke que les IDs de la **chaîne directe** de l'utilisateur (feuilles + parents via `ID_REGROUP_PARENTS`), pas tous les nœuds intermédiaires de l'arbre de navigation. Quand l'utilisateur clique sur un nœud intermédiaire absent de `regroups_json`, la méthode retournait `[]`.
 
-#### 2.2 Authentification HTTP Basic (`authenticate`)
-- Endpoint : `GET /user_ident.php/user/{login}/{password}`
-- Header `Authorization: Basic base64(login:password)` injecté automatiquement
-- Gestion des cas : HTTP 401, 404, `se_message == 'log_ko'`
-- Parsing manuel du JSON (responseType plain) pour résister aux Content-Type incorrects du serveur
+### Corrections — `lib/services/database_service.dart`
+Ajout d'un import `package:flutter/foundation.dart` pour `debugPrint`.
 
-#### 2.3 Intercepteur d'authentification (`_AuthInjectorInterceptor`)
-- Ré-injecte l'en-tête Authorization sur **toutes** les requêtes, y compris les redirections 3xx
-- Garantit qu'aucune requête ne part sans authentification
+**Triple stratégie dans `getSchoolsByRegroup()`** :
 
-#### 2.4 User-Agent
-- `Mozilla/5.0 (Linux; Android 10) StatEduc/1.0` — imite un navigateur pour passer les éventuels filtres serveur
+| Stratégie | Mécanisme | Cas couvert |
+|-----------|-----------|-------------|
+| **Strategy 1** *(existante)* | `localisations.regroups_json` contient `idRegp` | Chaîne locs complète — cas nominal |
+| **Strategy 2** *(nouveau fallback)* | `schools.id_regroup = idRegp` direct SQL | Nœud intermédiaire absent de la chaîne locs |
+| **Strategy 3** *(last resort)* | Tous les établissements de la campagne | Aucune correspondance → jamais d'écran vide |
 
----
+**Logs debug `[DB]`** ajoutés :
+- Nombre de lignes `localisations` pour `(id_camp, id_system)` — détecte mismatch `id_system`
+- Échantillon `regroups_json` du premier enregistrement
+- Résultats quantifiés pour chaque stratégie
 
-## 3. Chargement de campagne
+### Corrections — `lib/providers/campaign_provider.dart`
+**Logs debug `[Nav]`** ajoutés dans :
+- `navigateIntoRegroup()` : affiche le `idRegp` cliqué, le nombre d'enfants détectés, et si on bascule en mode leaf
+- `_loadSchoolsForRegroup()` : affiche le nombre d'établissements retournés
 
-### Fichier : `lib/providers/campaign_provider.dart`
-
-#### 3.1 Chargement complet en une seule opération
-Reproduction exacte du flux JavaScript `charge_camp.js` :
-1. `GET /user_camp.php/new_camp/{userId}/1` → liste des campagnes disponibles
-2. `GET /user_camp.php/reg_camp/{login}/{campId}/1` → entités administratives (regroups)
-3. `GET /user_camp.php/typ_reg_camp/{userId}/{campId}/{typeRegroups}` → types de regroups
-4. `GET /user_camp.php/etabs_status/` → statuts d'établissements
-5. `GET /user_camp.php/etabs_camp/{userId}/{campId}/1` → liste des établissements
-6. `GET /user_camp.php/locs_camp/{userId}/{campId}` → localisations (école → regroupement)
-7. `GET /user_camp.php/sys_camp/{userId}/{campId}` → secteurs d'éducation
-8. Pour chaque secteur : `GET /data_camp.php/theme_camp/{campId}/{sysId}/eng` → questions/thèmes
-9. Pour chaque question : `GET /data_camp.php/html_theme_camp/{campId}/{qstId}/eng` → HTML formulaire (deux étapes)
-10. `GET /data_camp.php/regle_theme_camp/{qstId}/{sysId}` → règles de validation
-
-#### 3.2 Persistance locale
-Chaque étape du chargement persiste en SQLite via `database_service.dart`. En cas de déconnexion ultérieure, toutes les données restent disponibles.
-
-#### 3.3 `idYear` / `codeyear` — code d'année scolaire
-- Le serveur PHP gère la session avec `$_SESSION['annee']`
-- L'application mobile ne maintient pas de session HTTP
-- Solution : `User.codeyear` est lu depuis la réponse d'authentification, transmis en dernier segment de l'URL save (`/{id_annee}`) et reload
-- Le serveur reconnaît ce segment et réinjecte la valeur dans `$_SESSION['annee']`
+Ces logs sont visibles via `flutter logs` sur l'appareil physique pour diagnostics terrain.
 
 ---
 
-## 4. Saisie de données — formulaire WebView
+## [1.0.1] — 2026-05-28 — fix(ssl): accept self-signed certificates
 
-### Fichier : `lib/screens/data_entry/school_data_screen.dart`
+### Problème
+L'écran "Charger une campagne" affichait **"Erreur réseau : The connection errored: Software caused connection abort"** malgré une connexion réseau stable.
 
-#### 4.1 Rendu HTML via WebView
-- Le formulaire de saisie est le HTML original du serveur, rendu dans un WebView
-- Inject JS bridge pour intercepter les soumissions de formulaire
-- Extraction des valeurs saisies via JavaScript avant sauvegarde
+### Cause racine — triple blocage SSL
+1. `network_security_config.xml` contenait des entrées CIDR invalides (`<domain>192.168.1.0/24</domain>`) bloquant tout le trafic HTTP.
+2. Dart/Flutter utilise son propre moteur TLS (BoringSSL) indépendamment d'Android — rejetait les certificats auto-signés du serveur intranet.
+3. Absence de `HttpOverrides` global — les instances `HttpClient` hors Dio n'étaient pas configurées.
 
-#### 4.2 Sélecteur de question
-- Les questions sont affichées sous forme de chips colorés
-- Couleur : vert = données saisies, gris = vide
-- Correction : les chips utilisent maintenant `ChoiceChip` avec couleur sélectionnée correcte (bug précédent : couleur ne changeait pas à la sélection)
+### Corrections
 
-#### 4.3 Sélecteur de filtre (période)
-- Visible uniquement si la question a `has_filter = 1`
-- Change les données affichées pour la période sélectionnée
-
-#### 4.4 Alerte de cohérence post-envoi
-- Après un envoi réussi, si le serveur retourne des violations de cohérence, un `AlertDialog` s'affiche listant chaque violation avec son message
-- Les violations sont non-bloquantes (l'envoi a déjà eu lieu)
-
----
-
-## 5. Sauvegarde des données
-
-### Fichier : `lib/services/api_service.dart` — méthode `saveData()`
-
-#### 5.1 Endpoint
-```
-POST /data_save.php/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0[/{id_annee}]
-Content-Type: application/x-www-form-urlencoded
+#### `android/app/src/main/res/xml/network_security_config.xml`
+Remplacé la configuration invalide par un `base-config` permissif :
+```xml
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system"/>
+            <certificates src="user"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>
 ```
 
-#### 5.2 Encodage des champs radio
-Problème corrigé : dans l'application JS, les champs radio sont stockés comme `fieldName#optionId = "1"`. La transformation vers le format serveur est :
-- Clé `fieldName#optionId` avec valeur `"1"` → envoyé comme `fieldName=optionId`
-- Clé `fieldName#optionId` avec valeur `"0"` → non envoyé (option non cochée)
-
-#### 5.3 Substitution `/` → `_slh_`
-Le serveur PHP original utilise `str_replace('_slh_', '/', $value)` pour décoder les valeurs. L'application mobile reproduit l'encodage inverse : `strVal.replaceAll('/', '_slh_')`.
-
-#### 5.4 Injection `LOC_REG_0`
-La première question doit toujours inclure `&LOC_REG_0={school.idRegroup}` dans le body POST. Ce champ lie l'établissement à son regroupement administratif.
-
-#### 5.5 Segment `id_annee`
-Si `user.codeyear` est non vide, il est ajouté comme dernier segment de l'URL. Le serveur PHP dispose d'une route dédiée pour ce cas :
-```
-/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0/{id_annee}
+#### `lib/services/api_service.dart`
+Ajout imports `dart:io` et `package:dio/io.dart`.
+Override de l'adaptateur HTTP Dio pour accepter les certificats auto-signés :
+```dart
+(_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+  final client = HttpClient();
+  client.badCertificateCallback = (cert, host, port) => true;
+  return client;
+};
 ```
 
-#### 5.6 Timeouts Dio élevés
-Les timeouts ont été portés à des valeurs élevées pour les réseaux lents fréquents en contexte africain :
-- `connectTimeout` : 60 s
-- `receiveTimeout` : 180 s
-- `sendTimeout` : 120 s
-
----
-
-## 6. Contrôle de cohérence côté serveur
-
-> **Important** : Le contrôle de cohérence est **exclusivement côté serveur**. Il n'y a pas de moteur d'évaluation embarqué dans l'application mobile.
-
-### Fichier : `lib/services/api_service.dart` — méthode `checkCoherence()`
-
-#### 6.1 Endpoint
-```
-GET /data_controle.php/theme_controle/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/{yearCode}
-```
-
-#### 6.2 Déclenchement
-- Appelé **automatiquement** après chaque `saveData()` réussi
-- Non bloquant : si l'appel échoue (réseau), il est silencieusement ignoré
-
-#### 6.3 Réponse serveur
-```json
-{
-  "se_status": 200,
-  "se_data": {
-    "nb_erreurs": 2,
-    "erreurs": [
-      {
-        "id_regle": 5,
-        "id_regle_assoc": 7,
-        "message": "Effectif garçons doit être <= effectif total",
-        "regle_1": "NB_GARCONS",
-        "regle_2": "TOTAL",
-        "critere": "<="
-      }
-    ]
+#### `lib/main.dart`
+Ajout d'un `HttpOverrides` global couvrant toutes les instances `HttpClient` hors Dio :
+```dart
+class _TrustAllCertificates extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (cert, host, port) => true;
   }
 }
-```
 
-#### 6.4 Modèle `CoherenceError`
-```dart
-class CoherenceError {
-  final int    idRegle;
-  final int    idRegleAssoc;
-  final String message;
-  final String regle1;     // valeur calculée côté 1
-  final String regle2;     // valeur calculée côté 2
-  final String critere;    // opérateur de comparaison
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = _TrustAllCertificates();
+  ...
 }
 ```
 
-#### 6.5 Affichage
-- `DataEntryProvider._coherenceErrors` est peuplé après chaque envoi réussi
-- `school_data_screen.dart` affiche un `AlertDialog` si la liste est non vide
-- Le getter `hasCoherenceErrors` permet au widget de réagir
+---
+
+## [1.0.0] — 2026-05-22 à 2026-05-28 — Réécriture complète Flutter
+
+### Vue d'ensemble
+Réécriture complète de l'application mobile StatEduc depuis Cordova/JavaScript vers Flutter/Dart. L'application originale utilisait `localStorage` et des appels AJAX jQuery ; la nouvelle version utilise SQLite (sqflite), Provider pour la gestion d'état, Dio pour les requêtes HTTP, et une architecture propre MVC/Provider.
+
+### Architecture générale
+
+#### Modèles (`lib/models/`)
+- `User` — utilisateur authentifié (id, login, prénom, nom, année, filtres)
+- `Campaign` — campagne de collecte (id, nom, dates, statut, typeRegroups CSV)
+- `Regroup` / `RegroupType` — arbre de regroupements administratifs
+- `School` / `SchoolStatus` — établissements scolaires
+- `EducationSystem` — systèmes éducatifs (MOBILE, Education de Base, etc.)
+- `Question` — thèmes de collecte avec règles de validation
+- `Localisation` — liaisons école ↔ système ↔ chaîne de regroupements
+
+#### Services (`lib/services/`)
+- `ApiService` — singleton Dio avec Basic Auth, intercepteurs de log, SSL bypass, retry
+- `DatabaseService` — singleton SQLite remplaçant les 25+ clés `localStorage` originales
+- `AuthService` — authentification + stockage sécurisé des credentials (flutter_secure_storage)
+- `CoherenceEvaluator` — moteur d'évaluation offline des règles de cohérence
+
+#### Providers (`lib/providers/`)
+- `CampaignProvider` — gestion des campagnes, navigation hiérarchique regroupements → établissements, téléchargement en 9 étapes (regroups → types → statuts → schools → locs → systems → formulaires + règles)
+- `DataEntryProvider` — saisie de données par établissement, sauvegarde locale + synchronisation serveur, cohérence offline
+
+#### Écrans (`lib/screens/`)
+- `SplashScreen` — écran de démarrage avec vérification session
+- `OnboardingScreen` — configuration URL serveur + login
+- `LoginScreen` — authentification
+- `CampaignsScreen` — liste des campagnes téléchargées
+- `LoadCampaignScreen` — chargement d'une nouvelle campagne (9 étapes avec progress bar)
+- `CampaignDetailScreen` — sélecteur de système éducatif → navigation hiérarchique → liste établissements
+- `SchoolDataScreen` — formulaire de saisie par établissement (rendu HTML WebView + bannière cohérence)
+
+### Schéma SQLite (version 3)
+Tables créées : `settings`, `campaigns`, `education_systems`, `regroup_types`, `regroups`, `school_statuses`, `schools`, `localisations`, `questions`, `form_html`, `validation_rules`, `coherence_rules`, `collected_data`, `filter_periods`
+
+### Fonctionnalités migrées depuis JavaScript original
+- Authentification Basic Auth (charge_camp.js, users.js)
+- Chargement campagne multi-étapes avec barre de progression (charge_camp.js — stmChargeCamp)
+- Navigation hiérarchique regroupements (page_camp.js — displayRegroups, displayFinalRegroupEtabs)
+- Affichage liste établissements filtrés par regroupement et système
+- Rendu formulaires HTML via WebView (deux requêtes authentifiées)
+- Sauvegarde données : POST multipart vers `/data_camp.php/save_data/` (page_etab.js)
+- Règles de cohérence offline : évaluation SQL côté client (data_rules.php)
+- Indicateur connectivité réseau (connectivity_plus)
+- Stockage PIN/credentials sécurisé (flutter_secure_storage)
+
+### Build Android
+- Gradle 8.14.x, AGP 8.11.1, Kotlin 2.2.20, compileSdk 36
+- Dépendances : dio 5.7, provider 6.1, sqflite 2.3, flutter_secure_storage 9.2, webview_flutter 4.10
+- Signing : keystore configuré dans `key.properties`
+
+### Corrections Build
+- Suppression `flutter_sms` (namespace AGP 8.x incompatible)
+- Suppression `vibration` (incompatibilité KGP)
+- Remplacement `flutter_html` (beta cassée) par `webview_flutter` pour le rendu formulaires
+- Fix `GeneratedPluginRegistrant.java` après changement plugins
+- Upgrade Kotlin 2.0.21 → 2.1.0 → 2.2.20 pour compatibilité AGP 8.11.1
+- Fix `debugPrint` string interpolation (erreur Dart)
+- Fix `ValidationRule.validate()` méthode manquante
+- Fix `ApiService` singleton — instance partagée AuthService + CampaignProvider
+- Fix timeouts Dio : connectTimeout 60s, receiveTimeout 180s, sendTimeout 120s
+
+### Fix spinner infini
+Le `StreamBuilder` de chargement n'avait pas de condition de terminaison quand le step atteignait 100%. Remplacé par un `Consumer<CampaignProvider>` qui lit `isLoadingCampaign` directement.
+
+### Fix formulaires
+- Encodage UTF-8 des paramètres POST
+- Transformation radio buttons : `{"radio_name": "value"}` → `"radio_name=value"` (format FormData)
+- Authentification sur la seconde requête HTML (fetch URL → fetch contenu)
+
+### Fix navigation
+- `CampaignDetailScreen` : machine à 5 états (`selectedSystem == null` / `isNavigating` / `regroups` / `schools` / `empty`) pour éviter le spinner infini
+- `navigateUpRegroup` : recalcul du niveau correct en remontant le breadcrumb
 
 ---
 
-## 7. Base de données locale SQLite
+## Notes techniques
 
-### Fichier : `lib/services/database_service.dart`
+### Endpoint mapping (JS → Flutter)
+| Endpoint | Paramètre clé | Notes |
+|----------|---------------|-------|
+| `new_camp/{userId}/1` | `currentUser.id` | Liste des campagnes disponibles |
+| `reg_camp/{login}/{campId}/1` | `currentUser.login` ← LOGIN, pas ID ! | Regroupements |
+| `etabs_camp/{userId}/{campId}/1` | `currentUser.id` | Établissements |
+| `locs_camp/{userId}/{campId}` | `currentUser.id` | Localisations |
+| `sys_camp/{userId}/{campId}` | `currentUser.id` | Systèmes éducatifs |
+| `theme_camp/{campId}/{sysId}/eng` | — | Questions/formulaires |
+| `regle_theme_camp/{qstId}/{sysId}` | — | Règles de cohérence |
+| `save_data/{campId}/{etabId}/{sysId}/{qstId}/{filterId}` | — | Sauvegarde saisie |
 
-#### 7.1 Versioning
-| Version | Description |
-|---|---|
-| v1 | Toutes les tables de base |
-| v2 | Ajout colonne `sort_order` dans `questions` (migration ALTER TABLE) |
-| v3 | Ajout table `coherence_rules` (schéma réservé, voir §11) |
-
-#### 7.2 `collected_data` — stockage des saisies
-Table centrale qui remplace toutes les clés `stm_EtabCollectData_*` :
-```sql
-CREATE TABLE collected_data (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  id_camp     TEXT NOT NULL,
-  id_etab     TEXT NOT NULL,
-  id_qst      TEXT NOT NULL,
-  id_filter   TEXT,
-  field_name  TEXT NOT NULL,
-  field_value TEXT,
-  is_sent     INTEGER NOT NULL DEFAULT 0,  -- 1 après envoi réussi
-  updated_at  TEXT NOT NULL
-);
-CREATE UNIQUE INDEX idx_collected_data_key
-  ON collected_data (id_camp, id_etab, id_qst, COALESCE(id_filter,''), field_name);
+### Format `locs_camp` (serveur)
+```json
+{ "idloc": ..., "idcamp": "...", "idsys": "...",
+  "regroups": "id1,id2,...",  // CSV — IDs chaîne utilisateur seulement
+  "etabs": "id1,id2,..." }    // CSV — établissements filtrés
 ```
+⚠ `regroups` contient uniquement la chaîne directe de l'utilisateur, pas tous les nœuds de navigation.
 
-#### 7.3 `filter_periods` — périodes de filtre
-Stocke les périodes disponibles (ex : Trim1, Trim2, Trim3) pour chaque campagne :
-```sql
-CREATE TABLE filter_periods (
-  id_camp     TEXT NOT NULL,
-  id_filter   TEXT NOT NULL,
-  lib_filter  TEXT NOT NULL,
-  PRIMARY KEY (id_camp, id_filter)
-);
+### Format `reg_camp` (serveur → client)
+```json
+{ "id": "...", "nom": "...", "type": "...", "parentid": "-1" }
 ```
-
-#### 7.4 CRUD disponibles
-Chaque table dispose de méthodes `get*`, `insert*` (batch), et pour `collected_data` : `saveCollectedField`, `saveCollectedData`, `getCollectedData`, `markCollectedDataSent`, `deleteCollectedData`.
-
----
-
-## 8. Corrections build Android
-
-### Fichier : `android/app/build.gradle`, `pubspec.yaml`
-
-#### 8.1 Suppression de `vibration`
-La dépendance `vibration` utilisait Kotlin Gradle Plugin (KGP) incompatible avec AGP 8.x et ne définissait pas `namespace`. Erreur de build résolue en retirant la dépendance.
-
-#### 8.2 Suppression de `flutter_sms`
-Même problème : `flutter_sms` causait une erreur AGP 8.x `namespace not specified`. Supprimé.
-
-#### 8.3 Mise à jour `GeneratedPluginRegistrant.java`
-Régénéré après les suppressions de plugins.
-
----
-
-## 9. Corrections réseau (Dio)
-
-### Fichier : `lib/services/api_service.dart`
-
-#### 9.1 Timeouts élevés
-Portés à 60 s (connect), 180 s (receive), 120 s (send) pour les connexions lentes.
-
-#### 9.2 Message d'erreur timeout clair
-Avant : message d'erreur Dio brut, incompréhensible pour l'utilisateur.  
-Après : message en français indiquant que le délai est dépassé et suggérant de vérifier la connexion.
-
-#### 9.3 Gestion `responseType: plain`
-Toutes les réponses sont récupérées en plain text puis parsées manuellement en JSON. Évite les exceptions Dio quand le Content-Type serveur est `text/html` au lieu de `application/json`.
-
----
-
-## 10. Corrections UI
-
-### `lib/screens/data_entry/school_data_screen.dart`
-
-#### 10.1 Couleur des chips
-Avant : la couleur sélectionnée ne s'affichait pas.  
-Après : `ChoiceChip` avec `selectedColor` et `backgroundColor` distincts.
-
----
-
-## 11. Table `coherence_rules` — schéma réservé
-
-### Fichier : `lib/services/database_service.dart`
-
-La table `coherence_rules` est **créée dans le schéma SQLite** (version 3) mais **n'est pas utilisée par l'application**. Elle est réservée pour un éventuel usage futur.
-
-Le contrôle de cohérence est géré intégralement par le serveur via `data_controle.php` (voir §6). L'application mobile appelle cet endpoint après chaque sauvegarde et affiche les violations retournées.
-
-```sql
-CREATE TABLE IF NOT EXISTS coherence_rules (
-  id              INTEGER PRIMARY KEY AUTOINCREMENT,
-  id_camp         TEXT NOT NULL,
-  id_qst          TEXT NOT NULL,
-  id_etab         TEXT NOT NULL,
-  id_filter       TEXT,
-  id_regle        INTEGER NOT NULL,
-  lib_regle       TEXT NOT NULL DEFAULT '',
-  sql_regle       TEXT NOT NULL,
-  id_assoc        INTEGER NOT NULL,
-  id_regle_assoc  INTEGER NOT NULL,
-  lib_regle_assoc TEXT NOT NULL DEFAULT '',
-  sql_assoc       TEXT NOT NULL,
-  critere         TEXT NOT NULL,
-  message         TEXT NOT NULL DEFAULT '',
-  fetched_at      TEXT NOT NULL
-);
-```
-
----
-
-## Commits associés
-
-| SHA | Message |
-|---|---|
-| `381de3e` | fix(admin): suppress ADOdb debug echo + guard AJAX JSON against output pollution |
-| `b544819` | fix(save/coherence): complete data-not-saved fix + coherence control for mobile |
-| `7bb5ac3` | serveur add code |
-| `6178a0b` | fix(network): raise Dio timeouts + clean saveData timeout error message |
-| `0237f45` | fix(ui/data): chip colors, UTF-8 form encoding, saveData radio transform |
-| `3e712c5` | 20260528 |
-| `654652d` | fix(build): remove unused vibration dep (also had KGP/namespace issues) |
-| `0785d3a` | fix(build): remove unused flutter_sms causing AGP 8.x namespace error |
+`parentid == "-1"` → racine → stocké `NULL` dans SQLite.
