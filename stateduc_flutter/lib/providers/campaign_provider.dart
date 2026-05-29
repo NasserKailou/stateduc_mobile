@@ -150,10 +150,15 @@ class CampaignProvider extends ChangeNotifier {
     final childRegroups =
         await _db.getChildRegroups(_selectedCampaign!.idCamp, regroup.idRegp);
 
+    debugPrint('[Nav] navigateIntoRegroup: regp=${regroup.idRegp} '
+        '"${regroup.libRegp}" → ${childRegroups.length} children');
+
     if (childRegroups.isEmpty) {
-      // Leaf regroup → show schools for this regroup
+      // Leaf regroup → load schools for this regroup
+      debugPrint('[Nav] Leaf detected → loading schools for regp=${regroup.idRegp}');
       await _loadSchoolsForRegroup(regroup.idRegp);
     } else {
+      debugPrint('[Nav] Non-leaf → showing ${childRegroups.length} children');
       _currentRegroups = childRegroups;
       _currentSchools  = [];
     }
@@ -203,13 +208,17 @@ class CampaignProvider extends ChangeNotifier {
 
   Future<void> _loadSchoolsForRegroup(String idRegp) async {
     try {
-      _currentSchools = await _db.getSchoolsByRegroup(
+      final schools = await _db.getSchoolsByRegroup(
         _selectedCampaign!.idCamp,
         _selectedSystem!.idSystem,
         idRegp,
       );
+      debugPrint('[Nav] _loadSchoolsForRegroup regp=$idRegp → '
+          '${schools.length} schools');
+      _currentSchools  = schools;
       _currentRegroups = [];
     } catch (e) {
+      debugPrint('[Nav] _loadSchoolsForRegroup ERROR: $e');
       _error = 'Erreur chargement établissements : ${e.toString()}';
     }
   }
