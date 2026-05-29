@@ -24,8 +24,16 @@ class Regroup {
   /// Parses server JSON from /user_camp.php/reg_camp/{login}/{campId}/1
   factory Regroup.fromJson(Map<String, dynamic> json) {
     final parentidRaw = json['parentid']?.toString() ?? json['id_parent_regp']?.toString();
-    // Map '-1' (JS root sentinel) → null (DB representation of root)
-    final parentId = (parentidRaw == null || parentidRaw == '-1') ? null : parentidRaw;
+    // Map root sentinels → null (DB representation of root regroup):
+    //   '-1' = JS StmRegroup convention (most StatEduc deployments)
+    //   '0'  = some servers send 0 for top-level regroups
+    //   ''   = empty string from some PHP versions
+    //   null = already null
+    final isRoot = parentidRaw == null ||
+        parentidRaw == '-1' ||
+        parentidRaw == '0' ||
+        parentidRaw.trim().isEmpty;
+    final parentId = isRoot ? null : parentidRaw;
     return Regroup(
       idRegp:      (json['id'] ?? json['id_regp'] ?? '').toString(),
       libRegp:     (json['nom'] ?? json['lib_regp'] ?? '').toString(),
@@ -42,7 +50,16 @@ class Regroup {
   };
 
   /// True if this is a root-level regroup (no parent).
-  bool get isRoot => idParentRegp == null;
+  /// Handles multiple root sentinels:
+  ///   null = stored as NULL in DB (normal case after fromJson fix)
+  ///   '-1' = legacy stored value before fromJson fix  
+  ///   '0'  = some servers send 0 for top-level regroups
+  ///   ''   = empty string from some PHP versions
+  bool get isRoot =>
+      idParentRegp == null ||
+      idParentRegp == '-1' ||
+      idParentRegp == '0' ||
+      idParentRegp!.trim().isEmpty;
 
   bool isChildOf(String parentId) => idParentRegp == parentId;
 }

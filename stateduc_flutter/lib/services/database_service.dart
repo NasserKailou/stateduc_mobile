@@ -491,16 +491,16 @@ class DatabaseService {
       debugPrint('[DB] getChildRegroups camp=$idCamp parentId=NULL '
           '→ ${rows.length} rows (IS NULL query)');
 
-      // Fallback: server may have stored '-1' or '' instead of NULL
+      // Fallback: server may have stored '-1', '0', or '' instead of NULL
       if (rows.isEmpty) {
         rows = await db.rawQuery(
           "SELECT * FROM regroups WHERE id_camp = ? AND "
-          "(id_parent_regp = '-1' OR id_parent_regp = '' OR id_parent_regp IS NULL) "
+          "(id_parent_regp = '-1' OR id_parent_regp = '0' OR id_parent_regp = '' OR id_parent_regp IS NULL) "
           "ORDER BY lib_regp ASC",
           [idCamp],
         );
         debugPrint('[DB] getChildRegroups camp=$idCamp parentId=NULL '
-            '→ ${rows.length} rows (fallback -1/empty query)');
+            '→ ${rows.length} rows (fallback -1/0/empty query)');
       }
 
       // Last resort: if still empty, just return ALL regroups for this camp

@@ -206,8 +206,10 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
 
     // ── 4a. Quoted VALUE="$VAR" → VALUE="" ────────────────────────────────
     // Matches: value="$ANY_CAPS_VAR_0" (case-insensitive attribute name)
+    // NOTE: Dart's RegExp does NOT support inline flags like (?i).
+    //       Use caseSensitive: false parameter instead.
     html = html.replaceAllMapped(
-      RegExp(r'(?i)(value=)"(\$[A-Z_][A-Z_0-9]*)"'),
+      RegExp(r'(value=)"(\$[A-Z_][A-Z_0-9]*)"', caseSensitive: false),
       (m) => '${m.group(1)!}""',
     );
 
@@ -216,7 +218,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     //          VALUE=$CODE_DIPLOME_0_12   → VALUE=12
     // The last underscore-separated segment of the var name is the option value.
     html = html.replaceAllMapped(
-      RegExp(r'(?i)(value=)\$([A-Z_][A-Z_0-9]*)'),
+      RegExp(r'(value=)\$([A-Z_][A-Z_0-9]*)', caseSensitive: false),
       (m) {
         final varName = m.group(2)!;
         final lastSeg = varName.contains('_')

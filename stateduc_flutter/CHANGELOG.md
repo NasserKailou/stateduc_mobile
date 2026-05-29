@@ -4,6 +4,40 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-05-29 — Session 9 : crash FormatException regex, icône splash asset, regroups parentid=0
+
+### 🔴 Fix CRITIQUE — Crash `FormatException: Invalid group (?i)` dans les formulaires
+
+**Cause racine** : `RegExp(r'(?i)(value=)...')` — Dart ne supporte **pas** les flags inline comme `(?i)` dans les expressions régulières. Flutter lève une `FormatException` au moment de compiler le regex, ce qui crashe `_preprocessHtml()` et affiche l'écran rouge d'erreur.
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- Remplacé `RegExp(r'(?i)(value=)"(\$[A-Z_]...)"')` par `RegExp(r'(value=)"(\$[A-Z_]...)"', caseSensitive: false)`
+- Remplacé `RegExp(r'(?i)(value=)\$([A-Z_]...)')` par `RegExp(r'(value=)\$([A-Z_]...)', caseSensitive: false)`
+- Dart utilise `caseSensitive: false` comme paramètre — pas de flag inline
+
+### 🔴 Fix — Icône splash toujours vide : asset `assets/icon/icon.png` non déclaré
+
+**Cause racine** : `pubspec.yaml` déclarait `- assets/` (répertoire racine uniquement). Flutter **n'inclut pas automatiquement les sous-répertoires** — chaque sous-dossier doit être déclaré explicitement. `assets/icon/icon.png` n'était donc pas bundlé dans l'APK → `Image.asset` échouait silencieusement.
+
+**`stateduc_flutter/pubspec.yaml`** :
+- Ajouté `- assets/icon/` sous la clé `assets:`
+
+### 🟡 Fix — Navigation regroupements : `parentid=0` ignoré comme racine
+
+**Cause racine** : Certains déploiements StatEduc retournent `parentid: "0"` pour les regroupements racine (au lieu de `-1` qui est la convention JS standard). Le code ne mappait que `-1` → null (racine). Résultat : tous les regroupements semblaient avoir un parent → `getChildRegroups(null)` retournait 0 lignes → navigation vide.
+
+**`stateduc_flutter/lib/models/regroup.dart`** :
+- `fromJson` : ajouté `"0"` et `""` comme sentinels supplémentaires → mappés null (racine)
+- Getter `isRoot` : robustifié → vrai si `idParentRegp` est null, `'-1'`, `'0'`, ou chaîne vide
+
+**`stateduc_flutter/lib/services/database_service.dart`** :
+- Requête fallback `getChildRegroups` : ajouté `OR id_parent_regp = '0'` pour gérer les données existantes en DB
+
+**`stateduc_flutter/lib/providers/campaign_provider.dart`** :
+- Ajout d'un 2e fallback dans `selectSystem()` : si `getChildRegroups` retourne vide mais `_allRegroups` contient des entrées, utilise `_allRegroups.where((r) => r.isRoot)` — couvre les données migrées avant ce correctif
+
+---
+
 ## [Unreleased] — 2026-05-29 — Session 8 : icône splash, formulaire gris, pré-remplissage, grille scroll, typo PHP
 
 ### 🔴 Fix — Icône splash screen toujours vide (cercle blanc)

@@ -135,6 +135,20 @@ class CampaignProvider extends ChangeNotifier {
     debugPrint('[Nav] selectSystem ${system.libSystem} → '
         '${_currentRegroups.length} root regroups after _loadRegroups');
 
+    // If no root regroups found via DB query (all three fallback strategies
+    // failed), try _allRegroups which was loaded at selectCampaign() time.
+    // This handles the case where getChildRegroups returns 0 rows but the
+    // server DID send regroups (e.g. all with parentid='0' stored non-null).
+    if (_currentRegroups.isEmpty && _allRegroups.isNotEmpty) {
+      // Filter to root regroups only (null parent = root)
+      final rootRegroups = _allRegroups.where((r) => r.isRoot).toList();
+      if (rootRegroups.isNotEmpty) {
+        _currentRegroups = rootRegroups;
+        debugPrint('[Nav] ✓ Used _allRegroups fallback → '
+            '${rootRegroups.length} root regroups');
+      }
+    }
+
     // If no root regroups found at all, load schools directly
     // (handles flat configuration or regroup hierarchy issues)
     if (_currentRegroups.isEmpty) {
