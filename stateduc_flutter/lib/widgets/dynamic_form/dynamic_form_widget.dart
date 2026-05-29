@@ -78,8 +78,15 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
         onPageFinished: (_) {
           _pageLoaded = true;
           if (mounted) setState(() => _isRendering = false);
-          _injectData();
-          _injectBridge();
+          // Use addPostFrameCallback so that Flutter finishes propagating
+          // the latest widget.data (including pre-filled identification fields)
+          // before we inject values into the WebView.
+          // Without this, _injectData() might run with stale/empty widget.data
+          // if the provider notifyListeners() hasn't rebuilt this widget yet.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _injectData();
+            _injectBridge();
+          });
         },
         onWebResourceError: (err) {
           debugPrint('[DynamicForm] WebView error: ${err.description}');
@@ -299,15 +306,25 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     background: #fff;
     color: #000;
   }
-  table { border-collapse: collapse; width: 100%; }
+  /* Horizontal scroll for wide grid tables */
+  body > form, body > table, .div-table-questionnaire {
+    overflow-x: auto;
+    display: block;
+    -webkit-overflow-scrolling: touch;
+  }
+  table { border-collapse: collapse; min-width: 100%; }
   td, th {
     border: 1px solid #ccc;
     padding: 4px 6px;
     vertical-align: middle;
+    white-space: nowrap;
   }
   th { background: #dce6f1; font-weight: bold; font-size: 12px; }
+  /* Allow text wrapping in header cells */
+  th { white-space: normal; min-width: 60px; }
   input[type=text], input[type=number], textarea, select {
     width: 100%;
+    min-width: 60px;
     padding: 4px;
     border: 1px solid #aaa;
     border-radius: 3px;
@@ -339,7 +356,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     text-align: right;
   }
   label { font-weight: 500; }
-  /* Grid table overflow scrolling */
+  /* Grid table overflow scrolling — wrap all tables in a scrollable container */
   .table-questionnaire { overflow-x: auto; display: block; }
   /* Add-row button in grid forms */
   .grille-add-row {
@@ -358,6 +375,19 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   }
   .grille-add-row:active { background: #0d47a1; }
 </style>
+<script>
+// Wrap all tables in a scrollable div after load (for wide grille tables)
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('table').forEach(function(tbl) {
+    if (!tbl.parentElement.classList.contains('div-table-questionnaire')) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'div-table-questionnaire';
+      tbl.parentNode.insertBefore(wrapper, tbl);
+      wrapper.appendChild(tbl);
+    }
+  });
+});
+</script>
 </head>
 <body>
 $formHtml
@@ -377,8 +407,22 @@ $formHtml
   var data = $jsonData;
   for (var name in data) {
     var val = data[name];
+    // Try attribute selector (case-insensitive in HTML5 for standard attrs)
     var els = document.querySelectorAll('[name="' + name + '"]');
-    els.forEach(function(el) {
+    // Fallback: iterate all inputs/selects if selector returned nothing
+    // (handles edge cases with non-standard attribute casing)
+    if (!els || els.length === 0) {
+      var allInputs = document.querySelectorAll('input, select, textarea');
+      var arr = [];
+      for (var j = 0; j < allInputs.length; j++) {
+        if ((allInputs[j].getAttribute('name') || '').toUpperCase() === name.toUpperCase()) {
+          arr.push(allInputs[j]);
+        }
+      }
+      els = arr;
+    }
+    var elArr = els instanceof Array ? els : Array.prototype.slice.call(els);
+    elArr.forEach(function(el) {
       if (el.type === 'radio') {
         el.checked = (el.value === val);
       } else if (el.type === 'checkbox') {
@@ -509,26 +553,31 @@ $formHtml
   Widget build(BuildContext context) {
     // Show a brief loading indicator while the WebView renders the first page.
     // This replaces the gray blank that appears before onPageFinished fires.
+    // The white Container ensures no gray flash even before setBackgroundColor
+    // takes effect in the WebView engine.
     final webView = WebViewWidget(
       controller: _controller,
     );
 
     final body = _isRendering
-        ? Stack(
-            children: [
-              webView,
-              const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(strokeWidth: 2),
-                    SizedBox(height: 8),
-                    Text('Chargement du formulaire…',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
+        ? Container(
+            color: Colors.white,
+            child: Stack(
+              children: [
+                webView,
+                const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(strokeWidth: 2),
+                      SizedBox(height: 8),
+                      Text('Chargement du formulaire…',
+                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
         : webView;
 

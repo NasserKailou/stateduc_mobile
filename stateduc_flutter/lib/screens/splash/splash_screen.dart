@@ -81,24 +81,16 @@ class _SplashScreenState extends State<SplashScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // ── App icon ────────────────────────────────────────────────
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
+              // icon.png has a white background with a blue logo in the center.
+              // We clip it to a circle and show it directly on the blue splash
+              // background — the white background of the PNG provides the white
+              // circle effect; no extra Container needed.
+              ClipOval(
                 child: Image.asset(
                   'assets/icon/icon.png',
-                  fit: BoxFit.contain,
+                  width: 160,
+                  height: 160,
+                  fit: BoxFit.cover,
                 ),
               ),
 

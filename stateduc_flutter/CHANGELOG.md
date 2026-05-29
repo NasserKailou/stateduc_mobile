@@ -4,6 +4,56 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-05-29 — Session 8 : icône splash, formulaire gris, pré-remplissage, grille scroll, typo PHP
+
+### 🔴 Fix — Icône splash screen toujours vide (cercle blanc)
+
+**Cause racine confirmée** : `icon.png` est une image 2048×2048 RGBA avec fond blanc (87 % de pixels blancs) et contenu bleu centré. L'approche précédente (cercle blanc + `BoxFit.contain`) rendait le logo invisible : blanc sur blanc.
+
+**`stateduc_flutter/lib/screens/splash/splash_screen.dart`** :
+- Supprimé le `Container` avec fond blanc et `BoxDecoration` cercle
+- Remplacé par `ClipOval` + `Image.asset(..., fit: BoxFit.cover, width: 160, height: 160)`
+- Le fond blanc de `icon.png` lui-même fournit le cercle blanc — le `ClipOval` le découpe circulairement
+- Sur le fond bleu splash, le résultat est un cercle blanc avec le logo bleu centré
+
+### 🔴 Fix — Formulaire gris (écran WebView entièrement gris)
+
+**Cause racine** : Le `Stack` de l'overlay de chargement avait un fond transparent. Avant que `setBackgroundColor(Colors.white)` prenne effet dans le moteur WebView, la couleur de fond du `Scaffold` parent (gris clair) transparaissait.
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- Enveloppé le `Stack` de chargement dans un `Container(color: Colors.white, ...)`
+- Le fond blanc garantit qu'aucun gris ne transparaît, même avant que le WebView initialise sa propre couleur de fond
+
+### 🔴 Fix — Pré-remplissage identification : race condition de timing
+
+**Cause racine** : `onPageFinished` était appelé directement sur le thread de rendu Flutter. Si `selectQuestion()` avait appelé `notifyListeners()` juste avant que le WebView termine son chargement, `widget.data` pouvait encore contenir l'ancien `Map` vide au moment où `_injectData()` s'exécutait (avant que Flutter propage le nouveau `data` aux props du widget).
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- `onPageFinished` utilise maintenant `WidgetsBinding.instance.addPostFrameCallback(...)` pour différer `_injectData()` + `_injectBridge()` jusqu'au prochain frame Flutter
+- Garantit que `widget.data` reflète les dernières valeurs pré-remplies (`_prefillIdentificationFields()`) avant l'injection JS
+
+### 🔴 Fix — Injection JS champs avec `NAME=` majuscule
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- `_injectData()` JavaScript inclut désormais un fallback case-insensitive pour les noms d'attributs
+- Si `querySelectorAll('[name="X"]')` ne trouve rien, boucle sur tous les inputs et compare `getAttribute('name').toUpperCase() === name.toUpperCase()`
+- Couvre les formulaires dont le HTML utilise `NAME='NOM_ETABLISSEMENT_0'` (majuscule) au lieu de `name=`
+
+### 🟡 Fix — Formulaires grille : scroll horizontal des tableaux larges
+
+**`stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart`** :
+- `_buildHtmlPage()` : CSS amélioré — les `<table>` sont maintenant enveloppés par JS dans un `<div class="div-table-questionnaire">` avec `overflow-x: auto; display: block; -webkit-overflow-scrolling: touch`
+- `th` : `white-space: normal; min-width: 60px` pour permettre le retour à la ligne dans les en-têtes de colonnes grille
+- Script `DOMContentLoaded` qui enveloppe automatiquement tous les tableaux en divs scrollables
+
+### 🔴 Fix — Typo `$id_teme` dans `data_save.php` (route GET)
+
+**`StatEduc_MEN_2025/data_save.php`** (route GET `/theme_save/.../:data`, ligne 153) :
+- Corrigé `if ($id_teme == $id_theme_ident)` → `if ($id_theme == $id_theme_ident)`
+- Ce typo empêchait la comparaison du thème courant avec le thème d'identification → `LOC_REG_0` n'était jamais injecté côté serveur pour la route GET historique
+
+---
+
 ## [Unreleased] — 2026-05-29 — Session 5 : fix VALUE=$VAR dans les formulaires grille + détection grille améliorée
 
 ### 🔴 Fix CRITIQUE — Boutons radio/select jamais pré-sélectionnés dans les formulaires grille

@@ -150,7 +150,7 @@ $app->get('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:
 	$theme_manager = new theme_manager($id_camp);  
 	$theme_manager->charger_theme($id_camp, $id_sector);
 	$id_theme_ident = $theme_manager->recherche_theme_def();
-	if ($id_teme == $id_theme_ident) {  
+	if ($id_theme == $id_theme_ident) {  
 		$foundLoc1 = array_key_exists('LOC_REG_0', $data_to_send) && (strlen($data_to_send["LOC_REG_0"]) > 0);
 		
 		if (!$foundLoc1) {
