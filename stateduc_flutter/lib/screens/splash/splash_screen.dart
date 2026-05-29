@@ -80,10 +80,10 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // ── Animated GIF logo ────────────────────────────────────────
+              // ── App icon ────────────────────────────────────────────────
               Container(
-                width: 140,
-                height: 140,
+                width: 150,
+                height: 150,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -95,12 +95,10 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(12),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/icon/icon.png',
-                    fit: BoxFit.cover,
-                  ),
+                padding: const EdgeInsets.all(16),
+                child: Image.asset(
+                  'assets/icon/icon.png',
+                  fit: BoxFit.contain,
                 ),
               ),
 

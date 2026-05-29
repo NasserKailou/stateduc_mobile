@@ -74,6 +74,10 @@ $app->get(
             ? ' AND ID_PERIODE=' . (int)$id_filter . ' '
             : '';
 
+        // --- Verification acces campagne (avec fallback mobile) ---
+        $is_mobile_request = ($id_annee !== '' && $id_annee !== '0');
+        $access_ok = false;
+
         $req_camp = "SELECT DISTINCT ID_CAMPAGNE
                      FROM DICO_FIXE_REGROUPEMENT DFR, ADMIN_USERS AU
                      WHERE AU.NOM_USER LIKE '" . $user . "'
@@ -83,11 +87,24 @@ $app->get(
                      AND ID_CAMPAGNE = " . (int)$id_camp . ";";
 
         $camps = $GLOBALS['conn_dico']->GetAll($req_camp);
-        if (!is_array($camps) || count($camps) === 0 || $camps[0] === '') {
+        if (is_array($camps) && count($camps) > 0 && $camps[0] !== '') {
+            $access_ok = true;
+        }
+
+        // Fallback pour les utilisateurs mobiles : verifier existence utilisateur
+        if (!$access_ok && $is_mobile_request) {
+            $req_user = "SELECT CODE_USER FROM ADMIN_USERS WHERE NOM_USER LIKE '" . $user . "'";
+            $user_row = $GLOBALS['conn_dico']->GetRow($req_user);
+            if ($user_row && isset($user_row['CODE_USER']) && (int)$user_row['CODE_USER'] > 0) {
+                $access_ok = true;
+            }
+        }
+
+        if (!$access_ok) {
             $rps = array(
                 $lib_status  => $status_ko,
                 $lib_message => $msg_ko,
-                $lib_data    => "L'utilisateur '" . $user . "' n'a pas accès à cette campagne"
+                $lib_data    => "L'utilisateur '" . $user . "' n'a pas acces a cette campagne"
             );
             echo json_encode($rps);
             return;

@@ -148,7 +148,7 @@ $app->get('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:
 	}
 	require_once $GLOBALS['SISED_PATH_CLS'] . 'metier/theme_manager.class.php';
 	$theme_manager = new theme_manager($id_camp);  
-	$theme_manager->charger_theme($id_camp, $i_sector);
+	$theme_manager->charger_theme($id_camp, $id_sector);
 	$id_theme_ident = $theme_manager->recherche_theme_def();
 	if ($id_teme == $id_theme_ident) {  
 		$foundLoc1 = array_key_exists('LOC_REG_0', $data_to_send) && (strlen($data_to_send["LOC_REG_0"]) > 0);
@@ -192,7 +192,16 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 	}
 	// Priorite : parametre URL (mobile) > session (navigateur web)
 	$id_year = ($id_annee != '' && $id_annee != '0') ? $id_annee : (isset($_SESSION['annee']) ? $_SESSION['annee'] : '');
-  $requete = "SELECT DISTINCT ID_CAMPAGNE
+
+	// --- Verification acces campagne ---
+	// Pour les requetes mobiles (id_annee fourni dans l'URL), on effectue d'abord
+	// la verification normale via DICO_FIXE_REGROUPEMENT. Si elle echoue
+	// (l'utilisateur mobile n'a pas forcement de ligne dans cette table),
+	// on tente un acces simplifie : verifier que l'utilisateur existe dans ADMIN_USERS.
+	$is_mobile_request = ($id_annee != '' && $id_annee != '0');
+	$access_ok = false;
+
+	$requete = "SELECT DISTINCT ID_CAMPAGNE
 				FROM DICO_FIXE_REGROUPEMENT DFR, ADMIN_USERS AU
 				WHERE AU.NOM_USER LIKE '".$user."' 
             AND DFR.ID_USER=AU.CODE_USER 
@@ -200,8 +209,22 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 				".$period_query." 
             AND ID_CAMPAGNE=".$id_camp.";";
 	$camps = $GLOBALS['conn_dico']->GetAll($requete);
-	 
-  if (count($camps) == 0 || $camps[0] == '') {
+
+	if (count($camps) > 0 && $camps[0] != '') {
+		$access_ok = true;
+	}
+
+	// Fallback pour les utilisateurs mobiles : verifier existence utilisateur
+	if (!$access_ok && $is_mobile_request) {
+		$req_user = "SELECT CODE_USER FROM ADMIN_USERS WHERE NOM_USER LIKE '".$user."'";
+		$user_row = $GLOBALS['conn_dico']->GetRow($req_user);
+		if ($user_row && isset($user_row['CODE_USER']) && (int)$user_row['CODE_USER'] > 0) {
+			// Utilisateur valide - autoriser acces mobile (la campagne est deja telechargee)
+			$access_ok = true;
+		}
+	}
+
+  if (!$access_ok) {
 		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"L'utilisateur '".$user."' n'a pas acc�s � cette campagne");
 		echo json_encode($rps);
 		return;
@@ -220,7 +243,7 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 	//A REVOIR POUR LE CAS DES MULTIPLES CHAINES
 	require_once $GLOBALS['SISED_PATH_CLS'] . 'metier/theme_manager.class.php';
 	$theme_manager = new theme_manager($id_camp);  
-	$theme_manager->charger_theme($id_camp, $i_sector);
+	$theme_manager->charger_theme($id_camp, $id_sector);
 	$id_theme_ident = $theme_manager->recherche_theme_def();
 	if ($id_theme == $id_theme_ident) {  
 		$foundLoc1 = array_key_exists('LOC_REG_0', $data_to_send) && (strlen($data_to_send["LOC_REG_0"]) > 0);

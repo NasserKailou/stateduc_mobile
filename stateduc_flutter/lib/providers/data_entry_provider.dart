@@ -249,11 +249,19 @@ class DataEntryProvider extends ChangeNotifier {
       // Load saved field values (no filter yet)
       await _loadFormData(idFilter: null);
 
-      // Pre-fill identification form fields for first question
+      // Pre-fill identification form fields.
       // The identification form (theme d'identification) has fields that are
       // already known: school name, code, admin code, status, subsector.
       // Pre-filling saves the user from re-entering known data.
-      if (_isFirstQuestion) {
+      // We pre-fill for the first question OR if the HTML contains known
+      // identification field names (works for any campaign type).
+      final htmlLower = (_formHtml ?? '').toLowerCase();
+      final isIdentificationForm = _isFirstQuestion ||
+          htmlLower.contains('nom_etablissement') ||
+          htmlLower.contains('code_administratif') ||
+          htmlLower.contains('nom_etab') ||
+          htmlLower.contains('nom_eco');
+      if (isIdentificationForm) {
         _prefillIdentificationFields();
       }
     } catch (e) {

@@ -699,7 +699,7 @@ if(!(isset($_POST['login']) && isset($_POST['password']))
 		$requete   = "SELECT LIBELLE, CODE_LIBELLE
 						FROM DICO_LIBELLE_PAGE 
 						WHERE CODE_LANGUE='".$_SESSION['langue']."';";
-		$_SESSION['tab_libelles'] = $GLOBALS['conn_dico']->GetAll($requete);echo "<pre>"; print_r($requete);
+		$_SESSION['tab_libelles'] = $GLOBALS['conn_dico']->GetAll($requete);
 		//set_tab_session('secteurs', $_SESSION['langue']);
 		//gestion de l'ann�e
 		if(!isset($_SESSION['annee']) || $_SESSION['annee']=='' || preg_match('#index.php#',$_SERVER['PHP_SELF'])) {

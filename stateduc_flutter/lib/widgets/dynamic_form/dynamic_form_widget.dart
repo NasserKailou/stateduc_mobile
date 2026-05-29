@@ -41,6 +41,7 @@ class DynamicFormWidget extends StatefulWidget {
 class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   late final WebViewController _controller;
   bool _pageLoaded = false;
+  bool _isRendering = false;  // true while WebView is loading initial HTML
 
   // True when the HTML looks like a grille (grid) form.
   bool get _isGridForm => _detectGridForm(widget.html);
@@ -52,8 +53,10 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   void initState() {
     super.initState();
     _gridRowCount = _countGridRows(widget.html);
+    _isRendering  = true;
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(Colors.white)   // ← prevents gray flash before page loads
       ..addJavaScriptChannel(
         'FieldChanged',
         onMessageReceived: (JavaScriptMessage msg) {
@@ -74,8 +77,13 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       ..setNavigationDelegate(NavigationDelegate(
         onPageFinished: (_) {
           _pageLoaded = true;
+          if (mounted) setState(() => _isRendering = false);
           _injectData();
           _injectBridge();
+        },
+        onWebResourceError: (err) {
+          debugPrint('[DynamicForm] WebView error: ${err.description}');
+          if (mounted) setState(() => _isRendering = false);
         },
       ))
       ..loadRequest(_buildHtmlUri(widget.html));
@@ -86,7 +94,8 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     super.didUpdateWidget(old);
     // Reload HTML when the form changes (question switch)
     if (old.html != widget.html) {
-      _pageLoaded = false;
+      _pageLoaded  = false;
+      _isRendering = true;
       setState(() {
         _gridRowCount = _countGridRows(widget.html);
       });
@@ -166,13 +175,18 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
 
     // ── 2. HTML entity unescape ────────────────────────────────────────────
     // Run AFTER mojibake repair so entities in repaired text are also caught.
-    html = html
-        .replaceAll('&lt;',   '<')
-        .replaceAll('&gt;',   '>')
-        .replaceAll('&amp;',  '&')
-        .replaceAll('&quot;', '"')
-        .replaceAll('&#39;',  "'")
-        .replaceAll('&nbsp;', '\u00A0');
+    // Run TWICE to handle double-encoded entities like &amp;lt;b&amp;gt;
+    // (server sometimes double-encodes: &amp;lt; → first pass: &lt; → second: <)
+    for (int pass = 0; pass < 2; pass++) {
+      html = html
+          .replaceAll('&lt;',   '<')
+          .replaceAll('&gt;',   '>')
+          .replaceAll('&amp;',  '&')
+          .replaceAll('&quot;', '"')
+          .replaceAll('&#39;',  "'")
+          .replaceAll('&nbsp;', '\u00A0')
+          .replaceAll('&apos;', "'");
+    }
 
     // ── 3. $NUMERO_LOCAL_N → row number (1-based) ─────────────────────────
     html = html.replaceAllMapped(
@@ -352,8 +366,11 @@ $formHtml
   }
 
   // ── Inject saved field values into the form ────────────────────────────────
+  // NOTE: do NOT guard on widget.data.isEmpty — identification fields are
+  // pre-filled in _formData BEFORE the page loads, and we must inject them
+  // even when no previously-saved data exists.
   void _injectData() {
-    if (widget.data.isEmpty) return;
+    if (!_pageLoaded) return;
     final jsonData = json.encode(widget.data);
     _controller.runJavaScript('''
 (function() {
@@ -490,14 +507,39 @@ $formHtml
 
   @override
   Widget build(BuildContext context) {
+    // Show a brief loading indicator while the WebView renders the first page.
+    // This replaces the gray blank that appears before onPageFinished fires.
+    final webView = WebViewWidget(
+      controller: _controller,
+    );
+
+    final body = _isRendering
+        ? Stack(
+            children: [
+              webView,
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(strokeWidth: 2),
+                    SizedBox(height: 8),
+                    Text('Chargement du formulaire…',
+                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+              ),
+            ],
+          )
+        : webView;
+
     if (_isGridForm) {
       return Column(
         children: [
-          Expanded(child: WebViewWidget(controller: _controller)),
+          Expanded(child: body),
           _buildAddRowButton(),
         ],
       );
     }
-    return WebViewWidget(controller: _controller);
+    return body;
   }
 }

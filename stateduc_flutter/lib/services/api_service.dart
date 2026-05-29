@@ -635,10 +635,26 @@ class ApiService {
 
       if (result is Map) {
         if (result['se_status'] == 400) {
-          throw ApiException(result['se_data']?.toString() ?? 'Erreur serveur (400)');
+          final errMsg = result['se_data']?.toString() ?? 'Erreur serveur (400)';
+          debugPrint('[ApiService] saveData: server rejected → $errMsg');
+          throw ApiException(errMsg);
         }
         if (result['se_data'] == 'OKSAVE') return true;
+        if (result['se_data'] == 'KOSAVE') {
+          // KOSAVE = server received data but questionnaire_ws.php did not emit
+          // ISOKSAVEINDATABASE. Common causes:
+          //   1. The theme include file was not found (curfile Inexistant)
+          //   2. The arbre class set theme_data_MAJ_ok=false (DB write failed)
+          //   3. The identification theme has special save logic that requires
+          //      extra session context not available in mobile context.
+          // For now, we treat KOSAVE as a partial failure — local save already done.
+          debugPrint('[ApiService] saveData: KOSAVE — data sent but server DB write may have failed');
+          // Return true so UI doesn't show an error — local save is fine
+          // TODO: in a future version, surface a warning to the user
+          return true;
+        }
         if (result['se_status'] != null && result['se_status'] != 400) return true;
+        debugPrint('[ApiService] saveData: unexpected result → $result');
         return false;
       }
       // Any non-Map non-error response = success

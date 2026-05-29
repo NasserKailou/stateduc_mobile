@@ -172,8 +172,8 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
             ),
             onPressed: () async {
               Navigator.pop(ctx);
-              // TODO: campaigns.deleteCampaign(c.idCamp)
-              // Reload list
+              await campaigns.deleteCampaign(c.idCamp);
+              // Reload list after deletion
               await campaigns.loadLocalCampaigns();
             },
             child: const Text('Supprimer'),

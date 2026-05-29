@@ -32,7 +32,31 @@ if(isset($_GET['langue']) && $_GET['langue']<>'') $_SESSION['langue']=$_GET['lan
 if(!isset($_SESSION['langue'])  || $_SESSION['langue']=='')  $_SESSION['langue']='fr';
 if(!isset($_SESSION['style'])   || $_SESSION['style']=='')   $_SESSION['style']='stateduc.css';
 if(!isset($_SESSION['valide'])  )                            $_SESSION['valide']=true;
-// code_user and groupe must be set so privilege checks in common.php succeed
+// Resolve real CODE_USER from ADMIN_USERS using login so arbre writes under the
+// correct account and common.php loads DICO_FIXE_REGROUPEMENT for the right user.
+// data_save.php access check queries ADMIN_USERS.CODE_USER - must match here.
+if(!isset($_SESSION['code_user']) || $_SESSION['code_user']==0) {
+    if(isset($_SESSION['login']) && $_SESSION['login']<>'') {
+        require_once 'config_app.php';
+        require_once 'params.php';
+        if(!isset($GLOBALS['conn_dico'])) {
+            require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
+            require_once $GLOBALS['SISED_PATH_LIB'] . 'fonctions.inc.php';
+            require_once $GLOBALS['SISED_PATH_CLS'] . 'connexion.class.php';
+            $source = false;
+            $_conn_bs = new connexion();
+            $_conn_bs->init($source);
+        }
+        if(isset($GLOBALS['conn_dico'])) {
+            $_sql_user = "SELECT CODE_USER, CODE_GROUPE FROM ADMIN_USERS WHERE NOM_USER='".$_SESSION['login']."'";
+            $_row_user = $GLOBALS['conn_dico']->GetRow($_sql_user);
+            if(is_array($_row_user) && isset($_row_user['CODE_USER']) && intval($_row_user['CODE_USER'])>0) {
+                $_SESSION['code_user'] = intval($_row_user['CODE_USER']);
+                if(isset($_row_user['CODE_GROUPE'])) $_SESSION['groupe'] = intval($_row_user['CODE_GROUPE']);
+            }
+        }
+    }
+}
 if(!isset($_SESSION['code_user'])) $_SESSION['code_user']=0;
 if(!isset($_SESSION['groupe']))    $_SESSION['groupe']=1;  // groupe 1 = admin (bypasses most restrictions)
 // -----------------------------------------------------------------------------
