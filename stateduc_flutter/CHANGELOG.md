@@ -4,6 +4,28 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-05-30 — Session 13 : PHP 500 sur data_save.php — variables indéfinies dans callbacks
+
+### 🔴 Fix CRITIQUE — HTTP 500 sur POST `/theme_save/.../id_annee` malgré le fix session 12b
+
+**Symptôme** : `[Dio←] 500 .../data_save.php/theme_save/test/2/2/15702/70/0/0/23` — body vide.
+**Log Apache** : `PHP Parse error: syntax error, unexpected ')' on line 334` sur le XAMPP de l'utilisateur.
+
+**Double diagnostic** :
+
+1. **Parse error sur XAMPP** : L'utilisateur n'avait pas encore copié le `data_save.php` corrigé (sessions 11-12b) vers son XAMPP. La version sur le serveur contenait encore `});` (ligne 334 originale, corrigée en session 11 → `}` dans notre repo). **Action** : l'utilisateur doit copier le fichier depuis le repo vers XAMPP.
+
+2. **Variables indéfinies dans `theme_save_handler()`** (présentes dans notre repo, fixes additionnelles session 13) :
+   - `$curl->error()` callback (ancienne L296) capturait `$data` dans `use(...)` — variable qui n'existe pas dans le scope de `theme_save_handler()` (elle existe dans la route GET originale mais pas dans la fonction déléguée). PHP 7 strict mode → fatal error.
+   - `$date_time` utilisé dans `saveLogInfo()` dans le callback `error` (ancienne L307) — également non défini dans ce scope (défini seulement dans le callback `success`).
+   - `saveLogInfo()` appelée sans le 9e paramètre `$id_annee` depuis l'ancien callback error → warning PHP.
+
+**`StatEduc_MEN_2025/data_save.php`** (session 13) :
+- Callback `$curl->error()` dans `theme_save_handler()` : suppression de `$data` du `use(...)`, suppression de l'utilisation de `$data` dans le body, remplacement de `$date_time` non défini par `$date_time_err = date(...)` local, passage de `$id_year` à `saveLogInfo()`.
+- `saveLogInfo()` : paramètre `$id_annee` rendu optionnel (`= 0`) pour compatibilité avec les appels existants.
+
+---
+
 ## [Unreleased] — 2026-05-29 — Session 12b : KOSAVE timeout 3min — deadlock Apache self-curl
 
 ### 🔴 Fix CRITIQUE — Timeout 3 minutes sur l'envoi + KOSAVE persistant

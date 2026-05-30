@@ -293,22 +293,20 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 		//echo 'call to "' . $instance->url . '" was successful. response was' . "<br/>";
 		//echo $instance->response . "\n";
 	});
-	$curl->error(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $data, $id_year, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
-		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>$instance->error_code." : ".$instance->error_message);	
-		$string = date('Y/m/d H:i:s');
+	$curl->error(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>$instance->error_code." : ".$instance->error_message);
+		$date_time_err = date('Y/m/d H:i:s');
+		$string = $date_time_err;
 		$string .= ";".$instance->error_code.":".$instance->error_message;
 		$string .= ";".$instance->url;
-		$string .= ";".$data."\n";
+		$string .= ";\n";
 		$myFile = "moblogs/".$user.".log";
 		renameLastFile("moblogs/".$user);
 		$fh = fopen($myFile, 'a');
 		@fwrite($fh, $string);
-		@fclose($fh);             	 
-    	saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, "KO");
+		@fclose($fh);
+		saveLogInfo($user, $date_time_err, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, "KO", $id_year);
 		echo json_encode($rps);
-		/*echo 'call to "' . $instance->url . '" was unsuccessful.' . "<br/>";
-		echo 'error code:' . $instance->error_code . "<br/>";
-		echo 'error message:' . $instance->error_message . "<br/>";   */
 	});
 	$curl->complete(function($instance) {
 		//echo 'call completed' . "<br/>";
@@ -434,7 +432,7 @@ function in_array_r($needle, $haystack, $strict = false) {
     return false;
 }
 
-function saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut, $id_annee) {
+function saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut, $id_annee = 0) {
   $req = "INSERT INTO DATA_SAVING_LOGS (CODE_USER, LOG_DATE_TIME, ID_THEME_SYSTEME, CODE_ANNEE, CODE_PERIODE, CODE_CAMPAGNE".
          ", CODE_SECTEUR, CODE_ECOLE, CODE_FILTRE, STATUT_OPERATION) VALUES ('".$user."','".$date_time."',".$id_theme.",".
          $id_annee.",".$id_filter.",".$id_camp.",".$id_sector.",".$id_etab.",".$id_filter.",'".$statut."')";
