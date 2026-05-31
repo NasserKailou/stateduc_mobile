@@ -244,9 +244,12 @@ class CampaignProvider extends ChangeNotifier {
         _selectedSystem!.idSystem,
         idRegp,
       );
+      // Enrich with libStatus from school_statuses table
+      final enriched = await _db.resolveSchoolStatuses(
+          _selectedCampaign!.idCamp, schools);
       debugPrint('[Nav] _loadSchoolsForRegroup regp=$idRegp → '
-          '${schools.length} schools');
-      _currentSchools  = schools;
+          '${enriched.length} schools');
+      _currentSchools  = enriched;
       _currentRegroups = [];
     } catch (e) {
       debugPrint('[Nav] _loadSchoolsForRegroup ERROR: $e');

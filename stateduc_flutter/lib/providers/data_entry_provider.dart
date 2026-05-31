@@ -200,6 +200,7 @@ class DataEntryProvider extends ChangeNotifier {
   }) {
     // Fire and forget — errors are non-fatal
     Future(() async {
+      final yearCode = _codeyear ?? '';
       for (final q in questions) {
         try {
           final rules = await _api.fetchRules(
@@ -208,12 +209,17 @@ class DataEntryProvider extends ChangeNotifier {
             sysId:    idSystem,
             qstId:    q.idQst,
             etabId:   idEtab,
-            filter:   null,
+            filter:   _selectedFilter?.idFilter,
+            yearCode: yearCode,
           );
           if (rules.isNotEmpty) {
             await _db.insertCoherenceRules(rules);
             debugPrint('[DataEntry] stored ${rules.length} offline coherence rules '
-                'for qst=${q.idQst} etab=$idEtab');
+                'for qst=${q.idQst} etab=$idEtab year=$yearCode');
+          } else {
+            debugPrint('[DataEntry] no offline coherence rules returned '
+                'for qst=${q.idQst} etab=$idEtab year=$yearCode '
+                '(normal if no rules configured in DB for this theme)');
           }
         } catch (_) {
           // Non-fatal — no coherence rules available offline for this question

@@ -14,7 +14,7 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 // Timeout pour l'appel interne vers questionnaire_ws.php
 // Sans timeout, le curl attend indefiniment si Apache est sature (self-curl deadlock)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15); // echec rapide si connexion impossible
-$curl->setOpt(CURLOPT_TIMEOUT, 60);         // max 60s pour la sauvegarde (questionnaire_ws.php)
+$curl->setOpt(CURLOPT_TIMEOUT, 120);        // max 120s - questionnaire_ws.php peut prendre >60s sur serveur charge
 
 $app = new \Slim\Slim();
 

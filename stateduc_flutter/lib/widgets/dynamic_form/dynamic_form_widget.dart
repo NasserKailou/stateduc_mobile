@@ -163,6 +163,12 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   //         comparison works correctly.
   String _preprocessHtml(String html) {
     // ── 1. Mojibake repair ─────────────────────────────────────────────────
+    // Strategy: always attempt repair if mojibake patterns are detected.
+    // Accept the decoded result even if a small number of \uFFFD replacement
+    // chars appear (< 5% of total length) — these come from lone continuation
+    // bytes like U+00C2 followed by a plain ASCII space (non-breaking space
+    // sequences). Rejecting the whole repair because of a handful of \uFFFD
+    // leaves ALL accented characters garbled, which is worse.
     if (_looksLikeMojibake(html)) {
       try {
         // Treat each code unit as a raw Latin-1 byte (code units ≤ 0xFF)
@@ -170,10 +176,16 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
           for (final c in html.codeUnits) if (c <= 0xFF) c,
         ];
         final decoded = utf8.decode(latin1Bytes, allowMalformed: true);
-        // Only adopt the decoded version if it doesn't contain replacement chars
-        if (!decoded.contains('\uFFFD')) {
+        // Count replacement chars — accept if fewer than 5% of input length
+        final replacements = '\uFFFD'.allMatches(decoded).length;
+        final threshold    = (latin1Bytes.length * 0.05).ceil();
+        if (replacements <= threshold) {
           html = decoded;
-          debugPrint('[DynamicForm] Mojibake repaired (${latin1Bytes.length} bytes)');
+          debugPrint('[DynamicForm] Mojibake repaired '
+              '(${latin1Bytes.length} bytes, $replacements replacement chars)');
+        } else {
+          debugPrint('[DynamicForm] Mojibake repair rejected '
+              '($replacements replacements > threshold $threshold)');
         }
       } catch (_) {
         // Keep original if repair fails
@@ -233,21 +245,41 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
 
   // Returns true if the string likely contains ISO-8859-1 bytes mis-read as
   // individual Unicode code points (Mojibake).
-  // Signature: U+00C3 followed by U+0080–U+00BF = UTF-8 two-byte sequence.
+  //
+  // ISO-8859-15 → UTF-8 two-byte sequences start with 0xC2 or 0xC3.
+  //   0xC3 (U+00C3) + 0x80–0xBF → Latin chars: é è à ô î â ë ï û ù ç ü Ô Î …
+  //   0xC2 (U+00C2) + 0x80–0xBF → special chars: ° nbsp © ® « » …
+  //     Common: 0xC2 0xA0 = non-breaking space (shows as 'Â ' in mojibake)
+  //             0xC2 0xB0 = degree sign (shows as 'Â°')
+  //
+  // Also catches 0xE2 (U+00E2) start byte for 3-byte UTF-8 sequences:
+  //   0xE2 + 0x80 + 0x99 = U+2019 right single quotation mark (apostrophe)
+  //   shows as 'â€™' in mojibake (e.g. "l'établissement" → "lâ€™établissement")
   bool _looksLikeMojibake(String s) {
-    // Quick check: common French Mojibake patterns
+    // Quick check: common French mojibake two-char patterns
     if (s.contains('Ã©') || s.contains('Ã¨') || s.contains('Ã ') ||
         s.contains('Ã´') || s.contains('Ã®') || s.contains('Ã¢') ||
         s.contains('Ã«') || s.contains('Ã¯') || s.contains('Ã»') ||
         s.contains('Ã¹') || s.contains('Ã§') || s.contains('Ã¼') ||
-        s.contains('Â°')  || s.contains('Nâ')) {
+        s.contains('Ãˆ') || s.contains('Ã‰') || s.contains('Ã€') ||
+        s.contains('Â°')  || s.contains('Â ')  ||  // degree + nbsp
+        s.contains('Â«')  || s.contains('Â»')  ||  // guillemets
+        s.contains('â€™') || s.contains('â€œ') ||  // smart quotes
+        s.contains('Nâ')  || s.contains('nÂ°')) {  // N° patterns
       return true;
     }
-    // Thorough check: scan for UTF-8 continuation byte pairs
+    // Thorough check: scan for UTF-8 lead byte followed by continuation byte
     for (int i = 0; i < s.length - 1; i++) {
-      if (s.codeUnitAt(i) == 0xC3) {
+      final c = s.codeUnitAt(i);
+      if (c == 0xC2 || c == 0xC3) {
         final next = s.codeUnitAt(i + 1);
         if (next >= 0x80 && next <= 0xBF) return true;
+      }
+      // 3-byte UTF-8 sequence start (0xE2 = â in Latin-1)
+      if (c == 0xE2 && i + 2 < s.length) {
+        final n1 = s.codeUnitAt(i + 1);
+        final n2 = s.codeUnitAt(i + 2);
+        if (n1 >= 0x80 && n1 <= 0xBF && n2 >= 0x80 && n2 <= 0xBF) return true;
       }
     }
     return false;

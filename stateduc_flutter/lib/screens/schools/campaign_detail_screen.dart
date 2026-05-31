@@ -177,12 +177,20 @@ class CampaignDetailScreen extends StatelessWidget {
 
   void _openSchool(
       BuildContext context, CampaignProvider camps, School school) {
+    // Build administrative hierarchy from the current navigation breadcrumb.
+    // e.g. breadcrumb = [AGADEZ, ADERBISANAT, ADEBISSANAT]
+    //   → adminHierarchy = "AGADEZ / ADERBISANAT / ADEBISSANAT"
+    final breadcrumb = camps.regroupBreadcrumb;
+    final adminHierarchy = breadcrumb.isNotEmpty
+        ? breadcrumb.map((r) => r.libRegp).join(' / ')
+        : school.libHierarchy;
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => SchoolDataScreen(
           campaign: campaign,
-          school: school,
+          school: school.copyWith(libHierarchy: adminHierarchy),
           idSystem: camps.selectedSystem!.idSystem,
           libSystem: camps.selectedSystem?.libSystem,
         ),

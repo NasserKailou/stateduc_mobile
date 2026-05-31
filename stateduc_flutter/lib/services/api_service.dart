@@ -676,7 +676,19 @@ class ApiService {
         throw ApiException(
             'Impossible de joindre le serveur. Vérifiez votre réseau.');
       }
-      throw ApiException('Erreur envoi données : ${e.message ?? e.type.name}');
+      // DioExceptionType.unknown — can be caused by socket errors, aborted
+      // connections, or server-side errors that don't produce an HTTP response.
+      // Provide a more informative message than just 'unknown'.
+      final rawMsg = e.message ?? '';
+      if (rawMsg.toLowerCase().contains('socket') ||
+          rawMsg.toLowerCase().contains('connection') ||
+          rawMsg.toLowerCase().contains('network') ||
+          e.type.name == 'unknown') {
+        throw ApiException(
+            'Erreur de connexion réseau.\n'
+            'Vérifiez que le serveur est accessible et réessayez.');
+      }
+      throw ApiException('Erreur envoi données : ${rawMsg.isNotEmpty ? rawMsg : e.type.name}');
     }
   }
 

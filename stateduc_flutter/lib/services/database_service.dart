@@ -790,6 +790,27 @@ class DatabaseService {
     await batch.commit(noResult: true);
   }
 
+  /// Enriches a list of schools with their [libStatus] resolved from the
+  /// school_statuses table for the given campaign.
+  ///
+  /// Called after [getSchoolsByRegroup] to add human-readable status labels
+  /// (e.g. "Public", "Privé") so they appear in the school header.
+  Future<List<School>> resolveSchoolStatuses(
+      String idCamp, List<School> schools) async {
+    if (schools.isEmpty) return schools;
+    // Build status map for O(1) lookup
+    final statuses = await getSchoolStatuses(idCamp);
+    final statusMap = <String, String>{
+      for (final s in statuses) s.idStatus: s.libStatus,
+    };
+    return schools.map((school) {
+      if (school.idStatus == null || statusMap.isEmpty) return school;
+      final label = statusMap[school.idStatus!];
+      if (label == null) return school;
+      return school.copyWith(libStatus: label);
+    }).toList();
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // LOCALISATIONS
   // ═══════════════════════════════════════════════════════════════════════════
