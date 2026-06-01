@@ -5,20 +5,32 @@ import '../services/api_service.dart';
 import '../services/database_service.dart';
 import '../services/coherence_evaluator.dart';
 
-/// DataEntryProvider — form data entry state manager.
+/// DataEntryProvider — gestionnaire de l'état de saisie des données d'un formulaire.
 ///
-/// Mirrors original logic from:
+/// Réplique la logique originale de :
 ///   page_etab.js   → stmPageEtab: initHtml, initPageData, savePage,
 ///                    saveQstOnServer, reloadFromServer, getPageDataToSend
 ///   etabs.js       → StmCollectData CRUD
-///   questions.js   → StmData.validate() — field validation
-///   calc_total.js  → 2D matrix total calculations
+///   questions.js   → StmData.validate() — validation des champs
+///   calc_total.js  → calculs de totaux de matrices 2D
 ///
-/// CRITICAL details from page_etab.js:
-///   Save:   POST /data_save.php/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0
-///   Reload: GET  /data_reload.php/theme_data/{login}/{sysId}/{qstId}/{campId}/{etabId}/{filter}
-///   LOC_REG_0: First question must include &LOC_REG_0={etab.idRegroup} if not present
-///   Radio fields in storage: key = "fieldName#optionId", value = "1"
+/// DÉTAILS CRITIQUES de page_etab.js :
+///   Sauvegarde : POST /data_save.php/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0
+///   Rechargement : GET /data_reload.php/theme_data/{login}/{sysId}/{qstId}/{campId}/{etabId}/{filter}
+///   LOC_REG_0 : La première question doit inclure &LOC_REG_0={etab.idRegroup} si absent
+///   Champs radio en stockage : clé = "fieldName#optionId", valeur = "1"
+///
+/// Fonctionnement général :
+///   1. [initForSchool]   → initialise le contexte (campagne, établissement, système)
+///   2. [selectQuestion]  → charge le HTML + règles + données sauvegardées du thème
+///   3. [updateField]     → met à jour un champ en mémoire
+///   4. [saveLocally]     → persiste dans SQLite (hors ligne)
+///   5. [sendToServer]    → POST au serveur + contrôle de cohérence
+///   6. [reloadFromServer] → GET depuis le serveur (remplace les données locales)
+///
+/// Contrôle de cohérence :
+///   - Offline : [checkCoherenceOffline] via [CoherenceEvaluator] après sauvegarde
+///   - Serveur : automatique après [sendToServer] via [ApiService.checkCoherence]
 class DataEntryProvider extends ChangeNotifier {
   DataEntryProvider({
     required DatabaseService db,
@@ -31,56 +43,56 @@ class DataEntryProvider extends ChangeNotifier {
   final ApiService _api;
   final CoherenceEvaluator _evaluator;
 
-  // ─── Current context ────────────────────────────────────────────────────────
+  // ─── Contexte courant ────────────────────────────────────────────────────────
   String? _idCamp;
   String? _idEtab;
   String? _libEtab;
   String? _idSystem;
-  String? _idRegroupEtab;  // school.idRegroup — for LOC_REG_0 injection
-  String? _idStatus;       // school.idStatus — for identification radio pre-fill
-  User?   _currentUser;    // cached for auto-reload-from-server on form open
+  String? _idRegroupEtab;  // school.idRegroup — pour l'injection de LOC_REG_0
+  String? _idStatus;       // school.idStatus — pour le pré-remplissage radio statut
+  User?   _currentUser;    // mis en cache pour le rechargement automatique à l'ouverture
 
-  // ─── School identification info (for header + pre-fill) ────────────────────
-  String? _codeEtab;       // administrative code e.g. "101012071"
-  String? _libyear;        // school year label e.g. "2024-2025"
-  String? _codeyear;       // school year code e.g. "2024"
-  String? _libStatus;      // e.g. "Public", "Privé"
-  String? _libSubsector;   // e.g. "Education de Base"
-  String? _adminHierarchy; // e.g. "AGADEZ / ADERBISANAT / ADEBISSANAT"
+  // ─── Informations d'identification de l'établissement (en-tête + pré-remplissage) ──
+  String? _codeEtab;       // code administratif ex. "101012071"
+  String? _libyear;        // libellé de l'année scolaire ex. "2024-2025"
+  String? _codeyear;       // code de l'année scolaire ex. "2024"
+  String? _libStatus;      // ex. "Public", "Privé"
+  String? _libSubsector;   // ex. "Education de Base"
+  String? _adminHierarchy; // ex. "AGADEZ / ADERBISANAT / ADEBISSANAT"
 
-  // ─── Questions + selected question ─────────────────────────────────────────
+  // ─── Questions + question sélectionnée ──────────────────────────────────────
   List<Question>  _questions         = [];
   Question?       _selectedQuestion;
-  bool            _isFirstQuestion   = false;  // true when selected == questions[0]
+  bool            _isFirstQuestion   = false;  // vrai si question sélectionnée == questions[0]
 
-  // ─── Filter periods ─────────────────────────────────────────────────────────
+  // ─── Périodes de filtre ──────────────────────────────────────────────────────
   List<FilterPeriod> _filterPeriods  = [];
   FilterPeriod?      _selectedFilter;
 
-  // ─── Form state ─────────────────────────────────────────────────────────────
+  // ─── État du formulaire ──────────────────────────────────────────────────────
   String? _formHtml;
-  Map<String, String> _formData         = {};
-  Map<String, String> _validationErrors = {};
-  List<ValidationRule> _rules           = [];
+  Map<String, String> _formData         = {};  // données saisies en mémoire
+  Map<String, String> _validationErrors = {};  // erreurs de validation par champ
+  List<ValidationRule> _rules           = [];  // règles de validation du thème courant
 
-  // ─── Status flags ───────────────────────────────────────────────────────────
-  bool    _isLoading        = false;
-  bool    _isSaving         = false;
-  bool    _isSending        = false;
-  bool    _isReloading      = false;
-  bool    _hasUnsavedChanges = false;
+  // ─── Indicateurs de statut ───────────────────────────────────────────────────
+  bool    _isLoading        = false;   // chargement initial de la question
+  bool    _isSaving         = false;   // sauvegarde locale en cours
+  bool    _isSending        = false;   // envoi au serveur en cours
+  bool    _isReloading      = false;   // rechargement depuis le serveur en cours
+  bool    _hasUnsavedChanges = false;  // vrai si des modifications non sauvegardées existent
   String? _error;
   String? _successMessage;
 
-  // ─── Server-side coherence check results ────────────────────────────────────
-  // Populated after sendToServer() succeeds.
-  // Empty list = no violations (coherence OK).
+  // ─── Résultats du contrôle de cohérence serveur ──────────────────────────────
+  // Rempli après sendToServer() si le serveur détecte des violations.
+  // Liste vide = aucune violation (cohérence OK).
   List<CoherenceError> _coherenceErrors = [];
   bool                 _isCheckingCoherence = false;
 
-  // ─── Offline coherence check results ────────────────────────────────────────
-  // Populated after saveLocally() or immediately on field update (non-blocking).
-  // Empty list = no violations detected locally.
+  // ─── Résultats du contrôle de cohérence hors ligne ──────────────────────────
+  // Rempli après saveLocally() ou checkCoherenceOffline().
+  // Liste vide = aucune violation détectée localement.
   List<OfflineCoherenceError> _offlineCoherenceErrors = [];
   bool                        _isCheckingOffline       = false;
 
@@ -119,8 +131,15 @@ class DataEntryProvider extends ChangeNotifier {
   bool get hasOfflineCoherenceErrors => _offlineCoherenceErrors.isNotEmpty;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // INIT — set context for a specific school + system
-  // Called when SchoolDataScreen opens.
+  // INITIALISATION — configure le contexte pour un établissement + système donnés
+  //
+  // Appelé à l'ouverture de SchoolDataScreen (via addPostFrameCallback).
+  // Réinitialise tout l'état (questions, formulaire, erreurs), charge les
+  // questions depuis SQLite, puis sélectionne automatiquement la première
+  // pour que le formulaire soit immédiatement visible.
+  //
+  // Lance aussi le téléchargement en arrière-plan des règles de cohérence
+  // pour toutes les questions (non bloquant, best-effort).
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> initForSchool({
@@ -128,14 +147,14 @@ class DataEntryProvider extends ChangeNotifier {
     required String idEtab,
     required String libEtab,
     required String idSystem,
-    String? idRegroupEtab,  // school.idRegroup for LOC_REG_0
-    String? idStatus,       // school.idStatus — numeric e.g. "1"=Public, "2"=Privé
-    String? codeEtab,       // administrative code
-    String? libyear,        // school year label e.g. "2024-2025"
-    String? codeyear,       // school year code e.g. "2024"
-    String? libStatus,      // e.g. "Public"
-    String? libSubsector,   // e.g. "Education de Base"
-    String? adminHierarchy, // e.g. "AGADEZ / ADERBISANAT"
+    String? idRegroupEtab,  // school.idRegroup pour LOC_REG_0
+    String? idStatus,       // school.idStatus — numérique ex. "1"=Public, "2"=Privé
+    String? codeEtab,       // code administratif
+    String? libyear,        // libellé année scolaire ex. "2024-2025"
+    String? codeyear,       // code année scolaire ex. "2024"
+    String? libStatus,      // ex. "Public"
+    String? libSubsector,   // ex. "Education de Base"
+    String? adminHierarchy, // ex. "AGADEZ / ADERBISANAT"
   }) async {
     _idCamp         = idCamp;
     _idEtab         = idEtab;
@@ -149,7 +168,8 @@ class DataEntryProvider extends ChangeNotifier {
     _libStatus      = libStatus;
     _libSubsector   = libSubsector;
     _adminHierarchy = adminHierarchy;
-    // NOTE: _currentUser is set via setCurrentUser() called separately from SchoolDataScreen
+    // NOTE : _currentUser est défini via setCurrentUser() appelé séparément
+    // depuis SchoolDataScreen avant initForSchool
     _selectedQuestion = null;
     _selectedFilter   = null;
     _formHtml         = null;
@@ -163,6 +183,7 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Charge les questions et les périodes de filtre depuis SQLite
       _questions     = await _db.getQuestions(idCamp, idSystem);
       _filterPeriods = await _db.getFilterPeriods(idCamp);
     } catch (e) {
@@ -172,11 +193,11 @@ class DataEntryProvider extends ChangeNotifier {
       notifyListeners();
     }
 
-    // Auto-select first question so the form is immediately visible
+    // Sélection automatique de la première question pour afficher le formulaire
     if (_questions.isNotEmpty && _error == null) {
       await selectQuestion(_questions.first);
-      // Fetch coherence rules for this school (non-blocking, best-effort)
-      // Run in parallel for all questions so they are available for offline evaluation.
+      // Téléchargement en arrière-plan des règles de cohérence pour toutes les questions
+      // (non bloquant — exécuté en parallèle pour être disponibles au contrôle offline)
       _fetchAndStoreCoherenceRulesBackground(
         idCamp:  idCamp,
         idEtab:  idEtab,
@@ -187,9 +208,14 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FETCH COHERENCE RULES (background, non-blocking)
-  // Downloads rules from server and stores them in coherence_rules SQLite.
-  // Called once when a school is opened. Silently fails if offline.
+  // TÉLÉCHARGEMENT DES RÈGLES DE COHÉRENCE (arrière-plan, non bloquant)
+  //
+  // Télécharge les règles depuis data_rules.php et les stocke dans la table
+  // coherence_rules de SQLite. Appelé une fois à l'ouverture d'un établissement.
+  // Échoue silencieusement si hors ligne.
+  //
+  // Le yearCode est passé pour corriger l'absence de session PHP côté mobile
+  // (corrigé en session 14).
   // ═══════════════════════════════════════════════════════════════════════════
 
   void _fetchAndStoreCoherenceRulesBackground({
@@ -198,7 +224,7 @@ class DataEntryProvider extends ChangeNotifier {
     required String idSystem,
     required List<Question> questions,
   }) {
-    // Fire and forget — errors are non-fatal
+    // Fire and forget — les erreurs sont non fatales
     Future(() async {
       final yearCode = _codeyear ?? '';
       for (final q in questions) {
@@ -210,7 +236,7 @@ class DataEntryProvider extends ChangeNotifier {
             qstId:    q.idQst,
             etabId:   idEtab,
             filter:   _selectedFilter?.idFilter,
-            yearCode: yearCode,
+            yearCode: yearCode,  // ← correction session 14 : yearCode passé au serveur
           );
           if (rules.isNotEmpty) {
             await _db.insertCoherenceRules(rules);
@@ -222,21 +248,29 @@ class DataEntryProvider extends ChangeNotifier {
                 '(normal if no rules configured in DB for this theme)');
           }
         } catch (_) {
-          // Non-fatal — no coherence rules available offline for this question
+          // Non fatal — pas de règles disponibles offline pour cette question
         }
       }
     });
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SELECT QUESTION — load HTML form + rules + saved data
-  // Mirrors: stmPageEtab.initHtml() + initPageData()
+  // SÉLECTIONNER UNE QUESTION — charge le formulaire HTML + règles + données sauvegardées
+  //
+  // Réplique : stmPageEtab.initHtml() + initPageData()
+  //
+  // Workflow :
+  //   1. Charge le HTML du formulaire depuis le cache SQLite
+  //   2. Charge les règles de validation du thème
+  //   3. Charge les données collectées sauvegardées pour (idCamp, idEtab, idQst)
+  //   4. Pré-remplit les champs d'identification si c'est le premier thème
+  //   5. Lance le rechargement automatique depuis le serveur en arrière-plan
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // SET CURRENT USER — must be called from SchoolDataScreen after initForSchool.
-  // Stored so selectQuestion can auto-reload from server when local data empty.
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ── Définir l'utilisateur courant ────────────────────────────────────────
+  // Doit être appelé depuis SchoolDataScreen après initForSchool.
+  // Mis en cache pour que selectQuestion puisse déclencher le rechargement
+  // automatique depuis le serveur quand les données locales sont vides.
   void setCurrentUser(User? user) {
     _currentUser = user;
   }
@@ -249,31 +283,30 @@ class DataEntryProvider extends ChangeNotifier {
     _hasUnsavedChanges = false;
     _error             = null;
     _successMessage    = null;
-    // Track if this is the first question (for LOC_REG_0 injection)
+    // Détermine si c'est la première question (pour l'injection de LOC_REG_0)
     _isFirstQuestion = _questions.isNotEmpty &&
         _questions.first.idQst == question.idQst;
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Load cached form HTML
+      // Charge le HTML du formulaire depuis le cache SQLite
       _formHtml = await _db.getFormHtml(_idCamp!, question.idQst);
       final _htmlSnippet = _formHtml == null
           ? 'NULL'
           : 'len=${_formHtml!.length} '
             'snippet=${_formHtml!.length > 80 ? _formHtml!.substring(0, 80) : _formHtml}';
       debugPrint('[DataEntry] selectQuestion: idQst=${question.idQst} formHtml=$_htmlSnippet');
-      // Load validation rules
+      // Charge les règles de validation du thème
       _rules    = await _db.getValidationRules(_idCamp!, question.idQst);
-      // Load saved field values from local SQLite
+      // Charge les valeurs de champs sauvegardées depuis SQLite
       await _loadFormData(idFilter: null);
 
-      // Pre-fill identification form fields.
-      // The identification form (theme d'identification) has fields that are
-      // already known: school name, code, admin code, status, subsector.
-      // Pre-filling saves the user from re-entering known data.
-      // We pre-fill for the first question OR if the HTML contains known
-      // identification field names (works for any campaign type).
+      // Pré-remplissage des champs d'identification.
+      // Le formulaire d'identification (thème d'identification) contient des champs
+      // déjà connus : nom, code administratif, statut, sous-secteur.
+      // On pré-remplit pour la première question OU si le HTML contient des noms
+      // de champs d'identification connus (fonctionne pour tout type de campagne).
       final htmlLower = (_formHtml ?? '').toLowerCase();
       final isIdentificationForm = _isFirstQuestion ||
           htmlLower.contains('nom_etablissement') ||
@@ -284,12 +317,13 @@ class DataEntryProvider extends ChangeNotifier {
         _prefillIdentificationFields();
       }
 
-      // Auto-reload from server:
-      // - Always for identification forms (server may have date fields like
-      //   DATE_CREATION_0, DATE_RECONNAISSANCE_0 not available in local school data).
-      //   Server values only overwrite fields that are currently empty.
-      // - For other forms: only when local data is empty (first open).
-      // Run in background so it doesn't block the form from rendering.
+      // Rechargement automatique depuis le serveur :
+      // - Toujours pour le formulaire d'identification (le serveur peut avoir
+      //   des champs de dates comme DATE_CREATION_0 absent des données locales).
+      //   Les valeurs serveur n'écrasent que les champs actuellement vides.
+      // - Pour les autres formulaires : seulement quand les données locales
+      //   sont vides (première ouverture).
+      // Exécuté en arrière-plan pour ne pas bloquer l'affichage du formulaire.
       if (_currentUser != null) {
         if (isIdentificationForm || _formData.isEmpty) {
           _autoReloadFromServerBackground();
@@ -303,13 +337,18 @@ class DataEntryProvider extends ChangeNotifier {
     }
   }
 
-  // ── Background reload from server ────────────────────────────────────────────
-  // Called on question open when:
-  //   - Local data is empty (first open of any form), OR
-  //   - It's an identification form (server may have date fields not in local data).
-  // On success: merges server data into _formData (server fills empty fields only),
-  //   then notifies listeners so WebView re-injects updated values.
-  // On error: silently ignored (offline or no prior save is normal).
+  // ── Rechargement automatique depuis le serveur (arrière-plan) ─────────────
+  // Appelé à l'ouverture d'une question quand :
+  //   - Les données locales sont vides (première saisie), OU
+  //   - C'est un formulaire d'identification (le serveur peut avoir des champs
+  //     de dates non présents dans les données locales de l'établissement).
+  //
+  // En cas de succès : fusionne les données serveur dans _formData
+  //   - Données locales vides : écrasement complet par les données serveur
+  //   - Données locales présentes (formulaire d'identification) :
+  //     n'écrase que les champs actuellement vides pour préserver les saisies
+  //
+  // En cas d'erreur : ignoré silencieusement (hors ligne ou pas de sauvegarde préalable)
   void _autoReloadFromServerBackground() {
     final user      = _currentUser;
     final question  = _selectedQuestion;
@@ -317,7 +356,7 @@ class DataEntryProvider extends ChangeNotifier {
     final idEtab    = _idEtab;
     final idSystem  = _idSystem;
     final idFilter  = _selectedFilter?.idFilter;
-    // Snapshot whether local data was empty at call time
+    // Capture l'état des données locales au moment de l'appel
     final localWasEmpty = _formData.isEmpty;
     if (user == null || question == null || idCamp == null ||
         idEtab == null || idSystem == null) return;
@@ -334,11 +373,11 @@ class DataEntryProvider extends ChangeNotifier {
         );
         if (serverFields == null || serverFields.isEmpty) return;
 
-        // Convert server values to String map
+        // Convertit les valeurs serveur en Map<String, String>
         final Map<String, String> serverStr = serverFields.map(
           (k, v) => MapEntry(k, v?.toString() ?? ''),
         );
-        // Save to SQLite so offline use has the server data
+        // Sauvegarde en SQLite pour utilisation hors ligne
         await _db.saveCollectedData(
           idCamp:   idCamp,
           idEtab:   idEtab,
@@ -346,21 +385,20 @@ class DataEntryProvider extends ChangeNotifier {
           idFilter: idFilter,
           data:     serverStr,
         );
-        // Only update in-memory if this is still the same question
+        // Met à jour en mémoire uniquement si la même question est toujours affichée
         if (_selectedQuestion?.idQst == question.idQst) {
-          // Merge strategy:
-          // - If local was empty: server values populate everything (full reload).
-          // - If local had data (identification form reload for dates etc.):
-          //   server values only fill fields that are currently empty/missing,
-          //   so user-entered unsaved changes are preserved.
+          // Stratégie de fusion :
+          // - Si les données locales étaient vides : remplissage complet (rechargement total)
+          // - Si les données locales étaient présentes (formulaire d'identification) :
+          //   ne remplit que les champs vides/manquants pour préserver les saisies
           bool changed = false;
           for (final entry in serverStr.entries) {
             if (localWasEmpty) {
-              // Full overwrite — local was empty so no user changes to protect
+              // Écrasement complet — pas de saisies à protéger
               _formData[entry.key] = entry.value;
               changed = true;
             } else {
-              // Fill-if-empty — preserve any user-entered data
+              // Remplissage conditionnel — préserve les saisies existantes
               final existing = _formData[entry.key];
               if (existing == null || existing.trim().isEmpty) {
                 if (entry.value.isNotEmpty) {
@@ -380,23 +418,30 @@ class DataEntryProvider extends ChangeNotifier {
           }
         }
       } catch (_) {
-        // Non-fatal — offline or no prior save
+        // Non fatal — hors ligne ou pas de sauvegarde préalable sur le serveur
         debugPrint('[DataEntry] _autoReloadFromServerBackground: no server data (normal if first entry)');
       }
     });
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // PRE-FILL IDENTIFICATION FORM
-  // Injects known school fields into _formData for the identification form
-  // (first question / theme d'identification).
-  // Only sets fields that are not already filled (respects saved values).
-  // Field names mirror the server's DICO_CHAMP values for identification.
+  // PRÉ-REMPLISSAGE DES CHAMPS D'IDENTIFICATION
+  //
+  // Injecte dans _formData les valeurs connues de l'établissement pour
+  // le formulaire d'identification (premier thème / thème d'identification).
+  // Ne remplit que les champs absents ou vides (respecte les valeurs sauvegardées).
+  //
+  // Les noms de champs reproduisent les DICO_CHAMP du serveur pour l'identification.
+  //
+  // Champs radio :
+  //   Le HTML contient VALUE='CODE_TYPE_STATUT_ETABLISSEMENT_0_N' où N = idStatus.
+  //   On pré-remplit la clé du groupe radio avec la valeur complète de l'option
+  //   pour que _injectData() puisse faire : el.checked = (el.value === val).
   // ═══════════════════════════════════════════════════════════════════════════
   void _prefillIdentificationFields() {
-    // Fill a field only if the source value is non-null AND non-empty,
-    // AND the form field is either absent OR currently empty/blank.
-    // This lets saved non-empty values take precedence but fills in blanks.
+    // Ne remplit un champ que si la source est non nulle/non vide
+    // ET que le champ est absent OU actuellement vide/blanc.
+    // Les valeurs sauvegardées non vides ont la priorité.
     void fill(String key, String? value) {
       if (value == null || value.trim().isEmpty) return;
       final existing = _formData[key];
@@ -405,40 +450,40 @@ class DataEntryProvider extends ChangeNotifier {
       }
     }
 
-    // ── School name ──────────────────────────────────────────────────────────
-    // Identification form uses _0 suffix (row index 0 for non-grille forms).
-    fill('NOM_ETABLISSEMENT_0',  _libEtab);   // mobile identification form
-    fill('NOM_ETABLISSEMENT',    _libEtab);   // fallback (other forms)
+    // ── Nom de l'établissement ───────────────────────────────────────────
+    // Le formulaire d'identification utilise le suffixe _0 (index de ligne 0)
+    fill('NOM_ETABLISSEMENT_0',  _libEtab);   // formulaire d'identification mobile
+    fill('NOM_ETABLISSEMENT',    _libEtab);   // fallback (autres formulaires)
     fill('LIB_ETABLISSEMENT',    _libEtab);
     fill('NOM_ETAB',             _libEtab);
 
-    // ── Administrative code ───────────────────────────────────────────────────
-    fill('CODE_ADMINISTRATIF_0', _codeEtab);  // mobile identification form
+    // ── Code administratif ────────────────────────────────────────────────
+    fill('CODE_ADMINISTRATIF_0', _codeEtab);  // formulaire d'identification mobile
     fill('CODE_ETABLISSEMENT',   _codeEtab);
     fill('COD_ETAB',             _codeEtab);
     fill('CODE_ADMIN',           _codeEtab);
 
-    // ── Status / type ─────────────────────────────────────────────────────────
+    // ── Statut / type ─────────────────────────────────────────────────────
     fill('STATUT',               _libStatus);
     fill('LIB_STATUT',           _libStatus);
 
-    // ── Radio: Statut de l'établissement ─────────────────────────────────────
-    // HTML radio VALUE='CODE_TYPE_STATUT_ETABLISSEMENT_0_N' where N = idStatus.
+    // ── Radio : Statut de l'établissement ─────────────────────────────────
+    // La valeur radio est 'CODE_TYPE_STATUT_ETABLISSEMENT_0_N' où N = idStatus.
     // idStatus='1' → Public, '2' → Privé, '3' → Communautaire.
-    // We pre-fill the radio group key with the full option value string so
-    // _injectData() can set: el.checked = (el.value === val) correctly.
+    // On pré-remplit la clé du groupe radio avec la valeur complète de l'option
+    // pour que _injectData() puisse faire : el.checked = (el.value === val).
     if (_idStatus != null && _idStatus!.isNotEmpty) {
       final statusRadioVal = 'CODE_TYPE_STATUT_ETABLISSEMENT_0_$_idStatus';
       fill('CODE_TYPE_STATUT_ETABLISSEMENT_0', statusRadioVal);
-      // Fallback field names used in other forms
+      // Noms de champs alternatifs utilisés dans d'autres formulaires
       fill('CODE_STATUT_ETABLISSEMENT_0', 'CODE_STATUT_ETABLISSEMENT_0_$_idStatus');
     }
 
-    // ── Sous-secteur ─────────────────────────────────────────────────────────
+    // ── Sous-secteur ──────────────────────────────────────────────────────
     fill('SOUS_SECTEUR',         _libSubsector);
     fill('LIB_SOUS_SECTEUR',     _libSubsector);
 
-    // ── Année scolaire ────────────────────────────────────────────────────────
+    // ── Année scolaire ────────────────────────────────────────────────────
     fill('ANNEE_SCOLAIRE',       _libyear);
     fill('LIB_ANNEE',            _libyear);
 
@@ -448,7 +493,9 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SELECT FILTER — reload data for selected filter period
+  // SÉLECTIONNER UN FILTRE — recharge les données pour la période sélectionnée
+  // La sélection d'un nouveau filtre efface les données en mémoire et recharge
+  // depuis SQLite pour la période correspondante.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectFilter(FilterPeriod? filter) async {
@@ -466,6 +513,7 @@ class DataEntryProvider extends ChangeNotifier {
     }
   }
 
+  /// Charge les données collectées depuis SQLite pour la question et le filtre courants.
   Future<void> _loadFormData({String? idFilter}) async {
     if (_idCamp == null || _idEtab == null || _selectedQuestion == null) return;
     _formData = await _db.getCollectedData(
@@ -477,8 +525,12 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FIELD UPDATE — called by form widgets on change
-  // Mirrors: script.js ctrl_saisie / ctrl_saisie_text
+  // MISE À JOUR D'UN CHAMP — appelé par les widgets de formulaire à chaque changement
+  //
+  // Réplique : script.js ctrl_saisie / ctrl_saisie_text
+  //
+  // Met à jour _formData en mémoire, marque les modifications non sauvegardées,
+  // et efface l'erreur de validation éventuelle pour ce champ.
   // ═══════════════════════════════════════════════════════════════════════════
 
   void updateField(String fieldName, String value) {
@@ -488,8 +540,8 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Validates a single field against its rules.
-  /// Returns French error message or null if valid.
+  /// Valide un seul champ selon ses règles.
+  /// Retourne un message d'erreur en français ou null si valide.
   String? validateField(String fieldName, String value) {
     final fieldRules = _rules.where((r) => r.idChamp == fieldName).toList();
     if (fieldRules.isEmpty) return null;
@@ -501,13 +553,15 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // VALIDATE ALL — before save or send
+  // VALIDER TOUS LES CHAMPS — avant sauvegarde ou envoi
+  // Vérifie d'abord les champs obligatoires (mandatory), puis les types/plages
+  // sur les champs remplis. Retourne vrai si tout est valide.
   // ═══════════════════════════════════════════════════════════════════════════
 
   bool validateAll() {
     _validationErrors = {};
     bool isValid = true;
-    // Check mandatory fields first
+    // Vérifie les champs obligatoires en premier
     for (final rule in _rules) {
       if (rule.ruleType == 'mandatory') {
         final val = _formData[rule.idChamp] ?? '';
@@ -517,7 +571,7 @@ class DataEntryProvider extends ChangeNotifier {
         }
       }
     }
-    // Check type/range on filled fields
+    // Vérifie le type/plage sur les champs remplis
     for (final entry in _formData.entries) {
       if (_validationErrors.containsKey(entry.key)) continue;
       final error = validateField(entry.key, entry.value);
@@ -531,7 +585,11 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SAVE LOCALLY — mirrors stmPageEtab.savePage()
+  // SAUVEGARDER LOCALEMENT — réplique stmPageEtab.savePage()
+  //
+  // Persiste les données du formulaire courant dans la table collected_data
+  // de SQLite. Après la sauvegarde, lance le contrôle de cohérence offline
+  // en arrière-plan pour signaler d'éventuelles violations avant l'envoi.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> saveLocally() async {
@@ -553,7 +611,7 @@ class DataEntryProvider extends ChangeNotifier {
       _hasUnsavedChanges = false;
       _successMessage    = 'Données sauvegardées localement';
       notifyListeners();
-      // Run offline coherence check in background after save
+      // Lance le contrôle de cohérence offline en arrière-plan après la sauvegarde
       Future(() => checkCoherenceOffline());
       return true;
     } catch (e) {
@@ -567,11 +625,21 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SEND TO SERVER — mirrors stmPageEtab.saveQstOnServer()
+  // ENVOYER AU SERVEUR — réplique stmPageEtab.saveQstOnServer()
   //
   // POST /data_save.php/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0
-  // Uses user.login (NOT user.idUser)!
-  // For first question: injects LOC_REG_0={etab.idRegroup} if missing.
+  //
+  // IMPORTANT : utilise user.login (PAS user.idUser) !
+  // Pour la première question : injecte LOC_REG_0={etab.idRegroup} si absent.
+  //
+  // Workflow :
+  //   1. Sauvegarde locale (assure la persistance)
+  //   2. POST au serveur
+  //   3. Si succès : marque is_sent=1 dans SQLite + contrôle de cohérence serveur
+  //   4. Si échec : _error avec message
+  //
+  // Le yearCode est injecté dans l'URL pour contourner l'absence de session
+  // PHP côté mobile.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> sendToServer({required User user, bool online = true}) async {
@@ -587,7 +655,7 @@ class DataEntryProvider extends ChangeNotifier {
       return false;
     }
 
-    // Save locally first (ensures data is persisted)
+    // Sauvegarde locale d'abord (assure la persistance même si l'envoi échoue)
     await saveLocally();
 
     _isSending      = true;
@@ -597,18 +665,19 @@ class DataEntryProvider extends ChangeNotifier {
 
     try {
       final ok = await _api.saveData(
-        login:            user.login,         // ← uses login, not idUser!
+        login:            user.login,         // ← utilise login, pas idUser !
         campId:           _idCamp!,
         sysId:            _idSystem!,
         qstId:            _selectedQuestion!.idQst,
         etabId:           _idEtab!,
         filter:           _selectedFilter?.idFilter,
         formData:         _formData,
-        etabRegroupId:    _idRegroupEtab,     // for LOC_REG_0
+        etabRegroupId:    _idRegroupEtab,     // pour LOC_REG_0 (première question)
         isFirstQuestion:  _isFirstQuestion,
-        yearCode:         user.codeyear,      // inject school year for PHP session bypass
+        yearCode:         user.codeyear,      // contournement session PHP absente
       );
       if (ok) {
+        // Marque les données comme envoyées dans SQLite
         await _db.markCollectedDataSent(
           idCamp:   _idCamp!,
           idEtab:   _idEtab!,
@@ -618,10 +687,10 @@ class DataEntryProvider extends ChangeNotifier {
         _successMessage = 'Données envoyées avec succès';
         notifyListeners();
 
-        // ── Coherence check (non-blocking) ─────────────────────────────────
-        // Runs automatically after a successful save. The server's
-        // controle_theme_batch executes SQL rules against the now-saved
-        // data in DB and returns any violations.
+        // ── Contrôle de cohérence serveur (non bloquant) ────────────────
+        // S'exécute automatiquement après chaque envoi réussi.
+        // controle_theme_batch.class.php exécute les règles SQL sur les
+        // données nouvellement sauvegardées en DB et retourne les violations.
         _isCheckingCoherence = true;
         _coherenceErrors     = [];
         notifyListeners();
@@ -636,7 +705,7 @@ class DataEntryProvider extends ChangeNotifier {
             yearCode: user.codeyear,
           );
         } catch (_) {
-          _coherenceErrors = []; // Non-fatal — silently ignore
+          _coherenceErrors = []; // Non fatal — ignoré silencieusement
         } finally {
           _isCheckingCoherence = false;
           notifyListeners();
@@ -661,10 +730,15 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // OFFLINE COHERENCE CHECK
-  // Evaluates locally stored coherence rules against collected_data.
-  // Can be called after saveLocally() or triggered manually from the UI.
-  // Non-blocking: errors are surfaced through offlineCoherenceErrors getter.
+  // CONTRÔLE DE COHÉRENCE HORS LIGNE
+  //
+  // Évalue les règles de cohérence stockées localement contre collected_data.
+  // Peut être appelé après saveLocally() ou manuellement depuis l'interface.
+  // Non bloquant : les violations sont exposées via offlineCoherenceErrors.
+  //
+  // La logique d'évaluation est dans CoherenceEvaluator.evaluate() qui applique
+  // les opérateurs SQL (<=, >=, =, <, >) via _applyOperator.
+  // RAPPEL : _applyOperator retourne true quand la règle EST VIOLÉE.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> checkCoherenceOffline() async {
@@ -674,6 +748,7 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Récupère les règles de cohérence stockées pour ce contexte
       final rules = await _db.getCoherenceRules(
         idCamp: _idCamp!,
         idQst:  _selectedQuestion!.idQst,
@@ -685,6 +760,7 @@ class DataEntryProvider extends ChangeNotifier {
         return;
       }
 
+      // Lance l'évaluation des règles sur les données du formulaire courant
       _offlineCoherenceErrors = await _evaluator.evaluate(
         rules:    rules,
         formData: _formData,
@@ -706,13 +782,16 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // RELOAD FROM SERVER — mirrors stmPageEtab.reloadQstFromServer()
+  // RECHARGER DEPUIS LE SERVEUR — réplique stmPageEtab.reloadQstFromServer()
   //
   // GET /data_reload.php/theme_data/{login}/{sysId}/{qstId}/{campId}/{etabId}/{filter}
-  // Uses user.login (NOT user.idUser)!
+  // IMPORTANT : utilise user.login (PAS user.idUser) !
   //
-  // Response: { fieldName: [value, type], ... }
-  //   radio fields: stored as fieldName#optionId = '1'
+  // Réponse : { fieldName: [value, type], ... }
+  //   Champs radio : stockés comme fieldName#optionId = '1'
+  //
+  // Remplace complètement les données locales par les données du serveur,
+  // puis marque les données comme envoyées (is_sent=1).
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> reloadFromServer({required User user}) async {
@@ -728,9 +807,9 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Reload from server (already parses radio field format in api_service)
+      // Rechargement depuis le serveur (la conversion des champs radio est faite dans api_service)
       final serverFields = await _api.reloadData(
-        login:    user.login,     // ← uses login, not idUser!
+        login:    user.login,     // ← utilise login, pas idUser !
         sysId:    _idSystem!,
         qstId:    _selectedQuestion!.idQst,
         campId:   _idCamp!,
@@ -744,12 +823,12 @@ class DataEntryProvider extends ChangeNotifier {
         return false;
       }
 
-      // Convert Map<String, dynamic> → Map<String, String> for local DB
+      // Convertit Map<String, dynamic> → Map<String, String> pour la DB locale
       final Map<String, String> serverFieldsStr = serverFields.map(
         (k, v) => MapEntry(k, v?.toString() ?? ''),
       );
 
-      // Replace local data with server values
+      // Remplace les données locales par les données serveur
       await _db.deleteCollectedData(
         idCamp:   _idCamp!,
         idEtab:   _idEtab!,
@@ -763,6 +842,7 @@ class DataEntryProvider extends ChangeNotifier {
         idFilter: _selectedFilter?.idFilter,
         data:     serverFieldsStr,
       );
+      // Marque comme synchronisé (données = serveur)
       await _db.markCollectedDataSent(
         idCamp:   _idCamp!,
         idEtab:   _idEtab!,
@@ -790,8 +870,13 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SEND ALL CAMPAIGN DATA (page_camp.js sendAllData)
-  // Sends all collected data for all schools in the campaign.
+  // ENVOYER TOUTES LES DONNÉES D'UNE CAMPAGNE (page_camp.js sendAllData)
+  //
+  // Envoie toutes les données collectées pour tous les établissements et
+  // toutes les questions d'une campagne. Retourne un dictionnaire de résultats
+  // indexé par "${idEtab}_${idQst}" (vrai = envoyé, faux = échec).
+  //
+  // Utilisé pour la synchronisation globale depuis l'écran de campagne.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<Map<String, bool>> sendAllCampaignData({
@@ -804,19 +889,20 @@ class DataEntryProvider extends ChangeNotifier {
     final results = <String, bool>{};
     for (final etabId in etabIds) {
       for (final qstId in qstIds) {
+        // Récupère les données collectées pour (campagne, établissement, question)
         final data = await _db.getCollectedData(
           idCamp: idCamp,
           idEtab: etabId,
           idQst:  qstId,
         );
-        if (data.isEmpty) continue;
+        if (data.isEmpty) continue;  // pas de données → ignore
 
-        // Determine if this is the first question
+        // Détermine si c'est la première question (pour LOC_REG_0)
         final isFirst = qstIds.isNotEmpty && qstIds.first == qstId;
 
         try {
           final ok = await _api.saveData(
-            login:           user.login,    // ← uses login!
+            login:           user.login,    // ← utilise login !
             campId:          idCamp,
             sysId:           idSystem,
             qstId:           qstId,
@@ -824,7 +910,7 @@ class DataEntryProvider extends ChangeNotifier {
             filter:          null,
             formData:        data,
             isFirstQuestion: isFirst,
-            yearCode:        user.codeyear, // inject school year for PHP session bypass
+            yearCode:        user.codeyear, // contournement session PHP
           );
           results['${etabId}_$qstId'] = ok;
           if (ok) {
@@ -843,11 +929,19 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 2D MATRIX TOTAL CALCULATION
-  // Replaces calc_total.js — calcul_Total_ThemeMat2D, set_TOTAL_ThemeMat2D
+  // CALCUL DES TOTAUX DE MATRICE 2D
+  //
+  // Remplace calc_total.js — calcul_Total_ThemeMat2D, set_TOTAL_ThemeMat2D
+  //
+  // Calcule les totaux de lignes, de colonnes et le grand total d'une
+  // matrice de saisie (grille 2D). Les clés de champs suivent la convention :
+  //   ${cellPrefix}_${row}_${col}   → valeur de la cellule
+  //   total_r${row}                  → total de la ligne
+  //   total_c${col}                  → total de la colonne
+  //   total_all                      → grand total
   // ═══════════════════════════════════════════════════════════════════════════
 
-  /// Recalculates all row/column/grand totals for a 2D matrix form.
+  /// Recalcule tous les totaux de lignes, colonnes et grand total d'une grille 2D.
   Map<String, String> calculateMatrixTotals({
     required Map<String, String> data,
     required int rows,
@@ -856,6 +950,7 @@ class DataEntryProvider extends ChangeNotifier {
   }) {
     final result = Map<String, String>.from(data);
 
+    // Totaux de lignes
     for (int r = 0; r < rows; r++) {
       double rowTotal = 0;
       for (int c = 0; c < cols; c++) {
@@ -865,6 +960,7 @@ class DataEntryProvider extends ChangeNotifier {
       result['total_r$r'] = rowTotal.toStringAsFixed(0);
     }
 
+    // Totaux de colonnes
     for (int c = 0; c < cols; c++) {
       double colTotal = 0;
       for (int r = 0; r < rows; r++) {
@@ -874,6 +970,7 @@ class DataEntryProvider extends ChangeNotifier {
       result['total_c$c'] = colTotal.toStringAsFixed(0);
     }
 
+    // Grand total (somme des totaux de lignes)
     double grandTotal = 0;
     for (int r = 0; r < rows; r++) {
       grandTotal += double.tryParse(result['total_r$r'] ?? '') ?? 0;
@@ -883,7 +980,8 @@ class DataEntryProvider extends ChangeNotifier {
     return result;
   }
 
-  /// Calculates a formula-based total (sum of named fields).
+  /// Calcule un total basé sur une formule (somme de champs nommés).
+  /// Utilisé pour les champs de total calculés dynamiquement dans les formulaires.
   double calculateFormulaTotal(List<String> fieldNames) {
     return fieldNames.fold(
         0.0, (sum, name) => sum + (double.tryParse(_formData[name] ?? '') ?? 0));
@@ -893,6 +991,7 @@ class DataEntryProvider extends ChangeNotifier {
   // HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
 
+  /// Efface tous les messages (erreur, succès, violations offline).
   void clearMessages() {
     _error                  = null;
     _successMessage         = null;
@@ -900,6 +999,7 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Efface uniquement le message d'erreur courant.
   void clearError() {
     _error = null;
     notifyListeners();

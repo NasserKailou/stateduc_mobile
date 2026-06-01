@@ -7,16 +7,24 @@ import '../../models/school.dart';
 import '../../models/education_system.dart';
 import '../data_entry/school_data_screen.dart';
 
-/// CampaignDetailScreen — system selector + hierarchical regroup drill-down
-/// + school list.
+/// CampaignDetailScreen — sélecteur de système éducatif + navigation hiérarchique
+/// dans les regroupements + liste des établissements.
 ///
-/// Navigation flow (mirrors page_camp.js):
-///   displaySystems()        → EducationSystem selection chips
-///   displayRegroups(null)   → Root regroupements list
-///   displayRegroups(id)     → Child regroupements drill-down
-///   displayFinalRegroupEtabs() → School list (leaf node)
+/// Flux de navigation (réplique page_camp.js) :
+///   displaySystems()             → puces de sélection du système éducatif
+///   displayRegroups(null)        → liste des regroupements racine
+///   displayRegroups(id)          → sous-regroupements (drill-down)
+///   displayFinalRegroupEtabs()   → liste des établissements (nœud feuille)
 ///
-/// Breadcrumb trail shown at top when drilling into regroups.
+/// Un fil d'Ariane est affiché en haut de l'écran dès qu'un système est
+/// sélectionné, permettant de remonter à n'importe quel niveau de la hiérarchie.
+///
+/// Widgets privés :
+///   [_BreadcrumbBar]   — barre de navigation avec système + regroupements
+///   [_SystemChip]      — puce de sélection d'un système éducatif
+///   [_RegroupTile]     — tuile de navigation dans un regroupement
+///   [_SchoolTile]      — tuile représentant un établissement
+///   [_UnsentDataBanner] — bannière d'alerte données non envoyées (placeholder)
 class CampaignDetailScreen extends StatelessWidget {
   const CampaignDetailScreen({super.key, required this.campaign});
   final Campaign campaign;
@@ -27,6 +35,7 @@ class CampaignDetailScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           title: Text(campaign.libCamp),
+          // Affiche le fil d'Ariane sous le titre dès qu'un système est sélectionné
           bottom: camps.selectedSystem != null
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(40),
@@ -45,28 +54,36 @@ class CampaignDetailScreen extends StatelessWidget {
     });
   }
 
+  /// Construit le corps selon l'état de navigation :
+  ///   - Aucun système sélectionné → sélecteur de systèmes
+  ///   - Navigation en cours → indicateur de chargement
+  ///   - Niveau feuille (établissements) → liste d'établissements
+  ///   - Listes vides après navigation → état vide / erreur
+  ///   - Sinon → liste de regroupements (drill-down)
   Widget _buildBody(BuildContext context, CampaignProvider camps) {
-    // No system selected → show system chips
+    // Aucun système sélectionné → affiche les puces de sélection
     if (camps.selectedSystem == null) {
       return _buildSystemSelector(context, camps);
     }
-    // Navigation in progress → real loading spinner (controlled by isNavigating)
+    // Navigation en cours → indicateur de chargement (contrôlé par isNavigating)
     if (camps.isNavigating) {
       return const Center(child: CircularProgressIndicator());
     }
-    // System selected, no regroups left, schools available → school list
+    // Système sélectionné, plus de regroupements, des établissements disponibles → liste
     if (camps.currentRegroups.isEmpty && camps.currentSchools.isNotEmpty) {
       return _buildSchoolList(context, camps);
     }
-    // Both lists empty after navigation finished → show empty/error state (no infinite spinner)
+    // Les deux listes vides après navigation → état vide/erreur (pas de spinner infini)
     if (camps.currentRegroups.isEmpty && camps.currentSchools.isEmpty) {
       return _buildEmptyState(context, camps);
     }
-    // Regroup drill-down list
+    // Navigation dans la hiérarchie de regroupements
     return _buildRegroupList(context, camps);
   }
 
-  // ─── System selector ─────────────────────────────────────────────────────
+  // ─── Sélecteur de système éducatif ──────────────────────────────────────
+  /// Affiche les systèmes éducatifs de la campagne sous forme de puces cliquables.
+  /// Ex. : "Education de Base", "Enseignement Secondaire", "Alphabétisation"
   Widget _buildSystemSelector(
       BuildContext context, CampaignProvider camps) {
     if (camps.systems.isEmpty) {
@@ -97,7 +114,10 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
-  // ─── Empty state (no regroups and no schools after navigation) ──────────
+  // ─── État vide (aucun regroupement ni établissement après navigation) ────
+  /// Affiché quand une navigation aboutit à un résultat vide.
+  /// Montre l'erreur éventuelle du provider ou un message générique.
+  /// Propose un bouton "Revenir en arrière" si un fil d'Ariane existe.
   Widget _buildEmptyState(BuildContext context, CampaignProvider camps) {
     final errorMsg = camps.error;
     return Center(
@@ -131,7 +151,9 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
-  // ─── Regroup drill-down ──────────────────────────────────────────────────
+  // ─── Liste de regroupements (drill-down) ────────────────────────────────
+  /// Affiche la liste des sous-regroupements du niveau courant.
+  /// Chaque tuile appelle [CampaignProvider.navigateIntoRegroup] au tap.
   Widget _buildRegroupList(
       BuildContext context, CampaignProvider camps) {
     return ListView.builder(
@@ -148,12 +170,14 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
-  // ─── School list ─────────────────────────────────────────────────────────
+  // ─── Liste des établissements (nœud feuille) ─────────────────────────────
+  /// Affiche la bannière de données non envoyées (placeholder) puis
+  /// la liste des établissements du regroupement courant.
   Widget _buildSchoolList(
       BuildContext context, CampaignProvider camps) {
     return Column(
       children: [
-        // Unsent data warning banner
+        // Bannière de données non envoyées (placeholder — voir _UnsentDataBanner)
         _UnsentDataBanner(
           idCamp: campaign.idCamp,
           idSystem: camps.selectedSystem!.idSystem,
@@ -175,15 +199,21 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Ouvre l'écran de saisie [SchoolDataScreen] pour un établissement.
+  ///
+  /// Construit la hiérarchie administrative à partir du fil d'Ariane de navigation.
+  /// Ex. : breadcrumb = [AGADEZ, ADERBISANAT, ADEBISSANAT]
+  ///   → adminHierarchy = "AGADEZ / ADERBISANAT / ADEBISSANAT"
+  ///
+  /// Si le fil d'Ariane est vide (navigation plate), utilise [school.libHierarchy]
+  /// comme fallback (valeur stockée sur le serveur à l'inscription de l'établissement).
   void _openSchool(
       BuildContext context, CampaignProvider camps, School school) {
-    // Build administrative hierarchy from the current navigation breadcrumb.
-    // e.g. breadcrumb = [AGADEZ, ADERBISANAT, ADEBISSANAT]
-    //   → adminHierarchy = "AGADEZ / ADERBISANAT / ADEBISSANAT"
     final breadcrumb = camps.regroupBreadcrumb;
+    // Construit la chaîne de hiérarchie administrative depuis le fil d'Ariane
     final adminHierarchy = breadcrumb.isNotEmpty
         ? breadcrumb.map((r) => r.libRegp).join(' / ')
-        : school.libHierarchy;
+        : school.libHierarchy;  // fallback : valeur stockée dans la BDD serveur
 
     Navigator.push(
       context,
@@ -198,10 +228,13 @@ class CampaignDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Revient à la sélection de système éducatif (réinitialise la navigation).
   void _backToSystems(BuildContext context, CampaignProvider camps) {
     camps.selectCampaign(campaign);
   }
 
+  /// Navigue vers le niveau [breadcrumbIndex] du fil d'Ariane.
+  /// Calcule le nombre de niveaux à remonter et appelle [navigateUpRegroup].
   void _navigateToLevel(
       BuildContext context, CampaignProvider camps, int breadcrumbIndex) {
     final levelsUp =
@@ -212,7 +245,10 @@ class CampaignDetailScreen extends StatelessWidget {
   }
 }
 
-// ─── Breadcrumb bar ──────────────────────────────────────────────────────────
+// ─── Barre de fil d'Ariane ───────────────────────────────────────────────────
+/// Barre de navigation horizontale affichée sous le titre de la AppBar.
+/// Montre : [Système] > [Regroupement 1] > [Regroupement 2] > …
+/// Les éléments cliquables permettent de remonter à n'importe quel niveau.
 class _BreadcrumbBar extends StatelessWidget {
   const _BreadcrumbBar({
     required this.system,
@@ -232,6 +268,7 @@ class _BreadcrumbBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
+          // Élément racine : nom du système éducatif (cliquable → retour systèmes)
           InkWell(
             onTap: onSystemTap,
             child: Text(system.libSystem,
@@ -239,6 +276,7 @@ class _BreadcrumbBar extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w600)),
           ),
+          // Éléments du fil d'Ariane : un chevron + nom de regroupement par niveau
           for (int i = 0; i < breadcrumb.length; i++) ...[
             const Icon(Icons.chevron_right, size: 16),
             InkWell(
@@ -246,6 +284,7 @@ class _BreadcrumbBar extends StatelessWidget {
               child: Text(
                 breadcrumb[i].libRegp,
                 style: TextStyle(
+                  // Dernier élément en noir (courant) ; les autres en couleur primaire (cliquables)
                   color: i < breadcrumb.length - 1
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.onSurface,
@@ -262,7 +301,9 @@ class _BreadcrumbBar extends StatelessWidget {
   }
 }
 
-// ─── System chip ────────────────────────────────────────────────────────────
+// ─── Puce de sélection d'un système éducatif ────────────────────────────────
+/// Puce cliquable représentant un système éducatif.
+/// Ex. : "Education de Base", "Enseignement Secondaire"
 class _SystemChip extends StatelessWidget {
   const _SystemChip({required this.system, required this.onTap});
   final EducationSystem system;
@@ -281,7 +322,10 @@ class _SystemChip extends StatelessWidget {
   }
 }
 
-// ─── Regroup tile ────────────────────────────────────────────────────────────
+// ─── Tuile de regroupement ───────────────────────────────────────────────────
+/// Tuile représentant un regroupement géographique ou administratif
+/// (commune, département, région, district…).
+/// Le [typeLabel] est résolu via [CampaignProvider.regroupTypeLabel].
 class _RegroupTile extends StatelessWidget {
   const _RegroupTile({
     required this.regroup,
@@ -308,7 +352,10 @@ class _RegroupTile extends StatelessWidget {
   }
 }
 
-// ─── School tile ─────────────────────────────────────────────────────────────
+// ─── Tuile d'établissement ───────────────────────────────────────────────────
+/// Tuile représentant un établissement scolaire dans la liste.
+/// Affiche le nom et le statut (Public/Privé/Communautaire) si disponible.
+/// Le tap ouvre l'écran de saisie [SchoolDataScreen] via [_openSchool].
 class _SchoolTile extends StatelessWidget {
   const _SchoolTile({required this.school, required this.onTap});
   final School school;
@@ -337,7 +384,14 @@ class _SchoolTile extends StatelessWidget {
   }
 }
 
-// ─── Unsent data banner ──────────────────────────────────────────────────────
+// ─── Bannière données non envoyées ──────────────────────────────────────────
+/// Bannière affichée au-dessus de la liste des établissements lorsque des
+/// données collectées n'ont pas encore été envoyées au serveur.
+///
+/// PLACEHOLDER : dans l'implémentation complète, ce widget interrogerait
+/// la table [collected_data] de SQLite pour compter les lignes avec
+/// is_sent = 0 pour la campagne et le système donnés, puis afficherait
+/// une bannière d'alerte orange avec le nombre d'établissements concernés.
 class _UnsentDataBanner extends StatelessWidget {
   const _UnsentDataBanner(
       {required this.idCamp, required this.idSystem});
@@ -346,8 +400,8 @@ class _UnsentDataBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // In a real app this would check the DB for unsent data
-    // and show a banner if any; for now it's a placeholder.
+    // Placeholder — dans une vraie implémentation, vérifier la DB pour les données non envoyées
+    // et afficher une bannière si is_sent=0 pour (idCamp, idSystem)
     return const SizedBox.shrink();
   }
 }

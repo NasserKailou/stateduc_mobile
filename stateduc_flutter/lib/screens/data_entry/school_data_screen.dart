@@ -10,25 +10,39 @@ import '../../widgets/common/loading_overlay.dart';
 import '../../models/user.dart';  // FilterPeriod
 import '../../services/coherence_evaluator.dart';  // OfflineCoherenceError
 
-/// SchoolDataScreen — data entry for a specific school.
+/// SchoolDataScreen — écran de saisie des données pour un établissement scolaire.
 ///
-/// Mirrors:
-///   camp.html (p_etab page) + page_etab.js completely:
-///   - initHtml()       → render form HTML
-///   - initPageData()   → load saved values
-///   - savePage()       → save locally
-///   - saveQstOnServer() → send to server
-///   - reload from server
-///   - question selector
-///   - filter (period) selector
-///   - dynamic grid rows (addGrilleLine)
+/// Réplique complètement la page camp.html (p_etab) + page_etab.js :
+///   - initHtml()          → affichage du formulaire HTML dans le WebView
+///   - initPageData()      → chargement des valeurs sauvegardées
+///   - savePage()          → sauvegarde locale dans SQLite
+///   - saveQstOnServer()   → envoi au serveur (POST data_save.php)
+///   - reloadQstFromServer() → rechargement des données depuis le serveur
+///   - sélecteur de question (thème)
+///   - sélecteur de filtre (période)
+///   - ajout de lignes dans les grilles (addGrilleLine)
+///
+/// Structure de l'écran :
+///   AppBar :
+///     - Titre : nom de l'établissement + nom de la question sélectionnée
+///     - Actions : [sauvegarder] [envoyer au serveur] [menu options]
+///   Body :
+///     - [_SchoolInfoHeader] : bandeau d'identification de l'établissement
+///     - [_MessageBanner]    : messages d'erreur / succès (dismissible)
+///     - [_OfflineCoherenceBanner] : violations de cohérence offline
+///     - [_QuestionSelector] : chips de sélection de thème (horizontale)
+///     - [_FilterSelector]   : menu déroulant de période si filtre actif
+///     - [DynamicFormWidget] : formulaire HTML dans WebView
+///
+/// Après un envoi réussi avec violations de cohérence serveur :
+///   → Affiche un [AlertDialog] listant chaque violation avec son message.
 class SchoolDataScreen extends StatefulWidget {
   const SchoolDataScreen({
     super.key,
     required this.campaign,
     required this.school,
     required this.idSystem,
-    this.libSystem,    // e.g. "Education de Base"
+    this.libSystem,    // ex. "Education de Base"
   });
   final Campaign campaign;
   final School school;
@@ -43,10 +57,14 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   @override
   void initState() {
     super.initState();
+    // addPostFrameCallback : attend que le build initial soit terminé avant
+    // d'appeler initForSchool, car read<Provider>() ne peut pas être appelé
+    // pendant le build du widget parent (contrainte Flutter/Provider).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       final entry = context.read<DataEntryProvider>();
-      // Store the current user so selectQuestion can auto-reload from server
+      // Stocke l'utilisateur courant pour que selectQuestion puisse
+      // déclencher le rechargement automatique depuis le serveur
       entry.setCurrentUser(auth.user);
       entry.initForSchool(
         idCamp:         widget.campaign.idCamp,
@@ -54,12 +72,12 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         libEtab:        widget.school.libEtab,
         idSystem:       widget.idSystem,
         idRegroupEtab:  widget.school.idRegroup,
-        idStatus:       widget.school.idStatus,   // ← numeric status for radio pre-fill
+        idStatus:       widget.school.idStatus,   // ← statut numérique pour le pré-remplissage radio
         codeEtab:       widget.school.codeEtab,
         libyear:        auth.user?.libyear,
         codeyear:       auth.user?.codeyear,
         libStatus:      widget.school.libStatus,
-        libSubsector:   widget.libSystem,   // type secteur enseignement (ex: "Education de Base")
+        libSubsector:   widget.libSystem,   // type secteur enseignement (ex. "Education de Base")
         adminHierarchy: widget.school.libHierarchy,
       );
     });
@@ -67,9 +85,12 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Consumer2 écoute AuthProvider (pour l'utilisateur courant)
+    // et DataEntryProvider (pour l'état du formulaire et des données)
     return Consumer2<AuthProvider, DataEntryProvider>(
       builder: (context, auth, entry, _) {
         return LoadingOverlay(
+          // Overlay de chargement pendant l'envoi au serveur ou le rechargement
           isLoading: entry.isSending || entry.isReloading,
           message:
               entry.isSending ? 'Envoi en cours…' : 'Rechargement…',
@@ -78,8 +99,10 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Ligne 1 : nom de l'établissement
                   Text(widget.school.libEtab,
                       style: const TextStyle(fontSize: 16)),
+                  // Ligne 2 : libellé de la question/thème sélectionné(e)
                   if (entry.selectedQuestion != null)
                     Text(entry.selectedQuestion!.libQst,
                         style: const TextStyle(
@@ -98,16 +121,21 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     );
   }
 
+  /// Construit les boutons d'action de la AppBar.
+  /// N'affiche rien si aucune question n'est sélectionnée.
+  ///   - Icône disquette / coche : sauvegarde locale (change selon hasUnsavedChanges)
+  ///   - Icône cloud upload   : envoi au serveur
+  ///   - Menu popup           : option "Recharger depuis serveur"
   List<Widget> _buildActions(
       BuildContext context, AuthProvider auth, DataEntryProvider entry) {
     if (entry.selectedQuestion == null) return [];
     return [
-      // Save locally
+      // Sauvegarder localement
       IconButton(
         icon: Icon(
           entry.hasUnsavedChanges
-              ? Icons.save_outlined
-              : Icons.check_circle_outline,
+              ? Icons.save_outlined      // disquette si modifications non sauvegardées
+              : Icons.check_circle_outline,  // coche si tout est sauvegardé
           color: entry.hasUnsavedChanges
               ? Theme.of(context).colorScheme.primary
               : null,
@@ -116,7 +144,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         onPressed:
             entry.isSaving ? null : () => _saveLocally(context, entry),
       ),
-      // Send to server
+      // Envoyer au serveur
       IconButton(
         icon: const Icon(Icons.cloud_upload_outlined),
         tooltip: 'Envoyer au serveur',
@@ -124,7 +152,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
             ? null
             : () => _sendToServer(context, auth, entry),
       ),
-      // More options
+      // Options supplémentaires
       PopupMenuButton<String>(
         onSelected: (v) => _onMenuSelected(v, context, auth, entry),
         itemBuilder: (_) => [
@@ -140,18 +168,20 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  /// Construit le corps de l'écran : bandeau d'info + messages + formulaire.
   Widget _buildBody(
       BuildContext context, AuthProvider auth, DataEntryProvider entry) {
     return Column(
       children: [
-        // ── School identification header ─────────────────────────────────
+        // ── Bandeau d'identification de l'établissement ──────────────────
+        // Affiche : année scolaire, hiérarchie admin, nom/code/ID, statut, secteur
         _SchoolInfoHeader(
           entry: entry,
           campaign: widget.campaign,
           school: widget.school,
           libSystem: widget.libSystem,
         ),
-        // ── Messages ────────────────────────────────────────────────────
+        // ── Messages d'erreur / succès ───────────────────────────────────
         if (entry.error != null)
           _MessageBanner(
             message: entry.error!,
@@ -164,20 +194,23 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
             isError: false,
             onDismiss: entry.clearMessages,
           ),
-        // ── Offline coherence violations ─────────────────────────────────
+        // ── Violations de cohérence hors ligne ───────────────────────────
+        // Affichées après une sauvegarde locale si des règles offline sont violées
         if (entry.hasOfflineCoherenceErrors)
           _OfflineCoherenceBanner(
             errors: entry.offlineCoherenceErrors,
             onDismiss: entry.clearMessages,
           ),
-        // ── Question selector ────────────────────────────────────────────
+        // ── Sélecteur de question (thème) ────────────────────────────────
+        // Chips horizontales pour naviguer entre les thèmes du système éducatif
         if (entry.questions.isNotEmpty)
           _QuestionSelector(
             questions: entry.questions,
             selected: entry.selectedQuestion,
             onSelect: entry.selectQuestion,
           ),
-        // ── Filter selector (if question has filter) ─────────────────────
+        // ── Sélecteur de filtre (période) ────────────────────────────────
+        // Visible seulement si la question courante supporte les filtres
         if (entry.selectedQuestion?.hasFilter == true &&
             entry.filterPeriods.isNotEmpty)
           _FilterSelector(
@@ -185,16 +218,17 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
             selected: entry.selectedFilter,
             onSelect: entry.selectFilter,
           ),
-        // ── Form ──────────────────────────────────────────────────────────
+        // ── Formulaire de saisie ─────────────────────────────────────────
         Expanded(
           child: entry.selectedQuestion == null
-              ? _buildNoQuestion()
+              ? _buildNoQuestion()   // état vide si aucune question sélectionnée
               : _buildForm(context, entry),
         ),
       ],
     );
   }
 
+  /// Affiche un écran vide invitant à sélectionner un formulaire.
   Widget _buildNoQuestion() {
     return const Center(
       child: Padding(
@@ -212,10 +246,15 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     );
   }
 
+  /// Construit le formulaire de saisie.
+  ///
+  /// Si le HTML est manquant / vide / placeholder d'erreur → affiche
+  /// un message "Formulaire non disponible" avec conseil de re-téléchargement.
+  /// Sinon → affiche [DynamicFormWidget] avec le HTML du thème sélectionné.
   Widget _buildForm(BuildContext context, DataEntryProvider entry) {
     final html = entry.formHtml;
-    // Show offline message when HTML is missing, empty, or is the error
-    // placeholder stored during a failed campaign download
+    // Formulaire indisponible si HTML null, vide, ou placeholder d'erreur
+    // stocké lors d'un échec de téléchargement de campagne
     final isUnavailable = html == null ||
         html.trim().isEmpty ||
         html.contains('Formulaire non disponible');
@@ -238,12 +277,13 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         ),
       );
     }
+    // Formulaire disponible → WebView avec HTML du thème
     return DynamicFormWidget(
       html: html,
       data: entry.formData,
       validationErrors: entry.validationErrors,
       rules: entry.selectedQuestion != null
-          ? [] // rules accessed via provider
+          ? [] // règles accessibles via le provider
           : [],
       onFieldChanged: entry.updateField,
       onAddGridRow: _onAddGridRow,
@@ -254,6 +294,8 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   // ACTIONS
   // ═══════════════════════════════════════════════════════════════════════════
 
+  /// Sauvegarde les données du formulaire courant dans SQLite (hors ligne).
+  /// Affiche un SnackBar en cas d'échec.
   Future<void> _saveLocally(
       BuildContext context, DataEntryProvider entry) async {
     final ok = await entry.saveLocally();
@@ -265,10 +307,20 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     }
   }
 
+  /// Envoie les données au serveur via POST data_save.php/theme_save.
+  ///
+  /// Workflow :
+  ///   1. Validation des champs (avertissement seulement, pas de blocage)
+  ///   2. [DataEntryProvider.sendToServer] → POST + cohérence serveur
+  ///   3. En cas d'erreur → SnackBar
+  ///   4. En cas de succès avec violations de cohérence →
+  ///      [AlertDialog] listant les incohérences détectées par le serveur
+  ///
+  /// Réplique : stmPageEtab.saveQstOnServer() + contrôle cohérence serveur
   Future<void> _sendToServer(BuildContext context, AuthProvider auth,
       DataEntryProvider entry) async {
     if (auth.user == null) return;
-    // Validate — but only warn, do not block send (mirrors original app)
+    // Validation — ne bloque pas l'envoi (comme dans l'application originale)
     entry.validateAll();
 
     final ok = await entry.sendToServer(user: auth.user!);
@@ -281,7 +333,9 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
       return;
     }
 
-    // ── After successful send: show coherence errors if any ─────────────────
+    // ── Après envoi réussi : afficher les erreurs de cohérence si présentes ──
+    // Le serveur exécute controle_theme_batch.class.php après la sauvegarde
+    // et retourne les violations via data_controle.php.
     if (ok && entry.hasCoherenceErrors) {
       final errors = entry.coherenceErrors;
       await showDialog(
@@ -305,6 +359,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
+                // Liste des violations avec message ou description générique
                 ...errors.map((e) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
@@ -338,9 +393,14 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     }
   }
 
+  /// Recharge les données du thème courant depuis le serveur.
+  /// Demande une confirmation avant d'écraser les données locales.
+  ///
+  /// Réplique : stmPageEtab.reloadQstFromServer()
   Future<void> _reloadFromServer(BuildContext context, AuthProvider auth,
       DataEntryProvider entry) async {
     if (auth.user == null) return;
+    // Boîte de dialogue de confirmation avant écrasement des données locales
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -362,6 +422,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     }
   }
 
+  /// Gère la sélection dans le menu popup de la AppBar.
   void _onMenuSelected(String value, BuildContext context,
       AuthProvider auth, DataEntryProvider entry) {
     if (value == 'reload') {
@@ -369,19 +430,26 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     }
   }
 
+  /// Appelé par [DynamicFormWidget] quand l'utilisateur ajoute une ligne
+  /// dans un formulaire de type grille.
+  /// Le widget gère l'ajout en interne via le pont JavaScript ;
+  /// le provider peut aussi suivre les lignes supplémentaires si nécessaire.
   void _onAddGridRow(String tableId) {
-    // DynamicFormWidget handles this internally;
-    // provider can also track extra rows if needed.
+    // DynamicFormWidget gère l'ajout de ligne en interne ;
+    // le provider peut traquer les lignes supplémentaires si besoin.
   }
 }
 
-// ─── School identification info header ───────────────────────────────────────
-/// Displays the school identification breadcrumb above each form,
-/// mirroring the server's header:
+// ─── Bandeau d'identification de l'établissement ─────────────────────────────
+/// Affiche les informations d'identification au-dessus de chaque formulaire,
+/// reproduisant l'en-tête de la page serveur :
 ///   Année en session : 2024-2025
 ///   AGADEZ / ADERBISANAT / ADEBISSANAT
-///   Nom établissement: ABACHARA  Identifiant: 70  Code Administratif: 101012071
-///   Statut: Public  Type secteur: Education de Base
+///   Établissement : ABACHARA  ID : 70  Code Admin : 101012071
+///   Statut : Public  Type secteur : Education de Base
+///
+/// Les valeurs proviennent du [DataEntryProvider] (priorité) puis du [School].
+/// Le type de secteur vient de [libSystem] (jamais de libStatus, concept différent).
 class _SchoolInfoHeader extends StatelessWidget {
   const _SchoolInfoHeader({
     required this.entry,
@@ -398,13 +466,14 @@ class _SchoolInfoHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final libyear     = entry.libyear ?? '';
+    // Hiérarchie administrative : provider d'abord, puis school.libHierarchy
     final adminHier   = entry.adminHierarchy ?? school.libHierarchy ?? '';
     final libEtab     = school.libEtab;
     final idEtab      = school.idEtab;
     final codeEtab    = school.codeEtab ?? '';
     final libStatus   = entry.libStatus ?? school.libStatus ?? '';
-    // Type secteur enseignement: prefer provider value (set at initForSchool),
-    // then widget.libSystem, never fall back to libStatus (different concept).
+    // Type de secteur : provider d'abord, puis libSystem du widget
+    // Ne jamais utiliser libStatus ici (concept différent)
     final libSubsect  = entry.libSubsector ?? libSystem ?? '';
 
     return Container(
@@ -419,17 +488,20 @@ class _SchoolInfoHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Ligne : année scolaire en session
           if (libyear.isNotEmpty)
             _InfoRow(
               icon: Icons.calendar_today_outlined,
               text: 'Année en session : $libyear',
               bold: true,
             ),
+          // Ligne : hiérarchie administrative (ex. AGADEZ / ADERBISANAT / …)
           if (adminHier.isNotEmpty)
             _InfoRow(
               icon: Icons.location_on_outlined,
               text: adminHier,
             ),
+          // Chips : nom de l'établissement, ID interne, code administratif
           Wrap(
             spacing: 16,
             runSpacing: 2,
@@ -441,6 +513,7 @@ class _SchoolInfoHeader extends StatelessWidget {
                 _InfoChip(label: 'Code Admin', value: codeEtab),
             ],
           ),
+          // Chips : statut (Public/Privé…) et type de secteur
           Wrap(
             spacing: 16,
             runSpacing: 2,
@@ -457,6 +530,8 @@ class _SchoolInfoHeader extends StatelessWidget {
   }
 }
 
+/// Ligne d'information avec icône et texte.
+/// Utilisé dans [_SchoolInfoHeader] pour les lignes pleine largeur.
 class _InfoRow extends StatelessWidget {
   const _InfoRow({required this.icon, required this.text, this.bold = false});
   final IconData icon;
@@ -488,6 +563,8 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
+/// Paire label : valeur en ligne.
+/// Utilisé dans [_SchoolInfoHeader] pour les informations en [Wrap].
 class _InfoChip extends StatelessWidget {
   const _InfoChip({required this.label, required this.value});
   final String label;
@@ -509,7 +586,10 @@ class _InfoChip extends StatelessWidget {
   }
 }
 
-// ─── Question selector ───────────────────────────────────────────────────────
+// ─── Sélecteur de question (thème) ──────────────────────────────────────────
+/// Barre de chips horizontale pour naviguer entre les thèmes / formulaires
+/// du système éducatif sélectionné.
+/// La chip sélectionnée est mise en évidence avec la couleur primaire.
 class _QuestionSelector extends StatelessWidget {
   const _QuestionSelector({
     required this.questions,
@@ -555,7 +635,11 @@ class _QuestionSelector extends StatelessWidget {
   }
 }
 
-// ─── Filter selector ─────────────────────────────────────────────────────────
+// ─── Sélecteur de filtre (période) ──────────────────────────────────────────
+/// Menu déroulant de sélection de la période de collecte.
+/// Visible uniquement si la question courante a des filtres (hasFilter == true)
+/// et que des périodes sont disponibles pour la campagne.
+/// Ex. : "Trimestre 1", "Trimestre 2", "Toutes"
 class _FilterSelector extends StatelessWidget {
   const _FilterSelector({
     required this.filters,
@@ -595,7 +679,17 @@ class _FilterSelector extends StatelessWidget {
   }
 }
 
-// ─── Offline coherence banner ────────────────────────────────────────────────
+// ─── Bannière de violations de cohérence hors ligne ─────────────────────────
+/// Bannière expansible affichant les violations de cohérence détectées
+/// par [CoherenceEvaluator] (contrôle offline) après une sauvegarde locale.
+///
+/// Chaque violation affiche :
+///   - Le message configuré sur le serveur, OU
+///   - Une description générée : "libRegle doit être critere libRegleAssoc
+///     (valeurs : val1 / val2)"
+///
+/// La bannière est indépendante du contrôle serveur (data_controle.php) ;
+/// elle permet de corriger les données avant l'envoi au serveur.
 class _OfflineCoherenceBanner extends StatelessWidget {
   const _OfflineCoherenceBanner({
     required this.errors,
@@ -639,6 +733,7 @@ class _OfflineCoherenceBanner extends StatelessWidget {
             ),
           ],
         ),
+        // Détail de chaque violation dans la section expansible
         children: errors
             .map((e) => Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
@@ -652,6 +747,7 @@ class _OfflineCoherenceBanner extends StatelessWidget {
                         child: Text(
                           e.message.isNotEmpty
                               ? e.message
+                              // Description générique si pas de message configuré
                               : '${e.libRegle} doit être ${e.critere} ${e.libRegleAssoc} '
                                   '(valeurs : ${e.value1.toStringAsFixed(0)} / ${e.value2.toStringAsFixed(0)})',
                           style: const TextStyle(fontSize: 12),
@@ -666,7 +762,9 @@ class _OfflineCoherenceBanner extends StatelessWidget {
   }
 }
 
-// ─── Message banner ──────────────────────────────────────────────────────────
+// ─── Bannière de message (erreur ou succès) ──────────────────────────────────
+/// Bannière dismissible affichant un message d'erreur (fond rouge) ou
+/// de succès (fond vert) après une opération de sauvegarde ou d'envoi.
 class _MessageBanner extends StatelessWidget {
   const _MessageBanner({
     required this.message,

@@ -8,16 +8,25 @@ import '../models/user.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 
-/// CampaignProvider — manages campaigns, navigation hierarchy
-/// (system → regroup drill-down → school list) and the 9-step download workflow.
+/// CampaignProvider — gestionnaire des campagnes, de la navigation hiérarchique
+/// (système éducatif → navigation dans les regroupements → liste d'établissements)
+/// et du workflow de téléchargement en 9 étapes.
 ///
-/// Mirrors original logic from:
+/// Réplique la logique originale de :
 ///   campagnes.js    → StmCampagne, stmCampagnes
 ///   page_camp.js    → stmPageCamp: displaySystems, displayRegroups,
 ///                     displayEtabs, displayFinalRegroupEtabs
-///   charge_camp.js  → stmChargeCamp: sequential AJAX download steps 1-9
+///   charge_camp.js  → stmChargeCamp: chaîne AJAX séquentielle étapes 1-9
 ///   page_new_camp.js → stmPageNewCamp.getCampsFromServer()
-///   regroups.js     → setEtabLocs, hierarchical traversal
+///   regroups.js     → setEtabLocs, traversée hiérarchique
+///
+/// Cycle de vie :
+///   1. [loadLocalCampaigns]     → lit les campagnes stockées en SQLite locale
+///   2. [selectCampaign]         → charge systèmes + regroupements de la campagne
+///   3. [selectSystem]           → démarre la navigation depuis la racine
+///   4. [navigateIntoRegroup]    → descend d'un niveau dans la hiérarchie
+///   5. [navigateUpRegroup]      → remonte dans le fil d'Ariane
+///   6. Niveau feuille           → [_loadSchoolsForRegroup] charge la liste d'établissements
 class CampaignProvider extends ChangeNotifier {
   CampaignProvider({
     required DatabaseService db,
@@ -28,7 +37,7 @@ class CampaignProvider extends ChangeNotifier {
   final DatabaseService _db;
   final ApiService _api;
 
-  // ─── Campaign list ──────────────────────────────────────────────────────────
+  // ─── Liste des campagnes locales ────────────────────────────────────────────
   List<Campaign> _campaigns = [];
   Campaign? _selectedCampaign;
   bool _loadingCampaigns = false;
@@ -39,15 +48,16 @@ class CampaignProvider extends ChangeNotifier {
   bool get isLoadingCampaigns          => _loadingCampaigns;
   String? get error                    => _error;
 
-  // ─── Navigation state ──────────────────────────────────────────────────────
+  // ─── État de navigation dans la hiérarchie ──────────────────────────────────
+  // Navigation : système → regroupement (drill-down) → liste d'établissements
   List<EducationSystem> _systems      = [];
   EducationSystem? _selectedSystem;
-  List<Regroup> _regroupBreadcrumb    = [];
-  List<Regroup> _currentRegroups      = [];
-  List<School>  _currentSchools       = [];
-  List<RegroupType> _regroupTypes     = [];
-  List<Regroup> _allRegroups          = [];
-  /// True while _loadSchoolsForRegroup() or _loadRegroups() is in flight.
+  List<Regroup> _regroupBreadcrumb    = [];  // fil d'Ariane des regroupements parcourus
+  List<Regroup> _currentRegroups      = [];  // regroupements visibles au niveau actuel
+  List<School>  _currentSchools       = [];  // établissements du nœud feuille courant
+  List<RegroupType> _regroupTypes     = [];  // types de regroupements (commune, région…)
+  List<Regroup> _allRegroups          = [];  // tous les regroupements (chargés à selectCampaign)
+  /// Vrai pendant que _loadSchoolsForRegroup() ou _loadRegroups() est en cours.
   bool _isNavigating                   = false;
 
   List<EducationSystem> get systems           => _systems;
@@ -55,17 +65,19 @@ class CampaignProvider extends ChangeNotifier {
   List<Regroup> get regroupBreadcrumb         => _regroupBreadcrumb;
   List<Regroup> get currentRegroups           => _currentRegroups;
   List<School>  get currentSchools            => _currentSchools;
-  /// True while navigating (loading regroups or schools from DB).
+  /// Vrai pendant la navigation (chargement des regroupements ou établissements).
   bool get isNavigating                       => _isNavigating;
 
+  /// Vrai quand on est au niveau feuille (aucun sous-regroupement, des établissements présents).
   bool get isAtSchoolLevel =>
       _currentRegroups.isEmpty && _currentSchools.isNotEmpty;
 
-  // ─── Available campaigns from server ───────────────────────────────────────
+  // ─── Campagnes disponibles sur le serveur ────────────────────────────────────
   List<Campaign> _serverCampaigns = [];
   List<Campaign> get serverCampaigns => _serverCampaigns;
 
-  // ─── Campaign download progress ────────────────────────────────────────────
+  // ─── Progression du téléchargement d'une campagne ──────────────────────────
+  // Mise à jour à chaque étape du workflow charge_camp.js
   int    _loadStep       = 0;
   int    _loadTotalSteps = 9;
   String _loadStepLabel  = '';
@@ -77,7 +89,9 @@ class CampaignProvider extends ChangeNotifier {
   bool   get isLoadingCampaign  => _isLoadingCampaign;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // LOAD LOCAL CAMPAIGNS
+  // CHARGER LES CAMPAGNES LOCALES
+  // Lit toutes les campagnes déjà téléchargées et stockées dans SQLite.
+  // Appelé au démarrage de l'application ou à l'ouverture de l'écran principal.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> loadLocalCampaigns() async {
@@ -95,7 +109,8 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SELECT CAMPAIGN — load its systems + regroups from local DB
+  // SÉLECTIONNER UNE CAMPAGNE — charge ses systèmes + regroupements depuis SQLite
+  // Réinitialise l'état de navigation (breadcrumb, listes).
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectCampaign(Campaign campaign) async {
@@ -107,6 +122,7 @@ class CampaignProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
+      // Charge les systèmes éducatifs, tous les regroupements et leurs types
       _systems      = await _db.getEducationSystems(campaign.idCamp);
       _allRegroups  = await _db.getRegroups(campaign.idCamp);
       _regroupTypes = await _db.getRegroupTypes(campaign.idCamp);
@@ -117,8 +133,14 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SELECT SYSTEM — start regroup drill-down from root
-  // Mirrors: stmPageCamp.displaySystems() → displayRegroups(null)
+  // SÉLECTIONNER UN SYSTÈME ÉDUCATIF — démarre la navigation depuis la racine
+  //
+  // Réplique : stmPageCamp.displaySystems() → displayRegroups(null)
+  //
+  // Stratégies de fallback pour les regroupements racine :
+  //   1. getChildRegroups(null) → requête standard avec parentId = null
+  //   2. _allRegroups.where(isRoot) → fallback si la requête standard échoue
+  //   3. _loadSchoolsForRegroup('__all__') → configuration plate (pas de regroups)
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectSystem(EducationSystem system) async {
@@ -130,17 +152,18 @@ class CampaignProvider extends ChangeNotifier {
     _isNavigating      = true;
     notifyListeners();
 
-    await _loadRegroups(null); // load root regroups
+    // Stratégie 1 : charge les regroupements racine via requête DB standard
+    await _loadRegroups(null);
 
     debugPrint('[Nav] selectSystem ${system.libSystem} → '
         '${_currentRegroups.length} root regroups after _loadRegroups');
 
-    // If no root regroups found via DB query (all three fallback strategies
-    // failed), try _allRegroups which was loaded at selectCampaign() time.
-    // This handles the case where getChildRegroups returns 0 rows but the
-    // server DID send regroups (e.g. all with parentid='0' stored non-null).
+    // Stratégie 2 : si aucun regroupement trouvé par la requête standard,
+    // utilise _allRegroups (chargé à selectCampaign) filtré sur les racines.
+    // Gère le cas où getChildRegroups retourne 0 lignes mais le serveur
+    // a bien envoyé des regroupements (ex. tous avec parentid='0' non null).
     if (_currentRegroups.isEmpty && _allRegroups.isNotEmpty) {
-      // Filter to root regroups only (null parent = root)
+      // Filtrer sur les regroupements racine uniquement (parent null = racine)
       final rootRegroups = _allRegroups.where((r) => r.isRoot).toList();
       if (rootRegroups.isNotEmpty) {
         _currentRegroups = rootRegroups;
@@ -149,8 +172,8 @@ class CampaignProvider extends ChangeNotifier {
       }
     }
 
-    // If no root regroups found at all, load schools directly
-    // (handles flat configuration or regroup hierarchy issues)
+    // Stratégie 3 : toujours aucun regroupement → configuration plate,
+    // charge les établissements directement (pas de hiérarchie de regroupements).
     if (_currentRegroups.isEmpty) {
       debugPrint('[Nav] ⚠ No root regroups — loading schools directly '
           'for system ${system.idSystem}');
@@ -162,8 +185,15 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // NAVIGATE INTO REGROUP — drill-down one level
-  // Mirrors: stmPageCamp.displayRegroups(id_regp) and displayFinalRegroupEtabs()
+  // NAVIGUER DANS UN REGROUPEMENT — descend d'un niveau
+  //
+  // Réplique : stmPageCamp.displayRegroups(id_regp) et displayFinalRegroupEtabs()
+  //
+  // Logique :
+  //   - Ajoute le regroupement au fil d'Ariane
+  //   - Si le regroupement est un nœud feuille (pas d'enfants) →
+  //     charge les établissements de ce regroupement
+  //   - Sinon → affiche ses sous-regroupements
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> navigateIntoRegroup(Regroup regroup) async {
@@ -181,10 +211,11 @@ class CampaignProvider extends ChangeNotifier {
         '"${regroup.libRegp}" → ${childRegroups.length} children');
 
     if (childRegroups.isEmpty) {
-      // Leaf regroup → load schools for this regroup
+      // Nœud feuille → charge les établissements de ce regroupement
       debugPrint('[Nav] Leaf detected → loading schools for regp=${regroup.idRegp}');
       await _loadSchoolsForRegroup(regroup.idRegp);
     } else {
+      // Nœud intermédiaire → affiche les sous-regroupements
       debugPrint('[Nav] Non-leaf → showing ${childRegroups.length} children');
       _currentRegroups = childRegroups;
       _currentSchools  = [];
@@ -193,9 +224,12 @@ class CampaignProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Navigate back up the breadcrumb [levelsUp] levels.
+  /// Remonte dans le fil d'Ariane de [levelsUp] niveaux.
+  /// Si le fil d'Ariane devient vide → revient aux regroupements racine.
+  /// Si le parent résultant n'a plus d'enfants → charge ses établissements.
   Future<void> navigateUpRegroup({int levelsUp = 1}) async {
     if (_regroupBreadcrumb.isEmpty) return;
+    // Tronque le fil d'Ariane en remontant [levelsUp] niveaux
     final newBreadcrumb = _regroupBreadcrumb.sublist(
         0,
         (_regroupBreadcrumb.length - levelsUp)
@@ -207,12 +241,15 @@ class CampaignProvider extends ChangeNotifier {
     notifyListeners();
 
     if (newBreadcrumb.isEmpty) {
+      // Retour à la racine : recharge les regroupements de premier niveau
       await _loadRegroups(null);
     } else {
+      // Retour à un niveau intermédiaire : recharge les enfants du nouveau parent
       final parent      = newBreadcrumb.last;
       final childRegroups =
           await _db.getChildRegroups(_selectedCampaign!.idCamp, parent.idRegp);
       if (childRegroups.isEmpty) {
+        // Le parent est un nœud feuille → charge ses établissements
         await _loadSchoolsForRegroup(parent.idRegp);
       } else {
         _currentRegroups = childRegroups;
@@ -223,6 +260,8 @@ class CampaignProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Charge les regroupements enfants du [parentId] donné depuis SQLite.
+  /// [parentId] = null → regroupements racine (premier niveau).
   Future<void> _loadRegroups(String? parentId) async {
     try {
       final regroups =
@@ -237,6 +276,9 @@ class CampaignProvider extends ChangeNotifier {
     }
   }
 
+  /// Charge les établissements du regroupement [idRegp] depuis SQLite,
+  /// puis enrichit chaque établissement avec son libellé de statut
+  /// via [DatabaseService.resolveSchoolStatuses].
   Future<void> _loadSchoolsForRegroup(String idRegp) async {
     try {
       final schools = await _db.getSchoolsByRegroup(
@@ -244,7 +286,7 @@ class CampaignProvider extends ChangeNotifier {
         _selectedSystem!.idSystem,
         idRegp,
       );
-      // Enrich with libStatus from school_statuses table
+      // Enrichit avec le libellé de statut depuis la table school_statuses
       final enriched = await _db.resolveSchoolStatuses(
           _selectedCampaign!.idCamp, schools);
       debugPrint('[Nav] _loadSchoolsForRegroup regp=$idRegp → '
@@ -258,9 +300,13 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SERVER: GET AVAILABLE CAMPAIGNS
+  // SERVEUR : RÉCUPÉRER LES CAMPAGNES DISPONIBLES
+  //
   // GET /user_camp.php/new_camp/{userId}/1
-  // From page_new_camp.js: getCampsFromServer()
+  // Issu de page_new_camp.js : getCampsFromServer()
+  //
+  // Retourne les campagnes auxquelles l'utilisateur a accès sur le serveur
+  // mais qui ne sont pas encore téléchargées localement.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> fetchServerCampaigns(String userId) async {
@@ -280,27 +326,29 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // LOAD CAMPAIGN FROM SERVER (charge_camp.js — stmChargeCamp)
+  // TÉLÉCHARGER UNE CAMPAGNE DEPUIS LE SERVEUR (charge_camp.js — stmChargeCamp)
   //
-  // Sequential steps (mirrors original AJAX chain):
-  //   Step 1: regroups    → GET /user_camp.php/reg_camp/{LOGIN}/{campId}/1
-  //   Step 2: type_regs   → GET /user_camp.php/typ_reg_camp/{userId}/{campId}/{typeRegroups}
-  //   Step 3: statuses    → GET /user_camp.php/etabs_status/  (NO params)
-  //   Step 4: schools     → GET /user_camp.php/etabs_camp/{userId}/{campId}/1
-  //   Step 5: locs        → GET /user_camp.php/locs_camp/{userId}/{campId}
-  //   Step 6: systems     → GET /user_camp.php/sys_camp/{userId}/{campId}
-  //   Step 7+ (per sys):  → GET /data_camp.php/theme_camp/{campId}/{sysId}/eng
-  //     per question:
-  //     Step 8: html form → two-step: GET url → GET HTML with auth
-  //     Step 9: rules     → GET /data_camp.php/regle_theme_camp/{qstId}/{sysId}
+  // Workflow séquentiel en 9 étapes (réplique la chaîne AJAX originale) :
+  //   Étape 1 : regroupements → GET /user_camp.php/reg_camp/{LOGIN}/{campId}/1
+  //   Étape 2 : types_regroups → GET /user_camp.php/typ_reg_camp/{userId}/{campId}/{typeRegroups}
+  //   Étape 3 : statuts → GET /user_camp.php/etabs_status/  (sans paramètres)
+  //   Étape 4 : établissements → GET /user_camp.php/etabs_camp/{userId}/{campId}/1
+  //   Étape 5 : localisations → GET /user_camp.php/locs_camp/{userId}/{campId}
+  //   Étape 6 : systèmes éducatifs → GET /user_camp.php/sys_camp/{userId}/{campId}
+  //   Étape 7+ (par système) : → GET /data_camp.php/theme_camp/{campId}/{sysId}/eng
+  //     par question :
+  //     Étape 8 : formulaire HTML → deux requêtes : GET url → GET HTML avec auth
+  //     Étape 9 : règles → GET /data_camp.php/regle_theme_camp/{qstId}/{sysId}
   //
-  // CRITICAL: login is for reg_camp; userId is for all others!
+  // CRITIQUE : login est utilisé pour reg_camp ; userId pour tous les autres !
+  //
+  // Les étapes 8 et 9 sont non-fatales : un échec ne bloque pas le téléchargement.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<bool> loadCampaignFromServer({
     required Campaign campaign,
-    required String login,   // currentUser.login  ← for reg_camp endpoint
-    required String userId,  // currentUser.idUser ← for all other endpoints
+    required String login,   // currentUser.login  ← pour l'endpoint reg_camp
+    required String userId,  // currentUser.idUser ← pour tous les autres endpoints
   }) async {
     _isLoadingCampaign = true;
     _loadStep          = 0;
@@ -308,42 +356,42 @@ class CampaignProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Step 1 — Regroups (uses LOGIN)
+      // Étape 1 — Regroupements (utilise LOGIN)
       _setLoadStep(1, 'Chargement des regroupements…');
       final regroups = await _api.getRegroups(login, campaign.idCamp);
       await _db.insertRegroups(campaign.idCamp, regroups);
 
-      // Step 2 — Regroup types (uses userId + campaign.typeRegroups CSV)
+      // Étape 2 — Types de regroupements (utilise userId + campaign.typeRegroups CSV)
       _setLoadStep(2, 'Chargement des types de regroupements…');
       final regroupTypes = await _api.getRegroupTypes(
           userId, campaign.idCamp, campaign.typeRegroups);
       await _db.insertRegroupTypes(campaign.idCamp, regroupTypes);
 
-      // Step 3 — School statuses (NO params)
+      // Étape 3 — Statuts des établissements (sans paramètres)
       _setLoadStep(3, 'Chargement des statuts…');
       final statuses = await _api.getSchoolStatuses();
       await _db.insertSchoolStatuses(campaign.idCamp, statuses);
 
-      // Step 4 — Schools (uses userId)
+      // Étape 4 — Établissements (utilise userId)
       _setLoadStep(4, 'Chargement des établissements…');
       final schools = await _api.getSchools(userId, campaign.idCamp);
       await _db.insertSchools(campaign.idCamp, schools);
 
-      // Step 5 — Localisations (uses userId)
+      // Étape 5 — Localisations (utilise userId)
       _setLoadStep(5, 'Chargement des localisations…');
       final locs = await _api.getLocalisations(userId, campaign.idCamp);
       await _db.insertLocalisations(campaign.idCamp, locs);
 
-      // Step 6 — Education systems (uses userId)
+      // Étape 6 — Systèmes éducatifs (utilise userId)
       _setLoadStep(6, 'Chargement des systèmes éducatifs…');
       final systems = await _api.getEducationSystems(userId, campaign.idCamp);
       await _db.insertEducationSystems(campaign.idCamp, systems);
 
-      // Steps 7+: per system — questions, HTML, rules
-      // Total steps = 6 + sum over all systems of (1 + questions.length * 2)
+      // Étapes 7+ : par système éducatif — questions, HTML du formulaire, règles
+      // Nombre total d'étapes = 6 + somme sur tous systèmes de (1 + nb_questions * 2)
       int stepOffset = 7;
       for (final system in systems) {
-        // Step 7 (per system) — Questions
+        // Étape 7 (par système) — Questions / thèmes
         _setLoadStep(
             stepOffset, 'Chargement formulaires : ${system.libSystem}…');
         final questions =
@@ -351,23 +399,23 @@ class CampaignProvider extends ChangeNotifier {
         await _db.insertQuestions(campaign.idCamp, questions);
         stepOffset++;
 
-        // Steps 8+9 per question — HTML + Rules (non-fatal failures)
+        // Étapes 8+9 par question — HTML + Règles (échecs non fatals)
         _loadTotalSteps = stepOffset + (questions.length * 2);
         notifyListeners();
 
         for (final q in questions) {
-          // Step: HTML form (two-step fetch) — non-fatal
+          // Étape : formulaire HTML (deux requêtes) — non fatal
           _setLoadStep(stepOffset, 'Chargement formulaire : ${q.libQst}…');
           try {
             final html =
                 await _api.getFormHtml(campaign.idCamp, q.idQst);
             await _db.insertFormHtml(campaign.idCamp, q.idQst, html);
           } catch (_) {
-            // HTML fetch failure is non-fatal — form will be unavailable offline
+            // Échec HTML non fatal — le formulaire sera indisponible hors ligne
           }
           stepOffset++;
 
-          // Step: Validation rules — non-fatal
+          // Étape : règles de validation — non fatal
           _setLoadStep(stepOffset, 'Chargement règles : ${q.libQst}…');
           try {
             final rules = await _api.getValidationRules(
@@ -375,16 +423,13 @@ class CampaignProvider extends ChangeNotifier {
             await _db.insertValidationRules(
                 campaign.idCamp, q.idQst, rules);
           } catch (_) {
-            // Rules fetch failure is non-fatal
+            // Échec règles non fatal
           }
           stepOffset++;
         }
       }
 
-      // Also save filter periods from user's filters if embedded in campaign
-      // (filter_periods are stored per-campaign at load time)
-
-      // Persist campaign to DB
+      // Persiste la campagne en SQLite et rafraîchit la liste locale
       await _db.insertCampaign(campaign);
       _campaigns = await _db.getCampaigns();
 
@@ -405,7 +450,9 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SAVE FILTER PERIODS for a campaign (from user.filters)
+  // SAUVEGARDER LES PÉRIODES DE FILTRE D'UNE CAMPAGNE (depuis user.filters)
+  // Stocke les périodes de collecte (ex. trimestre 1, trimestre 2) pour
+  // permettre la saisie filtrée par période dans l'écran de saisie.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> saveFilterPeriodsForCampaign(
@@ -415,7 +462,8 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // GET QUESTIONS (for data entry screen)
+  // RÉCUPÉRER LES QUESTIONS D'UN SYSTÈME (pour l'écran de saisie)
+  // Délègue directement à DatabaseService.getQuestions().
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<Question>> getQuestionsForSystem(
@@ -424,7 +472,9 @@ class CampaignProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // DELETE CAMPAIGN
+  // SUPPRIMER UNE CAMPAGNE
+  // Supprime toutes les données liées (établissements, formulaires, règles…)
+  // et réinitialise l'état de navigation si la campagne était sélectionnée.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> deleteCampaign(String idCamp) async {
@@ -432,6 +482,7 @@ class CampaignProvider extends ChangeNotifier {
       await _db.deleteCampaign(idCamp);
       _campaigns = await _db.getCampaigns();
       if (_selectedCampaign?.idCamp == idCamp) {
+        // Réinitialise l'état de navigation si la campagne supprimée était active
         _selectedCampaign  = null;
         _selectedSystem    = null;
         _regroupBreadcrumb = [];
@@ -449,13 +500,16 @@ class CampaignProvider extends ChangeNotifier {
   // HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
 
+  /// Met à jour l'étape courante du téléchargement et notifie les écouteurs.
+  /// Utilisé par loadCampaignFromServer() pour mettre à jour la barre de progression.
   void _setLoadStep(int step, String label) {
     _loadStep      = step;
     _loadStepLabel = label;
     notifyListeners();
   }
 
-  /// Returns human-readable label for a regroup type ID.
+  /// Retourne le libellé lisible d'un type de regroupement à partir de son ID.
+  /// Retourne l'ID brut si le type n'est pas trouvé dans la liste locale.
   String regroupTypeLabel(String idTypeRegp) {
     try {
       return _regroupTypes

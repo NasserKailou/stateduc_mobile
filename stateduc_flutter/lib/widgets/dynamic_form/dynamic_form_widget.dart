@@ -3,19 +3,38 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../models/question.dart';
 
-/// DynamicFormWidget — renders the server HTML form inside a WebView.
+/// DynamicFormWidget — affiche le formulaire HTML du serveur dans un WebView.
 ///
-/// Architecture:
-///   1. The raw HTML is passed in (cached in SQLite from server download).
-///   2. A WebView loads it via a Base64 data-URI (UTF-8) so accented chars
-///      always render correctly, regardless of device locale.
-///   3. A JavaScript bridge ('FieldChanged') posts field-change events back
-///      to Flutter whenever an input/select/textarea changes.
-///   4. On init, existing [data] values are injected via JS so the form
-///      shows previously saved values.
-///   5. Validation errors are shown via JS by adding a red border to fields.
-///   6. A native "+ Ajouter une ligne" FAB is overlaid for grid-type forms
-///      so users can add rows even when the server JS buttons are unavailable.
+/// Architecture générale :
+///   1. Le HTML brut est transmis en paramètre (mis en cache dans SQLite lors
+///      du téléchargement de la campagne).
+///   2. Le WebView charge le HTML via une data-URI Base64 (UTF-8) afin que
+///      les caractères accentués s'affichent toujours correctement,
+///      indépendamment de la locale de l'appareil.
+///   3. Un pont JavaScript ('FieldChanged') renvoie les événements de changement
+///      de champ vers Flutter dès qu'un input/select/textarea change.
+///   4. À l'initialisation, les valeurs existantes ([data]) sont injectées via
+///      JavaScript pour que le formulaire affiche les valeurs préalablement sauvegardées.
+///   5. Les erreurs de validation sont affichées via JavaScript en ajoutant
+///      une bordure rouge aux champs concernés.
+///   6. Un bouton natif "Ajouter une ligne" (FAB) est superposé pour les formulaires
+///      de type grille, permettant d'ajouter des lignes même si les boutons
+///      JavaScript du serveur ne fonctionnent pas dans le WebView.
+///
+/// Traitement du HTML avant affichage [_preprocessHtml] :
+///   1. Réparation du mojibake ISO-8859-15 → UTF-8 (seuil 5% U+FFFD)
+///   2. Décodage des entités HTML (&lt; &gt; &amp; …) — deux passes
+///   3. Substitution des numéros de lignes $NUMERO_LOCAL_N (1-based)
+///   4. Substitution des placeholders PHP $VAR dans les attributs VALUE=
+///
+/// Pont JavaScript [_injectBridge] :
+///   - Tous les inputs/selects/textareas envoient leurs valeurs via FieldChanged.postMessage
+///   - Les boutons "Ajouter" (addGrilleLine) déclenchent __addGridRow__
+///
+/// Gestion des grilles (formulaires de type tableau) :
+///   - Détection : [_detectGridForm] — $NUMERO_LOCAL, addGrilleLine, NAME double-indexé
+///   - Comptage des lignes : [_countGridRows] — deux patterns (NUMERO_LOCAL et ligne-paire)
+///   - Ajout de lignes : bouton natif + JavaScript fallback (clone de la dernière ligne)
 class DynamicFormWidget extends StatefulWidget {
   const DynamicFormWidget({
     super.key,
@@ -41,12 +60,12 @@ class DynamicFormWidget extends StatefulWidget {
 class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   late final WebViewController _controller;
   bool _pageLoaded = false;
-  bool _isRendering = false;  // true while WebView is loading initial HTML
+  bool _isRendering = false;  // vrai pendant le chargement initial du HTML dans le WebView
 
-  // True when the HTML looks like a grille (grid) form.
+  // Vrai si le HTML correspond à un formulaire de type grille (tableau multi-lignes).
   bool get _isGridForm => _detectGridForm(widget.html);
 
-  // Number of grid rows currently rendered (for FAB label).
+  // Nombre de lignes de grille actuellement affichées (pour le label du bouton FAB).
   int _gridRowCount = 0;
 
   @override
@@ -56,17 +75,19 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     _isRendering  = true;
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)   // ← prevents gray flash before page loads
+      ..setBackgroundColor(Colors.white)   // ← évite le flash gris avant le chargement
       ..addJavaScriptChannel(
         'FieldChanged',
+        // Pont JavaScript → Flutter : reçoit les changements de champs depuis le WebView.
+        // msg.message = JSON : {"name":"nomDuChamp","value":"valeurDuChamp"}
+        // Cas spécial : name == '__addGridRow__' → demande d'ajout de ligne
         onMessageReceived: (JavaScriptMessage msg) {
-          // msg.message = JSON: {"name":"fieldName","value":"fieldValue"}
           try {
             final m = json.decode(msg.message) as Map<String, dynamic>;
             final name  = m['name']?.toString()  ?? '';
             final value = m['value']?.toString() ?? '';
             if (name == '__addGridRow__') {
-              // Native add-row request from bridge or FAB
+              // Demande d'ajout de ligne depuis le pont ou le bouton FAB
               widget.onAddGridRow?.call(value);
             } else if (name.isNotEmpty) {
               widget.onFieldChanged(name, value);
@@ -78,11 +99,12 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
         onPageFinished: (_) {
           _pageLoaded = true;
           if (mounted) setState(() => _isRendering = false);
-          // Use addPostFrameCallback so that Flutter finishes propagating
-          // the latest widget.data (including pre-filled identification fields)
-          // before we inject values into the WebView.
-          // Without this, _injectData() might run with stale/empty widget.data
-          // if the provider notifyListeners() hasn't rebuilt this widget yet.
+          // addPostFrameCallback : attend que Flutter ait propagé les dernières
+          // widget.data (incluant les champs d'identification pré-remplis) avant
+          // d'injecter les valeurs dans le WebView.
+          // Sans cela, _injectData() pourrait s'exécuter avec des widget.data
+          // obsolètes/vides si notifyListeners() du provider n'a pas encore
+          // déclenché le rebuild de ce widget.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _injectData();
             _injectBridge();
@@ -99,7 +121,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   @override
   void didUpdateWidget(DynamicFormWidget old) {
     super.didUpdateWidget(old);
-    // Reload HTML when the form changes (question switch)
+    // Recharge le HTML quand le formulaire change (changement de question)
     if (old.html != widget.html) {
       _pageLoaded  = false;
       _isRendering = true;
@@ -109,7 +131,8 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       _controller.loadRequest(_buildHtmlUri(widget.html));
       return;
     }
-    // Re-inject data when it changes externally (e.g. reload from server)
+    // Réinjecte les données quand elles changent de l'extérieur
+    // (ex. rechargement depuis le serveur, pré-remplissage identification)
     if (_pageLoaded &&
         (old.data != widget.data ||
          old.validationErrors != widget.validationErrors)) {
@@ -118,11 +141,12 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     }
   }
 
-  // ── Convert HTML to a Base64 data-URI so the WebView always uses UTF-8 ──────
-  // loadHtmlString() does not reliably honour the <meta charset="UTF-8"> tag on
-  // Android, causing accented characters (é, è, à …) to display as Mojibake
-  // (Ã©, etc.).  Encoding the bytes as Base64 and loading via a data: URI
-  // forces the engine to decode the content as UTF-8.
+  // ── Convertit le HTML en data-URI Base64 pour forcer l'encodage UTF-8 ──────
+  //
+  // loadHtmlString() ne respecte pas de manière fiable le <meta charset="UTF-8">
+  // sur Android, ce qui provoque l'affichage des caractères accentués (é, è, à…)
+  // sous forme de Mojibake (Ã©, etc.). En encodant les octets en Base64 et en
+  // chargeant via une data: URI, on force le moteur à décoder en UTF-8.
   Uri _buildHtmlUri(String formHtml) {
     final processed  = _preprocessHtml(formHtml);
     final bytes      = utf8.encode(_buildHtmlPage(processed));
@@ -130,53 +154,56 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     return Uri.parse('data:text/html;charset=utf-8;base64,$base64Html');
   }
 
-  // ── Pre-process raw HTML from the server before rendering ─────────────────
+  // ── Prétraitement du HTML brut du serveur avant affichage ─────────────────
   //
-  // 1. ISO-8859-15 → UTF-8 Mojibake repair:
-  //    Server HTML files are encoded in ISO-8859-15.  When sqflite stores /
-  //    reads them as Dart Strings, each byte > 0x7F becomes the corresponding
-  //    Unicode code point (Latin-1 interpretation), so the UTF-8 multi-byte
-  //    sequences for French chars appear as pairs like U+00C3 U+00A9 ("Ã©").
-  //    Fix: re-encode code units ≤ 0xFF as raw bytes and decode as UTF-8.
+  // 1. Réparation du mojibake ISO-8859-15 → UTF-8 :
+  //    Les fichiers HTML du serveur sont encodés en ISO-8859-15. Quand sqflite
+  //    les stocke/lit comme des chaînes Dart, chaque octet > 0x7F devient le
+  //    point de code Unicode correspondant (interprétation Latin-1), donc les
+  //    séquences UTF-8 multi-octets pour les caractères français apparaissent
+  //    comme des paires telles que U+00C3 U+00A9 ("Ã©").
+  //    Correction : ré-encode les unités de code ≤ 0xFF comme octets bruts
+  //    et décode en UTF-8.
   //
-  // 2. HTML entity unescape:
-  //    Some form files double-encode HTML entities.  Common symptom:
-  //    "&lt;b&gt;1.6 …&lt;/b&gt;" rendered literally instead of <b>…</b>.
-  //    We unescape the five standard XML/HTML entities before render.
+  //    Seuil de tolérance : accepte le résultat même si < 5% de U+FFFD
+  //    apparaissent (séquences d'octets orphelins comme espace insécable).
+  //    Rejeter l'ensemble de la réparation à cause d'une poignée de U+FFFD
+  //    laisserait TOUS les caractères accentués illisibles, ce qui est pire.
   //
-  // 3. $NUMERO_LOCAL_N substitution:
-  //    Grille template rows contain "$NUMERO_LOCAL_0", "$NUMERO_LOCAL_1" etc.
-  //    Replace with 1-based display numbers.
+  // 2. Décodage des entités HTML :
+  //    Certains fichiers de formulaire ont des entités HTML doublement encodées.
+  //    Symptôme typique : "&lt;b&gt;1.6 …&lt;/b&gt;" affiché littéralement.
+  //    On décode les cinq entités standard XML/HTML avant le rendu.
+  //    Deux passes pour gérer le double-encodage (&amp;lt; → &lt; → <).
   //
-  // 4. PHP $VAR placeholder substitution in VALUE= attributes:
-  //    All HTML form files are PHP templates served by the server after
-  //    variable substitution.  The mobile app receives the RAW template with
-  //    unresolved $VAR placeholders because it caches the static HTML, not
-  //    the rendered output.
+  // 3. Substitution $NUMERO_LOCAL_N :
+  //    Les lignes de template de grille contiennent "$NUMERO_LOCAL_0", "_1" etc.
+  //    Remplace par des numéros d'affichage (base 1).
   //
-  //    Two patterns appear:
-  //    a) Quoted text inputs:  VALUE="$NOM_ETABLISSEMENT_0"
-  //       → Strip to VALUE="" so the input starts empty; _injectData() fills it.
-  //    b) Unquoted radio/select options: VALUE=$CODE_TYPE_SEXE_0_1
-  //       → The last numeric segment IS the actual option value (e.g. 1, 2, 12).
-  //       → Replace with VALUE=1 so _injectData()'s el.checked=(el.value===val)
-  //         comparison works correctly.
+  // 4. Substitution des placeholders PHP $VAR dans les attributs VALUE= :
+  //    Les formulaires HTML sont des templates PHP servis après substitution
+  //    de variables. L'application mobile reçoit le template brut avec les
+  //    placeholders $VAR non résolus (cache HTML statique).
+  //    Deux patterns :
+  //    a) Entrées texte entre guillemets : VALUE="$NOM_ETABLISSEMENT_0"
+  //       → Remplace par VALUE="" (vide), _injectData() remplira ensuite.
+  //    b) Options radio/select non quotées : VALUE=$CODE_TYPE_SEXE_0_1
+  //       → Le dernier segment numérique est la vraie valeur de l'option.
+  //       → Remplace par VALUE=1 pour que el.checked=(el.value===val) fonctionne.
   String _preprocessHtml(String html) {
-    // ── 1. Mojibake repair ─────────────────────────────────────────────────
-    // Strategy: always attempt repair if mojibake patterns are detected.
-    // Accept the decoded result even if a small number of \uFFFD replacement
-    // chars appear (< 5% of total length) — these come from lone continuation
-    // bytes like U+00C2 followed by a plain ASCII space (non-breaking space
-    // sequences). Rejecting the whole repair because of a handful of \uFFFD
-    // leaves ALL accented characters garbled, which is worse.
+    // ── 1. Réparation du mojibake ──────────────────────────────────────────
+    // Stratégie : tente toujours la réparation si des patterns mojibake sont détectés.
+    // Accepte le résultat décodé même si un petit nombre de \uFFFD apparaît
+    // (< 5% de la longueur totale) — provient d'octets de continuation orphelins
+    // comme U+00C2 suivi d'un espace ASCII (séquence espace insécable).
     if (_looksLikeMojibake(html)) {
       try {
-        // Treat each code unit as a raw Latin-1 byte (code units ≤ 0xFF)
+        // Traite chaque unité de code comme un octet Latin-1 brut (≤ 0xFF)
         final latin1Bytes = <int>[
           for (final c in html.codeUnits) if (c <= 0xFF) c,
         ];
         final decoded = utf8.decode(latin1Bytes, allowMalformed: true);
-        // Count replacement chars — accept if fewer than 5% of input length
+        // Compte les caractères de remplacement — accepte si < 5% de la longueur
         final replacements = '\uFFFD'.allMatches(decoded).length;
         final threshold    = (latin1Bytes.length * 0.05).ceil();
         if (replacements <= threshold) {
@@ -188,14 +215,14 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
               '($replacements replacements > threshold $threshold)');
         }
       } catch (_) {
-        // Keep original if repair fails
+        // Conserve l'original si la réparation échoue
       }
     }
 
-    // ── 2. HTML entity unescape ────────────────────────────────────────────
-    // Run AFTER mojibake repair so entities in repaired text are also caught.
-    // Run TWICE to handle double-encoded entities like &amp;lt;b&amp;gt;
-    // (server sometimes double-encodes: &amp;lt; → first pass: &lt; → second: <)
+    // ── 2. Décodage des entités HTML ────────────────────────────────────────
+    // Exécuté APRÈS la réparation mojibake pour capturer aussi les entités
+    // dans le texte réparé.
+    // Deux passes pour gérer le double-encodage (&amp;lt; → &lt; → <)
     for (int pass = 0; pass < 2; pass++) {
       html = html
           .replaceAll('&lt;',   '<')
@@ -207,7 +234,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
           .replaceAll('&apos;', "'");
     }
 
-    // ── 3. $NUMERO_LOCAL_N → row number (1-based) ─────────────────────────
+    // ── 3. $NUMERO_LOCAL_N → numéro de ligne (base 1) ─────────────────────
     html = html.replaceAllMapped(
       RegExp(r'\$NUMERO_LOCAL_(\d+)'),
       (m) {
@@ -216,19 +243,19 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       },
     );
 
-    // ── 4a. Quoted VALUE="$VAR" → VALUE="" ────────────────────────────────
-    // Matches: value="$ANY_CAPS_VAR_0" (case-insensitive attribute name)
-    // NOTE: Dart's RegExp does NOT support inline flags like (?i).
-    //       Use caseSensitive: false parameter instead.
+    // ── 4a. VALUE="$VAR" entre guillemets → VALUE="" ────────────────────────
+    // Matche : value="$NOM_QCQ_VAR_0" (attribut insensible à la casse)
+    // NOTE : le RegExp de Dart ne supporte PAS les flags inline (?i).
+    //        Utiliser le paramètre caseSensitive: false à la place.
     html = html.replaceAllMapped(
       RegExp(r'(value=)"(\$[A-Z_][A-Z_0-9]*)"', caseSensitive: false),
       (m) => '${m.group(1)!}""',
     );
 
-    // ── 4b. Unquoted VALUE=$VAR → VALUE=<last-numeric-segment> ────────────
-    // Matches: VALUE=$CODE_TYPE_SEXE_0_1  → VALUE=1
+    // ── 4b. VALUE=$VAR non quoté → VALUE=<dernier-segment-numérique> ────────
+    // Matche : VALUE=$CODE_TYPE_SEXE_0_1  → VALUE=1
     //          VALUE=$CODE_DIPLOME_0_12   → VALUE=12
-    // The last underscore-separated segment of the var name is the option value.
+    // Le dernier segment séparé par un underscore est la valeur de l'option.
     html = html.replaceAllMapped(
       RegExp(r'(value=)\$([A-Z_][A-Z_0-9]*)', caseSensitive: false),
       (m) {
@@ -243,39 +270,40 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     return html;
   }
 
-  // Returns true if the string likely contains ISO-8859-1 bytes mis-read as
-  // individual Unicode code points (Mojibake).
+  // Retourne vrai si la chaîne contient probablement des octets ISO-8859-1
+  // mal interprétés comme des points de code Unicode individuels (Mojibake).
   //
-  // ISO-8859-15 → UTF-8 two-byte sequences start with 0xC2 or 0xC3.
-  //   0xC3 (U+00C3) + 0x80–0xBF → Latin chars: é è à ô î â ë ï û ù ç ü Ô Î …
-  //   0xC2 (U+00C2) + 0x80–0xBF → special chars: ° nbsp © ® « » …
-  //     Common: 0xC2 0xA0 = non-breaking space (shows as 'Â ' in mojibake)
-  //             0xC2 0xB0 = degree sign (shows as 'Â°')
+  // Les séquences ISO-8859-15 → UTF-8 à deux octets commencent par 0xC2 ou 0xC3 :
+  //   0xC3 (U+00C3) + 0x80–0xBF → caractères latins : é è à ô î â ë ï û ù ç ü Ô Î …
+  //   0xC2 (U+00C2) + 0x80–0xBF → caractères spéciaux : ° nbsp © ® « » …
+  //     Fréquents : 0xC2 0xA0 = espace insécable (affiché 'Â ' en mojibake)
+  //                 0xC2 0xB0 = degré (affiché 'Â°')
   //
-  // Also catches 0xE2 (U+00E2) start byte for 3-byte UTF-8 sequences:
-  //   0xE2 + 0x80 + 0x99 = U+2019 right single quotation mark (apostrophe)
-  //   shows as 'â€™' in mojibake (e.g. "l'établissement" → "lâ€™établissement")
+  // Capte aussi 0xE2 (U+00E2) début d'une séquence UTF-8 à 3 octets :
+  //   0xE2 + 0x80 + 0x99 = U+2019 apostrophe courbe droite
+  //   affiché 'â€™' en mojibake (ex. "l'établissement" → "lâ€™établissement")
   bool _looksLikeMojibake(String s) {
-    // Quick check: common French mojibake two-char patterns
+    // Vérification rapide : patterns mojibake français courants (deux caractères)
     if (s.contains('Ã©') || s.contains('Ã¨') || s.contains('Ã ') ||
         s.contains('Ã´') || s.contains('Ã®') || s.contains('Ã¢') ||
         s.contains('Ã«') || s.contains('Ã¯') || s.contains('Ã»') ||
         s.contains('Ã¹') || s.contains('Ã§') || s.contains('Ã¼') ||
         s.contains('Ãˆ') || s.contains('Ã‰') || s.contains('Ã€') ||
-        s.contains('Â°')  || s.contains('Â ')  ||  // degree + nbsp
-        s.contains('Â«')  || s.contains('Â»')  ||  // guillemets
-        s.contains('â€™') || s.contains('â€œ') ||  // smart quotes
-        s.contains('Nâ')  || s.contains('nÂ°')) {  // N° patterns
+        s.contains('Â°')  || s.contains('Â ')  ||  // degré + espace insécable
+        s.contains('Â«')  || s.contains('Â»')  ||  // guillemets français
+        s.contains('â€™') || s.contains('â€œ') ||  // apostrophes courbes
+        s.contains('Nâ')  || s.contains('nÂ°')) {  // patterns N°
       return true;
     }
-    // Thorough check: scan for UTF-8 lead byte followed by continuation byte
+    // Vérification approfondie : recherche un octet de tête UTF-8 suivi
+    // d'un octet de continuation dans la chaîne
     for (int i = 0; i < s.length - 1; i++) {
       final c = s.codeUnitAt(i);
       if (c == 0xC2 || c == 0xC3) {
         final next = s.codeUnitAt(i + 1);
         if (next >= 0x80 && next <= 0xBF) return true;
       }
-      // 3-byte UTF-8 sequence start (0xE2 = â in Latin-1)
+      // Début de séquence UTF-8 à 3 octets (0xE2 = 'â' en Latin-1)
       if (c == 0xE2 && i + 2 < s.length) {
         final n1 = s.codeUnitAt(i + 1);
         final n2 = s.codeUnitAt(i + 2);
@@ -285,13 +313,14 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     return false;
   }
 
-  // ── Detect whether this is a grid (grille) type form ──────────────────────
-  // Grid forms have multiple row fields identified by any of these patterns:
-  //   • $NUMERO_LOCAL_N  — explicit row-number placeholder (locaux forms)
-  //   • addGrilleLine    — JS function that adds a new row
-  //   • NUMERO_LOCAL     — partial match (same class of forms)
-  //   • MiseEvidenceLigneFrame — JS used in all multi-row grille tables
-  //   • NAME='FIELD_N_V'  — double-indexed field name (row index + option value)
+  // ── Détecte si ce formulaire est de type grille (tableau multi-lignes) ────
+  //
+  // Les formulaires grille ont plusieurs champs de ligne identifiés par :
+  //   • $NUMERO_LOCAL_N  — placeholder de numéro de ligne (formulaires locaux)
+  //   • addGrilleLine    — fonction JS qui ajoute une nouvelle ligne
+  //   • NUMERO_LOCAL     — correspondance partielle (même famille de formulaires)
+  //   • MiseEvidenceLigneFrame — JS utilisé dans tous les tableaux grille multi-lignes
+  //   • NAME='FIELD_N_V'  — nom de champ doublement indexé (index ligne + valeur option)
   bool _detectGridForm(String html) {
     return html.contains(r'$NUMERO_LOCAL') ||
            html.contains('addGrilleLine') ||
@@ -300,22 +329,22 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
            RegExp(r"NAME='[A-Z_]+_\d+_\d+'").hasMatch(html);
   }
 
-  // Count grid rows already in the HTML (for grille forms).
-  // Handles two patterns:
-  //   1. $NUMERO_LOCAL_N  — explicit row number placeholder (locaux, etc.)
-  //   2. ligne-paire_N_0 / ligne-impaire_N_0 — CSS row-id pattern
+  // Compte les lignes de grille déjà présentes dans le HTML (pour les formulaires grille).
+  // Gère deux patterns :
+  //   1. $NUMERO_LOCAL_N  — placeholder de numéro de ligne (locaux, etc.)
+  //   2. ligne-paire_N_0 / ligne-impaire_N_0 — pattern d'id CSS de ligne
   //      (personnel, identification_local, etc.)
   int _countGridRows(String html) {
     int max = -1;
 
-    // Pattern 1: $NUMERO_LOCAL_N
+    // Pattern 1 : $NUMERO_LOCAL_N
     for (final m in RegExp(r'\$NUMERO_LOCAL_(\d+)').allMatches(html)) {
       final n = int.tryParse(m.group(1) ?? '') ?? 0;
       if (n > max) max = n;
     }
     if (max >= 0) return max + 1;
 
-    // Pattern 2: id='ligne-paire_N_0' or id='ligne-impaire_N_0'
+    // Pattern 2 : id='ligne-paire_N_0' ou id='ligne-impaire_N_0'
     for (final m in RegExp(r"ligne-(?:paire|impaire)_(\d+)_0").allMatches(html)) {
       final n = int.tryParse(m.group(1) ?? '') ?? 0;
       if (n > max) max = n;
@@ -323,7 +352,13 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     return max >= 0 ? max + 1 : 0;
   }
 
-  // ── Build the full HTML page loaded into the WebView ───────────────────────
+  // ── Construit la page HTML complète chargée dans le WebView ───────────────
+  //
+  // Encapsule le fragment HTML du formulaire dans une page complète avec :
+  //   - <meta charset="UTF-8"> et viewport pour le mobile
+  //   - CSS : mise en forme des champs, tableaux horizontalement défilants,
+  //     champs de total (fond bleu), masquage des éléments Cordova
+  //   - JavaScript : wrapping automatique des tableaux dans des divs défilants
   String _buildHtmlPage(String formHtml) {
     return '''<!DOCTYPE html>
 <html>
@@ -340,7 +375,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     background: #fff;
     color: #000;
   }
-  /* Horizontal scroll for wide grid tables */
+  /* Défilement horizontal pour les tableaux de grille larges */
   body > form, body > table, .div-table-questionnaire {
     overflow-x: auto;
     display: block;
@@ -354,7 +389,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     white-space: nowrap;
   }
   th { background: #dce6f1; font-weight: bold; font-size: 12px; }
-  /* Allow text wrapping in header cells */
+  /* Autoriser le retour à la ligne dans les cellules d'en-tête */
   th { white-space: normal; min-width: 60px; }
   input[type=text], input[type=number], textarea, select {
     width: 100%;
@@ -378,11 +413,11 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     background: #f5f5f5;
     color: #555;
   }
-  /* Hide Cordova-specific elements that don't work in WebView */
+  /* Masque les éléments Cordova qui ne fonctionnent pas dans le WebView */
   .ui-loader, [data-role=navbar], [data-role=footer],
   input[id^=btn_save], input[name^=btn_save],
   input[id^=btn_save_and], input[name^=btn_save_and] { display: none !important; }
-  /* Total fields styling */
+  /* Style des champs de total */
   input.total_, input[name^=total_] {
     background: #e8f0fe;
     font-weight: bold;
@@ -390,9 +425,9 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     text-align: right;
   }
   label { font-weight: 500; }
-  /* Grid table overflow scrolling — wrap all tables in a scrollable container */
+  /* Défilement horizontal des tableaux grille — wrap dans un conteneur défilant */
   .table-questionnaire { overflow-x: auto; display: block; }
-  /* Add-row button in grid forms */
+  /* Bouton d'ajout de ligne dans les formulaires grille */
   .grille-add-row {
     display: block;
     margin: 8px 0;
@@ -410,7 +445,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   .grille-add-row:active { background: #0d47a1; }
 </style>
 <script>
-// Wrap all tables in a scrollable div after load (for wide grille tables)
+// Wrap tous les tableaux dans un div défilant après le chargement (pour les tableaux grille larges)
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('table').forEach(function(tbl) {
     if (!tbl.parentElement.classList.contains('div-table-questionnaire')) {
@@ -429,10 +464,21 @@ $formHtml
 </html>''';
   }
 
-  // ── Inject saved field values into the form ────────────────────────────────
-  // NOTE: do NOT guard on widget.data.isEmpty — identification fields are
-  // pre-filled in _formData BEFORE the page loads, and we must inject them
-  // even when no previously-saved data exists.
+  // ── Injecte les valeurs de champs sauvegardées dans le formulaire ──────────
+  //
+  // IMPORTANT : ne pas conditionner à widget.data.isEmpty — les champs
+  // d'identification sont pré-remplis dans _formData AVANT le chargement de la
+  // page, et ils doivent être injectés même quand aucune donnée sauvegardée
+  // n'existe pour ce thème.
+  //
+  // Gère trois types de champs HTML :
+  //   - radio   : el.checked = (el.value === val)
+  //   - checkbox : el.checked = (val === '1' || val === 'true')
+  //   - autres   : el.value = val
+  //
+  // Fallback d'attribut : si le sélecteur CSS ne trouve rien, itère tous les
+  // inputs/selects en comparant l'attribut NAME en majuscules (gère les
+  // cas limites de casse non standard dans les anciens formulaires).
   void _injectData() {
     if (!_pageLoaded) return;
     final jsonData = json.encode(widget.data);
@@ -441,10 +487,10 @@ $formHtml
   var data = $jsonData;
   for (var name in data) {
     var val = data[name];
-    // Try attribute selector (case-insensitive in HTML5 for standard attrs)
+    // Sélecteur CSS par attribut name (insensible à la casse en HTML5 pour les attributs standard)
     var els = document.querySelectorAll('[name="' + name + '"]');
-    // Fallback: iterate all inputs/selects if selector returned nothing
-    // (handles edge cases with non-standard attribute casing)
+    // Fallback : itère tous les inputs/selects si le sélecteur ne retourne rien
+    // (gère les cas limites avec une casse non standard dans l'attribut)
     if (!els || els.length === 0) {
       var allInputs = document.querySelectorAll('input, select, textarea');
       var arr = [];
@@ -470,7 +516,14 @@ $formHtml
 ''');
   }
 
-  // ── Wire all form fields to post changes back via FieldChanged channel ─────
+  // ── Câble tous les champs du formulaire pour renvoyer les changements via FieldChanged ──
+  //
+  // Après l'injection initiale des données, connecte tous les inputs/selects/textareas
+  // au pont JavaScript FieldChanged pour transmettre chaque modification à Flutter.
+  //
+  // Cas spécial : les boutons "Ajouter" (qui contiennent addGrilleLine dans
+  // leur onclick) sont reliés pour envoyer '__addGridRow__' via le pont,
+  // déclenchant l'ajout d'une nouvelle ligne dans le formulaire grille.
   void _injectBridge() {
     _controller.runJavaScript('''
 (function() {
@@ -494,12 +547,12 @@ $formHtml
     }
   });
 
-  // Wire server-side "Ajouter" buttons (addGrilleLine) if present
+  // Câble les boutons "Ajouter" du serveur (addGrilleLine) si présents
   document.querySelectorAll('input[type=button], button').forEach(function(btn) {
     var oc = btn.getAttribute('onclick') || '';
     var txt = (btn.textContent || btn.value || '').toLowerCase();
     if (oc.indexOf('addGrilleLine') >= 0 || txt.indexOf('ajouter') >= 0) {
-      btn.style.display = '';  // ensure visible
+      btn.style.display = '';  // assure la visibilité
       btn.addEventListener('click', function(e) {
         e.preventDefault();
         notify('__addGridRow__', oc);
@@ -510,7 +563,11 @@ $formHtml
 ''');
   }
 
-  // ── Highlight validation errors ────────────────────────────────────────────
+  // ── Met en évidence les erreurs de validation ──────────────────────────────
+  //
+  // Ajoute/retire la classe CSS 'error' (bordure rouge) sur les champs
+  // ayant des erreurs de validation. Appelé via didUpdateWidget quand
+  // validationErrors change.
   void _injectValidationErrors() {
     final jsonErrors = json.encode(widget.validationErrors);
     _controller.runJavaScript('''
@@ -527,31 +584,49 @@ $formHtml
 ''');
   }
 
-  // ── Native "+ Ajouter une ligne" button for grid forms ─────────────────────
+  // ── Bouton natif "Ajouter une ligne" pour les formulaires grille ───────────
+  //
+  // Bouton Flutter natif affiché sous le WebView pour les formulaires de type grille.
+  // Avantage : fonctionne même si les boutons JavaScript du serveur sont
+  // masqués ou inopérants dans le WebView (styles Cordova masqués).
+  //
+  // Au clic :
+  //   1. Notifie le parent (onAddGridRow)
+  //   2. Incrémente le compteur de lignes (pour mettre à jour le label)
+  //   3. Envoie au WebView le JS d'ajout de ligne :
+  //      a) Tente d'abord la fonction addGrilleLine() du serveur si elle existe
+  //      b) Sinon, fallback : clone la dernière ligne de données du tableau,
+  //         remplace l'index de ligne dans les attributs NAME/ID,
+  //         vide les valeurs et câble les nouveaux champs au pont FieldChanged
+  //
+  // Le fallback de clonage identifie l'index de ligne depuis les attributs id
+  // des TR (ex. id='ligne-paire_14_0' → index 14) plutôt que depuis les noms
+  // de champs (certains formulaires ont des numéros de colonnes dans les noms
+  // de champs, ex. CODE_TYPE_DISCIPLINE_FORM_1_0 où '1' est la colonne, pas la ligne).
   Widget _buildAddRowButton() {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       child: ElevatedButton.icon(
         onPressed: () {
-          // Notify parent to add a new grid row
+          // Notifie le parent pour qu'il puisse suivre les lignes supplémentaires
           widget.onAddGridRow?.call('native_add');
           setState(() => _gridRowCount++);
-          // Also tell the WebView to call addGrilleLine if JS function exists
+          // Demande au WebView d'appeler addGrilleLine si la fonction JS existe
           _controller.runJavaScript(r'''
 (function() {
   if (typeof addGrilleLine === 'function') {
     addGrilleLine();
     return;
   }
-  // ── Fallback: find the last DATA row (a row that contains inputs) and clone it.
-  // Grille tables have a complex header (multiple <tr> for column headers) and
-  // then data rows. We must find the last <tr> that actually contains an
-  // <input>, <select> or <textarea> — not a header or spacer row.
+  // ── Fallback : trouve la dernière ligne DATA (contenant des inputs) et la clone.
+  // Les tableaux grille ont un en-tête complexe (plusieurs <tr> pour les entêtes de colonnes)
+  // puis des lignes de données. On doit trouver le dernier <tr> contenant réellement
+  // un <input>, <select> ou <textarea> — pas une ligne d'en-tête ou d'espacement.
   var tables = document.querySelectorAll('table');
   tables.forEach(function(tbl) {
     var allRows = tbl.querySelectorAll('tr');
-    // Find rows that have at least one input/select/textarea
+    // Trouve les lignes qui contiennent au moins un input/select/textarea
     var dataRows = [];
     for (var i = 0; i < allRows.length; i++) {
       if (allRows[i].querySelectorAll('input, select, textarea').length > 0) {
@@ -560,17 +635,17 @@ $formHtml
     }
     if (dataRows.length === 0) return;
 
-    // The last data row is our template
+    // La dernière ligne de données est notre template
     var templateRow = dataRows[dataRows.length - 1];
     var newRow = templateRow.cloneNode(true);
 
-    // Determine the new row index.
-    // Strategy: read the row index from TR id attributes across all data rows.
-    //   e.g. id='ligne-paire_14_0' → row index 14; next row = 15.
-    // We do NOT use field names because some forms embed column numbers in
-    // field names (e.g. CODE_TYPE_DISCIPLINE_FORM_1_0 where '1' is the column,
-    // not the row — this would give a wrong maxIdx).
-    var newIdx = dataRows.length; // default fallback
+    // Détermine le nouvel index de ligne.
+    // Stratégie : lit l'index de ligne depuis les attributs id des TR sur toutes les lignes de données.
+    //   ex. id='ligne-paire_14_0' → index de ligne 14 ; prochaine ligne = 15.
+    // On n'utilise PAS les noms de champs car certains formulaires ont des numéros
+    // de colonnes dans les noms (ex. CODE_TYPE_DISCIPLINE_FORM_1_0 où '1' est la colonne,
+    // pas la ligne — cela donnerait un maxIdx incorrect).
+    var newIdx = dataRows.length; // fallback par défaut
     var maxRowIdx = -1;
     for (var ri = 0; ri < dataRows.length; ri++) {
       var rowId = dataRows[ri].getAttribute('id') || '';
@@ -582,18 +657,16 @@ $formHtml
     }
     if (maxRowIdx >= 0) { newIdx = maxRowIdx + 1; }
 
-    // Update ALL inputs in the new row:
-    // Replace ONLY the row-index segment in NAME and ID, keep option suffix.
+    // Met à jour TOUS les inputs de la nouvelle ligne :
+    // Remplace UNIQUEMENT le segment d'index de ligne dans NAME et ID, garde le suffixe d'option.
     //
-    // We replace the SPECIFIC occurrence of _{maxRowIdx} (or _{maxRowIdx}_N)
-    // rather than any /_(\d+)(_\d+)?$/ pattern, because some field names embed
-    // column numbers before the row index:
-    //   CODE_TYPE_DISCIPLINE_FORM_1_14  → replace _14 (row), keep nothing
-    //   CODE_TYPE_SEXE_14_1             → replace _14 (row), keep _1 (option)
-    //   MATRICULE_14                    → replace _14
-    // Using a specific regex avoids matching the wrong numeric segment.
-    // Build a regex that matches _{maxRowIdx} or _{maxRowIdx}_{optSuffix} at end of name.
-    // Fallback: when maxRowIdx<0 (no TR ids found), match generic _{digits} pattern.
+    // On remplace l'occurrence SPÉCIFIQUE de _{maxRowIdx} (ou _{maxRowIdx}_N)
+    // plutôt qu'un pattern générique /_{digits}(_\d+)?$/, car certains noms de champs
+    // intègrent des numéros de colonnes avant l'index de ligne :
+    //   CODE_TYPE_DISCIPLINE_FORM_1_14  → remplace _14 (ligne), rien d'autre
+    //   CODE_TYPE_SEXE_14_1             → remplace _14 (ligne), garde _1 (option)
+    //   MATRICULE_14                    → remplace _14
+    // Un regex spécifique évite de matcher le mauvais segment numérique.
     var oldRowPat = (maxRowIdx >= 0)
         ? new RegExp('_' + maxRowIdx + '(_\\d+)?$')
         : /_(\d+)(_\d+)?$/;
@@ -608,7 +681,7 @@ $formHtml
           return '_' + newIdx + (optIdx || '');
         });
       }
-      // Clear value
+      // Vide la valeur
       if (el.type === 'radio' || el.type === 'checkbox') {
         el.checked = false;
       } else {
@@ -616,10 +689,10 @@ $formHtml
       }
     });
 
-    // Insert the new row right after the template row
+    // Insère la nouvelle ligne juste après la ligne template
     templateRow.parentNode.insertBefore(newRow, templateRow.nextSibling);
 
-    // Wire the new fields to the FieldChanged bridge
+    // Câble les nouveaux champs au pont FieldChanged
     newRow.querySelectorAll('input, select, textarea').forEach(function(el) {
       var name = el.name;
       if (!name) return;
@@ -653,10 +726,10 @@ $formHtml
 
   @override
   Widget build(BuildContext context) {
-    // Show a brief loading indicator while the WebView renders the first page.
-    // This replaces the gray blank that appears before onPageFinished fires.
-    // The white Container ensures no gray flash even before setBackgroundColor
-    // takes effect in the WebView engine.
+    // Affiche un indicateur de chargement bref pendant que le WebView rend la première page.
+    // Remplace le blanc/gris qui apparaît avant onPageFinished.
+    // Le Container blanc assure l'absence de flash gris même avant que
+    // setBackgroundColor prenne effet dans le moteur WebView.
     final webView = WebViewWidget(
       controller: _controller,
     );
@@ -667,6 +740,7 @@ $formHtml
             child: Stack(
               children: [
                 webView,
+                // Indicateur de chargement centré pendant le rendu
                 const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -683,6 +757,7 @@ $formHtml
           )
         : webView;
 
+    // Pour les formulaires grille : WebView expansible + bouton "Ajouter une ligne"
     if (_isGridForm) {
       return Column(
         children: [
@@ -691,6 +766,7 @@ $formHtml
         ],
       );
     }
+    // Pour les formulaires simples : WebView seul
     return body;
   }
 }
