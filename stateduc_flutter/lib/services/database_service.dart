@@ -10,23 +10,37 @@ import '../models/education_system.dart';
 import '../models/question.dart';
 import '../models/user.dart';
 
-/// DatabaseService — replaces all 25+ localStorage keys from the original app.
+/// DatabaseService — Couche d'accès aux données SQLite de l'application StatEduc Mobile.
 ///
-/// Original localStorage key map → SQLite tables:
-///   stm_User               → settings (key/value)
-///   stm_Year               → settings
-///   stm_Filter             → settings
-///   stm_Campagnes          → campaigns
-///   stm_Localisations      → localisations
-///   stm_Systems            → education_systems
-///   stm_TypeRegroups       → regroup_types
-///   stm_Regroups           → regroups
-///   stm_Etabs              → schools
-///   stm_Status             → school_statuses
-///   stm_Questions          → questions
-///   stm_Rules              → validation_rules
-///   stm_Annee_*            → stored in campaigns.years (JSON)
-///   stm_EtabCollectData_*  → collected_data
+/// Remplace les 25+ clés localStorage de l'application web originale par des tables SQLite.
+/// Implémenté comme SINGLETON : une seule instance partagée par tous les providers.
+///
+/// CORRESPONDANCE localStorage → SQLite :
+///   stm_User, stm_Year, stm_Filter       → settings (clé/valeur)
+///   stm_Campagnes                         → campaigns
+///   stm_Localisations                     → localisations
+///   stm_Systems                           → education_systems
+///   stm_TypeRegroups                      → regroup_types
+///   stm_Regroups                          → regroups
+///   stm_Etabs                             → schools
+///   stm_Status                            → school_statuses
+///   stm_Questions                         → questions
+///   stm_Rules                             → validation_rules
+///   stm_EtabCollectData_{etab}_{qst}[_{filter}] → collected_data
+///
+/// VERSION DE LA BASE :
+///   v1 : schéma initial
+///   v2 : ajout colonne sort_order dans questions
+///   v3 : ajout table coherence_rules (session 14 — contrôles offline)
+///
+/// TABLE CRITIQUE — coherence_rules :
+///   Stocke les règles téléchargées depuis data_rules.php pour l'évaluation offline.
+///   Indexée par (id_camp, id_qst, id_etab) pour recherche rapide.
+///
+/// TABLE CRITIQUE — collected_data :
+///   Stocke toutes les saisies de l'agent de collecte (field_name → field_value).
+///   Clé unique : (id_camp, id_etab, id_qst, COALESCE(id_filter,''), field_name)
+///   Champ is_sent=1 après envoi serveur réussi.
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   factory DatabaseService() => _instance;

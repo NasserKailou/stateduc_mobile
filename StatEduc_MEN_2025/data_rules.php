@@ -1,44 +1,77 @@
 <?php
 /**
- * data_rules.php — Exposition des règles de cohérence pour évaluation offline
+ * data_rules.php — Exposition des règles de cohérence pour évaluation OFFLINE
  *
- * Route : GET /theme_rules/{user}/{id_camp}/{id_sector}/{id_theme}/{id_etab}/{id_filter}/{id_annee}
+ * Ce fichier retourne les règles de cohérence d'un thème sous forme structurée,
+ * avec les SQL déjà interpolés (variables PHP substituées par les valeurs concrètes
+ * de l'établissement, de l'année et du filtre). L'app Flutter stocke ces règles
+ * dans sa base SQLite locale pour les évaluer sans connexion réseau.
  *
- * Retourne toutes les règles de cohérence d'un thème dans leur forme structurée,
- * avec les SQLs interpolés (variables PHP substituées), pour que l'app mobile
- * puisse les stocker localement et les évaluer côté client.
+ * ─── Contexte architectural ───────────────────────────────────────────────────
  *
- * Réponse JSON :
- *   {
- *     "se_status": 200,
- *     "se_message": "OK",
- *     "se_data": {
- *       "id_theme": 3,
- *       "nb_regles": 2,
- *       "regles": [
- *         {
- *           "id_regle": 5,
- *           "sql_regle": "SELECT SUM(NB_G) FROM TABLE WHERE CODE_ETAB='ECO001' AND CODE_ANNEE=2024",
- *           "associations": [
- *             {
- *               "id_assoc": 12,
- *               "id_regle_assoc": 7,
- *               "sql_assoc": "SELECT SUM(NB_F) FROM TABLE WHERE ...",
- *               "critere": "<=",
- *               "message": "Effectif garçons doit être <= effectif filles"
- *             }
- *           ]
- *         }
- *       ]
- *     }
- *   }
+ * Le système de contrôle de cohérence fonctionne en deux modes :
  *
- * NOTES :
- *   - Les SQL sont interpolés avec les valeurs concrètes (code_etab, code_annee, etc.)
- *     via eval(), comme le fait controle_theme.class.php::get_regles().
- *   - L'app mobile stocke ces règles dans la table coherence_rules (SQLite local).
- *   - L'évaluation offline s'appuie sur des requêtes SQLite contre collected_data.
- *   - Compatibilité PHP 7.3.4 garantie (pas de syntaxe PHP 8+).
+ *   Mode SERVEUR (data_controle.php) :
+ *     - Exécute les SQL directement contre la base Oracle/MySQL du serveur
+ *     - Comparaison précise des valeurs sauvegardées
+ *     - Déclenché après l'envoi des données (sendToServer)
+ *
+ *   Mode OFFLINE (ce fichier + CoherenceEvaluator.dart) :
+ *     - data_rules.php retourne les SQL interpolés (côté serveur)
+ *     - L'app Flutter stocke ces SQL dans la table SQLite coherence_rules
+ *     - CoherenceEvaluator.dart extrait le nom de champ du SQL (SELECT SUM(CHAMP))
+ *       et cherche ce champ dans collected_data (données locales)
+ *     - Évaluation possible même sans réseau, dès la saisie
+ *
+ * ─── Route principale ─────────────────────────────────────────────────────────
+ *
+ *  GET /theme_rules/{user}/{id_camp}/{id_sector}/{id_theme}/{id_etab}/{id_filter}/{id_annee}
+ *      → Route MOBILE avec code année scolaire dans l'URL
+ *
+ *  GET /theme_rules/{user}/{id_camp}/{id_sector}/{id_theme}/{id_etab}/{id_filter}
+ *      → Route NAVIGATEUR (rétrocompatible, utilise $_SESSION['annee'])
+ *
+ * ─── Format de réponse JSON ───────────────────────────────────────────────────
+ *
+ *  {
+ *    "se_status": 200,
+ *    "se_message": "OK",
+ *    "se_data": {
+ *      "id_theme": 3,
+ *      "nb_regles": 2,
+ *      "regles": [
+ *        {
+ *          "id_regle": 5,
+ *          "lib_regle": "Effectif total garçons",
+ *          "sql_regle": "SELECT SUM(NB_G) FROM TAB WHERE CODE_ETAB='ECO001' AND CODE_ANNEE=2024",
+ *          "associations": [
+ *            {
+ *              "id_assoc":        12,
+ *              "id_regle_assoc":  7,
+ *              "lib_regle_assoc": "Effectif total filles",
+ *              "sql_assoc":       "SELECT SUM(NB_F) FROM TAB WHERE ...",
+ *              "critere":         ">=",
+ *              "message":         "Effectif garçons doit être >= effectif filles"
+ *            }
+ *          ]
+ *        }
+ *      ]
+ *    }
+ *  }
+ *
+ * ─── Notes importantes ────────────────────────────────────────────────────────
+ *  - Interpolation SQL via eval() : reproduit exactement la logique de
+ *    controle_theme.class.php::get_regles() pour que les SQL retournés soient
+ *    identiques à ceux utilisés côté serveur pour le contrôle réel.
+ *  - ID thème composite : même logique que data_controle.php — le suffixe secteur
+ *    est retiré avant la requête DICO_REGLE_THEME.
+ *  - yearCode (session 14) : l'ID année était manquant dans fetchRules() côté Flutter,
+ *    provoquant nb_regles=0. Ajout de $id_annee dans l'URL règle ce problème.
+ *  - Compatibilité PHP 7.3.4 garantie (pas de syntaxe PHP 8+).
+ *
+ * @author    Projet StatEduc MEN — développement mobile AK / sessions 11-15
+ * @version   session-15 (commentaires français complets)
+ * @requires  Slim v2
  */
 
 require_once 'common_ws.php';

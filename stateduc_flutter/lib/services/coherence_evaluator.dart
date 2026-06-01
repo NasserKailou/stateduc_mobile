@@ -1,36 +1,63 @@
+// =============================================================================
+// coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
+// =============================================================================
+//
+// Ce fichier implémente l'évaluation offline des règles de cohérence StatEduc.
+// Il est le pendant mobile de controle_theme_batch.class.php (côté serveur).
+//
+// CONTEXTE :
+//   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
+//   sql_assoc) sur la base Oracle/MySQL, puis compare les résultats avec un
+//   opérateur (critere). Cette approche n'est pas possible hors ligne car le
+//   mobile n'a pas accès à la base de données serveur.
+//
+// APPROCHE OFFLINE :
+//   Les SQL serveur suivent un pattern prévisible :
+//     SELECT SUM(NOM_CHAMP) FROM TABLE WHERE CODE_ETAB=X AND CODE_ANNEE=Y [...]
+//
+//   On extrait NOM_CHAMP par regex et on recherche sa valeur dans la table
+//   SQLite `collected_data` (données saisies par l'agent de collecte).
+//   La somme SUM() est calculée sur tous les filtres disponibles.
+//
+// PRINCIPE DE VIOLATION :
+//   - Si la condition "V1 critere V2" est VRAIE → données cohérentes (OK)
+//   - Si la condition est FAUSSE              → violation détectée (KO)
+//   - _applyOperator() retourne true quand la règle EST violée
+//
+// CONSERVATISME :
+//   Si un champ SQL ne peut pas être extrait ou trouvé dans collected_data,
+//   la règle est silencieusement ignorée (pas de faux positifs).
+//   Ce moteur ne signale que les violations CERTAINES.
+//
+// PATTERNS SQL SUPPORTÉS :
+//   1. SELECT SUM(CHAMP) FROM ...
+//   2. SELECT NVL(SUM(CHAMP),0) FROM ...    (Oracle NVL)
+//   3. SELECT COALESCE(SUM(CHAMP),0) FROM ...
+//   4. SELECT CHAMP FROM ...               (champ brut sans agrégation)
+//
+// PATTERNS SQL NON SUPPORTÉS (ignorés silencieusement) :
+//   - JOINs multi-tables
+//   - Sous-requêtes
+//   - COUNT(), AVG(), MIN(), MAX() sans SUM()
+//   - Fonctions SQL complexes
 import 'package:flutter/foundation.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 
-/// CoherenceEvaluator — offline coherence check engine.
+/// CoherenceEvaluator — Moteur d'évaluation de cohérence hors ligne.
 ///
-/// Context:
-///   The server's coherence system works by evaluating two SQL rules
-///   (sql_regle and sql_assoc), each of which returns a single numeric
-///   value from the production database, then comparing them with a
-///   `critere` operator (e.g. "<=", ">", "=").
+/// Équivalent mobile de `controle_theme_batch.class.php` (serveur).
 ///
-/// Offline approach:
-///   Server SQL is against the server DB (MySQL/Oracle) and cannot run
-///   locally.  However the SQL follows a predictable pattern:
+/// Principe de fonctionnement :
+///   1. Charge les données persistées depuis SQLite (collected_data)
+///   2. Superpose les données non sauvegardées (formData en mémoire)
+///   3. Pour chaque règle : extrait V1 (sql_regle) et V2 (sql_assoc)
+///   4. Applique l'opérateur critere : si NON respecté → violation
 ///
-///     SELECT SUM(FIELD_NAME) FROM SOME_TABLE
-///       WHERE CODE_ETAB = 'X' AND CODE_ANNEE = Y [AND ...]
-///
-///   We extract FIELD_NAME with a regex, then query the local
-///   `collected_data` table for the matching field value that the user
-///   has entered for the current school+question+filter context.
-///
-///   SUM aggregates across all rows with that field name (e.g. across
-///   multiple filter periods for the same question).
-///
-/// Limitations:
-///   - Only supports `SELECT SUM(field)` or `SELECT field` patterns.
-///   - Multi-table JOINs or subqueries are not evaluated (skipped).
-///   - If the field cannot be found in collected_data the rule is skipped.
-///
-/// This evaluator is intentionally conservative: it returns violations
-/// only when it is CERTAIN of a problem. When in doubt it stays silent.
+/// Différence avec le contrôle serveur :
+///   - Serveur : exécute SQL réel sur Oracle/MySQL → résultat exact
+///   - Offline  : extrait le nom de champ par regex et cherche dans SQLite
+///     → approximation acceptable pour un feedback immédiat à l'agent
 class CoherenceEvaluator {
   CoherenceEvaluator({
     required DatabaseService db,
@@ -39,15 +66,24 @@ class CoherenceEvaluator {
   final DatabaseService _db;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // PUBLIC API
+  // API PUBLIQUE
   // ═══════════════════════════════════════════════════════════════════════════
 
-  /// Evaluates all coherence rules for the given context and returns a list
-  /// of violations (empty list = all rules pass or cannot be evaluated).
+  /// Évalue toutes les règles de cohérence pour le contexte donné.
+  /// Retourne la liste des violations (liste vide = cohérence OK ou non évaluable).
   ///
-  /// [rules]    — rules for this (idCamp, idQst, idEtab) context
-  /// [formData] — current form data Map<fieldName, value> (may contain unsaved changes)
-  /// [idCamp], [idQst], [idEtab], [idFilter] — current data entry context
+  /// Paramètres :
+  ///   [rules]    — règles pour ce (idCamp, idQst, idEtab), chargées depuis SQLite
+  ///   [formData] — données formulaire en mémoire (peuvent contenir des modifs non sauvegardées)
+  ///   [idCamp], [idQst], [idEtab], [idFilter] — contexte de saisie courant
+  ///
+  /// Algorithme :
+  ///   1. Construit values = collected_data SQLite + formData (override)
+  ///      (les clés de champ sont mises en MAJUSCULES pour comparaison insensible à la casse)
+  ///   2. Pour chaque règle : _extractValue(sql) → valeur numérique ou null
+  ///   3. Si V1 ou V2 non trouvé → règle ignorée silencieusement
+  ///   4. _applyOperator(V1, V2, critere) → true si VIOLÉE
+  ///   5. Violation → OfflineCoherenceError ajouté à la liste retournée
   Future<List<OfflineCoherenceError>> evaluate({
     required List<CoherenceRule> rules,
     required Map<String, String> formData,
@@ -115,17 +151,22 @@ class CoherenceEvaluator {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // PRIVATE HELPERS
+  // HELPERS PRIVÉS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  /// Extracts a numeric value from [sql] by parsing the field name and
-  /// looking it up in [values].
+  /// Extrait une valeur numérique depuis [sql] en analysant le nom de champ
+  /// et en le cherchant dans [values] (map NOM_CHAMP → valeur double).
   ///
-  /// Supported patterns:
-  ///   SELECT SUM(FIELD_NAME) FROM ...
-  ///   SELECT FIELD_NAME FROM ...
-  ///   SELECT NVL(SUM(FIELD_NAME),0) FROM ...   (Oracle NVL)
-  ///   SELECT COALESCE(SUM(FIELD_NAME),0) FROM ...
+  /// Patterns SQL supportés :
+  ///   SELECT SUM(NOM_CHAMP) FROM ...                      → Pattern 1
+  ///   SELECT NVL(SUM(NOM_CHAMP),0) FROM ...               → Pattern 1 (Oracle NVL)
+  ///   SELECT COALESCE(SUM(NOM_CHAMP),0) FROM ...          → Pattern 1
+  ///   SELECT NOM_CHAMP FROM ...                           → Pattern 2
+  ///
+  /// Retourne null si :
+  ///   - Le pattern n'est pas reconnu (JOIN, sous-requête, etc.)
+  ///   - Le nom de champ n'est pas trouvé dans [values]
+  ///   - Le SQL est vide
   double? _extractValue(String sql, Map<String, double> values) {
     if (sql.trim().isEmpty) return null;
     final upperSql = sql.toUpperCase();
@@ -158,8 +199,10 @@ class CoherenceEvaluator {
     return null;
   }
 
-  /// For SUM() rules, sum all values with this field name across the values map.
-  /// In practice the map already contains a single entry per field (per filter).
+  /// Calcule la somme d'un champ sur tous les filtres disponibles dans [values].
+  /// Les clés peuvent avoir un suffixe filtre : "NOM_CHAMP#ID_FILTRE".
+  /// Si aucun filtre n'est trouvé, retourne values[fieldName] directement.
+  /// Retourne 0 si le champ n'existe pas dans aucune version de la clé.
   double _sumFieldAcrossAllFilters(String fieldName, Map<String, double> values) {
     double sum = 0;
     bool found = false;
@@ -174,13 +217,14 @@ class CoherenceEvaluator {
     return found ? sum : (values[fieldName] ?? 0);
   }
 
-  /// Returns true when the rule is VIOLATED (i.e. the constraint is NOT met).
+  /// Applique l'opérateur critere et retourne TRUE si la règle est VIOLÉE.
   ///
-  /// The critere from the server describes the REQUIRED relationship: v1 critere v2.
-  /// The rule is violated when that relationship does NOT hold.
+  /// IMPORTANT : retourne true quand la contrainte N'EST PAS respectée.
+  ///   critere '<=': règle = "V1 doit être <= V2"  → violée si V1 > V2  → return !(V1 <= V2)
+  ///   critere '>=': règle = "V1 doit être >= V2"  → violée si V1 < V2  → return !(V1 >= V2)
   ///
-  /// Operators observed in StatEduc:
-  ///   <=  >=  <  >  =  !=  <>
+  /// Opérateurs reconnus (observés dans StatEduc) : <=  >=  <  >  =  !=  <>
+  /// Opérateur inconnu → return false (pas de violation — conservatisme).
   bool _applyOperator(double v1, double v2, String critere) {
     switch (critere.trim()) {
       case '<=': return !(v1 <= v2);
@@ -211,9 +255,11 @@ class CoherenceEvaluator {
   }
 }
 
-// ─── Offline violation model ─────────────────────────────────────────────────
+// ─── Modèle de violation offline ─────────────────────────────────────────────
 
-/// A coherence rule violation detected by the offline engine.
+/// Violation de cohérence détectée par le moteur offline (CoherenceEvaluator).
+/// Équivalent de CoherenceError (version serveur) mais avec les valeurs calculées
+/// V1 et V2 pour affichage à l'agent de collecte.
 class OfflineCoherenceError {
   final int    idRegle;
   final int    idRegleAssoc;

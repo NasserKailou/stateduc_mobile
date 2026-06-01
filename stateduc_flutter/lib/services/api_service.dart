@@ -1,12 +1,42 @@
-// API Service — gère toutes les communications HTTP avec le serveur StatEduc.
+// =============================================================================
+// api_service.dart — Service HTTP central pour l'application StatEduc Mobile
+// =============================================================================
 //
-// Correspondance exacte avec les fonctions JS originales :
-//   getDataFromServer(servSuffix, params, callBack)  → _get(path)
-//   postDataToServer(servSuffix, params, themeData)  → saveData()
-//   getFormDataFromServer(servSuffix, params, ...)   → reloadData()
+// Ce fichier est le SEUL point d'entrée vers le serveur REST StatEduc.
+// Il est implémenté comme un SINGLETON : une seule instance est créée et partagée
+// par tous les providers (AuthProvider, CampaignProvider, DataEntryProvider).
+//
+// CORRESPONDANCE avec le code JavaScript original (app web) :
+//   getDataFromServer(servSuffix, params, callBack)    → _get(path)
+//   postDataToServer(servSuffix, params, themeData)    → saveData()
+//   getFormDataFromServer(servSuffix, params, ...)     → reloadData()
 //   addQstHtml: GET url → then GET that url with auth  → getFormHtml()
 //
-// Source JS : charge_camp.js, page_etab.js, page_new_camp.js, users.js
+// Sources JS d'origine : charge_camp.js, page_etab.js, page_new_camp.js, users.js
+//
+// ARCHITECTURE HTTP :
+//   - Client HTTP : Dio (avec intercepteurs)
+//   - Timeouts configurés :
+//       connectTimeout = 60s  (réseau lent possible)
+//       receiveTimeout = 300s (5 min — chaîne data_save→questionnaire_ws peut être longue)
+//       sendTimeout    = 120s (envoi de gros formulaires sur liaison lente)
+//   - SSL : certificats auto-signés acceptés (intranet MEN)
+//   - Auth : HTTP Basic (Authorization: Basic base64(login:password))
+//   - Intercepteur _AuthInjectorInterceptor : ré-injecte l'en-tête auth sur chaque requête
+//
+// MÉTHODES PRINCIPALES :
+//   authenticate()     → Authentification utilisateur (GET /user_ident.php/user/...)
+//   saveData()         → Envoi du formulaire au serveur (POST /data_save.php/theme_save/...)
+//   fetchRules()       → Récupération règles cohérence offline (GET /data_rules.php/...)
+//   checkCoherence()   → Contrôle cohérence serveur post-envoi (GET /data_controle.php/...)
+//   getFormHtml()      → Chargement HTML formulaire en 2 étapes (bytes Latin-1 → String)
+//   reloadData()       → Rechargement données serveur (GET /data_reload.php/...)
+//
+// GESTION MOJIBAKE (correction session 14) :
+//   Les formulaires HTML sont encodés ISO-8859-15 côté serveur.
+//   getFormHtml() récupère les bytes bruts (ResponseType.bytes) et les convertit
+//   avec String.fromCharCodes() pour préserver les codes Latin-1.
+//   DynamicFormWidget._preprocessHtml() corrige ensuite l'encodage avec un seuil 5% U+FFFD.
 
 import 'dart:convert';
 import 'dart:io';
@@ -27,31 +57,42 @@ class ApiService {
   String? _password;
 
   // ─── Singleton ──────────────────────────────────────────────────────────────
-  // CRITICAL: ONE shared instance used by AuthService, CampaignProvider,
-  // DataEntryProvider. configure() called at login immediately visible to all.
+  // UNE SEULE instance partagée par AuthProvider, CampaignProvider et DataEntryProvider.
+  // configure() est appelée lors de la connexion — les modifications sont immédiatement
+  // visibles par tous les providers qui utilisent ApiService().
+  // Pattern factory : ApiService() retourne toujours _instance.
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
 
   ApiService._internal() {
     _dio = Dio(
       BaseOptions(
-        connectTimeout: const Duration(seconds: 60),   // raised: server/network can be slow
-        receiveTimeout: const Duration(seconds: 300),  // 5 min: data_save → questionnaire_ws curl chain can be slow
-        sendTimeout: const Duration(seconds: 120),     // raised: POST form data on slow link
+        // Timeouts — valeurs augmentées pour tenir compte des serveurs lents
+        // et des liaisons réseau instables (intranet MEN, serveurs chargés)
+        connectTimeout: const Duration(seconds: 60),   // connexion initiale
+        receiveTimeout: const Duration(seconds: 300),  // 5 min : chaîne data_save → questionnaire_ws peut être lente
+        sendTimeout: const Duration(seconds: 120),     // envoi POST données formulaire sur liaison lente
         followRedirects: true,
         maxRedirects: 5,
+        // validateStatus : accepte tous les codes HTTP < 600 pour les gérer manuellement
+        // (évite que Dio lance une exception pour les 400/401/404 — on les traite nous-mêmes)
         validateStatus: (status) => status != null && status < 600,
       ),
     );
 
     // ── SSL / Certificat auto-signé ──────────────────────────────────────────
-    // Le serveur StatEduc est souvent déployé sur un réseau local avec un
-    // certificat auto-signé ou sans HTTPS du tout. Dart/Flutter utilise son
-    // propre moteur TLS (BoringSSL) indépendamment d'Android, ce qui cause
-    // l'erreur "Software caused connection abort" quand le certificat est
-    // rejeté. On configure l'adaptateur IO pour ignorer les erreurs de
-    // certificat. La sécurité réseau est garantie par le périmètre du réseau
-    // local (intranet MEN) et non par TLS public.
+    // PROBLÈME : Le serveur StatEduc est déployé sur intranet avec un certificat
+    // auto-signé (ou HTTP simple sans TLS). Dart/Flutter utilise BoringSSL
+    // indépendamment du système Android, ce qui provoque l'erreur
+    // "Software caused connection abort" si le certificat est invalide.
+    //
+    // SOLUTION : On configure l'IOHttpClientAdapter pour ignorer les erreurs
+    // de certificat via badCertificateCallback → return true.
+    //
+    // SÉCURITÉ : Ce contournement est acceptable car :
+    //   1. L'application fonctionne sur intranet MEN (réseau fermé)
+    //   2. L'authentification HTTP Basic ajoute une couche de contrôle d'accès
+    //   3. Les données ne transitent pas sur Internet public
     (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
       final client = HttpClient();
       client.badCertificateCallback =
@@ -68,6 +109,12 @@ class ApiService {
   }
 
   // ─── Log Interceptor ────────────────────────────────────────────────────────
+  // Intercepteur de journalisation pour le débogage des requêtes/réponses Dio.
+  // Affiche dans la console (debugPrint) :
+  //   [Dio→] : méthode HTTP, URI, début du header Authorization, début du body POST
+  //   [Dio←] : code HTTP, URI, début du corps de réponse
+  //   [Dio✗] : type d'erreur, URI, message, corps de réponse si disponible
+  // Les corps sont tronqués à 200/300 caractères pour éviter de saturer les logs.
 
   InterceptorsWrapper _buildLogInterceptor() {
     return InterceptorsWrapper(
@@ -103,17 +150,17 @@ class ApiService {
   }
 
   // ─── Configuration ──────────────────────────────────────────────────────────
+  // configure() est appelée UNE FOIS lors de la connexion de l'utilisateur.
+  // Elle initialise l'URL de base Dio, les headers Authorization et User-Agent.
+  // updateCredentials() permet de mettre à jour les credentials sans rechanger l'URL.
 
-  /// Normalise l'URL serveur :
-  /// - ajoute http:// si aucun schéma n'est présent
-  /// - garantit un slash final (nécessaire pour que Dio préserve
-  ///   le chemin complet quand on appelle _dio.get('sous/chemin'))
+  /// Normalise l'URL serveur saisie par l'utilisateur :
+  ///   - Ajoute http:// si aucun schéma présent (ex: "192.168.1.10/app")
+  ///   - Garantit un slash final OBLIGATOIRE (comportement Dio avec baseUrl)
   ///
   /// IMPORTANT — comportement Dio avec baseUrl :
-  ///   baseUrl = 'http://host:port/app'  + get('/endpoint')
-  ///   → Dio résout à 'http://host:port/endpoint'  ← PERD /app !
-  ///   baseUrl = 'http://host:port/app/' + get('endpoint')
-  ///   → Dio résout à 'http://host:port/app/endpoint' ← CORRECT ✓
+  ///   'http://host/app'  + get('/endpoint') → 'http://host/endpoint'  ← PERD /app !
+  ///   'http://host/app/' + get('endpoint')  → 'http://host/app/endpoint' ← CORRECT ✓
   static String normalizeServerUrl(String raw) {
     String url = raw.trim();
     if (url.isEmpty) return url;
@@ -526,34 +573,50 @@ class ApiService {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SAVE DATA TO SERVER (POST)
+  // SAUVEGARDE DES DONNÉES (POST)
+  // =============================================================================
   // Source JS: page_etab.js saveOneQstOnServer() → postDataToServer():
-  //   POST /data_save.php/theme_save/{login}/{id_camp}/{id_sys}/{id_qst}/
-  //        {id_etab}/{filter}/0
-  //   Body: application/x-www-form-urlencoded form data
-  //   Response: JSON string → parse → { se_status, se_data }
-  //   se_data == 'OKSAVE' means success
   //
-  // Body format (from getPageDataToSend()):
-  //   field=value pairs, URL-encoded, + trailing:
-  //   &switch_theme_id=&save_and_prev=0&save_and_next=0
-  //   Special: LOC_REG_0 = etab.idRegroup always included in first question
-  // ═══════════════════════════════════════════════════════════════════════════
+  //   POST /data_save.php/theme_save/{login}/{id_camp}/{id_sys}/{id_qst}/
+  //        {id_etab}/{filter}/0[/{yearCode}]
+  //   Body: application/x-www-form-urlencoded
+  //   Réponse: JSON { se_status, se_data }
+  //     se_data == 'OKSAVE' → succès
+  //     se_status == 400    → erreur serveur (message dans se_data)
+  //
+  // CHAÎNE D'ENVOI CÔTÉ SERVEUR (data_save.php) :
+  //   1. Vérifie les droits d'accès (DICO_FIXE_REGROUPEMENT + fallback ADMIN_USERS)
+  //   2. session_write_close() → libère le verrou de session ANTI-DEADLOCK
+  //   3. curl POST → questionnaire_ws.php (écriture en base Oracle/MySQL)
+  //   4. Retourne OKSAVE si questionnaire_ws.php a émis ISOKSAVEINDATABASE
+  //
+  // CONSTRUCTION DU CORPS POST (mirroir exact de page_etab.js getPageDataToSend()) :
+  //   • Champs radio : clé "fieldName#optionId" = "1" → transformé en "fieldName=optionId"
+  //     (seules les options cochées sont envoyées, les décochées sont omises)
+  //   • Autres champs : remplacement "/" → "_slh_" uniquement (PAS d'encodeURIComponent)
+  //   • Toujours ajouté à la fin : switch_theme_id= save_and_prev= save_and_next=
+  //   • Premier thème : LOC_REG_0={etabRegroupId} ajouté (regroupement de l'établissement)
+  //
+  // PARAMÈTRE yearCode (correction session 14) :
+  //   Ajouté comme dernier segment de l'URL : .../0/{yearCode}
+  //   Permet au PHP de récupérer l'année scolaire sans session navigateur.
+  //   Sans ce paramètre, $_SESSION['annee'] est vide → saveLogInfo() échoue.
+  // =============================================================================
 
   Future<bool> saveData({
-    required String login, // currentUser.login
-    required String campId, // stmCamp.id
-    required String sysId, // stmPageEtab.currSys.id
-    required String qstId, // question id
-    required String etabId, // school id
-    required String? filter, // filter period id or null
+    required String login, // login de l'utilisateur (currentUser.login)
+    required String campId, // ID de la campagne (stmCamp.id)
+    required String sysId, // ID du secteur/système éducatif
+    required String qstId, // ID du thème/formulaire à sauvegarder
+    required String etabId, // ID de l'établissement scolaire
+    required String? filter, // ID de la période filtre (ou null si aucun filtre)
     required Map<String, dynamic>
-        formData, // dynamic to accept both String and server data
-    String? etabRegroupId, // school.idRegroup (for LOC_REG_0 in q1)
+        formData, // données du formulaire (champs + valeurs)
+    String? etabRegroupId, // ID du regroupement de l'établissement (pour LOC_REG_0)
     bool isFirstQuestion =
-        false, // true when sending question[0] → includes LOC_REG_0
+        false, // true si c'est le premier thème → inclut LOC_REG_0
     bool isLastPage = true,
-    String yearCode = '', // user.codeyear — school year code for PHP session bypass
+    String yearCode = '', // code année scolaire (user.codeyear) — contournement session PHP
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
     // Build form body exactly like page_etab.js getPageDataToSend():
@@ -693,21 +756,24 @@ class ApiService {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // RELOAD DATA FROM SERVER (GET)
+  // RECHARGEMENT DES DONNÉES DEPUIS LE SERVEUR (GET)
   // Source JS: page_etab.js reloadOneQstFromServer() → getFormDataFromServer():
   //   GET /data_reload.php/theme_data/{login}/{id_sys}/{id_qst}/{id_camp}/
   //       {id_etab}/{filter}
-  //   Response: raw JSON string → parse → map of { fieldName: [value, type], ... }
-  //   { se_status:400, se_data: error_msg } on error
+  //   Réponse : JSON brut → map { fieldName: [valeur, type], ... }
+  //   ou { se_status:400, se_data: message_erreur } en cas d'erreur
+  //
+  // Utilisé pour pré-remplir le formulaire avec les valeurs déjà enregistrées
+  // en base de données (après un rechargement manuel par l'utilisateur).
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<Map<String, dynamic>?> reloadData({
-    required String login, // stmChargeCamp.currUser.login
-    required String sysId, // stmPageEtab.currSys.id
-    required String qstId, // question id
-    required String campId, // stmCamp.id
-    required String etabId, // school id
-    required String? filter, // filter period id or null
+    required String login, // login de l'utilisateur
+    required String sysId, // ID du secteur
+    required String qstId, // ID du thème/formulaire
+    required String campId, // ID de la campagne
+    required String etabId, // ID de l'établissement
+    required String? filter, // période filtre (ou null)
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
     try {
@@ -742,19 +808,23 @@ class ApiService {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // PRIVATE HELPER — Generic GET with se_data unwrapping
-  // ═══════════════════════════════════════════════════════════════════════════
-  // COHERENCE RULES — FETCH FOR OFFLINE EVALUATION
-  // Source server: data_rules.php
-  //   GET /theme_rules/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/{yearCode}
-  //   Response se_data: { id_theme, nb_regles, regles: [
+  // RÈGLES DE COHÉRENCE OFFLINE — TÉLÉCHARGEMENT DEPUIS data_rules.php
+  // =============================================================================
+  //   GET /data_rules.php/theme_rules/{login}/{campId}/{sysId}/{qstId}/
+  //       {etabId}/{filter}/{yearCode}
+  //
+  //   Réponse se_data : { id_theme, nb_regles, regles: [
   //     { id_regle, lib_regle, sql_regle, associations: [
   //       { id_assoc, id_regle_assoc, lib_regle_assoc, sql_assoc, critere, message }
   //     ]}
   //   ]}
   //
-  // Each (rule, association) pair becomes one CoherenceRule row in SQLite.
-  // Called once per question during campaign download (non-fatal failure).
+  // Chaque paire (règle, association) devient UNE ligne CoherenceRule en SQLite.
+  // Appelé une fois par thème lors du téléchargement de la campagne (non-bloquant).
+  //
+  // CORRECTION SESSION 14 :
+  //   yearCode ajouté dans l'URL — sans lui, data_rules.php retourne nb_regles=0
+  //   car $_SESSION['annee'] est vide en contexte mobile (pas de session PHP).
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<CoherenceRule>> fetchRules({
@@ -831,15 +901,29 @@ class ApiService {
     }
   }
 
-  // COHERENCE CHECK — POST-SAVE CONTROL
-  // Source server: data_controle.php / controle_theme_batch.class.php
+  // CONTRÔLE DE COHÉRENCE SERVEUR — APRÈS ENVOI DES DONNÉES
+  // =============================================================================
+  // Source serveur: data_controle.php → controle_theme_batch.class.php
+  //
   //   GET /data_controle.php/theme_controle/{login}/{campId}/{sysId}/{qstId}/
   //        {etabId}/{filter}/{yearCode}
-  //   Response: { se_status:200, se_data: { nb_erreurs: N, erreurs: [...] } }
-  //   erreurs[]: { id_regle, id_regle_assoc, message, regle_1, regle_2, critere }
+  //   Réponse : { se_status:200, se_data: { nb_erreurs: N, erreurs: [...] } }
+  //   erreurs[] : { id_regle, id_regle_assoc, message, regle_1, regle_2, critere }
   //
-  // Designed to be called AFTER saveData() succeeds.
-  // Returns list of CoherenceError objects (empty list = no violations).
+  // FONCTIONNEMENT :
+  //   Exécuté APRÈS saveData() réussi pour vérifier la cohérence des données
+  //   fraîchement enregistrées en base Oracle/MySQL.
+  //   Contrairement au contrôle offline (CoherenceEvaluator), ce contrôle
+  //   exécute les requêtes SQL directement sur la base de données serveur,
+  //   donc il est exhaustif et précis.
+  //
+  // RÉSULTAT : Liste de CoherenceError (vide = pas de violations).
+  //   En cas d'erreur réseau → retourne [] (non-bloquant, DataEntryProvider
+  //   ne bloque pas l'envoi si le contrôle échoue).
+  //
+  // ID THÈME COMPOSITE :
+  //   L'ID thème peut être composite (ex: 15702 = thème 1570 + secteur 2).
+  //   data_controle.php appelle controle_strip_theme_id() pour extraire 1570.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<CoherenceError>> checkCoherence({
@@ -891,8 +975,11 @@ class ApiService {
     }
   }
 
-  // Mirrors: getDataFromServer(servSuffix, params, callBack) in charge_camp.js
-  //   success callback receives response.se_data
+  // Miroir de : getDataFromServer(servSuffix, params, callBack) dans charge_camp.js
+  //   → callback reçoit response.se_data (déballage de l'enveloppe JSON)
+  //
+  // HELPER PRIVÉ — GET générique avec déballage de l'enveloppe se_data
+  // Utilisé par toutes les méthodes de lecture (getSchools, getCampaigns, etc.)
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<dynamic> _get(String path) async {
@@ -939,11 +1026,19 @@ class ApiService {
   }
 }
 
-// ─── Auth Injector Interceptor ───────────────────────────────────────────────
-// Ensures the Authorization header is present on EVERY request, including
-// those automatically generated by Dio when following 3xx redirects.
-// Dio's default redirect handler re-uses the original options so headers
-// should be preserved, but this interceptor is a safety net.
+// ─── Intercepteur d'injection du header Authorization ───────────────────────
+// Garantit que le header Authorization est présent sur CHAQUE requête Dio,
+// y compris celles générées automatiquement lors du suivi des redirections 3xx.
+//
+// PROBLÈME : Lors d'un redirect, Dio peut perdre ou ne pas propager les headers
+// personnalisés selon la version et la configuration de l'adaptateur HTTP.
+//
+// SOLUTION : Cet intercepteur vérifie à chaque requête si Authorization est présent.
+// Si absent, il le ré-injecte à partir des credentials stockés dans ApiService.
+//
+// Ce mécanisme est indispensable car le serveur StatEduc utilise parfois des
+// redirections internes (ex: Apache mod_rewrite) qui peuvent provoquer une
+// perte des headers.
 class _AuthInjectorInterceptor extends Interceptor {
   final ApiService _service;
   _AuthInjectorInterceptor(this._service);
@@ -966,11 +1061,15 @@ class _AuthInjectorInterceptor extends Interceptor {
   }
 }
 
-/// A single coherence rule downloaded from data_rules.php for offline evaluation.
+/// CoherenceRule — Règle de cohérence téléchargée depuis data_rules.php
+/// pour l'évaluation hors ligne par CoherenceEvaluator.
 ///
-/// The server returns (rule, associated-rule, critere, message) pairs.
-/// Stored flat in the SQLite coherence_rules table keyed by context
-/// (id_camp, id_qst, id_etab, id_filter).
+/// Une règle représente une paire (R1, R2) avec un opérateur de comparaison :
+///   "R1.sql_regle {critere} R2.sql_assoc" doit être vrai pour que les données soient cohérentes.
+///
+/// Stockage : table SQLite `coherence_rules` indexée par (id_camp, id_qst, id_etab).
+/// Champs JSON serveur : id_regle, lib_regle, sql_regle, id_assoc, id_regle_assoc,
+///                       lib_regle_assoc, sql_assoc, critere, message.
 class CoherenceRule {
   final String idCamp;
   final String idQst;
@@ -1013,16 +1112,18 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
-/// Represents a coherence control violation returned by data_controle.php.
+/// CoherenceError — Violation de cohérence retournée par data_controle.php.
 ///
-/// Server source: controle_theme_batch.class.php → tab_regles_theme_assoc_not_ok
-/// JSON fields:
-///   id_regle       → rule ID from DICO_REGLE_THEME
-///   id_regle_assoc → associated rule ID
-///   message        → human-readable violation message (translated by server)
-///   regle_1        → label of the first data value
-///   regle_2        → label of the associated data value
-///   critere        → comparison operator (>, <, =, etc.)
+/// Générée par controle_theme_batch.class.php côté serveur :
+///   le tableau $tab_regles_theme_assoc_not_ok est sérialisé en JSON par data_controle.php.
+///
+/// Champs JSON :
+///   id_regle       → ID de la règle R1 (DICO_REGLE_THEME)
+///   id_regle_assoc → ID de la règle R2 associée
+///   message        → message d'erreur traduit (depuis DICO_REGLE_THEME_ASSOC)
+///   regle_1        → libellé de la valeur calculée pour R1 (pour affichage)
+///   regle_2        → libellé de la valeur calculée pour R2 (pour affichage)
+///   critere        → opérateur de comparaison (<=, >=, =, etc.)
 class CoherenceError {
   final int idRegle;
   final int idRegleAssoc;

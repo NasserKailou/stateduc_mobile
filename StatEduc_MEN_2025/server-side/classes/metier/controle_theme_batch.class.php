@@ -1,4 +1,107 @@
-<?php class controle_theme{
+<?php
+/**
+ * controle_theme_batch.class.php ? Moteur de contrôle de cohérence des données de collecte
+ *
+ * Ce fichier implémente la classe `controle_theme` qui effectue les contrôles de cohérence
+ * inter-règles pour un thème de collecte statistique (StatEduc MEN).
+ *
+ * =========================================================================
+ * PRINCIPE DES CONTRÔLES DE COHÉRENCE
+ * =========================================================================
+ *
+ * Un contrôle de cohérence met en relation DEUX règles SQL (R1 et R2) via un opérateur
+ * de comparaison (critère OP) stocké dans DICO_REGLE_THEME_ASSOC :
+ *
+ *   R1 OP R2  ?  si la condition est VRAIE : données cohérentes (OK)
+ *                si la condition est FAUSSE : violation détectée (KO)
+ *
+ * Exemple : "Nb élèves filles <= Nb élèves total"
+ *   R1 = SELECT SUM(NB_FILLES) FROM ...  ? valeur numérique
+ *   R2 = SELECT SUM(NB_TOTAL)  FROM ...  ? valeur numérique
+ *   OP = '<='
+ *   ? eval("if(V1 <= V2) $OK=true; else $OK=false;")
+ *
+ * =========================================================================
+ * DEUX MODES D'UTILISATION
+ * =========================================================================
+ *
+ * MODE HTML (alert = true)  ? usage navigateur web classique :
+ *   - Génère des alertes JavaScript (navigateurs modernes) ou VBScript (IE)
+ *   - Affiche message OK ou KO directement dans le navigateur après soumission
+ *   - Utilisé dans le workflow web standard de StatEduc
+ *
+ * MODE BATCH/API (alert = false)  ? usage depuis data_controle.php (API mobile) :
+ *   - N'affiche aucune alerte HTML
+ *   - Remplit $tab_regles_theme_assoc_not_ok[] avec les règles en violation
+ *   - data_controle.php lit ce tableau et retourne les erreurs en JSON
+ *   - Utilisé par l'application Flutter pour les contrôles serveur
+ *
+ * =========================================================================
+ * FLUX D'EXÉCUTION
+ * =========================================================================
+ *
+ *   __construct($ctrl_id, $langue, $code_etablissement, $code_annee, $code_filtre, $alert)
+ *       ?
+ *       ??? get_regles()
+ *       ?     ?? Charge R1 depuis DICO_REGLE_THEME (WHERE ID_REGLE_THEME = regle1)
+ *       ?     ?? Interpole les variables PHP dans le SQL via eval()
+ *       ?     ?    ex: eval('$sql = "$sql_regle_theme";')
+ *       ?     ?    ? $code_etablissement, $code_annee, $code_filtre remplacés
+ *       ?     ?? Charge R2 depuis DICO_REGLE_THEME (WHERE ID_REGLE_THEME = regle2)
+ *       ?     ?? Remplit $tab_regles_theme[] et $tab_regles_theme_assoc[]
+ *       ?
+ *       ??? controle_regles_theme()
+ *             ?? Pour chaque R1 dans $tab_regles_theme :
+ *             ?   ?? valeur_sql_regle(sql_R1) ? V1
+ *             ?       ?? Pour chaque R2 dans $tab_regles_theme_assoc[R1] :
+ *             ?           ?? valeur_sql_regle(sql_R2) ? V2
+ *             ?           ?? eval("if(V1 OP V2) $OK=true; else $OK=false;")
+ *             ?           ?? Si OK=true  ? alerter(id_regle, id_regle_assoc, 'regle_OK')
+ *             ?           ?? Si OK=false ? $tab_regles_theme_assoc_not_ok[R1][R2] = infos
+ *             ?                          ? alerter(id_regle, id_regle_assoc, 'regle_pas_OK')
+ *
+ * =========================================================================
+ * STRUCTURE DE $tab_regles_theme_assoc_not_ok
+ * =========================================================================
+ *
+ * Tableau indexé par [id_regle_R1][id_regle_R2] contenant pour chaque violation :
+ *   - 'id_assoc'        : ID de l'association DICO_REGLE_THEME_ASSOC
+ *   - 'id_regle_assoc'  : ID de la règle R2
+ *   - 'critere_assoc'   : opérateur utilisé (<=, >=, =, <, >, <>)
+ *   - 'id_theme_assoc'  : ID du thème de R2
+ *   - 'id_theme'        : ID du thème de R1
+ *   - 'sql_assoc'       : SQL interpolé de R2
+ *   - 'msg_assoc'       : libellé du message d'erreur (DICO_REGLE_THEME_ASSOC)
+ *   - 'nom_regle_1'     : libellé traduit de R1 (DICO_REGLE_THEME)
+ *   - 'nom_regle_2'     : libellé traduit de R2 (DICO_REGLE_THEME)
+ *   - 'val_champ1'      : valeur calculée de V1 (pour affichage)
+ *   - 'val_champ2'      : valeur calculée de V2 (pour affichage)
+ *
+ * =========================================================================
+ * TABLES BASE DE DONNÉES UTILISÉES (DICO)
+ * =========================================================================
+ *
+ *   DICO_REGLE_THEME         : définit les règles SQL (R1, R2) par thème
+ *   DICO_REGLE_THEME_ASSOC   : associe R1 et R2 avec l'opérateur (CRITERE)
+ *                              et le flag ACTIVER_CTRL (1=actif)
+ *   DICO_MESSAGE             : messages traduits pour les alertes (IDs 101-107)
+ *   DICO_TRADUCTION          : libellés traduits de toutes les nomenclatures
+ *
+ * =========================================================================
+ * DÉPENDANCES
+ * =========================================================================
+ *
+ *   $GLOBALS['conn']       : connexion AdoDB à la base de données de collecte
+ *   $GLOBALS['conn_dico']  : connexion AdoDB à la base DICO (règles, libellés)
+ *   $GLOBALS['PARAM']      : paramètres globaux (CODE_ETABLISSEMENT, TYPE_ANNEE, etc.)
+ *   erreur_manager         : classe de gestion des erreurs SQL
+ *   recherche_libelle_nomenclature_ctrl() : fonction globale de traduction nomenclature
+ *
+ * @author    Équipe StatEduc MEN
+ * @version   2025
+ * @encoding  ISO-8859-15 / Windows CRLF (fichier legacy ? ne pas convertir)
+ */
+class controle_theme{
 		
 			
 		/**
@@ -104,13 +207,21 @@
 		
 		
 		/**
-		* METHODE : 
-		* <pre>
-		* 
-		* </pre>
-		* @access public
-		* 
-		*/
+		 * Constructeur ? Initialise le moteur de contrôle et lance l'exécution complète.
+		 *
+		 * Initialise tous les attributs de l'instance, puis si ctrl_id != 0, déclenche
+		 * automatiquement get_regles() pour charger les règles SQL, puis
+		 * controle_regles_theme() pour exécuter les comparaisons.
+		 *
+		 * @param int    $ctrl_id              ID de l'association (DICO_REGLE_THEME_ASSOC.ID_ASSOC_REG_THM)
+		 *                                     Passé 0 ? n'exécute pas les contrôles (instance vide)
+		 * @param string $langue               Code langue pour les libellés traduits (ex: 'FR', 'EN')
+		 * @param string $code_etablissement   Code de l'établissement ciblé par le contrôle
+		 * @param string $code_annee           Code de l'année scolaire (ex: '2024')
+		 * @param string $code_filtre          Code filtre optionnel (ex: secteur, sous-groupe)
+		 * @param bool   $alert                true = mode HTML (alertes JS/VBScript)
+		 *                                     false = mode batch API (remplit tab_regles_theme_assoc_not_ok)
+		 */
 		public function __construct($ctrl_id, $langue, $code_etablissement, $code_annee, $code_filtre='', $alert){ 
 				$this->conn 	   					= $GLOBALS['conn'];
 				$this->ctrl_id   					= $ctrl_id;
@@ -129,13 +240,17 @@
 		
 		
 		/**
-		* METHODE : 
-		* <pre>
-		* 
-		* </pre>
-		* @access public
-		* 
-		*/
+		 * recherche_libelle ? Récupère un libellé traduit depuis DICO_TRADUCTION.
+		 *
+		 * Détermine la connexion à utiliser selon le type de table :
+		 *   - Table de nomenclature (préfixée par PARAM.TYPE) ? base courante ($GLOBALS['conn'])
+		 *   - Autre table ? base DICO externe ($GLOBALS['conn_dico'])
+		 *
+		 * @param  int    $code    Code de la nomenclature à traduire
+		 * @param  string $langue  Code langue (ex: 'FR')
+		 * @param  string $table   Nom de la table de nomenclature (ex: 'DICO_REGLE_THEME')
+		 * @return string          Libellé traduit ou chaîne vide si non trouvé
+		 */
 		public function recherche_libelle($code,$langue,$table){
 				// permet de récupérer le libellé dans la table de traduction
 				// en fonction de la langue et de la table  aussi
@@ -194,13 +309,22 @@
     
 		
 		/**
-		* METHODE : 
-		* <pre>
-		* 
-		* </pre>
-		* @access public
-		* 
-		*/
+		 * valeur_sql_regle ? Exécute un SQL et retourne le résultat sous forme de tableau 2D.
+		 *
+		 * Deux cas de figure :
+		 *   1. Si $sql est une constante numérique pure (ex: "0", "42") :
+		 *      ? retourne directement array(array($sql)) sans requête DB
+		 *   2. Sinon : exécute la requête via AdoDB GetAll() et retourne le résultat
+		 *      ? Si résultat vide : retourne array(array(0)) (convention "zéro")
+		 *      ? Si erreur SQL   : retourne la chaîne 'erreur' (gérée par controle_regles_theme)
+		 *
+		 * Le résultat est toujours de la forme : array(array(valeur, ...))
+		 * pour être compatible avec la logique de comparaison multi-champs/multi-lignes.
+		 *
+		 * @param  string $sql  Requête SQL interpolée (avec variables $code_etablissement etc.)
+		 *                      ou constante numérique
+		 * @return mixed        Tableau 2D de résultats, ou 'erreur' en cas d'exception SQL
+		 */
 		public function valeur_sql_regle($sql){
 			//permet de retourner la valeur du SQL
 			//$GLOBALS['ADODB_FETCH_MODE'] 	= ADODB_FETCH_NUM;
@@ -240,13 +364,31 @@
 		
 		
 		/**
-		* METHODE : 
-		* <pre>
-		* 
-		* </pre>
-		* @access public
-		* 
-		*/
+		 * get_regles ? Charge et interpole toutes les règles SQL associées au contrôle.
+		 *
+		 * Cette méthode effectue les opérations suivantes :
+		 *
+		 * 1. Déclare les variables PHP locales ($code_etablissement, $code_annee, $code_filtre)
+		 *    ET les variables dynamiques globales (via ${$GLOBALS['PARAM']['CODE_ETABLISSEMENT']} etc.)
+		 *    pour permettre à eval() de les substituer dans les SQL stockés en base.
+		 *
+		 * 2. Requête DICO_REGLE_THEME_ASSOC (WHERE ID_ASSOC_REG_THM = $ctrl_id AND ACTIVER_CTRL=1)
+		 *    ? récupère theme1, regle1, critere, theme2, regle2
+		 *
+		 * 3. Charge R1 : SQL de la règle principale (regle1 du theme1)
+		 *    ? eval('$sql = "$sql_regle_theme";') ? interpolation des variables PHP dans le SQL
+		 *    ? stocké dans $this->tab_regles_theme[id_regle]['sql']
+		 *
+		 * 4. Charge R2 : SQL de la règle associée (regle2 du theme2)
+		 *    ? eval('$sql = "$sql_regle_assoc";') ? même interpolation
+		 *    ? stocké dans $this->tab_regles_theme_assoc[regle1][regle2][] avec :
+		 *         'id_assoc', 'id_regle_assoc', 'critere_assoc', 'id_theme_assoc',
+		 *         'id_theme', 'sql_assoc', 'msg_assoc', 'nom_regle_1', 'nom_regle_2'
+		 *
+		 * IMPORTANT : L'interpolation via eval() permet aux SQL de contenir des références
+		 * aux variables PHP comme $code_etablissement ou $code_annee, rendant les requêtes
+		 * dynamiques selon le contexte de l'établissement et de l'année scolaire.
+		 */
 		public function get_regles(){
 				// permet de récupérer toutes les règles de contrôle associées
 				// au thème ainsi les règles en association 
@@ -348,13 +490,36 @@
 		
 		
 		/**
-		* METHODE : 
-		* <pre>
-		* 
-		* </pre>
-		* @access public
-		* 
-		*/
+		 * controle_regles_theme ? Exécute les comparaisons R1 OP R2 et détecte les violations.
+		 *
+		 * Algorithme principal de contrôle de cohérence :
+		 *
+		 * Pour chaque règle R1 dans $tab_regles_theme :
+		 *   1. V1 = valeur_sql_regle(sql_R1)
+		 *   2. Si V1 = 'erreur' ? alerter('regle_sql_erreur') et passer à la suivante
+		 *   3. Pour chaque règle associée R2 dans $tab_regles_theme_assoc[R1] :
+		 *      a. V2 = valeur_sql_regle(sql_R2)
+		 *      b. Si V2 = 'erreur' ? alerter('regle_sql_erreur')
+		 *      c. CAS SPÉCIAUX (considérés OK sans comparaison) :
+		 *         - V1=0 ET V2=0 (données toutes nulles)
+		 *         - V2=0 avec opérateur > ou >= (ne peut violer "X > 0" si X=0)
+		 *         - V1=0 avec opérateur < ou <= (symétrique)
+		 *      d. COMPARAISON NORMALE :
+		 *         - Construit $chaine_op = "V1 OP V2"
+		 *         - eval("if($chaine_op) $OK = true; else $OK = false;")
+		 *         - Si OK=true  ? alerter('regle_OK') (si ALERT_CTRL_THM_OK=true)
+		 *         - Si OK=false ? remplit $tab_regles_theme_assoc_not_ok[R1][R2]
+		 *                       ? alerter('regle_pas_OK')
+		 *
+		 * GESTION MULTI-LIGNES / MULTI-CHAMPS :
+		 *   - Si nb_records_1 == nb_records_2 ET nb_champs_1 == nb_champs_2 :
+		 *     comparaison ligne-à-ligne, champ-à-champ
+		 *   - Sinon (cardinalités différentes) :
+		 *     $OK=false immédiatement, extrait premier enregistrement pour affichage
+		 *
+		 * NOTE : unset des variables de session num_lig_page / nbre_lig_page
+		 * au début pour éviter des effets de bord de pagination.
+		 */
 		public function controle_regles_theme(){
 				// Pour chaque règle du thème R1
 				// On récupère VAL_1 = valeur_sql_regle(R1)
@@ -605,13 +770,33 @@
 		
 		
 		/**
-		* METHODE : 
-		* <pre>
-		* 
-		* </pre>
-		* @access public
-		* 
-		*/
+		 * alerter ? Génère une alerte HTML (JS ou VBScript/IE) selon le cas de contrôle.
+		 *
+		 * Cette méthode n'est active QUE si $this->alert = true (mode navigateur web).
+		 * En mode batch API ($alert=false), cette méthode n'est jamais appelée pour
+		 * 'regle_pas_OK' (les erreurs sont stockées dans $tab_regles_theme_assoc_not_ok).
+		 *
+		 * Cas gérés :
+		 *   'theme_pas_regle'  : le thème n'a aucune règle ? message DICO_MESSAGE[103]
+		 *   'regle_pas_assoc'  : une règle R1 n'a pas de règle associée R2
+		 *                        ? message DICO_MESSAGE[104] + libellé de R1
+		 *   'regle_sql_erreur' : erreur d'exécution SQL pour une règle
+		 *                        ? message DICO_MESSAGE[106] + libellé de la règle
+		 *   'regle_OK'         : contrôle passé avec succès (affiché seulement si
+		 *                        PARAM['ALERT_CTRL_THM_OK']=true)
+		 *                        ? messages DICO_MESSAGE[101] et [105]
+		 *   'regle_pas_OK'     : VIOLATION détectée
+		 *                        ? libellé depuis DICO_REGLE_THEME_ASSOC (message métier)
+		 *
+		 * Détection navigateur :
+		 *   - strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') ? Internet Explorer ? VBScript
+		 *   - Sinon ? JavaScript alert()
+		 *
+		 * @param int|string $id_regle        ID de la règle R1 (pour libellé et recherche)
+		 * @param int|string $id_regle_assoc  ID de la règle R2 associée
+		 * @param string     $cas             Type d'alerte : 'theme_pas_regle', 'regle_pas_assoc',
+		 *                                    'regle_sql_erreur', 'regle_OK', 'regle_pas_OK'
+		 */
 		public function alerter($id_regle, $id_regle_assoc, $cas){
 				// Si cas=bon Alerte positive
 				// Sinon Si cas=mauvais Alerte négative
@@ -765,6 +950,6 @@
 				*/
 		}
 
-}//Fin class controle_theme
+}// Fin class controle_theme ? Moteur de contrôle de cohérence StatEduc MEN
 
 ?>
