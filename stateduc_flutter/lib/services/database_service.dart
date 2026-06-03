@@ -1141,6 +1141,29 @@ class DatabaseService {
     return rows.isNotEmpty;
   }
 
+  /// Retourne tous les couples distincts (id_etab, id_qst) qui ont des données
+  /// collectées pour une campagne donnée (envoyées ou non).
+  ///
+  /// Utilisé par [sendAllFormsForCampaign] pour itérer sur tous les formulaires
+  /// saisis, même si l'établissement courant n'est pas ouvert dans l'UI.
+  Future<List<Map<String, String>>> getDistinctEtabQstWithData(
+      String idCamp) async {
+    final db = await database;
+    // SELECT DISTINCT pour ne pas envoyer le même formulaire plusieurs fois
+    // (plusieurs lignes dans collected_data par formulaire)
+    final rows = await db.rawQuery(
+      'SELECT DISTINCT id_etab, id_qst FROM collected_data WHERE id_camp = ?',
+      [idCamp],
+    );
+    return rows
+        .map((r) => {
+              'id_etab': r['id_etab'] as String? ?? '',
+              'id_qst': r['id_qst'] as String? ?? '',
+            })
+        .where((m) => m['id_etab']!.isNotEmpty && m['id_qst']!.isNotEmpty)
+        .toList();
+  }
+
   /// Deletes all collected data for a school+question (for reload from server).
   Future<void> deleteCollectedData({
     required String idCamp,

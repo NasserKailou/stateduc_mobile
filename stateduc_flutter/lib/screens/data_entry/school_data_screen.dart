@@ -162,6 +162,14 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
                 leading: Icon(Icons.refresh),
                 title: Text('Recharger depuis serveur'),
               )),
+          // ── Envoi global de tous les formulaires de cet établissement ──
+          const PopupMenuItem(
+              value: 'send_all',
+              child: ListTile(
+                leading: Icon(Icons.cloud_sync_outlined),
+                title: Text('Envoyer tous les formulaires'),
+                subtitle: Text('Tous les formulaires de cet établissement'),
+              )),
         ],
       ),
     ];
@@ -427,7 +435,149 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
       AuthProvider auth, DataEntryProvider entry) {
     if (value == 'reload') {
       _reloadFromServer(context, auth, entry);
+    } else if (value == 'send_all') {
+      _sendAllForms(context, auth, entry);
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  /// Envoie TOUS les formulaires de l'établissement courant vers le serveur.
+  ///
+  /// Affiche une boîte de dialogue de confirmation, puis une barre de
+  /// progression pendant l'envoi séquentiel de chaque formulaire.
+  /// Un résumé est affiché en fin d'opération (succès / erreurs).
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<void> _sendAllForms(BuildContext context, AuthProvider auth,
+      DataEntryProvider entry) async {
+    if (auth.user == null) return;
+
+    final total = entry.questions.length;
+    if (total == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aucun formulaire à envoyer')),
+      );
+      return;
+    }
+
+    // Confirmation avant envoi
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.cloud_sync_outlined),
+            SizedBox(width: 8),
+            Text('Envoi global'),
+          ],
+        ),
+        content: Text(
+          'Envoyer les $total formulaire(s) de cet établissement ?\n\n'
+          'Les données seront sauvegardées localement avant envoi.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(ctx, true),
+            icon: const Icon(Icons.cloud_upload_outlined),
+            label: const Text('Envoyer'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+
+    // Dialogue de progression
+    int _sent = 0;
+    final progressNotifier = ValueNotifier<int>(0);
+
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => ValueListenableBuilder<int>(
+        valueListenable: progressNotifier,
+        builder: (_, progress, __) => AlertDialog(
+          title: const Text('Envoi en cours…'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LinearProgressIndicator(
+                value: total > 0 ? progress / total : 0,
+              ),
+              const SizedBox(height: 12),
+              Text('$progress / $total formulaire(s)'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Lancement de l'envoi global
+    final results = await entry.sendAllFormsForSchool(
+      user: auth.user!,
+      onProgress: (sent, tot) {
+        progressNotifier.value = sent;
+      },
+    );
+
+    // Ferme le dialogue de progression
+    if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    progressNotifier.dispose();
+
+    if (!mounted) return;
+
+    // Résumé
+    final okCount   = results.values.where((v) => v).length;
+    final failCount = results.values.where((v) => !v).length;
+    final hasError  = entry.error != null;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              hasError || failCount > 0
+                  ? Icons.warning_amber_rounded
+                  : Icons.check_circle_outline,
+              color: hasError || failCount > 0
+                  ? Colors.orange
+                  : Colors.green,
+            ),
+            const SizedBox(width: 8),
+            const Text('Résultat de l\'envoi'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('✅  $okCount formulaire(s) envoyé(s) avec succès'),
+            if (failCount > 0)
+              Text('⚠️  $failCount formulaire(s) non envoyé(s) '  
+                   '(données manquantes ou erreur serveur)'),
+            if (hasError) ...[  
+              const SizedBox(height: 8),
+              Text(
+                entry.error ?? '',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 13),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Appelé par [DynamicFormWidget] quand l'utilisateur ajoute une ligne

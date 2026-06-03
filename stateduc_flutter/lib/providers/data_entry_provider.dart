@@ -242,6 +242,17 @@ class DataEntryProvider extends ChangeNotifier {
             await _db.insertCoherenceRules(rules);
             debugPrint('[DataEntry] stored ${rules.length} offline coherence rules '
                 'for qst=${q.idQst} etab=$idEtab year=$yearCode');
+            // ── Re-déclenche le contrôle offline si les règles viennent d'arriver
+            // pour la question actuellement affichée et que des données sont présentes.
+            // Cela résout le cas où saveLocally() appelait checkCoherenceOffline()
+            // avant que les règles soient stockées (règles vides → aucun contrôle).
+            if (_selectedQuestion?.idQst == q.idQst &&
+                _formData.isNotEmpty &&
+                !_isCheckingOffline) {
+              debugPrint('[DataEntry] rules arrived for current question — '
+                  're-triggering offline coherence check');
+              await checkCoherenceOffline();
+            }
           } else {
             debugPrint('[DataEntry] no offline coherence rules returned '
                 'for qst=${q.idQst} etab=$idEtab year=$yearCode '
@@ -320,14 +331,31 @@ class DataEntryProvider extends ChangeNotifier {
       // Rechargement automatique depuis le serveur :
       // - Toujours pour le formulaire d'identification (le serveur peut avoir
       //   des champs de dates comme DATE_CREATION_0 absent des données locales).
-      //   Les valeurs serveur n'écrasent que les champs actuellement vides.
+      //   Pour l'identification : forceOverwrite=true → les données serveur
+      //   remplacent toutes les données locales (le serveur est source de vérité).
       // - Pour les autres formulaires : seulement quand les données locales
       //   sont vides (première ouverture).
       // Exécuté en arrière-plan pour ne pas bloquer l'affichage du formulaire.
       if (_currentUser != null) {
         if (isIdentificationForm || _formData.isEmpty) {
-          _autoReloadFromServerBackground();
+          // Pour le formulaire d'identification, forcer l'écrasement des données
+          // locales par les données serveur (toujours à jour, source de vérité).
+          _autoReloadFromServerBackground(
+            forceOverwrite: isIdentificationForm,
+          );
         }
+      }
+
+      // ── Contrôle de cohérence offline au changement de question ──────────
+      // Si des données locales existent déjà pour ce formulaire, on lance
+      // immédiatement le contrôle offline (en arrière-plan, non bloquant).
+      // Cela garantit que le bandeau d'alerte est visible dès l'ouverture
+      // d'un formulaire déjà saisi, sans attendre une nouvelle sauvegarde.
+      // Note : si les règles ne sont pas encore chargées (fetch background en
+      // cours), le re-déclenchement depuis _fetchAndStoreCoherenceRulesBackground
+      // prendra le relais dès que les règles seront disponibles.
+      if (_formData.isNotEmpty) {
+        Future(() => checkCoherenceOffline());
       }
     } catch (e) {
       _error = 'Erreur chargement formulaire : ${e.toString()}';
@@ -349,15 +377,17 @@ class DataEntryProvider extends ChangeNotifier {
   //     n'écrase que les champs actuellement vides pour préserver les saisies
   //
   // En cas d'erreur : ignoré silencieusement (hors ligne ou pas de sauvegarde préalable)
-  void _autoReloadFromServerBackground() {
+  void _autoReloadFromServerBackground({bool forceOverwrite = false}) {
     final user      = _currentUser;
     final question  = _selectedQuestion;
     final idCamp    = _idCamp;
     final idEtab    = _idEtab;
     final idSystem  = _idSystem;
     final idFilter  = _selectedFilter?.idFilter;
-    // Capture l'état des données locales au moment de l'appel
-    final localWasEmpty = _formData.isEmpty;
+    // Capture l'état des données locales au moment de l'appel.
+    // forceOverwrite = true pour le formulaire d'identification : les données
+    // serveur remplacent toujours les données locales (le serveur est source de vérité).
+    final localWasEmpty = _formData.isEmpty || forceOverwrite;
     if (user == null || question == null || idCamp == null ||
         idEtab == null || idSystem == null) return;
 
@@ -865,6 +895,229 @@ class DataEntryProvider extends ChangeNotifier {
       return false;
     } finally {
       _isReloading = false;
+      notifyListeners();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ENVOYER TOUS LES FORMULAIRES D'UN ÉTABLISSEMENT (envoi global établissement)
+  //
+  // Envoie toutes les questions/formulaires de l'établissement COURANT en une
+  // seule opération. C'est l'équivalent de cliquer sur "Envoyer" pour chaque
+  // formulaire individuellement, mais en une seule action.
+  //
+  // Retourne une Map<idQst, bool> indiquant le résultat pour chaque formulaire.
+  // Le callback [onProgress] est appelé après chaque envoi pour mettre à jour
+  // une éventuelle barre de progression dans l'interface.
+  //
+  // Contrairement à sendToServer() qui n'envoie que le formulaire courant,
+  // cette méthode itère sur TOUTES les questions de l'établissement actuel.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Envoie tous les formulaires de l'établissement courant vers le serveur.
+  ///
+  /// [user] : utilisateur connecté (login + yearCode).
+  /// [onProgress] : callback optionnel appelé après chaque envoi avec (index, total).
+  Future<Map<String, bool>> sendAllFormsForSchool({
+    required User user,
+    void Function(int sent, int total)? onProgress,
+  }) async {
+    if (_idCamp == null || _idEtab == null || _idSystem == null) {
+      _error = 'Contexte invalide pour l\'envoi global';
+      notifyListeners();
+      return {};
+    }
+
+    final results = <String, bool>{};
+    final questionsToSend = List<Question>.from(_questions);
+    final total = questionsToSend.length;
+    int sent = 0;
+
+    _isSending = true;
+    _error     = null;
+    _successMessage = null;
+    notifyListeners();
+
+    try {
+      for (int i = 0; i < questionsToSend.length; i++) {
+        final q = questionsToSend[i];
+        // Charge les données collectées pour cette question depuis SQLite
+        final data = await _db.getCollectedData(
+          idCamp:   _idCamp!,
+          idEtab:   _idEtab!,
+          idQst:    q.idQst,
+          idFilter: null,
+        );
+        if (data.isEmpty) {
+          // Aucune donnée locale pour ce formulaire → ignore
+          results[q.idQst] = false;
+          sent++;
+          onProgress?.call(sent, total);
+          continue;
+        }
+
+        final isFirst = _questions.isNotEmpty && _questions.first.idQst == q.idQst;
+        try {
+          final ok = await _api.saveData(
+            login:           user.login,
+            campId:          _idCamp!,
+            sysId:           _idSystem!,
+            qstId:           q.idQst,
+            etabId:          _idEtab!,
+            filter:          null,
+            formData:        data,
+            etabRegroupId:   _idRegroupEtab,
+            isFirstQuestion: isFirst,
+            yearCode:        user.codeyear,
+          );
+          results[q.idQst] = ok;
+          if (ok) {
+            await _db.markCollectedDataSent(
+              idCamp:   _idCamp!,
+              idEtab:   _idEtab!,
+              idQst:    q.idQst,
+              idFilter: null,
+            );
+          }
+        } on ApiException catch (e) {
+          results[q.idQst] = false;
+          debugPrint('[DataEntry] sendAllFormsForSchool: '
+              'ApiException for qst=${q.idQst}: ${e.message}');
+        } catch (e) {
+          results[q.idQst] = false;
+          debugPrint('[DataEntry] sendAllFormsForSchool: '
+              'error for qst=${q.idQst}: $e');
+        }
+        sent++;
+        onProgress?.call(sent, total);
+      }
+
+      // Résumé
+      final okCount   = results.values.where((v) => v).length;
+      final skipCount = results.values.where((v) => !v).length;
+      _successMessage = '$okCount formulaire(s) envoyé(s) avec succès'
+          '${skipCount > 0 ? ', $skipCount ignoré(s) (données manquantes ou erreur)' : ''}.';
+      notifyListeners();
+      return results;
+    } catch (e) {
+      _error = 'Erreur envoi global : ${e.toString()}';
+      notifyListeners();
+      return results;
+    } finally {
+      _isSending = false;
+      notifyListeners();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ENVOYER TOUS LES FORMULAIRES DE TOUS LES ÉTABLISSEMENTS (envoi global campagne)
+  //
+  // Envoie TOUTES les données collectées pour TOUS les établissements de la
+  // campagne courante. Utilise getDistinctEtabQstWithData() pour trouver tous
+  // les couples (id_etab, id_qst) qui ont des données, sans se limiter à
+  // l'établissement actuellement affiché.
+  //
+  // Le callback [onProgress] est appelé après chaque envoi pour mettre à jour
+  // une barre de progression dans l'interface.
+  //
+  // Retourne Map<"${idEtab}_${idQst}", bool> pour le résumé de l'opération.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Envoie tous les formulaires de tous les établissements de la campagne.
+  ///
+  /// [user] : utilisateur connecté (login + codeyear + yearCode).
+  /// [idCamp] : identifiant de la campagne à synchroniser.
+  /// [idSystem] : identifiant du système éducatif.
+  /// [onProgress] : callback optionnel appelé après chaque envoi (index, total).
+  Future<Map<String, bool>> sendAllFormsForCampaign({
+    required User user,
+    required String idCamp,
+    required String idSystem,
+    void Function(int sent, int total)? onProgress,
+  }) async {
+    final results = <String, bool>{};
+
+    // Récupère tous les couples (etab, qst) qui ont des données pour la campagne
+    final etabQstList = await _db.getDistinctEtabQstWithData(idCamp);
+    if (etabQstList.isEmpty) {
+      _successMessage = 'Aucune donnée locale à envoyer pour cette campagne.';
+      notifyListeners();
+      return {};
+    }
+
+    final total = etabQstList.length;
+    int sent = 0;
+
+    _isSending      = true;
+    _error          = null;
+    _successMessage = null;
+    notifyListeners();
+
+    try {
+      for (int i = 0; i < etabQstList.length; i++) {
+        final pair    = etabQstList[i];
+        final etabId  = pair['id_etab']!;
+        final qstId   = pair['id_qst']!;
+        final key     = '${etabId}_$qstId';
+
+        // Charge les données pour ce couple (etab, qst)
+        final data = await _db.getCollectedData(
+          idCamp:   idCamp,
+          idEtab:   etabId,
+          idQst:    qstId,
+          idFilter: null,
+        );
+        if (data.isEmpty) {
+          results[key] = false;
+          sent++;
+          onProgress?.call(sent, total);
+          continue;
+        }
+
+        try {
+          final ok = await _api.saveData(
+            login:    user.login,
+            campId:   idCamp,
+            sysId:    idSystem,
+            qstId:    qstId,
+            etabId:   etabId,
+            filter:   null,
+            formData: data,
+            yearCode: user.codeyear,
+          );
+          results[key] = ok;
+          if (ok) {
+            await _db.markCollectedDataSent(
+              idCamp:   idCamp,
+              idEtab:   etabId,
+              idQst:    qstId,
+              idFilter: null,
+            );
+          }
+        } on ApiException catch (e) {
+          results[key] = false;
+          debugPrint('[DataEntry] sendAllFormsForCampaign: '
+              'ApiException for $key: ${e.message}');
+        } catch (e) {
+          results[key] = false;
+          debugPrint('[DataEntry] sendAllFormsForCampaign: error for $key: $e');
+        }
+        sent++;
+        onProgress?.call(sent, total);
+      }
+
+      final okCount   = results.values.where((v) => v).length;
+      final failCount = results.values.where((v) => !v).length;
+      _successMessage = '$okCount formulaire(s) envoyé(s) avec succès'
+          '${failCount > 0 ? ', $failCount ignoré(s)' : ''}.';
+      notifyListeners();
+      return results;
+    } catch (e) {
+      _error = 'Erreur envoi global campagne : ${e.toString()}';
+      notifyListeners();
+      return results;
+    } finally {
+      _isSending = false;
       notifyListeners();
     }
   }

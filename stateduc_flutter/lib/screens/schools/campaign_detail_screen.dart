@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/campaign_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/data_entry_provider.dart';
 import '../../models/campaign.dart';
 import '../../models/regroup.dart';
 import '../../models/school.dart';
@@ -25,9 +27,16 @@ import '../data_entry/school_data_screen.dart';
 ///   [_RegroupTile]     — tuile de navigation dans un regroupement
 ///   [_SchoolTile]      — tuile représentant un établissement
 ///   [_UnsentDataBanner] — bannière d'alerte données non envoyées (placeholder)
-class CampaignDetailScreen extends StatelessWidget {
+class CampaignDetailScreen extends StatefulWidget {
   const CampaignDetailScreen({super.key, required this.campaign});
   final Campaign campaign;
+
+  @override
+  State<CampaignDetailScreen> createState() => _CampaignDetailScreenState();
+}
+
+class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
+  Campaign get campaign => widget.campaign;
 
   @override
   Widget build(BuildContext context) {
@@ -175,12 +184,40 @@ class CampaignDetailScreen extends StatelessWidget {
   /// la liste des établissements du regroupement courant.
   Widget _buildSchoolList(
       BuildContext context, CampaignProvider camps) {
+    final idSystem = camps.selectedSystem!.idSystem;
     return Column(
       children: [
+        // ── Bouton d'envoi global pour tous les établissements ────────────
+        // Permet d'envoyer en une seule opération tous les formulaires
+        // de tous les établissements actuellement affichés.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+          child: Consumer<DataEntryProvider>(
+            builder: (ctx, entry, _) => OutlinedButton.icon(
+              onPressed: entry.isSending
+                  ? null
+                  : () => _sendAllCampaignForms(context, camps, idSystem),
+              icon: entry.isSending
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.cloud_sync_outlined),
+              label: Text(entry.isSending
+                  ? 'Envoi en cours…'
+                  : 'Envoyer tous les établissements'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(44),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
         // Bannière de données non envoyées (placeholder — voir _UnsentDataBanner)
         _UnsentDataBanner(
           idCamp: campaign.idCamp,
-          idSystem: camps.selectedSystem!.idSystem,
+          idSystem: idSystem,
         ),
         Expanded(
           child: ListView.builder(
@@ -196,6 +233,148 @@ class CampaignDetailScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  /// Envoie tous les formulaires de tous les établissements de la campagne
+  /// au serveur.
+  ///
+  /// Affiche une boîte de confirmation, puis un dialogue de progression,
+  /// et enfin un résumé des résultats.
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<void> _sendAllCampaignForms(
+      BuildContext context, CampaignProvider camps, String idSystem) async {
+    final auth  = context.read<AuthProvider>();
+    final entry = context.read<DataEntryProvider>();
+    if (auth.user == null) return;
+
+    // Confirmation
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.cloud_sync_outlined),
+            SizedBox(width: 8),
+            Text('Envoi global campagne'),
+          ],
+        ),
+        content: const Text(
+          'Envoyer TOUS les formulaires de TOUS les établissements '  
+          'de cette campagne ?\n\n'
+          'Cette opération peut prendre plusieurs minutes.\n'
+          'Vérifiez que votre réseau est stable avant de continuer.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(ctx, true),
+            icon: const Icon(Icons.cloud_upload_outlined),
+            label: const Text('Envoyer tout'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+
+    // Dialogue de progression
+    final progressNotifier = ValueNotifier<(int, int)>((0, 0));
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => ValueListenableBuilder<(int, int)>(
+        valueListenable: progressNotifier,
+        builder: (_, progress, __) {
+          final sent  = progress.$1;
+          final total = progress.$2;
+          return AlertDialog(
+            title: const Text('Envoi en cours…'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LinearProgressIndicator(
+                  value: total > 0 ? sent / total : null,
+                ),
+                const SizedBox(height: 12),
+                Text(total > 0
+                    ? '$sent / $total formulaire(s)'
+                    : 'Préparation…'),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    // Lancement de l'envoi global campagne
+    final results = await entry.sendAllFormsForCampaign(
+      user:     auth.user!,
+      idCamp:   campaign.idCamp,
+      idSystem: idSystem,
+      onProgress: (sent, total) {
+        progressNotifier.value = (sent, total);
+      },
+    );
+
+    // Ferme le dialogue de progression
+    if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    progressNotifier.dispose();
+    if (!mounted) return;
+
+    // Résumé
+    final okCount   = results.values.where((v) => v).length;
+    final failCount = results.values.where((v) => !v).length;
+    final hasError  = entry.error != null;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              hasError || failCount > 0
+                  ? Icons.warning_amber_rounded
+                  : Icons.check_circle_outline,
+              color: hasError || failCount > 0
+                  ? Colors.orange
+                  : Colors.green,
+            ),
+            const SizedBox(width: 8),
+            const Text('Résultat de l\'envoi'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('✅  $okCount formulaire(s) envoyé(s) avec succès'),
+            if (failCount > 0)
+              Text('⚠️  $failCount formulaire(s) non envoyé(s)'),
+            if (hasError) ...[  
+              const SizedBox(height: 8),
+              Text(
+                entry.error ?? '',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 13),
+              ),
+            ],
+            if (results.isEmpty)
+              const Text('Aucune donnée locale trouvée pour cette campagne.'),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -244,6 +423,11 @@ class CampaignDetailScreen extends StatelessWidget {
     }
   }
 }
+
+// ─── Espace commentaire pour la conversion StatelessWidget → StatefulWidget ──
+// La classe CampaignDetailScreen a été convertie en StatefulWidget en
+// session 17 pour permettre l'envoi global de campagne (méthode
+// _sendAllCampaignForms) qui nécessite le lifecycle 'mounted'.
 
 // ─── Barre de fil d'Ariane ───────────────────────────────────────────────────
 /// Barre de navigation horizontale affichée sous le titre de la AppBar.

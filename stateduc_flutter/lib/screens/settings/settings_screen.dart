@@ -63,11 +63,29 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(builder: (context, auth, _) {
+      // Couleurs de la TabBar — forcer un contraste élevé quel que soit le thème.
+      // Par défaut Material 3, les onglets non sélectionnés utilisent
+      // onSurface.withOpacity(0.5) ce qui les rend trop gris/peu lisibles.
+      final appBarFg = Theme.of(context).appBarTheme.foregroundColor
+          ?? Theme.of(context).colorScheme.onPrimary;
       return Scaffold(
         appBar: AppBar(
           title: const Text('Paramètres'),
           bottom: TabBar(
             controller: _tabController,
+            // Onglet sélectionné : blanc (ou couleur avant-plan de l'AppBar)
+            labelColor: appBarFg,
+            // Onglets non sélectionnés : même couleur à 80 % d'opacité (lisible)
+            unselectedLabelColor: appBarFg.withOpacity(0.80),
+            indicatorColor: appBarFg,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
             tabs: const [
               Tab(icon: Icon(Icons.dns_outlined), text: 'Serveur'),
               Tab(icon: Icon(Icons.lock_outline), text: 'PIN'),

@@ -19,7 +19,7 @@
 //   - Timeouts configurés :
 //       connectTimeout = 60s  (réseau lent possible)
 //       receiveTimeout = 300s (5 min — chaîne data_save→questionnaire_ws peut être longue)
-//       sendTimeout    = 120s (envoi de gros formulaires sur liaison lente)
+//       sendTimeout    = 300s (5 min — aligné sur receiveTimeout, liaisons intranet lentes)
 //   - SSL : certificats auto-signés acceptés (intranet MEN)
 //   - Auth : HTTP Basic (Authorization: Basic base64(login:password))
 //   - Intercepteur _AuthInjectorInterceptor : ré-injecte l'en-tête auth sur chaque requête
@@ -71,7 +71,7 @@ class ApiService {
         // et des liaisons réseau instables (intranet MEN, serveurs chargés)
         connectTimeout: const Duration(seconds: 60),   // connexion initiale
         receiveTimeout: const Duration(seconds: 300),  // 5 min : chaîne data_save → questionnaire_ws peut être lente
-        sendTimeout: const Duration(seconds: 120),     // envoi POST données formulaire sur liaison lente
+        sendTimeout: const Duration(seconds: 300),     // 5 min : aligné sur receiveTimeout — liaisons lentes intranet MEN
         followRedirects: true,
         maxRedirects: 5,
         // validateStatus : accepte tous les codes HTTP < 600 pour les gérer manuellement
