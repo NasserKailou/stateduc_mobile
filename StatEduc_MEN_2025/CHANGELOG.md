@@ -6,6 +6,26 @@ Pull Request ouverte : [PR #1](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## ℹ️ Session 17 — 2026-06-03 — Session Flutter uniquement (aucun changement PHP)
+
+> **Aucune modification apportée aux fichiers PHP côté serveur lors de la session 17.**
+
+La session 17 a porté exclusivement sur l'application mobile Flutter :
+
+| Correction / Ajout | Impact côté serveur |
+|--------------------|---------------------|
+| `sendTimeout` Dio 120 s → 300 s | Aucun — le serveur ne voit pas les timeouts client |
+| Cohérence offline re-déclenchée (règles arrivées + ouverture formulaire) | Aucun — exploite les règles déjà retournées par `data_rules.php` |
+| `sendAllFormsForSchool()` | Aucun — utilise l'endpoint `data_save.php` existant, appels multiples normaux |
+| `sendAllFormsForCampaign()` + `getDistinctEtabQstWithData()` | Aucun — même endpoint, multiples appels séquentiels |
+| `_autoReloadFromServerBackground(forceOverwrite: true)` pour identification | Aucun — utilise `data_reload.php` existant, comportement GET inchangé |
+| Settings `TabBar` : couleurs explicites | Aucun — UI locale uniquement |
+
+**Commit Flutter** : `1db4be2` — `feat(session17): timeout, cohérence offline, envoi global, identification, settings`  
+**Commit PHP** : *néant* — aucun fichier `StatEduc_MEN_2025/` modifié en session 17.
+
+---
+
 ## Table des matières
 
 1. [Architecture REST — Slim v2](#1-architecture-rest--slim-v2)
@@ -404,11 +424,12 @@ $id_year = ($id_annee != '' && $id_annee != '0')
 
 ## Commits associés
 
-| SHA | Message |
-|---|---|
-| `381de3e` | fix(admin): suppress ADOdb debug echo + guard AJAX JSON against output pollution |
-| `b544819` | fix(save/coherence): complete data-not-saved fix + coherence control for mobile |
-| `7bb5ac3` | serveur add code |
+| SHA | Session | Message |
+|-----|---------|---------|
+| `1db4be2` | **17 (Flutter)** | feat(session17): timeout, cohérence offline, envoi global, identification, settings |
+| `381de3e` | 1-15 (PHP) | fix(admin): suppress ADOdb debug echo + guard AJAX JSON against output pollution |
+| `b544819` | 1-15 (PHP) | fix(save/coherence): complete data-not-saved fix + coherence control for mobile |
+| `7bb5ac3` | 1-15 (PHP) | serveur add code |
 
 ## Fichiers modifiés / créés
 

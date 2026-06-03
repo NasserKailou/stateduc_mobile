@@ -4,6 +4,227 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-06-03 — Session 17 : timeout, cohérence offline, envoi global, identification, contraste settings
+
+### 🔴 Fix — `api_service.dart` : timeout "délais d'attente dépassé" sur réseau stable
+
+**Symptôme** : L'envoi d'un formulaire échouait avec `DioExceptionType.sendTimeout` même sur un réseau intranet stable. La chaîne d'appels `data_save.php → session_write_close → curl interne → questionnaire_ws.php` peut dépasser 2 minutes sur un serveur XAMPP chargé.
+
+**Cause racine** : `sendTimeout` était fixé à **120 s** — insuffisant pour les envois lents (payload volumineux + traitement PHP).
+
+**`stateduc_flutter/lib/services/api_service.dart`** :
+- `sendTimeout` 120 s → **300 s** (5 minutes)
+- `connectTimeout` reste 60 s, `receiveTimeout` reste 300 s (inchangés depuis session 12b)
+
+```dart
+connectTimeout: const Duration(seconds: 60),
+receiveTimeout: const Duration(seconds: 300),
+sendTimeout:    const Duration(seconds: 300),  // était 120 s
+```
+
+| Timeout | Avant | Après | Rôle |
+|---------|-------|-------|------|
+| `connectTimeout` | 60 s | 60 s | Établissement connexion TCP |
+| `receiveTimeout` | 300 s | 300 s | Attente réponse complète serveur |
+| `sendTimeout` | **120 s** | **300 s** | Envoi du corps de la requête |
+
+---
+
+### 🟠 Fix — Cohérence offline non déclenchée après sauvegarde locale
+
+**Symptôme** : Après `saveLocally()`, l'indicateur de cohérence offline restait vide. Les règles de cohérence étaient chargées en arrière-plan ; au moment où `checkCoherenceOffline()` était appelé, elles n'étaient pas encore en SQLite → résultat vide.
+
+**Cause racine** : `checkCoherenceOffline()` n'était déclenché que dans le flux `sendToServer()` / `saveLocally()`, pas après l'arrivée des règles ni à l'ouverture d'un formulaire déjà rempli.
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** — deux corrections :
+
+**Fix 1 — Re-déclencher la cohérence quand les règles arrivent (`_fetchAndStoreCoherenceRulesBackground`)** :
+```dart
+if (rules.isNotEmpty) {
+  await _db.insertCoherenceRules(rules);
+  // NOUVEAU : re-trigger si règles arrivent pour le formulaire courant déjà rempli
+  if (_selectedQuestion?.idQst == q.idQst &&
+      _formData.isNotEmpty &&
+      !_isCheckingOffline) {
+    await checkCoherenceOffline();
+  }
+}
+```
+
+**Fix 2 — Déclencher la cohérence à l'ouverture d'un formulaire déjà rempli (`selectQuestion`)** :
+```dart
+// NOUVEAU : lance la cohérence offline si le formulaire contient déjà des données
+if (_formData.isNotEmpty) {
+  Future(() => checkCoherenceOffline());
+}
+```
+
+---
+
+### 🟢 Nouveau — Envoi global : tous les formulaires d'un établissement
+
+**Besoin** : Pouvoir envoyer en une seule action tous les formulaires saisis pour l'établissement courant, sans devoir naviguer dans chaque formulaire et cliquer "Envoyer".
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** — nouvelle méthode `sendAllFormsForSchool()` :
+```dart
+Future<Map<String, bool>> sendAllFormsForSchool({
+  required User user,
+  void Function(int sent, int total)? onProgress,
+}) async {
+  // Itère sur toutes les questions (_questions) de l'établissement courant (_idEtab)
+  // Pour chaque question : charge les données depuis SQLite, envoie via _api.saveData()
+  // Marque is_sent=1 dans SQLite en cas de succès
+  // Retourne Map<idQst, bool> (true = succès, false = échec)
+}
+```
+
+**`stateduc_flutter/lib/screens/data_entry/school_data_screen.dart`** — nouveau menu item et méthode :
+- Ajout dans le `PopupMenu` : `'send_all'` → `ListTile` avec `Icons.cloud_sync_outlined` et label "Envoyer tous les formulaires"
+- `_onMenuSelected` : branche `'send_all'` → appel `_sendAllForms(context, auth, entry)`
+- Nouvelle méthode `_sendAllForms()` :
+  - Dialogue de confirmation
+  - Progress dialog avec `ValueNotifier<int>` et `LinearProgressIndicator`
+  - Appel `entry.sendAllFormsForSchool(user: user, onProgress: callback)`
+  - Fermeture du progress dialog
+  - Dialogue résumé : ✅ N succès / ⚠️ N échecs
+
+---
+
+### 🟢 Nouveau — Envoi global : tous les formulaires de toute la campagne
+
+**Besoin** : Depuis l'écran de campagne, envoyer d'un seul tap tous les formulaires de tous les établissements collectés.
+
+**`stateduc_flutter/lib/services/database_service.dart`** — nouvelle méthode `getDistinctEtabQstWithData()` :
+```dart
+Future<List<Map<String, String>>> getDistinctEtabQstWithData(String idCamp) async {
+  final db = await database;
+  final rows = await db.rawQuery(
+    'SELECT DISTINCT id_etab, id_qst FROM collected_data WHERE id_camp = ?',
+    [idCamp],
+  );
+  return rows
+      .map((r) => {
+            'id_etab': r['id_etab'] as String? ?? '',
+            'id_qst':  r['id_qst']  as String? ?? '',
+          })
+      .where((m) => m['id_etab']!.isNotEmpty && m['id_qst']!.isNotEmpty)
+      .toList();
+}
+```
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** — nouvelle méthode `sendAllFormsForCampaign()` :
+```dart
+Future<Map<String, bool>> sendAllFormsForCampaign({
+  required User user,
+  required String idCamp,
+  required String idSystem,
+  void Function(int sent, int total)? onProgress,
+}) async {
+  // Utilise _db.getDistinctEtabQstWithData(idCamp) pour lister toutes les paires (etab, qst)
+  // Pour chaque paire : charge les données SQLite, envoie, marque is_sent=1 si succès
+  // Retourne Map<"${etabId}_${qstId}", bool>
+}
+```
+
+**`stateduc_flutter/lib/screens/schools/campaign_detail_screen.dart`** — conversion `StatelessWidget` → `StatefulWidget` + bouton global :
+
+```dart
+// AVANT
+class CampaignDetailScreen extends StatelessWidget { ... }
+
+// APRÈS
+class CampaignDetailScreen extends StatefulWidget {
+  const CampaignDetailScreen({super.key, required this.campaign});
+  final Campaign campaign;
+  @override
+  State<CampaignDetailScreen> createState() => _CampaignDetailScreenState();
+}
+class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
+  Campaign get campaign => widget.campaign;
+}
+```
+
+- Imports ajoutés : `auth_provider.dart`, `data_entry_provider.dart`
+- Bouton `OutlinedButton.icon` en tête de liste établissements :
+  - Label : "Envoyer tous les établissements"
+  - Icône : `Icons.cloud_sync_outlined`
+  - Désactivé si `entry.isSending`
+  - Appelle `_sendAllCampaignForms()` avec confirmation + progress dialog + résumé
+
+---
+
+### 🟡 Fix — Identification : données serveur ne remplacent pas les données locales
+
+**Symptôme** : Sur certains types de campagne, le formulaire d'identification se pré-remplissait avec les données locales (souvent vides ou incomplètes) et ignorait les données du serveur.
+
+**Cause racine** : `_autoReloadFromServerBackground()` utilisait `localWasEmpty = _formData.isEmpty` pour décider si le serveur devait écraser le local. Si des données locales existaient (même incomplètes), le serveur était ignoré.
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** :
+```dart
+// AVANT — paramètre inexistant, toujours basé sur _formData.isEmpty
+void _autoReloadFromServerBackground() { ... }
+
+// APRÈS — forceOverwrite=true => localWasEmpty=true => serveur gagne toujours
+void _autoReloadFromServerBackground({bool forceOverwrite = false}) {
+  final localWasEmpty = _formData.isEmpty || forceOverwrite;
+  ...
+}
+```
+- `selectQuestion()` appelle désormais :
+  ```dart
+  _autoReloadFromServerBackground(forceOverwrite: isIdentificationForm);
+  ```
+- Pour les formulaires d'identification → **le serveur a toujours priorité** (données d'établissement officielles).
+- Pour les autres formulaires → comportement inchangé (le local n'est écrasé que s'il était vide).
+
+---
+
+### 🟡 Fix — Settings : onglets Serveur/PIN/Sécurité trop peu contrastés
+
+**Symptôme** : Dans l'écran Paramètres, les libellés et icônes des onglets "Serveur", "PIN", "Sécurité" étaient grisés et difficiles à lire (surtout l'onglet non sélectionné).
+
+**Cause racine** : Material 3 applique par défaut `unselectedLabelColor = onSurface.withOpacity(0.38)` — très peu lisible sur un fond coloré (`AppBar`).
+
+**`stateduc_flutter/lib/screens/settings/settings_screen.dart`** :
+```dart
+// AVANT — couleurs Material 3 par défaut (trop grises)
+TabBar(
+  controller: _tabController,
+  tabs: const [ Tab(icon: Icon(Icons.dns_outlined), text: 'Serveur'), ... ],
+),
+
+// APRÈS — couleurs explicites basées sur appBarFg
+final appBarFg = Theme.of(context).appBarTheme.foregroundColor
+    ?? Theme.of(context).colorScheme.onPrimary;
+TabBar(
+  controller: _tabController,
+  labelColor:            appBarFg,
+  unselectedLabelColor:  appBarFg.withOpacity(0.80),
+  indicatorColor:        appBarFg,
+  labelStyle:            const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+  unselectedLabelStyle:  const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+  tabs: const [ Tab(icon: Icon(Icons.dns_outlined), text: 'Serveur'), ... ],
+),
+```
+
+---
+
+### 📊 Fichiers modifiés — Session 17 (Flutter uniquement, aucun changement PHP)
+
+| Fichier | Type | Résumé |
+|---------|------|--------|
+| `lib/services/api_service.dart` | Fix | `sendTimeout` 120 s → 300 s |
+| `lib/services/database_service.dart` | Nouveau | `getDistinctEtabQstWithData(idCamp)` |
+| `lib/providers/data_entry_provider.dart` | Fix + Nouveau | Cohérence offline re-trigger × 2 ; `_autoReloadFromServerBackground(forceOverwrite)` ; `sendAllFormsForSchool()` ; `sendAllFormsForCampaign()` |
+| `lib/screens/data_entry/school_data_screen.dart` | Nouveau | Menu "Envoyer tous les formulaires" + `_sendAllForms()` avec progress dialog |
+| `lib/screens/schools/campaign_detail_screen.dart` | Nouveau | `StatelessWidget` → `StatefulWidget` ; bouton "Envoyer tous les établissements" + `_sendAllCampaignForms()` |
+| `lib/screens/settings/settings_screen.dart` | Fix | `TabBar` : `labelColor`/`unselectedLabelColor`/`indicatorColor` explicites depuis `appBarFg` |
+
+**Commit** : `1db4be2` — `feat(session17): timeout, cohérence offline, envoi global, identification, settings`  
+**PR** : [#1 — ak_main → main](https://github.com/NasserKailou/stateduc_mobile/pull/1)
+
+---
+
 ## [Unreleased] — 2026-05-30 — Session 13 : PHP 500 sur data_save.php — variables indéfinies dans callbacks
 
 ### 🔴 Fix CRITIQUE — HTTP 500 sur POST `/theme_save/.../id_annee` malgré le fix session 12b
