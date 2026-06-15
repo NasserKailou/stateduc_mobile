@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/question.dart';
 import '../models/user.dart';
@@ -95,6 +96,10 @@ class DataEntryProvider extends ChangeNotifier {
   // Liste vide = aucune violation détectée localement.
   List<OfflineCoherenceError> _offlineCoherenceErrors = [];
   bool                        _isCheckingOffline       = false;
+
+  // ─── Debounce pour le contrôle offline déclenché par updateField() ───────────
+  // Évite d'évaluer la cohérence à chaque frappe — attend 800 ms d'inactivité.
+  Timer? _coherenceDebounce;
 
   // ─── Getters ─────────────────────────────────────────────────────────────────
   String? get idCamp              => _idCamp;
@@ -445,6 +450,11 @@ class DataEntryProvider extends ChangeNotifier {
             debugPrint('[DataEntry] _autoReloadFromServerBackground: '
                 'loaded ${serverStr.length} fields from server for qst=${question.idQst}');
             notifyListeners();
+            // Relance la cohérence offline maintenant que les données serveur
+            // sont fusionnées dans _formData (non bloquant).
+            if (!_isCheckingOffline) {
+              Future(() => checkCoherenceOffline());
+            }
           }
         }
       } catch (_) {
@@ -541,6 +551,10 @@ class DataEntryProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+    // Relance la cohérence offline pour la nouvelle période si des données existent
+    if (_formData.isNotEmpty) {
+      Future(() => checkCoherenceOffline());
+    }
   }
 
   /// Charge les données collectées depuis SQLite pour la question et le filtre courants.
@@ -568,6 +582,16 @@ class DataEntryProvider extends ChangeNotifier {
     _hasUnsavedChanges   = true;
     _validationErrors.remove(fieldName);
     notifyListeners();
+    // ── Déclenchement debounced de la cohérence offline ──────────────────
+    // Attend 800 ms après la dernière frappe avant d'évaluer, pour éviter
+    // de sur-solliciter SQLite à chaque caractère saisi.
+    // Ne se déclenche que si des règles existent pour ce contexte.
+    _coherenceDebounce?.cancel();
+    _coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
+      if (_formData.isNotEmpty && !_isCheckingOffline) {
+        checkCoherenceOffline();
+      }
+    });
   }
 
   /// Valide un seul champ selon ses règles.
@@ -1256,5 +1280,11 @@ class DataEntryProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _coherenceDebounce?.cancel();
+    super.dispose();
   }
 }

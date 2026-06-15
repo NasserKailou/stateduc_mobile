@@ -126,12 +126,40 @@ class _PinScreenState extends State<PinScreen> {
   }
 
   // ─── Logo ───────────────────────────────────────────────────────────────────
+  // Affiche le drapeau du Burundi + nom de l'application + sous-titre.
+  // Le drapeau est chargé depuis assets/icon/Flag_of_country.png.
+  // En cas d'erreur de chargement (asset manquant), repli sur l'icône school.
   Widget _buildLogo() {
     return Column(
       children: [
-        Icon(Icons.school,
-            size: 72,
-            color: Theme.of(context).colorScheme.primary),
+        // Drapeau du Burundi — encadré avec ombre légère pour le détacher du fond
+        Container(
+          width: 96,
+          height: 64,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.18),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.asset(
+              'assets/icon/Flag_of_country.png',
+              fit: BoxFit.cover,
+              // Repli sur l'icône school si l'asset est introuvable
+              errorBuilder: (_, __, ___) => Icon(
+                Icons.school,
+                size: 64,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ),
         const SizedBox(height: 12),
         Text('StatEduc',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(

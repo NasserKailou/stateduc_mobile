@@ -4,6 +4,143 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-06-15 — Session 18 : drapeau Burundi + renforcement cohérence offline
+
+### 🟢 Amélioration — `pin_screen.dart` : remplacement de l'icône `school` par le drapeau du Burundi
+
+**Avant** : L'écran d'accueil/PIN affichait une icône Material `Icons.school` générique (taille 72).
+
+**Après** : L'asset `assets/icon/Flag_of_country.png` (drapeau du Burundi) est affiché dans un
+conteneur rectangulaire arrondi (96×64 px) avec ombre légère, centré au-dessus du titre.
+Un `errorBuilder` assure le repli sur `Icons.school` si l'image n'est pas chargée
+(robustesse en cas d'asset manquant).
+
+```dart
+// AVANT
+Icon(Icons.school, size: 72, color: Theme.of(context).colorScheme.primary)
+
+// APRÈS
+Container(
+  width: 96, height: 64,
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(6),
+    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 8, offset: Offset(0, 3))],
+  ),
+  child: ClipRRect(
+    borderRadius: BorderRadius.circular(6),
+    child: Image.asset(
+      'assets/icon/Flag_of_country.png',
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Icon(Icons.school, size: 64, ...),
+    ),
+  ),
+)
+```
+
+L'asset `assets/icon/` est déjà déclaré dans `pubspec.yaml` → aucune modification de config nécessaire.
+
+---
+
+### 🔴 Fix — Cohérence offline non déclenchée à la saisie
+
+**Symptôme observé** : Les contrôles de cohérence offline ne s'affichaient que lors de l'envoi
+au serveur (`sendToServer()`), jamais pendant la saisie ni à l'ouverture d'un formulaire.
+
+**Audit session 18 — problèmes identifiés** :
+
+| # | Problème | Localisation |
+|---|---------|-------------|
+| A | `updateField()` ne déclenche JAMAIS la cohérence offline | `data_entry_provider.dart` |
+| B | `selectFilter()` ne re-déclenche pas la cohérence après changement de période | `data_entry_provider.dart` |
+| C | `_autoReloadFromServerBackground()` met à jour `_formData` sans re-vérifier la cohérence | `data_entry_provider.dart` |
+| D | Indicateur visuel "contrôle en cours" absent dans l'UI | `school_data_screen.dart` |
+
+**`stateduc_flutter/lib/providers/data_entry_provider.dart`** — 4 corrections :
+
+**Fix A — Import `dart:async` + Timer debounce + `updateField()` déclenche la cohérence** :
+```dart
+// En tête de fichier — ajout
+import 'dart:async';
+
+// Dans la déclaration des champs
+Timer? _coherenceDebounce;  // debounce 800 ms pour updateField()
+
+// updateField() — désormais déclenche checkCoherenceOffline() en debounce
+void updateField(String fieldName, String value) {
+  _formData[fieldName] = value;
+  _hasUnsavedChanges   = true;
+  _validationErrors.remove(fieldName);
+  notifyListeners();
+  // Debounce 800 ms — évite une évaluation à chaque frappe
+  _coherenceDebounce?.cancel();
+  _coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
+    if (_formData.isNotEmpty && !_isCheckingOffline) {
+      checkCoherenceOffline();
+    }
+  });
+}
+```
+
+**Fix B — `selectFilter()` relance la cohérence après changement de filtre** :
+```dart
+// À la fin de selectFilter(), après le chargement des données
+if (_formData.isNotEmpty) {
+  Future(() => checkCoherenceOffline());
+}
+```
+
+**Fix C — `_autoReloadFromServerBackground()` relance la cohérence après fusion** :
+```dart
+// Après notifyListeners() dans le bloc if (changed)
+if (!_isCheckingOffline) {
+  Future(() => checkCoherenceOffline());
+}
+```
+
+**Fix D — Nettoyage du Timer dans `dispose()`** :
+```dart
+@override
+void dispose() {
+  _coherenceDebounce?.cancel();
+  super.dispose();
+}
+```
+
+**`stateduc_flutter/lib/screens/data_entry/school_data_screen.dart`** — indicateur visuel :
+```dart
+// Avant le banner d'erreurs offline : spinner pendant le contrôle
+if (entry.isCheckingOffline)
+  const LinearProgressIndicator(),
+if (entry.hasOfflineCoherenceErrors)
+  _OfflineCoherenceBanner(errors: entry.offlineCoherenceErrors, ...),
+```
+
+---
+
+### 📊 Tableau complet des déclenchements cohérence offline (après session 18)
+
+| Événement | Trigger | Délai | Depuis |
+|-----------|---------|-------|--------|
+| Saisie d'un champ | `updateField()` → debounce 800 ms | 0.8 s après dernière frappe | **Session 18** |
+| Sauvegarde locale | `saveLocally()` → `Future()` | Immédiat (arrière-plan) | Sessions 1-16 |
+| Ouverture formulaire déjà rempli | `selectQuestion()` → `Future()` | Immédiat | Session 17 |
+| Changement de filtre/période | `selectFilter()` → `Future()` | Immédiat | **Session 18** |
+| Règles reçues du serveur | `_fetchAndStoreCoherenceRulesBackground()` | Arrière-plan | Session 17 |
+| Données serveur fusionnées | `_autoReloadFromServerBackground()` → `Future()` | Arrière-plan | **Session 18** |
+| Envoi serveur | `sendToServer()` → `checkCoherence()` (API) | Après POST réussi | Sessions 1-16 |
+
+---
+
+### 📊 Fichiers modifiés — Session 18
+
+| Fichier | Type | Résumé |
+|---------|------|--------|
+| `lib/screens/login/pin_screen.dart` | UX | Remplacement `Icons.school` → `Image.asset('assets/icon/Flag_of_country.png')` avec `errorBuilder` |
+| `lib/providers/data_entry_provider.dart` | Fix | `dart:async` import ; `Timer _coherenceDebounce` ; `updateField()` debounce ; `selectFilter()` trigger ; `_autoReloadFromServerBackground()` trigger ; `dispose()` |
+| `lib/screens/data_entry/school_data_screen.dart` | UX | `LinearProgressIndicator` pendant `isCheckingOffline` |
+
+---
+
 ## [Unreleased] — 2026-06-03 — Session 17 : timeout, cohérence offline, envoi global, identification, contraste settings
 
 ### 🔴 Fix — `api_service.dart` : timeout "délais d'attente dépassé" sur réseau stable

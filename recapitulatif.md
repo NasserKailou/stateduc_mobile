@@ -3,7 +3,7 @@
 **Dépôt :** https://github.com/NasserKailou/stateduc_mobile  
 **Branche principale :** `ak_main`  
 **Date :** Juin 2026  
-**Dernière session :** Session 17 — commit `1db4be2`
+**Dernière session :** Session 18 — commits `1db4be2` (code s17) · `deb819e` (docs s17) · session 18 en cours
 
 ---
 
@@ -53,11 +53,12 @@ StatEduc Mobile est une application Flutter qui permet aux agents de collecte du
 | `stateduc_flutter/lib/services/api_service.dart` | Session 17 | Service HTTP central (singleton Dio) — sendTimeout 300s |
 | `stateduc_flutter/lib/services/coherence_evaluator.dart` | Session 15 | Moteur évaluation cohérence offline |
 | `stateduc_flutter/lib/services/database_service.dart` | Session 17 | Service SQLite — 13 tables + `getDistinctEtabQstWithData()` |
-| `stateduc_flutter/lib/providers/data_entry_provider.dart` | Session 17 | Provider saisie — envoi global école/campagne, cohérence offline améliorée |
+| `stateduc_flutter/lib/providers/data_entry_provider.dart` | **Session 18** | Provider saisie — debounce cohérence offline sur `updateField()` ; `selectFilter()` ; `_autoReloadFromServerBackground()` ; `dispose()` |
 | `stateduc_flutter/lib/providers/campaign_provider.dart` | Session 16 | Provider gestion campagnes |
 | `stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart` | Session 16 | Widget WebView formulaires HTML |
+| `stateduc_flutter/lib/screens/login/pin_screen.dart` | **Session 18** | Drapeau Burundi (`Flag_of_country.png`) remplace `Icons.school` — `errorBuilder` de repli |
 | `stateduc_flutter/lib/screens/schools/campaign_detail_screen.dart` | Session 17 | Écran navigation établissements — bouton envoi global campagne |
-| `stateduc_flutter/lib/screens/data_entry/school_data_screen.dart` | Session 17 | Écran saisie données école — bouton envoi global établissement |
+| `stateduc_flutter/lib/screens/data_entry/school_data_screen.dart` | **Session 18** | `LinearProgressIndicator` pendant `isCheckingOffline` ; commentaire bannière mis à jour |
 | `stateduc_flutter/lib/screens/settings/settings_screen.dart` | Session 17 | Paramètres — TabBar contraste corrigé |
 
 ---
@@ -174,26 +175,65 @@ Map<String,double> values = {
 // critere = "<="  →  violated = !(90.0 <= 85.0) = true   → VIOLATION
 ```
 
-### 4.4 Fix session 17 — déclenchement cohérence offline
+### 4.4 Fix sessions 17-18 — déclenchement cohérence offline
 
-Avant la session 17, `checkCoherenceOffline()` n'était déclenché qu'après un envoi serveur. Désormais :
+**Session 17** : deux déclenchements ajoutés (règles arrivées + ouverture formulaire).
+
+**Session 18** : audit révèle que les contrôles restent absents pendant la saisie active.
+Quatre déclenchements supplémentaires ajoutés :
 
 ```dart
+// ── Session 17 ────────────────────────────────────────────────────────────
+
 // Dans _fetchAndStoreCoherenceRulesBackground() :
-// Dès que les règles arrivent pour la question courante et que
-// des données sont présentes → re-déclenche le contrôle
-if (_selectedQuestion?.idQst == q.idQst &&
-    _formData.isNotEmpty &&
-    !_isCheckingOffline) {
-  await checkCoherenceOffline();  // ← Nouveau (session 17)
+// Dès que les règles arrivent pour la question courante
+if (_selectedQuestion?.idQst == q.idQst && _formData.isNotEmpty && !_isCheckingOffline) {
+  await checkCoherenceOffline();  // ← Session 17
 }
 
-// Dans selectQuestion() :
-// À l'ouverture d'un formulaire déjà saisi
+// Dans selectQuestion() : à l'ouverture d'un formulaire déjà saisi
 if (_formData.isNotEmpty) {
-  Future(() => checkCoherenceOffline());  // ← Nouveau (session 17)
+  Future(() => checkCoherenceOffline());  // ← Session 17
 }
+
+// ── Session 18 ────────────────────────────────────────────────────────────
+
+// Dans updateField() : debounce 800 ms après chaque frappe
+import 'dart:async';
+Timer? _coherenceDebounce;
+
+void updateField(String fieldName, String value) {
+  _formData[fieldName] = value;
+  _hasUnsavedChanges   = true;
+  _validationErrors.remove(fieldName);
+  notifyListeners();
+  _coherenceDebounce?.cancel();
+  _coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
+    if (_formData.isNotEmpty && !_isCheckingOffline) checkCoherenceOffline();
+  });
+}
+
+// Dans selectFilter() : après changement de filtre/période
+if (_formData.isNotEmpty) { Future(() => checkCoherenceOffline()); }  // ← Session 18
+
+// Dans _autoReloadFromServerBackground() : après fusion données serveur
+if (!_isCheckingOffline) { Future(() => checkCoherenceOffline()); }  // ← Session 18
+
+// Dans dispose() : nettoyage du Timer
+@override void dispose() { _coherenceDebounce?.cancel(); super.dispose(); }
 ```
+
+**Tableau récapitulatif des 7 déclenchements (état final session 18)** :
+
+| Événement | Méthode | Délai | Session |
+|-----------|---------|-------|---------|
+| Frappe dans un champ | `updateField()` debounce | 800 ms | **18** |
+| Sauvegarde locale | `saveLocally()` | Immédiat | 1-16 |
+| Ouverture formulaire rempli | `selectQuestion()` | Immédiat | 17 |
+| Changement filtre/période | `selectFilter()` | Immédiat | **18** |
+| Règles arrivées du serveur | `_fetchAndStoreCoherenceRulesBackground()` | Arrière-plan | 17 |
+| Données serveur fusionnées | `_autoReloadFromServerBackground()` | Arrière-plan | **18** |
+| Envoi serveur | `sendToServer()` → API | Après POST OK | 1-16 |
 
 ### 4.5 Contrôle serveur (controle_theme_batch.class.php)
 
@@ -308,6 +348,8 @@ _autoReloadFromServerBackground(
 | **17** | **Envoi formulaire-par-formulaire uniquement** | **`sendAllFormsForSchool()` + `sendAllFormsForCampaign()`** |
 | **17** | **Page identification non pré-remplie sur certaines campagnes** | **`forceOverwrite: true` pour formulaires d'identification** |
 | **17** | **Onglets Settings (Serveur/PIN/Sécurité) trop gris** | **`labelColor`/`unselectedLabelColor` forcés sur `appBarFg`** |
+| **18** | **Icône générique `school` à l'écran d'accueil** | **Drapeau Burundi `Flag_of_country.png` dans `pin_screen.dart`** |
+| **18** | **Cohérence offline muette pendant la saisie active** | **Debounce 800ms dans `updateField()` + 3 nouveaux triggers** |
 
 ---
 
@@ -503,7 +545,7 @@ flutter build apk --release --split-per-abi
 
 ---
 
-*Document mis à jour — Projet StatEduc Mobile MEN — Sessions 1-17 — Juin 2026*
+*Document mis à jour — Projet StatEduc Mobile MEN — Sessions 1-18 — Juin 2026*
 
 
 ---

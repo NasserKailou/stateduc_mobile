@@ -203,7 +203,11 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
             onDismiss: entry.clearMessages,
           ),
         // ── Violations de cohérence hors ligne ───────────────────────────
-        // Affichées après une sauvegarde locale si des règles offline sont violées
+        // Affichées dès qu'une violation est détectée après sauvegarde locale,
+        // modification de champ (debounce 800 ms) ou ouverture d'un formulaire
+        // déjà saisi. Un spinner indique que le contrôle est en cours.
+        if (entry.isCheckingOffline)
+          const LinearProgressIndicator(),
         if (entry.hasOfflineCoherenceErrors)
           _OfflineCoherenceBanner(
             errors: entry.offlineCoherenceErrors,
