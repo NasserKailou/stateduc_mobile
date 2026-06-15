@@ -3,7 +3,7 @@
 **Dépôt :** https://github.com/NasserKailou/stateduc_mobile  
 **Branche principale :** `ak_main`  
 **Date :** Juin 2026  
-**Dernière session :** Session 18 — commits `1db4be2` (code s17) · `deb819e` (docs s17) · session 18 en cours
+**Dernière session :** Session 19 — timeout fix + retry automatique (en cours de commit)
 
 ---
 

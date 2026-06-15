@@ -33,6 +33,11 @@ import '../services/coherence_evaluator.dart';
 ///   - Offline : [checkCoherenceOffline] via [CoherenceEvaluator] après sauvegarde
 ///   - Serveur : automatique après [sendToServer] via [ApiService.checkCoherence]
 class DataEntryProvider extends ChangeNotifier {
+  // Nombre total de tentatives d'envoi (1 initiale + _kMaxRetries re-tentatives).
+  // Exposé en public pour que l'UI puisse afficher "Tentative N/kMaxSendAttempts".
+  // Doit être synchronisé avec ApiService._kMaxRetries + 1.
+  static const int kMaxSendAttempts = 3;  // 1 + 2 retries
+
   DataEntryProvider({
     required DatabaseService db,
     required ApiService api,
@@ -80,6 +85,7 @@ class DataEntryProvider extends ChangeNotifier {
   bool    _isLoading        = false;   // chargement initial de la question
   bool    _isSaving         = false;   // sauvegarde locale en cours
   bool    _isSending        = false;   // envoi au serveur en cours
+  int     _sendAttempt      = 0;       // numéro de tentative d'envoi (0 = pas d'envoi, 1-3 = retry)
   bool    _isReloading      = false;   // rechargement depuis le serveur en cours
   bool    _hasUnsavedChanges = false;  // vrai si des modifications non sauvegardées existent
   String? _error;
@@ -123,6 +129,7 @@ class DataEntryProvider extends ChangeNotifier {
   bool    get isLoading           => _isLoading;
   bool    get isSaving            => _isSaving;
   bool    get isSending           => _isSending;
+  int     get sendAttempt         => _sendAttempt;   // 0 = inactif, 1/2/3 = tentative retry
   bool    get isReloading         => _isReloading;
   bool    get hasUnsavedChanges   => _hasUnsavedChanges;
   String? get error               => _error;
@@ -713,11 +720,14 @@ class DataEntryProvider extends ChangeNotifier {
     await saveLocally();
 
     _isSending      = true;
+    _sendAttempt    = 1;  // première tentative
     _error          = null;
     _successMessage = null;
     notifyListeners();
 
     try {
+      // saveData() utilise _withRetry() en interne — le retry est transparent ici.
+      // _sendAttempt sera mis à jour via le callback onRetry si le retry se déclenche.
       final ok = await _api.saveData(
         login:            user.login,         // ← utilise login, pas idUser !
         campId:           _idCamp!,
@@ -729,6 +739,11 @@ class DataEntryProvider extends ChangeNotifier {
         etabRegroupId:    _idRegroupEtab,     // pour LOC_REG_0 (première question)
         isFirstQuestion:  _isFirstQuestion,
         yearCode:         user.codeyear,      // contournement session PHP absente
+        onRetry: (attempt) {
+          // Callback appelé par _withRetry avant chaque nouvelle tentative
+          _sendAttempt = attempt + 1;
+          notifyListeners();
+        },
       );
       if (ok) {
         // Marque les données comme envoyées dans SQLite
@@ -778,7 +793,8 @@ class DataEntryProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } finally {
-      _isSending = false;
+      _isSending   = false;
+      _sendAttempt = 0;   // remet à zéro : overlay "Tentative N/3" disparaît
       notifyListeners();
     }
   }

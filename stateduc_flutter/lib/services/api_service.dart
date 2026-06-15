@@ -16,10 +16,11 @@
 //
 // ARCHITECTURE HTTP :
 //   - Client HTTP : Dio (avec intercepteurs)
-//   - Timeouts configurés :
-//       connectTimeout = 60s  (réseau lent possible)
-//       receiveTimeout = 300s (5 min — chaîne data_save→questionnaire_ws peut être longue)
-//       sendTimeout    = 300s (5 min — aligné sur receiveTimeout, liaisons intranet lentes)
+//   - Timeouts configurés (session 19) :
+//       connectTimeout = 60s   (connexion initiale — temps réseau)
+//       receiveTimeout = 600s  (10 min — chaîne data_save → questionnaire_ws très lente)
+//       sendTimeout    = null  (désactivé — le body POST est petit, ne pas limiter)
+//   - Retry automatique : 2 tentatives supplémentaires sur sendTimeout/receiveTimeout/unknown
 //   - SSL : certificats auto-signés acceptés (intranet MEN)
 //   - Auth : HTTP Basic (Authorization: Basic base64(login:password))
 //   - Intercepteur _AuthInjectorInterceptor : ré-injecte l'en-tête auth sur chaque requête
@@ -67,11 +68,17 @@ class ApiService {
   ApiService._internal() {
     _dio = Dio(
       BaseOptions(
-        // Timeouts — valeurs augmentées pour tenir compte des serveurs lents
-        // et des liaisons réseau instables (intranet MEN, serveurs chargés)
-        connectTimeout: const Duration(seconds: 60),   // connexion initiale
-        receiveTimeout: const Duration(seconds: 300),  // 5 min : chaîne data_save → questionnaire_ws peut être lente
-        sendTimeout: const Duration(seconds: 300),     // 5 min : aligné sur receiveTimeout — liaisons lentes intranet MEN
+        // Timeouts — session 19 : sendTimeout désactivé (null), receiveTimeout 600s
+        //
+        // sendTimeout = null  : Le body POST de saveData est petit (<10 KB). Sur Android,
+        //   Dio peut déclencher sendTimeout prématurément même sur réseau stable si le
+        //   serveur tarde à accusser réception. Désactiver évite ce faux-positif.
+        // receiveTimeout = 600s : La chaîne data_save.php → curl interne → questionnaire_ws.php
+        //   peut dépasser 5 min sur un serveur XAMPP chargé (page HTML complète + 2× include
+        //   + requêtes DB Oracle). 10 min = sécurité maximale pour les réseaux MEN.
+        connectTimeout: const Duration(seconds: 60),   // 60s : connexion initiale
+        receiveTimeout: const Duration(seconds: 600),  // 10 min : chaîne save → questionnaire_ws
+        sendTimeout:    null,                           // désactivé : body petit, pas limiter
         followRedirects: true,
         maxRedirects: 5,
         // validateStatus : accepte tous les codes HTTP < 600 pour les gérer manuellement
@@ -603,20 +610,97 @@ class ApiService {
   //   Sans ce paramètre, $_SESSION['annee'] est vide → saveLogInfo() échoue.
   // =============================================================================
 
+  // ─── Helper : retry automatique pour les envois ──────────────────────────────
+  // Réessaie l'opération [fn] jusqu'à [maxAttempts] fois en cas d'erreur
+  // transitoire (sendTimeout, receiveTimeout, unknown/socket).
+  //
+  // Entre deux tentatives : délai progressif (délai × numéro de tentative)
+  // pour laisser le serveur récupérer.
+  //
+  // Ne réessaie PAS sur :
+  //   - Erreurs métier (ApiException) : 401, 404, réponse JSON se_status 400
+  //   - connectionTimeout : le serveur est injoignable → inutile de réessayer
+  static const int _kMaxRetries  = 2;       // 2 re-tentatives (3 essais au total)
+  static const int _kRetryDelay  = 5;       // 5 secondes entre tentatives
+
+  /// [onRetry] : callback optionnel appelé AVANT chaque re-tentative.
+  ///   Paramètre : numéro de tentative en cours (1 = 1ère re-tentative, 2 = 2ème…).
+  ///   Utilisé par DataEntryProvider pour mettre à jour _sendAttempt et
+  ///   afficher "Tentative 2/3…" dans l'overlay UI.
+  Future<T> _withRetry<T>(
+    Future<T> Function() fn, {
+    void Function(int attempt)? onRetry,
+  }) async {
+    int attempt = 0;
+    while (true) {
+      try {
+        return await fn();
+      } on ApiException {
+        // Erreurs métier — ne pas réessayer
+        rethrow;
+      } on DioException catch (e) {
+        final isRetryable =
+            e.type == DioExceptionType.sendTimeout    ||
+            e.type == DioExceptionType.receiveTimeout ||
+            e.type == DioExceptionType.unknown;
+        attempt++;
+        if (!isRetryable || attempt > _kMaxRetries) rethrow;
+        onRetry?.call(attempt);  // notifie le provider avant le délai
+        final delay = Duration(seconds: _kRetryDelay * attempt);
+        debugPrint('[ApiService] retry $attempt/$_kMaxRetries after ${delay.inSeconds}s '
+            '(type=${e.type.name} msg=${e.message})');
+        await Future.delayed(delay);
+      }
+    }
+  }
+
   Future<bool> saveData({
-    required String login, // login de l'utilisateur (currentUser.login)
-    required String campId, // ID de la campagne (stmCamp.id)
-    required String sysId, // ID du secteur/système éducatif
-    required String qstId, // ID du thème/formulaire à sauvegarder
-    required String etabId, // ID de l'établissement scolaire
-    required String? filter, // ID de la période filtre (ou null si aucun filtre)
-    required Map<String, dynamic>
-        formData, // données du formulaire (champs + valeurs)
-    String? etabRegroupId, // ID du regroupement de l'établissement (pour LOC_REG_0)
-    bool isFirstQuestion =
-        false, // true si c'est le premier thème → inclut LOC_REG_0
+    required String login,     // login de l'utilisateur (currentUser.login)
+    required String campId,    // ID de la campagne (stmCamp.id)
+    required String sysId,     // ID du secteur/système éducatif
+    required String qstId,     // ID du thème/formulaire à sauvegarder
+    required String etabId,    // ID de l'établissement scolaire
+    required String? filter,   // ID de la période filtre (ou null si aucun filtre)
+    required Map<String, dynamic> formData, // données du formulaire (champs + valeurs)
+    String? etabRegroupId,     // ID du regroupement de l'établissement (pour LOC_REG_0)
+    bool isFirstQuestion = false, // true si c'est le premier thème → inclut LOC_REG_0
     bool isLastPage = true,
-    String yearCode = '', // code année scolaire (user.codeyear) — contournement session PHP
+    String yearCode = '',      // code année scolaire (user.codeyear) — contournement session PHP
+    void Function(int attempt)? onRetry, // callback appelé avant chaque re-tentative
+  }) async {
+    // Délègue à _withRetry pour réessayer automatiquement en cas d'erreur transitoire.
+    // onRetry est transmis pour que DataEntryProvider puisse afficher "Tentative 2/3…".
+    return _withRetry(
+      () => _saveDataOnce(
+        login:           login,
+        campId:          campId,
+        sysId:           sysId,
+        qstId:           qstId,
+        etabId:          etabId,
+        filter:          filter,
+        formData:        formData,
+        etabRegroupId:   etabRegroupId,
+        isFirstQuestion: isFirstQuestion,
+        isLastPage:      isLastPage,
+        yearCode:        yearCode,
+      ),
+      onRetry: onRetry,
+    );
+  }
+
+  /// Effectue une tentative d'envoi unique — appelé par saveData() via _withRetry().
+  Future<bool> _saveDataOnce({
+    required String login,
+    required String campId,
+    required String sysId,
+    required String qstId,
+    required String etabId,
+    required String? filter,
+    required Map<String, dynamic> formData,
+    String? etabRegroupId,
+    bool isFirstQuestion = false,
+    bool isLastPage = true,
+    String yearCode = '',
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
     // Build form body exactly like page_etab.js getPageDataToSend():
@@ -727,29 +811,40 @@ class ApiService {
       if (e.response?.statusCode == 404) {
         throw ApiException('Endpoint introuvable (vérifiez l\'URL serveur)');
       }
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.sendTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
+      // ── Timeout (sendTimeout désactivé depuis session 19 → normalement plus reçu) ──
+      // connectionTimeout : serveur injoignable (réseau coupé, IP incorrecte)
+      // receiveTimeout    : questionnaire_ws.php a pris >600s (serveur très surchargé)
+      // sendTimeout       : ne devrait plus se produire (= null depuis session 19)
+      if (e.type == DioExceptionType.connectionTimeout) {
         throw ApiException(
-            'Délai d\'attente dépassé lors de l\'envoi.\n'
-            'Le serveur est lent ou la connexion est instable.\n'
-            'Vérifiez votre réseau et réessayez.');
+            'Impossible de joindre le serveur.\n'
+            'Vérifiez l\'URL et votre connexion réseau.');
+      }
+      if (e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        // Ces types seront interceptés par _withRetry — si on arrive ici
+        // c'est que les _kMaxRetries tentatives ont toutes échoué.
+        throw ApiException(
+            'Délai d\'attente dépassé après ${_kMaxRetries + 1} tentatives.\n'
+            'Le serveur ne répond pas (type: ${e.type.name}).\n'
+            'Vérifiez que le serveur XAMPP est démarré et réessayez plus tard.');
       }
       if (e.type == DioExceptionType.connectionError) {
         throw ApiException(
             'Impossible de joindre le serveur. Vérifiez votre réseau.');
       }
-      // DioExceptionType.unknown — can be caused by socket errors, aborted
-      // connections, or server-side errors that don't produce an HTTP response.
-      // Provide a more informative message than just 'unknown'.
+      // DioExceptionType.unknown — peut être causé par : socket reset, serveur
+      // qui coupe la connexion TCP avant de répondre, erreur SSL, etc.
+      // Sera intercepté par _withRetry si c'est la 1ère/2ème tentative.
       final rawMsg = e.message ?? '';
-      if (rawMsg.toLowerCase().contains('socket') ||
+      if (e.type == DioExceptionType.unknown ||
+          rawMsg.toLowerCase().contains('socket') ||
           rawMsg.toLowerCase().contains('connection') ||
-          rawMsg.toLowerCase().contains('network') ||
-          e.type.name == 'unknown') {
+          rawMsg.toLowerCase().contains('network')) {
         throw ApiException(
-            'Erreur de connexion réseau.\n'
-            'Vérifiez que le serveur est accessible et réessayez.');
+            'Erreur réseau lors de l\'envoi (${e.type.name}).\n'
+            'Cause probable : serveur interrompu ou réseau instable.\n'
+            'Réessayez quand le réseau est stable.');
       }
       throw ApiException('Erreur envoi données : ${rawMsg.isNotEmpty ? rawMsg : e.type.name}');
     }

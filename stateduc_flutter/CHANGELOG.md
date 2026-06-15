@@ -4,6 +4,71 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-06-15 — Session 19 : correction timeout + retry automatique
+
+### 🔴 Fix — "Délai d'attente dépassé lors de l'envoi" sur réseau stable
+
+**Symptôme** : L'erreur _"Délai d'attente dépassé lors de l'envoi. Le serveur est lent ou la connexion est instable."_ s'affichait même avec un réseau Wi-Fi ou LTE stable (capture écran utilisateur).
+
+**Causes racines identifiées** :
+1. `sendTimeout: Duration(seconds: 300)` — Dio peut déclencher ce timeout prématurément sur Android même sur réseau stable, quand le serveur XAMPP tarde à accuser réception du POST.
+2. `receiveTimeout: Duration(seconds: 300)` — insuffisant : la chaîne `data_save.php → curl interne → questionnaire_ws.php` peut dépasser 5 min sur XAMPP chargé.
+3. Aucun mécanisme de retry : la moindre erreur transitoire (reset TCP, microcoupure) causait un échec définitif.
+
+**Correctifs appliqués** (`api_service.dart`) :
+
+| Paramètre | Avant | Après | Raison |
+|-----------|-------|-------|--------|
+| `sendTimeout` | `300s` | `null` (désactivé) | Body POST < 10 KB — faux-positif Android fréquent |
+| `receiveTimeout` | `300s` | `600s` (10 min) | Chaîne save→questionnaire_ws peut dépasser 5 min |
+| Retry | aucun | 2 re-tentatives | Erreurs transitoires réseau/timeout |
+
+**Nouveau helper `_withRetry<T>()`** :
+```dart
+// 2 re-tentatives = 3 essais au total
+// Délai progressif : 5s × numéro de tentative
+// Ne réessaie PAS sur : ApiException (401, 404, se_status 400), connectionTimeout
+// Réessaie sur : sendTimeout, receiveTimeout, DioExceptionType.unknown
+static const int _kMaxRetries = 2;
+static const int _kRetryDelay = 5;
+
+Future<T> _withRetry<T>(Future<T> Function() fn, {void Function(int attempt)? onRetry}) async { ... }
+```
+
+**Refactoring `saveData()`** :
+- Public `saveData()` → délègue à `_withRetry()` + accepte `onRetry` callback
+- Privé `_saveDataOnce()` → implémentation HTTP unique (inchangée)
+- `onRetry` transmis depuis `DataEntryProvider.sendToServer()` → affichage "Tentative 2/3…" dans l'UI
+
+**Messages d'erreur améliorés** (par type `DioExceptionType`) :
+- `connectionTimeout` → _"Impossible de joindre le serveur. Vérifiez l'URL et votre connexion réseau."_
+- `sendTimeout`/`receiveTimeout` → _"Délai d'attente dépassé après 3 tentatives. Le serveur ne répond pas…"_
+- `unknown`/socket → _"Erreur réseau lors de l'envoi… Réessayez quand le réseau est stable."_
+
+---
+
+### 🟢 Amélioration — Suivi des tentatives de retry dans l'UI
+
+**Fichiers** : `data_entry_provider.dart`, `school_data_screen.dart`
+
+**Nouveautés** :
+- Champ `int _sendAttempt` (0 = inactif, 1–3 = numéro de tentative en cours)
+- Getter public `int get sendAttempt`
+- Constante publique `static const int kMaxSendAttempts = 3`
+- `sendToServer()` : initialise `_sendAttempt = 1`, callback `onRetry` incrémente avant chaque re-tentative, `finally` remet `_sendAttempt = 0`
+- Overlay `LoadingOverlay` : affiche _"Envoi… (tentative 2/3)"_ dès que `sendAttempt > 1`
+
+```dart
+// school_data_screen.dart — overlay message
+message: entry.isSending
+    ? (entry.sendAttempt > 1
+        ? 'Envoi… (tentative ${entry.sendAttempt}/${DataEntryProvider.kMaxSendAttempts})'
+        : 'Envoi en cours…')
+    : 'Rechargement…',
+```
+
+---
+
 ## [Unreleased] — 2026-06-15 — Session 18 : drapeau Burundi + renforcement cohérence offline
 
 ### 🟢 Amélioration — `pin_screen.dart` : remplacement de l'icône `school` par le drapeau du Burundi

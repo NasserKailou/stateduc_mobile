@@ -90,10 +90,14 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     return Consumer2<AuthProvider, DataEntryProvider>(
       builder: (context, auth, entry, _) {
         return LoadingOverlay(
-          // Overlay de chargement pendant l'envoi au serveur ou le rechargement
+          // Overlay de chargement pendant l'envoi au serveur ou le rechargement.
+          // En cas de retry (_sendAttempt > 1), affiche le numéro de tentative.
           isLoading: entry.isSending || entry.isReloading,
-          message:
-              entry.isSending ? 'Envoi en cours…' : 'Rechargement…',
+          message: entry.isSending
+              ? (entry.sendAttempt > 1
+                  ? 'Envoi… (tentative ${entry.sendAttempt}/${DataEntryProvider.kMaxSendAttempts})'
+                  : 'Envoi en cours…')
+              : 'Rechargement…',
           child: Scaffold(
             appBar: AppBar(
               title: Column(
