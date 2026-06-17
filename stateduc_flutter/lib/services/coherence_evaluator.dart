@@ -202,8 +202,9 @@ class CoherenceEvaluator {
   /// Calcule la somme d'un champ sur tous les filtres disponibles dans [values].
   /// Les clés peuvent avoir un suffixe filtre : "NOM_CHAMP#ID_FILTRE".
   /// Si aucun filtre n'est trouvé, retourne values[fieldName] directement.
-  /// Retourne 0 si le champ n'existe pas dans aucune version de la clé.
-  double _sumFieldAcrossAllFilters(String fieldName, Map<String, double> values) {
+  /// Retourne null si le champ n'existe pas (pour que l'appelant puisse ignorer
+  /// la règle — comportement conservatif, évite les faux positifs).
+  double? _sumFieldAcrossAllFilters(String fieldName, Map<String, double> values) {
     double sum = 0;
     bool found = false;
     for (final entry in values.entries) {
@@ -214,7 +215,9 @@ class CoherenceEvaluator {
         found = true;
       }
     }
-    return found ? sum : (values[fieldName] ?? 0);
+    // Retourne null si le champ est introuvable — le moteur ignorera silencieusement
+    // la règle plutôt que d'évaluer avec 0 (évite les faux positifs/négatifs).
+    return found ? sum : null;
   }
 
   /// Applique l'opérateur critere et retourne TRUE si la règle est VIOLÉE.

@@ -4,7 +4,100 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
-## [Unreleased] — 2026-06-17 — Session 20 : en-tête institutionnel + documentation
+## [Unreleased] — 2026-06-17 — Session 21 : correction cohérence hors ligne
+
+### 🔴 Fix — `coherence_evaluator.dart` : `_sumFieldAcrossAllFilters` retournait `0` au lieu de `null`
+
+**Problème** : Quand un champ référencé dans une règle SQL (pattern `SUM(CHAMP)`) n'était pas
+présent dans les données collectées (`collected_data`), `_sumFieldAcrossAllFilters()` retournait
+`0.0` au lieu de `null`. Cela causait l'évaluation de la règle avec `V1=0 critere V2=0`, produisant
+des résultats incorrects (faux négatifs si critère `<=`, faux positifs si critère `>=`).
+
+**Correction** : Retourne `null` quand le champ est introuvable. L'appelant `_extractValue()` propage
+`null` vers `evaluate()` qui ignore silencieusement la règle (comportement conservatif correct —
+le moteur ne signale que les violations certaines).
+
+```dart
+// Avant : double _sumFieldAcrossAllFilters(...) { ... return found ? sum : (values[fieldName] ?? 0); }
+// Après : double? _sumFieldAcrossAllFilters(...) { ... return found ? sum : null; }
+```
+
+---
+
+### 🔴 Fix — `data_entry_provider.dart` : re-déclenchement cohérence après chargement des règles
+
+**Problème** : Dans `_fetchAndStoreCoherenceRulesBackground()`, le re-déclenchement du contrôle
+de cohérence offline (après insertion des règles depuis le serveur) était conditionné à
+`_formData.isNotEmpty`. Cette condition empêchait le contrôle de s'exécuter si les règles
+arrivaient avant que l'utilisateur ait commencé à saisir.
+
+**Correction** : Suppression de la condition `_formData.isNotEmpty`. Le re-déclenchement est
+maintenant systématique dès que les règles arrivent pour la question courante (et que
+`_isCheckingOffline == false`). Si les données sont vides, le contrôle retournera 0 violations —
+ce qui est correct et met à jour l'UI de façon cohérente.
+
+```dart
+// Avant :
+if (_selectedQuestion?.idQst == q.idQst && _formData.isNotEmpty && !_isCheckingOffline)
+// Après :
+if (_selectedQuestion?.idQst == q.idQst && !_isCheckingOffline)
+```
+
+---
+
+### 🟢 Amélioration — `data_entry_provider.dart` : `updateField()` — suppression garde `_formData.isNotEmpty`
+
+Dans le callback debounce de `updateField()`, la garde `if (_formData.isNotEmpty)` a été retirée.
+Elle était redondante (le champ vient d'être mis à jour donc `_formData` est forcément non vide)
+et aurait pu masquer le problème si l'implémentation changeait.
+
+**Avant** :
+```dart
+_coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
+  if (_formData.isNotEmpty && !_isCheckingOffline) {
+    checkCoherenceOffline();
+  }
+});
+```
+
+**Après** :
+```dart
+_coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
+  if (!_isCheckingOffline) {
+    checkCoherenceOffline();
+  }
+});
+```
+
+---
+
+### 🟢 Amélioration — `school_data_screen.dart` : bouton manuel "Vérifier la cohérence"
+
+Ajout d'une option "Vérifier la cohérence" dans le menu popup (⋮) de la barre d'application.
+Permet à l'agent de collecte de déclencher manuellement le contrôle hors ligne si le check
+automatique (debounce 800ms) n'a pas encore pu s'exécuter (ex. : règles pas encore téléchargées).
+
+```dart
+PopupMenuItem(
+  value: 'check_coherence',
+  child: ListTile(
+    leading: Icon(Icons.rule_folder_outlined),
+    title: Text('Vérifier la cohérence'),
+    subtitle: Text('Contrôle offline immédiat'),
+  )),
+```
+
+---
+
+### 🔵 Diagnostic — `data_entry_provider.dart` : `debugPrint` enrichis
+
+Ajout de `debugPrint` détaillés pour tracer le flux de cohérence offline dans les logs Flutter :
+- `[DataEntry] updateField: CHAMP = "valeur" (N champs en mémoire) — debounce 800ms`
+- `[DataEntry] debounce fired: _formData=N _isCheckingOffline=false`
+- `[DataEntry] rules arrived for current question (formData=N fields) — re-triggering`
+- `[DataEntry] checkCoherenceOffline: aucune règle stockée pour idCamp=... idQst=... idEtab=...`
+
+---
 
 ### 🟢 Amélioration — `pin_screen.dart` : en-tête institutionnel complet
 

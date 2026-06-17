@@ -166,6 +166,14 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
                 leading: Icon(Icons.refresh),
                 title: Text('Recharger depuis serveur'),
               )),
+          // ── Vérification manuelle de la cohérence offline ───────────────
+          const PopupMenuItem(
+              value: 'check_coherence',
+              child: ListTile(
+                leading: Icon(Icons.rule_folder_outlined),
+                title: Text('Vérifier la cohérence'),
+                subtitle: Text('Contrôle offline immédiat'),
+              )),
           // ── Envoi global de tous les formulaires de cet établissement ──
           const PopupMenuItem(
               value: 'send_all',
@@ -443,6 +451,11 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
       AuthProvider auth, DataEntryProvider entry) {
     if (value == 'reload') {
       _reloadFromServer(context, auth, entry);
+    } else if (value == 'check_coherence') {
+      // Déclenchement manuel du contrôle de cohérence offline.
+      // Utile si le check automatique (debounce) n'a pas encore pu s'exécuter
+      // (ex. règles pas encore téléchargées depuis le serveur).
+      entry.checkCoherenceOffline();
     } else if (value == 'send_all') {
       _sendAllForms(context, auth, entry);
     }

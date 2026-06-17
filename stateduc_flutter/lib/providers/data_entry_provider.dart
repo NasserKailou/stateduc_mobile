@@ -255,13 +255,15 @@ class DataEntryProvider extends ChangeNotifier {
             debugPrint('[DataEntry] stored ${rules.length} offline coherence rules '
                 'for qst=${q.idQst} etab=$idEtab year=$yearCode');
             // ── Re-déclenche le contrôle offline si les règles viennent d'arriver
-            // pour la question actuellement affichée et que des données sont présentes.
-            // Cela résout le cas où saveLocally() appelait checkCoherenceOffline()
-            // avant que les règles soient stockées (règles vides → aucun contrôle).
+            // pour la question actuellement affichée.
+            // La condition _formData.isNotEmpty a été retirée : on re-déclenche
+            // systématiquement dès que les règles arrivent pour la question courante,
+            // même si les données sont vides (le contrôle retournera 0 violations,
+            // ce qui est correct et met à jour l'UI de façon cohérente).
             if (_selectedQuestion?.idQst == q.idQst &&
-                _formData.isNotEmpty &&
                 !_isCheckingOffline) {
-              debugPrint('[DataEntry] rules arrived for current question — '
+              debugPrint('[DataEntry] rules arrived for current question '
+                  '(formData=${_formData.length} fields) — '
                   're-triggering offline coherence check');
               await checkCoherenceOffline();
             }
@@ -592,10 +594,14 @@ class DataEntryProvider extends ChangeNotifier {
     // ── Déclenchement debounced de la cohérence offline ──────────────────
     // Attend 800 ms après la dernière frappe avant d'évaluer, pour éviter
     // de sur-solliciter SQLite à chaque caractère saisi.
-    // Ne se déclenche que si des règles existent pour ce contexte.
+    debugPrint('[DataEntry] updateField: $fieldName = "$value" '
+        '(${_formData.length} champs en mémoire) '
+        '— debounce 800ms → checkCoherenceOffline');
     _coherenceDebounce?.cancel();
     _coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
-      if (_formData.isNotEmpty && !_isCheckingOffline) {
+      debugPrint('[DataEntry] debounce fired: '
+          '_formData=${_formData.length} _isCheckingOffline=$_isCheckingOffline');
+      if (!_isCheckingOffline) {
         checkCoherenceOffline();
       }
     });
@@ -826,7 +832,10 @@ class DataEntryProvider extends ChangeNotifier {
       );
 
       if (rules.isEmpty) {
-        debugPrint('[DataEntry] checkCoherenceOffline: no rules stored for this context');
+        debugPrint('[DataEntry] checkCoherenceOffline: aucune règle stockée pour '
+            'idCamp=$_idCamp idQst=${_selectedQuestion!.idQst} idEtab=$_idEtab '
+            '— le fetch background est peut-être encore en cours. '
+            'Le contrôle sera re-déclenché automatiquement à l\'arrivée des règles.');
         return;
       }
 
