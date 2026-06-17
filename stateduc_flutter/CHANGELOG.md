@@ -4,6 +4,69 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Unreleased] — 2026-06-17 — Session 20 : en-tête institutionnel + documentation
+
+### 🟢 Amélioration — `pin_screen.dart` : en-tête institutionnel complet
+
+**Avant** : L'écran d'accueil affichait directement le drapeau du Burundi (session 18), sans mention du nom de l'institution.
+
+**Après** : Deux lignes institutionnelles en **italique** s'affichent au-dessus du drapeau, avec la même police et couleur principale (`colorScheme.primary`) que le titre "StatEduc" :
+
+```dart
+// Ligne 1 — République du Burundi
+// Ligne 2 — Ministère de l'Éducation Nationale
+// (séparateur 14px)
+// Drapeau du Burundi (96×64 px, ombre, coin arrondis)
+// (séparateur 12px)
+// StatEduc  (headlineMedium bold)
+// Collecte de données éducatives (bodyMedium)
+```
+
+**Style des deux lignes institutionnelles** :
+```dart
+Theme.of(context).textTheme.headlineMedium?.copyWith(
+  fontStyle: FontStyle.italic,      // texte oblique
+  fontWeight: FontWeight.w600,      // semi-bold — même poids que StatEduc
+  color: primaryColor,              // couleur principale de l'application
+)
+```
+
+**Résultat visuel** :
+```
+  République du Burundi                  ← italique, couleur principale
+  Ministère de l'Éducation Nationale     ← italique, couleur principale
+
+        [Drapeau du Burundi]
+
+            StatEduc
+  Collecte de données éducatives
+```
+
+---
+
+### 📄 Nouveau document — `administration.md`
+
+Création du guide d'administration complet A→Z de l'application, destiné aux administrateurs et superviseurs de collecte du MEN. Couvre 20 sections :
+- Installation, premier démarrage, connexion au serveur
+- Création, modification et réinitialisation du PIN
+- Configuration URL serveur, téléchargement de campagne
+- Navigation, remplissage questionnaire, sauvegarde locale
+- Contrôle de cohérence hors ligne (7 déclenchements)
+- Envoi des données (formulaire / établissement / campagne)
+- Contrôle de cohérence serveur, rechargement depuis serveur
+- Gestion des erreurs réseau (tableau messages + diagnostic)
+- Tableau de bord administrateur — vérifications essentielles
+
+---
+
+### 📄 Documents mis à jour
+
+- **`recapitulatif.md`** : duplication de contenu supprimée (la moitié du fichier était dupliquée depuis la session 18) ; mise à jour sessions 19-20 ; nouvelle section "Timeouts Dio — Configuration actuelle" ; ajout `administration.md` dans le tableau documentation ; correctifs sessions 19+20 ajoutés au tableau historique
+- **`notepresentation.md`** : références mises à jour sessions 19-20 ; tableau documentation enrichi avec `administration.md` ; timeouts mis à jour (600s / null) ; tableau résultats complété
+- **`stateduc_flutter/CHANGELOG.md`** : entrée session 20 (ce fichier)
+
+---
+
 ## [Unreleased] — 2026-06-15 — Session 19 : correction timeout + retry automatique
 
 ### 🔴 Fix — "Délai d'attente dépassé lors de l'envoi" sur réseau stable

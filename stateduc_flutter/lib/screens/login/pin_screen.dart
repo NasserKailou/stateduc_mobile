@@ -126,13 +126,28 @@ class _PinScreenState extends State<PinScreen> {
   }
 
   // ─── Logo ───────────────────────────────────────────────────────────────────
-  // Affiche le drapeau du Burundi + nom de l'application + sous-titre.
-  // Le drapeau est chargé depuis assets/icon/Flag_of_country.png.
-  // En cas d'erreur de chargement (asset manquant), repli sur l'icône school.
+  // Affiche l'en-tête institutionnel complet :
+  //   1. "République du Burundi"          — italic, même police que StatEduc
+  //   2. "Ministère de l'Éducation Nationale" — italic, même police que StatEduc
+  //   3. Drapeau du Burundi (Flag_of_country.png) — image avec ombre
+  //   4. "StatEduc"                        — titre principal bold
+  //   5. "Collecte de données éducatives"  — sous-titre
   Widget _buildLogo() {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final labelStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.w600,
+      color: primaryColor,
+    );
     return Column(
       children: [
-        // Drapeau du Burundi — encadré avec ombre légère pour le détacher du fond
+        // ── Ligne 1 : République du Burundi ─────────────────────────────────
+        Text('République du Burundi', style: labelStyle),
+        const SizedBox(height: 2),
+        // ── Ligne 2 : Ministère de l'Éducation Nationale ────────────────────
+        Text("Ministère de l'Éducation Nationale", style: labelStyle),
+        const SizedBox(height: 14),
+        // ── Drapeau du Burundi — encadré avec ombre légère ──────────────────
         Container(
           width: 96,
           height: 64,

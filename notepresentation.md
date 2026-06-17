@@ -257,13 +257,14 @@ git checkout ak_main
 ```
 
 ### Documentation disponible
-| Document | Contenu |
-|---------|---------|
-| `recapitulatif.md` | Architecture complète, correctifs, guide développeur (sessions 1-18) |
-| `stateduc_flutter/CHANGELOG.md` | Historique détaillé des modifications Flutter (sessions 1-18) |
-| `StatEduc_MEN_2025/CHANGELOG.md` | Historique des modifications PHP |
-| Code source | Tous les fichiers commentés en français |
-| PR #1 | https://github.com/NasserKailou/stateduc_mobile/pull/1 |
+| Document | Contenu | Audience |
+|---------|---------|----------|
+| `administration.md` | Guide A→Z : installation, PIN, campagne, saisie, envoi, dépannage | Administrateurs, superviseurs |
+| `recapitulatif.md` | Architecture, correctifs, guide développeur (sessions 1-20) | Développeurs, mainteneurs |
+| `stateduc_flutter/CHANGELOG.md` | Historique détaillé Flutter (sessions 1-20) | Développeurs |
+| `StatEduc_MEN_2025/CHANGELOG.md` | Historique des modifications PHP | Développeurs PHP |
+| Code source | Tous les fichiers commentés en français | Développeurs |
+| PR #1 | https://github.com/NasserKailou/stateduc_mobile/pull/1 | Équipe projet |
 
 ---
 
