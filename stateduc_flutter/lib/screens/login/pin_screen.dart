@@ -85,8 +85,7 @@ class _PinScreenState extends State<PinScreen> {
           // Navigate to campaign list
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (_) => const CampaignListScreen()),
+              MaterialPageRoute(builder: (_) => const CampaignListScreen()),
             );
           });
           return const Scaffold(
@@ -98,8 +97,7 @@ class _PinScreenState extends State<PinScreen> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 24, vertical: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: Column(
                 children: [
                   _buildLogo(),
@@ -135,18 +133,19 @@ class _PinScreenState extends State<PinScreen> {
   Widget _buildLogo() {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final labelStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
-      fontStyle: FontStyle.italic,
-      fontWeight: FontWeight.w600,
-      color: primaryColor,
-    );
+          fontStyle: FontStyle.italic,
+          fontWeight: FontWeight.w600,
+          color: primaryColor,
+        );
     return Column(
       children: [
         // ── Ligne 1 : République du Burundi ─────────────────────────────────
         Text('République du Burundi', style: labelStyle),
         const SizedBox(height: 2),
         // ── Ligne 2 : Ministère de l'Éducation Nationale ────────────────────
-        Text("Ministère de l'Éducation Nationale", style: labelStyle),
-        const SizedBox(height: 14),
+        //Text("Ministère de l'Éducation Nationale", style: labelStyle),
+        //const SizedBox(height: 1),
+
         // ── Drapeau du Burundi — encadré avec ombre légère ──────────────────
         Container(
           width: 96,
@@ -205,8 +204,7 @@ class _PinScreenState extends State<PinScreen> {
           Expanded(
             child: Text(auth.error!,
                 style: TextStyle(
-                    color:
-                        Theme.of(context).colorScheme.onErrorContainer)),
+                    color: Theme.of(context).colorScheme.onErrorContainer)),
           ),
           IconButton(
             icon: const Icon(Icons.close, size: 18),
@@ -262,11 +260,9 @@ class _PinScreenState extends State<PinScreen> {
               children: [
                 Checkbox(
                   value: _showSecurityQuestion,
-                  onChanged: (v) =>
-                      setState(() => _showSecurityQuestion = v!),
+                  onChanged: (v) => setState(() => _showSecurityQuestion = v!),
                 ),
-                const Expanded(
-                    child: Text('Ajouter une question de sécurité')),
+                const Expanded(child: Text('Ajouter une question de sécurité')),
               ],
             ),
             if (_showSecurityQuestion) ...[
@@ -310,8 +306,8 @@ class _PinScreenState extends State<PinScreen> {
     final pin = _pinController.text.trim();
     final confirm = _confirmPinController.text.trim();
     if (pin.length < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Le PIN doit avoir au moins 4 chiffres')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Le PIN doit avoir au moins 4 chiffres')));
       return;
     }
     if (pin != confirm) {
@@ -382,8 +378,7 @@ class _PinScreenState extends State<PinScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed:
-                  auth.isLoading ? null : () => _doServerLogin(auth),
+              onPressed: auth.isLoading ? null : () => _doServerLogin(auth),
               icon: auth.isLoading
                   ? const SizedBox(
                       width: 18,
@@ -405,14 +400,13 @@ class _PinScreenState extends State<PinScreen> {
     final password = _passwordController.text;
     if (rawUrl.isEmpty || login.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Veuillez remplir tous les champs')));
+          const SnackBar(content: Text('Veuillez remplir tous les champs')));
       return;
     }
     // Display the normalized URL in the field so user can see what was used
     _serverUrlController.text = rawUrl;
     await auth.loginToServer(
-      serverUrl: rawUrl,   // ApiService.normalizeServerUrl() handles http://
+      serverUrl: rawUrl, // ApiService.normalizeServerUrl() handles http://
       login: login,
       password: password,
     );
@@ -449,8 +443,7 @@ class _PinScreenState extends State<PinScreen> {
             // Forgot PIN
             if (auth.securityQuestion != null)
               TextButton(
-                onPressed: () =>
-                    setState(() => _showForgotPin = true),
+                onPressed: () => setState(() => _showForgotPin = true),
                 child: const Text('PIN oublié ?'),
               ),
             // Server re-login link
@@ -509,8 +502,7 @@ class _PinScreenState extends State<PinScreen> {
               child: const Text('Réinitialiser'),
             ),
             TextButton(
-              onPressed: () =>
-                  setState(() => _showForgotPin = false),
+              onPressed: () => setState(() => _showForgotPin = false),
               child: const Text('Annuler'),
             ),
           ],
@@ -557,8 +549,8 @@ class _PinPadState extends State<_PinPad> {
 
   void _confirm() async {
     if (_entered.length < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('PIN trop court')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('PIN trop court')));
       return;
     }
     final pin = _entered;
@@ -598,15 +590,9 @@ class _PinPadState extends State<_PinPad> {
           children: [
             for (final d in ['1', '2', '3', '4', '5', '6', '7', '8', '9'])
               _DigitButton(digit: d, onTap: () => _append(d)),
-            _DigitButton(
-                digit: '⌫',
-                onTap: _backspace,
-                isIcon: true),
+            _DigitButton(digit: '⌫', onTap: _backspace, isIcon: true),
             _DigitButton(digit: '0', onTap: () => _append('0')),
-            _DigitButton(
-                digit: '✓',
-                onTap: _confirm,
-                isConfirm: true),
+            _DigitButton(digit: '✓', onTap: _confirm, isConfirm: true),
           ],
         ),
       ],
