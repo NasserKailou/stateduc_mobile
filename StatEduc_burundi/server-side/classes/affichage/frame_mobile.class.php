@@ -96,7 +96,47 @@ class frame_mobile{
 		$this->generer_frame($code_annee, $code_etablissement);
 		
     }
-	
+
+	/**
+	 * METHODE : _mobile_libelle_clean($str)
+	 * Nettoyage des libelles pour le chemin Mobile uniquement.
+	 *
+	 * Problemes corriges (session 23 - 2026-06-23) :
+	 *   Bug A : htmlEncode() convertissait <b>1.1.</b> en &lt;b&gt;1.1.&lt;/b&gt;
+	 *            car les balises HTML sont inutiles dans le template WebView mobile.
+	 *            Correction : strip_tags() supprime les balises avant tout encodage.
+	 *   Bug B : La base dico_DB (MS Access ODBC) retourne les chaines en ISO-8859-1.
+	 *            La page classique declare charset=iso-8859-15 -> rendu correct navigateur.
+	 *            Le fichier ws_mob_*.frame doit etre en UTF-8 pour Flutter WebView.
+	 *            Correction : mb_convert_encoding() convertit ISO-8859-1 -> UTF-8.
+	 *
+	 * Ordre des operations (important) :
+	 *   1. mb_convert_encoding : ISO-8859-1 -> UTF-8  (Bug B)
+	 *   2. html_entity_decode  : decode les eventuelles entites HTML deja presentes
+	 *   3. strip_tags          : supprime les balises <b>, <i>, etc.  (Bug A)
+	 *   4. trim                : nettoie les espaces residuels
+	 *
+	 * @access private
+	 * @param  string $str Libelle brut retourne par la requete ADODB
+	 * @return string      Libelle propre, UTF-8, sans balises HTML
+	 */
+	function _mobile_libelle_clean($str) {
+		if ($str === null || $str === '') return '';
+		// Etape 1 - Conversion ISO-8859-1 (Windows-1252) -> UTF-8
+		// mb_detect_encoding est fiable ici car les accents ISO ne sont pas
+		// des sequences UTF-8 valides a deux octets.
+		if (mb_detect_encoding($str, 'UTF-8', true) === false) {
+			$str = mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1');
+		}
+		// Etape 2 - Decoder les entites HTML eventuellement deja presentes
+		// (cas ou la DB stocke &eacute; au lieu de e accent aigu)
+		$str = html_entity_decode($str, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		// Etape 3 - Supprimer les balises HTML (<b>, <i>, <br>, etc.)
+		$str = strip_tags($str);
+		// Etape 4 - Nettoyage final
+		return trim($str);
+	}
+
 	function js_Post_Form($id_theme, $id_systeme){
 		$operateurs = array("==","<",">","<=",">=", "si");
 		$requete = "
@@ -214,7 +254,7 @@ class frame_mobile{
 						if(!is_array($aresult)){                    
 								throw new Exception('ERR_SQL');  
 						} 
-						return htmlEncode($aresult[0]['LIBELLE']);									
+						return $this->_mobile_libelle_clean($aresult[0]['LIBELLE']); // fix session23: Bug A+B
 				}
 				catch(Exception $e){
 						$erreur = new erreur_manager($e,$requete);
@@ -244,7 +284,7 @@ class frame_mobile{
 					if(!is_array($all_res)){                    
 							throw new Exception('ERR_SQL');  
 					} 
-					return htmlEncode($all_res[0]['LIBELLE']);									
+					return $this->_mobile_libelle_clean($all_res[0]['LIBELLE']); // fix session23: Bug A+B
 			}
 			catch(Exception $e){
 					$erreur = new erreur_manager($e,$requete);
@@ -446,7 +486,7 @@ class frame_mobile{
 						} 
 						foreach( $all_res as $i => $res) {
 							$code[] = $res[$this->get_champ_extract($champ_pere)];		
-							$all_res[$i]['LIBELLE']= htmlEncode($all_res[$i]['LIBELLE']);
+							$all_res[$i]['LIBELLE']= $this->_mobile_libelle_clean($all_res[$i]['LIBELLE']); // fix session23: Bug A+B
 						}
 						return $all_res;							
 					}
