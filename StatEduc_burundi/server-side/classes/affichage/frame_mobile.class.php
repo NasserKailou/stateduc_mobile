@@ -1,14 +1,16 @@
-<?php /** 
-
+<?php
 /**
  * frame_mobile.class.php
  *
  * Classe de generation des frames HTML pour les formulaires mobiles StatEduc.
- * Produit les fichiers ws_mob_*.frame utilises par le WebView Flutter.
- * MODIFIE session 23 : ajout de _mobile_libelle_clean() pour corriger
- *   Bug A (entites HTML brutes &lt;b&gt;) et Bug B (mojibake ISO-8859-1).
- * Les libelles de zones passent desormais par mb_convert_encoding + strip_tags
- *   avant ecriture dans le fichier frame (UTF-8 propre, sans balises).
+ * Genere les fichiers ws_mob_*.frame utilises par le WebView Flutter.
+ *
+ * MODIFIE session 23 (2026-06-23) :
+ *   Ajout de _mobile_libelle_clean() pour corriger :
+ *     Bug A : entites HTML brutes (&lt;b&gt;) dans le WebView mobile
+ *     Bug B : mojibake ISO-8859-1 -> UTF-8 (accents corrompus)
+ *   Les libelles de zones passent desormais par mb_convert_encoding + strip_tags
+ *   avant ecriture dans le fichier frame (UTF-8 propre, sans balises HTML).
  *
  * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
  * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
@@ -17,13 +19,7 @@
  *          Toutes les modifications et nouveautes sont documentees
  *          directement dans le code avec des commentaires en francais.
  */
-	 * Classe frame : génération des frames
-	 * <pre>
-	 * Genère un fichier "frame" contenant la structure HTML du thème sous la
-	 * forme d'un formulaire proche du questionnaire d'enquête
-	 * </pre>
-	 * @access public
-	*/
+
 class frame_mobile{
 	/**
 	 * Attribut : id_themes
