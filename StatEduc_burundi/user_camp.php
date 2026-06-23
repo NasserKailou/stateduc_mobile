@@ -1,4 +1,20 @@
 <?php session_start();
+
+/**
+ * user_camp.php
+ *
+ * Web Service REST - Gestion des campagnes et etablissements pour l'app mobile.
+ * Routes : GET /new_camp, /theme_camp, /list_etab, etc.
+ * Renvoie la liste des campagnes disponibles, les themes et les ecoles
+ * assignes a l'agent collecteur connecte.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-19
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 require_once 'common_ws.php';
 
 require_once $GLOBALS['SISED_PATH_LIB'] . 'adodb_xml/class.ADODB_XML.php';

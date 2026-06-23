@@ -1,4 +1,20 @@
 <?php
+
+/**
+ * HttpAuth.php
+ *
+ * Middleware d'authentification HTTP Basic pour les Web Services mobiles Slim v2.
+ * Etend \Slim\Middleware et intercepte chaque requete avant le routeur.
+ * Verifie les entetes Authorization (Basic base64) et bloque les acces
+ * non autorises avec une reponse 401 WWW-Authenticate.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-19
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 // Class destinée à gérer l'authentification
 class HttpAuth extends \Slim\Middleware
 {

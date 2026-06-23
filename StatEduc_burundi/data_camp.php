@@ -1,4 +1,21 @@
 <?php
+
+/**
+ * data_camp.php
+ *
+ * Web Service REST - Generation et envoi des frames (templates HTML) pour formulaires mobiles.
+ * Route : GET /theme_frame/{user}/{id_camp}/{id_sector}/{id_theme}/{id_etab}/{id_filter}/{id_annee}
+ * Utilise frame_mobile.class.php pour produire les fichiers ws_mob_*.frame.
+ * MODIFIE session 23 : integration de _mobile_libelle_clean() via frame_mobile
+ *   pour corriger Bug A (entites HTML brutes) et Bug B (mojibake ISO-8859-1).
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-23
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 require_once 'common_ws.php';
 
 $app = new \Slim\Slim();

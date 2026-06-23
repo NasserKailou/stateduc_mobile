@@ -1,4 +1,20 @@
 <?php
+
+/**
+ * data_rules.php
+ *
+ * Web Service REST - Exposition des regles de coherence pour evaluation offline.
+ * Route : GET /theme_rules/{user}/{id_camp}/{id_sector}/{id_theme}/{id_etab}/{id_filter}/{id_annee}
+ * Retourne toutes les regles de coherence d'un theme avec les SQLs interpoles.
+ * Permet a l'app mobile de stocker les regles localement (mode hors-ligne).
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 9-21
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 /**
  * data_rules.php — Exposition des règles de cohérence pour évaluation offline
  *

@@ -1,4 +1,20 @@
 <?php
+
+/**
+ * common_ws.php
+ *
+ * Fichier d'amorçage et middleware commun a tous les Web Services mobiles.
+ * Charge config_app.php, params.php, params_sys.php, params_ws.php.
+ * Initialise les connexions base de donnees et les chemins globaux.
+ * Point d'entree unique pour toute la couche WS REST de l'app mobile.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-19
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 require_once 'config_app.php';
 require_once 'params.php';
 require_once 'params_sys.php';

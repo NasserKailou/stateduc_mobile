@@ -1,4 +1,20 @@
 <?php
+
+/**
+ * data_reload.php
+ *
+ * Web Service REST - Rechargement et pre-remplissage des donnees pour l'app mobile.
+ * Route : GET /data_reload/{user}/{id_camp}/{id_sector}/{id_theme}/{id_etab}/{id_filter}/{id_annee}
+ * Renvoie les valeurs deja saisies afin de pre-remplir le formulaire a la reprise.
+ * Corrige l'encodage ISO-8859-1 vers UTF-8 avant serialisation JSON.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 4-19
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 require_once 'common_ws.php';
 
 require_once $GLOBALS['SISED_PATH_LIB'] . 'adodb_xml/class.ADODB_XML.php';

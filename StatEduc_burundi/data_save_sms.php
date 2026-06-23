@@ -1,4 +1,20 @@
 <?php
+
+/**
+ * data_save_sms.php
+ *
+ * Web Service REST - Sauvegarde des donnees collectees via SMS.
+ * Route : POST /data_save_sms
+ * Traite et persiste les donnees envoyees par SMS depuis les zones sans Internet.
+ * Decodage et validation du message SMS avant insertion en base.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-17
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 require_once 'common_ws.php';
 
 require $GLOBALS['SISED_PATH_LIB'] . 'Curl/Curl.php';

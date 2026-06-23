@@ -1,4 +1,20 @@
 <?php
+
+/**
+ * data_controle.php
+ *
+ * Web Service REST - Controle de coherence des donnees (API REST pour app mobile).
+ * Route : GET /theme_controle/{user}/{id_camp}/{id_sector}/{id_theme}/{id_etab}/{id_filter}/{id_annee}
+ * Execute les regles de coherence du theme contre les donnees deja sauvegardees.
+ * Retourne la liste des violations detectees avec messages explicatifs.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 10-21
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
 /**
  * data_controle.php — Contrôle de cohérence des données (API REST pour app mobile)
  *

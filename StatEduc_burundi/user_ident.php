@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * user_ident.php
+ *
+ * Web Service REST - Authentification utilisateur mobile.
+ * Route : POST /user/login
+ * Verifie identifiant + mot de passe dans la base Access (dico_DB.mdb).
+ * Retourne un token de session JSON si les credentials sont valides.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-14
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
+
 
 require_once 'common_ws.php';
 
