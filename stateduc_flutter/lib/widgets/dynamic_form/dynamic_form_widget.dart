@@ -504,7 +504,14 @@ $formHtml
     var elArr = els instanceof Array ? els : Array.prototype.slice.call(els);
     elArr.forEach(function(el) {
       if (el.type === 'radio') {
-        el.checked = (el.value === val);
+        // Normalise les anciens identifiants serveur style "CODE_TYPE_ACCES_0_6" → "6"
+        var normalizedVal = val;
+        var lastUnder = val.lastIndexOf('_');
+        if (lastUnder >= 0) {
+          var lastSeg = val.substring(lastUnder + 1);
+          if (/^\d+$/.test(lastSeg)) { normalizedVal = lastSeg; }
+        }
+        el.checked = (el.value === normalizedVal);
       } else if (el.type === 'checkbox') {
         el.checked = (val === '1' || val === 'true');
       } else {

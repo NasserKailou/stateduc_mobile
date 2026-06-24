@@ -903,9 +903,26 @@ class DataEntryProvider extends ChangeNotifier {
       }
 
       // Convertit Map<String, dynamic> → Map<String, String> pour la DB locale
-      final Map<String, String> serverFieldsStr = serverFields.map(
-        (k, v) => MapEntry(k, v?.toString() ?? ''),
-      );
+      // Le serveur retourne des tableaux [valeur, type] ex: ["CODE_TYPE_ACCES_0_6","radio"]
+      // On extrait v[0] et on normalise les IDs radio style ancien "CHAMP_0_6" → "6"
+      final Map<String, String> serverFieldsStr = {};
+      serverFields.forEach((k, v) {
+        String strVal;
+        if (v is List && v.isNotEmpty) {
+          strVal = v[0]?.toString() ?? '';
+          // Normalise les anciens identifiants radio : "CODE_TYPE_ACCES_0_6" → "6"
+          if (v.length >= 2 && v[1].toString() == 'radio') {
+            final lastUnder = strVal.lastIndexOf('_');
+            if (lastUnder >= 0) {
+              final lastSeg = strVal.substring(lastUnder + 1);
+              if (RegExp(r'^\d+$').hasMatch(lastSeg)) strVal = lastSeg;
+            }
+          }
+        } else {
+          strVal = v?.toString() ?? '';
+        }
+        serverFieldsStr[k] = strVal;
+      });
 
       // Remplace les données locales par les données serveur
       await _db.deleteCollectedData(
