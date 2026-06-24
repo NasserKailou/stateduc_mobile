@@ -60,7 +60,8 @@ class DynamicFormWidget extends StatefulWidget {
 class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   late final WebViewController _controller;
   bool _pageLoaded = false;
-  bool _isRendering = false;  // vrai pendant le chargement initial du HTML dans le WebView
+  bool _isRendering =
+      false; // vrai pendant le chargement initial du HTML dans le WebView
 
   // Vrai si le HTML correspond à un formulaire de type grille (tableau multi-lignes).
   bool get _isGridForm => _detectGridForm(widget.html);
@@ -72,10 +73,11 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   void initState() {
     super.initState();
     _gridRowCount = _countGridRows(widget.html);
-    _isRendering  = true;
+    _isRendering = true;
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)   // ← évite le flash gris avant le chargement
+      ..setBackgroundColor(
+          Colors.white) // ← évite le flash gris avant le chargement
       ..addJavaScriptChannel(
         'FieldChanged',
         // Pont JavaScript → Flutter : reçoit les changements de champs depuis le WebView.
@@ -84,7 +86,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
         onMessageReceived: (JavaScriptMessage msg) {
           try {
             final m = json.decode(msg.message) as Map<String, dynamic>;
-            final name  = m['name']?.toString()  ?? '';
+            final name = m['name']?.toString() ?? '';
             final value = m['value']?.toString() ?? '';
             if (name == '__addGridRow__') {
               // Demande d'ajout de ligne depuis le pont ou le bouton FAB
@@ -123,7 +125,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     super.didUpdateWidget(old);
     // Recharge le HTML quand le formulaire change (changement de question)
     if (old.html != widget.html) {
-      _pageLoaded  = false;
+      _pageLoaded = false;
       _isRendering = true;
       setState(() {
         _gridRowCount = _countGridRows(widget.html);
@@ -135,7 +137,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     // (ex. rechargement depuis le serveur, pré-remplissage identification)
     if (_pageLoaded &&
         (old.data != widget.data ||
-         old.validationErrors != widget.validationErrors)) {
+            old.validationErrors != widget.validationErrors)) {
       _injectData();
       _injectValidationErrors();
     }
@@ -148,8 +150,8 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   // sous forme de Mojibake (Ã©, etc.). En encodant les octets en Base64 et en
   // chargeant via une data: URI, on force le moteur à décoder en UTF-8.
   Uri _buildHtmlUri(String formHtml) {
-    final processed  = _preprocessHtml(formHtml);
-    final bytes      = utf8.encode(_buildHtmlPage(processed));
+    final processed = _preprocessHtml(formHtml);
+    final bytes = utf8.encode(_buildHtmlPage(processed));
     final base64Html = base64Encode(bytes);
     return Uri.parse('data:text/html;charset=utf-8;base64,$base64Html');
   }
@@ -200,12 +202,13 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       try {
         // Traite chaque unité de code comme un octet Latin-1 brut (≤ 0xFF)
         final latin1Bytes = <int>[
-          for (final c in html.codeUnits) if (c <= 0xFF) c,
+          for (final c in html.codeUnits)
+            if (c <= 0xFF) c,
         ];
         final decoded = utf8.decode(latin1Bytes, allowMalformed: true);
         // Compte les caractères de remplacement — accepte si < 5% de la longueur
         final replacements = '\uFFFD'.allMatches(decoded).length;
-        final threshold    = (latin1Bytes.length * 0.05).ceil();
+        final threshold = (latin1Bytes.length * 0.05).ceil();
         if (replacements <= threshold) {
           html = decoded;
           debugPrint('[DynamicForm] Mojibake repaired '
@@ -225,11 +228,11 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     // Deux passes pour gérer le double-encodage (&amp;lt; → &lt; → <)
     for (int pass = 0; pass < 2; pass++) {
       html = html
-          .replaceAll('&lt;',   '<')
-          .replaceAll('&gt;',   '>')
-          .replaceAll('&amp;',  '&')
+          .replaceAll('&lt;', '<')
+          .replaceAll('&gt;', '>')
+          .replaceAll('&amp;', '&')
           .replaceAll('&quot;', '"')
-          .replaceAll('&#39;',  "'")
+          .replaceAll('&#39;', "'")
           .replaceAll('&nbsp;', '\u00A0')
           .replaceAll('&apos;', "'");
     }
@@ -284,15 +287,30 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   //   affiché 'â€™' en mojibake (ex. "l'établissement" → "lâ€™établissement")
   bool _looksLikeMojibake(String s) {
     // Vérification rapide : patterns mojibake français courants (deux caractères)
-    if (s.contains('Ã©') || s.contains('Ã¨') || s.contains('Ã ') ||
-        s.contains('Ã´') || s.contains('Ã®') || s.contains('Ã¢') ||
-        s.contains('Ã«') || s.contains('Ã¯') || s.contains('Ã»') ||
-        s.contains('Ã¹') || s.contains('Ã§') || s.contains('Ã¼') ||
-        s.contains('Ãˆ') || s.contains('Ã‰') || s.contains('Ã€') ||
-        s.contains('Â°')  || s.contains('Â ')  ||  // degré + espace insécable
-        s.contains('Â«')  || s.contains('Â»')  ||  // guillemets français
-        s.contains('â€™') || s.contains('â€œ') ||  // apostrophes courbes
-        s.contains('Nâ')  || s.contains('nÂ°')) {  // patterns N°
+    if (s.contains('Ã©') ||
+        s.contains('Ã¨') ||
+        s.contains('Ã ') ||
+        s.contains('Ã´') ||
+        s.contains('Ã®') ||
+        s.contains('Ã¢') ||
+        s.contains('Ã«') ||
+        s.contains('Ã¯') ||
+        s.contains('Ã»') ||
+        s.contains('Ã¹') ||
+        s.contains('Ã§') ||
+        s.contains('Ã¼') ||
+        s.contains('Ãˆ') ||
+        s.contains('Ã‰') ||
+        s.contains('Ã€') ||
+        s.contains('Â°') ||
+        s.contains('Â ') || // degré + espace insécable
+        s.contains('Â«') ||
+        s.contains('Â»') || // guillemets français
+        s.contains('â€™') ||
+        s.contains('â€œ') || // apostrophes courbes
+        s.contains('Nâ') ||
+        s.contains('nÂ°')) {
+      // patterns N°
       return true;
     }
     // Vérification approfondie : recherche un octet de tête UTF-8 suivi
@@ -323,10 +341,10 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   //   • NAME='FIELD_N_V'  — nom de champ doublement indexé (index ligne + valeur option)
   bool _detectGridForm(String html) {
     return html.contains(r'$NUMERO_LOCAL') ||
-           html.contains('addGrilleLine') ||
-           html.contains('NUMERO_LOCAL') ||
-           html.contains('MiseEvidenceLigneFrame') ||
-           RegExp(r"NAME='[A-Z_]+_\d+_\d+'").hasMatch(html);
+        html.contains('addGrilleLine') ||
+        html.contains('NUMERO_LOCAL') ||
+        html.contains('MiseEvidenceLigneFrame') ||
+        RegExp(r"NAME='[A-Z_]+_\d+_\d+'").hasMatch(html);
   }
 
   // Compte les lignes de grille déjà présentes dans le HTML (pour les formulaires grille).
@@ -345,7 +363,8 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     if (max >= 0) return max + 1;
 
     // Pattern 2 : id='ligne-paire_N_0' ou id='ligne-impaire_N_0'
-    for (final m in RegExp(r"ligne-(?:paire|impaire)_(\d+)_0").allMatches(html)) {
+    for (final m
+        in RegExp(r"ligne-(?:paire|impaire)_(\d+)_0").allMatches(html)) {
       final n = int.tryParse(m.group(1) ?? '') ?? 0;
       if (n > max) max = n;
     }
@@ -512,7 +531,7 @@ $formHtml
         var lastUnder = val.lastIndexOf('_');
         if (lastUnder >= 0) {
           var lastSeg = val.substring(lastUnder + 1);
-          if (/^\d+$/.test(lastSeg)) { normalizedVal = lastSeg; }  // JS regex — NE PAS modifier: ce code est du JavaScript (string WebView, pas du Dart)
+         if (/^\\d+\$/.test(lastSeg)) { normalizedVal = lastSeg; }  // JS regex — NE PAS modifier: ce code est du JavaScript (string WebView, pas du Dart)
         }
         el.checked = (el.value === normalizedVal);
       } else if (el.type === 'checkbox') {
