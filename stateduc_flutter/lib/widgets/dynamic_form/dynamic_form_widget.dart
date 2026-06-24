@@ -482,6 +482,9 @@ $formHtml
   void _injectData() {
     if (!_pageLoaded) return;
     final jsonData = json.encode(widget.data);
+    // ⚠️  TOUT LE CODE CI-DESSOUS (jusqu'à ''') EST DU JAVASCRIPT, PAS DU DART.
+    //     Ne jamais remplacer la syntaxe JS par de la syntaxe Dart ici.
+    //     Exemples JS valides ici :  /regex/.test(x)   ===   var x   typeof
     _controller.runJavaScript('''
 (function() {
   var data = $jsonData;
@@ -509,7 +512,7 @@ $formHtml
         var lastUnder = val.lastIndexOf('_');
         if (lastUnder >= 0) {
           var lastSeg = val.substring(lastUnder + 1);
-          if (RegExp(r'^\d+$').hasMatch(lastSeg)) { normalizedVal = lastSeg; }
+          if (/^\d+$/.test(lastSeg)) { normalizedVal = lastSeg; }  // JS regex — NE PAS modifier: ce code est du JavaScript (string WebView, pas du Dart)
         }
         el.checked = (el.value === normalizedVal);
       } else if (el.type === 'checkbox') {
@@ -532,6 +535,7 @@ $formHtml
   // leur onclick) sont reliés pour envoyer '__addGridRow__' via le pont,
   // déclenchant l'ajout d'une nouvelle ligne dans le formulaire grille.
   void _injectBridge() {
+    // ⚠️  JAVASCRIPT ci-dessous (jusqu'à ''') — ne pas utiliser syntaxe Dart ici.
     _controller.runJavaScript('''
 (function() {
   function notify(name, value) {
@@ -577,6 +581,7 @@ $formHtml
   // validationErrors change.
   void _injectValidationErrors() {
     final jsonErrors = json.encode(widget.validationErrors);
+    // ⚠️  JAVASCRIPT ci-dessous (jusqu'à ''') — ne pas utiliser syntaxe Dart ici.
     _controller.runJavaScript('''
 (function() {
   document.querySelectorAll('.error').forEach(function(el) {
@@ -619,6 +624,7 @@ $formHtml
           // Notifie le parent pour qu'il puisse suivre les lignes supplémentaires
           widget.onAddGridRow?.call('native_add');
           setState(() => _gridRowCount++);
+          // ⚠️  JAVASCRIPT ci-dessous (jusqu'à r''') — ne pas utiliser syntaxe Dart ici.
           // Demande au WebView d'appeler addGrilleLine si la fonction JS existe
           _controller.runJavaScript(r'''
 (function() {
