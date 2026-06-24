@@ -590,6 +590,15 @@ class grille {
 								 throw new Exception('ERR_SQL');   
 						}
 						$nb_table_liee				=   $rstableliee->RecordCount();
+                        // === SESSION 28 DIAG : get_dico TABLE_MERE ===
+                        $diag_log_dico = dirname(__FILE__).'/../../../../moblogs/diag_grille.log';
+                        $_diag_appart = isset($_SESSION['type_ent_stat']) ? $_SESSION['type_ent_stat'] : 'UNDEF';
+                        file_put_contents($diag_log_dico,
+                            date('Y-m-d H:i:s').';get_dico;theme='.$id_theme.';systeme='.$id_systeme.
+                            ';type_ent_stat='.$_diag_appart.';frame='.($dico['template']??'UNSET').
+                            ';nb_table_liee='.$nb_table_liee.';sqltableliee='.str_replace("\n",' ',$sqltableliee)."\n",
+                            FILE_APPEND);
+                        // === FIN SESSION 28 DIAG ===
 						
 						$pile_jointure	        	= 	array();
 						$tab_order_by	        	=	array();
@@ -1755,7 +1764,17 @@ class grille {
 						$sql = $this->sql_data[$nomtableliee];
                         //echo  $nomtableliee.'<br>'.$sql .'<br><br>';
 						$tab_donnees_bdd = array();
-                        //echo "<br> *** $nomtableliee *** <br>".$sql.'<br><br>';                
+                        //echo "<br> *** $nomtableliee *** <br>".$sql.'<br><br>';
+                        // === SESSION 28 DIAG : log sql_data + nb lignes ===
+                        $diag_log_gdb = dirname(__FILE__).'/../../../../moblogs/diag_grille.log';
+                        $diag_type_ent = isset($_SESSION['type_ent_stat']) ? $_SESSION['type_ent_stat'] : 'UNDEF';
+                        $diag_theme = isset($this->id_theme) ? $this->id_theme : '?';
+                        $diag_syst  = isset($this->id_systeme) ? $this->id_systeme : '?';
+                        file_put_contents($diag_log_gdb,
+                            date('Y-m-d H:i:s').';get_donnees_bdd;theme='.$diag_theme.';systeme='.$diag_syst.
+                            ';type_ent_stat='.$diag_type_ent.';table='.$nomtableliee.';sql='.str_replace("\n",' ',$sql)."\n",
+                            FILE_APPEND);
+                        // === FIN SESSION 28 DIAG ===
 						try{
 								$recordSet	=	$this->conn->Execute($sql);
 								
@@ -1796,8 +1815,16 @@ class grille {
 								}
 						}catch( Exception $e){
 								$err = new erreur_manager($e, $sql);
+                        // === SESSION 28 DIAG : erreur SQL ===
+                        file_put_contents($diag_log_gdb,
+                            date('Y-m-d H:i:s').';SQL_ERROR;theme='.$diag_theme.';table='.$nomtableliee.';msg='.$e->getMessage()."\n",
+                            FILE_APPEND);
 						}
-                        
+                        // === SESSION 28 DIAG : nb rows retournees ===
+                        file_put_contents($diag_log_gdb,
+                            date('Y-m-d H:i:s').';get_donnees_bdd_result;theme='.$diag_theme.';table='.$nomtableliee.';nb_rows='.count($tab_donnees_bdd)."\n",
+                            FILE_APPEND);
+                        // === FIN SESSION 28 DIAG ===
 						//$this->matrice_donnees[$nomtableliee]	=	$tab_donnees_bdd;
 						$this->VARS_GLOBALS['donnees_bdd'][$nomtableliee] = $tab_donnees_bdd;
 					}
