@@ -78,7 +78,7 @@ $_diag_early = date('Y-m-d H:i:s').';questionnaire.php;EARLY;theme='.($_GET['the
     "\n";
 error_log('[DIAG_S28_EARLY] '.$_diag_early);
 @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_diag_early, FILE_APPEND);
-@file_put_contents('/tmp/diag_stateduc.log', $_diag_early, FILE_APPEND);
+@file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_early, FILE_APPEND);
 // === FIN SESSION 28 DIAG ===
 unset($_SESSION['reg_parents']);
 if(isset($_GET['tmis'])) require_once $GLOBALS['SISED_PATH_CLS'] . 'arbre/arbre4.class.php';
@@ -1548,7 +1548,7 @@ $_diag_s28 = date('Y-m-d H:i:s').';questionnaire.php;curfile;theme_get='.($_GET[
 error_log('[DIAG_S28] '.$_diag_s28);
 $_diag_log_q = dirname(__FILE__).'/moblogs/diag_questionnaire.log';
 @file_put_contents($_diag_log_q, $_diag_s28, FILE_APPEND);
-@file_put_contents('/tmp/diag_stateduc.log', $_diag_s28, FILE_APPEND);
+@file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_s28, FILE_APPEND);
 // === FIN SESSION 28 DIAG ===
 if(file_exists($curfile) and $nom_theme != '') {
     require_once $curfile;

@@ -547,7 +547,7 @@ class grille {
         $_diag_top = date('Y-m-d H:i:s').';get_dico_ENTER;id_theme='.$id_theme.';id_systeme='.$id_systeme.';type_ent_stat='.$_diag_appart_top."\n";
         error_log('[DIAG_S28_TOP] '.$_diag_top);
         @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_top, FILE_APPEND);
-        @file_put_contents('/tmp/diag_stateduc.log', $_diag_top, FILE_APPEND);
+        @file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_top, FILE_APPEND);
         // === FIN SESSION 28 DIAG ===
         
         // pour récupérer le nom du FRAME, le nombre de lignes, et la CLASSE
@@ -577,7 +577,7 @@ class grille {
         $_diag_fe = date('Y-m-d H:i:s').';get_dico_FRAME_ERR;id_theme='.$id_theme.';id_systeme='.$id_systeme.';msg='.$e->getMessage()."\n";
         error_log('[DIAG_S28_FRAME_ERR] '.$_diag_fe);
         @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_fe, FILE_APPEND);
-        @file_put_contents('/tmp/diag_stateduc.log', $_diag_fe, FILE_APPEND);
+        @file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_fe, FILE_APPEND);
 		}        
 		// Fin Traitement Erreur Cas : Execute / GetOne
         // === SESSION 28 DIAG : resultat FRAME ===
@@ -587,7 +587,7 @@ class grille {
             ';sql_frame='.str_replace("\n",' ',$sql)."\n";
         error_log('[DIAG_S28_FRAME_RES] '.$_diag_fr);
         @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_fr, FILE_APPEND);
-        @file_put_contents('/tmp/diag_stateduc.log', $_diag_fr, FILE_APPEND);
+        @file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_fr, FILE_APPEND);
         // === FIN ===
 		///
 
@@ -617,7 +617,7 @@ class grille {
                             ';nb_table_liee='.$nb_table_liee.';sqltableliee='.str_replace("\n",' ',$sqltableliee)."\n";
                         error_log('[DIAG_S28_DICO] '.$_diag_line_dico);
                         @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_line_dico, FILE_APPEND);
-                        @file_put_contents('/tmp/diag_stateduc.log', $_diag_line_dico, FILE_APPEND);
+                        @file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_line_dico, FILE_APPEND);
                         // === FIN SESSION 28 DIAG ===
 						
 						$pile_jointure	        	= 	array();
@@ -1793,7 +1793,7 @@ class grille {
                             ';type_ent_stat='.$diag_type_ent.';table='.$nomtableliee.';sql='.str_replace("\n",' ',$sql)."\n";
                         error_log('[DIAG_S28_GDB] '.$_diag_line_gdb);
                         @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_line_gdb, FILE_APPEND);
-                        @file_put_contents('/tmp/diag_stateduc.log', $_diag_line_gdb, FILE_APPEND);
+                        @file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_line_gdb, FILE_APPEND);
                         // === FIN SESSION 28 DIAG ===
 						try{
 								$recordSet	=	$this->conn->Execute($sql);
@@ -1839,13 +1839,13 @@ class grille {
                         $_diag_line_err = date('Y-m-d H:i:s').';SQL_ERROR;theme='.$diag_theme.';table='.$nomtableliee.';msg='.$e->getMessage()."\n";
                         error_log('[DIAG_S28_SQLERR] '.$_diag_line_err);
                         @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_line_err, FILE_APPEND);
-                        @file_put_contents('/tmp/diag_stateduc.log', $_diag_line_err, FILE_APPEND);
+                        @file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_line_err, FILE_APPEND);
 						}
                         // === SESSION 28 DIAG : nb rows retournees ===
                         $_diag_line_rows = date('Y-m-d H:i:s').';get_donnees_bdd_result;theme='.$diag_theme.';table='.$nomtableliee.';nb_rows='.count($tab_donnees_bdd)."\n";
                         error_log('[DIAG_S28_ROWS] '.$_diag_line_rows);
                         @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_line_rows, FILE_APPEND);
-                        @file_put_contents('/tmp/diag_stateduc.log', $_diag_line_rows, FILE_APPEND);
+                        @file_put_contents(sys_get_temp_dir().'/diag_stateduc.log', $_diag_line_rows, FILE_APPEND);
                         // === FIN SESSION 28 DIAG ===
 						//$this->matrice_donnees[$nomtableliee]	=	$tab_donnees_bdd;
 						$this->VARS_GLOBALS['donnees_bdd'][$nomtableliee] = $tab_donnees_bdd;
