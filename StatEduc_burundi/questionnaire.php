@@ -67,6 +67,21 @@ $GLOBALS['lancer_theme_manager_classe'] = true;
 $GLOBALS['theme_data_MAJ_ok'] 			= true;
 
 require_once 'common.php';
+// Session 28 : diagnostic logging pour themes mobiles
+if(isset($_GET['theme']) && isset($_GET['type_ent_stat'])) {
+    $_diag_log = dirname(__FILE__).'/moblogs/diag_questionnaire.log';
+    $_diag_msg = date('Y-m-d H:i:s').';questionnaire.php'
+        .';theme='.$_GET['theme']
+        .';type_ent_stat='.$_GET['type_ent_stat']
+        .';code_etab='.(isset($_GET['code_etab'])?$_GET['code_etab']:'')
+        .';secteur='.(isset($_SESSION['secteur'])?$_SESSION['secteur']:'VIDE')
+        .';chaine='.(isset($_SESSION['chaine'])?$_SESSION['chaine']:'VIDE')
+        .';theme_manager_id='.(isset($theme_manager->id)?$theme_manager->id:'NULL')
+        .';theme_manager_list_count='.(isset($theme_manager->list)?count($theme_manager->list):0)
+        .';classe='.(isset($theme_manager->classe)?$theme_manager->classe:'VIDE')
+        ."\n";
+    file_put_contents($_diag_log, $_diag_msg, FILE_APPEND);
+}
 unset($_SESSION['reg_parents']);
 if(isset($_GET['tmis'])) require_once $GLOBALS['SISED_PATH_CLS'] . 'arbre/arbre4.class.php';
 else require_once $GLOBALS['SISED_PATH_CLS'] . 'arbre/arbre.class.php';
@@ -1182,6 +1197,19 @@ function extraire_valeur_matrice($texte){
 			
 		}
     }
+// Session 28 : log post-arbre
+if(isset($_GET['theme']) && isset($_GET['type_ent_stat'])) {
+    $_diag_log = dirname(__FILE__).'/moblogs/diag_questionnaire.log';
+    $_diag_msg2 = date('Y-m-d H:i:s').';POST_ARBRE'
+        .';theme='.$_GET['theme']
+        .';code_etab='.(isset($_SESSION['code_etab'])?$_SESSION['code_etab']:'')
+        .';code_regroupement='.(isset($_SESSION['code_regroupement'])?$_SESSION['code_regroupement']:'VIDE')
+        .';chaine='.(isset($_SESSION['chaine'])?$_SESSION['chaine']:'VIDE')
+        .';hier_len='.strlen(trim(isset($_SESSION['hierarchie_regroup'])?$_SESSION['hierarchie_regroup']:''))
+        .';infos_etab_len='.strlen(trim(isset($_SESSION['infos_etab'])?$_SESSION['infos_etab']:''))
+        ."\n";
+    file_put_contents($_diag_log, $_diag_msg2, FILE_APPEND);
+}
 if(isset($_SESSION['tab_entite_stat']) && is_array($_SESSION['tab_entite_stat']) && count($_SESSION['tab_entite_stat'])>0){
 	foreach ($_SESSION['tab_entite_stat'] as $ent_stat){
 		$_SESSION['theme_manager'.$ent_stat[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_RATTACHEMENT']]] = ${'theme_manager'.$ent_stat[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_RATTACHEMENT']]};

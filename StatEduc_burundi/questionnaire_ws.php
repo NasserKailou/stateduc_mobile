@@ -85,6 +85,22 @@ $_appart_mob = (isset($_GET['type_ent_stat']) && $_GET['type_ent_stat']<>'') ? $
 $theme_manager->charger_theme($_appart_mob, $_GET['sector']);
 $theme_manager->set_theme_courant();
 $theme_manager->set_classe();
+// Session 28 : diagnostic logging questionnaire_ws.php
+{
+    $_diag_log_ws = dirname(__FILE__).'/moblogs/diag_questionnaire.log';
+    $_diag_ws = date('Y-m-d H:i:s').';questionnaire_ws.php'
+        .';theme='.(isset($_GET['theme'])?$_GET['theme']:'')
+        .';type_ent_stat='.(isset($_GET['type_ent_stat'])?$_GET['type_ent_stat']:'')
+        .';appart_mob='.$_appart_mob
+        .';sector='.(isset($_GET['sector'])?$_GET['sector']:'')
+        .';secteur='.(isset($_SESSION['secteur'])?$_SESSION['secteur']:'VIDE')
+        .';chaine='.(isset($_SESSION['chaine'])?$_SESSION['chaine']:'VIDE')
+        .';theme_manager_id='.(isset($theme_manager->id)?$theme_manager->id:'NULL')
+        .';list_count='.(isset($theme_manager->list)?count($theme_manager->list):0)
+        .';classe='.(isset($theme_manager->classe)?$theme_manager->classe:'VIDE')
+        ."\n";
+    file_put_contents($_diag_log_ws, $_diag_ws, FILE_APPEND);
+}
 unset($_SESSION['reg_parents']);
 if(isset($_GET['tmis'])) require_once $GLOBALS['SISED_PATH_CLS'] . 'arbre/arbre4.class.php';
 else require_once $GLOBALS['SISED_PATH_CLS'] . 'arbre/arbre.class.php';
@@ -1070,6 +1086,19 @@ function extraire_valeur_matrice($texte){
 			$_SESSION['hierarchie_regroup'] .= '<br>';
 			$_SESSION['infos_etab'] = get_infos_etab();
 			if(isset($_SESSION['infos_data_entry'])) unset($_SESSION['infos_data_entry']);
+			// Session 28 : log apres arbre
+			{
+				$_diag_log_ws2 = dirname(__FILE__).'/moblogs/diag_questionnaire.log';
+				$_diag_ws2 = date('Y-m-d H:i:s').';WS_POST_ARBRE'
+					.';theme='.(isset($_GET['theme'])?$_GET['theme']:'')
+					.';code_etab='.(isset($_SESSION['code_etab'])?$_SESSION['code_etab']:'')
+					.';code_reg='.(isset($_SESSION['code_regroupement'])?$_SESSION['code_regroupement']:'VIDE')
+					.';chaine='.(isset($_SESSION['chaine'])?$_SESSION['chaine']:'VIDE')
+					.';hier_len='.strlen(trim(isset($_SESSION['hierarchie_regroup'])?$_SESSION['hierarchie_regroup']:''))
+					.';infos_etab_len='.strlen(trim(isset($_SESSION['infos_etab'])?$_SESSION['infos_etab']:''))
+					."\n";
+				file_put_contents($_diag_log_ws2, $_diag_ws2, FILE_APPEND);
+			}
 		}else{
 			$_SESSION['hierarchie_regroup'] = '';
 			if($_SESSION['nom_reg_parents_tmis'])
