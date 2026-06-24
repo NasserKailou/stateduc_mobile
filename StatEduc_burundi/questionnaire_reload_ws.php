@@ -1,4 +1,19 @@
-<?php 
+<?php
+
+/**
+ * questionnaire_reload_ws.php
+ *
+ * Endpoint interne de pre-remplissage du formulaire (rechargement des donnees existantes).
+ * Appele via curl interne depuis data_reload.php pour pre-remplir le formulaire mobile.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-24
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
+
 session_start();
 set_time_limit(0);
 ////Recuperation des varibles globales dans $_GET
@@ -16,11 +31,58 @@ if(count($_GET)>0) {
 		$i++;
 	}
 }//print_r($_POST);
-//On positionne la filtre, l'année et le secteur (si necessaire) choisis en session
+//On positionne la filtre, l'annee et le secteur (si necessaire) choisis en session
 if(isset($_GET['filtre']) && $_GET['filtre']<>'') $_SESSION['filtre']=$_GET['filtre'];
 if(isset($_GET['annee']) && $_GET['annee']<>'') $_SESSION['annee']=$_GET['annee'];
+// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+// Session 24 : correction bug pre-remplissage formulaire mobile
+// data_reload.php passe 'code_annee' mais ce fichier ne lisait que 'annee'.
+// Resultat : $_SESSION['annee'] jamais initialise -> requetes DB retournaient annee vide -> aucune donnee pre-remplie.
+// Fix : lire aussi 'code_annee' (priorite inferieure a 'annee' si les deux sont presents).
+if(isset($_GET['code_annee']) && $_GET['code_annee']<>'' && (!isset($_SESSION['annee']) || $_SESSION['annee']=='')) {
+    $_SESSION['annee'] = $_GET['code_annee'];
+}
+//fin correction session 24
 if(isset($_GET['secteur']) && $_GET['secteur']<>'') $_SESSION['secteur']=$_GET['secteur'];
 if(isset($_GET['sector']) && $_GET['sector']<>'') $_SESSION['sector']=$_GET['sector'];
+
+// --- Bootstrap session mobile/curl (identique a questionnaire_ws.php) ------------------
+// Quand appele via curl interne depuis data_reload.php, il n'existe pas de session navigateur.
+// data_reload.php passe 'login' et 'langue' en GET pour que les requetes DICO_FIXE_REGROUPEMENT
+// utilisent le bon utilisateur et que les libelles soient en bonne langue.
+if(isset($_GET['login']) && $_GET['login']<>'')   $_SESSION['login']=$_GET['login'];
+if(isset($_GET['langue']) && $_GET['langue']<>'') $_SESSION['langue']=$_GET['langue'];
+// Valeurs par defaut pour eviter les erreurs fatales dans common.php / lit_libelles_page
+if(!isset($_SESSION['langue'])  || $_SESSION['langue']=='')  $_SESSION['langue']='fr';
+if(!isset($_SESSION['style'])   || $_SESSION['style']=='')   $_SESSION['style']='stateduc.css';
+if(!isset($_SESSION['valide'])  )                            $_SESSION['valide']=true;
+// Resolution du CODE_USER depuis ADMIN_USERS via le login, identique a questionnaire_ws.php
+if(!isset($_SESSION['code_user']) || $_SESSION['code_user']==0) {
+    if(isset($_SESSION['login']) && $_SESSION['login']<>'') {
+        require_once 'config_app.php';
+        require_once 'params.php';
+        if(!isset($GLOBALS['conn_dico'])) {
+            require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
+            require_once $GLOBALS['SISED_PATH_LIB'] . 'fonctions.inc.php';
+            require_once $GLOBALS['SISED_PATH_CLS'] . 'connexion.class.php';
+            $source = false;
+            $_conn_bs = new connexion();
+            $_conn_bs->init($source);
+        }
+        if(isset($GLOBALS['conn_dico'])) {
+            $_sql_user = "SELECT CODE_USER, CODE_GROUPE FROM ADMIN_USERS WHERE NOM_USER='".$_SESSION['login']."'";
+            $_row_user = $GLOBALS['conn_dico']->GetRow($_sql_user);
+            if(is_array($_row_user) && isset($_row_user['CODE_USER']) && intval($_row_user['CODE_USER'])>0) {
+                $_SESSION['code_user'] = intval($_row_user['CODE_USER']);
+                if(isset($_row_user['CODE_GROUPE'])) $_SESSION['groupe'] = intval($_row_user['CODE_GROUPE']);
+            }
+        }
+    }
+}
+if(!isset($_SESSION['code_user'])) $_SESSION['code_user']=0;
+if(!isset($_SESSION['groupe']))    $_SESSION['groupe']=1;
+// --- fin bootstrap session mobile ----------------------------------------------------------
+
 //on lance le theme_manager et on inclue la classe dynamiquement avant d'inclure common.php (pour utilisation en session)
 $GLOBALS['lancer_theme_manager'] 		= true;
 $GLOBALS['lancer_theme_manager_classe'] = true;

@@ -24,8 +24,8 @@ class frame_mobile{
 	/**
 	 * Attribut : id_themes
 	 * <pre>
-	 * variable associée au thême : contient un tableau de thêmes pour 
-	 * lesquels on cherche à générer les templates correspondants
+	 * variable associï¿½e au thï¿½me : contient un tableau de thï¿½mes pour 
+	 * lesquels on cherche ï¿½ gï¿½nï¿½rer les templates correspondants
 	 * </pre>
 	 * @var array
 	 * @access public
@@ -35,8 +35,8 @@ class frame_mobile{
 		/**
 	 * Attribut : langues
 	 * <pre>
-	 * variable associée à la langue choisie : Les templates 
-	 * seront générés suivant les langues contenues dans la variable
+	 * variable associï¿½e ï¿½ la langue choisie : Les templates 
+	 * seront gï¿½nï¿½rï¿½s suivant les langues contenues dans la variable
 	 * </pre>
 	 * @var array
 	 * @access public
@@ -47,7 +47,7 @@ class frame_mobile{
 	 * Attribut : id_systemes
 	 * <pre>
 	 * Contient les codes systeme d'enseignement pour lesquels
-	 * on cherche  à générer les frames
+	 * on cherche  ï¿½ gï¿½nï¿½rer les frames
 	 * </pre>
 	 * @var array
 	 * @access public
@@ -57,8 +57,8 @@ class frame_mobile{
 	 /**
 	 * Attribut : conn
 	 * <pre>
-	 * Dans cette variable on extrait la variable globale de connexion à la 
-	 * base pour en faire une propriété de la classe
+	 * Dans cette variable on extrait la variable globale de connexion ï¿½ la 
+	 * base pour en faire une propriï¿½tï¿½ de la classe
 	 * </pre>
  	 * @var string
 	 * @access public
@@ -68,7 +68,7 @@ class frame_mobile{
 		/**
 	 * Attribut : dico
 	 * <pre>
-	 * variable dico: reçoit les élèments tels que les zones et leurs descriptions
+	 * variable dico: reï¿½oit les ï¿½lï¿½ments tels que les zones et leurs descriptions
 	 * </pre>
 	 * @var array
 	 * @access public
@@ -78,7 +78,7 @@ class frame_mobile{
 		/**
 	 * Attribut : libelle_long
 	 * <pre>
-	 * variable contenant le libellé ou le titre complet traduit du FRAME
+	 * variable contenant le libellï¿½ ou le titre complet traduit du FRAME
 	 * </pre>
 	 * @var string
 	 * @access public
@@ -88,7 +88,7 @@ class frame_mobile{
 		public $mat_nomenc_col;	// Pour gerer les libelles affiches comme colonne de la grille
     	public $mat_dim_col;
 		public $type_theme;
-		public $nb_themes_to_generate;//nombre de themes à générer
+		public $nb_themes_to_generate;//nombre de themes ï¿½ gï¿½nï¿½rer
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
 	 /**
@@ -97,7 +97,7 @@ class frame_mobile{
  	 * Constructeur de la classe :
 	 * </pre>
 	 * @access public
-	 * @param numeric $id_themes :tableau de thêmes
+	 * @param numeric $id_themes :tableau de thï¿½mes
 	 * @param numeric $langues : tableau de langues
 	 */ 	 
     function __construct( $id_themes, $langues, $id_systemes, $code_annee='', $code_etablissement=''){ 
@@ -251,7 +251,7 @@ class frame_mobile{
 	*FIN
 	*</pre>
 	* @access public
-	* @param numeric $id_zone : la zone à traduire
+	* @param numeric $id_zone : la zone ï¿½ traduire
 	* @param string  $langue	: la langue de traduction
 	* 
 	*/
@@ -277,7 +277,7 @@ class frame_mobile{
     }
 
 	function recherche_libelle($code,$langue,$table){
-			// permet de récupérer le libellé dans la table de traduction
+			// permet de rï¿½cupï¿½rer le libellï¿½ dans la table de traduction
 			// en fonction de la langue et de la table  aussi
 			
 					// Positionnement de la connexion 
@@ -308,7 +308,7 @@ class frame_mobile{
 	
 	/**
 	* METHODE :  get_champ_extract($nom_champ):
-	* Retourne les 30 ou 31 premiers caractères de $nom_champ en fonction du type de SGBD 
+	* Retourne les 30 ou 31 premiers caractï¿½res de $nom_champ en fonction du type de SGBD 
     * pour extraire la valeur du champ $nom_champ dans un recordset
 	*
 	* @access public
@@ -330,7 +330,7 @@ class frame_mobile{
 	}
 
     function recherche_libelle_page($code,$langue,$table){
-				// permet de récupérer le libellé dans la table de traduction
+				// permet de rï¿½cupï¿½rer le libellï¿½ dans la table de traduction
 				// en fonction de la langue et de la table  aussi
 				$requete 	= "SELECT LIBELLE
 										FROM DICO_LIBELLE_PAGE 
@@ -389,9 +389,9 @@ class frame_mobile{
 	
 		/**
 	* METHODE :  requete_nomenclature(table_nomenclature, champ_fils, champ_pere, langue ,$id_systeme):
-	* Cette fonction est utilisée pour les champs "combos" et "liste_radio"
-	* Elle retourne les libellés d'une table de nomenclature
-	* en tenant compte de l'existance éventuelle d'une table "NOMENCLATURE"_SYSTEME
+	* Cette fonction est utilisï¿½e pour les champs "combos" et "liste_radio"
+	* Elle retourne les libellï¿½s d'une table de nomenclature
+	* en tenant compte de l'existance ï¿½ventuelle d'une table "NOMENCLATURE"_SYSTEME
 	* et la triant par ordre d'affichage (ORDRE_"NOMENCLATURE")
  	*
 	*<pre>
@@ -401,9 +401,9 @@ class frame_mobile{
 	*</pre>
 	* @access public
 	* @param string $table_nomenclature : la table de nomenclature
-	* @param string $champ_fils	: le champ nomenclature à traduire
+	* @param string $champ_fils	: le champ nomenclature ï¿½ traduire
 	* @param string $champ_pere : le champ correspondant au champ 
-	* nomenclature dans la table mère
+	* nomenclature dans la table mï¿½re
 	* @param string $langue	: la langue de traduction
 	* 
 	*/
@@ -522,7 +522,7 @@ class frame_mobile{
 //----------------------------------------------------------------------
 		/**
 		* METHODE :  generer_frame_matrice_2D(id_theme, langue):
-		* Cette fonction est utilisée pour générer les matrices à deux dimensions
+		* Cette fonction est utilisï¿½e pour gï¿½nï¿½rer les matrices ï¿½ deux dimensions
 		*
 		*<pre>
 		*DEBUT
@@ -530,8 +530,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
     function generer_frame_matrice_2D($id_theme, $langue ,$id_systeme){	
@@ -539,6 +539,30 @@ class frame_mobile{
         $Ligne			= -1;
         // Entete de tableau 
         $html 	  	 	= ""; 
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 		
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 				
@@ -617,8 +641,8 @@ class frame_mobile{
         $html 			.= "<TABLE class='table-questionnaire' border=1>" ;
         
         // La dimension Colonne (TYPE_DIMENSION=2) est dans $this->dico[1] puisque la requete
-        // sur le dico est trié par ordre croissant du champ TYPE_DIMENSION
-        // Lecture des libellés de la table de nomenclature
+        // sur le dico est triï¿½ par ordre croissant du champ TYPE_DIMENSION
+        // Lecture des libellï¿½s de la table de nomenclature
 		//echo '<pre>';
 		//print_r($this->dico);
         // On compte le nombre de colonnes (nombre d'occurence de la nomenclature)
@@ -648,7 +672,7 @@ class frame_mobile{
 
 				// Pour chaque valeur de la dimension colonne
         foreach ($elements_col as $element){
-        // On imprime le libellé des colonnes
+        // On imprime le libellï¿½ des colonnes
             $html		.="\t\t<TD $colspan CLASS='ligne-titre' align='center'>";
 						
 			$html 		.= $element['LIBELLE'];
@@ -668,7 +692,7 @@ class frame_mobile{
 			  $html 			.= "\n\t<TR>\n";	// Zone vide d'intersection des 2 dimensions
 			
 			foreach ($elements_col as $element){
-			// On imprime le libellé des colonnes
+			// On imprime le libellï¿½ des colonnes
 					$html		.="\t\t<TD  align='center'>".$libelle_mesure1."</TD>\n";
 					if($this->dico[0][MESURE2] <> '')
 					$html		.="\t\t<TD  align='center'>".$libelle_mesure2."</TD>\n";
@@ -689,8 +713,8 @@ class frame_mobile{
 		}
             
         // La dimension Ligne (TYPE_DIMENSION=1) est dans $this->dico[0] puisque la requete
-        // sur le dico est trié par ordre croissant du champ TYPE_DIMENSION
-        // Lecture des libellés de la table de nomenclature
+        // sur le dico est triï¿½ par ordre croissant du champ TYPE_DIMENSION
+        // Lecture des libellï¿½s de la table de nomenclature
         
         // Pour chaque ligne
         foreach ($elements_ligne as $element){
@@ -707,7 +731,7 @@ class frame_mobile{
 			}
 
             $html 		        .= "\n\t<TR>\n";
-					  // On imprime l'entête de ligne
+					  // On imprime l'entï¿½te de ligne
             $html 		.= "\n\t\t<TD CLASS='".$classe_fond."'>".$element['LIBELLE']."</TD>\n";
             for ($i=0; $i<$nb_col; $i++){					
                // Pour chaque colonne, on imprime la (ou les) zone(s) de texte
@@ -815,7 +839,7 @@ class frame_mobile{
         //$html 			.= "\n</Form>";
 
         //print '<BR>'.$this->dico[0]['FRAME'];
-        // Création du fichier frame
+        // Crï¿½ation du fichier frame
 				//echo '$fdgfdfgfgdf='.$element['FRAME'] ;
                 //echo '<pre>';
                 //print_r($element);
@@ -832,7 +856,7 @@ class frame_mobile{
 //----------------------------------------------------------------------
 		/**
 		* METHODE :  generer_frame_matrice_1D(id_theme, langue):
-		* Cette fonction est utilisée pour générer les matrices à une dimension
+		* Cette fonction est utilisï¿½e pour gï¿½nï¿½rer les matrices ï¿½ une dimension
 		*
 		*<pre>
 		*DEBUT
@@ -840,8 +864,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
 
@@ -849,6 +873,30 @@ class frame_mobile{
         
    	// (Ligne par ligne)
         $html 	  	 = ""; 
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 		
         //$html 			.= "<link href='../css/formulaire_senegal.css' rel='stylesheet' type='text/css'>"."\n"; 
@@ -894,15 +942,15 @@ class frame_mobile{
 				}
         if ($this->dico[0][TYPE_DIMENSION] == 2){	//	Dimension Colonne
 
-            // TODO: il reste toujours à régler le problème du système d'enseignement
-            // DIM_SQL et DIM_LIBELLE ne sont donc plus utilisés
+            // TODO: il reste toujours ï¿½ rï¿½gler le problï¿½me du systï¿½me d'enseignement
+            // DIM_SQL et DIM_LIBELLE ne sont donc plus utilisï¿½s
             /*$sql_col            = "SELECT D_TRAD.LIBELLE
                                     FROM ".$this->dico[0][TABLE_REF]." AS NOM,  DICO_TRADUCTION AS D_TRAD
                                     WHERE NOM.CODE_LIBELLE = D_TRAD.CODE_LIBELLE 
                                     And D_TRAD.NOM_TABLE='".$this->dico[0][TABLE_REF]."' 
                                     And D_TRAD.CODE_LANGUE='".$langue."';";
             $elements_col	= $this->conn->GetAll($sql_col);*/
-            // Lecture des libellés de la table de nomenclature
+            // Lecture des libellï¿½s de la table de nomenclature
             $elements_col = $this->requete_nomenclature($this->dico[0][TABLE_REF], $this->dico[0][CHAMP], '', $langue ,$id_systeme, $this->dico[0]['DIM_SQL']);
 						
 						$req_lib_mes        = "SELECT  DICO_TRADUCTION.LIBELLE_MESURE1,DICO_ZONE.TYPE_SAISIE_MESURE1,DICO_TRADUCTION.LIBELLE_MESURE2, DICO_ZONE.TYPE_SAISIE_MESURE2 
@@ -1051,15 +1099,15 @@ class frame_mobile{
         }    
 
         if ($this->dico[0][TYPE_DIMENSION] == 1) {	// Dimension Ligne
-            // TODO: il reste toujours à régler le problème du système d'enseignement
-            // DIM_SQL et DIM_LIBELLE ne sont donc plus utilisés
+            // TODO: il reste toujours ï¿½ rï¿½gler le problï¿½me du systï¿½me d'enseignement
+            // DIM_SQL et DIM_LIBELLE ne sont donc plus utilisï¿½s
             /*$sql_ligne            = "SELECT D_TRAD.LIBELLE
                                     FROM ".$this->dico[0][TABLE_REF]." AS NOM,  DICO_TRADUCTION AS D_TRAD
                                     WHERE NOM.CODE_LIBELLE = D_TRAD.CODE_LIBELLE 
                                     And D_TRAD.NOM_TABLE='".$this->dico[0][TABLE_REF]."' 
                                     And D_TRAD.CODE_LANGUE='".$langue."';";
             $elements_ligne	= $this->conn->GetAll($sql_ligne);*/
-            // Lecture des libellés de la table de nomenclature
+            // Lecture des libellï¿½s de la table de nomenclature
             $elements_ligne 	= $this->requete_nomenclature($this->dico[0][TABLE_REF], $this->dico[0][CHAMP], '', $langue ,$id_systeme, $this->dico[0]['DIM_SQL']);
             $nb_elements_ligne = count($elements_ligne);
             $req_lib_mes        = "	SELECT  DICO_TRADUCTION.LIBELLE_MESURE1,DICO_ZONE.TYPE_SAISIE_MESURE1,DICO_TRADUCTION.LIBELLE_MESURE2, DICO_ZONE.TYPE_SAISIE_MESURE2 
@@ -1083,7 +1131,7 @@ class frame_mobile{
 								$erreur = new erreur_manager($e,$req_lib_mes);
 						}
 						// Fin Traitement Erreur Cas : GetAll / GetRow
-            // Création d'un tableau 1D sur plusieurs colonnes
+            // Crï¿½ation d'un tableau 1D sur plusieurs colonnes
             if ($this->dico[0][NB_LIGNE]>1){
             $html 		.= "\n\t<TR>";
                 $nb_ligne_colonne	= $nb_elements_ligne / $this->dico[0][NB_LIGNE];
@@ -1124,7 +1172,7 @@ class frame_mobile{
 										  if( ($pass%2)==0 ) $classe ='ligne-titre'; //$classe ='#FFCCFF';
 											else $classe ='ligne-paire';	
 								
-									 // On prépare l'entête de ligne
+									 // On prï¿½pare l'entï¿½te de ligne
 
 									$html 		.= "\n\t\t<TD $colspan  CLASS='$classe' >";
 
@@ -1137,7 +1185,7 @@ class frame_mobile{
 										$html 		.= "\n\t<TR>";
 										
 										foreach ($elements_ligne as $element){
-												 // On prépare l'entête de ligne
+												 // On prï¿½pare l'entï¿½te de ligne
 											$html			.="\n\t\t<TD CLASS='fond_gris'>$libelle_mesure1</TD>\n";
 											if( $this->dico[0][MESURE2] != '')
 												$html			.="\n\t\t<TD CLASS='fond_gris'>$libelle_mesure2</TD>\n";	
@@ -1212,7 +1260,7 @@ class frame_mobile{
 		/**
 		* METHODE :  generer_frame_matrice(id_theme, langue):
 		* Cette fonction identifie le type de matrice 
-		* et appele la fonction de génaration correspondante 
+		* et appele la fonction de gï¿½naration correspondante 
 		*
 		*<pre>
 		*DEBUT
@@ -1220,8 +1268,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
     function generer_frame_matrice($id_theme, $langue ,$id_systeme){
@@ -1289,7 +1337,7 @@ class frame_mobile{
 		/**
 		* METHODE :  tri_fils(dico):
 		* Cette fonction permet de trier les zones suivant 
-		* la'ordre de précédence attribué aux objets d'affichage
+		* la'ordre de prï¿½cï¿½dence attribuï¿½ aux objets d'affichage
 		*
 		*<pre>
 		*DEBUT
@@ -1297,14 +1345,14 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param array $dico : variable dico à trier
+		* @param array $dico : variable dico ï¿½ trier
 		* 
 		*/
 
     function tri_fils($dico) {
     	/**
          * Trie les elements fils d'un tableau (dico) selon l'ordre de
-         * précedence
+         * prï¿½cedence
          */
 				//echo 'dico<br><pre>';
 				//print_r($dico);
@@ -1313,7 +1361,7 @@ class frame_mobile{
 				
         foreach ($dico as $row){
             //print_r($row);
-            if ($row[PRECEDENT_ZONE] == 0){ // On a trouvé le premier
+            if ($row[PRECEDENT_ZONE] == 0){ // On a trouvï¿½ le premier
                 array_push ($dico_trie, $row);
                 break;
             }
@@ -1322,7 +1370,7 @@ class frame_mobile{
         for ($i=0; $i<$nb_dico; $i++)
         {
             foreach ($dico as $row){
-                if ($row[PRECEDENT_ZONE] == $dico_trie[$i][ID_ZONE]){ // On a trouvé le premier
+                if ($row[PRECEDENT_ZONE] == $dico_trie[$i][ID_ZONE]){ // On a trouvï¿½ le premier
                     array_push ($dico_trie, $row);
                     break;
                 }
@@ -1339,7 +1387,7 @@ class frame_mobile{
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		function formulaire_concat_zone_html($element,$langue,$id_systeme){
 				$html ='';
-				static $deja_aff_sys = array(); // permet de ne pas repeter un objet de type clé à l'affichage
+				static $deja_aff_sys = array(); // permet de ne pas repeter un objet de type clï¿½ ï¿½ l'affichage
 				// c'est le cas de CODE_REGROUPEMENT(type:systeme_valeur_multiple)ds ENV_SOCIO et ds ECONOMIE_ENV_SOCIO
 				if($element['TYPE_OBJET']=='booleen'){
 						$html.= '<label for="'.$element['CHAMP_PERE']."_0_1".'">'.$GLOBALS['libelle_oui'].'</label>';
@@ -1395,7 +1443,7 @@ class frame_mobile{
 							foreach($result_nomenc as $element_result_nomenc){
 									//Un valeur du combo pour chaque valeur de la nomenclature 
 									$html 	.= "\t\t\t<OPTION VALUE=".$element['CHAMP_PERE']."_0_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])].">"; 
-									// Lecture des libellés de la table de nomenclature
+									// Lecture des libellï¿½s de la table de nomenclature
 					
 									$html 	.= $element_result_nomenc['LIBELLE']."</OPTION>\n"; 
 							}
@@ -1406,7 +1454,7 @@ class frame_mobile{
 						//////////////////////
 				}
 				elseif( $element['TYPE_OBJET'] == 'systeme_valeur_unique' and !isset($deja_aff_sys[$element['CHAMP_PERE']]) ){
-						/////////// caracteristiques systeme déjà 
+						/////////// caracteristiques systeme dï¿½jï¿½ 
 						$deja_aff_sys[$element['CHAMP_PERE']] = 1;
 						///////////////// 
 						if( $element['BOUTON_INTERFACE']=='popup' ){
@@ -1427,7 +1475,7 @@ class frame_mobile{
 									$html.= "<INPUT ".' ID=\''. $element['CHAMP_PERE']."_0" .'\' '."NAME='".$element['CHAMP_PERE']."_0"."' TYPE='text' ".$element['ATTRIB_OBJET']." ";
 									$html.= "VALUE=''>\n";
 						}
-				}elseif($element['TYPE_OBJET']=='hidden_field'){//Ajout HEBIE pour gestion champs cachés
+				}elseif($element['TYPE_OBJET']=='hidden_field'){//Ajout HEBIE pour gestion champs cachï¿½s
 						$html.= "<INPUT NAME='".$element['CHAMP_PERE']."_0"."' TYPE='hidden' ";
 						$html.= "".' ID=\''. $element['CHAMP_PERE']."_0" .'\' ';
 						if($element['VALEUR_CONSTANTE']<>'')
@@ -1476,7 +1524,7 @@ class frame_mobile{
 						foreach($result_nomenc as $element_result_nomenc){
 								//Un valeur du combo pour chaque valeur de la nomenclature 
 								$html 	.= "\t\t\t<OPTION VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."'>"; 
-								// Lecture des libellés de la table de nomenclature
+								// Lecture des libellï¿½s de la table de nomenclature
 				
 								$html 	.= $element_result_nomenc['LIBELLE']."</OPTION>\n"; 
 						}
@@ -1498,7 +1546,7 @@ class frame_mobile{
 						 
 						$html		.= "\t\t</table>\n";
 
-				//Ajout HEBIE pour gestion champs cachés
+				//Ajout HEBIE pour gestion champs cachï¿½s
 				}elseif($element['TYPE_OBJET']=='hidden_field'){
 						$html.= "<INPUT ".' name_base=\''.$element['CHAMP_PERE']."_#_".$code_dims.'\' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$code_dims .'\' '."NAME='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."' TYPE='hidden' ";
 						$html.= "VALUE=\"\$".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."\"/>\n";
@@ -1543,7 +1591,7 @@ class frame_mobile{
 		//----------------------------------------------------------------------
 		/**
 		* METHODE :  generer_frame_formulaire(id_theme, langue):
-		* Effectue la génération des templates comme les formulaires 
+		* Effectue la gï¿½nï¿½ration des templates comme les formulaires 
 		*
 		*<pre>
 		*DEBUT
@@ -1551,8 +1599,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
 	function generer_frame_formulaire($id_theme, $langue ,$id_systeme, $code_annee='', $code_etablissement=''){
@@ -1588,6 +1636,30 @@ class frame_mobile{
 				$this->type_theme	= $GLOBALS['conn_dico']->GetOne($req_type_theme);
 				//Fin Recuperation du type de theme
 		
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 		$html 	  	 .= ""; 
 		
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
@@ -1870,7 +1942,7 @@ class frame_mobile{
 										
 										if(count($mat_codes_colonne)){
 											foreach ($mat_codes_colonne as $col => $elem_col){
-												// On imprime le libellé des colonnes
+												// On imprime le libellï¿½ des colonnes
 												$html		.="\t\t<TD $colspan CLASS='ligne-titre' align='center'>";
 												
 												$html 		.= $elem_col['libelle'];
@@ -1896,7 +1968,7 @@ class frame_mobile{
 											$html 			.= "\n\t<TR>\n";	// Zone vide d'intersection des 2 dimensions
 											if(count($mat_codes_colonne)){
 												foreach ($mat_codes_colonne as $col => $elem_col){
-													// On imprime le libellé des colonnes
+													// On imprime le libellï¿½ des colonnes
 													foreach($mat_liste_mes as $i_mes => $mes){
 														$html		.="\t\t<TD  align='center'>";
 														
@@ -1961,7 +2033,7 @@ class frame_mobile{
 														$classe_fond = 'ligne-paire';
 													}
 												}
-												//Modif Hebie pour affichage libellé nomenclature parent
+												//Modif Hebie pour affichage libellï¿½ nomenclature parent
 												if(count(array_keys($elem_li))==4){
 													if(!in_array($elem_li['code_parent'],$tab_nomenc_parent)){
 														$tab_nomenc_parent[] = $elem_li['code_parent'];
@@ -1971,9 +2043,9 @@ class frame_mobile{
 														$nbsp = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 													}
 												}
-												//Fin Modif Hebie pour affichage libellé nomenclature parent
+												//Fin Modif Hebie pour affichage libellï¿½ nomenclature parent
 												$html 		        .= "\n\t<TR>\n";
-												// On imprime l'entête de ligne
+												// On imprime l'entï¿½te de ligne
 												$html 		.= "\n\t\t<TD CLASS='".$classe_fond."' ".$mat_dim_ligne['ATTRIB_OBJET'].">$nbsp".$elem_li['libelle']."</TD>\n";
 												if(count($mat_codes_colonne)){
 													$tmp_i_mes=1;
@@ -2224,7 +2296,7 @@ class frame_mobile{
 											$html 			.= "\n\t<TR>\n\t\t<TD $colspan  CLASS='ligne-titre'>&nbsp</TD>\n";	// Zone vide d'intersection des 2 dimensions
 											if(count($mat_codes_colonne)){
 												foreach ($mat_codes_colonne as $col => $elem_col){
-													// On imprime le libellé des colonnes
+													// On imprime le libellï¿½ des colonnes
 													$html		.="\t\t<TD CLASS='ligne-titre' align='center'>";
 													$html 		.= $elem_col['libelle'];
 													$html		.="</TD>\n";
@@ -2260,7 +2332,7 @@ class frame_mobile{
 														}
 													}
 													
-													//Modif Hebie pour affichage libellé nomenclature parent
+													//Modif Hebie pour affichage libellï¿½ nomenclature parent
 													if(count(array_keys($elem_li))==4){
 														if(!in_array($elem_li['code_parent'],$tab_nomenc_parent)){
 															$tab_nomenc_parent[] = $elem_li['code_parent'];
@@ -2270,11 +2342,11 @@ class frame_mobile{
 															$nbsp = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 														}
 													}
-													//Fin Modif Hebie pour affichage libellé nomenclature parent
+													//Fin Modif Hebie pour affichage libellï¿½ nomenclature parent
 										
 													$html 		        .= "\n\t<TR>\n";
 		
-															  // On imprime l'entête de ligne
+															  // On imprime l'entï¿½te de ligne
 													$html 		.= "\n\t\t<TD $rowspan style='vertical-align:middle' CLASS='".$classe_fond."' ".$mat_dim_ligne['ATTRIB_OBJET'].">$nbsp".$elem_li['libelle']."</TD>\n";
 													$k=1;
 													if(count($affiche_totaux_mat_Frml)){
@@ -2284,7 +2356,7 @@ class frame_mobile{
 													}
 													foreach($mat_liste_mes as $i_mes => $nom_champ_mes){
 														$html 			.= "\n\t<TR>\n";
-														// On imprime le libellé des mesures
+														// On imprime le libellï¿½ des mesures
 														$html		.="\t\t<TD  nowrap='nowrap' align='center' valign='middle' CLASS='".$classe_fond."'>".$tab_libelles_mesures[$i_mes]."</TD>\n";
 																									
 														if(count($mat_codes_colonne)){
@@ -2346,7 +2418,7 @@ class frame_mobile{
 													
 													if($affiche_sous_totaux){
 														$html 			.= "\n\t<TR>\n";
-															// On imprime le libellé des mesures
+															// On imprime le libellï¿½ des mesures
 															if($element['LIB_EXPR']<>'')
 																$html		.="\t\t<TD  align='center' valign='middle' CLASS='".$classe_fond."'>".trim($element['LIB_EXPR'])."</TD>\n";	
 															else
@@ -2376,7 +2448,7 @@ class frame_mobile{
 														}
 											
 														$html 			.= "\n\t<TR>\n";	
-														// On imprime le libellé des mesures
+														// On imprime le libellï¿½ des mesures
 														$html		.="\t\t<TD $colspan nowrap='nowrap' align='center' valign='middle' CLASS='".$classe_fond."'>".$tab_libelles_mesures[$i_mes]."</TD>\n";
 														
 														if( count($affiche_totaux_mat_Frml) > 1){
@@ -2658,7 +2730,7 @@ class frame_mobile{
 									}
 							}
 							elseif( ((trim($element['NOM_GROUPE']=='')) or (isset($tab_elem_grp[$element['NOM_GROUPE']]) and ( count($tab_elem_grp[$element['NOM_GROUPE']])==1 ) )) && (!isset($element['OBJET_MATRICIEL'])) ){
-									// zone non groupée à afficher sur une ligne
+									// zone non groupï¿½e ï¿½ afficher sur une ligne
 									$pass_ligne++;
 									if($pass_ligne%2==0) $class_ligne = 'ligne-impaire-left'; else  $class_ligne = 'ligne-paire-left';
 									
@@ -2690,7 +2762,7 @@ class frame_mobile{
 									}
 							}
 	
-							elseif( !in_array($element['NOM_GROUPE'], $nom_grp_deja_aff) ){// plusieurs zones groupées
+							elseif( !in_array($element['NOM_GROUPE'], $nom_grp_deja_aff) ){// plusieurs zones groupï¿½es
 							///
 								//echo '<pre>';
 								//print_r($element);
@@ -2850,7 +2922,7 @@ class frame_mobile{
 //----------------------------------------------------------------------
  		/**
 		* METHODE :  generer_frame_grille(id_theme, langue):
-		* Effectue la génération des templates de type grille
+		* Effectue la gï¿½nï¿½ration des templates de type grille
 		* comme les LOCAUX et les PERSONNELS
 		*
 		*<pre>
@@ -2859,8 +2931,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
 
@@ -2901,7 +2973,7 @@ class frame_mobile{
 											
 			// Les Locaux par exemple
 			$NB_TOTAL_COL 	= 0;
-			$NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes à afficher
+			$NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes ï¿½ afficher
 			$dico        	= $this->tri_fils($this->dico);
 			$affiche_vertic_mes=0;
 			$style_align_middle = '';
@@ -2935,7 +3007,7 @@ class frame_mobile{
 			$html 			.= "<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=".$id_theme.$id_systeme."' METHOD='POST' class='grille_ligne'>"."\n";
 			$html 			.= "<TABLE class='table-questionnaire' border='1'>"."\n\t";
 			$html           .= '<TR  style="height:25px;">'."\n\t\t";
-			// Calcul du nombre de lignes de libellés
+			// Calcul du nombre de lignes de libellï¿½s
 			$nb_niv_1             = 1;
 			$nb_niv_2             = 1;
 			foreach($dico as $i_elem => $element){
@@ -3020,10 +3092,10 @@ class frame_mobile{
 							$erreur = new erreur_manager($e,$requete);
 					}
 			}
-			// Affichage de la colonne contenant l'icône de sélection des éléments à supprimer
+			// Affichage de la colonne contenant l'icï¿½ne de sï¿½lection des ï¿½lï¿½ments ï¿½ supprimer
 			$html 			.= "\t\t<TD ROWSPAN='".$nb_niv_1."' class='".$classe_fond."'></TD>\n";
 			$html 			.= "\t\t<TD ROWSPAN='".$nb_niv_1."' class='".$classe_fond."'>#</TD>\n";
-			//Ajout HEBIE pour affichage de la colonne contenant l'icône de modification d'un élément de la grille
+			//Ajout HEBIE pour affichage de la colonne contenant l'icï¿½ne de modification d'un ï¿½lï¿½ment de la grille
 			if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHERS_MANAGEMENT'] && in_array(''.$id_theme.$id_systeme,$GLOBALS['PARAM']['TEACHERS_LIST_THEMES'])){
 				$position = array_search(''.$id_theme.$id_systeme,$GLOBALS['PARAM']['TEACHERS_LIST_THEMES']);
 				if (array_key_exists($position, $GLOBALS['PARAM']['TEACHER_DETAILS_THEMES']) && $GLOBALS['PARAM']['TEACHER_DETAILS_THEMES'][$position]<>''){
@@ -3044,13 +3116,13 @@ class frame_mobile{
 			
 			foreach($dico as $i_elem => $element){
 				if( ( $element['TYPE_OBJET'] <> 'dimension_ligne')  && ( $element['TYPE_OBJET'] <> 'dimension_colonne') ){ // si type dimension on ignore
-					// Affichage de la colonne vide entre chaque éléments de la grille
+					// Affichage de la colonne vide entre chaque ï¿½lï¿½ments de la grille
 					 
-					// Pour chacun des éléments du tableau
-					// imprimer l'éventuel libellé d'entête
-					// et prévoir les colspan pour cadrer avec la seconde ligne de libellés (horizontaux)
+					// Pour chacun des ï¿½lï¿½ments du tableau
+					// imprimer l'ï¿½ventuel libellï¿½ d'entï¿½te
+					// et prï¿½voir les colspan pour cadrer avec la seconde ligne de libellï¿½s (horizontaux)
 					if( (isset($element['OBJET_MATRICIEL']) && ($element['OBJET_MATRICIEL'] == true)) ){
-						//récupération des
+						//rï¿½cupï¿½ration des
 						
 						if(!in_array($element['NOM_GROUPE'], $nom_grp_deja_aff)){
 							$nom_grp_deja_aff[]	=	$element['NOM_GROUPE'];
@@ -3160,7 +3232,7 @@ class frame_mobile{
 							$html .="\t\t<TD class='col_sep' ROWSPAN='".(1+$nb_niv_1)."' style='width: 1px; padding: 1px;'></TD>\n";
 							$html 			        .= "\t\t<TD style='height:25px;'";
 							
-						// Lecture des libellés de la table de nomenclature
+						// Lecture des libellï¿½s de la table de nomenclature
 						if ( $element['TYPE_OBJET'] == 'booleen' ) {               
 							$result_nomenc 		= $this->requete_nomenclature_bool($element['CHAMP_PERE'], $langue );
 						}elseif ( $element['TYPE_OBJET'] == 'text_valeur_multiple' ) { 
@@ -3185,7 +3257,7 @@ class frame_mobile{
 						// Fin Modification Hebie
 					}
 					//$html                       .= $element['LIBELLE']."</TD>\n";
-					// Affichage de la colonne vide entre chaque éléments de la grille
+					// Affichage de la colonne vide entre chaque ï¿½lï¿½ments de la grille
 					//$html                   .="\t\t<TD ROWSPAN=".($NB_LIGNE_ECRAN+$nb_niv_1)."></TD>\n";
 				}
 			}
@@ -3204,8 +3276,8 @@ class frame_mobile{
 				$html .= "\t<TR  style='height:25px;'>\n";
 				$niv_3_entete = false ;
 				foreach($dico as $i_elem => $element){
-					//Pour chacun des éléments du tableau (de type liste_radio)
-					//imprimer les libellé des nomenclatures (verticaux)
+					//Pour chacun des ï¿½lï¿½ments du tableau (de type liste_radio)
+					//imprimer les libellï¿½ des nomenclatures (verticaux)
 					$cpt++;
 					if( (isset($element['OBJET_MATRICIEL']) && ($element['OBJET_MATRICIEL'] == true)) ){
 						if(!in_array($element['NOM_GROUPE'], $nom_grp_deja_aff)){
@@ -3237,7 +3309,7 @@ class frame_mobile{
 							}
 						}
 					}elseif( ($element['TYPE_OBJET'] == 'liste_radio') or ($element['TYPE_OBJET'] == 'booleen') or ($element['TYPE_OBJET']=='liste_checkbox') or ($element['TYPE_OBJET']=='text_valeur_multiple')){
-						// Lecture des libellés de la table de nomenclature	
+						// Lecture des libellï¿½s de la table de nomenclature	
 						if($element['TYPE_OBJET']=='booleen'){
 							$result_nomenc 	= $this->requete_nomenclature_bool($element['CHAMP_PERE'], $langue );
 						}elseif ( $element['TYPE_OBJET'] == 'text_valeur_multiple' ) { 
@@ -3252,7 +3324,7 @@ class frame_mobile{
 						else $taille_max =   30;
 						
 						foreach($result_nomenc as $element_result_nomenc){		
-							//Pour chaque libellé de la nomenclature
+							//Pour chaque libellï¿½ de la nomenclature
 							// Modification Alassane
 							$html 		.="\t\t"."<TD class='$classe_fond' style='height:25px;' ROWSPAN=".$nb_niv_2." nowrap  align='center'>".$element_result_nomenc['LIBELLE']."</TD>\n";
 							// Fin Modification alassane
@@ -3312,7 +3384,7 @@ class frame_mobile{
 			
 			
 			// Affichage des zones de saisie
-			// Autant de fois que lignes à affcher (nbre défini dans DICO_THEME.NB_LIGNES)
+			// Autant de fois que lignes ï¿½ affcher (nbre dï¿½fini dans DICO_THEME.NB_LIGNES)
 			for ($j = 0; $j < 1; $j++){
 	
 				if(!isset($classe_fond)) {
@@ -3348,8 +3420,8 @@ class frame_mobile{
 							$i_TD++;
 			foreach($dico as $element){
 									//$i_TD++;
-					// Pour chacun des éléments du tableau
-					// Lecture des libellés de la table de nomenclature
+					// Pour chacun des ï¿½lï¿½ments du tableau
+					// Lecture des libellï¿½s de la table de nomenclature
 					// Modif Alassane
 					if (strlen($element['CHAMP_PERE'])>30){
 						if ($this->conn->databaseType == 'mssqlnative' || $this->conn->databaseType == 'mssql'){
@@ -3606,8 +3678,8 @@ class frame_mobile{
 //---------------------------------------------------------------------
 /**
 		* METHODE :  generer_frame_grille_eff_1(id_theme, langue):
-		* Effectue la génération des templates à l'image
-		* de celui des EFFECTIFS (02 mesures )présenté en un seul bloc
+		* Effectue la gï¿½nï¿½ration des templates ï¿½ l'image
+		* de celui des EFFECTIFS (02 mesures )prï¿½sentï¿½ en un seul bloc
 		*
 		*<pre>
 		*DEBUT
@@ -3615,8 +3687,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
 	function generer_frame_grille_eff_1($id_theme, $langue ,$id_systeme){
@@ -3649,7 +3721,7 @@ class frame_mobile{
 									
 				$affiche_eff = 0;
 				$NB_TOTAL_COL = 0;
-				$NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes à afficher
+				$NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes ï¿½ afficher
 				$dico        = $this->tri_fils($this->dico);
 				$affiche_vertic_mes=0;
 				foreach($dico as $dc){
@@ -3670,6 +3742,30 @@ class frame_mobile{
 				$mess_alert		 	= $this->recherche_libelle(110,$langue,'DICO_MESSAGE');
 				$mess_alert			= addslashes($mess_alert);
 				
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 		
@@ -3683,7 +3779,7 @@ class frame_mobile{
 		//////////////////Affichage horizontal des mesures///////////////
 		////////////////////////////////////////////////////////////////
 		if(!$affiche_vertic_mes	){
-			// Calcul du nombre de lignes de libellés
+			// Calcul du nombre de lignes de libellï¿½s
 			$nb_colspan_2 = 1;
 			$nb_chp_eff = 0;
 			$nb_colspan_1 = 1;
@@ -3843,7 +3939,7 @@ class frame_mobile{
 				$nom_groupe_val_multi_affiche  = array(); // pour regrouper les champs de type valeur_multiple suivant le nom_groupe								
 				//echo'<pre>'; 
 				//print_r($tab_groupe);
-				// Affichage de la colonne contenant l'icône ?????????Ade sélection des éléments à supprimer
+				// Affichage de la colonne contenant l'icï¿½ne ?????????Ade sï¿½lection des ï¿½lï¿½ments ï¿½ supprimer
 				$html 			.= "\t"."<TR>"."\n";
 		$html 			.= "\t\t<TD COLSPAN='$nb_colspan_1' class='ligne-impaire'></TD>";
 		for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -4235,7 +4331,7 @@ class frame_mobile{
 								
 								$pass = 0;
 								foreach($result_nomenc as $element_result_nomenc){		
-							//Pour chaque libellé de la nomenclature
+							//Pour chaque libellï¿½ de la nomenclature
 								if($pass > 0) $html.= "\t".'<TR>'."\n";		
 										$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc[LIBELLE]."</TD>\n";
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -4536,7 +4632,7 @@ class frame_mobile{
 							$html             .= $this->recherche_libelle_zone($element['ID_ZONE'],$langue)."</TD>\n";
 							$pass = 0;
 							foreach($result_nomenc as $element_result_nomenc){		
-								//Pour chaque libellé de la nomenclature
+								//Pour chaque libellï¿½ de la nomenclature
 								if($pass > 0) $html.= "\t".'<TR>'."\n";		
 								$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc[LIBELLE]."</TD>\n";
 								for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -4567,7 +4663,7 @@ class frame_mobile{
 							}
 							$html 			.= "\t".'</TR>'."\n";
 						}
-				}// fin parcours des éléments de dico
+				}// fin parcours des ï¿½lï¿½ments de dico
 				//// generation des lignes comme total ou nbre redoublants
 				$html		.= "</TABLE>";
 		
@@ -4575,7 +4671,7 @@ class frame_mobile{
 	///////////////////Affichage verticale des mesures//////////////////
 	///////////////////////////////////////////////////////////////////
 	}else{
-		// Calcul du nombre de lignes de libellés
+		// Calcul du nombre de lignes de libellï¿½s
 		$nb_colspan_2 = 1;
 		$nb_chp_eff = 0;
 		//$nb_colspan_1 = 1;
@@ -4731,7 +4827,7 @@ class frame_mobile{
 				$nom_groupe_val_multi_affiche  = array(); // pour regrouper les champs de type valeur_multiple suivant le nom_groupe								
 				//echo'<pre>'; 
 				//print_r($tab_groupe);
-				// Affichage de la colonne contenant l'icône ?????????Ade sélection des éléments à supprimer
+				// Affichage de la colonne contenant l'icï¿½ne ?????????Ade sï¿½lection des ï¿½lï¿½ments ï¿½ supprimer
 				$html 			.= "\t"."<TR>"."\n";
 		$html 			.= "\t\t<TD COLSPAN='$nb_colspan_1' class='ligne-impaire'></TD>";
 		for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -5144,7 +5240,7 @@ class frame_mobile{
 								
 								$pass = 0;
 								foreach($result_nomenc as $element_result_nomenc){		
-							//Pour chaque libellé de la nomenclature
+							//Pour chaque libellï¿½ de la nomenclature
 								if($pass > 0) $html.= "\t".'<TR>'."\n";		
 										$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc[LIBELLE]."</TD>\n";
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -5393,7 +5489,7 @@ class frame_mobile{
 							$html             .= $this->recherche_libelle_zone($element['ID_ZONE'],$langue)."</TD>\n";
 							$pass = 0;
 							foreach($result_nomenc as $element_result_nomenc){		
-								//Pour chaque libellé de la nomenclature
+								//Pour chaque libellï¿½ de la nomenclature
 								if($pass > 0) $html.= "\t".'<TR>'."\n";		
 								$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc[LIBELLE]."</TD>\n";
 								for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -5424,7 +5520,7 @@ class frame_mobile{
 							}
 							$html 			.= "\t".'</TR>'."\n";
 						}
-				}// fin parcours des éléments de dico
+				}// fin parcours des ï¿½lï¿½ments de dico
 				//// generation des lignes comme total ou nbre redoublants
 				$html		.= "</TABLE>";
 
@@ -5459,7 +5555,7 @@ class frame_mobile{
 //----------------------------------------------------------------------
  		/**
 		* METHODE :  generer_frame_grille_eff_1_fix_col(id_theme, langue):
-		* Effectue la génération des templates à l'image avec des libelles affiches comme dimension colonne
+		* Effectue la gï¿½nï¿½ration des templates ï¿½ l'image avec des libelles affiches comme dimension colonne
 		*
 		*<pre>
 		*DEBUT
@@ -5467,8 +5563,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
 	function generer_frame_grille_eff_1_fix_col($id_theme, $langue ,$id_systeme){
@@ -5506,7 +5602,7 @@ class frame_mobile{
 									
 				$affiche_eff = 0;
 				$NB_TOTAL_COL = 0;
-				$NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes à afficher
+				$NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes ï¿½ afficher
 				$dico        = $this->tri_fils($this->dico);
 				$affiche_vertic_mes=0;
 				foreach($dico as $dc){
@@ -5527,6 +5623,30 @@ class frame_mobile{
 				$mess_alert		 	= $this->recherche_libelle(110,$langue,'DICO_MESSAGE');
 				$mess_alert			= addslashes($mess_alert);
 				
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 
@@ -5540,7 +5660,7 @@ class frame_mobile{
 		//////////////////Affichage horizontal des mesures///////////////
 		////////////////////////////////////////////////////////////////
 		if(!$affiche_vertic_mes	){
-			// Calcul du nombre de lignes de libellés
+			// Calcul du nombre de lignes de libellï¿½s
 			$nb_colspan_2 = 1;
 			$nb_chp_eff = 0;
 			$nb_colspan_1 = 1;
@@ -5701,7 +5821,7 @@ class frame_mobile{
 					$nom_groupe_val_multi_affiche  = array(); // pour regrouper les champs de type valeur_multiple suivant le nom_groupe								
 					//echo'<pre>'; 
 					//print_r($tab_groupe);
-					// Affichage de la colonne contenant l'icône ?????????Ade sélection des éléments à supprimer
+					// Affichage de la colonne contenant l'icï¿½ne ?????????Ade sï¿½lection des ï¿½lï¿½ments ï¿½ supprimer
 					/*$html 			.= "\t"."<TR>"."\n";
 			$html 			.= "\t\t<TD COLSPAN='$nb_colspan_1' class='ligne-impaire'></TD>";
 			for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -6103,7 +6223,7 @@ class frame_mobile{
 									
 									$pass = 0;
 									foreach($result_nomenc as $element_result_nomenc){		
-								//Pour chaque libellé de la nomenclature
+								//Pour chaque libellï¿½ de la nomenclature
 									if($pass > 0) $html.= "\t".'<TR>'."\n";		
 											$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
 											for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -6459,7 +6579,7 @@ class frame_mobile{
 								$html             .= $this->recherche_libelle_zone($dico[$i_elem]['ID_ZONE'],$langue)."</TD>\n";
 								$pass = 0;
 								foreach($result_nomenc as $element_result_nomenc){		
-									//Pour chaque libellé de la nomenclature
+									//Pour chaque libellï¿½ de la nomenclature
 									if($pass > 0) $html.= "\t".'<TR>'."\n";		
 									$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
 									for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -6490,7 +6610,7 @@ class frame_mobile{
 								}
 								$html 			.= "\t".'</TR>'."\n";
 							}
-					}// fin parcours des éléments de dico
+					}// fin parcours des ï¿½lï¿½ments de dico
 					//// generation des lignes comme total ou nbre redoublants
 					$html		.= "</TABLE>";
 		
@@ -6499,7 +6619,7 @@ class frame_mobile{
 		///////////////////////////////////////////////////////////////////
 		}else{
 						
-			// Calcul du nombre de lignes de libellés
+			// Calcul du nombre de lignes de libellï¿½s
 			$nb_colspan_2 = 1;
 			$nb_chp_eff = 0;
 			//$nb_colspan_1 = 1;
@@ -7065,7 +7185,7 @@ class frame_mobile{
 									
 									$pass = 0;
 									foreach($result_nomenc as $element_result_nomenc){		
-								//Pour chaque libellé de la nomenclature
+								//Pour chaque libellï¿½ de la nomenclature
 									if($pass > 0) $html.= "\t".'<TR>'."\n";		
 											$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
 											for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -7366,7 +7486,7 @@ class frame_mobile{
 								$html             .= $this->recherche_libelle_zone($dico[$i_elem]['ID_ZONE'],$langue)."</TD>\n";
 								$pass = 0;
 								foreach($result_nomenc as $element_result_nomenc){		
-									//Pour chaque libellé de la nomenclature
+									//Pour chaque libellï¿½ de la nomenclature
 									if($pass > 0) $html.= "\t".'<TR>'."\n";		
 									$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
 									for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -7398,7 +7518,7 @@ class frame_mobile{
 								}
 								$html 			.= "\t".'</TR>'."\n";
 							}
-					}// fin parcours des éléments de dico
+					}// fin parcours des ï¿½lï¿½ments de dico
 					//// generation des lignes comme total ou nbre redoublants
 					$html		.= "</TABLE>";
 
@@ -7433,9 +7553,9 @@ class frame_mobile{
 
  		/**
 		* METHODE :  generer_frame_grille_eff_2(id_theme, langue):
-		* Effectue la génération des templates à l'image
-		* de celui des EFFECTIFS (04 mesures ) présenté en un seul bloc
-		* où chaque ligne d'effectifs est suivie d'une ligne de redoublants
+		* Effectue la gï¿½nï¿½ration des templates ï¿½ l'image
+		* de celui des EFFECTIFS (04 mesures ) prï¿½sentï¿½ en un seul bloc
+		* oï¿½ chaque ligne d'effectifs est suivie d'une ligne de redoublants
 		*
 		*<pre>
 		*DEBUT
@@ -7443,8 +7563,8 @@ class frame_mobile{
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
 
@@ -7481,7 +7601,7 @@ class frame_mobile{
 		// Les Locaux par exemple
 				$affiche_eff 	= 0;
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes à afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes ï¿½ afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
@@ -7490,6 +7610,30 @@ class frame_mobile{
 				$mess_alert		 	= $this->recherche_libelle(110,$langue,'DICO_MESSAGE');
 				$mess_alert			= addslashes($mess_alert);
 				
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 		
@@ -7499,7 +7643,7 @@ class frame_mobile{
 		$html 			.= "<FORM ACTION='questionnaire.php?theme_frame=".$id_theme.$id_systeme."' METHOD='POST' NAME='form1'>"."\n";
         $html 			.= "<TABLE class='table-questionnaire' border='1'>" . "\n";
 
-        // Calcul du nombre de lignes de libellés
+        // Calcul du nombre de lignes de libellï¿½s
         $nb_colspan_2 = 2;
 				$nb_colspan_1 = 1;
 				$tab_champ_val_multi = array();
@@ -7595,7 +7739,7 @@ class frame_mobile{
 				$nom_groupe_val_multi_affiche  = array(); // pour regrouper les champs de type valeur_multiple suivant le nom_groupe								
 				//echo'<pre>'; 
 				//print_r($tab_groupe);
-				// Affichage de la colonne contenant l'icône ?????????Ade sélection des éléments à supprimer
+				// Affichage de la colonne contenant l'icï¿½ne ?????????Ade sï¿½lection des ï¿½lï¿½ments ï¿½ supprimer
                 // $tabindex = array(); $tabindex[$ligne] = $ligne * 1000 ; $tabindex[$ligne]++;  tabindex='".$tabindex[$ligne]."';
 				$html 			.= "\t"."<TR>"."\n";
         $html 			.= "\t\t<TD COLSPAN='$nb_colspan_1' class='".$classe_fond."'></TD>";
@@ -7690,7 +7834,7 @@ if(!isset($classe_fond)) {
 								
 								$pass = 0;
 								foreach($result_nomenc as $element_result_nomenc){		
-                            //Pour chaque libellé de la nomenclature
+                            //Pour chaque libellï¿½ de la nomenclature
                 		if($pass > 0) $html.= "\t".'<TR>'."\n";		
 										$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -7983,7 +8127,7 @@ if(!isset($classe_fond)) {
                             $html             .= $this->recherche_libelle_zone($element['ID_ZONE'],$langue)."</TD>\n";
                             $pass = 0;
                             foreach($result_nomenc as $element_result_nomenc){		
-                                //Pour chaque libellé de la nomenclature
+                                //Pour chaque libellï¿½ de la nomenclature
                                 if($pass > 0) $html.= "\t".'<TR>'."\n";		
                                 $html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
                                 for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -8014,7 +8158,7 @@ if(!isset($classe_fond)) {
                             }
                             $html 			.= "\t".'</TR>'."\n";
                         }
-				}// fin parcours des éléments de dico
+				}// fin parcours des ï¿½lï¿½ments de dico
 				//// generation des lignes comme total ou nbre redoublants
 				$html		.= "</TABLE>";
 
@@ -8041,9 +8185,9 @@ if(!isset($classe_fond)) {
 //----------------------------------------------------------------------
  		/**
 		* METHODE :  generer_frame_grille_eff_3(id_theme, langue):
-		* Effectue la génération des templates à l'image
-		* de celui des EFFECTIFS (04 mesures ) présenté deux blocs
-		* où le bloc des effectifs est suivi de celui des redoublants
+		* Effectue la gï¿½nï¿½ration des templates ï¿½ l'image
+		* de celui des EFFECTIFS (04 mesures ) prï¿½sentï¿½ deux blocs
+		* oï¿½ le bloc des effectifs est suivi de celui des redoublants
 		*
 		*<pre>
 		*DEBUT
@@ -8051,8 +8195,8 @@ if(!isset($classe_fond)) {
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
 
@@ -8089,7 +8233,7 @@ if(!isset($classe_fond)) {
 		// Les Locaux par exemple
 				$affiche_eff = 0;
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes à afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes ï¿½ afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
@@ -8098,6 +8242,30 @@ if(!isset($classe_fond)) {
 				$mess_alert		 	= $this->recherche_libelle(110,$langue,'DICO_MESSAGE');
 				$mess_alert			= addslashes($mess_alert);
 				
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 
@@ -8107,7 +8275,7 @@ if(!isset($classe_fond)) {
 		$html 			.= "<FORM ACTION='questionnaire.php?theme_frame=".$id_theme.$id_systeme."' METHOD='POST' NAME='form1'>"."\n";
         $html 			.= "<TABLE class='table-questionnaire' border='1'>" . "\n";
 
-        // Calcul du nombre de lignes de libellés
+        // Calcul du nombre de lignes de libellï¿½s
         $nb_colspan_2 = 2;
 				$nb_colspan_1 = 1;
 				$tab_champ_val_multi = array();
@@ -8203,7 +8371,7 @@ if(!isset($classe_fond)) {
 				$nom_groupe_val_multi_affiche  = array(); // pour regrouper les champs de type valeur_multiple suivant le nom_groupe								
 				//echo'<pre>'; 
 				//print_r($tab_groupe);
-				// Affichage de la colonne contenant l'icône ?????????Ade sélection des éléments à supprimer
+				// Affichage de la colonne contenant l'icï¿½ne ?????????Ade sï¿½lection des ï¿½lï¿½ments ï¿½ supprimer
 				$html 			.= "\t"."<TR>"."\n";
         $html 			.= "\t\t<TD COLSPAN='$nb_colspan_1' class='td_center ligne-titre'></TD>";
         for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -8299,7 +8467,7 @@ if(!isset($classe_fond)) {
 								
 								$pass = 0;
 								foreach($result_nomenc as $element_result_nomenc){		
-                            //Pour chaque libellé de la nomenclature
+                            //Pour chaque libellï¿½ de la nomenclature
                 		if($pass > 0) $html.= "\t".'<TR>'."\n";		
 										$html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -8564,7 +8732,7 @@ if(!isset($classe_fond)) {
                             $html             .= $this->recherche_libelle_zone($element['ID_ZONE'],$langue)."</TD>\n";
                             $pass = 0;
                             foreach($result_nomenc as $element_result_nomenc){		
-                                //Pour chaque libellé de la nomenclature
+                                //Pour chaque libellï¿½ de la nomenclature
                                 if($pass > 0) $html.= "\t".'<TR>'."\n";		
                                 $html 		.="\t\t"."<TD nowrap  class='".$classe_fond."'>". $element_result_nomenc['LIBELLE']."</TD>\n";
                                 for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
@@ -8595,7 +8763,7 @@ if(!isset($classe_fond)) {
                             }
                             $html 			.= "\t".'</TR>'."\n";
                         }
-				}// fin parcours des éléments de dico
+				}// fin parcours des ï¿½lï¿½ments de dico
 				//// generation des lignes comme total ou nbre redoublants
 				$html		.= "</TABLE>";
 
@@ -8621,7 +8789,7 @@ if(!isset($classe_fond)) {
 //----------------------------------------------------------------------
  		/**
 		* METHODE :  generer_frame_mat_grille(id_theme, langue):
-		* Effectue la génération des templates comme
+		* Effectue la gï¿½nï¿½ration des templates comme
 		* les AIRES DE RECRUTEMENT, ORIGINE DES NOUVEAUX ELEVES  
 		*
 		*<pre>
@@ -8630,8 +8798,8 @@ if(!isset($classe_fond)) {
 		*FIN
 		*</pre>
 		* @access public
-		* @param numeric $id_theme : le thème choisi
-		* @param string $langue		: la langue associée
+		* @param numeric $id_theme : le thï¿½me choisi
+		* @param string $langue		: la langue associï¿½e
 		* 
 		*/
    function generer_frame_mat_grille($id_theme, $langue ,$id_systeme){
@@ -8666,7 +8834,7 @@ if(!isset($classe_fond)) {
 				//echo "<br>$requete<br>";					
 				// Les Locaux par exemple
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes à afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes ï¿½ afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
@@ -8675,6 +8843,30 @@ if(!isset($classe_fond)) {
 				$mess_alert		 	= $this->recherche_libelle(110,$langue,'DICO_MESSAGE');
 				$mess_alert			= addslashes($mess_alert);
 				
+
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : CSS mobile â€” reduction espaces inutiles, adaptation ecran mobile, meilleure UX
+		// Injection CSS pure presentation â€” aucune logique metier modifiee
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile â€” responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "</style>\n";
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 
@@ -8684,7 +8876,7 @@ if(!isset($classe_fond)) {
 		$html 			.= "<FORM ACTION='questionnaire.php?theme_frame=".$id_theme.$id_systeme."' METHOD='POST' NAME='form1'>"."\n";
         $html 			.= "<TABLE class='table-questionnaire' border='1'>" . "\n";
 
-        // Calcul du nombre de lignes de libellés
+        // Calcul du nombre de lignes de libellï¿½s
         $nb_colspan 		= 0;
 				$nb_rowspan_1 	= 2;
 				$nb_rowspan_2 	= 1;
@@ -8775,18 +8967,18 @@ if(!isset($classe_fond)) {
 				}
 				$html 			.= "\t".'</TR>'."\n";
 				
-				/// 2ème TR
+				/// 2ï¿½me TR
   			$html 			.= "\t"."<TR  class='ligne-impaire'>"."\n";
 				foreach($dico as $element){
 						if ( trim($element['TYPE_OBJET']) == 'systeme_liste_radio' 
 											or trim($element['TYPE_OBJET']) == 'liste_radio' 
 											or trim($element['TYPE_OBJET']) == 'booleen'){
-                            // Lecture des libellés de la table de nomenclature
+                            // Lecture des libellï¿½s de la table de nomenclature
                             $result_nomenc 	= $this->requete_nomenclature($element['TABLE_FILLE'], $element['CHAMP_FILS'], $element['CHAMP_PERE'], $langue ,$id_systeme, $element['SQL_REQ']);
                             //print_r($result_nomenc);
                             //print '<BR><BR>';
                             foreach($result_nomenc as $element_result_nomenc){		
-                                //Pour chaque libellé de la nomenclature
+                                //Pour chaque libellï¿½ de la nomenclature
                                 
                                 // Modification Alassane
 								if(isset($element['TAILLE_LIB_VERTICAUX'])) $taille_max = $element['TAILLE_LIB_VERTICAUX']; 
@@ -8805,7 +8997,7 @@ if(!isset($classe_fond)) {
         }
 				$html 			.= "\t".'</TR>'."\n";
 				
-				/// 3 ème TR si plusieurs champs de saisies associés comme G et F
+				/// 3 ï¿½me TR si plusieurs champs de saisies associï¿½s comme G et F
 										
 				if($nb_colspan >0){
 						foreach($dico as $element){
@@ -9259,8 +9451,8 @@ if(!isset($classe_fond)) {
 
  		/**
 		* METHODE :  generer_frame:
-		* Parcourt les themes, recupère le type de frame à générer
-		* et appéle la fonction associée
+		* Parcourt les themes, recupï¿½re le type de frame ï¿½ gï¿½nï¿½rer
+		* et appï¿½le la fonction associï¿½e
 		*
 		*<pre>
 		*DEBUT
@@ -9275,7 +9467,7 @@ if(!isset($classe_fond)) {
 						//$this->langue = $langue;
 						if($code_annee=='' && $code_etablissement=='')	print '<H2>langue = '.$langue.'</H2>';
 						$rep_frames = $GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/';
-						if (!file_exists($rep_frames)){ // Création du répertoire
+						if (!file_exists($rep_frames)){ // Crï¿½ation du rï¿½pertoire
 
 								if ( !mkdir($rep_frames) ){}
 								else{

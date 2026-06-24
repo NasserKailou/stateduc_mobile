@@ -125,7 +125,11 @@ $app->get('/theme_data/:user/:id_sector/:id_theme/:id_camp/:id_etab/:id_filter',
 		//echo 'call completed' . "<br/>";
 	});
 	
-	$urlBase = $GLOBALS['SISED_AURL'].'questionnaire_reload_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&code_annee='.$id_year;
+	// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+	// Session 24 : ajout login et langue dans l'URL pour le bootstrap session mobile
+	// questionnaire_reload_ws.php a besoin de ces params quand il n'y a pas de session navigateur
+	$lang_reload = isset($_SESSION['langue']) && $_SESSION['langue']<>'' ? $_SESSION['langue'] : 'fr';
+	$urlBase = $GLOBALS['SISED_AURL'].'questionnaire_reload_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&code_annee='.$id_year.'&login='.$user.'&langue='.$lang_reload;
 	if ($id_filter != null) {
 		if (strpos($id_filter, ':') !== false) {
 			$ids = explode(':', $id_filter);
