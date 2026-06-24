@@ -144,8 +144,12 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   }
 
   void _openCampaign(Campaign c, CampaignProvider campaigns) async {
+    // Affiche le dialog de chargement pendant que selectCampaign() charge
+    // les systèmes + regroupements depuis SQLite (même feedback que l'envoi).
+    _showLoadingDialog(c.libCamp);
     await campaigns.selectCampaign(c);
     if (mounted) {
+      Navigator.pop(context); // ferme le dialog de chargement
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -153,6 +157,55 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
         ),
       );
     }
+  }
+
+  /// Affiche un dialog modal avec spinner pendant le chargement de la campagne.
+  /// Ressemble au dialog d'attente lors de l'envoi de données.
+  void _showLoadingDialog(String campName) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,   // l'utilisateur ne peut pas fermer manuellement
+      builder: (ctx) => PopScope(
+        canPop: false,             // désactive le bouton Retour système
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: CircularProgressIndicator(strokeWidth: 3),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Connexion en cours…',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        campName,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _confirmDelete(Campaign c, CampaignProvider campaigns) {

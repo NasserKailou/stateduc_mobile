@@ -76,6 +76,11 @@ class CampaignProvider extends ChangeNotifier {
   List<Campaign> _serverCampaigns = [];
   List<Campaign> get serverCampaigns => _serverCampaigns;
 
+  // ─── Sélection d'une campagne (chargement local SQLite) ────────────────────
+  /// Vrai pendant que selectCampaign() charge les systèmes / regroupements depuis SQLite.
+  bool _isSelectingCampaign = false;
+  bool get isSelectingCampaign => _isSelectingCampaign;
+
   // ─── Progression du téléchargement d'une campagne ──────────────────────────
   // Mise à jour à chaque étape du workflow charge_camp.js
   int    _loadStep       = 0;
@@ -114,12 +119,13 @@ class CampaignProvider extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> selectCampaign(Campaign campaign) async {
-    _selectedCampaign = campaign;
-    _selectedSystem   = null;
-    _regroupBreadcrumb = [];
-    _currentRegroups  = [];
-    _currentSchools   = [];
-    _error = null;
+    _selectedCampaign    = campaign;
+    _selectedSystem      = null;
+    _regroupBreadcrumb   = [];
+    _currentRegroups     = [];
+    _currentSchools      = [];
+    _error               = null;
+    _isSelectingCampaign = true;   // ← indicateur de chargement activé
     notifyListeners();
     try {
       // Charge les systèmes éducatifs, tous les regroupements et leurs types
@@ -128,6 +134,8 @@ class CampaignProvider extends ChangeNotifier {
       _regroupTypes = await _db.getRegroupTypes(campaign.idCamp);
     } catch (e) {
       _error = 'Erreur chargement systèmes : ${e.toString()}';
+    } finally {
+      _isSelectingCampaign = false; // ← indicateur de chargement désactivé
     }
     notifyListeners();
   }
