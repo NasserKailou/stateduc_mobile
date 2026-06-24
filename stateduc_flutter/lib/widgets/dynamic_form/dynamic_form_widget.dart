@@ -509,7 +509,7 @@ $formHtml
         var lastUnder = val.lastIndexOf('_');
         if (lastUnder >= 0) {
           var lastSeg = val.substring(lastUnder + 1);
-          if (/^\d+$/.test(lastSeg)) { normalizedVal = lastSeg; }
+          if (RegExp(r'^\d+$').hasMatch(lastSeg)) { normalizedVal = lastSeg; }
         }
         el.checked = (el.value === normalizedVal);
       } else if (el.type === 'checkbox') {
