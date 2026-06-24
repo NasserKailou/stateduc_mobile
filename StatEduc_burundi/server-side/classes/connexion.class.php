@@ -133,81 +133,53 @@ class connexion {
 
         $GLOBALS['ADODB_FETCH_MODE'] = ADODB_FETCH_ASSOC;
 		
-		//mise à jour par Nasser kailounasser@gmail.com
-		if (file_exists($GLOBALS['SISED_PATH'] . 'server-side/dico_DB.mdb')){
-			///  bass : connexion s�par�e � une source dico
+		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+		// Session 24 : Support SQL Server 2012 pour dico_DB en plus d'Access
+		// Detection automatique : fichier Access .mdb/.accdb si present sur disque,
+		// sinon SQL Server 2012 si connexion principale est mssql,
+		// sinon meme SGBD que la connexion principale (mysql/postgres).
+		// Aucun changement de code metier requis - totalement transparent.
+		if (file_exists($GLOBALS['SISED_PATH'] . 'server-side/dico_DB.mdb')) {
+			// Connexion dico Access .mdb (compatibilite legacy)
 			$conn_dico = ADONewConnection('access');
 			$conn_dico->Connect('Driver={Microsoft Access Driver (*.mdb)};Dbq=' . $GLOBALS['SISED_PATH'] . 'server-side/dico_DB.mdb' . ';Uid=Admin;Pwd=\'\';');
 			$GLOBALS['conn_dico'] = $conn_dico;
-			
-			/*var_dump($conn_dico->IsConnected());
-			$requete = "select * from ADMIN_GROUPES";
-			$fixe_regroup = $GLOBALS['conn_dico']->GetAll($requete);
-			print_r($fixe_regroup);
-			exit;*/
-			
-			///  fin bass
-		} elseif (file_exists($GLOBALS['SISED_PATH'] . 'server-side/dico_DB.accdb')){
-			///  bass : connexion s�par�e � une source dico
+		} elseif (file_exists($GLOBALS['SISED_PATH'] . 'server-side/dico_DB.accdb')) {
+			// Connexion dico Access .accdb
 			$conn_dico = ADONewConnection('access');
 			$conn_dico->Connect('Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=' . $GLOBALS['SISED_PATH'] . 'server-side/dico_DB.accdb' . ';Uid=Admin;Pwd=\'\';');
 			$GLOBALS['conn_dico'] = $conn_dico;
-			///  fin bass
-		} elseif($curcnx['type']=='mssql') {
-			ini_set("display_errors",0);error_reporting(0);
-	      	$conn_dico = ADONewConnection('mssqlnative');
-			$conn_dico->setConnectionParameter('CharacterSet','UTF-8');
-			ini_set("display_errors",1);error_reporting(1);
-	  		//$conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], 'dico_DB');	
-			//$conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $GLOBALS['$dico_DB']); 
-			
-			if(!isset($GLOBALS['PARAM']['dico_DB']) || $GLOBALS['PARAM']['dico_DB']=='') {
-				$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], 'dico_DB');
-				} else {
-					$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $GLOBALS['PARAM']['dico_DB']);
-				}
-			
-	  		$GLOBALS['conn_dico'] = $conn_dico;
-	    } elseif($curcnx['type']=='mysql') { 
-			//ini_set("display_errors",0);error_reporting(0);
-	      	$conn_dico = ADONewConnection('mysqli');
-			//$conn_dico->setConnectionParameter(MYSQLI_SET_CHARSET_NAME,'utf8mb4');
-			//ini_set("display_errors",1);error_reporting(1);
-			//$con_result = $conn_dico->PConnect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], 'dico_DB');
-			//$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $curcnx['base']);
-			//$conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $GLOBALS['$dico_DB']);
-			if(!isset($GLOBALS['PARAM']['dico_DB']) || $GLOBALS['PARAM']['dico_DB']=='') {
-				$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], 'dico_DB');
-				} else {
-					$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $GLOBALS['PARAM']['dico_DB']);
-				}
-			
-			
-			$conn_dico->setCharset('utf8'); 
-			
-	  		$GLOBALS['conn_dico'] = $conn_dico;
-			/*var_dump($conn_dico->IsConnected());
-			$requete = "select * from ADMIN_GROUPES";
-			$fixe_regroup = $GLOBALS['conn_dico']->GetAll($requete);
-			print_r($fixe_regroup);
-			exit;*/
-	    }elseif($curcnx['type']=='postgres9') { 
-			ini_set("display_errors",0);error_reporting(0);
-	      	
-			ini_set("display_errors",1);error_reporting(1);
-	      	$conn_dico = ADONewConnection('postgres9');//$conn_dico->debug = true;
-			//$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $GLOBALS['$dico_DB']);
-			if(!isset($GLOBALS['PARAM']['dico_DB']) || $GLOBALS['PARAM']['dico_DB']=='') {
-				$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], 'dico_DB');
-				} else {
-					$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $GLOBALS['PARAM']['dico_DB']);
-				}
-			
-			
-			//$conn_dico->debug = true;
-	  		$GLOBALS['conn_dico'] = $conn_dico;
-	    }
-//fin mise à jour Nasser        
+		} elseif ($curcnx['type'] == 'mssql') {
+			// Connexion dico SQL Server 2012+ (dico_DB sur meme serveur SQL que la base principale)
+			// Si PARAM['dico_DB'] est defini dans params.php/params_sys.php il est utilise,
+			// sinon on essaie 'dico_DB' puis la base principale en fallback.
+			ini_set('display_errors', 0); error_reporting(0);
+			$conn_dico = ADONewConnection('mssqlnative');
+			$conn_dico->setConnectionParameter('CharacterSet', 'UTF-8');
+			ini_set('display_errors', 1); error_reporting(1);
+			$dico_db_name = (isset($GLOBALS['PARAM']['dico_DB']) && $GLOBALS['PARAM']['dico_DB'] != '')
+				? $GLOBALS['PARAM']['dico_DB'] : 'dico_DB';
+			$con_result = $conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $dico_db_name);
+			if (!$con_result) {
+				// Fallback : si dico_DB introuvable, utiliser la meme base que la connexion principale
+				$conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $curcnx['base']);
+			}
+			$GLOBALS['conn_dico'] = $conn_dico;
+		} elseif ($curcnx['type'] == 'mysql') {
+			$conn_dico = ADONewConnection('mysqli');
+			$dico_db_name = (isset($GLOBALS['PARAM']['dico_DB']) && $GLOBALS['PARAM']['dico_DB'] != '')
+				? $GLOBALS['PARAM']['dico_DB'] : 'dico_DB';
+			$conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $dico_db_name);
+			$conn_dico->setCharset('utf8');
+			$GLOBALS['conn_dico'] = $conn_dico;
+		} elseif ($curcnx['type'] == 'postgres9') {
+			$conn_dico = ADONewConnection('postgres9');
+			$dico_db_name = (isset($GLOBALS['PARAM']['dico_DB']) && $GLOBALS['PARAM']['dico_DB'] != '')
+				? $GLOBALS['PARAM']['dico_DB'] : 'dico_DB';
+			$conn_dico->Connect($curcnx['serveur'], $curcnx['utilisateur'], $curcnx['mdp'], $dico_db_name);
+			$GLOBALS['conn_dico'] = $conn_dico;
+		}
+		//fin mise a jour Nasser - Session 24
 		
 		$conn_type = $curcnx['type'];
 		if($conn_type == 'mssql') {
