@@ -70,8 +70,19 @@ $_SESSION['secteur'] = $_GET['sector'];
 $_SESSION['sector'] = $_GET['sector'];
 $_SESSION['code_etab'] = $_GET['code_etab'];
 $GLOBALS['ne_pas_verifier_session'] = true;
+// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+// Session 27 : fix bootstrap type_ent_stat + charger_theme APPARTENANCE pour themes mobiles
+// Sans $_SESSION['type_ent_stat'], set_tab_session('chaines') charge la mauvaise chaine
+// -> $_SESSION['chaine'] vide -> requetes arbre echouent -> infos_etab vide -> form non affiche.
+// charger_theme sans APPARTENANCE charge tous themes secteur -> collision themes classique/mobile.
+// Fix : injecter type_ent_stat en session avant common.php, puis charger_theme(APPARTENANCE, sector).
+if(isset($_GET['type_ent_stat']) && $_GET['type_ent_stat']<>'') {
+    $_SESSION['type_ent_stat'] = $_GET['type_ent_stat'];
+}
 require_once 'common.php';
-$theme_manager->charger_theme("", $_GET['sector']);
+// Recharger avec APPARTENANCE = campagne (type_ent_stat) pour isoler les themes mobiles
+$_appart_mob = (isset($_GET['type_ent_stat']) && $_GET['type_ent_stat']<>'') ? $_GET['type_ent_stat'] : '';
+$theme_manager->charger_theme($_appart_mob, $_GET['sector']);
 $theme_manager->set_theme_courant();
 $theme_manager->set_classe();
 unset($_SESSION['reg_parents']);

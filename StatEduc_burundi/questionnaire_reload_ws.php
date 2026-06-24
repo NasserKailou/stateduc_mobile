@@ -92,9 +92,14 @@ $_SESSION['secteur'] = $_GET['sector'];
 $_SESSION['sector'] = $_GET['sector'];
 $_SESSION['code_etab'] = $_GET['code_etab'];
 $GLOBALS['ne_pas_verifier_session'] = true;
+// Session 27 : meme fix que questionnaire_ws.php - type_ent_stat + charger_theme(APPARTENANCE)
+if(isset($_GET['type_ent_stat']) && $_GET['type_ent_stat']<>'') {
+    $_SESSION['type_ent_stat'] = $_GET['type_ent_stat'];
+}
 require_once 'common.php';
 
-$theme_manager->charger_theme("", $_GET['sector']);
+$_appart_mob = (isset($_GET['type_ent_stat']) && $_GET['type_ent_stat']<>'') ? $_GET['type_ent_stat'] : '';
+$theme_manager->charger_theme($_appart_mob, $_GET['sector']);
 $theme_manager->set_theme_courant();
 $theme_manager->set_classe();
 unset($_SESSION['reg_parents']);
