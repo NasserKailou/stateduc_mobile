@@ -32,13 +32,10 @@
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
 oCMenu.makeMenu('1010','0','Accueil','accueil.php','','80');
 oCMenu.makeMenu('1060','0','Choisir un Secteur','saisie_donnees.php?val=choix_sys_saisie','','130');
-oCMenu.makeMenu('1020','0','Choix Etablissement','','','130');
+oCMenu.makeMenu('1020','0','Choix Etablissement','saisie_donnees.php?val=choix_etablissement','','130');
 oCMenu.makeMenu('1030','0','Questionnaires','','','130');
 oCMenu.makeMenu('1050','0','Ajout Etablissement','saisie_donnees.php?val=new_etab&theme=101','','155');
 oCMenu.makeMenu('1040','0','Quitter','?val=logout','','42');
-oCMenu.makeMenu('18104','1030','Identification_ALPHA','questionnaire.php?theme=18104&type_ent_stat=2','','220');
-oCMenu.makeMenu('18204','1030','Environnement_Alpha','questionnaire.php?theme=18204&type_ent_stat=2','','220');
-oCMenu.makeMenu('18304','1030','Infos Etablissement','questionnaire.php?theme=18304&type_ent_stat=2','','220');
 
 //Leave this line - it constructs the menu
             oCMenu.construct();

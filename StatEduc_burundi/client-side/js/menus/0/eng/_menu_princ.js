@@ -33,7 +33,7 @@
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
 oCMenu.makeMenu('2080','0','(#)Accueil','accueil.php','','60');
 oCMenu.makeMenu('20810','2010','(#)Choisir un Secteur','saisie_donnees.php?val=choix_sys_princ','','145');
-oCMenu.makeMenu('20140','2010','(#)Choix Etablissement','saisie_donnees.php?val=choix_etablissement','','145');
+oCMenu.makeMenu('20140','2010','Choix Etablissement','','','145');
 oCMenu.makeMenu('20660','2010','(#)Ajout Etablissement','saisie_donnees.php?val=new_etab&theme=101','','145');
 oCMenu.makeMenu('2020','0','(#)Contrôle / Validation','','','135');
 oCMenu.makeMenu('30605','2020','(#)Suivi Saisie Données','','','140');

@@ -30,10 +30,10 @@
             oCMenu.level[2]=new cm_makeLevel(110,22,"clS2","clS2over");
             oCMenu.level[3]=new cm_makeLevel(140,22);oCMenu.fromLeft=296;
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
-oCMenu.makeMenu('30010','0','Home','accueil.php','','80');
-oCMenu.makeMenu('30050','0','Select a Sector','saisie_donnees.php?val=choix_sys_rpt','','130');
-oCMenu.makeMenu('30030','0','Reports List','','','180');
-oCMenu.makeMenu('30020','0','Quit','?val=logout','','42');
+oCMenu.makeMenu('30010','0','(#)Accueil','accueil.php','','80');
+oCMenu.makeMenu('30050','0','(#)Choisir un Secteur','saisie_donnees.php?val=choix_sys_rpt','','130');
+oCMenu.makeMenu('30030','0','(#)Liste des Etats','','','180');
+oCMenu.makeMenu('30020','0','(#)Quitter','?val=logout','','42');
 
 //Leave this line - it constructs the menu
             oCMenu.construct();

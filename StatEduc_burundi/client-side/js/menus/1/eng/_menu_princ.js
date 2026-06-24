@@ -39,7 +39,9 @@ oCMenu.makeMenu('20770','20120','(#)Modification - Liaisons','saisie_donnees.php
 oCMenu.makeMenu('20130','2010','(#)Nomenclatures','saisie_donnees.php?val=nomenclature','','145');
 oCMenu.makeMenu('30340','2010','(#)Données Population','saisie_donnees.php?val=pop&type=regs','','145');
 oCMenu.makeMenu('20810','2010','(#)Choisir un Secteur','saisie_donnees.php?val=choix_sys_princ','','145');
-oCMenu.makeMenu('20140','2010','(#)Choix Etablissement','saisie_donnees.php?val=choix_etablissement','','145');
+oCMenu.makeMenu('20140','2010','Choix Etablissement','','','145');
+oCMenu.makeMenu('31730','20140','Classique','saisie_donnees.php?val=choix_etablissement&type_ent_stat=1','','130');
+oCMenu.makeMenu('31740','20140','Mobile','saisie_donnees.php?val=choix_etablissement&type_ent_stat=2','','130');
 oCMenu.makeMenu('20660','2010','(#)Ajout Etablissement','saisie_donnees.php?val=new_etab&theme=101','','145');
 oCMenu.makeMenu('2020','0','(#)Contrôle / Validation','','','135');
 oCMenu.makeMenu('30350','2020','(#)Controle de Cohérences','administration.php?val=controle','','140');

@@ -30,16 +30,16 @@
             oCMenu.level[2]=new cm_makeLevel(110,22,"clS2","clS2over");
             oCMenu.level[3]=new cm_makeLevel(140,22);oCMenu.fromLeft=206;
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
-oCMenu.makeMenu('30010','0','Home','accueil.php','','80');
-oCMenu.makeMenu('30050','0','Select a Sector','saisie_donnees.php?val=choix_sys_rpt','','130');
-oCMenu.makeMenu('30040','0','Reports Management','synthese.php','','180');
-oCMenu.makeMenu('20850','30040','Reports Management','synthese.php?val=gest_rpt','','160');
-oCMenu.makeMenu('20860','30040','Measures Management','synthese.php?val=gest_mes','','160');
-oCMenu.makeMenu('30060','30040','Criteria Management','synthese.php?val=criteres','','160');
-oCMenu.makeMenu('20870','30040','Dimensions Management','synthese.php?val=gest_dim','','160');
-oCMenu.makeMenu('20880','30040','Aggregations Management','synthese.php?val=gest_agg','','160');
-oCMenu.makeMenu('30030','0','Reports List','','','180');
-oCMenu.makeMenu('30020','0','Quit','?val=logout','','42');
+oCMenu.makeMenu('30010','0','(#)Accueil','accueil.php','','80');
+oCMenu.makeMenu('30050','0','(#)Choisir un Secteur','saisie_donnees.php?val=choix_sys_rpt','','130');
+oCMenu.makeMenu('30040','0','(#)Gestion des Etats','synthese.php','','180');
+oCMenu.makeMenu('20850','30040','(#)Gestion des Etats','synthese.php?val=gest_rpt','','160');
+oCMenu.makeMenu('20860','30040','(#)Gesion des Mesures','synthese.php?val=gest_mes','','160');
+oCMenu.makeMenu('30060','30040','(#)Gestion des Critères','synthese.php?val=criteres','','160');
+oCMenu.makeMenu('20870','30040','(#)Gestion des Dimensions','synthese.php?val=gest_dim','','160');
+oCMenu.makeMenu('20880','30040','(#)Gestion des Aggrégations','synthese.php?val=gest_agg','','160');
+oCMenu.makeMenu('30030','0','(#)Liste des Etats','','','180');
+oCMenu.makeMenu('30020','0','(#)Quitter','?val=logout','','42');
 
 //Leave this line - it constructs the menu
             oCMenu.construct();

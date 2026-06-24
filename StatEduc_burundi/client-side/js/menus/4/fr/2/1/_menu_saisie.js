@@ -30,25 +30,14 @@
             oCMenu.level[2]=new cm_makeLevel(110,22,"clS2","clS2over");
             oCMenu.level[3]=new cm_makeLevel(140,22);oCMenu.fromLeft=175;
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
-oCMenu.makeMenu('102','1030','Identification Etablissement','questionnaire.php?theme=102&type_ent_stat=1','','220');
-oCMenu.makeMenu('502','1030','Infos Generales - ecole','questionnaire.php?theme=502&type_ent_stat=1','','220');
-oCMenu.makeMenu('8302','1030','Locaux','#','','220');
-oCMenu.makeMenu('6702','8302','CaractÈristiques et Etat','questionnaire.php?theme=6702&type_ent_stat=1','','220');
-oCMenu.makeMenu('6502','8302','RÈcap Salles de classe','questionnaire.php?theme=6502&type_ent_stat=1','','220');
-oCMenu.makeMenu('6602','1030','Mobilier et Equipement','questionnaire.php?theme=6602&type_ent_stat=1','','220');
-oCMenu.makeMenu('7002','1030','Equipements Didactiques','questionnaire.php?theme=7002&type_ent_stat=1','','220');
-oCMenu.makeMenu('8402','1030','Personnel','#','','220');
-oCMenu.makeMenu('6802','8402','Liste nominative','questionnaire.php?theme=6802&type_ent_stat=1','','220');
-oCMenu.makeMenu('7102','8402',' RÈcap. Enseignant ','questionnaire.php?theme=7102&type_ent_stat=1','','220');
-oCMenu.makeMenu('8502','1030','Effectif des ÈlËves','#','','220');
-oCMenu.makeMenu('7202','8502','Nvx Inscrits en 1Ëre AnnÈe','questionnaire.php?theme=7202&type_ent_stat=1','','220');
-oCMenu.makeMenu('6902','8502','Effectifs GP par age','questionnaire.php?theme=6902&type_ent_stat=1','','220');
-oCMenu.makeMenu('8202','8502','Aire de Recrutement','questionnaire.php?theme=8202&type_ent_stat=1','','220');
-oCMenu.makeMenu('13002','8502','X. Structure PÈdagogique et Effectifs Eleves','questionnaire.php?theme=13002&type_ent_stat=1','','220');
-oCMenu.makeMenu('15202','8502','REFUGIES','questionnaire.php?theme=15202&type_ent_stat=1','','220');
-oCMenu.makeMenu('8602','8502','Provenant Passerelle','questionnaire.php?theme=8602&type_ent_stat=1','','220');
-oCMenu.makeMenu('15102','8502','Provenant coranique','questionnaire.php?theme=15102&type_ent_stat=1','','220');
-oCMenu.makeMenu('7302','8502','Result. Exam & Effect Handicap','questionnaire.php?theme=7302&type_ent_stat=1','','220');
+oCMenu.makeMenu('802','1030','Identification & Localisation','questionnaire.php?theme=802&type_ent_stat=1','','250');
+oCMenu.makeMenu('902','1030','Donn√©es G√©n√©rales','questionnaire.php?theme=902&type_ent_stat=1','','250');
+oCMenu.makeMenu('1102','1030','Mobilier, Equipement & Manuels','questionnaire.php?theme=1102&type_ent_stat=1','','250');
+oCMenu.makeMenu('1202','1030','Infos relatives aux √©l√®ves(1)','questionnaire.php?theme=1202&type_ent_stat=1','','250');
+oCMenu.makeMenu('6702','1030','Infos relatives aux √©l√®ves( 2)','questionnaire.php?theme=6702&type_ent_stat=1','','250');
+oCMenu.makeMenu('8002','1030','Donn√©es financi√®res ','questionnaire.php?theme=8002&type_ent_stat=1','','250');
+oCMenu.makeMenu('1302','1030','Infos sur le personnel','questionnaire.php?theme=1302&type_ent_stat=1','','250');
+oCMenu.makeMenu('7702','1030','Liste Personnel','questionnaire.php?theme=7702&type_ent_stat=1','','250');
 
 //Leave this line - it constructs the menu
             oCMenu.construct();

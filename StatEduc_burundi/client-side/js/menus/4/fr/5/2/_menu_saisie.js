@@ -30,13 +30,6 @@
             oCMenu.level[2]=new cm_makeLevel(110,22,"clS2","clS2over");
             oCMenu.level[3]=new cm_makeLevel(140,22);oCMenu.fromLeft=175;
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
-oCMenu.makeMenu('1010','0','Accueil','accueil.php','','80');
-oCMenu.makeMenu('1060','0','Choisir un Secteur','saisie_donnees.php?val=choix_sys_saisie','','130');
-oCMenu.makeMenu('1020','0','Choix Etablissement','saisie_donnees.php?val=choix_etablissement','','130');
-oCMenu.makeMenu('1030','0','Questionnaires','questionnaire.php','','130');
-oCMenu.makeMenu('1040','0','Quitter','?val=logout','','42');
-oCMenu.makeMenu('34605','1030','Données Mensuelles ESU','questionnaire.php?theme=34605&type_ent_stat=2','','180');
-oCMenu.makeMenu('34705','1030','Données Trimestrielles ESU','questionnaire.php?theme=34705&type_ent_stat=2','','180');
 
 //Leave this line - it constructs the menu
             oCMenu.construct();

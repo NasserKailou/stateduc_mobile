@@ -32,21 +32,17 @@
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
 oCMenu.makeMenu('1010','0','Accueil','accueil.php','','80');
 oCMenu.makeMenu('1060','0','Choisir un Secteur','saisie_donnees.php?val=choix_sys_saisie','','130');
-oCMenu.makeMenu('1020','0','Choix Etablissement','','','130');
+oCMenu.makeMenu('1020','0','Choix Etablissement','saisie_donnees.php?val=choix_etablissement','','130');
 oCMenu.makeMenu('1030','0','Questionnaires','','','130');
 oCMenu.makeMenu('1050','0','Ajout Etablissement','saisie_donnees.php?val=new_etab&theme=101','','155');
 oCMenu.makeMenu('1040','0','Quitter','?val=logout','','42');
-oCMenu.makeMenu('2901','1030','Identification','questionnaire.php?theme=2901&type_ent_stat=1','','220');
-oCMenu.makeMenu('3001','1030','Infomations Générales','questionnaire.php?theme=3001&type_ent_stat=1','','220');
-oCMenu.makeMenu('7501','1030','Caractéristiques des locaux','questionnaire.php?theme=7501&type_ent_stat=1','','220');
-oCMenu.makeMenu('6101','1030','Récap Salles de classe','questionnaire.php?theme=6101&type_ent_stat=1','','220');
-oCMenu.makeMenu('7901','1030','Mobilier et Equipement','questionnaire.php?theme=7901&type_ent_stat=1','','220');
-oCMenu.makeMenu('7801','1030','Informations - Personnel','questionnaire.php?theme=7801&type_ent_stat=1','','220');
-oCMenu.makeMenu('8101','1030','Récapitulatif Enseignant ','questionnaire.php?theme=8101&type_ent_stat=1','','220');
-oCMenu.makeMenu('7701','1030','Effectifs GP par age','questionnaire.php?theme=7701&type_ent_stat=1','','220');
-oCMenu.makeMenu('13301','1030','Handicap','questionnaire.php?theme=13301&type_ent_stat=1','','220');
-oCMenu.makeMenu('15501','1030','Réfugies','questionnaire.php?theme=15501&type_ent_stat=1','','220');
-oCMenu.makeMenu('13101','1030','Coordonnés des responsables locaux de la collecte de données','questionnaire.php?theme=13101&type_ent_stat=1','','220');
+oCMenu.makeMenu('101','1030','Identification & Localisation','questionnaire.php?theme=101&type_ent_stat=1','','200');
+oCMenu.makeMenu('201','1030','DonnÃ©es GÃ©nÃ©rales','questionnaire.php?theme=201&type_ent_stat=1','','200');
+oCMenu.makeMenu('401','1030','Mobiliers & Equipements','questionnaire.php?theme=401&type_ent_stat=1','','200');
+oCMenu.makeMenu('501','1030','Infos relatives aux enfants','questionnaire.php?theme=501&type_ent_stat=1','','200');
+oCMenu.makeMenu('8201','1030','Protection des enfants et donnees financieres presco','questionnaire.php?theme=8201&type_ent_stat=1','','200');
+oCMenu.makeMenu('601','1030','Infos sur le personnel','questionnaire.php?theme=601&type_ent_stat=1','','200');
+oCMenu.makeMenu('7601','1030','Liste Personnel','questionnaire.php?theme=7601&type_ent_stat=1','','200');
 
 //Leave this line - it constructs the menu
             oCMenu.construct();

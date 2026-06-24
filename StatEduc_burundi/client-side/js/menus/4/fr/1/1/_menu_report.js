@@ -30,6 +30,15 @@
             oCMenu.level[2]=new cm_makeLevel(110,22,"clS2","clS2over");
             oCMenu.level[3]=new cm_makeLevel(140,22);oCMenu.fromLeft=512;
             oCMenu.level[1]=new cm_makeLevel(102,22,"clS","clSover",1,1,"clB",0,"right",0,0,"client-side/image/menu_arrow.php",10,10);
+oCMenu.makeMenu('21','30030','Nombre Etablissements','synthese.php?val=list_rpt&id_rpt=2&type_rpt=&id_syst=1','','270');
+oCMenu.makeMenu('31','30030','Effectifs élèves','#','','270');
+oCMenu.makeMenu('11','31','Effectifs élèves par niveau et âge','synthese.php?val=list_rpt&id_rpt=1&type_rpt=1&id_syst=1','','270');
+oCMenu.makeMenu('41','31','Effectifs élèves par niveau et nationalité','synthese.php?val=list_rpt&id_rpt=4&type_rpt=1&id_syst=1','','270');
+oCMenu.makeMenu('51','30030','Salles de classe','synthese.php?val=list_rpt&id_rpt=5&type_rpt=&id_syst=1','','270');
+oCMenu.makeMenu('61','30030','Manuels élèves','synthese.php?val=list_rpt&id_rpt=6&type_rpt=&id_syst=1','','270');
+oCMenu.makeMenu('71','30030','Personnel','#','','270');
+oCMenu.makeMenu('81','71','Personnel enseignant par niveau et diplôme/certificat','synthese.php?val=list_rpt&id_rpt=8&type_rpt=1&id_syst=1','','270');
+oCMenu.makeMenu('91','71','Personnel enseignant par nationalité  et diplôme/certificat','synthese.php?val=list_rpt&id_rpt=9&type_rpt=1&id_syst=1','','270');
 
 //Leave this line - it constructs the menu
             oCMenu.construct();
