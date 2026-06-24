@@ -547,7 +547,11 @@ class grille {
 		$sql 						=   ' SELECT A.*, B.FRAME, B.NB_LIGNES_FRAME  FROM DICO_THEME  A, DICO_THEME_SYSTEME B '.
                                         ' WHERE A.ID=B.ID '.
                                         ' AND A.ID='.$id_theme.
-                                        ' AND B.ID_SYSTEME='.$id_systeme;
+                                        ' AND B.ID_SYSTEME='.$id_systeme.
+                                        // Session 28 : filtre APPARTENANCE pour isoler le bon FRAME classique vs mobile
+                                        // Sans ce filtre, quand ID=900 existe en APPARTENANCE=1 ET APPARTENANCE=2,
+                                        // la requete retourne 2 lignes et prend le mauvais FRAME (ex: infos_gen_2.html au lieu de 9002.html)
+                                        (isset($_SESSION['type_ent_stat']) && $_SESSION['type_ent_stat']<>'' ? ' AND B.APPARTENANCE='.$_SESSION['type_ent_stat'] : '');
 									  
 		// Traitement Erreur Cas : Execute / GetOne
 		try {            
