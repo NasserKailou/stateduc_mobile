@@ -740,7 +740,8 @@ class frame_mobile{
                 $html		.= " ".' ID=\''. $this->dico[0][MESURE1].'_'.$Ligne."_".$i .'\' '."NAME='".$this->dico[0][MESURE1].'_'.$Ligne."_".$i."' ";
 				$html		.= "name_base='".$this->dico[0][MESURE1].'_#_'.$i."' ";
                 if ($type_mesure1=='checkbox'){
-                    $html		.= "VALUE='".$this->dico[0][MESURE1].'_'.$Ligne."_".$i."' data-mini='true' ";
+                    // @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE matrice_2D MESURE1 checkbox
+					$html		.= "VALUE='1' data-mini='true' ";
                 }else{
                     $html		.= "VALUE='' ".$set_TOTAL_2Dim;
                 }
@@ -756,7 +757,8 @@ class frame_mobile{
                     $html		.= " ".' ID=\''. $this->dico[0][MESURE2].'_'.$Ligne."_".$i .'\' '."NAME='".$this->dico[0][MESURE2].'_'.$Ligne."_".$i."' ";
 					$html		.= "name_base='".$this->dico[0][MESURE1].'_#_'.$i."' ";
                 if ($type_mesure2=='checkbox'){
-                    $html		.= "VALUE='".$this->dico[0][MESURE2].'_'.$Ligne."_".$i."' data-mini='true' ";
+                    // @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE matrice_2D MESURE2 checkbox
+					$html		.= "VALUE='1' data-mini='true' ";
                 }else{
                     $html		.= "VALUE='' ".$set_TOTAL_2Dim;
                 }
@@ -1017,7 +1019,8 @@ class frame_mobile{
                                 $html		.= " ".' ID=\''. $this->dico[0][MESURE1].'_'.$ligne .'\' '."NAME='".$this->dico[0][MESURE1].'_'.$ligne."' ";
 								$html		.= "name_base='".$this->dico[0][MESURE1].'_#\' ';
                                 if ($type_mesure1 =='checkbox'){
-                                    $html		.= "VALUE='".$this->dico[0][MESURE1].'_'.$ligne."' data-mini='true'  ";
+                                    // @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE matrice_1D MESURE1 radio
+											$html		.= "VALUE='1' data-mini='true'  ";
                                 }else{
                                     $html		.= "VALUE='' ";
                                 }
@@ -1041,7 +1044,8 @@ class frame_mobile{
                                     $html		.= " ".' ID=\''. $this->dico[0][MESURE2].'_'.$ligne .'\' '."NAME='".$this->dico[0][MESURE2].'_'.$ligne."' ";
 									$html		.= "name_base='".$this->dico[0][MESURE2].'_#\' ';
                                     if ($type_mesure2=='checkbox'){
-                                        $html		.= "VALUE='".$this->dico[0][MESURE2].'_'.$ligne."' data-mini='true' ";
+                                        // @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE matrice_1D MESURE2 radio
+													$html		.= "VALUE='1' data-mini='true' ";
                                     }else{
                                         $html		.= "VALUE='' ";
                                     }
@@ -1147,8 +1151,9 @@ class frame_mobile{
                         $html		.= "<INPUT TYPE='".$type_mesure1."'";
                         $html		.= " ".' ID=\''. $this->dico[0][MESURE1]."_".$Ligne .'\' '."NAME='".$this->dico[0][MESURE1]."_".$Ligne."' ";
 						$html		.= "name_base='".$this->dico[0][MESURE1].'_#\' ';
+                        // @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE matrice_1D MESURE1 checkbox (Ligne)
                         if ($type_mesure1 == 'checkbox'){
-                            $html		.= "VALUE='".$this->dico[0][MESURE1]."_".$Ligne."' data-mini='true' ";
+                            $html		.= "VALUE='1' data-mini='true' ";
                         }else{
                             $html		.= "VALUE='' ";
                         }
@@ -1201,7 +1206,8 @@ class frame_mobile{
                     $html		.= " ".' ID=\''. $this->dico[0][MESURE1].'_'.$colonne .'\' '."NAME='".$this->dico[0][MESURE1].'_'.$colonne."' ";
 					$html		.= "name_base='".$this->dico[0][MESURE1].'_#\' ';
                     if ($type_mesure1	=='checkbox'){
-                        $html		.= "VALUE='".$this->dico[0][MESURE1].'_'.$colonne."' data-mini='true' ";
+                        // @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE matrice_1D MESURE1 radio (colonne)
+					$html		.= "VALUE='1' data-mini='true' ";
                     }else{
                         $html		.= "VALUE='' ";
                     }
@@ -1219,7 +1225,8 @@ class frame_mobile{
                         $html		.= " ".' ID=\''. $this->dico[0][MESURE2].'_'.$colonne .'\' '."NAME='".$this->dico[0][MESURE2].'_'.$colonne."' ";
 						$html		.= "name_base='".$this->dico[0][MESURE2].'_#\' ';
                         if ($type_mesure2	=='checkbox'){
-                            $html		.= "VALUE='".$this->dico[0][MESURE2].'_'.$colonne."' data-mini='true' ";
+                            // @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE matrice_1D MESURE2 radio (colonne)
+					$html		.= "VALUE='1' data-mini='true' ";
                         }else{
                             $html		.= "VALUE='' ";
                         }
@@ -1385,6 +1392,7 @@ class frame_mobile{
         
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE attributes (session 25)
 		function formulaire_concat_zone_html($element,$langue,$id_systeme){
 				$html ='';
 				static $deja_aff_sys = array(); // permet de ne pas repeter un objet de type cl� � l'affichage
@@ -1392,18 +1400,21 @@ class frame_mobile{
 				if($element['TYPE_OBJET']=='booleen'){
 						$html.= '<label for="'.$element['CHAMP_PERE']."_0_1".'">'.$GLOBALS['libelle_oui'].'</label>';
 						$html.= "<INPUT NAME='".$element['CHAMP_PERE']."_0"."' TYPE='radio' ".$element['ATTRIB_OBJET']." ";
-						$html.= "".' ID=\''. $element['CHAMP_PERE']."_0_1" .'\' '."VALUE='".$element['CHAMP_PERE']."_0_1"."' data-mini='true'>\n";
+						// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE booleen OUI
+						$html.= "".' ID=\''. $element['CHAMP_PERE']."_0_1" .'\' '."VALUE='1' data-mini='true'>\n";
 						
 						$html.= '<label for="'.$element['CHAMP_PERE']."_0_0".'">'.$GLOBALS['libelle_non'].'</label>';
 						$html.= "<INPUT NAME='".$element['CHAMP_PERE']."_0"."' TYPE='radio' ".$element['ATTRIB_OBJET']." ";
-						$html.= "".' ID=\''. $element['CHAMP_PERE']."_0_0" .'\' '."VALUE='".$element['CHAMP_PERE']."_0_0"."' data-mini='true'>\n";
+						// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE booleen NON
+						$html.= "".' ID=\''. $element['CHAMP_PERE']."_0_0" .'\' '."VALUE='0' data-mini='true'>\n";
 						
 				}
 				elseif($element['TYPE_OBJET']=='checkbox'){
 						//////////////////////
 						
 						$html.= "<INPUT NAME='".$element['CHAMP_PERE']."_0"."' TYPE='checkbox' ".$element['ATTRIB_OBJET']." ";
-						$html.= "".' ID=\''. $element['CHAMP_PERE']."_0" .'\' '."VALUE='".$element['CHAMP_PERE']."_0"."' data-mini='true'>\n";
+						// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE checkbox
+						$html.= "".' ID=\''. $element['CHAMP_PERE']."_0" .'\' '."VALUE='1' data-mini='true'>\n";
 						//////////////////////
 				}
 				elseif($element['TYPE_OBJET']=='text'){
@@ -1442,7 +1453,8 @@ class frame_mobile{
 							$result_nomenc 	= $this->requete_nomenclature($element['TABLE_FILLE'], $element['CHAMP_FILS'], $element['CHAMP_PERE'], $langue ,$id_systeme, $element['SQL_REQ']); 
 							foreach($result_nomenc as $element_result_nomenc){
 									//Un valeur du combo pour chaque valeur de la nomenclature 
-									$html 	.= "\t\t\t<OPTION VALUE=".$element['CHAMP_PERE']."_0_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])].">"; 
+									// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE combo option
+							$html 	.= "\t\t\t<OPTION VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."'>"; 
 									// Lecture des libell�s de la table de nomenclature
 					
 									$html 	.= $element_result_nomenc['LIBELLE']."</OPTION>\n"; 
@@ -1487,6 +1499,7 @@ class frame_mobile{
 		}
 
 		
+		// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE attributes (session 25)
 		function get_cell_matrice($ligne ,$code_dims, $element, $fonc_total, $langue, $id_systeme){
 			
 				$html 		= '';
@@ -1495,18 +1508,21 @@ class frame_mobile{
 						
 						$html.= '<label for="'.$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_1".'">'.$GLOBALS['libelle_oui'].'</label>';
 						$html.= "<INPUT".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$code_dims."_1" .'\' '." NAME='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."' TYPE='radio' ".$element['ATTRIB_OBJET']." ";
-						$html.= "VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_1' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'>\n";
+						// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE get_cell_matrice booleen OUI
+						$html.= "VALUE='1' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'>\n";
 						
 						$html.= '<label for="'.$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_0".'">'.$GLOBALS['libelle_non'].'</label>';
 						$html.= "<INPUT ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$code_dims."_0" .'\' '."NAME='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."' TYPE='radio' ".$element['ATTRIB_OBJET']." ";
-						$html.= "VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_0' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'>\n";
+						// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE get_cell_matrice booleen NON
+						$html.= "VALUE='0' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'>\n";
 						
 				}
 				elseif($element['TYPE_OBJET']=='checkbox'){
 						//////////////////////
 						
 						$html.= "<INPUT name_base='".$element['CHAMP_PERE']."_#_".$code_dims."' ID='". $element['CHAMP_PERE']."_".$ligne."_".$code_dims ."' NAME='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."' TYPE='checkbox' ".$element['ATTRIB_OBJET']." ";
-						$html.= "VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'>\n";
+						// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE get_cell_matrice checkbox
+						$html.= "VALUE='1' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'>\n";
 						//////////////////////
 				}
 				elseif($element['TYPE_OBJET']=='text'){
@@ -1523,7 +1539,8 @@ class frame_mobile{
 						$result_nomenc 	= $this->requete_nomenclature($element['TABLE_FILLE'], $element['CHAMP_FILS'], $element['CHAMP_PERE'], $langue ,$id_systeme, $element['SQL_REQ']); 
 						foreach($result_nomenc as $element_result_nomenc){
 								//Un valeur du combo pour chaque valeur de la nomenclature 
-								$html 	.= "\t\t\t<OPTION VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."'>"; 
+								// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE get_cell_matrice combo OPTION
+								$html 	.= "\t\t\t<OPTION VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."'>"; 
 								// Lecture des libell�s de la table de nomenclature
 				
 								$html 	.= $element_result_nomenc['LIBELLE']."</OPTION>\n"; 
@@ -1540,7 +1557,8 @@ class frame_mobile{
 							$html		.= "\t\t\t<tr>\n";
 							$html		.= "\t\t\t\t<td nowrap='nowrap'>".'<label for="'.$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])].'">'.$element_result_nomenc['LIBELLE'].'</label>'."</td>\n";
 							$html		.= "\t\t\t\t<td>"."<INPUT".' name_base=\''.$element['CHAMP_PERE']."_#_".$code_dims.'\' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$code_dims."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '." NAME='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."' TYPE='radio' 
-											VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'></td>\n"; 
+// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE get_cell_matrice liste_radio
+											VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true' tabindex='".$GLOBALS['cell_mat_index']."'></td>\n"; 
 							$html		.= "\t\t\t</tr>\n";
 						}
 						 
@@ -2706,7 +2724,8 @@ class frame_mobile{
 																$zone_ref = get_zone_ref_of($element['ID_ZONE_REF']);
 																$html.= "".' ID=\''. $element['CHAMP_PERE']."_0_".$liste_choix[$ordre][$this->get_champ_extract($zone_ref['CHAMP_FILS'])] .'\' '."VALUE=''>";
 															}else{
-																$html.= "".' ID=\''. $element['CHAMP_PERE']."_0_".$liste_choix[$ordre][$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."VALUE='".$element['CHAMP_PERE']."_0_".$liste_choix[$ordre][$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'>";
+																// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE generer_frame_formulaire nomenclature radio
+																$html.= "".' ID=\''. $element['CHAMP_PERE']."_0_".$liste_choix[$ordre][$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."VALUE='".$liste_choix[$ordre][$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'>";
 															}
 															// Fin Modif Alassane
 															
@@ -3553,7 +3572,8 @@ class frame_mobile{
 							case 'booleen':
 								foreach($result_nomenc as $element_result_nomenc){
 									//Un bouton radio pour chaque valeur de la nomenclature
-									$html       .= "\t\t<TD ".$style_align_middle." class='".$classe_fond."' id='".'ligne-paire'.'_'.$j.'_'.$i_TD."'><input name_base='".$element['CHAMP_PERE']."_#_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' id='".$element['CHAMP_PERE']."_".$j."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' name='".$element['CHAMP_PERE']."_".$j."' type='radio' value='".$element['CHAMP_PERE']."_".$j."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'>";
+									$html       .= "\t\t<TD ".$style_align_middle." class='".$classe_fond."' id='".'ligne-paire'.'_'.$j.'_'.$i_TD."'><input name_base='".$element['CHAMP_PERE']."_#_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' id='".$element['CHAMP_PERE']."_".$j."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])].// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE grille radio inline
+												"' name='".$element['CHAMP_PERE']."_".$j."' type='radio' value='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'>";
 								  	$html       .= "</TD>\n";
 									$i_TD++;
 									( ($aff_total_vertic == true)  && ($j == 0) ) ? ( $last_tr_tot .= '<td></td>' ) : ( $last_tr_tot .= '' ) ;
@@ -3562,7 +3582,8 @@ class frame_mobile{
 							case 'liste_checkbox':
 								foreach($result_nomenc as $element_result_nomenc){
 									$html       .= "\t\t<TD ".$style_align_middle." class='".$classe_fond."' id='".$classe_fond.'_'.$j.'_'.$i_TD."'><INPUT ".' name_base=\''.$element['CHAMP_PERE']."_#_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])].'\' ID=\''. $element['CHAMP_PERE']."_".$j."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$j."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]." TYPE='checkbox'";
-									$html       .= " VALUE='".$element['CHAMP_PERE']."_".$j."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+									// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE grille liste_checkbox
+								$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 									$html       .= ">";
 															  $html       .= "</TD>\n";
 																$i_TD++;
@@ -3597,7 +3618,8 @@ class frame_mobile{
 								}else{
 									foreach($result_nomenc as $element_result_nomenc){
 										//Un valeur du combo pour chaque valeur de la nomenclature 
-										$html 	.= "\t\t\t<OPTION VALUE='".$element['CHAMP_PERE']."_".$j."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."'>"; 
+										// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE grille combo OPTION
+										$html 	.= "\t\t\t<OPTION VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."'>"; 
 								
 										$html 	.= $element_result_nomenc['LIBELLE']."</OPTION>\n"; 
 									}
@@ -3617,7 +3639,8 @@ class frame_mobile{
 												
 						case 'checkbox':
 							$html 	        .= "\t\t<TD ".$style_align_middle." class='".$classe_fond."'  id='".$classe_fond.'_'.$j.'_'.$i_TD."'><INPUT ".' name_base=\''.$element['CHAMP_PERE']."_#".'\' ID=\''. $element['CHAMP_PERE']."_".$j .'\' '."NAME=".$element['CHAMP_PERE']."_".$j." TYPE='checkbox'";
-							$html 	        .= " VALUE='".$element['CHAMP_PERE']."_".$j."' data-mini='true'"; 
+							// @auteur kailounasser@gmail.com - Abdoul Nasser Kailou — fix VALUE grille checkbox
+								$html 	        .= " VALUE='1' data-mini='true'"; 
 							$html       		.= ">";
 												$html 	        .= "</TD>\n";
 												$i_TD++;
@@ -4337,7 +4360,7 @@ class frame_mobile{
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 												$tabindex[$ligne]++;
 												$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-												$html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+												$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 												$html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
 										}
 										$html 					.= "\t".'</TR>'."\n";
@@ -4638,7 +4661,7 @@ class frame_mobile{
 								for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 									$tabindex[$ligne]++;
 									$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-									$html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+									$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 									$html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
 								}
 								$html 					.= "\t".'</TR>'."\n";
@@ -4658,7 +4681,7 @@ class frame_mobile{
 								$tabindex[$ligne]++;
 								$html .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'>";
 								$html 	        .= "<INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne .'\' '."NAME='".$element['CHAMP_PERE']."_".$ligne."' TYPE='checkbox' ";
-								$html 	        .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."' data-mini='true'"; 
+								$html 	        .= " VALUE='1' data-mini='true'"; 
 								$html 	        .= $element['ATTRIB_OBJET']."></TD>\n";
 							}
 							$html 			.= "\t".'</TR>'."\n";
@@ -5246,7 +5269,7 @@ class frame_mobile{
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 												$tabindex[$ligne]++;
 												$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-												$html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+												$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 												$html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
 										}
 										$html 					.= "\t".'</TR>'."\n";
@@ -5495,7 +5518,7 @@ class frame_mobile{
 								for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 									$tabindex[$ligne]++;
 									$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-									$html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+									$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 									$html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
 								}
 								$html 					.= "\t".'</TR>'."\n";
@@ -5515,7 +5538,7 @@ class frame_mobile{
 								$tabindex[$ligne]++;
 								$html .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'>";
 								$html 	        .= "<INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne .'\' '."NAME='".$element['CHAMP_PERE']."_".$ligne."' TYPE='checkbox' ";
-								$html 	        .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."' data-mini='true'"; 
+								$html 	        .= " VALUE='1' data-mini='true'"; 
 								$html 	        .= $element['ATTRIB_OBJET']."></TD>\n";
 							}
 							$html 			.= "\t".'</TR>'."\n";
@@ -6229,7 +6252,7 @@ class frame_mobile{
 											for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 													$tabindex[$ligne]++;
 													$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])] .'\' '."NAME='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' TYPE='radio'";
-													$html       .= " VALUE='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
+													$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
 													$html       .= "".$dico[$i_elem]['ATTRIB_OBJET']."></TD>\n";
 											}
 											$html 					.= "\t".'</TR>'."\n";
@@ -6241,7 +6264,7 @@ class frame_mobile{
 									$html		.= "\t\t\t\t<td nowrap='nowrap'>".$element_result_nomenc['LIBELLE']."</td>\n";
 									foreach($result_nomenc as $element_result_nomenc){
 										$html		.= "\t\t\t\t<td>"."<INPUT".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$code_dims."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '." NAME='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."' TYPE='radio' 
-														VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$code_dims."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'></td>\n"; 
+														VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'></td>\n"; 
 										$html		.= "\t\t\t</tr>\n";
 									}
 									*/
@@ -6585,7 +6608,7 @@ class frame_mobile{
 									for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 										$tabindex[$ligne]++;
 										$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $dico[$i_elem]['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])] .'\' '."NAME=".$dico[$i_elem]['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-										$html       .= " VALUE='".$dico[$i_elem]['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
+										$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
 										$html       .= "".$dico[$i_elem]['ATTRIB_OBJET']."></TD>\n";
 									}
 									$html 					.= "\t".'</TR>'."\n";
@@ -6605,7 +6628,7 @@ class frame_mobile{
 									$tabindex[$ligne]++;
 									$html .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'>";
 									$html 	        .= "<INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])].'\' '."NAME='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' TYPE='checkbox' ";
-									$html 	        .= " VALUE='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' data-mini='true'"; 
+									$html 	        .= " VALUE='".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' data-mini='true'"; 
 									$html 	        .= $dico[$i_elem]['ATTRIB_OBJET']."></TD>\n";
 								}
 								$html 			.= "\t".'</TR>'."\n";
@@ -7191,7 +7214,7 @@ class frame_mobile{
 											for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 													$tabindex[$ligne]++;
 													$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])] .'\' '."NAME='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' TYPE='radio'";
-													$html       .= " VALUE='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
+													$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
 													$html       .= "".$dico[$i_elem]['ATTRIB_OBJET']."></TD>\n";
 											}
 											
@@ -7492,7 +7515,7 @@ class frame_mobile{
 									for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
 										$tabindex[$ligne]++;
 										$html       .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $dico[$i_elem]['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])] .'\' '."NAME=".$dico[$i_elem]['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-										$html       .= " VALUE='".$dico[$i_elem]['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
+										$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($dico[$i_elem]['CHAMP_PERE'])]."' data-mini='true'"; 
 										$html       .= "".$dico[$i_elem]['ATTRIB_OBJET']."></TD>\n";
 									}
 									$html 					.= "\t".'</TR>'."\n";
@@ -7513,7 +7536,7 @@ class frame_mobile{
 									$tabindex[$ligne]++;
 									$html .= "\t\t<TD COLSPAN=".($nb_colspan_2 * $nb_cols_zone_mat)." class='".$classe_fond."'>";
 									$html 	        .= "<INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])].'\' '."NAME='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' TYPE='checkbox' ";
-									$html 	        .= " VALUE='".$dico[$i_elem]['CHAMP_PERE']."_0_".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' data-mini='true'"; 
+									$html 	        .= " VALUE='".$this->mat_nomenc_col[$ligne][$this->get_champ_extract($this->mat_dim_col['CHAMP_FILS'])]."' data-mini='true'"; 
 									$html 	        .= $dico[$i_elem]['ATTRIB_OBJET']."></TD>\n";
 								}
 								$html 			.= "\t".'</TR>'."\n";
@@ -7840,7 +7863,7 @@ if(!isset($classe_fond)) {
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
                                                 $tabindex[$ligne]++;
 												$html       .= "\t\t<TD COLSPAN='$nb_colspan_2' class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-												$html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+												$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 												$html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
 										}
 										$html 					.= "\t".'</TR>'."\n";
@@ -8133,7 +8156,7 @@ if(!isset($classe_fond)) {
                                 for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
                                     $tabindex[$ligne]++;
                                     $html       .= "\t\t<TD COLSPAN='$nb_colspan_2' class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-                                    $html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+                                    $html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
                                     $html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
                                 }
                                 $html 					.= "\t".'</TR>'."\n";
@@ -8153,7 +8176,7 @@ if(!isset($classe_fond)) {
                                 $tabindex[$ligne]++;
                                 $html.= "\t\t<TD COLSPAN='$nb_colspan_2' class='".$classe_fond."'>";
                                 $html 	        .= "<INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne .'\' '."NAME='".$element['CHAMP_PERE']."_".$ligne."' TYPE='checkbox' ";
-                                $html 	        .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."' data-mini='true'"; 
+                                $html 	        .= " VALUE='1' data-mini='true'"; 
                                 $html 	        .= $element['ATTRIB_OBJET']."></TD>\n";
                             }
                             $html 			.= "\t".'</TR>'."\n";
@@ -8473,7 +8496,7 @@ if(!isset($classe_fond)) {
 										for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
                                                 $tabindex[$ligne]++;
 												$html       .= "\t\t<TD COLSPAN='$nb_colspan_2' class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-												$html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+												$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 												$html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
 										}
 										$html 					.= "\t".'</TR>'."\n";
@@ -8738,7 +8761,7 @@ if(!isset($classe_fond)) {
                                 for( $ligne=0; $ligne < $NB_LIGNE_ECRAN; $ligne++ ){
                                     $tabindex[$ligne]++;
                                     $html       .= "\t\t<TD COLSPAN='$nb_colspan_2' class='".$classe_fond."'><INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-                                    $html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+                                    $html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
                                     $html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
                                 }
                                 $html 					.= "\t".'</TR>'."\n";
@@ -8758,7 +8781,7 @@ if(!isset($classe_fond)) {
                                 $tabindex[$ligne]++;
                                 $html .= "\t\t<TD COLSPAN='$nb_colspan_2' class='".$classe_fond."'>";
                                 $html 	        .= "<INPUT tabindex='".$tabindex[$ligne]."' ".' ID=\''. $element['CHAMP_PERE']."_".$ligne .'\' '."NAME='".$element['CHAMP_PERE']."_".$ligne."' TYPE='checkbox' ";
-                                $html 	        .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."' data-mini='true'"; 
+                                $html 	        .= " VALUE='1' data-mini='true'"; 
                                 $html 	        .= $element['ATTRIB_OBJET']."></TD>\n";
                             }
                             $html 			.= "\t".'</TR>'."\n";
@@ -9204,7 +9227,7 @@ if(!isset($classe_fond)) {
 								elseif($element['TYPE_OBJET'] == 'checkbox'){
 											$html 	        .= "\t\t<TD class='".$classe_fond."'  id='".$classe_fond.'_'.$ligne.'_'.$i_TD."'>
 																<INPUT ".' ID=\''. $element['CHAMP_PERE']."_".$ligne .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='checkbox'";
-											$html 	        .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."' data-mini='true'"; 
+											$html 	        .= " VALUE='1' data-mini='true'"; 
 											$html       		.= ">";
 											$html 	        .= "</TD>\n";
 											$i_TD++;
@@ -9229,7 +9252,7 @@ if(!isset($classe_fond)) {
 										$result_nomenc 		= $this->requete_nomenclature($element['TABLE_FILLE'],$element['CHAMP_FILS'], $element['CHAMP_PERE'], $langue ,$id_systeme, $element['SQL_REQ']);
 										foreach($result_nomenc as $element_result_nomenc){		
 												$html       .= "\t\t<TD class='".$classe_fond."' id='".$classe_fond.'_'.$ligne.'_'.$i_TD."'><INPUT ".' ID=\''. $element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])] .'\' '."NAME=".$element['CHAMP_PERE']."_".$ligne." TYPE='radio'";
-												$html       .= " VALUE='".$element['CHAMP_PERE']."_".$ligne."_".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
+												$html       .= " VALUE='".$element_result_nomenc[$this->get_champ_extract($element['CHAMP_PERE'])]."' data-mini='true'"; 
 												$html       .= "".$element['ATTRIB_OBJET']."></TD>\n";
 												$i_TD++;
 										}
