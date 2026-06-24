@@ -542,6 +542,13 @@ class grille {
 		//Fin ajout Hebie
 		$conn					= $GLOBALS['conn'];
         unset($dico); // préparation de la variable DICO
+        // === SESSION 28 DIAG : entree get_dico ===
+        $_diag_appart_top = isset($_SESSION['type_ent_stat']) ? $_SESSION['type_ent_stat'] : 'UNDEF';
+        $_diag_top = date('Y-m-d H:i:s').';get_dico_ENTER;id_theme='.$id_theme.';id_systeme='.$id_systeme.';type_ent_stat='.$_diag_appart_top."\n";
+        error_log('[DIAG_S28_TOP] '.$_diag_top);
+        @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_top, FILE_APPEND);
+        @file_put_contents('/tmp/diag_stateduc.log', $_diag_top, FILE_APPEND);
+        // === FIN SESSION 28 DIAG ===
         
         // pour récupérer le nom du FRAME, le nombre de lignes, et la CLASSE
 		$sql 						=   ' SELECT A.*, B.FRAME, B.NB_LIGNES_FRAME  FROM DICO_THEME  A, DICO_THEME_SYSTEME B '.
@@ -567,8 +574,21 @@ class grille {
 		}
 		catch (Exception $e) {
 			$erreur = new erreur_manager($e,$sql);
+        $_diag_fe = date('Y-m-d H:i:s').';get_dico_FRAME_ERR;id_theme='.$id_theme.';id_systeme='.$id_systeme.';msg='.$e->getMessage()."\n";
+        error_log('[DIAG_S28_FRAME_ERR] '.$_diag_fe);
+        @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_fe, FILE_APPEND);
+        @file_put_contents('/tmp/diag_stateduc.log', $_diag_fe, FILE_APPEND);
 		}        
 		// Fin Traitement Erreur Cas : Execute / GetOne
+        // === SESSION 28 DIAG : resultat FRAME ===
+        $_diag_fr = date('Y-m-d H:i:s').';get_dico_FRAME_RESULT;id_theme='.$id_theme.';id_systeme='.$id_systeme.
+            ';frame='.(isset($dico['template'])?$dico['template']:'NULL').
+            ';nb_lignes='.(isset($dico['nb_lignes'])?$dico['nb_lignes']:'NULL').
+            ';sql_frame='.str_replace("\n",' ',$sql)."\n";
+        error_log('[DIAG_S28_FRAME_RES] '.$_diag_fr);
+        @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_fr, FILE_APPEND);
+        @file_put_contents('/tmp/diag_stateduc.log', $_diag_fr, FILE_APPEND);
+        // === FIN ===
 		///
 
 		// récupération des zones de saisie de la grille
