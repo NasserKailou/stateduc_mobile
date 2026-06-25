@@ -14,7 +14,8 @@ import 'services/database_service.dart';
 import 'screens/splash/splash_screen.dart';
 
 // ─── Global SSL override ─────────────────────────────────────────────────────
-// Le serveur StatEduc est déployé sur un intranet MEN avec des certificats
+// Le serveur StatEduc est déployé sur un Serveur du MEN avec des certificats
+//accessible a travers le liens https://stateduc.mineduc.gov.bi/
 // auto-signés ou sans HTTPS. Cet override permet à tous les HttpClient créés
 // dans l'application d'accepter ces certificats.
 // NOTE : n'affecte que les connexions via dart:io HttpClient.
