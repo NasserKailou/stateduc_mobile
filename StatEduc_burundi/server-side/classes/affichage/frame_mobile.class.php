@@ -180,6 +180,25 @@ class frame_mobile{
 	//             Seule la presentation est affectee.
 	//             Ne pas supprimer ni modifier les appels metier qui suivent.
 	// =========================================================================
+	// =========================================================================
+	// _get_mobile_css_js()  — session 24 base + session 31 enrichi + session 32 fix
+	//
+	// CORRECTIONS session 32 :
+	//   1. Suppression du classement mobile-card-table par nb de colonnes :
+	//      les tableaux de DONNÉES (matrices avec champs NB_/TOT_) ne sont
+	//      JAMAIS transformés en carte — leur structure HTML est préservée.
+	//      Seuls les tableaux de MISE EN PAGE sans champs de saisie (wrappeurs
+	//      externes) reçoivent éventuellement le scroll horizontal si > 5 cols.
+	//   2. Stub set_TOTAL_MatFrml / set_TOTAL_MatFrml_Champ : ces fonctions
+	//      serveur-side dépendent de jQuery qui n'existe pas dans le WebView
+	//      Flutter. Sans stub, leur appel via onchange lève une ReferenceError
+	//      qui interrompt la propagation des événements et casse le pont
+	//      FieldChanged → données non transmises → non insérées en base.
+	//   3. Auto-totaux pure-JS (sans jQuery) pour matrices TOT_ :
+	//      remplace la logique serveur pour les champs NB_*_LIGNE_COL,
+	//      met à jour TOT_*_ALL_MES_LIGNE_*, TOT_*_ALL_MES_COLONNE_* et
+	//      TOT_*_ALL_MES_0 à chaque saisie.
+	// =========================================================================
 	function _get_mobile_css_js() {
 		$html = '';
 		// ── CSS ──────────────────────────────────────────────────────────────
@@ -214,7 +233,9 @@ class frame_mobile{
 		$html .= "body.mobile-optimized-fragment { padding: 10px !important; }\n";
 		$html .= "div[align=center], div[align='center'] { width: 100%; max-width: 100%; }\n";
 		$html .= "form[name='form1'] { width: 100%; max-width: 100%; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; max-width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: fixed; background: var(--card-bg); }\n";
+		// session 32 : table-layout:auto permet aux colonnes de s'adapter à leur contenu
+		// sans forcer une largeur fixe qui écrase les petites cellules numériques
+		$html .= ".table-questionnaire { width: 100% !important; max-width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: auto; background: var(--card-bg); }\n";
 		$html .= ".table-questionnaire td, .table-questionnaire th { line-height: 1.35; border-color: var(--line) !important; }\n";
 		$html .= "tr.ligne-titre td, tr.ligne-titre th, .ligne-titre { background: var(--title-bg) !important; color: var(--title-fg); }\n";
 		$html .= "input[type=text], input[type=number], select, textarea { min-height: 46px; width: 100% !important; max-width: 100% !important; padding: 10px 12px !important; font-size: 16px !important; line-height: 1.25; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; background: #fff; box-shadow: inset 0 1px 2px rgba(17,37,63,.04); }\n";
@@ -225,11 +246,13 @@ class frame_mobile{
 		$html .= ".option-chip:hover { background: #f9fbff; }\n";
 		$html .= ".option-chip.is-checked { background: var(--soft); border-color: #96b3ea; }\n";
 		$html .= ".field-active { outline: 2px solid var(--focus); outline-offset: 2px; background: #fffef7 !important; }\n";
+		// .table-mobile-scroll : uniquement pour tableaux larges (> 5 colonnes) wrappés par JS
 		$html .= ".table-mobile-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); margin: 8px 0 14px; }\n";
-		$html .= ".table-mobile-scroll > .table-questionnaire { min-width: 980px; border: 0 !important; }\n";
+		$html .= ".table-mobile-scroll > .table-questionnaire { min-width: 600px; border: 0 !important; }\n";
 		$html .= ".table-mobile-scroll::after { content: '\u21c6 Faites d\u00e9filer horizontalement'; display: block; padding: 8px 12px 10px; color: var(--muted); font-size: 12px; background: linear-gradient(180deg,rgba(255,255,255,0),rgba(245,247,251,1)); }\n";
 		$html .= ".table-mobile-scroll td:first-child, .table-mobile-scroll th:first-child { position: sticky; left: 0; z-index: 2; background: inherit; box-shadow: 1px 0 0 var(--line); }\n";
-		$html .= ".table-mobile-scroll tr:first-child td, .table-mobile-scroll tr:first-child th, .table-mobile-scroll tr:nth-child(2) td, .table-mobile-scroll tr:nth-child(2) th { position: sticky; top: 0; z-index: 3; }\n";
+		// session 32 : .mobile-card-table conservé en CSS mais N'EST PLUS appliqué aux tableaux de données
+		// (il peut encore servir pour les tableaux purement de mise en forme sans inputs numériques)
 		$html .= ".mobile-card-table { border: 0 !important; background: transparent !important; }\n";
 		$html .= ".mobile-card-table > tbody > tr { display: block; margin: 0 0 12px; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }\n";
 		$html .= ".mobile-card-table > tbody > tr > td, .mobile-card-table > tbody > tr > th { display: block; width: 100% !important; max-width: 100% !important; border-left: 0 !important; border-right: 0 !important; padding: 10px 12px !important; white-space: normal !important; }\n";
@@ -239,31 +262,169 @@ class frame_mobile{
 		$html .= ".mobile-card-table > tbody > tr:nth-child(odd) { background: #ffffff; }\n";
 		$html .= ".mobile-card-table > tbody > tr:nth-child(even) { background: #fbfcfe; }\n";
 		$html .= ".mobile-card-table br { display: inline; }\n";
-		$html .= "@media (max-width: 900px) { br { display: inline; } html, body { font-size: 16px !important; } body.mobile-optimized-fragment { padding: 8px !important; } .table-questionnaire { table-layout: auto !important; } }\n";
-		$html .= "@media (max-width: 768px) { .mobile-card-table > tbody > tr > td, .mobile-card-table > tbody > tr > th { font-size: 14px !important; } .table-mobile-scroll > .table-questionnaire { min-width: 920px; } }\n";
+		$html .= "@media (max-width: 900px) { br { display: inline; } html, body { font-size: 16px !important; } body.mobile-optimized-fragment { padding: 8px !important; } }\n";
+		$html .= "@media (max-width: 768px) { .mobile-card-table > tbody > tr > td, .mobile-card-table > tbody > tr > th { font-size: 14px !important; } .table-mobile-scroll > .table-questionnaire { min-width: 480px; } }\n";
 		$html .= "</style>\n";
 		// ── JS UX mobile ─────────────────────────────────────────────────────
 		$html .= "<script>\n";
 		$html .= "(function() {\n";
+		$html .= "  // ── session 32 FIX 1 : Stubs pour les fonctions jQuery serveur-side ──────\n";
+		$html .= "  // set_TOTAL_MatFrml et set_TOTAL_MatFrml_Champ utilisent jQuery ($) qui\n";
+		$html .= "  // n'existe pas dans le WebView Flutter. Sans ces stubs, leur appel via\n";
+		$html .= "  // l'attribut onchange lève une ReferenceError qui coupe la propagation\n";
+		$html .= "  // des événements et empêche le pont FieldChanged de recevoir les valeurs.\n";
+		$html .= "  if (typeof set_TOTAL_MatFrml_Champ === 'undefined') {\n";
+		$html .= "    window.set_TOTAL_MatFrml_Champ = function() { /* stub — remplacé par computeMatrixTotals() */ };\n";
+		$html .= "  }\n";
+		$html .= "  if (typeof set_TOTAL_MatFrml === 'undefined') {\n";
+		$html .= "    window.set_TOTAL_MatFrml = function() { /* stub — remplacé par computeMatrixTotals() */ };\n";
+		$html .= "  }\n";
+		$html .= "  if (typeof set_TOTAL_ThemeMat2D === 'undefined') {\n";
+		$html .= "    window.set_TOTAL_ThemeMat2D = function() { /* stub */ };\n";
+		$html .= "  }\n";
+		$html .= "\n";
+		$html .= "  // ── session 32 FIX 2 : Auto-totaux pure-JS pour matrices NB_/TOT_ ─────────\n";
+		$html .= "  //\n";
+		$html .= "  // Remplace set_TOTAL_MatFrml_Champ pour les WebViews Flutter (pas de jQuery).\n";
+		$html .= "  //\n";
+		$html .= "  // Nommage des champs (exemples réels depuis 9202.html) :\n";
+		$html .= "  //   NB_MOBILIER_ETAT_0_4_1   → mesure=NB_MOBILIER_ETAT, dim=0, ligne=4, col=1\n";
+		$html .= "  //   TOT_{idZone}_ALL_MES_LIGNE_0_{ligne}   → total ligne\n";
+		$html .= "  //   TOT_{idZone}_ALL_MES_COLONNE_0_{col}   → total colonne\n";
+		$html .= "  //   TOT_{idZone}_ALL_MES_0                  → grand total\n";
+		$html .= "  //\n";
+		$html .= "  // La fonction scanne tous les inputs NB_* du même tableau pour recalculer.\n";
+		$html .= "  //\n";
+		$html .= "  function getVal(name) {\n";
+		$html .= "    var el = document.querySelector('[name=\"' + name + '\"]');\n";
+		$html .= "    return el ? (parseFloat(el.value) || 0) : 0;\n";
+		$html .= "  }\n";
+		$html .= "  function setVal(name, val) {\n";
+		$html .= "    var el = document.querySelector('[name=\"' + name + '\"]');\n";
+		$html .= "    if (el) el.value = val;\n";
+		$html .= "  }\n";
+		$html .= "\n";
+		$html .= "  // Recompute tous les totaux du tableau contenant l'input modifié.\n";
+		$html .= "  // Détecte le pattern NB_{mes}_{dim}_{ligne}_{col} ou NB_{mes}_{dim}_{ligne}\n";
+		$html .= "  function computeMatrixTotals(changedInput) {\n";
+		$html .= "    var name = changedInput.name || '';\n";
+		$html .= "    // Cherche le tableau ancêtre .table-questionnaire\n";
+		$html .= "    var table = changedInput.closest('table.table-questionnaire');\n";
+		$html .= "    if (!table) return;\n";
+		$html .= "\n";
+		$html .= "    // Collecte tous les inputs NB_ éditables du tableau (pas readonly)\n";
+		$html .= "    var allNb = Array.prototype.slice.call(\n";
+		$html .= "      table.querySelectorAll('input[type=text]:not([readonly])')\n";
+		$html .= "    ).filter(function(el) { return /^NB_/i.test(el.name || ''); });\n";
+		$html .= "\n";
+		$html .= "    if (allNb.length === 0) return;\n";
+		$html .= "\n";
+		$html .= "    // Extrait les suffixes numériques depuis le nom : NB_MES_dim_... → suffixe = dim_ligne_col\n";
+		$html .= "    // Pattern : NB_{BASE}_{dim}_{ligne}_{col}  (col optionnelle pour 1D)\n";
+		$html .= "    var lignes = {};\n";
+		$html .= "    var cols   = {};\n";
+		$html .= "    var baseMes = null;\n";
+		$html .= "    var dimVal  = null;\n";
+		$html .= "\n";
+		$html .= "    allNb.forEach(function(el) {\n";
+		$html .= "      var m = el.name.match(/^(NB_[A-Z0-9_]+?)_(\\d+)_(\\d+)(?:_(\\d+))?$/i);\n";
+		$html .= "      if (!m) return;\n";
+		$html .= "      var mes = m[1]; var dim = m[2]; var li = m[3]; var co = m[4];\n";
+		$html .= "      if (!baseMes) { baseMes = mes; dimVal = dim; }\n";
+		$html .= "      var v = parseFloat(el.value) || 0;\n";
+		$html .= "      if (!lignes[li]) lignes[li] = 0;\n";
+		$html .= "      lignes[li] += v;\n";
+		$html .= "      if (co !== undefined) {\n";
+		$html .= "        if (!cols[co]) cols[co] = 0;\n";
+		$html .= "        cols[co] += v;\n";
+		$html .= "      }\n";
+		$html .= "    });\n";
+		$html .= "\n";
+		$html .= "    // Cherche les champs TOT_ dans le même tableau\n";
+		$html .= "    var allTot = Array.prototype.slice.call(\n";
+		$html .= "      table.querySelectorAll('input[readonly]')\n";
+		$html .= "    );\n";
+		$html .= "\n";
+		$html .= "    // Grand total = somme de toutes les valeurs NB_\n";
+		$html .= "    var grandTotal = 0;\n";
+		$html .= "    Object.keys(lignes).forEach(function(li) { grandTotal += lignes[li]; });\n";
+		$html .= "\n";
+		$html .= "    allTot.forEach(function(el) {\n";
+		$html .= "      var n = el.name || '';\n";
+		$html .= "      // TOT_{id}_ALL_MES_LIGNE_{dim}_{ligne}  ou  TOT_{id}_ALL_MES_LIGNE_{dim}\n";
+		$html .= "      var mLi = n.match(/TOT_[^_]+_ALL_MES_LIGNE_\\d+_(\\d+)$/i);\n";
+		$html .= "      if (mLi) { el.value = lignes[mLi[1]] || 0; return; }\n";
+		$html .= "      // TOT_{id}_ALL_MES_COLONNE_{dim}_{col}\n";
+		$html .= "      var mCo = n.match(/TOT_[^_]+_ALL_MES_COLONNE_\\d+_(\\d+)$/i);\n";
+		$html .= "      if (mCo) { el.value = cols[mCo[1]] || 0; return; }\n";
+		$html .= "      // TOT_{id}_ALL_MES_{dim}  (grand total — pattern court)\n";
+		$html .= "      var mGt = n.match(/TOT_[^_]+_ALL_MES_(\\d+)$/i);\n";
+		$html .= "      if (mGt) { el.value = grandTotal; return; }\n";
+		$html .= "      // TOT_{id}_ALL_MES_0 ou TOT_{id}_ALL_MES (sans suffixe numérique après 0)\n";
+		$html .= "      if (/TOT_[^_]+_ALL_MES_0$/i.test(n) || /TOT_[^_]+_ALL_MES$/i.test(n)) {\n";
+		$html .= "        el.value = grandTotal;\n";
+		$html .= "      }\n";
+		$html .= "    });\n";
+		$html .= "  }\n";
+		$html .= "\n";
 		$html .= "  function onReady(fn) {\n";
 		$html .= "    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', fn); } else { fn(); }\n";
 		$html .= "  }\n";
 		$html .= "  onReady(function() {\n";
 		$html .= "    document.body.classList.add('mobile-optimized-fragment');\n";
+		$html .= "\n";
+		$html .= "    // ── session 32 FIX 3 : Classification tables — NE PAS transformer les matrices ─\n";
+		$html .= "    // Un tableau EST une matrice de données si il contient des inputs NB_ ou des\n";
+		$html .= "    // champs readonly TOT_. Ces tableaux conservent leur structure HTML telle quelle.\n";
+		$html .= "    // Seuls les tableaux de mise en forme externes (> 5 cols, sans NB_/TOT_) sont\n";
+		$html .= "    // wrappés dans .table-mobile-scroll pour le défilement horizontal.\n";
 		$html .= "    document.querySelectorAll('table.table-questionnaire').forEach(function(table) {\n";
-		$html .= "      var rows = Array.prototype.slice.call(table.rows || []);\n";
-		$html .= "      var maxCells = rows.reduce(function(max, row) { return Math.max(max, row.cells ? row.cells.length : 0); }, 0);\n";
-		$html .= "      if (maxCells > 4) {\n";
-		$html .= "        if (!table.parentElement.classList.contains('table-mobile-scroll')) {\n";
+		$html .= "      // Détecter si ce tableau contient des champs de saisie de données\n";
+		$html .= "      var hasDataFields = table.querySelector(\n";
+		$html .= "        'input[name^=\"NB_\"], input[name^=\"nb_\"], input[readonly]'\n";
+		$html .= "      ) !== null;\n";
+		$html .= "      if (hasDataFields) {\n";
+		$html .= "        // Tableau de données : préserver la structure, juste wrapper si très large\n";
+		$html .= "        var rows = Array.prototype.slice.call(table.rows || []);\n";
+		$html .= "        var maxCells = rows.reduce(function(max, row) {\n";
+		$html .= "          return Math.max(max, row.cells ? row.cells.length : 0);\n";
+		$html .= "        }, 0);\n";
+		$html .= "        if (maxCells > 5 && !table.parentElement.classList.contains('table-mobile-scroll')) {\n";
 		$html .= "          var wrapper = document.createElement('div');\n";
 		$html .= "          wrapper.className = 'table-mobile-scroll';\n";
 		$html .= "          table.parentNode.insertBefore(wrapper, table);\n";
 		$html .= "          wrapper.appendChild(table);\n";
 		$html .= "        }\n";
+		$html .= "        // PAS de mobile-card-table sur les tableaux de données\n";
 		$html .= "      } else {\n";
-		$html .= "        table.classList.add('mobile-card-table');\n";
+		$html .= "        // Tableau de mise en forme : peut recevoir la card-table si 1 seule colonne\n";
+		$html .= "        var rows2 = Array.prototype.slice.call(table.rows || []);\n";
+		$html .= "        var maxCells2 = rows2.reduce(function(max, row) {\n";
+		$html .= "          return Math.max(max, row.cells ? row.cells.length : 0);\n";
+		$html .= "        }, 0);\n";
+		$html .= "        if (maxCells2 > 5 && !table.parentElement.classList.contains('table-mobile-scroll')) {\n";
+		$html .= "          var wrapper2 = document.createElement('div');\n";
+		$html .= "          wrapper2.className = 'table-mobile-scroll';\n";
+		$html .= "          table.parentNode.insertBefore(wrapper2, table);\n";
+		$html .= "          wrapper2.appendChild(table);\n";
+		$html .= "        }\n";
 		$html .= "      }\n";
 		$html .= "    });\n";
+		$html .= "\n";
+		$html .= "    // ── session 32 FIX 4 : Câble les auto-totaux sur tous les inputs NB_ ──────\n";
+		$html .= "    document.querySelectorAll('input[type=text]:not([readonly])').forEach(function(input) {\n";
+		$html .= "      if (/^NB_/i.test(input.name || '')) {\n";
+		$html .= "        input.addEventListener('input',  function() { computeMatrixTotals(input); });\n";
+		$html .= "        input.addEventListener('change', function() { computeMatrixTotals(input); });\n";
+		$html .= "      }\n";
+		$html .= "    });\n";
+		$html .= "    // Calcul initial (pour pré-remplissage depuis SQLite via _injectData())\n";
+		$html .= "    document.querySelectorAll('table.table-questionnaire').forEach(function(table) {\n";
+		$html .= "      var firstNb = table.querySelector('input[type=text]:not([readonly])');\n";
+		$html .= "      if (firstNb && /^NB_/i.test(firstNb.name || '')) { computeMatrixTotals(firstNb); }\n";
+		$html .= "    });\n";
+		$html .= "\n";
+		$html .= "    // ── inputmode numérique sur champs NB_/TOT_ ───────────────────────────────\n";
 		$html .= "    var numericRegex = /(^|_)(NB|TOT|SUPERFICIE|ANNEE|HEURES|MINITES|MINUTES|NOMBRE|TOTAL|ALL_MES|GP)(_|\$)/i;\n";
 		$html .= "    document.querySelectorAll(\"input[type='text']\").forEach(function(input) {\n";
 		$html .= "      var signature = [input.name || '', input.id || '', input.getAttribute('name_base') || ''].join(' ');\n";
@@ -279,6 +440,8 @@ class frame_mobile{
 		$html .= "      el.setAttribute('spellcheck', 'false');\n";
 		$html .= "      el.style.minHeight = '90px';\n";
 		$html .= "    });\n";
+		$html .= "\n";
+		$html .= "    // ── Option-chip : wrapping radio+label ───────────────────────────────────\n";
 		$html .= "    document.querySelectorAll('label[for]').forEach(function(label) {\n";
 		$html .= "      var targetId = label.getAttribute('for');\n";
 		$html .= "      var next = label.nextElementSibling;\n";
@@ -302,6 +465,8 @@ class frame_mobile{
 		$html .= "        refreshCheckedState();\n";
 		$html .= "      }\n";
 		$html .= "    });\n";
+		$html .= "\n";
+		$html .= "    // ── Field-active : highlight cellule active ───────────────────────────────\n";
 		$html .= "    document.querySelectorAll('input, select, textarea').forEach(function(field) {\n";
 		$html .= "      field.addEventListener('focus', function() { var td = field.closest('td, th'); if (td) td.classList.add('field-active'); });\n";
 		$html .= "      field.addEventListener('blur',  function() { var td = field.closest('td, th'); if (td) td.classList.remove('field-active'); });\n";
