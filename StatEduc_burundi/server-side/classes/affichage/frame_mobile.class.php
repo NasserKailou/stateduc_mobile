@@ -151,6 +151,168 @@ class frame_mobile{
 		return trim($str);
 	}
 
+	// =========================================================================
+	// METHODE : _get_mobile_css_js()
+	//
+	// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+	// Session 31 : CSS+JS mobile enrichis — refactoring anti-duplication
+	//
+	// Retourne le bloc <style> + <script> complet pour les formulaires mobiles.
+	// Centralise les 8 anciens blocs CSS identiques (session 24) en un seul appel.
+	//
+	// CSS inclut :
+	//   - Overrides session 24 (base responsive)
+	//   - Variables CSS (--mobile-bg, --accent, --focus, etc.)
+	//   - Champs texte/number/select agrandis (min-height 46px, font 16px)
+	//   - Boutons radio/checkbox enlages (20x20px) + .option-chip pill
+	//   - .table-mobile-scroll  : tableaux larges scrollables horizontalement
+	//   - .mobile-card-table    : tableaux simples en mode carte verticale
+	//   - .field-active         : highlight focus sur la cellule active
+	//
+	// JS inclut :
+	//   - Classification automatique des tableaux (scroll vs carte)
+	//   - Ajout inputmode=numeric sur champs NB_/TOT_/etc.
+	//   - Wrapping radio+label dans .option-chip
+	//   - Synchronisation .is-checked sur changement
+	//   - Highlight focus/blur sur cellule active
+	//
+	// IMPORTANT : cette methode ne modifie AUCUNE logique metier.
+	//             Seule la presentation est affectee.
+	//             Ne pas supprimer ni modifier les appels metier qui suivent.
+	// =========================================================================
+	function _get_mobile_css_js() {
+		$html = '';
+		// ── CSS ──────────────────────────────────────────────────────────────
+		$html .= "<style type='text/css'>\n";
+		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
+		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
+		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= "br { display: none; }\n";
+		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= "table { margin: 0 !important; }\n";
+		$html .= "@media (max-width: 600px) {\n";
+		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "}\n";
+		$html .= "/* === Mobile usability patch session 31 === */\n";
+		$html .= ":root {\n";
+		$html .= "  --mobile-bg: #f5f7fb; --card-bg: #ffffff; --line: #d7deea;\n";
+		$html .= "  --line-strong: #b7c4d8; --title-bg: #dce6f1; --title-fg: #183153;\n";
+		$html .= "  --accent: #1f5fbf; --focus: #ffb200; --soft: #eef4ff;\n";
+		$html .= "  --text: #1c2430; --muted: #5d6b82;\n";
+		$html .= "  --radius: 14px; --shadow: 0 4px 18px rgba(17,37,63,.08);\n";
+		$html .= "}\n";
+		$html .= "html, body { margin: 0 !important; padding: 0 !important; background: var(--mobile-bg); color: var(--text); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overscroll-behavior-y: contain; }\n";
+		$html .= "body.mobile-optimized-fragment { padding: 10px !important; }\n";
+		$html .= "div[align=center], div[align='center'] { width: 100%; max-width: 100%; }\n";
+		$html .= "form[name='form1'] { width: 100%; max-width: 100%; }\n";
+		$html .= ".table-questionnaire { width: 100% !important; max-width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: fixed; background: var(--card-bg); }\n";
+		$html .= ".table-questionnaire td, .table-questionnaire th { line-height: 1.35; border-color: var(--line) !important; }\n";
+		$html .= "tr.ligne-titre td, tr.ligne-titre th, .ligne-titre { background: var(--title-bg) !important; color: var(--title-fg); }\n";
+		$html .= "input[type=text], input[type=number], select, textarea { min-height: 46px; width: 100% !important; max-width: 100% !important; padding: 10px 12px !important; font-size: 16px !important; line-height: 1.25; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; background: #fff; box-shadow: inset 0 1px 2px rgba(17,37,63,.04); }\n";
+		$html .= "input[readonly] { background: #eef1f5 !important; color: #334155; font-weight: 700; }\n";
+		$html .= "input[type=radio], input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; min-height: 20px; accent-color: var(--accent); transform: none !important; margin: 0 !important; }\n";
+		$html .= "label { font-size: 14px !important; line-height: 1.35; margin: 0 !important; }\n";
+		$html .= ".option-chip { display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 8px; margin: 4px 6px 4px 0; padding: 8px 10px; min-height: 40px; border: 1px solid var(--line); border-radius: 999px; background: #fff; vertical-align: middle; }\n";
+		$html .= ".option-chip:hover { background: #f9fbff; }\n";
+		$html .= ".option-chip.is-checked { background: var(--soft); border-color: #96b3ea; }\n";
+		$html .= ".field-active { outline: 2px solid var(--focus); outline-offset: 2px; background: #fffef7 !important; }\n";
+		$html .= ".table-mobile-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); margin: 8px 0 14px; }\n";
+		$html .= ".table-mobile-scroll > .table-questionnaire { min-width: 980px; border: 0 !important; }\n";
+		$html .= ".table-mobile-scroll::after { content: '\u21c6 Faites d\u00e9filer horizontalement'; display: block; padding: 8px 12px 10px; color: var(--muted); font-size: 12px; background: linear-gradient(180deg,rgba(255,255,255,0),rgba(245,247,251,1)); }\n";
+		$html .= ".table-mobile-scroll td:first-child, .table-mobile-scroll th:first-child { position: sticky; left: 0; z-index: 2; background: inherit; box-shadow: 1px 0 0 var(--line); }\n";
+		$html .= ".table-mobile-scroll tr:first-child td, .table-mobile-scroll tr:first-child th, .table-mobile-scroll tr:nth-child(2) td, .table-mobile-scroll tr:nth-child(2) th { position: sticky; top: 0; z-index: 3; }\n";
+		$html .= ".mobile-card-table { border: 0 !important; background: transparent !important; }\n";
+		$html .= ".mobile-card-table > tbody > tr { display: block; margin: 0 0 12px; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }\n";
+		$html .= ".mobile-card-table > tbody > tr > td, .mobile-card-table > tbody > tr > th { display: block; width: 100% !important; max-width: 100% !important; border-left: 0 !important; border-right: 0 !important; padding: 10px 12px !important; white-space: normal !important; }\n";
+		$html .= ".mobile-card-table .td_space_blanc { display: none !important; }\n";
+		$html .= ".mobile-card-table .police_gras, .mobile-card-table tr.ligne-titre td, .mobile-card-table tr.ligne-titre th { font-weight: 700; }\n";
+		$html .= ".mobile-card-table .td_right, .mobile-card-table .td_left { text-align: left !important; }\n";
+		$html .= ".mobile-card-table > tbody > tr:nth-child(odd) { background: #ffffff; }\n";
+		$html .= ".mobile-card-table > tbody > tr:nth-child(even) { background: #fbfcfe; }\n";
+		$html .= ".mobile-card-table br { display: inline; }\n";
+		$html .= "@media (max-width: 900px) { br { display: inline; } html, body { font-size: 16px !important; } body.mobile-optimized-fragment { padding: 8px !important; } .table-questionnaire { table-layout: auto !important; } }\n";
+		$html .= "@media (max-width: 768px) { .mobile-card-table > tbody > tr > td, .mobile-card-table > tbody > tr > th { font-size: 14px !important; } .table-mobile-scroll > .table-questionnaire { min-width: 920px; } }\n";
+		$html .= "</style>\n";
+		// ── JS UX mobile ─────────────────────────────────────────────────────
+		$html .= "<script>\n";
+		$html .= "(function() {\n";
+		$html .= "  function onReady(fn) {\n";
+		$html .= "    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', fn); } else { fn(); }\n";
+		$html .= "  }\n";
+		$html .= "  onReady(function() {\n";
+		$html .= "    document.body.classList.add('mobile-optimized-fragment');\n";
+		$html .= "    document.querySelectorAll('table.table-questionnaire').forEach(function(table) {\n";
+		$html .= "      var rows = Array.prototype.slice.call(table.rows || []);\n";
+		$html .= "      var maxCells = rows.reduce(function(max, row) { return Math.max(max, row.cells ? row.cells.length : 0); }, 0);\n";
+		$html .= "      if (maxCells > 4) {\n";
+		$html .= "        if (!table.parentElement.classList.contains('table-mobile-scroll')) {\n";
+		$html .= "          var wrapper = document.createElement('div');\n";
+		$html .= "          wrapper.className = 'table-mobile-scroll';\n";
+		$html .= "          table.parentNode.insertBefore(wrapper, table);\n";
+		$html .= "          wrapper.appendChild(table);\n";
+		$html .= "        }\n";
+		$html .= "      } else {\n";
+		$html .= "        table.classList.add('mobile-card-table');\n";
+		$html .= "      }\n";
+		$html .= "    });\n";
+		$html .= "    var numericRegex = /(^|_)(NB|TOT|SUPERFICIE|ANNEE|HEURES|MINITES|MINUTES|NOMBRE|TOTAL|ALL_MES|GP)(_|\$)/i;\n";
+		$html .= "    document.querySelectorAll(\"input[type='text']\").forEach(function(input) {\n";
+		$html .= "      var signature = [input.name || '', input.id || '', input.getAttribute('name_base') || ''].join(' ');\n";
+		$html .= "      if (numericRegex.test(signature)) {\n";
+		$html .= "        input.setAttribute('inputmode', 'numeric');\n";
+		$html .= "        input.setAttribute('pattern', '[0-9]*');\n";
+		$html .= "        input.setAttribute('autocomplete', 'off');\n";
+		$html .= "      }\n";
+		$html .= "      input.setAttribute('autocapitalize', 'off');\n";
+		$html .= "      input.setAttribute('spellcheck', 'false');\n";
+		$html .= "    });\n";
+		$html .= "    document.querySelectorAll('textarea').forEach(function(el) {\n";
+		$html .= "      el.setAttribute('spellcheck', 'false');\n";
+		$html .= "      el.style.minHeight = '90px';\n";
+		$html .= "    });\n";
+		$html .= "    document.querySelectorAll('label[for]').forEach(function(label) {\n";
+		$html .= "      var targetId = label.getAttribute('for');\n";
+		$html .= "      var next = label.nextElementSibling;\n";
+		$html .= "      if (!next || next.tagName !== 'INPUT' || next.id !== targetId) return;\n";
+		$html .= "      if (label.parentElement && label.parentElement.classList.contains('option-chip')) return;\n";
+		$html .= "      var wrap = document.createElement('span');\n";
+		$html .= "      wrap.className = 'option-chip';\n";
+		$html .= "      label.parentNode.insertBefore(wrap, label);\n";
+		$html .= "      wrap.appendChild(label);\n";
+		$html .= "      wrap.appendChild(next);\n";
+		$html .= "    });\n";
+		$html .= "    function refreshCheckedState() {\n";
+		$html .= "      document.querySelectorAll('.option-chip').forEach(function(chip) {\n";
+		$html .= "        var input = chip.querySelector(\"input[type='radio'], input[type='checkbox']\");\n";
+		$html .= "        chip.classList.toggle('is-checked', !!(input && input.checked));\n";
+		$html .= "      });\n";
+		$html .= "    }\n";
+		$html .= "    refreshCheckedState();\n";
+		$html .= "    document.addEventListener('change', function(event) {\n";
+		$html .= "      if (event.target && (event.target.matches(\"input[type='radio']\") || event.target.matches(\"input[type='checkbox']\"))) {\n";
+		$html .= "        refreshCheckedState();\n";
+		$html .= "      }\n";
+		$html .= "    });\n";
+		$html .= "    document.querySelectorAll('input, select, textarea').forEach(function(field) {\n";
+		$html .= "      field.addEventListener('focus', function() { var td = field.closest('td, th'); if (td) td.classList.add('field-active'); });\n";
+		$html .= "      field.addEventListener('blur',  function() { var td = field.closest('td, th'); if (td) td.classList.remove('field-active'); });\n";
+		$html .= "    });\n";
+		$html .= "  });\n";
+		$html .= "})();\n";
+		$html .= "</script>\n";
+		return $html;
+	}
+
+
 	function js_Post_Form($id_theme, $id_systeme){
 		$operateurs = array("==","<",">","<=",">=", "si");
 		$requete = "
@@ -541,28 +703,9 @@ class frame_mobile{
         $html 	  	 	= ""; 
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 		
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 				
@@ -877,28 +1020,9 @@ class frame_mobile{
         $html 	  	 = ""; 
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 		
         //$html 			.= "<link href='../css/formulaire_senegal.css' rel='stylesheet' type='text/css'>"."\n"; 
@@ -1656,28 +1780,9 @@ class frame_mobile{
 		
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 		$html 	  	 .= ""; 
 		
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
@@ -3767,28 +3872,9 @@ class frame_mobile{
 				
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 		
@@ -5648,28 +5734,9 @@ class frame_mobile{
 				
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 
@@ -7635,28 +7702,9 @@ class frame_mobile{
 				
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 		
@@ -8267,28 +8315,9 @@ if(!isset($classe_fond)) {
 				
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 
@@ -8868,28 +8897,9 @@ if(!isset($classe_fond)) {
 				
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
-		// Session 24 : CSS mobile — reduction espaces inutiles, adaptation ecran mobile, meilleure UX
-		// Injection CSS pure presentation — aucune logique metier modifiee
-		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
-		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
-		$html .= "}\n";
-		$html .= "</style>\n";
+		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
+		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html .= $this->_get_mobile_css_js();
 				$html				  = "";
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 
