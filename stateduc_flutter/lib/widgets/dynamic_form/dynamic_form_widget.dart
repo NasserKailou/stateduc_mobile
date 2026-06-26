@@ -109,6 +109,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
           // déclenché le rebuild de ce widget.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _injectData();
+            _refreshMatrixTotals();
             _injectBridge();
           });
         },
@@ -139,6 +140,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
         (old.data != widget.data ||
             old.validationErrors != widget.validationErrors)) {
       _injectData();
+      _refreshMatrixTotals();
       _injectValidationErrors();
     }
   }
@@ -541,6 +543,28 @@ $formHtml
       }
     });
   }
+})();
+''');
+  }
+
+  // ── Recalcule les totaux matrix après injection des données ─────────────────
+  //
+  // session 32 : _injectData() remplit les champs NB_ depuis SQLite, mais
+  // computeMatrixTotals() (défini dans _get_mobile_css_js()) a déjà tourné au
+  // DOMContentLoaded avant que les valeurs soient injectées → les totaux
+  // affichaient 0. Ce call déclenche un nouveau calcul APRÈS l'injection.
+  //
+  // ⚠️  JAVASCRIPT ci-dessous (jusqu'à ''') — ne pas utiliser syntaxe Dart ici.
+  void _refreshMatrixTotals() {
+    _controller.runJavaScript('''
+(function() {
+  if (typeof computeMatrixTotals !== 'function') return;
+  document.querySelectorAll('table.table-questionnaire').forEach(function(table) {
+    var firstNb = table.querySelector('input[type=text]:not([readonly])');
+    if (firstNb && /^NB_/i.test(firstNb.name || '')) {
+      computeMatrixTotals(firstNb);
+    }
+  });
 })();
 ''');
   }
