@@ -201,78 +201,72 @@ class frame_mobile{
 	// =========================================================================
 	function _get_mobile_css_js() {
 		$html = '';
-		// ── CSS ──────────────────────────────────────────────────────────────
+		// ── CSS — tous les sélecteurs sont préfixés par .se-mobile-frame ───────────────────
 		$html .= "<style type='text/css'>\n";
-		$html .= "/* StatEduc mobile — responsive overrides session 24 */\n";
-		$html .= "*, *::before, *::after { box-sizing: border-box; }\n";
-		$html .= "html, body { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
-		$html .= ".table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
-		$html .= "label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
-		$html .= ".bouton_valider, input[type=submit], button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
-		$html .= "br { display: none; }\n";
-		$html .= "div[align=center], div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
-		$html .= "table { margin: 0 !important; }\n";
+		$html .= "/* session 33 : scoped to .se-mobile-frame — NO bleed to host page */\n";
+		$html .= ".se-mobile-frame *, .se-mobile-frame *::before, .se-mobile-frame *::after { box-sizing: border-box; }\n";
+		$html .= ".se-mobile-frame { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }\n";
+		$html .= ".se-mobile-frame .table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }\n";
+		$html .= ".se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }\n";
+		$html .= ".se-mobile-frame tr.ligne-titre td, .se-mobile-frame tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }\n";
+		$html .= ".se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select, .se-mobile-frame textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }\n";
+		$html .= ".se-mobile-frame input[type=radio], .se-mobile-frame input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }\n";
+		$html .= ".se-mobile-frame label { font-size: 12px; margin-right: 4px; cursor: pointer; }\n";
+		$html .= ".se-mobile-frame .bouton_valider, .se-mobile-frame input[type=submit], .se-mobile-frame button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }\n";
+		$html .= ".se-mobile-frame br { display: none; }\n";
+		$html .= ".se-mobile-frame div[align=center], .se-mobile-frame div[align='center'] { padding: 0 !important; margin: 0 !important; }\n";
+		$html .= ".se-mobile-frame table { margin: 0 !important; }\n";
 		$html .= "@media (max-width: 600px) {\n";
-		$html .= "  .table-questionnaire td, .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
-		$html .= "  input[type=text], input[type=number], select { font-size: 11px; padding: 2px; }\n";
-		$html .= "  .bouton_valider, input[type=submit] { padding: 10px; font-size: 13px; }\n";
+		$html .= "  .se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }\n";
+		$html .= "  .se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select { font-size: 11px; padding: 2px; }\n";
+		$html .= "  .se-mobile-frame .bouton_valider, .se-mobile-frame input[type=submit] { padding: 10px; font-size: 13px; }\n";
 		$html .= "}\n";
-		$html .= "/* === Mobile usability patch session 31 === */\n";
-		$html .= ":root {\n";
+		$html .= "/* === Mobile usability patch session 31 + 33 === */\n";
+		// CSS variables déplacées de :root vers .se-mobile-frame (isolation session 33)
+		$html .= ".se-mobile-frame {\n";
 		$html .= "  --mobile-bg: #f5f7fb; --card-bg: #ffffff; --line: #d7deea;\n";
 		$html .= "  --line-strong: #b7c4d8; --title-bg: #dce6f1; --title-fg: #183153;\n";
 		$html .= "  --accent: #1f5fbf; --focus: #ffb200; --soft: #eef4ff;\n";
 		$html .= "  --text: #1c2430; --muted: #5d6b82;\n";
 		$html .= "  --radius: 14px; --shadow: 0 4px 18px rgba(17,37,63,.08);\n";
 		$html .= "}\n";
-		$html .= "html, body { margin: 0 !important; padding: 0 !important; background: var(--mobile-bg); color: var(--text); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overscroll-behavior-y: contain; }\n";
-		$html .= "body.mobile-optimized-fragment { padding: 10px !important; }\n";
-		$html .= "div[align=center], div[align='center'] { width: 100%; max-width: 100%; }\n";
-		$html .= "form[name='form1'] { width: 100%; max-width: 100%; }\n";
+		$html .= ".se-mobile-frame.mobile-ready { padding: 10px; }\n";
+		$html .= ".se-mobile-frame div[align=center], .se-mobile-frame div[align='center'] { width: 100%; max-width: 100%; }\n";
+		$html .= ".se-mobile-frame form[name='form1'] { width: 100%; max-width: 100%; }\n";
 		// session 32 : table-layout:auto permet aux colonnes de s'adapter à leur contenu
-		// sans forcer une largeur fixe qui écrase les petites cellules numériques
-		$html .= ".table-questionnaire { width: 100% !important; max-width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: auto; background: var(--card-bg); }\n";
-		$html .= ".table-questionnaire td, .table-questionnaire th { line-height: 1.35; border-color: var(--line) !important; }\n";
-		$html .= "tr.ligne-titre td, tr.ligne-titre th, .ligne-titre { background: var(--title-bg) !important; color: var(--title-fg); }\n";
-		$html .= "input[type=text], input[type=number], select, textarea { min-height: 46px; width: 100% !important; max-width: 100% !important; padding: 10px 12px !important; font-size: 16px !important; line-height: 1.25; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; background: #fff; box-shadow: inset 0 1px 2px rgba(17,37,63,.04); }\n";
-		$html .= "input[readonly] { background: #eef1f5 !important; color: #334155; font-weight: 700; }\n";
-		$html .= "input[type=radio], input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; min-height: 20px; accent-color: var(--accent); transform: none !important; margin: 0 !important; }\n";
-		$html .= "label { font-size: 14px !important; line-height: 1.35; margin: 0 !important; }\n";
-		$html .= ".option-chip { display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 8px; margin: 4px 6px 4px 0; padding: 8px 10px; min-height: 40px; border: 1px solid var(--line); border-radius: 999px; background: #fff; vertical-align: middle; }\n";
-		$html .= ".option-chip:hover { background: #f9fbff; }\n";
-		$html .= ".option-chip.is-checked { background: var(--soft); border-color: #96b3ea; }\n";
-		$html .= ".field-active { outline: 2px solid var(--focus); outline-offset: 2px; background: #fffef7 !important; }\n";
-		// .table-mobile-scroll : uniquement pour tableaux larges (> 5 colonnes) wrappés par JS
-		$html .= ".table-mobile-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); margin: 8px 0 14px; }\n";
-		$html .= ".table-mobile-scroll > .table-questionnaire { min-width: 600px; border: 0 !important; }\n";
-		$html .= ".table-mobile-scroll::after { content: '\u21c6 Faites d\u00e9filer horizontalement'; display: block; padding: 8px 12px 10px; color: var(--muted); font-size: 12px; background: linear-gradient(180deg,rgba(255,255,255,0),rgba(245,247,251,1)); }\n";
-		$html .= ".table-mobile-scroll td:first-child, .table-mobile-scroll th:first-child { position: sticky; left: 0; z-index: 2; background: inherit; box-shadow: 1px 0 0 var(--line); }\n";
+		$html .= ".se-mobile-frame .table-questionnaire { width: 100% !important; max-width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: auto; background: var(--card-bg); }\n";
+		$html .= ".se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { line-height: 1.35; border-color: var(--line) !important; }\n";
+		$html .= ".se-mobile-frame tr.ligne-titre td, .se-mobile-frame tr.ligne-titre th, .se-mobile-frame .ligne-titre { background: var(--title-bg) !important; color: var(--title-fg); }\n";
+		$html .= ".se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select, .se-mobile-frame textarea { min-height: 46px; width: 100% !important; max-width: 100% !important; padding: 10px 12px !important; font-size: 16px !important; line-height: 1.25; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; background: #fff; box-shadow: inset 0 1px 2px rgba(17,37,63,.04); }\n";
+		$html .= ".se-mobile-frame input[readonly] { background: #eef1f5 !important; color: #334155; font-weight: 700; }\n";
+		$html .= ".se-mobile-frame input[type=radio], .se-mobile-frame input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; min-height: 20px; accent-color: var(--accent); transform: none !important; margin: 0 !important; }\n";
+		$html .= ".se-mobile-frame label { font-size: 14px !important; line-height: 1.35; margin: 0 !important; }\n";
+		$html .= ".se-mobile-frame .option-chip { display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 8px; margin: 4px 6px 4px 0; padding: 8px 10px; min-height: 40px; border: 1px solid var(--line); border-radius: 999px; background: #fff; vertical-align: middle; }\n";
+		$html .= ".se-mobile-frame .option-chip:hover { background: #f9fbff; }\n";
+		$html .= ".se-mobile-frame .option-chip.is-checked { background: var(--soft); border-color: #96b3ea; }\n";
+		$html .= ".se-mobile-frame .field-active { outline: 2px solid var(--focus); outline-offset: 2px; background: #fffef7 !important; }\n";
+		// .table-mobile-scroll : uniquement pour tableaux larges (> 5 colonnes)
+		$html .= ".se-mobile-frame .table-mobile-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); margin: 8px 0 14px; }\n";
+		$html .= ".se-mobile-frame .table-mobile-scroll > .table-questionnaire { min-width: 600px; border: 0 !important; }\n";
+		$html .= ".se-mobile-frame .table-mobile-scroll::after { content: '\u21c6 Faites d\u00e9filer horizontalement'; display: block; padding: 8px 12px 10px; color: var(--muted); font-size: 12px; background: linear-gradient(180deg,rgba(255,255,255,0),rgba(245,247,251,1)); }\n";
+		$html .= ".se-mobile-frame .table-mobile-scroll td:first-child, .se-mobile-frame .table-mobile-scroll th:first-child { position: sticky; left: 0; z-index: 2; background: inherit; box-shadow: 1px 0 0 var(--line); }\n";
 		// session 32 : .mobile-card-table conservé en CSS mais N'EST PLUS appliqué aux tableaux de données
-		// (il peut encore servir pour les tableaux purement de mise en forme sans inputs numériques)
-		$html .= ".mobile-card-table { border: 0 !important; background: transparent !important; }\n";
-		$html .= ".mobile-card-table > tbody > tr { display: block; margin: 0 0 12px; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }\n";
-		$html .= ".mobile-card-table > tbody > tr > td, .mobile-card-table > tbody > tr > th { display: block; width: 100% !important; max-width: 100% !important; border-left: 0 !important; border-right: 0 !important; padding: 10px 12px !important; white-space: normal !important; }\n";
-		$html .= ".mobile-card-table .td_space_blanc { display: none !important; }\n";
-		$html .= ".mobile-card-table .police_gras, .mobile-card-table tr.ligne-titre td, .mobile-card-table tr.ligne-titre th { font-weight: 700; }\n";
-		$html .= ".mobile-card-table .td_right, .mobile-card-table .td_left { text-align: left !important; }\n";
-		$html .= ".mobile-card-table > tbody > tr:nth-child(odd) { background: #ffffff; }\n";
-		$html .= ".mobile-card-table > tbody > tr:nth-child(even) { background: #fbfcfe; }\n";
-		$html .= ".mobile-card-table br { display: inline; }\n";
-		$html .= "@media (max-width: 900px) { br { display: inline; } html, body { font-size: 16px !important; } body.mobile-optimized-fragment { padding: 8px !important; } }\n";
-		$html .= "@media (max-width: 768px) { .mobile-card-table > tbody > tr > td, .mobile-card-table > tbody > tr > th { font-size: 14px !important; } .table-mobile-scroll > .table-questionnaire { min-width: 480px; } }\n";
+		$html .= ".se-mobile-frame .mobile-card-table { border: 0 !important; background: transparent !important; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table > tbody > tr { display: block; margin: 0 0 12px; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table > tbody > tr > td, .se-mobile-frame .mobile-card-table > tbody > tr > th { display: block; width: 100% !important; max-width: 100% !important; border-left: 0 !important; border-right: 0 !important; padding: 10px 12px !important; white-space: normal !important; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table .td_space_blanc { display: none !important; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table .police_gras, .se-mobile-frame .mobile-card-table tr.ligne-titre td, .se-mobile-frame .mobile-card-table tr.ligne-titre th { font-weight: 700; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table .td_right, .se-mobile-frame .mobile-card-table .td_left { text-align: left !important; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table > tbody > tr:nth-child(odd) { background: #ffffff; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table > tbody > tr:nth-child(even) { background: #fbfcfe; }\n";
+		$html .= ".se-mobile-frame .mobile-card-table br { display: inline; }\n";
+		$html .= "@media (max-width: 900px) { .se-mobile-frame br { display: inline; } .se-mobile-frame { font-size: 16px; } .se-mobile-frame.mobile-ready { padding: 8px; } }\n";
+		$html .= "@media (max-width: 768px) { .se-mobile-frame .mobile-card-table > tbody > tr > td, .se-mobile-frame .mobile-card-table > tbody > tr > th { font-size: 14px !important; } .se-mobile-frame .table-mobile-scroll > .table-questionnaire { min-width: 480px; } }\n";
 		$html .= "</style>\n";
-		// ── JS UX mobile ─────────────────────────────────────────────────────
+		// ── JS UX mobile — scopé au wrapper .se-mobile-frame ─────────────────────────────
 		$html .= "<script>\n";
 		$html .= "(function() {\n";
-		$html .= "  // ── session 32 FIX 1 : Stubs pour les fonctions jQuery serveur-side ──────\n";
-		$html .= "  // set_TOTAL_MatFrml et set_TOTAL_MatFrml_Champ utilisent jQuery ($) qui\n";
-		$html .= "  // n'existe pas dans le WebView Flutter. Sans ces stubs, leur appel via\n";
-		$html .= "  // l'attribut onchange lève une ReferenceError qui coupe la propagation\n";
-		$html .= "  // des événements et empêche le pont FieldChanged de recevoir les valeurs.\n";
+		$html .= "  // ── session 32 FIX 1 : Stubs pour les fonctions jQuery serveur-side ──────────────\n";
 		$html .= "  if (typeof set_TOTAL_MatFrml_Champ === 'undefined') {\n";
 		$html .= "    window.set_TOTAL_MatFrml_Champ = function() { /* stub — remplacé par computeMatrixTotals() */ };\n";
 		$html .= "  }\n";
@@ -283,87 +277,33 @@ class frame_mobile{
 		$html .= "    window.set_TOTAL_ThemeMat2D = function() { /* stub */ };\n";
 		$html .= "  }\n";
 		$html .= "\n";
-		$html .= "  // ── session 32 FIX 2 : Auto-totaux pure-JS pour matrices NB_/TOT_ ─────────\n";
-		$html .= "  //\n";
-		$html .= "  // Remplace set_TOTAL_MatFrml_Champ pour les WebViews Flutter (pas de jQuery).\n";
-		$html .= "  //\n";
-		$html .= "  // Nommage des champs (exemples réels depuis 9202.html) :\n";
-		$html .= "  //   NB_MOBILIER_ETAT_0_4_1   → mesure=NB_MOBILIER_ETAT, dim=0, ligne=4, col=1\n";
-		$html .= "  //   TOT_{idZone}_ALL_MES_LIGNE_0_{ligne}   → total ligne\n";
-		$html .= "  //   TOT_{idZone}_ALL_MES_COLONNE_0_{col}   → total colonne\n";
-		$html .= "  //   TOT_{idZone}_ALL_MES_0                  → grand total\n";
-		$html .= "  //\n";
-		$html .= "  // La fonction scanne tous les inputs NB_* du même tableau pour recalculer.\n";
-		$html .= "  //\n";
-		$html .= "  function getVal(name) {\n";
-		$html .= "    var el = document.querySelector('[name=\"' + name + '\"]');\n";
-		$html .= "    return el ? (parseFloat(el.value) || 0) : 0;\n";
-		$html .= "  }\n";
-		$html .= "  function setVal(name, val) {\n";
-		$html .= "    var el = document.querySelector('[name=\"' + name + '\"]');\n";
-		$html .= "    if (el) el.value = val;\n";
-		$html .= "  }\n";
-		$html .= "\n";
-		$html .= "  // Recompute tous les totaux du tableau contenant l'input modifié.\n";
-		$html .= "  // Détecte le pattern NB_{mes}_{dim}_{ligne}_{col} ou NB_{mes}_{dim}_{ligne}\n";
+		$html .= "  // ── session 32 FIX 2 : Auto-totaux pure-JS pour matrices NB_/TOT_ ────────────\n";
 		$html .= "  function computeMatrixTotals(changedInput) {\n";
-		$html .= "    var name = changedInput.name || '';\n";
-		$html .= "    // Cherche le tableau ancêtre .table-questionnaire\n";
+		$html .= "    var scope = document.querySelector('.se-mobile-frame') || document;\n";
 		$html .= "    var table = changedInput.closest('table.table-questionnaire');\n";
 		$html .= "    if (!table) return;\n";
-		$html .= "\n";
-		$html .= "    // Collecte tous les inputs NB_ éditables du tableau (pas readonly)\n";
 		$html .= "    var allNb = Array.prototype.slice.call(\n";
 		$html .= "      table.querySelectorAll('input[type=text]:not([readonly])')\n";
 		$html .= "    ).filter(function(el) { return /^NB_/i.test(el.name || ''); });\n";
-		$html .= "\n";
 		$html .= "    if (allNb.length === 0) return;\n";
-		$html .= "\n";
-		$html .= "    // Extrait les suffixes numériques depuis le nom : NB_MES_dim_... → suffixe = dim_ligne_col\n";
-		$html .= "    // Pattern : NB_{BASE}_{dim}_{ligne}_{col}  (col optionnelle pour 1D)\n";
-		$html .= "    var lignes = {};\n";
-		$html .= "    var cols   = {};\n";
-		$html .= "    var baseMes = null;\n";
-		$html .= "    var dimVal  = null;\n";
-		$html .= "\n";
+		$html .= "    var lignes = {}; var cols = {}; var grandTotal = 0;\n";
 		$html .= "    allNb.forEach(function(el) {\n";
 		$html .= "      var m = el.name.match(/^(NB_[A-Z0-9_]+?)_(\\d+)_(\\d+)(?:_(\\d+))?$/i);\n";
 		$html .= "      if (!m) return;\n";
-		$html .= "      var mes = m[1]; var dim = m[2]; var li = m[3]; var co = m[4];\n";
-		$html .= "      if (!baseMes) { baseMes = mes; dimVal = dim; }\n";
+		$html .= "      var li = m[3]; var co = m[4];\n";
 		$html .= "      var v = parseFloat(el.value) || 0;\n";
-		$html .= "      if (!lignes[li]) lignes[li] = 0;\n";
-		$html .= "      lignes[li] += v;\n";
-		$html .= "      if (co !== undefined) {\n";
-		$html .= "        if (!cols[co]) cols[co] = 0;\n";
-		$html .= "        cols[co] += v;\n";
-		$html .= "      }\n";
+		$html .= "      grandTotal += v;\n";
+		$html .= "      if (!lignes[li]) lignes[li] = 0; lignes[li] += v;\n";
+		$html .= "      if (co !== undefined) { if (!cols[co]) cols[co] = 0; cols[co] += v; }\n";
 		$html .= "    });\n";
-		$html .= "\n";
-		$html .= "    // Cherche les champs TOT_ dans le même tableau\n";
-		$html .= "    var allTot = Array.prototype.slice.call(\n";
-		$html .= "      table.querySelectorAll('input[readonly]')\n";
-		$html .= "    );\n";
-		$html .= "\n";
-		$html .= "    // Grand total = somme de toutes les valeurs NB_\n";
-		$html .= "    var grandTotal = 0;\n";
-		$html .= "    Object.keys(lignes).forEach(function(li) { grandTotal += lignes[li]; });\n";
-		$html .= "\n";
+		$html .= "    var allTot = Array.prototype.slice.call(table.querySelectorAll('input[readonly]'));\n";
 		$html .= "    allTot.forEach(function(el) {\n";
 		$html .= "      var n = el.name || '';\n";
-		$html .= "      // TOT_{id}_ALL_MES_LIGNE_{dim}_{ligne}  ou  TOT_{id}_ALL_MES_LIGNE_{dim}\n";
 		$html .= "      var mLi = n.match(/TOT_[^_]+_ALL_MES_LIGNE_\\d+_(\\d+)$/i);\n";
 		$html .= "      if (mLi) { el.value = lignes[mLi[1]] || 0; return; }\n";
-		$html .= "      // TOT_{id}_ALL_MES_COLONNE_{dim}_{col}\n";
 		$html .= "      var mCo = n.match(/TOT_[^_]+_ALL_MES_COLONNE_\\d+_(\\d+)$/i);\n";
 		$html .= "      if (mCo) { el.value = cols[mCo[1]] || 0; return; }\n";
-		$html .= "      // TOT_{id}_ALL_MES_{dim}  (grand total — pattern court)\n";
-		$html .= "      var mGt = n.match(/TOT_[^_]+_ALL_MES_(\\d+)$/i);\n";
-		$html .= "      if (mGt) { el.value = grandTotal; return; }\n";
-		$html .= "      // TOT_{id}_ALL_MES_0 ou TOT_{id}_ALL_MES (sans suffixe numérique après 0)\n";
-		$html .= "      if (/TOT_[^_]+_ALL_MES_0$/i.test(n) || /TOT_[^_]+_ALL_MES$/i.test(n)) {\n";
-		$html .= "        el.value = grandTotal;\n";
-		$html .= "      }\n";
+		$html .= "      if (/TOT_[^_]+_ALL_MES(?:_0)?$/i.test(n)) { el.value = grandTotal; }\n";
 		$html .= "    });\n";
 		$html .= "  }\n";
 		$html .= "\n";
@@ -371,62 +311,39 @@ class frame_mobile{
 		$html .= "    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', fn); } else { fn(); }\n";
 		$html .= "  }\n";
 		$html .= "  onReady(function() {\n";
-		$html .= "    document.body.classList.add('mobile-optimized-fragment');\n";
+		$html .= "    // session 33 : scope au wrapper, pas sur document.body\n";
+		$html .= "    var root = document.querySelector('.se-mobile-frame');\n";
+		$html .= "    if (root) root.classList.add('mobile-ready');\n";
+		$html .= "    var scope = root || document;\n";
 		$html .= "\n";
-		$html .= "    // ── session 32 FIX 3 : Classification tables — NE PAS transformer les matrices ─\n";
-		$html .= "    // Un tableau EST une matrice de données si il contient des inputs NB_ ou des\n";
-		$html .= "    // champs readonly TOT_. Ces tableaux conservent leur structure HTML telle quelle.\n";
-		$html .= "    // Seuls les tableaux de mise en forme externes (> 5 cols, sans NB_/TOT_) sont\n";
-		$html .= "    // wrappés dans .table-mobile-scroll pour le défilement horizontal.\n";
-		$html .= "    document.querySelectorAll('table.table-questionnaire').forEach(function(table) {\n";
-		$html .= "      // Détecter si ce tableau contient des champs de saisie de données\n";
-		$html .= "      var hasDataFields = table.querySelector(\n";
-		$html .= "        'input[name^=\"NB_\"], input[name^=\"nb_\"], input[readonly]'\n";
-		$html .= "      ) !== null;\n";
-		$html .= "      if (hasDataFields) {\n";
-		$html .= "        // Tableau de données : préserver la structure, juste wrapper si très large\n";
-		$html .= "        var rows = Array.prototype.slice.call(table.rows || []);\n";
-		$html .= "        var maxCells = rows.reduce(function(max, row) {\n";
-		$html .= "          return Math.max(max, row.cells ? row.cells.length : 0);\n";
-		$html .= "        }, 0);\n";
-		$html .= "        if (maxCells > 5 && !table.parentElement.classList.contains('table-mobile-scroll')) {\n";
-		$html .= "          var wrapper = document.createElement('div');\n";
-		$html .= "          wrapper.className = 'table-mobile-scroll';\n";
-		$html .= "          table.parentNode.insertBefore(wrapper, table);\n";
-		$html .= "          wrapper.appendChild(table);\n";
-		$html .= "        }\n";
-		$html .= "        // PAS de mobile-card-table sur les tableaux de données\n";
-		$html .= "      } else {\n";
-		$html .= "        // Tableau de mise en forme : peut recevoir la card-table si 1 seule colonne\n";
-		$html .= "        var rows2 = Array.prototype.slice.call(table.rows || []);\n";
-		$html .= "        var maxCells2 = rows2.reduce(function(max, row) {\n";
-		$html .= "          return Math.max(max, row.cells ? row.cells.length : 0);\n";
-		$html .= "        }, 0);\n";
-		$html .= "        if (maxCells2 > 5 && !table.parentElement.classList.contains('table-mobile-scroll')) {\n";
-		$html .= "          var wrapper2 = document.createElement('div');\n";
-		$html .= "          wrapper2.className = 'table-mobile-scroll';\n";
-		$html .= "          table.parentNode.insertBefore(wrapper2, table);\n";
-		$html .= "          wrapper2.appendChild(table);\n";
-		$html .= "        }\n";
+		$html .= "    // ── session 32 FIX 3 : Classification tables ──────────────────────────────────\n";
+		$html .= "    scope.querySelectorAll('table.table-questionnaire').forEach(function(table) {\n";
+		$html .= "      var hasDataFields = table.querySelector('input[name^=\"NB_\"], input[name^=\"nb_\"], input[readonly]') !== null;\n";
+		$html .= "      var rows = Array.prototype.slice.call(table.rows || []);\n";
+		$html .= "      var maxCells = rows.reduce(function(max, row) { return Math.max(max, row.cells ? row.cells.length : 0); }, 0);\n";
+		$html .= "      if (maxCells > 5 && !table.parentElement.classList.contains('table-mobile-scroll')) {\n";
+		$html .= "        var wrapper = document.createElement('div');\n";
+		$html .= "        wrapper.className = 'table-mobile-scroll';\n";
+		$html .= "        table.parentNode.insertBefore(wrapper, table);\n";
+		$html .= "        wrapper.appendChild(table);\n";
 		$html .= "      }\n";
 		$html .= "    });\n";
 		$html .= "\n";
-		$html .= "    // ── session 32 FIX 4 : Câble les auto-totaux sur tous les inputs NB_ ──────\n";
-		$html .= "    document.querySelectorAll('input[type=text]:not([readonly])').forEach(function(input) {\n";
+		$html .= "    // ── session 32 FIX 4 : Câble les auto-totaux sur tous les inputs NB_ ──────────\n";
+		$html .= "    scope.querySelectorAll('input[type=text]:not([readonly])').forEach(function(input) {\n";
 		$html .= "      if (/^NB_/i.test(input.name || '')) {\n";
 		$html .= "        input.addEventListener('input',  function() { computeMatrixTotals(input); });\n";
 		$html .= "        input.addEventListener('change', function() { computeMatrixTotals(input); });\n";
 		$html .= "      }\n";
 		$html .= "    });\n";
-		$html .= "    // Calcul initial (pour pré-remplissage depuis SQLite via _injectData())\n";
-		$html .= "    document.querySelectorAll('table.table-questionnaire').forEach(function(table) {\n";
+		$html .= "    scope.querySelectorAll('table.table-questionnaire').forEach(function(table) {\n";
 		$html .= "      var firstNb = table.querySelector('input[type=text]:not([readonly])');\n";
 		$html .= "      if (firstNb && /^NB_/i.test(firstNb.name || '')) { computeMatrixTotals(firstNb); }\n";
 		$html .= "    });\n";
 		$html .= "\n";
-		$html .= "    // ── inputmode numérique sur champs NB_/TOT_ ───────────────────────────────\n";
+		$html .= "    // ── inputmode numérique sur champs NB_/TOT_ ──────────────────────────────────\n";
 		$html .= "    var numericRegex = /(^|_)(NB|TOT|SUPERFICIE|ANNEE|HEURES|MINITES|MINUTES|NOMBRE|TOTAL|ALL_MES|GP)(_|\$)/i;\n";
-		$html .= "    document.querySelectorAll(\"input[type='text']\").forEach(function(input) {\n";
+		$html .= "    scope.querySelectorAll(\"input[type='text']\").forEach(function(input) {\n";
 		$html .= "      var signature = [input.name || '', input.id || '', input.getAttribute('name_base') || ''].join(' ');\n";
 		$html .= "      if (numericRegex.test(signature)) {\n";
 		$html .= "        input.setAttribute('inputmode', 'numeric');\n";
@@ -436,13 +353,13 @@ class frame_mobile{
 		$html .= "      input.setAttribute('autocapitalize', 'off');\n";
 		$html .= "      input.setAttribute('spellcheck', 'false');\n";
 		$html .= "    });\n";
-		$html .= "    document.querySelectorAll('textarea').forEach(function(el) {\n";
+		$html .= "    scope.querySelectorAll('textarea').forEach(function(el) {\n";
 		$html .= "      el.setAttribute('spellcheck', 'false');\n";
 		$html .= "      el.style.minHeight = '90px';\n";
 		$html .= "    });\n";
 		$html .= "\n";
-		$html .= "    // ── Option-chip : wrapping radio+label ───────────────────────────────────\n";
-		$html .= "    document.querySelectorAll('label[for]').forEach(function(label) {\n";
+		$html .= "    // ── Option-chip : wrapping radio+label ────────────────────────────────────────\n";
+		$html .= "    scope.querySelectorAll('label[for]').forEach(function(label) {\n";
 		$html .= "      var targetId = label.getAttribute('for');\n";
 		$html .= "      var next = label.nextElementSibling;\n";
 		$html .= "      if (!next || next.tagName !== 'INPUT' || next.id !== targetId) return;\n";
@@ -454,28 +371,31 @@ class frame_mobile{
 		$html .= "      wrap.appendChild(next);\n";
 		$html .= "    });\n";
 		$html .= "    function refreshCheckedState() {\n";
-		$html .= "      document.querySelectorAll('.option-chip').forEach(function(chip) {\n";
+		$html .= "      scope.querySelectorAll('.option-chip').forEach(function(chip) {\n";
 		$html .= "        var input = chip.querySelector(\"input[type='radio'], input[type='checkbox']\");\n";
 		$html .= "        chip.classList.toggle('is-checked', !!(input && input.checked));\n";
 		$html .= "      });\n";
 		$html .= "    }\n";
 		$html .= "    refreshCheckedState();\n";
 		$html .= "    document.addEventListener('change', function(event) {\n";
-		$html .= "      if (event.target && (event.target.matches(\"input[type='radio']\") || event.target.matches(\"input[type='checkbox']\"))) {\n";
+		$html .= "      if (event.target && (event.target.matches(\"input[type='radio']\") || event.target.matches(\"input[type='checkbox']\"))){\n";
 		$html .= "        refreshCheckedState();\n";
 		$html .= "      }\n";
 		$html .= "    });\n";
 		$html .= "\n";
-		$html .= "    // ── Field-active : highlight cellule active ───────────────────────────────\n";
-		$html .= "    document.querySelectorAll('input, select, textarea').forEach(function(field) {\n";
+		$html .= "    // ── Field-active : highlight cellule active ───────────────────────────────────\n";
+		$html .= "    scope.querySelectorAll('input, select, textarea').forEach(function(field) {\n";
 		$html .= "      field.addEventListener('focus', function() { var td = field.closest('td, th'); if (td) td.classList.add('field-active'); });\n";
 		$html .= "      field.addEventListener('blur',  function() { var td = field.closest('td, th'); if (td) td.classList.remove('field-active'); });\n";
 		$html .= "    });\n";
 		$html .= "  });\n";
 		$html .= "})();\n";
 		$html .= "</script>\n";
+		// ── session 33 : ouverture du wrapper div isolant tout le contenu mobile ──────────
+		$html .= "<div class=\"se-mobile-frame\">\n";
 		return $html;
 	}
+
 
 
 	function js_Post_Form($id_theme, $id_systeme){
@@ -1153,6 +1073,7 @@ class frame_mobile{
 				//echo '$fdgfdfgfgdf='.$element['FRAME'] ;
                 //echo '<pre>';
                 //print_r($element);
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
                 if (trim($this->dico[0]['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$this->dico[0]['FRAME'], $html);
 						echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -1541,6 +1462,7 @@ class frame_mobile{
         
         //print '<BR>affichage du template= '.$this->dico[0]['FRAME'];
         
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
                 if (trim($this->dico[0]['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$this->dico[0]['FRAME'], $html);
 						echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -3199,6 +3121,7 @@ class frame_mobile{
 		}*/
 		//$html 			.= "\n</Form>";
 		// print '<BR>'.$element['FRAME'];
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
 				if (trim($element['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 						if($code_annee=='' && $code_etablissement=='')	echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -3959,6 +3882,7 @@ class frame_mobile{
 			}
 	
 			//print '<BR>'.$element['FRAME'];
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
 			if (trim($element['FRAME']) <> '') {
 					file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 					echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -5816,6 +5740,7 @@ class frame_mobile{
 		$html 	  	  .= "</script>\n";
 
 			//print '<BR>'.$element['FRAME'];
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
 		if (trim($element['FRAME']) <> '') {
 			file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 			echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -7795,6 +7720,7 @@ class frame_mobile{
 		$html 	  	  .= "</script>\n";
 
 			//print '<BR>'.$element['FRAME'];
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
 		if (trim($element['FRAME']) <> '') {
 			file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 			echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -8408,6 +8334,7 @@ if(!isset($classe_fond)) {
 				$html 	  	  .= "</script>\n";
 
 					//print '<BR>'.$element['FRAME'];
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
 				if (trim($element['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 						echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -8994,6 +8921,7 @@ if(!isset($classe_fond)) {
 				$html 	  	  .= "</script>\n";
 
 					//print '<BR>'.$element['FRAME'];
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
 				if (trim($element['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 						echo "<b>Mobile Format:</b><br/><br/>".$html;
@@ -9638,6 +9566,7 @@ if(!isset($classe_fond)) {
 		$html	.= "</div>"."\n";
 
         //print '<BR>'.$element['FRAME'];
+				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
 				if (trim($element['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 						echo "<b>Mobile Format:</b><br/><br/>".$html;
