@@ -1,6 +1,7 @@
 <?php
 
-session_start();
+// session 34 : read_and_close - evite deadlock XAMPP Windows lock session
+@session_start(['read_and_close' => true]);
 
 $name = 'defaut';
 

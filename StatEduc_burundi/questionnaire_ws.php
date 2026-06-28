@@ -1,5 +1,6 @@
-<?php 
-session_start();
+<?php
+// session 34 : read_and_close pour eviter deadlock XAMPP curl interne data_save.php -> questionnaire_ws.php
+@session_start(['read_and_close' => true]);
 set_time_limit(0);
 ////Recuperation des varibles globales dans $_GET
 ini_set("memory_limit", "64M");

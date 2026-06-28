@@ -57,7 +57,8 @@ $connexion->init($source);
 
 require_once $GLOBALS['SISED_PATH_CLS'] . 'arbre/arbre.class.php';
 
-session_start();
+// session 34 : read_and_close pour eviter deadlock XAMPP Windows sur lock session
+@session_start(['read_and_close' => true]);
 $requete = "SELECT * FROM PARAM_DEFAUT;";
 $params = $GLOBALS['conn_dico']->GetRow($requete);
 if(!isset($_SESSION['langue']) || preg_match('#index.php#',$_SERVER['PHP_SELF'])) {
