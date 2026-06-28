@@ -192,60 +192,38 @@
 var tab_chps = new Array();
 </script>
 <div align=center>
-<FORM ACTION='questionnaire.php?theme_frame=8902' METHOD='POST' NAME='form1'>
+<FORM ACTION='questionnaire.php?theme_frame=9702' METHOD='POST' NAME='form1'>
 <TABLE class='table-questionnaire' border='1'>
-	<TR class='ligne-impaire-left'>
-		<TD colspan='4'>&nbsp;1.1. Nom de l'école :&nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_ETABLISSEMENT_0' TYPE='text' style = 'width:300px'  ID='NOM_ETABLISSEMENT_0' VALUE="" >
-&nbsp;</TD>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>4.2.b.  Elèves ayant fréquenté le  préscolaire parmi les   nouveaux inscrits :<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
 	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-paire-left'>
-		<TD colspan='4'>&nbsp;Ancien nom de l'école (si applicable)&nbsp;&nbsp;&nbsp;<INPUT NAME='ANCIEN_NOM_ETABLISSEMENT_0' TYPE='text' style = 'width:300px'  ID='ANCIEN_NOM_ETABLISSEMENT_0' VALUE="" >
-&nbsp;</TD>
+
+	<TR>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+
 	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-impaire-left'>
-		<TD colspan='4'>&nbsp;1.2. Nom de la Direction :&nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_DIRECTION_0' TYPE='text' style = 'width:250px'  ID='NOM_DIRECTION_0' VALUE="" >
-&nbsp;</TD>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Inscrits en 1ère venus du pré scolaire public ou privé</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_NV_PRESC_#_1' id='FILLES_NV_PRESC_0_1' name='FILLES_NV_PRESC_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_NV_PRESC_#_1' id='TOTAL_NV_PRESC_0_1' name='TOTAL_NV_PRESC_0_1' type='text' value=''></TD>
+
 	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-paire-left'>
-		<TD colspan='4'>&nbsp;1.3. Code de l'école :&nbsp;&nbsp;&nbsp;<INPUT NAME='CODE_ECOLE_PAYS_0' TYPE='text' style = 'width:100px'  ID='CODE_ECOLE_PAYS_0' VALUE="" >
-&nbsp;</TD>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Inscrits en 1ère venus du pré scolaire communautaire</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_NV_PRESC_#_2' id='FILLES_NV_PRESC_0_2' name='FILLES_NV_PRESC_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_NV_PRESC_#_2' id='TOTAL_NV_PRESC_0_2' name='TOTAL_NV_PRESC_0_2' type='text' value=''></TD>
+
 	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-impaire-left'>
-		<TD colspan='4'>&nbsp;Localisation :&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-paire-left'>
-		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;1.5. Milieu :&nbsp;</TD>
-		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_MILIEU_0_1'>urbain</LABEL><INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_1' VALUE='1' data-mini='true'></TD>
-		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_MILIEU_0_2'>rural</LABEL><INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_2' VALUE='2' data-mini='true'></TD>
-	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-impaire-left'>
-		<TD colspan='4'>&nbsp;1.6. Téléphone  de l'école:&nbsp;&nbsp;&nbsp;<INPUT NAME='TELEPHONE_0' TYPE='text' style = 'width:100px'  ID='TELEPHONE_0' VALUE="" >
-&nbsp;</TD>
-	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-paire-left'>
-		<TD colspan='4'>&nbsp;1.7. Année de création de l'école:&nbsp;&nbsp;&nbsp;<INPUT NAME='ANNEE_CREATION_0' TYPE='text' style='width:100px'  ID='ANNEE_CREATION_0' VALUE="" >
-&nbsp;</TD>
-	</TR>
-		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
-	<TR class='ligne-impaire-left'>
-		<TD  rowspan='3'  valign=top class='police_gras'>&nbsp;1.8. Pouvoir organisationnel :&nbsp;</TD>
-		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_STATUT_ORG_0_6'>Public/Etat</LABEL><INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_6' VALUE='6' data-mini='true'></TD>
-		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_STATUT_ORG_0_7'>Public sous convention</LABEL><INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_7' VALUE='7' data-mini='true'></TD>
-	</TR>
-	<TR class='ligne-impaire-left'>
-		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_STATUT_ORG_0_8'>Privé</LABEL><INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_8' VALUE='8' data-mini='true'></TD>
-		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_STATUT_ORG_0_13'>Privé à Programme étranger</LABEL><INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_13' VALUE='13' data-mini='true'></TD>
-	</TR>
-	<TR class='ligne-impaire-left'>
-		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_STATUT_ORG_0_9'>Consulaire</LABEL><INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_9' VALUE='9' data-mini='true'></TD>
-		<TD COLSPAN='2'>&nbsp;</TD>
+</TABLE></TD>
 	</TR>
 </TABLE></FORM></div>
 </div>
