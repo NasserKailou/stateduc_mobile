@@ -1,8 +1,43 @@
 # StatEduc MEN 2025 — Journal des travaux (Serveur PHP)
 
-Branche de développement : `ak_main`  
+Branche de développement : `ak_main` / `ak_secure`  
 Dépôt : `https://github.com/NasserKailou/stateduc_mobile`  
 Pull Request ouverte : [PR #1](https://github.com/NasserKailou/stateduc_mobile/pull/1)
+
+---
+
+## Session 35 — Sécurité : Migration md5 → bcrypt (branche `ak_secure`)
+
+### Contexte
+MD5 est un algorithme de hachage **cryptographiquement cassé** (collisions, rainbow tables, GPU cracking). Tous les mots de passe utilisateurs stockés en MD5 dans `ADMIN_USERS.PASSWORD` sont migrés vers **bcrypt** (`PASSWORD_BCRYPT`, cost=12), via les fonctions natives PHP `password_hash()` / `password_verify()`.
+
+### Stratégie technique
+- **Stockage** : `password_hash($mdp, PASSWORD_BCRYPT)` → hash `$2y$12$...` (60 chars)
+- **Vérification** : au lieu de `WHERE PASSWORD = md5(input)`, on charge le hash par login seul, puis `password_verify(input, hash)`
+- **Aucun changement côté Flutter** : l'app mobile envoyait déjà le mot de passe en clair dans l'URL REST et le header HTTP Basic. C'est le serveur qui faisait le md5. La suppression du md5 serveur est transparente pour le client mobile.
+
+### Fichiers modifiés
+
+| Fichier | Changement |
+|---------|-----------|
+| `server-side/lib/fonctions.inc.php` | `valide_user()`, `valide_user_ws()`, `infos_user_ws()` : requête SQL par login seul + `password_verify()` |
+| `common.php` | Suppression de `md5($_POST['password'])` dans l'appel `valide_user()` |
+| `user_ident.php` | Route `/user/` : suppression `md5($password)` ; route `/user_new_pwd/` : `password_hash($newpwd, PASSWORD_BCRYPT)` |
+| `server-side/include/web_services/HttpAuth.php` | Suppression `$password_md5 = md5($password)` ; vérification déléguée à `valide_user_ws()` |
+| `server-side/classes/metier/user.class.php` | Import Excel + formulaire création/modification : `md5()` → `password_hash($mdp, PASSWORD_BCRYPT)` |
+| `server-side/sql/create_admin_nasser_bcrypt.sql` | **NOUVEAU** — Script SQL création admin `nasser` / `nasser@2026` en bcrypt |
+
+### Script admin
+```sql
+-- Mot de passe : nasser@2026
+-- Hash bcrypt $2y$12$ (PHP PASSWORD_BCRYPT, cost=12)
+UPDATE ADMIN_USERS SET PASSWORD='$2y$12$BKWYlzyZuR5GrapX6c2ApuoxHONZ6GEGANd3ZA3DmaDe76LGYVGV2', CODE_GROUPE=1 WHERE NOM_USER='nasser';
+```
+
+### ⚠️ Important — Migration des utilisateurs existants
+Les mots de passe existants stockés en MD5 **ne fonctionneront plus** après déploiement.  
+Chaque utilisateur doit réinitialiser son mot de passe via l'interface de gestion (`administration.php?val=gestionuser`).  
+Voir le script complet : `server-side/sql/create_admin_nasser_bcrypt.sql`
 
 ---
 

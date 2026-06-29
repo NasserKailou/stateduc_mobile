@@ -924,7 +924,8 @@
 					}
 					//$donnees_ligne [] = $matr[$champ_ordre]; 
 					if (isset($matr[$i][$champ_pwd]) && $matr[$i][$champ_pwd]<>'' ){
-						$donnees_ligne [] = md5($matr[$i][$champ_pwd]);
+						// session 35 : migration md5 -> bcrypt (import Excel)
+						$donnees_ligne [] = password_hash($matr[$i][$champ_pwd], PASSWORD_BCRYPT);
 					}else{
 						$donnees_ligne []='';
 					}   
@@ -1177,11 +1178,14 @@
         if (is_array($matr)){                
 			foreach ($matr as $tab){
                 $action = $tab[sizeof($tab)-1];
-								// bass : traitement des mots de passe en md5
+								// session 35 : migration md5 -> bcrypt (creation/modification utilisateur)
 								if ($this->type_traitement=='user'){
-										$tab[5] = md5($tab[5]);
+										// Hacher le mot de passe en bcrypt seulement s'il est non vide
+										if (!empty($tab[5])) {
+											$tab[5] = password_hash($tab[5], PASSWORD_BCRYPT);
+										}
 								} 
-								// fin bass
+								// fin session 35
                 switch ($action){
                     case 'I':                        
                             $insert_ok=true;

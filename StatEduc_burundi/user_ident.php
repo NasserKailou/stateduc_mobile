@@ -34,7 +34,8 @@ $app->get('/user/:login/:password', function ($login, $password) use ($lib_statu
 	
 	$status = $GLOBALS['PARAM_WS']['LOGIN_OK'];	
 	//recup des infos de l'utilisateur
-	$user_info = infos_user_ws($login, md5($password));
+	// session 35 : bcrypt - le mot de passe est verifie en interne par infos_user_ws (password_verify)
+	$user_info = infos_user_ws($login, $password);
 	
 	$requete = "SELECT PARAM_DEFAUT.CODE_ANNEE FROM PARAM_DEFAUT";
    
@@ -81,7 +82,9 @@ $app->get('/leave/:login/:password', function ($login, $password) use ($lib_stat
 // permet de changer le mot de passe de l'utilisateur
 $app->get('/user_new_pwd/:login/:newpwd', function ($login, $newpwd) use ($lib_status, $lib_message, $lib_data, $status_ok) {
 	$status = $GLOBALS['PARAM_WS']['LOGIN_OK'];	     
-  $requete = "UPDATE ADMIN_USERS SET PASSWORD='".md5($newpwd)."' WHERE NOM_USER='".$login."'";
+  // session 35 : bcrypt - stockage du nouveau mot de passe avec password_hash
+  $hashed = password_hash($newpwd, PASSWORD_BCRYPT);
+  $requete = "UPDATE ADMIN_USERS SET PASSWORD='".$hashed."' WHERE NOM_USER='".$login."'";
   $ok = $GLOBALS['conn_dico']->Execute($requete);
   $data = "";
   if (!$ok) {

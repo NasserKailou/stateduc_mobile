@@ -657,7 +657,8 @@ if(!(isset($_POST['login']) && isset($_POST['password']))
 		 */
 		if((isset($_POST) && count($_POST)>0)) {
 			if(isset($_POST['login']) && isset($_POST['password'])) {
-				valide_user($_POST['login'],md5($_POST['password']));
+				// session 35 : le mot de passe est desormais verifie en bcrypt dans valide_user (password_verify)
+				valide_user($_POST['login'], $_POST['password']);
 				valide_user_LogByEtab($_POST['login'], $_POST['password']);
 				if(isset($_SESSION['valide']) && $_SESSION['valide']){
 					header('Location: '.$SISED_AURL.'accueil.php');
