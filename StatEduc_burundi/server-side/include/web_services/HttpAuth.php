@@ -15,7 +15,7 @@
  *          Toutes les modifications et nouveautes sont documentees
  *          directement dans le code avec des commentaires en francais.
  */
-// Class destinée à gérer l'authentification
+// Class destinï¿½e ï¿½ gï¿½rer l'authentification
 class HttpAuth extends \Slim\Middleware
 {
     /**
@@ -50,21 +50,22 @@ class HttpAuth extends \Slim\Middleware
      * @param   string  $password   The HTTP Authentication password     
      *
      */
-    public function authenticate($username, $password) { //return true;
+    public function authenticate($username, $password) {
+        // session 35 : migration md5 -> bcrypt
+        // valide_user_ws accepte desormais le mot de passe en clair et fait password_verify en interne
         if(!ctype_alnum($username))
             return false;
-         
+
         if(isset($username) && isset($password)) {
-			$password_md5 = md5($password);
-		// Check database here with $username and $password
-			if (valide_user_ws($username, $password_md5)) {
+			// password_verify est effectue dans valide_user_ws (fonctions.inc.php)
+			if (valide_user_ws($username, $password)) {
 				return true;
-			}else {
+			} else {
 				return false;
 			}
-        }
-        else
+        } else {
             return false;
+        }
     }
  
     /**

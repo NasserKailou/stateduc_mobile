@@ -1,9 +1,9 @@
 <?php function manage_magic_quotes(){
 		ini_set("magic_quotes_runtime", 0);
-		# On n'exécute la boucle que si nécessaire
+		# On n'exï¿½cute la boucle que si nï¿½cessaire
 		if(get_magic_quotes_gpc() == 1){
 				
-				# Définition de la fonction récursive.
+				# Dï¿½finition de la fonction rï¿½cursive.
 				function remove_magic_quotes(&$array)
 				{
 					 foreach($array as $key => $val){
@@ -19,7 +19,7 @@
 				
 				# Appel de la fonction pour chaque variables.
 				# Notes, vous pouvez enlevez celle d'on vous ne vous servez pas.
-				# Personnellement, j'enlève $_REQUEST et $_FILES
+				# Personnellement, j'enlï¿½ve $_REQUEST et $_FILES
 				
 				remove_magic_quotes($_POST);
 				remove_magic_quotes($_GET);
@@ -33,7 +33,7 @@
 function create_combo($tableau, $nom_combo, $nom_code, $selected_element, $fonction, $disabled='')
  {
  //TODO: en double avec arbre->create_combo
-  // Créé la chaine de texte qui va constituer la liste des options dans le combo   
+  // Crï¿½ï¿½ la chaine de texte qui va constituer la liste des options dans le combo   
     
     $chaine_combo='';
 	if(trim($fonction) <> ''){
@@ -71,7 +71,7 @@ function recherche_libelle($code_libelle){
 }
 */
 
-	//recherche le nom d'une valeur d'une table nomenclature (utilisé pour les infos établissement)
+	//recherche le nom d'une valeur d'une table nomenclature (utilisï¿½ pour les infos ï¿½tablissement)
     function recherche_libelle_nomenclature_ctrl($id_nomenclature, $table_nomenclature){
 		if(!in_array($table_nomenclature, array_map('strtoupper',$GLOBALS['conn']->MetaTables('TABLES')))){
 			$arr_tables_nomenc = preg_grep('/'.$table_nomenclature.'/', array_map('strtoupper',$GLOBALS['conn']->MetaTables('TABLES')));
@@ -87,7 +87,7 @@ function recherche_libelle($code_libelle){
         return $aresult[0]['LIBELLE'];
     }
 
-    //recherche le nom d'une valeur d'une table nomenclature (utilisé pour les infos établissement)
+    //recherche le nom d'une valeur d'une table nomenclature (utilisï¿½ pour les infos ï¿½tablissement)
     function recherche_libelle_nomenclature($id_nomenclature, $table_nomenclature){
 		$requete        = "SELECT LIBELLE FROM DICO_TRADUCTION
                             WHERE CODE_NOMENCLATURE=".$id_nomenclature." 
@@ -100,7 +100,7 @@ function recherche_libelle($code_libelle){
     }
 
     function recherche_libelle_page($code_libelle){
-    // Recherche le libellé à afficher à partir du tableau en session qui contient l'ensemble des libellés
+    // Recherche le libellï¿½ ï¿½ afficher ï¿½ partir du tableau en session qui contient l'ensemble des libellï¿½s
         foreach ($_SESSION['tab_libelles'] as $key => $row){
             foreach($row as $cell){
                 if ($cell == $code_libelle){
@@ -116,7 +116,7 @@ function recherche_libelle($code_libelle){
 		
 
     function lit_libelles_page($page){
-        // Recherche des libellés à traduire sur la page 
+        // Recherche des libellï¿½s ï¿½ traduire sur la page 
 				$GLOBALS['libelles_page_found'] = true;
         preg_match('`.*/(.*)$`', preg_replace('`\\\`', '/', $page), $reg);
         //$db                     = $GLOBALS['conn'];
@@ -135,7 +135,7 @@ function recherche_libelle($code_libelle){
 	// Fonction de login
 	
 		function valide_user_LogByEtab ($login,$password){
-			//Vérification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
+			//Vï¿½rification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
 			//(pour le choix du menu)
 						
 			// Modfi Bass - Atelier Somone Senegal
@@ -175,7 +175,7 @@ function recherche_libelle($code_libelle){
 					set_tab_session('secteurs', $_SESSION['langue']);
 					// Les chaines de regroupement
 					set_tab_session('chaines', '');                
-					// Les années
+					// Les annï¿½es
 					set_tab_session('annees', ''); 
 					// Les langues
 					set_tab_session('langues', ''); 
@@ -190,20 +190,25 @@ function recherche_libelle($code_libelle){
 	}// Fin function valide_user
 
 	function valide_user($login,$password){
-            //Vérification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
+            //Vï¿½rification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
             //(pour le choix du menu)
             //require_once $GLOBALS['SISED_PATH_LIB'] . 'fonctions.inc.php';
 
-           // $db                 = $GLOBALS['conn'];
-            $requete            = "SELECT CODE_GROUPE, CODE_USER FROM ADMIN_USERS
-                                    WHERE NOM_USER = '".$login."' AND PASSWORD = '".$password."';";
+                      // session 35 : migration md5 -> bcrypt (password_verify)
+            // Recupere le hash stocke + infos groupe pour ce login
+            $requete = "SELECT CODE_GROUPE, CODE_USER, PASSWORD FROM ADMIN_USERS
+                                    WHERE NOM_USER = '".$login."';";
             $groupe = $GLOBALS['conn_dico']->GetAll($requete);
-            
+
+            // Verification bcrypt du mot de passe soumis contre le hash stocke
+            if (!is_array($groupe) || count($groupe) == 0) return;
+            if (!password_verify($password, $groupe[0]['PASSWORD'])) return;
+
             $_SESSION['groupe'] = $groupe[0]['CODE_GROUPE'];
-			$_SESSION['code_user'] = $groupe[0]['CODE_USER'];
+            $_SESSION['code_user'] = $groupe[0]['CODE_USER'];
             if ( is_array($groupe) and (isset($_SESSION['groupe'])) ){
-                //Implémentation de la session
-                //TODO: à quoi ça sert dans la mesure où on "session_destroy()" dans le logout.php?
+                //Implï¿½mentation de la session
+                //TODO: ï¿½ quoi ï¿½a sert dans la mesure oï¿½ on "session_destroy()" dans le logout.php?
 				session_regenerate_id();
 				$_SESSION['valide'] = 1;
                 //Mise en place du cookie et de la session
@@ -221,7 +226,7 @@ function recherche_libelle($code_libelle){
 				*/
 
     //------------------Initialisation en SESSION
-                // TODO: Le premier questionnaire devra être retrouvé dans DICO_THEME
+                // TODO: Le premier questionnaire devra ï¿½tre retrouvï¿½ dans DICO_THEME
                 $_SESSION['ID_theme_defaut']    = 90;
 				//require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
                 //require_once $GLOBALS['SISED_PATH_LIB'] . 'connexion.inc.php';
@@ -229,14 +234,14 @@ function recherche_libelle($code_libelle){
 				set_tab_session('secteurs', $_SESSION['langue']);
                 // Les chaines de regroupement
 				set_tab_session('chaines', '');                
-				// Les années
+				// Les annï¿½es
 				set_tab_session('annees', ''); 
 				// Les filtres
 				set_tab_session('filtres', ''); 
                 // Les langues
                	set_tab_session('langues', ''); 
                 // Les IA
-                // TODO: implémenter le combo
+                // TODO: implï¿½menter le combo
 //*************************************************************
                 // Redirection
                 header('Location: '.$GLOBALS['SISED_AURL'].'accueil.php');
@@ -245,15 +250,20 @@ function recherche_libelle($code_libelle){
 	}// Fin function valide_user
 	
 	function valide_user_ws($login, $password) {
-		//Vérification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
+		//Vï¿½rification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
 		//(pour le choix du menu)
 		//require_once $GLOBALS['SISED_PATH_LIB'] . 'fonctions.inc.php';
 
-	   // $db                 = $GLOBALS['conn'];
-		$requete = "SELECT CODE_GROUPE, CODE_USER FROM ADMIN_USERS
-								WHERE NOM_USER = '".$login."' AND PASSWORD = '".$password."';";
+		// session 35 : migration md5 -> bcrypt (password_verify)
+		// Recupere le hash stocke + infos groupe pour ce login uniquement
+		$requete = "SELECT CODE_GROUPE, CODE_USER, PASSWORD FROM ADMIN_USERS
+								WHERE NOM_USER = '".$login."';";
 		$groupe = $GLOBALS['conn_dico']->GetRow($requete);
-		
+
+		// Verification bcrypt
+		if (!is_array($groupe) || empty($groupe['PASSWORD'])) return false;
+		if (!password_verify($password, $groupe['PASSWORD'])) return false;
+
 		$_SESSION['groupe'] = $groupe['CODE_GROUPE'];
 		$_SESSION['code_user'] = $groupe['CODE_USER'];
 		if (is_array($groupe) and (isset($_SESSION['groupe']))){
@@ -264,20 +274,23 @@ function recherche_libelle($code_libelle){
 	}// Fin function valide_user_ws
 	
 	function infos_user_ws($login, $password) {
-		//Vérification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
+		//Vï¿½rification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
 		//(pour le choix du menu)
 		//require_once $GLOBALS['SISED_PATH_LIB'] . 'fonctions.inc.php';
 
-	   // $db                 = $GLOBALS['conn'];
-		$requete = "SELECT CODE_GROUPE, CODE_USER, NOM_LONG_USER, EMAIL_USER FROM ADMIN_USERS
-								WHERE NOM_USER = '".$login."' AND PASSWORD = '".$password."';";
+		// session 35 : migration md5 -> bcrypt (password_verify)
+		// Recupere le hash + infos utilisateur par login uniquement
+		$requete = "SELECT CODE_GROUPE, CODE_USER, NOM_LONG_USER, EMAIL_USER, PASSWORD FROM ADMIN_USERS
+								WHERE NOM_USER = '".$login."';";
 		$groupe = $GLOBALS['conn_dico']->GetRow($requete);
-		
-		if (is_array($groupe)) {
-			return $groupe;
-		} else {
-			return NULL;
-		}
+
+		// Verification bcrypt
+		if (!is_array($groupe) || empty($groupe['PASSWORD'])) return NULL;
+		if (!password_verify($password, $groupe['PASSWORD'])) return NULL;
+
+		// Ne pas retourner le hash a l'appelant
+		unset($groupe['PASSWORD']);
+		return $groupe;
 	}// Fin function infos_user_ws
 	
 	function set_tab_session($cas, $langue){
@@ -572,7 +585,7 @@ function recherche_libelle($code_libelle){
 				} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 					$conn                 =   $GLOBALS['conn_dico']; 
 				}
-			// permet de récupérer le libellé dans la table de traduction
+			// permet de rï¿½cupï¿½rer le libellï¿½ dans la table de traduction
 			// en fonction de la langue et de la table  aussi
 			$requete 	= "SELECT LIBELLE
 									FROM DICO_TRADUCTION 
@@ -863,14 +876,14 @@ function recherche_libelle($code_libelle){
 	}
 	
 	function get_libelle_page($code,$langue,$table){
-				// permet de récupérer le libellé dans la table de traduction
+				// permet de rï¿½cupï¿½rer le libellï¿½ dans la table de traduction
 				// en fonction de la langue et de la table  aussi
 				$conn 	= $GLOBALS['conn'];
 				$requete 	= "SELECT LIBELLE
 										FROM DICO_LIBELLE_PAGE 
 										WHERE CODE_LIBELLE='".$code."' And CODE_LANGUE='".$langue."'
 										AND NOM_PAGE='".$table."'";
-				// Gestion des erreurs lors de l'exécution de la requête SQL
+				// Gestion des erreurs lors de l'exï¿½cution de la requï¿½te SQL
 				
                 try {
                     $all_res	= $GLOBALS['conn_dico']->GetAll($requete);
@@ -1088,7 +1101,7 @@ function recherche_libelle($code_libelle){
 	function get_cle_max_id_trace(){
 		$max_return = 0;
 		$sql = ' SELECT  MAX(ID_TRACE) as MAX_INSERT FROM  DICO_TRACE';       
-		// Gestion des erreurs lors de l'exécution de la requête SQL
+		// Gestion des erreurs lors de l'exï¿½cution de la requï¿½te SQL
 		try{
 			if (($rs =  $GLOBALS['conn_dico']->Execute($sql))===false) {   
 				throw new Exception('ERR_SQL');  
@@ -1103,7 +1116,7 @@ function recherche_libelle($code_libelle){
 		return($max_return);
 	}
 	
-	//converti les caractères spéciaux de word
+	//converti les caractï¿½res spï¿½ciaux de word
 	function convertWordSpecialChr($txt){ 
 
 	   //gestion des guillemets divers 
@@ -1302,7 +1315,7 @@ function recherche_libelle($code_libelle){
 	/**
 	* METHODE : get_tables_meres_theme()
 	* <pre>
-	* Récupération des tables mères du thème
+	* Rï¿½cupï¿½ration des tables mï¿½res du thï¿½me
 	* </pre>
 	* @access public
 	* 
@@ -1379,7 +1392,7 @@ function recherche_libelle($code_libelle){
 	/**
 	* METHODE : create_zip()
 	* <pre>
-	* fonction de création du fichier ZIP aprés export
+	* fonction de crï¿½ation du fichier ZIP aprï¿½s export
 	* </pre>
 	* @access public
 	* 
@@ -1428,7 +1441,7 @@ function recherche_libelle($code_libelle){
 	
 	function replaceAccents($str) {
 		$search = explode(",",
-	"ç,æ,œ,á,é,í,ó,ú,à,è,ì,ò,ù,ä,ë,ï,ö,ü,ÿ,â,ê,î,ô,û,å,ø,Ø,Å,Á,À,Â,Ä,È,É,Ê,Ë,Í,Î,Ï,Ì,Ò,Ó,Ô,Ö,Ú,Ù,Û,Ü,Ÿ,Ç,Æ,Œ");
+	"ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½,ï¿½");
 		$replace = explode(",",
 	"c,ae,oe,a,e,i,o,u,a,e,i,o,u,a,e,i,o,u,y,a,e,i,o,u,a,o,O,A,A,A,A,A,E,E,E,E,I,I,I,I,O,O,O,O,U,U,U,U,Y,C,AE,OE");
 		return str_replace($search, $replace, $str);
@@ -1439,8 +1452,8 @@ function recherche_libelle($code_libelle){
 		//$entities = array("&amp;", "&quot;", "&apos;", "&lt;", "&gt;", "&nbsp;", "&iexcl;", "&cent;", "&pound;", "&curren;", "&yen;", "&brvbar;", "&sect;", "&uml;", "&copy;", "&ordf;", "&laquo;", "&not;", "&shy;", "&reg;", "&macr;", "&deg;", "&plusmn;", "&sup2;", "&sup3;", "&acute;", "&micro;", "&para;", "&middot;", "&cedil;", "&sup1;", "&ordm;", "&raquo;", "&frac14;", "&frac12;", "&frac34;", "&iquest;", "&times;", "&divide;", "&Agrave;", "&Aacute;", "&Acirc;", "&Atilde;", "&Auml;", "&Aring;", "&AElig;", "&Ccedil;", "&Egrave;", "&Eacute;", "&Ecirc;", "&Euml;", "&Igrave;", "&Iacute;", "&Icirc;", "&Iuml;", "&ETH;", "&Ntilde;", "&Ograve;", "&Oacute;", "&Ocirc;", "&Otilde;", "&Ouml;", "&Oslash;", "&Ugrave;", "&Uacute;", "&Ucirc;", "&Uuml;", "&Yacute;", "&THORN;", "&szlig;", "&agrave;", "&aacute;", "&acirc;", "&atilde;", "&auml;", "&aring;", "&aelig;", "&ccedil;", "&egrave;", "&eacute;", "&ecirc;", "&euml;", "&igrave;", "&iacute;", "&icirc;", "&iuml;", "&eth;", "&ntilde;", "&ograve;", "&oacute;", "&ocirc;", "&otilde;", "&ouml;", "&oslash;", "&ugrave;", "&uacute;", "&ucirc;", "&uuml;", "&yacute;", "&thorn;", "&yuml;");
 		$entities = array("&lt;", "&gt;", "&amp;", "&quot;", "&apos;", "&nbsp;", "&iexcl;", "&cent;", "&pound;", "&curren;", "&yen;", "&brvbar;", "&sect;", "&uml;", "&copy;", "&ordf;", "&laquo;", "&not;", "&shy;", "&reg;", "&macr;", "&deg;", "&plusmn;", "&sup2;", "&sup3;", "&acute;", "&micro;", "&para;", "&middot;", "&cedil;", "&sup1;", "&ordm;", "&raquo;", "&frac14;", "&frac12;", "&frac34;", "&iquest;", "&times;", "&divide;", "&Agrave;", "&Aacute;", "&Acirc;", "&Atilde;", "&Auml;", "&Aring;", "&AElig;", "&Ccedil;", "&Egrave;", "&Eacute;", "&Ecirc;", "&Euml;", "&Igrave;", "&Iacute;", "&Icirc;", "&Iuml;", "&ETH;", "&Ntilde;", "&Ograve;", "&Oacute;", "&Ocirc;", "&Otilde;", "&Ouml;", "&Oslash;", "&Ugrave;", "&Uacute;", "&Ucirc;", "&Uuml;", "&Yacute;", "&THORN;", "&szlig;", "&agrave;", "&aacute;", "&acirc;", "&atilde;", "&auml;", "&aring;", "&aelig;", "&ccedil;", "&egrave;", "&eacute;", "&ecirc;", "&euml;", "&igrave;", "&iacute;", "&icirc;", "&iuml;", "&eth;", "&ntilde;", "&ograve;", "&oacute;", "&ocirc;", "&otilde;", "&ouml;", "&oslash;", "&ugrave;", "&uacute;", "&ucirc;", "&uuml;", "&yacute;", "&thorn;", "&yuml;");
 
-		//$UCchar = array("&", "\"", "'", "<", ">", "", "¡", "¢", "£", "¤", "¥", "¦", "§", "¨", "©", "ª", "«", "¬", "", "®", "¯", "°", "±", "²", "³", "´", "µ", "¶", "·", "¸", "¹", "º", "»", "¼", "½", "¾", "¿", "×", "÷", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "þ", "ÿ");
-		$UCchar = array("<", ">", "&", "\"", "'", "", "¡", "¢", "£", "¤", "¥", "¦", "§", "¨", "©", "ª", "«", "¬", "", "®", "¯", "°", "±", "²", "³", "´", "µ", "¶", "·", "¸", "¹", "º", "»", "¼", "½", "¾", "¿", "×", "÷", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "þ", "ÿ");
+		//$UCchar = array("&", "\"", "'", "<", ">", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½");
+		$UCchar = array("<", ">", "&", "\"", "'", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½");
 	  	// get input text
 	  	$tempString = $str;
 
@@ -1464,8 +1477,8 @@ function recherche_libelle($code_libelle){
 		//$entities = array("&amp;", "&quot;", "&apos;", "&lt;", "&gt;", "&nbsp;", "&iexcl;", "&cent;", "&pound;", "&curren;", "&yen;", "&brvbar;", "&sect;", "&uml;", "&copy;", "&ordf;", "&laquo;", "&not;", "&shy;", "&reg;", "&macr;", "&deg;", "&plusmn;", "&sup2;", "&sup3;", "&acute;", "&micro;", "&para;", "&middot;", "&cedil;", "&sup1;", "&ordm;", "&raquo;", "&frac14;", "&frac12;", "&frac34;", "&iquest;", "&times;", "&divide;", "&Agrave;", "&Aacute;", "&Acirc;", "&Atilde;", "&Auml;", "&Aring;", "&AElig;", "&Ccedil;", "&Egrave;", "&Eacute;", "&Ecirc;", "&Euml;", "&Igrave;", "&Iacute;", "&Icirc;", "&Iuml;", "&ETH;", "&Ntilde;", "&Ograve;", "&Oacute;", "&Ocirc;", "&Otilde;", "&Ouml;", "&Oslash;", "&Ugrave;", "&Uacute;", "&Ucirc;", "&Uuml;", "&Yacute;", "&THORN;", "&szlig;", "&agrave;", "&aacute;", "&acirc;", "&atilde;", "&auml;", "&aring;", "&aelig;", "&ccedil;", "&egrave;", "&eacute;", "&ecirc;", "&euml;", "&igrave;", "&iacute;", "&icirc;", "&iuml;", "&eth;", "&ntilde;", "&ograve;", "&oacute;", "&ocirc;", "&otilde;", "&ouml;", "&oslash;", "&ugrave;", "&uacute;", "&ucirc;", "&uuml;", "&yacute;", "&thorn;", "&yuml;");
 		$entities = array("&lt;", "&gt;", "&amp;", "&quot;", "&apos;", "&nbsp;", "&iexcl;", "&cent;", "&pound;", "&curren;", "&yen;", "&brvbar;", "&sect;", "&uml;", "&copy;", "&ordf;", "&laquo;", "&not;", "&shy;", "&reg;", "&macr;", "&deg;", "&plusmn;", "&sup2;", "&sup3;", "&acute;", "&micro;", "&para;", "&middot;", "&cedil;", "&sup1;", "&ordm;", "&raquo;", "&frac14;", "&frac12;", "&frac34;", "&iquest;", "&times;", "&divide;", "&Agrave;", "&Aacute;", "&Acirc;", "&Atilde;", "&Auml;", "&Aring;", "&AElig;", "&Ccedil;", "&Egrave;", "&Eacute;", "&Ecirc;", "&Euml;", "&Igrave;", "&Iacute;", "&Icirc;", "&Iuml;", "&ETH;", "&Ntilde;", "&Ograve;", "&Oacute;", "&Ocirc;", "&Otilde;", "&Ouml;", "&Oslash;", "&Ugrave;", "&Uacute;", "&Ucirc;", "&Uuml;", "&Yacute;", "&THORN;", "&szlig;", "&agrave;", "&aacute;", "&acirc;", "&atilde;", "&auml;", "&aring;", "&aelig;", "&ccedil;", "&egrave;", "&eacute;", "&ecirc;", "&euml;", "&igrave;", "&iacute;", "&icirc;", "&iuml;", "&eth;", "&ntilde;", "&ograve;", "&oacute;", "&ocirc;", "&otilde;", "&ouml;", "&oslash;", "&ugrave;", "&uacute;", "&ucirc;", "&uuml;", "&yacute;", "&thorn;", "&yuml;");
 
-		//$UCchar = array("&", "\"", "'", "<", ">", "", "¡", "¢", "£", "¤", "¥", "¦", "§", "¨", "©", "ª", "«", "¬", "", "®", "¯", "°", "±", "²", "³", "´", "µ", "¶", "·", "¸", "¹", "º", "»", "¼", "½", "¾", "¿", "×", "÷", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "þ", "ÿ");
-		$UCchar = array("<", ">", "&", "\"", "'", "", "¡", "¢", "£", "¤", "¥", "¦", "§", "¨", "©", "ª", "«", "¬", "", "®", "¯", "°", "±", "²", "³", "´", "µ", "¶", "·", "¸", "¹", "º", "»", "¼", "½", "¾", "¿", "×", "÷", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "þ", "ÿ");
+		//$UCchar = array("&", "\"", "'", "<", ">", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½");
+		$UCchar = array("<", ">", "&", "\"", "'", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½");
 	  	// get input text
 		$tempString = $str;
 		
