@@ -53,19 +53,13 @@ class HttpAuth extends \Slim\Middleware
     public function authenticate($username, $password) {
         // session 35 : migration md5 -> bcrypt
         // valide_user_ws accepte desormais le mot de passe en clair et fait password_verify en interne
-        if(!ctype_alnum($username))
-            return false;
-
-        if(isset($username) && isset($password)) {
-			// password_verify est effectue dans valide_user_ws (fonctions.inc.php)
-			if (valide_user_ws($username, $password)) {
-				return true;
-			} else {
-				return false;
-			}
-        } else {
+        // session 36 : suppression du ctype_alnum qui bloquait les logins avec tirets/points/underscores
+        if (empty($username) || empty($password)) {
             return false;
         }
+
+        // password_verify est effectue dans valide_user_ws (fonctions.inc.php)
+        return valide_user_ws($username, $password);
     }
  
     /**

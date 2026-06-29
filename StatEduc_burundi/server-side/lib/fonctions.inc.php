@@ -264,13 +264,15 @@ function recherche_libelle($code_libelle){
 		if (!is_array($groupe) || empty($groupe['PASSWORD'])) return false;
 		if (!password_verify($password, $groupe['PASSWORD'])) return false;
 
-		$_SESSION['groupe'] = $groupe['CODE_GROUPE'];
-		$_SESSION['code_user'] = $groupe['CODE_USER'];
-		if (is_array($groupe) and (isset($_SESSION['groupe']))){
-			return true;
-		} else {
-			return false;
-		}
+		// session 36 : fix regression read_and_close
+		// common_ws.php utilise session_start(['read_and_close'=>true]) (session 34) :
+		// les ecritures $_SESSION sont silencieusement ignorees dans ce contexte WS.
+		// L'ancien code ecrivait $_SESSION['groupe'] puis verifiait isset($_SESSION['groupe'])
+		// pour decider de retourner true -- ce qui echouait TOUJOURS avec read_and_close,
+		// retournant false meme apres un password_verify reussi (=> 401 sur data_camp.php).
+		// Correction : password_verify a deja valide les credentials, on retourne true directement.
+		// Les ecritures session sont inutiles dans le contexte REST (stateless par requete).
+		return true;
 	}// Fin function valide_user_ws
 	
 	function infos_user_ws($login, $password) {
