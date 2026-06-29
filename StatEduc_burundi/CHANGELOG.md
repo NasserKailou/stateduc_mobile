@@ -6,6 +6,39 @@ Pull Request ouverte : [PR #1](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## Session 36 — Correctif : Régression chargement formulaires après migration bcrypt (branche `ak_secure`)
+
+### Symptôme
+Après la migration md5→bcrypt (session 35), la connexion mobile fonctionnait, mais le chargement des formulaires de campagne s'arrêtait après l'étape 5/9 (localisations). L'écran affichait « Sélectionnez un formulaire pour commencer la saisie » sans formulaire chargé.
+
+### Cause racine identifiée — Double bug dans `valide_user_ws()`
+
+#### Bug 1 (principal) — Conflit `read_and_close` × écriture session
+`common_ws.php` utilise `@session_start(['read_and_close' => true])` depuis la session 34 (correction deadlock XAMPP Windows). Dans ce mode, la session est ouverte en **lecture seule** — toute écriture `$_SESSION[...]` est silencieusement ignorée.
+
+L'ancien `valide_user_ws()` écrivait `$_SESSION['groupe']` puis vérifiait `isset($_SESSION['groupe'])` pour retourner `true`. Avec `read_and_close`, cette écriture n'avait aucun effet → `isset()` retournait `false` → la fonction retournait `false` même après un `password_verify()` réussi → **HTTP 401 sur tous les endpoints `data_camp.php`**.
+
+Cela explique pourquoi `user_camp.php` (localisations — étape 5) fonctionnait : `$app->add(new \HttpAuth())` est **commenté** dans `user_camp.php` — aucune authentification requise. En revanche, `data_camp.php` (formulaires — étapes 7+) a `$app->add(new \HttpAuth())` **actif** → toutes les requêtes passaient par `valide_user_ws()` → 401.
+
+#### Bug 2 (secondaire) — `ctype_alnum` trop restrictif dans `HttpAuth::authenticate()`
+Le garde `if(!ctype_alnum($username))` bloquait tout login contenant un tiret, un underscore, un point ou une arobase. Remplacé par `empty($username) || empty($password)`.
+
+### Fichiers corrigés
+
+| Fichier | Changement |
+|---------|-----------|
+| `server-side/lib/fonctions.inc.php` | `valide_user_ws()` : suppression des écritures `$_SESSION` + vérification `isset()` ; remplacé par `return true` direct après `password_verify()` |
+| `server-side/include/web_services/HttpAuth.php` | `authenticate()` : `ctype_alnum($username)` → `empty($username) \|\| empty($password)` |
+
+### Résumé de la chaîne de chargement mobile (9 étapes)
+- Étapes 1–4 : regroups, types de groupes, statuts écoles, écoles → `user_camp.php` (HttpAuth désactivé) ✅
+- Étape 5 : localisations `locs_camp/` → `user_camp.php` (HttpAuth désactivé) ✅
+- Étape 6 : systèmes éducatifs `sys_camp/` → `user_camp.php` (HttpAuth désactivé) ✅
+- Étape 7+ : questions `theme_camp/` + HTML formulaires `html_theme_camp/` → `data_camp.php` (HttpAuth **actif**) ← **bloqué avant ce correctif**
+- Étape 8 : règles `regle_theme_camp/` → `data_camp.php` (HttpAuth actif) ← **bloqué avant ce correctif**
+
+---
+
 ## Session 35 — Sécurité : Migration md5 → bcrypt (branche `ak_secure`)
 
 ### Contexte
