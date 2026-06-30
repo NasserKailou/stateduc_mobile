@@ -2,7 +2,57 @@
 
 Branche de développement : `ak_main` / `ak_secure`  
 Dépôt : `https://github.com/NasserKailou/stateduc_mobile`  
-Pull Request ouverte : [PR #1](https://github.com/NasserKailou/stateduc_mobile/pull/1)
+Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/pull/2)
+
+---
+
+## Session 37 — Correctif complet : formulaires mobiles non téléchargés après migration bcrypt (branche `ak_secure`)
+
+### Symptôme persistant après session 36
+La connexion mobile fonctionnait, la liste des campagnes s'affichait, mais lors du téléchargement d'une campagne :
+- ✅ Étapes 1–6 (localisations, établissements, systèmes) : OK via `user_camp.php` (HttpAuth désactivé)
+- ❌ Étapes 7–9 (questions/thèmes, HTML formulaires, règles) : ÉCHEC via `data_camp.php` (HttpAuth **actif**)
+
+### Causes racines identifiées — Session 37
+
+#### Cause A — Champ `PASSWORD` trop petit dans la base Access (CRITIQUE)
+Un hash bcrypt PHP mesure **60 caractères** (`$2y$12$...`). Si le champ `PASSWORD` de la table `ADMIN_USERS` dans `dico_DB.mdb/.accdb` est défini en `TEXT(32)` ou `TEXT(50)`, Microsoft Access **tronque silencieusement** le hash lors de l'enregistrement. Résultat : `password_verify()` retourne toujours `false` → HTTP 401 permanent.
+
+**Correctif** : agrandir le champ à `TEXT(255)` via Access GUI ou DDL. Script fourni : `server-side/sql/alter_password_field_access.sql`.
+
+#### Cause B — Hashes MD5 legacy non migrés
+Si certains utilisateurs ont encore un hash MD5 (32 chars hexadécimaux) jamais mis à jour, `password_verify()` échoue systématiquement (bcrypt vs MD5 incompatibles).
+
+**Correctif** : `valide_user_ws()` et `infos_user_ws()` supportent désormais 4 cas :
+1. **Hash bcrypt complet** (60 chars, `$2y$`/`$2a$`) → `password_verify()`
+2. **Hash MD5 legacy** (32 chars hex) → `md5()` compare → **auto-migration vers bcrypt** en base
+3. **Hash bcrypt tronqué** (< 60 chars, commence par `$2y$`) → `error_log()` + refus (champ Access trop petit)
+4. **Format inconnu** → `error_log()` + refus sécurisé
+
+#### Cause C — `common_ws.php` `read_and_close` détruisait toutes les `$_SESSION` (session 34 regression)
+`@session_start(['read_and_close' => true])` ouvre la session en **lecture seule**. Toutes les écritures `$_SESSION['langue']`, `$_SESSION['annee']`, etc. effectuées juste après étaient **silencieusement ignorées**. Les variables n'étaient jamais persistées.
+
+**Correctif** : remplacement par `if (session_status() === PHP_SESSION_NONE) { session_start(); }` + `session_write_close()` explicite **après** toutes les initialisations. Protection anti-deadlock XAMPP maintenue par le close explicite.
+
+#### Cause D — Double `session_start()` dans `user_camp.php` masquait le bug (session 34 side-effect)
+La ligne 1 `<?php session_start()` dans `user_camp.php` démarrait une session normale. Le second appel `@session_start(['read_and_close' => true])` dans `common_ws.php` était ignoré (déjà ouvert). Résultat : `user_camp.php` obtenait une session normale par accident, `data_camp.php` (sans son propre `session_start`) héritait du `read_and_close` → explication exacte du comportement asymétrique étapes 1–6 OK / étapes 7+ KO.
+
+**Correctif** : suppression du `session_start()` dupliqué de `user_camp.php` ligne 1.
+
+### Fichiers modifiés — Session 37
+
+| Fichier | Changement |
+|---------|-----------|
+| `server-side/lib/fonctions.inc.php` | `valide_user_ws()` + `infos_user_ws()` : réécriture robuste 4 cas (bcrypt/MD5/tronqué/inconnu) avec auto-migration MD5→bcrypt |
+| `common_ws.php` | `@session_start(['read_and_close' => true])` → `if (session_status() === PHP_SESSION_NONE) { session_start(); }` + `session_write_close()` après init |
+| `user_camp.php` | Suppression du `<?php session_start();` dupliqué ligne 1 |
+| `server-side/sql/alter_password_field_access.sql` | Nouveau fichier : instructions pour agrandir le champ `PASSWORD` à `TEXT(255)` dans Access (3 méthodes : GUI, DDL, VBA) |
+
+### Résumé technique de la chaîne de chargement mobile (9 étapes)
+- Étapes 1–6 : `user_camp.php` (HttpAuth désactivé) — fonctionnaient avant, fonctionnent toujours ✅
+- Étape 7 `theme_camp/` : `data_camp.php` (HttpAuth **actif**) — `valide_user_ws()` retournait `false` → 401 → **maintenant corrigé** ✅
+- Étape 8 `html_theme_camp/` : `data_camp.php` (HttpAuth actif) — idem ✅
+- Étape 9 `regle_theme_camp/` : `data_camp.php` (HttpAuth actif) — idem ✅
 
 ---
 

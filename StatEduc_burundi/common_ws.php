@@ -57,8 +57,14 @@ $connexion->init($source);
 
 require_once $GLOBALS['SISED_PATH_CLS'] . 'arbre/arbre.class.php';
 
-// session 34 : read_and_close pour eviter deadlock XAMPP Windows sur lock session
-@session_start(['read_and_close' => true]);
+// session 37 : remplacement de read_and_close par session normale + session_write_close explicite
+// Raison : read_and_close provoquait la perte silencieuse de toutes les ecritures $_SESSION
+// (langue, annee, secteur, etc.) rendant les WS stateless et cassant les routes data_camp.php.
+// La protection anti-deadlock XAMPP est desormais assuree par session_write_close() apres
+// toutes les initialisations, limitant la duree du verrou de session au strict minimum.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $requete = "SELECT * FROM PARAM_DEFAUT;";
 $params = $GLOBALS['conn_dico']->GetRow($requete);
 if(!isset($_SESSION['langue']) || preg_match('#index.php#',$_SERVER['PHP_SELF'])) {
@@ -131,4 +137,5 @@ if(!isset($_SESSION['style'])) {
 		$_SESSION['style'] = $_GET['style'];
 	}
 }
+session_write_close(); // session 37 : libere le verrou de session apres init
 ?>

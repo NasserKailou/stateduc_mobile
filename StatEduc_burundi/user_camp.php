@@ -1,4 +1,8 @@
-<?php session_start();
+<?php
+// session 37 : suppression du session_start() duplique (ligne 1)
+// common_ws.php (inclus apres) gere desormais session_start() avec session_status() check.
+// Conserver session_start() ici masquait le bug read_and_close (le 2e appel etait ignore
+// -> user_camp.php obtenait une session normale par accident, data_camp.php non).
 
 /**
  * user_camp.php
