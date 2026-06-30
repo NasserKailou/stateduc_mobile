@@ -6,6 +6,41 @@ Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## Session 37b — Correctif collation SQL Server CI × bcrypt (branche `ak_secure`)
+
+### Contexte
+La base de données est sur **SQL Server** (pas Access). Le champ `PASSWORD` est déjà `VARCHAR(100)` — pas de troncature. La vraie cause racine du 401 sur `data_camp.php` est la **collation SQL Server Case Insensitive**.
+
+### Cause racine — Collation SQL Server CI altère le hash bcrypt
+
+SQL Server avec collation `French_CI_AS` ou `SQL_Latin1_General_CP1_CI_AS` (collation **CI** = Case Insensitive) peut normaliser la casse des valeurs `VARCHAR` lors de la lecture via le driver ADOdb `mssqlnative`. Le hash bcrypt (`$2y$12$BKWYlzy...`) contient des lettres majuscules/minuscules **significatives** (base64 modifié, case-sensitive). Si le driver retourne le hash avec la casse altérée, `password_verify()` retourne `false` → HTTP 401.
+
+### Double correctif appliqué
+
+#### Correctif 1 — PHP (déjà déployé) : `CONVERT ... COLLATE Latin1_General_CS_AS` dans le SELECT
+Les trois fonctions `valide_user()`, `valide_user_ws()`, `infos_user_ws()` utilisent maintenant :
+```sql
+SELECT CONVERT(VARCHAR(100), PASSWORD) COLLATE Latin1_General_CS_AS AS PASSWORD
+FROM ADMIN_USERS WHERE NOM_USER = '...'
+```
+Ce `COLLATE CS_AS` (Case Sensitive) au niveau de la requête force la restitution byte-pour-byte du hash, quel que soit la collation du serveur/base/champ.
+
+#### Correctif 2 — SQL Server (script fourni) : ALTER TABLE champ PASSWORD en `COLLATE Latin1_General_CS_AS`
+```sql
+ALTER TABLE ADMIN_USERS
+    ALTER COLUMN PASSWORD VARCHAR(100) COLLATE Latin1_General_CS_AS NOT NULL;
+```
+Script complet : `server-side/sql/alter_password_field_sqlserver.sql` (diagnostic, ALTER, vérification, test PHP).
+
+### Fichiers modifiés — Session 37b
+
+| Fichier | Changement |
+|---------|-----------|
+| `server-side/lib/fonctions.inc.php` | `valide_user()` + `valide_user_ws()` + `infos_user_ws()` : `SELECT PASSWORD` → `SELECT CONVERT(VARCHAR(100), PASSWORD) COLLATE Latin1_General_CS_AS AS PASSWORD` |
+| `server-side/sql/alter_password_field_sqlserver.sql` | **NOUVEAU** — Script SQL Server complet : diagnostic collation, `ALTER TABLE` champ `PASSWORD` en `Latin1_General_CS_AS`, vérification, test PHP |
+
+---
+
 ## Session 37 — Correctif complet : formulaires mobiles non téléchargés après migration bcrypt (branche `ak_secure`)
 
 ### Symptôme persistant après session 36
