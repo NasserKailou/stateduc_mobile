@@ -318,17 +318,21 @@ class CampaignProvider extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<void> fetchServerCampaigns(String userId) async {
-    _error          = null;
+    _error           = null;
     _serverCampaigns = [];
+    _loadingCampaigns = true;   // SESSION 38 : active l'indicateur de chargement
     notifyListeners();
     try {
-      _serverCampaigns = await _api.getAvailableCampaigns(userId);
+      _serverCampaigns  = await _api.getAvailableCampaigns(userId);
+      _loadingCampaigns = false;
       notifyListeners();
     } on ApiException catch (e) {
-      _error = e.message;
+      _error            = e.message;
+      _loadingCampaigns = false;
       notifyListeners();
     } catch (e) {
-      _error = 'Erreur serveur : ${e.toString()}';
+      _error            = 'Erreur serveur : ${e.toString()}';
+      _loadingCampaigns = false;
       notifyListeners();
     }
   }

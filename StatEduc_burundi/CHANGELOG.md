@@ -6,6 +6,58 @@ Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## Session 38 — Correctif formulaires mobiles (étapes 7–9) + indicateur chargement "Actualiser" (branche `ak_secure`)
+
+### Symptômes persistants après session 37b
+- ✅ Connexion mobile : OK
+- ✅ Étapes 1–6 (localisations, regroupements, établissements, systèmes) : OK
+- ❌ **Étapes 7–9 (formulaires de saisie) : toujours échouées** — "Sélectionnez un formulaire pour commencer la saisie" s'affiche vide
+- ❌ **Bouton "Actualiser"** (écran "Charger une campagne") : aucun retour visuel pendant le chargement
+
+### Cause racine A — Filtre `FRAME <> ''` dans `data_camp.php/theme_camp/` (**CRITIQUE**)
+
+Le SQL de la route `theme_camp` contenait :
+```sql
+AND (DICO_THEME_SYSTEME.FRAME <> '')
+```
+Ce filtre **masquait tous les thèmes dont le champ FRAME est vide ou NULL**, c'est-à-dire les formulaires dont le fichier `.frame` n'a pas encore été pré-généré côté serveur. Résultat : `GetAll()` retournait un tableau vide → Flutter `getQuestions()` retournait `[]` → la boucle `for (final q in questions)` ne s'exécutait jamais → **0 formulaire téléchargé**.
+
+**Correctif** : suppression du filtre `FRAME <> ''`. Le champ `FRAME` est maintenant inclus dans le SELECT retourné, permettant au client de gérer le cas vide.
+
+### Cause racine B — Boucle de tri `while ($nb > $nbo)` : risque de boucle infinie
+
+L'algorithme de tri de la chaîne `PRECEDENT` utilisait `while ($nb > $nbo)` sans protection. Si un élément `pre` pointait vers un `id` absent du résultat (chaîne brisée), `$nbo` n'atteignait jamais `$nb` → boucle infinie → PHP timeout → réponse vide côté Flutter.
+
+**Correctif** : réécriture complète avec compteur de sécurité `$max_iter = $nb * $nb + 1` et ajout des éléments restants en fin de liste en cas de chaîne brisée.
+
+### Cause racine C — `utf8_encode()` déprécié PHP 8.2
+
+Les lignes 74 et 89 utilisaient `utf8_encode()`, déprécié depuis PHP 8.2 et supprimé en PHP 9. Sur certaines configurations, cela génère des avertissements qui corrompent la réponse JSON.
+
+**Correctif** : remplacement par `mb_convert_encoding('UTF-8', 'ISO-8859-1')` avec fallback `iconv()` et dernier recours `utf8_encode()`.
+
+### Cause racine D — `fetchServerCampaigns()` ne mettait pas `_loadingCampaigns` à `true`
+
+La méthode `fetchServerCampaigns()` dans `campaign_provider.dart` vidait `_serverCampaigns` et appelait `notifyListeners()` mais **n'activait jamais `_loadingCampaigns = true`**. Le bouton "Actualiser" ne détectait donc jamais l'état de chargement et restait statique.
+
+**Correctif** : ajout de `_loadingCampaigns = true` en début de méthode et `_loadingCampaigns = false` dans les trois branches (succès + 2 erreurs).
+
+### Améliorations supplémentaires — `data_camp.php`
+
+- Ajout de `error_log()` diagnostiques dans `theme_camp` : SQL construit, nb lignes retournées, premier thème trouvé, erreur DB éventuelle
+- Vérification de `conn_dico` avant toute requête (retour `status_ko` propre si DB non disponible)
+- Route `html_theme_camp` : retour `status_ko` explicite si `FRAME` est vide/NULL (au lieu d'une URL malformée)
+
+### Fichiers modifiés — Session 38
+
+| Fichier | Changement |
+|---------|-----------|
+| `data_camp.php` | **REÉCRIT** : suppression filtre `FRAME <> ''`, inclusion FRAME dans SELECT, réécriture boucle de tri anti-boucle-infinie, remplacement `utf8_encode()`, logs diagnostiques, robustesse `html_theme_camp` FRAME vide |
+| `stateduc_flutter/lib/providers/campaign_provider.dart` | `fetchServerCampaigns()` : activation/désactivation de `_loadingCampaigns` |
+| `stateduc_flutter/lib/screens/campaigns/load_campaign_screen.dart` | `_buildEmpty()` : bouton "Actualiser" avec spinner + label "Chargement…" + désactivation pendant le fetch |
+
+---
+
 ## Session 37b — Correctif collation SQL Server CI × bcrypt (branche `ak_secure`)
 
 ### Contexte

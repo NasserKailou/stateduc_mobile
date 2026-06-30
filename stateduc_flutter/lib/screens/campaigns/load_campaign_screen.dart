@@ -83,6 +83,12 @@ class _LoadCampaignScreenState extends State<LoadCampaignScreen> {
   }
 
   Widget _buildEmpty(AuthProvider auth, CampaignProvider camps) {
+    // SESSION 38 : indicateur de chargement sur le bouton "Actualiser".
+    // Quand fetchServerCampaigns() est en cours, camps.isLoadingCampaigns==true :
+    //   • l'icône devient un CircularProgressIndicator animé
+    //   • le texte passe à "Chargement…"
+    //   • onPressed est null (bouton désactivé pour éviter les doubles-appels)
+    final bool fetching = camps.isLoadingCampaigns;
     return Column(
       children: [
         const Icon(Icons.cloud_off_outlined, size: 48),
@@ -90,11 +96,20 @@ class _LoadCampaignScreenState extends State<LoadCampaignScreen> {
         const Text('Aucune campagne disponible'),
         const SizedBox(height: 12),
         ElevatedButton.icon(
-          onPressed: auth.user == null
+          onPressed: (auth.user == null || fetching)
               ? null
               : () => camps.fetchServerCampaigns(auth.user!.idUser),
-          icon: const Icon(Icons.refresh),
-          label: const Text('Actualiser'),
+          icon: fetching
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Icon(Icons.refresh),
+          label: Text(fetching ? 'Chargement…' : 'Actualiser'),
         ),
       ],
     );
