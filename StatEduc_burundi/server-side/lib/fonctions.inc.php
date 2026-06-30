@@ -196,7 +196,10 @@ function recherche_libelle($code_libelle){
 
                       // session 35 : migration md5 -> bcrypt (password_verify)
             // Recupere le hash stocke + infos groupe pour ce login
-            $requete = "SELECT CODE_GROUPE, CODE_USER, PASSWORD FROM ADMIN_USERS
+            // Session 37b : COLLATE Latin1_General_CS_AS - SQL Server CI collation fix
+            $requete = "SELECT CODE_GROUPE, CODE_USER,
+                                    CONVERT(VARCHAR(100), PASSWORD) COLLATE Latin1_General_CS_AS AS PASSWORD
+                                    FROM ADMIN_USERS
                                     WHERE NOM_USER = '".$login."';";
             $groupe = $GLOBALS['conn_dico']->GetAll($requete);
 
@@ -256,7 +259,10 @@ function recherche_libelle($code_libelle){
 
 		if (empty($login) || empty($password)) return false;
 
-		$requete = "SELECT CODE_GROUPE, CODE_USER, PASSWORD FROM ADMIN_USERS
+		// Session 37b : COLLATE Latin1_General_CS_AS - SQL Server CI collation fix
+			$requete = "SELECT CODE_GROUPE, CODE_USER,
+								CONVERT(VARCHAR(100), PASSWORD) COLLATE Latin1_General_CS_AS AS PASSWORD
+								FROM ADMIN_USERS
 								WHERE NOM_USER = '".$login."';";
 		$groupe = $GLOBALS['conn_dico']->GetRow($requete);
 
@@ -300,7 +306,10 @@ function recherche_libelle($code_libelle){
 
 		if (empty($login) || empty($password)) return NULL;
 
-		$requete = "SELECT CODE_GROUPE, CODE_USER, NOM_LONG_USER, EMAIL_USER, PASSWORD FROM ADMIN_USERS
+		// Session 37b : COLLATE Latin1_General_CS_AS - SQL Server CI collation fix
+			$requete = "SELECT CODE_GROUPE, CODE_USER, NOM_LONG_USER, EMAIL_USER,
+								CONVERT(VARCHAR(100), PASSWORD) COLLATE Latin1_General_CS_AS AS PASSWORD
+								FROM ADMIN_USERS
 								WHERE NOM_USER = '".$login."';";
 		$groupe = $GLOBALS['conn_dico']->GetRow($requete);
 
