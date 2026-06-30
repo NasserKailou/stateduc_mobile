@@ -250,45 +250,92 @@ function recherche_libelle($code_libelle){
 	}// Fin function valide_user
 	
 	function valide_user_ws($login, $password) {
-		//V�rification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
-		//(pour le choix du menu)
-		//require_once $GLOBALS['SISED_PATH_LIB'] . 'fonctions.inc.php';
+		// Session 37 : authentification WS robuste
+		// Supporte : bcrypt ($2y$/$2a$, 60 chars), MD5 legacy (32 hex),
+		// champ PASSWORD tronque par Access TEXT(n) < 60 chars.
 
-		// session 35 : migration md5 -> bcrypt (password_verify)
-		// Recupere le hash stocke + infos groupe pour ce login uniquement
+		if (empty($login) || empty($password)) return false;
+
 		$requete = "SELECT CODE_GROUPE, CODE_USER, PASSWORD FROM ADMIN_USERS
 								WHERE NOM_USER = '".$login."';";
 		$groupe = $GLOBALS['conn_dico']->GetRow($requete);
 
-		// Verification bcrypt
 		if (!is_array($groupe) || empty($groupe['PASSWORD'])) return false;
-		if (!password_verify($password, $groupe['PASSWORD'])) return false;
 
-		// session 36 : fix regression read_and_close
-		// common_ws.php utilise session_start(['read_and_close'=>true]) (session 34) :
-		// les ecritures $_SESSION sont silencieusement ignorees dans ce contexte WS.
-		// L'ancien code ecrivait $_SESSION['groupe'] puis verifiait isset($_SESSION['groupe'])
-		// pour decider de retourner true -- ce qui echouait TOUJOURS avec read_and_close,
-		// retournant false meme apres un password_verify reussi (=> 401 sur data_camp.php).
-		// Correction : password_verify a deja valide les credentials, on retourne true directement.
-		// Les ecritures session sont inutiles dans le contexte REST (stateless par requete).
-		return true;
+		$stored_hash = $groupe['PASSWORD'];
+		$hash_len    = strlen($stored_hash);
+
+		// CAS 1 : hash bcrypt complet (60 chars, $2y$ ou $2a$)
+		if ($hash_len === 60 && (substr($stored_hash, 0, 4) === '$2y$' || substr($stored_hash, 0, 4) === '$2a$')) {
+			return password_verify($password, $stored_hash);
+		}
+
+		// CAS 2 : hash MD5 legacy (32 chars hex) - auto-migration vers bcrypt
+		if ($hash_len === 32 && ctype_xdigit($stored_hash)) {
+			if (md5($password) !== $stored_hash) return false;
+			// Migration automatique : on remplace le MD5 par bcrypt dans la base
+			$new_hash = password_hash($password, PASSWORD_BCRYPT);
+			if (!empty($new_hash) && strlen($new_hash) === 60) {
+				$upd = "UPDATE ADMIN_USERS SET PASSWORD='".$new_hash."' WHERE NOM_USER='".$login."'";
+				$GLOBALS['conn_dico']->Execute($upd); // silencieux si echec
+			}
+			return true;
+		}
+
+		// CAS 3 : hash bcrypt TRONQUE par Access TEXT(n) < 60 - champ trop petit
+		if ($hash_len < 60 && (substr($stored_hash, 0, 4) === '$2y$' || substr($stored_hash, 0, 4) === '$2a$')) {
+			error_log('[StatEduc WS] ERREUR : champ PASSWORD tronque (' . $hash_len . ' chars) pour login=' . $login . '. Agrandissez le champ a TEXT(255) dans la base Access.');
+			return false;
+		}
+
+		// CAS 4 : format inconnu -> refus securise
+		error_log('[StatEduc WS] AVERTISSEMENT : format hash inconnu (len=' . $hash_len . ') pour login=' . $login);
+		return false;
 	}// Fin function valide_user_ws
 	
 	function infos_user_ws($login, $password) {
-		//V�rification du login dans la table ADMIN_USERS et chargement du groupe utilisateur
-		//(pour le choix du menu)
-		//require_once $GLOBALS['SISED_PATH_LIB'] . 'fonctions.inc.php';
+		// Session 37 : authentification WS robuste (miroir de valide_user_ws)
+		// Supporte : bcrypt ($2y$/$2a$, 60 chars), MD5 legacy (32 hex),
+		// champ PASSWORD tronque par Access TEXT(n) < 60 chars.
 
-		// session 35 : migration md5 -> bcrypt (password_verify)
-		// Recupere le hash + infos utilisateur par login uniquement
+		if (empty($login) || empty($password)) return NULL;
+
 		$requete = "SELECT CODE_GROUPE, CODE_USER, NOM_LONG_USER, EMAIL_USER, PASSWORD FROM ADMIN_USERS
 								WHERE NOM_USER = '".$login."';";
 		$groupe = $GLOBALS['conn_dico']->GetRow($requete);
 
-		// Verification bcrypt
 		if (!is_array($groupe) || empty($groupe['PASSWORD'])) return NULL;
-		if (!password_verify($password, $groupe['PASSWORD'])) return NULL;
+
+		$stored_hash = $groupe['PASSWORD'];
+		$hash_len    = strlen($stored_hash);
+		$auth_ok     = false;
+
+		// CAS 1 : hash bcrypt complet (60 chars, $2y$ ou $2a$)
+		if ($hash_len === 60 && (substr($stored_hash, 0, 4) === '$2y$' || substr($stored_hash, 0, 4) === '$2a$')) {
+			$auth_ok = password_verify($password, $stored_hash);
+		}
+		// CAS 2 : hash MD5 legacy (32 chars hex) - auto-migration vers bcrypt
+		elseif ($hash_len === 32 && ctype_xdigit($stored_hash)) {
+			if (md5($password) === $stored_hash) {
+				$auth_ok = true;
+				// Migration automatique : on remplace le MD5 par bcrypt dans la base
+				$new_hash = password_hash($password, PASSWORD_BCRYPT);
+				if (!empty($new_hash) && strlen($new_hash) === 60) {
+					$upd = "UPDATE ADMIN_USERS SET PASSWORD='".$new_hash."' WHERE NOM_USER='".$login."'";
+					$GLOBALS['conn_dico']->Execute($upd); // silencieux si echec
+				}
+			}
+		}
+		// CAS 3 : hash bcrypt TRONQUE par Access TEXT(n) < 60
+		elseif ($hash_len < 60 && (substr($stored_hash, 0, 4) === '$2y$' || substr($stored_hash, 0, 4) === '$2a$')) {
+			error_log('[StatEduc WS] ERREUR : champ PASSWORD tronque (' . $hash_len . ' chars) pour login=' . $login . '. Agrandissez le champ a TEXT(255) dans la base Access.');
+		}
+		// CAS 4 : format inconnu
+		else {
+			error_log('[StatEduc WS] AVERTISSEMENT : format hash inconnu (len=' . $hash_len . ') pour login=' . $login);
+		}
+
+		if (!$auth_ok) return NULL;
 
 		// Ne pas retourner le hash a l'appelant
 		unset($groupe['PASSWORD']);
