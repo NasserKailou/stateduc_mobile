@@ -6,6 +6,72 @@ Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## Session 39 — Correctif contrôle de cohérence offline (branche `ak_secure`)
+
+### Symptôme
+Le contrôle de cohérence **serveur (online)** fonctionne correctement (visible dans la capture d'écran — "Contrôle de cohérence : 2 incohérence(s) détectée(s)"). Mais le contrôle **offline** retourne toujours 0 règles : `"no offline coherence rules returned"` dans les logs Flutter, même pour des thèmes qui ont des règles configurées en base de données.
+
+### Cause racine — Mauvaise décomposition de l'ID composite dans `data_rules.php`
+
+Les IDs de thèmes sont composites : l'app mobile concatène l'ID brut du thème avec le numéro de secteur zero-paddé.
+
+**Exemples réels observés :**
+```
+ID_THEME_SYSTEME = 10102   →   raw_theme = 101 + suffixe "02" (2 digits)
+ID_THEME_SYSTEME = 10202   →   raw_theme = 102 + suffixe "02"
+ID_THEME_SYSTEME = 10302   →   raw_theme = 103 + suffixe "02"
+```
+
+L'ancienne logique de décomposition utilisait `strlen(id_sector)` :
+```php
+$len_sector = strlen("2");  // = 1 (ERREUR : le suffixe réel est "02" = 2 chars)
+$candidate  = substr("10102", 0, 5 - 1);  // = "1010" (FAUX — devrait être "101")
+```
+Résultat : `SELECT ... WHERE ID_THEME = 1010` → 0 règles → `nb_regles: 0` → aucune règle stockée offline → contrôle offline muet.
+
+**Pourquoi `data_controle.php` fonctionnait quand même ?**
+`data_controle.php` utilise la même logique `strlen(id_sector)` mais traite des IDs différents (ex: `15702` → strip 1 → `1570` ✅). La base de données contient des IDs composites formés parfois avec 1 digit, parfois avec 2 digits selon le système et la campagne.
+
+### Correctifs appliqués
+
+#### `StatEduc_burundi/data_rules.php` (SESSION 39)
+
+Nouvelle fonction helper `rules_resolve_theme_id($id_theme, $id_sector)` qui :
+1. Teste plusieurs longueurs de suffixe (1 à 4 digits), en commençant par `strlen(id_sector)` pour la compatibilité rétrograde
+2. **Valide chaque candidat contre `DICO_REGLE_THEME`** : si au moins une règle existe pour ce candidat → c'est le bon raw ID
+3. Retourne le premier candidat validé, ou l'ID composite brut si aucun ne correspond
+4. `error_log()` diagnostiques à chaque étape pour faciliter le débogage
+
+```php
+// Avant (FAUX pour composite "10102" / sector "2"):
+$str_theme_id = substr("10102", 0, 5-1) = "1010"
+
+// Après (CORRECT):
+$str_theme_id = rules_resolve_theme_id("10102", "2")
+// → teste strip=1 → "1010" → 0 règles en DB → skip
+// → teste strip=2 → "101"  → N règles en DB → ✅ retourne "101"
+```
+
+#### `stateduc_flutter/lib/services/database_service.dart` (SESSION 39)
+
+Nouvelle méthode `getAllCollectedDataForCoherence()` qui charge **toutes les données** pour un contexte (camp+etab+qst) **sans restriction de filtre (période)**. Les clés sont formées comme `"FIELD_NAME"` (sans filtre) ou `"FIELD_NAME#FILTER_ID"` (avec filtre).
+
+Nécessaire car les SQL de cohérence serveur font `SUM(CHAMP) WHERE CODE_ETAB=X AND CODE_ANNEE=Y` (sans restriction de période), donc le moteur offline doit sommer les données de toutes les périodes.
+
+#### `stateduc_flutter/lib/services/coherence_evaluator.dart` (SESSION 39)
+
+Utilise `getAllCollectedDataForCoherence()` à la place de `getCollectedData()` pour le chargement des données persistées. Ajout de logs `debugPrint()` détaillés à chaque étape (champs chargés, valeurs V1/V2 extraites, résultat opérateur, violations).
+
+### Fichiers modifiés — Session 39
+
+| Fichier | Changement |
+|---------|-----------|
+| `StatEduc_burundi/data_rules.php` | **SESSION 39** : Nouvelle fonction `rules_resolve_theme_id()` avec validation DB multi-longueur, logs diagnostiques |
+| `stateduc_flutter/lib/services/database_service.dart` | **SESSION 39** : Nouvelle méthode `getAllCollectedDataForCoherence()` |
+| `stateduc_flutter/lib/services/coherence_evaluator.dart` | **SESSION 39** : Utilise `getAllCollectedDataForCoherence()`, ajout logs debugPrint détaillés |
+
+---
+
 ## Session 38 — Correctif formulaires mobiles (étapes 7–9) + indicateur chargement "Actualiser" (branche `ak_secure`)
 
 ### Symptômes persistants après session 37b

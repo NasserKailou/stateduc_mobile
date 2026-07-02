@@ -1043,6 +1043,42 @@ class DatabaseService {
     return result;
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SESSION 39 : getAllCollectedDataForCoherence
+  //
+  // Charge TOUTES les données collectées pour un contexte (camp+etab+qst)
+  // SANS restriction de filtre (période). Utilisé par CoherenceEvaluator pour
+  // reproduire le comportement du serveur : les SQL de cohérence font
+  // SUM(CHAMP) WHERE CODE_ETAB=X AND CODE_ANNEE=Y, sans filtrer par période.
+  // Retourne un Map { "FIELD_NAME#FILTER_ID" → value } pour les données filtrées
+  // et { "FIELD_NAME" → value } pour les données sans filtre.
+  // CoherenceEvaluator._sumFieldAcrossAllFilters() comprend les deux formats.
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<Map<String, String>> getAllCollectedDataForCoherence({
+    required String idCamp,
+    required String idEtab,
+    required String idQst,
+  }) async {
+    final db = await database;
+    final rows = await db.query(
+      'collected_data',
+      where: 'id_camp = ? AND id_etab = ? AND id_qst = ?',
+      whereArgs: [idCamp, idEtab, idQst],
+    );
+    final result = <String, String>{};
+    for (final r in rows) {
+      final fieldName  = r['field_name']  as String;
+      final fieldValue = r['field_value'] as String? ?? '';
+      final filterId   = r['id_filter']   as String?;
+      // Clé avec suffixe filtre si la donnée est périodique, sinon clé simple
+      final key = (filterId != null && filterId.isNotEmpty)
+          ? '$fieldName#$filterId'
+          : fieldName;
+      result[key] = fieldValue;
+    }
+    return result;
+  }
+
   /// Saves (upsert) a single field value.
   Future<void> saveCollectedField({
     required String idCamp,

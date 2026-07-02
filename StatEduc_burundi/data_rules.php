@@ -8,9 +8,19 @@
  * Retourne toutes les regles de coherence d'un theme avec les SQLs interpoles.
  * Permet a l'app mobile de stocker les regles localement (mode hors-ligne).
  *
+ * SESSION 39 :
+ *   - rules_resolve_theme_id() : correction du stripping de l'ID composite.
+ *     Problème : strlen(id_sector) donne 1 pour sector="2", mais le composite
+ *     10102 a été formé avec le suffixe "02" (2 digits). La fonction teste
+ *     maintenant plusieurs longueurs de suffixe (de 1 à 4) et valide chaque
+ *     candidat contre DICO_REGLE_THEME — on garde le premier qui retourne des
+ *     règles. Si aucun candidat ne correspond, on retourne l'ID composite brut.
+ *   - Ajout de error_log() diagnostiques dans les deux routes (theme_rules).
+ *   - Suppression du double $_SESSION['annee'] dans la route 2 (route web).
+ *
  * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
  * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
- * @sessions 9-21
+ * @sessions 9-21, 39
  * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
  *          Toutes les modifications et nouveautes sont documentees
  *          directement dans le code avec des commentaires en francais.
@@ -58,6 +68,70 @@
  */
 
 require_once 'common_ws.php';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SESSION 39 : rules_resolve_theme_id()
+//
+// Résout l'ID thème brut (raw) à partir d'un ID composite fourni par le mobile.
+//
+// PROBLÈME CORRIGÉ :
+//   L'ID composite est formé par : raw_theme_id || zero_padded_sector
+//   Exemples observés :
+//     raw=1570, sector=2  → composite=15702  (suffixe "2", 1 digit)
+//     raw=101,  sector=2  → composite=10102  (suffixe "02", 2 digits)
+//   L'ancienne logique strlen(id_sector) ne donnait que 1 char à stripper,
+//   donc 10102 → 1010 (FAUX) au lieu de 101 (JUSTE).
+//
+// SOLUTION :
+//   Tester plusieurs longueurs de suffixe (1 à 4 digits) et valider chaque
+//   candidat en cherchant au moins une règle dans DICO_REGLE_THEME.
+//   On retourne le premier candidat qui correspond.
+//   Si aucun ne correspond, on retourne l'ID composite brut (comportement neutre).
+//
+// @param string $id_theme  ID thème composite reçu dans l'URL (ex: "10102")
+// @param string $id_sector ID secteur reçu dans l'URL (ex: "2")
+// @return string            ID thème brut résolu (ex: "101")
+// ─────────────────────────────────────────────────────────────────────────────
+function rules_resolve_theme_id($id_theme, $id_sector) {
+    $str_theme  = '' . $id_theme;
+    $len_theme  = strlen($str_theme);
+
+    // Construire les candidats à tester : on essaie de stripper 1, 2, 3, 4 chars
+    // La longueur naturelle de strlen(id_sector) est testée EN PREMIER
+    // pour préserver la compatibilité avec les IDs courts (sector="2" → suffix="2").
+    $tried = array();
+    $priorities = array(strlen('' . $id_sector), 1, 2, 3, 4);
+
+    foreach ($priorities as $strip_len) {
+        if (isset($tried[$strip_len])) continue;   // éviter les doublons
+        $tried[$strip_len] = true;
+
+        if ($strip_len <= 0 || $strip_len >= $len_theme) continue;
+
+        $candidate = substr($str_theme, 0, $len_theme - $strip_len);
+        if (!is_numeric($candidate) || (int)$candidate <= 0) continue;
+
+        // Valider : au moins une règle existe pour ce candidat dans DICO_REGLE_THEME
+        $check_sql = "SELECT COUNT(*) AS NB FROM DICO_REGLE_THEME WHERE ID_THEME = " . (int)$candidate;
+        $check_row = $GLOBALS['conn_dico']->GetRow($check_sql);
+        $nb = isset($check_row['NB']) ? (int)$check_row['NB'] : 0;
+
+        error_log('[data_rules] resolve_theme_id: composite='.$id_theme
+                  .' strip='.$strip_len.' candidate='.$candidate.' nb_rules='.$nb);
+
+        if ($nb > 0) {
+            error_log('[data_rules] resolve_theme_id: FOUND raw_theme='.$candidate
+                      .' for composite='.$id_theme.' sector='.$id_sector);
+            return $candidate;
+        }
+    }
+
+    // Aucun candidat valide — retourner l'ID composite brut (aucune règle sera trouvée,
+    // mais on évite un retour incorrect qui donnerait de faux résultats).
+    error_log('[data_rules] resolve_theme_id: aucun candidat valide pour composite='
+              .$id_theme.' sector='.$id_sector.' — retour ID brut');
+    return $str_theme;
+}
 
 $app = new \Slim\Slim();
 
@@ -123,20 +197,15 @@ $app->get(
         ${$GLOBALS['PARAM']['CODE'] . '_' . $GLOBALS['PARAM']['TYPE_FILTRE']} = $code_filtre;
 
         // ── 4. Lire toutes les règles du thème depuis DICO_REGLE_THEME ───────
-        // The mobile app sends a composite theme ID (id_theme concatenated with id_sector).
-        // Example: sector=2, raw_theme=1560 → composite id_theme=15602.
-        // DICO_REGLE_THEME stores the raw theme ID (1560), so we must strip
-        // the sector suffix — same logic as questionnaire_reload_ws.php:
-        //   $str_theme_id = substr($id_theme, 0, strlen($id_theme)-strlen($id_sector))
-        $str_theme_id = $id_theme;
-        $len_sector   = strlen('' . $id_sector);
-        $len_theme    = strlen('' . $id_theme);
-        if ($len_theme > $len_sector) {
-            $candidate = substr('' . $id_theme, 0, $len_theme - $len_sector);
-            if (is_numeric($candidate) && (int)$candidate > 0) {
-                $str_theme_id = $candidate;
-            }
-        }
+        // SESSION 39 : remplacement de la logique strlen() par rules_resolve_theme_id()
+        // qui teste plusieurs longueurs de suffixe et valide contre DICO_REGLE_THEME.
+        // Corrige le cas composite=10102 / sector=2 → raw=101 (suffixe "02" 2 digits)
+        // que l'ancienne logique strlen("2")=1 ne savait pas gérer (donnait raw=1010).
+        error_log('[data_rules] theme_rules: id_camp='.$id_camp.' id_sector='.$id_sector
+                  .' id_theme='.$id_theme.' id_etab='.$id_etab.' year='.$id_year);
+
+        $str_theme_id = rules_resolve_theme_id($id_theme, $id_sector);
+        error_log('[data_rules] theme_rules: raw_theme_id='.$str_theme_id);
 
         $sql_regles_theme = "SELECT *
                               FROM DICO_REGLE_THEME
@@ -145,6 +214,7 @@ $app->get(
                               ORDER BY ORDRE_REGLE_THEME";
 
         $all_regles_theme = $GLOBALS['conn_dico']->GetAll($sql_regles_theme);
+        error_log('[data_rules] theme_rules: nb_regles_found='.(is_array($all_regles_theme) ? count($all_regles_theme) : 'NULL/false'));
 
         if (!is_array($all_regles_theme)) {
             $rps = array(
@@ -317,16 +387,9 @@ $app->get(
         ${$GLOBALS['PARAM']['CODE'] . '_' . $GLOBALS['PARAM']['TYPE_ANNEE']}  = $code_annee;
         ${$GLOBALS['PARAM']['CODE'] . '_' . $GLOBALS['PARAM']['TYPE_FILTRE']} = $code_filtre;
 
-        // Strip sector suffix from composite theme ID (same logic as route 1)
-        $str_theme_id2 = $id_theme;
-        $len_sector2   = strlen('' . $id_sector);
-        $len_theme2    = strlen('' . $id_theme);
-        if ($len_theme2 > $len_sector2) {
-            $candidate2 = substr('' . $id_theme, 0, $len_theme2 - $len_sector2);
-            if (is_numeric($candidate2) && (int)$candidate2 > 0) {
-                $str_theme_id2 = $candidate2;
-            }
-        }
+        // SESSION 39 : remplacement de la logique strlen() par rules_resolve_theme_id()
+        // (même correctif que route 1 — voir commentaire détaillé dans la fonction helper)
+        $str_theme_id2 = rules_resolve_theme_id($id_theme, $id_sector);
 
         $sql_regles_theme = "SELECT *
                               FROM DICO_REGLE_THEME
