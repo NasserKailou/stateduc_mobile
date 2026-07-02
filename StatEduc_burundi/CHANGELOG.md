@@ -6,6 +6,88 @@ Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## Session 40 — Correctif moteur cohérence offline : regex TABLE.FIELD + données cross-formulaires + agrégats virtuels (branche `ak_secure`)
+
+### Symptôme (après Session 39)
+Après `git pull` + re-téléchargement de la campagne, le contrôle offline retourne toujours **0 violation** alors que le serveur en détecte 2.
+
+Les logs Flutter montrent que les règles arrivent maintenant du serveur (`rules=2`) mais que **toutes les valeurs V1 et V2 sont `null`** → toutes les règles sont ignorées :
+
+```
+[CoherenceEval] rule=493 sql_regle="SELECT Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) ..." → v1=null
+[CoherenceEval] skip idRegle=493 — field not found in collected data
+[CoherenceEval] rule=495 sql_regle="SELECT Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) ..." → v1=null
+[CoherenceEval] skip idRegle=495 — field not found in collected data
+```
+
+### Causes racines (trois problèmes indépendants)
+
+#### Problème 1 — Regex `\w+` ne traverse pas le point dans `TABLE.FIELD` (CRITIQUE)
+
+L'ancienne regex `SUM\s*\(\s*(\w+)\s*\)` capturait le **qualificateur de table** au lieu du **nom de champ** :
+
+```
+SUM(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU)
+     ↑ \w+ s'arrête au point → capture "ELEVES_AGE_NIVEAU_SEXE" au lieu de "FILLES_AGE_NIVEAU"
+```
+
+Résultat : `_sumFieldAcrossAllFilters("ELEVES_AGE_NIVEAU_SEXE", values)` → null car aucun champ form n'a ce nom.
+
+**Correctif** : nouveau pattern `SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)` — le préfixe table est optionnel et non capturant.
+
+#### Problème 2 — Colonnes de vues DB agrégées absentes de `collected_data` (VIEW COLUMNS)
+
+Les colonnes `FILLES_AGE_NIVEAU` et `TOTAL_AGE_NIVEAU` sont des colonnes de la **vue DB `ELEVES_AGE_NIVEAU_SEXE`** — elles n'existent pas comme champs de formulaire dans `collected_data`. Même avec la regex corrigée, un lookup direct de `FILLES_AGE_NIVEAU` échouerait.
+
+**Correctif** : calcul de **totaux virtuels** dans `_injectVirtualAggregates()` :
+- `TOTAL_AGE_NIVEAU` ← somme de TOUS les champs numériques du formulaire courant
+- `FILLES_AGE_NIVEAU` ← somme des champs dont le nom porte un marqueur "filles" (`NB_F_*`, `_FILLES_*`, etc.)
+
+Ces valeurs approchent les agrégats calculés côté serveur par la vue SQL.
+
+#### Problème 3 — Données cross-formulaires manquantes (`DONNEES_ETABLISSEMENT`)
+
+La règle 493 (`sql_assoc`) référence `DONNEES_ETABLISSEMENT.NB_ELEVES_F` — un champ qui peut être collecté via un **formulaire différent** (`id_qst` différent). L'ancienne implémentation ne chargeait que les données du formulaire courant.
+
+**Correctif** : nouvelle méthode `getAllCollectedDataForCampEtab()` dans `database_service.dart` qui charge TOUTES les données collectées pour l'école + campagne (tous formulaires, tous filtres), puis injectées dans la map `values` avec priorité inférieure aux données du formulaire courant.
+
+### Correctifs appliqués
+
+#### `stateduc_flutter/lib/services/coherence_evaluator.dart` (SESSION 40) — RÉÉCRITURE COMPLÈTE
+
+1. **Regex SUM corrigée** : `SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)` — qualificateur table optionnel
+2. **Fallback multi-colonnes** : si la 1re colonne SUM n'est pas trouvée, essaie les colonnes suivantes
+3. **Chargement cross-formulaires** : appel à `getAllCollectedDataForCampEtab()` en étape 2 du `evaluate()`
+4. **Totaux virtuels** : `_injectVirtualAggregates()` calcule `TOTAL_AGE_NIVEAU` et `FILLES_AGE_NIVEAU` depuis les données brutes du formulaire courant
+5. **Logs améliorés** : raison précise du skip (`v1=X v2=Y`)
+
+#### `stateduc_flutter/lib/services/database_service.dart` (SESSION 40)
+
+Nouvelle méthode `getAllCollectedDataForCampEtab()` :
+- Requête sans filtre `id_qst` : charge TOUS les formulaires de l'école pour la campagne
+- Somme les valeurs numériques par nom de champ (même comportement que `SUM()` serveur)
+- Retourne `Map<String, String>` avec clés en MAJUSCULES
+
+### Résolution attendue pour règles 493 et 495
+
+| SQL pattern | Champ extrait | Résolution |
+|-------------|--------------|------------|
+| `Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU)` | `FILLES_AGE_NIVEAU` | Virtual aggregate (somme champs _F_) |
+| `Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU)` | `TOTAL_AGE_NIVEAU` | Virtual aggregate (somme tous champs) |
+| `Sum(DONNEES_ETABLISSEMENT.NB_ELEVES_F)` | `NB_ELEVES_F` | Cross-question lookup |
+| `Sum(DONNEES_ETABLISSEMENT.NB_ELEVES)` | `NB_ELEVES` | Cross-question lookup |
+
+### Fichiers modifiés — Session 40
+
+| Fichier | Changement |
+|---------|-----------|
+| `stateduc_flutter/lib/services/coherence_evaluator.dart` | **SESSION 40** : Réécriture `_extractValue()`, ajout `_injectVirtualAggregates()`, chargement cross-formulaires, regex TABLE.FIELD corrigée |
+| `stateduc_flutter/lib/services/database_service.dart` | **SESSION 40** : Nouvelle méthode `getAllCollectedDataForCampEtab()` |
+| `stateduc_mobile/stateduc_flutter/lib/services/coherence_evaluator.dart` | Miroir synchronisé |
+| `stateduc_mobile/stateduc_flutter/lib/services/database_service.dart` | Miroir synchronisé |
+
+---
+
 ## Session 39 — Correctif contrôle de cohérence offline (branche `ak_secure`)
 
 ### Symptôme
