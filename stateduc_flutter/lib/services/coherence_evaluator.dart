@@ -94,25 +94,34 @@ class CoherenceEvaluator {
   }) async {
     if (rules.isEmpty) return [];
 
-    // Build a combined data map: DB values + any unsaved formData overrides
+    // SESSION 39 : utilise getAllCollectedDataForCoherence() au lieu de
+    // getCollectedData() pour charger les données de TOUS les filtres (périodes).
+    // Cela reproduit le comportement serveur : les SQL de cohérence font
+    // SUM(CHAMP) sans restriction de filtre → la somme doit couvrir toutes
+    // les périodes collectées.
+    // Les clés retournées sont "FIELD_NAME" (sans filtre) ou "FIELD_NAME#FILTER_ID"
+    // (avec filtre). _sumFieldAcrossAllFilters() comprend les deux formats.
     final Map<String, double> values = {};
 
-    // Load persisted collected_data for this context
-    final persistedData = await _db.getCollectedData(
-      idCamp:   idCamp,
-      idEtab:   idEtab,
-      idQst:    idQst,
-      idFilter: idFilter,
+    // Load all collected_data for this school + question (all filter periods)
+    final persistedData = await _db.getAllCollectedDataForCoherence(
+      idCamp: idCamp,
+      idEtab: idEtab,
+      idQst:  idQst,
     );
     for (final entry in persistedData.entries) {
       final v = double.tryParse(entry.value);
       if (v != null) values[entry.key.toUpperCase()] = v;
     }
-    // Override with unsaved formData (in-memory)
+    // Override with unsaved formData (in-memory) — uses simple field names (no filter suffix)
     for (final entry in formData.entries) {
       final v = double.tryParse(entry.value);
       if (v != null) values[entry.key.toUpperCase()] = v;
     }
+
+    debugPrint('[CoherenceEval] evaluate: idQst=$idQst idEtab=$idEtab '
+        'persistedFields=${persistedData.length} formFields=${formData.length} '
+        'totalValues=${values.length} rules=${rules.length}');
 
     final violations = <OfflineCoherenceError>[];
 
@@ -120,6 +129,11 @@ class CoherenceEvaluator {
       try {
         final v1 = _extractValue(rule.sqlRegle, values);
         final v2 = _extractValue(rule.sqlAssoc, values);
+
+        debugPrint('[CoherenceEval] rule=${rule.idRegle} '
+            'sql_regle="${rule.sqlRegle}" → v1=$v1 | '
+            'sql_assoc="${rule.sqlAssoc}" → v2=$v2 | '
+            'critere="${rule.critere}"');
 
         if (v1 == null || v2 == null) {
           // Cannot evaluate — skip silently
@@ -129,6 +143,7 @@ class CoherenceEvaluator {
         }
 
         final violated = _applyOperator(v1, v2, rule.critere);
+        debugPrint('[CoherenceEval] rule=${rule.idRegle} v1=$v1 ${rule.critere} v2=$v2 → violated=$violated');
         if (violated) {
           violations.add(OfflineCoherenceError(
             idRegle:      rule.idRegle,
@@ -147,6 +162,7 @@ class CoherenceEvaluator {
         debugPrint('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
       }
     }
+    debugPrint('[CoherenceEval] evaluate complete: ${violations.length} violation(s)');
     return violations;
   }
 
