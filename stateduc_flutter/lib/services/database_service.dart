@@ -1079,6 +1079,48 @@ class DatabaseService {
     return result;
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SESSION 40 : getAllCollectedDataForCampEtab
+  //
+  // Charge TOUTES les données collectées pour une école et une campagne,
+  // TOUS formulaires (toutes questions) et TOUS filtres confondus.
+  //
+  // Utilisé par CoherenceEvaluator pour les règles qui référencent des champs
+  // provenant d'autres formulaires (ex : DONNEES_ETABLISSEMENT.NB_ELEVES_F
+  // peut être stocké dans un idQst différent de celui du formulaire courant).
+  //
+  // Le chargement cross-questions permet de couvrir ces cas sans connaissance
+  // a priori de la correspondance table DB → idQst.
+  //
+  // Retourne un Map { "FIELD_NAME" → somme de toutes les occurrences } sous forme
+  // de String. En cas de champs homonymes sur plusieurs filtres/questions, les
+  // valeurs numériques sont SOMMÉES (comportement coherent avec les SUM() du serveur).
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<Map<String, String>> getAllCollectedDataForCampEtab({
+    required String idCamp,
+    required String idEtab,
+  }) async {
+    final db = await database;
+    final rows = await db.query(
+      'collected_data',
+      where: 'id_camp = ? AND id_etab = ?',
+      whereArgs: [idCamp, idEtab],
+    );
+    // Accumulate numeric values — same field name may appear across
+    // multiple questions/filters: sum them to mirror server SUM() behaviour.
+    final sums = <String, double>{};
+    for (final r in rows) {
+      final fieldName  = (r['field_name'] as String).toUpperCase();
+      final fieldValue = r['field_value'] as String? ?? '';
+      final v = double.tryParse(fieldValue);
+      if (v != null) {
+        sums[fieldName] = (sums[fieldName] ?? 0.0) + v;
+      }
+    }
+    // Convert back to String map
+    return sums.map((k, v) => MapEntry(k, v.toString()));
+  }
+
   /// Saves (upsert) a single field value.
   Future<void> saveCollectedField({
     required String idCamp,
