@@ -5,6 +5,69 @@ Dépôt : `https://github.com/NasserKailou/stateduc_mobile`
 Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/pull/2)
 
 ---
+
+## Session 43 — Correctif définitif DNS : CURLOPT_RESOLVE bypass loopback
+
+### Problème persistant après Session 42
+
+```
+{"se_status":400,"se_data":"7 : Failed to connect to 172.16.0.32 port 9191: Connection refused"}
+```
+
+La sonde TCP (Session 42) détectait `172.16.0.32:9191` (Tomcat/proxy qui écoute aussi sur l'IP LAN),
+mais curl échouait ensuite sur ce chemin. La logique de sondage ne peut pas distinguer
+"port qui accepte une connexion TCP" de "port Apache interne qui peut traiter la requête PHP".
+
+### Analyse finale de la topologie
+
+```
+Internet ──► stateduc.ins.ne:9191 (Tomcat/reverse proxy, IP LAN 172.16.0.32)
+                    │
+                    ▼
+             Apache interne (port 80 ou 8080, loopback 127.0.0.1)
+                    │
+                    ▼
+             PHP questionnaire_ws.php
+```
+
+**Le bon chemin interne** est exactement l'URL publique `http://stateduc.ins.ne:9191/stateduc/`
+**mais** en forçant la connexion TCP vers `127.0.0.1` au lieu de résoudre `stateduc.ins.ne` par DNS
+(qui échoue depuis la VM avec curl 6).
+
+### Solution définitive — `CURLOPT_RESOLVE` dans `data_save.php` et `data_reload.php`
+
+`CURLOPT_RESOLVE` est une option curl native qui dit :
+> "Pour `hostname:port`, utilise cette IP au lieu de faire une résolution DNS"
+
+```php
+// Format : array('hostname:port:ip_cible')
+// Extrait automatiquement hostname et port depuis SISED_AURL
+function _sised_curl_resolve() {
+    $parsed = parse_url($GLOBALS['SISED_AURL_INTERNAL']); // = $SISED_AURL
+    $host = $parsed['host'];       // ex: stateduc.ins.ne
+    $port = $parsed['port'];       // ex: 9191
+    return array($host.':'.$port.':127.0.0.1');
+}
+$curl->setOpt(CURLOPT_RESOLVE, _sised_curl_resolve());
+```
+
+**Avantages** :
+- L'URL reste **identique** : `http://stateduc.ins.ne:9191/stateduc/questionnaire_ws.php?...`
+- Le Host header HTTP reste correct (requis par Apache/VirtualHost)
+- Seule la connexion TCP est redirigée vers `127.0.0.1`
+- **Pas besoin de connaître le port Apache interne** — on utilise exactement le port de l'URL publique
+- Fonctionne quel que soit le nom de domaine configuré, sans modifier `/etc/hosts`
+
+`config_app.php` simplifié : `$SISED_AURL_INTERNAL = $SISED_AURL;` (URL publique directe, plus de logique de sondage).
+
+### Fichiers modifiés
+
+- `StatEduc_burundi/config_app.php` — `SISED_AURL_INTERNAL = SISED_AURL` (simplifié)
+- `StatEduc_burundi/data_save.php` — `CURLOPT_RESOLVE` + fonction `_sised_curl_resolve()`
+- `StatEduc_burundi/data_reload.php` — `CURLOPT_RESOLVE` + timeout opts ajoutés
+
+---
+
 ## Session 42 — Correctif définitif DNS : auto-détection port interne par sondage TCP (`config_app.php`)
 
 ### Symptôme persistant (Session 41b → 41c non déployé en production)

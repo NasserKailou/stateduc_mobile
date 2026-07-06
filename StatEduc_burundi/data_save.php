@@ -31,6 +31,20 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 // Sans timeout, le curl attend indefiniment si Apache est sature (self-curl deadlock)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15); // echec rapide si connexion impossible
 $curl->setOpt(CURLOPT_TIMEOUT, 120);        // max 120s - questionnaire_ws.php peut prendre >60s sur serveur charge
+// CURLOPT_RESOLVE : bypass DNS pour les appels curl internes (Session 43)
+// Probleme : depuis la VM, le hostname (ex: stateduc.ins.ne) n'est pas resolvable en interne (curl 6).
+// Solution : dire a curl de connecter sur 127.0.0.1 pour hostname:port, sans changer l'URL ni le Host header.
+// Format CURLOPT_RESOLVE : array('hostname:port:ip_cible')
+// Fonctionne quel que soit le nom de domaine configure - sans modifier /etc/hosts - sans connaitre le port Apache.
+function _sised_curl_resolve() {
+    $parsed = parse_url($GLOBALS['SISED_AURL_INTERNAL']);
+    $host = isset($parsed['host']) ? $parsed['host'] : '';
+    $port = isset($parsed['port']) ? (int)$parsed['port'] : (isset($parsed['scheme']) && $parsed['scheme']==='https' ? 443 : 80);
+    if (empty($host)) return array();
+    // Rediriger hostname:port -> 127.0.0.1 (loopback - le serveur ecoute toujours sur 127.0.0.1)
+    return array($host.':'.$port.':127.0.0.1');
+}
+$curl->setOpt(CURLOPT_RESOLVE, _sised_curl_resolve());
 
 $app = new \Slim\Slim();
 
