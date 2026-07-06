@@ -118,6 +118,67 @@ Il a été implémenté en Sessions 39–40 (`CoherenceEvaluator`, `coherence_ru
 | `RESTITUTION_TECHNIQUE_STATEDUC_MOBILE.md` | Commit initial (document créé en Session 40, non committé) |
 
 ---
+### Correctif 41b — Cause racine réelle de l'erreur DNS : curl PHP interne (SERVEUR)
+
+**Important** : le correctif Flutter (Session 41) était basé sur une mauvaise hypothèse.
+Les logs de débogage révèlent la vraie cause :
+
+```
+[Dio←] 200 http://stateduc.ins.ne:9191/stateduc/data_save.php/...
+Body: {"se_status":400,"se_data":"6 : Could not resolve host: stateduc.ins.ne"}
+```
+
+**Le client Flutter reçoit HTTP 200** — la requête Dio arrive au serveur sans problème.
+**L'erreur DNS est dans la réponse JSON** — c'est le serveur PHP qui échoue à faire son curl interne.
+
+#### Chaîne d'exécution côté serveur (data_save.php)
+
+```
+Mobile (Flutter)
+  → POST data_save.php/theme_save/... (HTTP 200 — OK)
+     → PHP vérifie droits, construit $urlBase = $GLOBALS['SISED_AURL'].'questionnaire_ws.php?...'
+       $SISED_AURL = 'http://' . $_SERVER['HTTP_HOST'] . '/StatEduc/'
+                   = 'http://stateduc.ins.ne:9191/StatEduc/'
+     → $curl->post('http://stateduc.ins.ne:9191/StatEduc/questionnaire_ws.php?...', $data)
+       ← ERREUR : curl code 6 — "Could not resolve host: stateduc.ins.ne"
+          (le serveur lui-même ne résout pas son propre hostname DNS)
+     ← curl->error() callback → echo {"se_status":400,"se_data":"6 : ..."}
+  ← Flutter reçoit HTTP 200 + corps JSON d'erreur
+```
+
+#### Cause : `/etc/hosts` de la VM ne contient pas `stateduc.ins.ne`
+
+`stateduc.ins.ne` est résolu par un serveur DNS interne au LAN MEN. La VM elle-même
+n'a pas cette entrée dans ses résolveurs locaux → curl PHP depuis la VM échoue.
+
+#### Solution : `SISED_AURL_INTERNAL` dans `config_app.php`
+
+```php
+// Nouvelle variable : utilise 127.0.0.1 au lieu du hostname DNS pour les curl internes
+$_sised_host_parts   = explode(':', $_SERVER['HTTP_HOST']);
+$_sised_port         = isset($_sised_host_parts[1]) ? ':' . $_sised_host_parts[1] : '';
+$SISED_AURL_INTERNAL = 'http://127.0.0.1' . $_sised_port . $SISED_URL;
+// Ex: 'http://stateduc.ins.ne:9191/StatEduc/' → 'http://127.0.0.1:9191/StatEduc/'
+```
+
+Le port est conservé depuis `HTTP_HOST` pour que Apache/IIS achemine vers le bon vhost.
+
+#### Fichiers modifiés
+
+| Fichier | Modification |
+|---------|-------------|
+| `StatEduc_burundi/config_app.php` | +10 lignes : définition de `$SISED_AURL_INTERNAL` avec `127.0.0.1` |
+| `StatEduc_burundi/data_save.php` | 2 lignes : `$GLOBALS['SISED_AURL']` → `$GLOBALS['SISED_AURL_INTERNAL']` (urlBase questionnaire_ws) |
+| `StatEduc_burundi/data_reload.php` | 2 lignes : même correctif (questionnaire_ws + questionnaire_reload_ws) |
+
+#### Portée complète (autres fichiers non mobiles — PROD uniquement)
+
+Pour les pages d'administration web (`ctrl_validation_criteres.php`, `ctrl_validation_etab_details.php`,
+`ctrl_validation_etab_service.php`), le même problème peut survenir mais ces fichiers utilisent `common.php`
+(non `common_ws.php`) — ils ne sont pas touchés ici car hors périmètre mobile.
+
+---
+
 
 ## Session 40 — Correctif moteur cohérence offline : regex TABLE.FIELD + données cross-formulaires + agrégats virtuels (branche `ak_secure`)
 
