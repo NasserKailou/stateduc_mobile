@@ -5,12 +5,44 @@ $SISED_URL          = str_replace(preg_replace('`\\\`', '/', $_SERVER['DOCUMENT_
 $SISED_AURL         = $SISED_SERVER . $SISED_URL; // URL absolue pour accéder à l'application
 // SISED_AURL_INTERNAL : URL pour les appels curl internes (data_save.php -> questionnaire_ws.php).
 //
-// SOLUTION DEFINITIVE (Session 43) :
-//   On utilise exactement $SISED_AURL (= l'URL publique du serveur, ex: http://stateduc.ins.ne:9191/stateduc/).
-//   Le probleme DNS ('Could not resolve host') est resolu dans data_save.php et data_reload.php
-//   via CURLOPT_RESOLVE qui dit a curl : pour cet hostname:port -> utilise 127.0.0.1.
-//   Ainsi l'URL reste la meme quelle que soit la topologie de deploiement.
-$SISED_AURL_INTERNAL = $SISED_AURL;
+// TOPOLOGIE PRODUCTION MEN :
+//   Internet -> Fortinet port 9191 (NAT) -> VM Apache port local (80 ou 8080)
+//   Le port 9191 N'EXISTE PAS sur la VM -> curl vers *:9191 echoue toujours.
+//
+// SOLUTION DEFINITIVE (Session 44) :
+//   1. Curl vers http://127.0.0.1:PORT_APACHE_LOCAL/stateduc/questionnaire_ws.php
+//      PORT_APACHE_LOCAL = SERVER_PORT (port reel Apache, ex: 80 ou 8080)
+//      Fallback si SERVER_PORT non disponible : sonder 80 puis 8080
+//   2. Passer header 'Host: HTTP_HOST' (ex: stateduc.ins.ne:9191) pour que
+//      le VirtualHost Apache route vers la bonne application.
+//   => Bypass total du Fortinet/NAT, fonctionne quel que soit le nom de domaine.
+//
+// $SISED_AURL_INTERNAL  = URL interne (127.0.0.1:port_local)
+// $SISED_HOST_HEADER    = valeur du Host header a passer dans curl
+function _sised_local_port() {
+    // Priorite 1 : SERVER_PORT = port Apache reel (fiable si pas de proxy AJP)
+    if (isset($_SERVER['SERVER_PORT'])) {
+        $p = (int)$_SERVER['SERVER_PORT'];
+        // Ignorer si c'est le port proxy externe (ex: 9191, 8443, 443 sur proxy)
+        // SERVER_PORT est fiable sur Apache direct ; sur proxy inverse il peut
+        // valoir le port frontal. On le valide par fsockopen.
+        $en = 0; $es = ''; $s = @fsockopen('127.0.0.1', $p, $en, $es, 2);
+        if ($s !== false) { fclose($s); return $p; }
+    }
+    // Priorite 2 : sonder les ports Apache standard
+    foreach (array(80, 8080, 8000, 8888) as $p) {
+        $en = 0; $es = ''; $s = @fsockopen('127.0.0.1', $p, $en, $es, 2);
+        if ($s !== false) { fclose($s); return $p; }
+    }
+    // Fallback absolu : 80
+    return 80;
+}
+$_sised_local_port  = _sised_local_port();
+$_sised_local_scheme = ($_sised_local_port === 443) ? 'https' : 'http';
+$_sised_local_ps    = (!in_array($_sised_local_port, array(80, 443))) ? ':' . $_sised_local_port : '';
+$SISED_AURL_INTERNAL = $_sised_local_scheme . '://127.0.0.1' . $_sised_local_ps . $SISED_URL;
+// Host header = HTTP_HOST (ex: stateduc.ins.ne:9191) pour que Apache route correctement
+$SISED_HOST_HEADER   = $_SERVER['HTTP_HOST'];
 
 $SISED_PATH_INC     = $SISED_PATH . 'server-side/include/';
 $SISED_PATH_CLS     = $SISED_PATH . 'server-side/classes/';

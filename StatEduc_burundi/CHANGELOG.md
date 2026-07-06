@@ -6,6 +6,66 @@ Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## Session 44 — Correctif définitif : 127.0.0.1:PORT_LOCAL + Host header (bypass Fortinet/NAT)
+
+### Topologie réelle expliquée par l'utilisateur
+
+```
+Internet/LAN → Fortinet port 9191 (NAT externe) → VM Apache port local (80 ou 8080)
+```
+
+**Le port 9191 n'existe PAS sur la VM.** Il est géré uniquement par le Fortinet.
+Donc depuis la VM, `curl` vers `*:9191` échoue toujours — que ce soit avec
+`127.0.0.1`, `172.16.0.32`, le hostname ou CURLOPT_RESOLVE.
+
+Même principe prévu pour le serveur de production : `http://stateduc.mnineduc.gov.bi`
+sans port explicite (port 80/443 côté utilisateur, mais port différent en interne).
+
+### Solution définitive — Session 44
+
+**Deux changements complémentaires :**
+
+#### 1. `config_app.php` — `SISED_AURL_INTERNAL = http://127.0.0.1:PORT_LOCAL/stateduc/`
+
+Fonction `_sised_local_port()` qui détecte le port Apache local par TCP probe sur `127.0.0.1` :
+- Priorité 1 : `SERVER_PORT` validé par `fsockopen(127.0.0.1, SERVER_PORT)`
+- Priorité 2 : sonde 80, 8080, 8000, 8888
+- Fallback : 80
+
+Nouvelle variable `$SISED_HOST_HEADER = $_SERVER['HTTP_HOST']` (ex: `stateduc.ins.ne:9191`).
+
+#### 2. `data_save.php` + `data_reload.php` — Header `Host` dans le curl
+
+```php
+$curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
+// urlBase = http://127.0.0.1:80/stateduc/questionnaire_ws.php?...
+```
+
+curl se connecte à `127.0.0.1:80` (Apache local, pas le Fortinet),
+mais envoie `Host: stateduc.ins.ne:9191` → Apache route vers le bon VirtualHost.
+
+**Analogie** : comme passer par la porte de service d'un bâtiment tout en présentant
+le badge du visiteur normal — la sécurité (Apache VirtualHost) reconnaît l'identité.
+
+### Pourquoi les sessions précédentes échouaient
+
+| Session | URL curl | Résultat |
+|---|---|---|
+| 41 | `stateduc.ins.ne:9191` | DNS non résolvable depuis VM |
+| 41b | `127.0.0.1:9191` | Port 9191 inexistant sur VM (Fortinet only) |
+| 41c | `SERVER_ADDR:SERVER_PORT` | Non déployé |
+| 42 | Sonde TCP → `172.16.0.32:9191` | Tomcat LAN détecté mais refus |
+| 43 | CURLOPT_RESOLVE → `127.0.0.1:9191` | Port 9191 inexistant sur VM |
+| **44** | **`127.0.0.1:PORT_LOCAL` + Host header** | **✅ DÉFINITIF** |
+
+### Fichiers modifiés
+
+- `StatEduc_burundi/config_app.php` — `_sised_local_port()` + `SISED_HOST_HEADER`
+- `StatEduc_burundi/data_save.php` — `setHeader('Host', SISED_HOST_HEADER)`
+- `StatEduc_burundi/data_reload.php` — `setHeader('Host', SISED_HOST_HEADER)` + timeouts
+
+---
+
 ## Session 43 — Correctif définitif DNS : CURLOPT_RESOLVE bypass loopback
 
 ### Problème persistant après Session 42

@@ -31,20 +31,12 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 // Sans timeout, le curl attend indefiniment si Apache est sature (self-curl deadlock)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15); // echec rapide si connexion impossible
 $curl->setOpt(CURLOPT_TIMEOUT, 120);        // max 120s - questionnaire_ws.php peut prendre >60s sur serveur charge
-// CURLOPT_RESOLVE : bypass DNS pour les appels curl internes (Session 43)
-// Probleme : depuis la VM, le hostname (ex: stateduc.ins.ne) n'est pas resolvable en interne (curl 6).
-// Solution : dire a curl de connecter sur 127.0.0.1 pour hostname:port, sans changer l'URL ni le Host header.
-// Format CURLOPT_RESOLVE : array('hostname:port:ip_cible')
-// Fonctionne quel que soit le nom de domaine configure - sans modifier /etc/hosts - sans connaitre le port Apache.
-function _sised_curl_resolve() {
-    $parsed = parse_url($GLOBALS['SISED_AURL_INTERNAL']);
-    $host = isset($parsed['host']) ? $parsed['host'] : '';
-    $port = isset($parsed['port']) ? (int)$parsed['port'] : (isset($parsed['scheme']) && $parsed['scheme']==='https' ? 443 : 80);
-    if (empty($host)) return array();
-    // Rediriger hostname:port -> 127.0.0.1 (loopback - le serveur ecoute toujours sur 127.0.0.1)
-    return array($host.':'.$port.':127.0.0.1');
-}
-$curl->setOpt(CURLOPT_RESOLVE, _sised_curl_resolve());
+// Host header pour les appels curl internes (Session 44)
+// SISED_AURL_INTERNAL = http://127.0.0.1:PORT_LOCAL/stateduc/ (bypass Fortinet/NAT)
+// Le header Host = HTTP_HOST (ex: stateduc.ins.ne:9191) permet a Apache de router
+// vers le bon VirtualHost meme si l'URL utilise 127.0.0.1.
+// Fonctionne quel que soit le nom de domaine ou la topologie reseau.
+$curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
 
 $app = new \Slim\Slim();
 
@@ -395,25 +387,27 @@ $app->post('/theme_info_save', function () use ($lib_status, $lib_message, $lib_
 });
 
 $app->get('/test/', function () use($app) {
-    // Endpoint de diagnostic - Session 42
-    // Accessible via GET http://stateduc.ins.ne:9191/stateduc/data_save.php/test/
+    // Endpoint de diagnostic - Session 44
+    // GET http://stateduc.ins.ne:9191/stateduc/data_save.php/test/
+    // Retourne les URLs internes, variables serveur et resultat du probe TCP
     header('Content-Type: application/json; charset=utf-8');
     $info = array(
         'SISED_AURL'          => $GLOBALS['SISED_AURL'],
         'SISED_AURL_INTERNAL' => $GLOBALS['SISED_AURL_INTERNAL'],
+        'SISED_HOST_HEADER'   => isset($GLOBALS['SISED_HOST_HEADER']) ? $GLOBALS['SISED_HOST_HEADER'] : 'N/A',
         'HTTP_HOST'           => isset($_SERVER['HTTP_HOST'])   ? $_SERVER['HTTP_HOST']   : 'N/A',
         'SERVER_ADDR'         => isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'N/A',
         'SERVER_PORT'         => isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 'N/A',
         'SERVER_NAME'         => isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'N/A',
     );
-    // Test TCP vers l'URL interne
+    // Test TCP vers SISED_AURL_INTERNAL (doit etre 127.0.0.1:port_local)
     $p = parse_url($GLOBALS['SISED_AURL_INTERNAL']);
     $test_ip   = isset($p['host']) ? $p['host'] : '127.0.0.1';
     $test_port = isset($p['port']) ? (int)$p['port'] : 80;
     $en = 0; $es = '';
     $sock = @fsockopen($test_ip, $test_port, $en, $es, 3);
-    if ($sock !== false) { fclose($sock); $info['tcp_probe'] = 'OK'; }
-    else { $info['tcp_probe'] = 'FAIL: '.$en.' '.$es; }
+    if ($sock !== false) { fclose($sock); $info['tcp_probe_internal'] = 'OK -> '.$GLOBALS['SISED_AURL_INTERNAL']; }
+    else { $info['tcp_probe_internal'] = 'FAIL: '.$en.' '.$es; }
     echo json_encode($info, JSON_PRETTY_PRINT);
 });
 
