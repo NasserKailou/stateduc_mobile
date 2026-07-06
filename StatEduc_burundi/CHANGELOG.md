@@ -5,6 +5,63 @@ Dépôt : `https://github.com/NasserKailou/stateduc_mobile`
 Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/pull/2)
 
 ---
+## Session 42 — Correctif définitif DNS : auto-détection port interne par sondage TCP (`config_app.php`)
+
+### Symptôme persistant (Session 41b → 41c non déployé en production)
+
+Après les correctifs précédents, le serveur de production renvoyait toujours :
+```
+{"se_status":400,"se_data":"7 : Failed to connect to 127.0.0.1 port 9191: Connection refused"}
+```
+Port 9191 = port du reverse proxy/Tomcat **frontal** (externe). Apache interne écoute sur un port différent (80 ou 8080).
+
+### Cause racine complète
+
+| Variable PHP | Valeur sur le serveur MEN | Signification |
+|---|---|---|
+| `$_SERVER['HTTP_HOST']` | `stateduc.ins.ne:9191` | Port **proxy externe** (Tomcat/reverse proxy) |
+| `$_SERVER['SERVER_PORT']` | `80` ou `8080` | Port **Apache interne** réel |
+| `$_SERVER['SERVER_ADDR']` | `127.0.0.1` | IP interne Apache |
+
+Session 41b utilisait le port de `HTTP_HOST` (9191) → curl 7.
+Session 41c utilisait `SERVER_PORT` → correct en théorie, mais jamais déployé en production.
+
+### Solution définitive — `_sised_probe_internal_url()` dans `config_app.php`
+
+Nouvelle fonction qui **sonde par TCP** (`fsockopen()`, timeout 3s) les candidats ip:port dans l'ordre :
+1. `SERVER_ADDR:SERVER_PORT` — port Apache réel (idéal)
+2. `127.0.0.1:80` — Apache standard
+3. `127.0.0.1:8080` — Tomcat direct / XAMPP
+4. `SERVER_ADDR:80`
+5. `SERVER_ADDR:8080`
+
+Le premier qui accepte la connexion TCP est retenu. Résultat mis **en cache** (APCu si disponible, sinon fichier tmp, TTL 1h) → aucun overhead sur les requêtes suivantes.
+
+Cas particuliers gérés :
+- **IPv6 loopback** `::1` → normalisé en `127.0.0.1` pour curl
+- **Fallback** : si aucun port ne répond (fsockopen bloqué par firewall), utilise `SERVER_ADDR:SERVER_PORT` sans test
+
+Fonctionnel sur : XAMPP, Apache seul, Apache+Tomcat, reverse proxy, VirtualHost — **quelle que soit la topologie**.
+
+### Fichier modifié
+
+- `StatEduc_burundi/config_app.php` — remplace le bloc `SISED_AURL_INTERNAL` statique par `_sised_probe_internal_url()`
+
+### Endpoint de diagnostic ajouté
+
+`GET http://stateduc.ins.ne:9191/stateduc/data_save.php/test/` retourne désormais un JSON avec :
+```json
+{
+  "SISED_AURL": "http://stateduc.ins.ne:9191/stateduc/",
+  "SISED_AURL_INTERNAL": "http://127.0.0.1:80/stateduc/",
+  "HTTP_HOST": "stateduc.ins.ne:9191",
+  "SERVER_ADDR": "127.0.0.1",
+  "SERVER_PORT": "80",
+  "tcp_probe": "OK"
+}
+```
+
+---
 
 ## Session 41 — Correctif DNS production : fallback IP cache sur résolution hostname MEN (branche `ak_secure`)
 
