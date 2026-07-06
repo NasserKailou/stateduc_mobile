@@ -35,21 +35,13 @@ $lib_data = $GLOBALS['PARAM_WS']['LIB_DATA'];
 $status_ok = $GLOBALS['PARAM_WS']['STATUS_OK'];
 $status_ko = $GLOBALS['PARAM_WS']['STATUS_KO'];
 
-// Timeout + CURLOPT_RESOLVE pour les appels curl internes (Session 43)
+// Timeout + Host header pour les appels curl internes (Session 44)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15);
 $curl->setOpt(CURLOPT_TIMEOUT, 120);
-// CURLOPT_RESOLVE : bypass DNS - hostname:port -> 127.0.0.1 (loopback)
-// Fonctionne quel que soit le nom de domaine configure.
-if (!function_exists('_sised_curl_resolve')) {
-    function _sised_curl_resolve() {
-        $parsed = parse_url($GLOBALS['SISED_AURL_INTERNAL']);
-        $host = isset($parsed['host']) ? $parsed['host'] : '';
-        $port = isset($parsed['port']) ? (int)$parsed['port'] : (isset($parsed['scheme']) && $parsed['scheme']==='https' ? 443 : 80);
-        if (empty($host)) return array();
-        return array($host.':'.$port.':127.0.0.1');
-    }
-}
-$curl->setOpt(CURLOPT_RESOLVE, _sised_curl_resolve());
+// Host header = HTTP_HOST (ex: stateduc.ins.ne:9191) -> VirtualHost Apache correct
+// SISED_AURL_INTERNAL = http://127.0.0.1:PORT_LOCAL/ -> bypass Fortinet/NAT
+// Fonctionne quel que soit le nom de domaine ou la topologie reseau.
+$curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
 
 $app = new \Slim\Slim();
 
