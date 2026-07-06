@@ -6,6 +6,119 @@ Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/p
 
 ---
 
+## Session 41 — Correctif DNS production : fallback IP cache sur résolution hostname MEN (branche `ak_secure`)
+
+### Symptôme (constaté en production VM `http://stateduc.ins.ne:9191/StatEduc/`)
+
+Après déploiement sur la VM de production MEN :
+- Authentification ✅ (réseau MEN disponible au login)
+- Téléchargement campagne ✅
+- **Envoi des données ❌** : `"6 : Could not resolve host: stateduc.ins.ne"`
+
+Screenshot de l'erreur : DioException type=connectionError → SocketException: Failed host lookup 'stateduc.ins.ne'.
+
+### Cause racine
+
+`stateduc.ins.ne` est un **nom DNS interne au réseau LAN du MEN**. Scénario réel :
+1. L'agent se connecte depuis le bureau MEN (DNS interne disponible) → auth + campagne OK
+2. L'agent se rend dans l'école, saisit les données **hors ligne** (mode offline)
+3. Au retour, l'agent envoie depuis un réseau différent (4G, autre WiFi) **où `stateduc.ins.ne` n'est pas résolvable** → code 6
+
+Sur le réseau local de test, le DNS fonctionne → pas d'erreur en test local.
+
+### Solution : IP caching au moment de l'authentification
+
+#### Stratégie générale
+
+À l'authentification (qui réussit car le réseau MEN est disponible à ce moment-là) :
+1. Résoudre `stateduc.ins.ne` → IP numérique via `InternetAddress.lookup()`
+2. Mettre l'IP en cache mémoire **et** dans `SharedPreferences` (persistance multi-session)
+3. Sur les requêtes suivantes, si la résolution DNS échoue → remplacer le hostname par l'IP cachée et rejouer
+
+#### Modifications dans `api_service.dart`
+
+##### 1. Nouveaux champs + constante (classe `ApiService`)
+```dart
+String? _cachedServerIp;   // IP numérique résolue (ex: '192.168.10.5')
+int?    _cachedServerPort; // Port extrait de l'URL (ex: 9191)
+static const String _kDnsCacheKeyPrefix = 'dns_cache_';
+```
+
+##### 2. `configure()` — appel à `_loadCachedIp()` au démarrage
+`_loadCachedIp()` lit SharedPreferences pour restaurer le cache DNS d'une session précédente.
+
+##### 3. `_loadCachedIp()` — lecture cache persisté
+```dart
+Future<void> _loadCachedIp() async { ... }
+```
+Charge la valeur `dns_cache_<hostname>` depuis SharedPreferences au démarrage de l'app.
+
+##### 4. `_resolveAndCacheIp()` — résolution + mise en cache
+```dart
+Future<void> _resolveAndCacheIp() async { ... }
+```
+Appelée en **background** (unawaited) après une authentification réussie :
+- Ignore les IPs numériques (déjà cachées)
+- `InternetAddress.lookup(host).timeout(10s)` → préfère IPv4
+- Stocke `<ip>:<port>` dans SharedPreferences (`dns_cache_<hostname>`)
+- Non-bloquante si timeout ou exception
+
+##### 5. Helpers statiques
+- `_extractHostFromUrl()` — `Uri.parse(url).host`
+- `_extractPortFromUrl()` — `Uri.parse(url).port`
+- `_isNumericIp()` — regex IPv4 + détection IPv6 (`:`)
+- `_buildFallbackUrl()` — `uri.replace(host: cachedIp, port: cachedPort)`
+
+##### 6. Nouvelle classe `_DnsFallbackInterceptor`
+Intercepteur `onError` ajouté AVANT le log intercepteur :
+```dart
+class _DnsFallbackInterceptor extends Interceptor {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // Condition 1 : connectionError uniquement
+    // Condition 2 : message contient 'Failed host lookup' / 'Could not resolve host'
+    // Condition 3 : _cachedServerIp != null
+    // → Remplace hostname par IP, rejoue via _service._dio.fetch(fallbackOptions)
+    // → handler.resolve(response) si succès
+    // → handler.next(err) si IP inconnue ou fallback échoue aussi
+  }
+}
+```
+
+Chaine des intercepteurs (ordre d'ajout = ordre d'exécution `onRequest`, inversé pour `onError`) :
+```
+Ajout : _AuthInjectorInterceptor → _DnsFallbackInterceptor → LogInterceptor
+onError LIFO : LogInterceptor (log) → _DnsFallbackInterceptor (fallback) → _AuthInjector
+```
+
+##### 7. `authenticate()` — déclenchement de la résolution
+```dart
+// Après parsing réussi :
+_resolveAndCacheIp(); // non-awaited, non-bloquant
+return User.fromJson(userMap);
+```
+
+#### Avantages du design
+- **Zéro régression** : toute requête qui fonctionne normalement n'est pas affectée
+- **Transparent** : le fallback est invisible pour l'utilisateur (pas d'erreur si IP cachée disponible)
+- **Persistant** : l'IP survit aux redémarrages de l'app (SharedPreferences)
+- **Multi-pattern** : capture les variantes du message SocketException sur Android/iOS/Linux
+
+### Information : contrôle offline déjà opérationnel (Sessions 39–40)
+
+La capture d'écran transmise montre **"1 incohérence(s) locale(s) — Contrôle offline – non envoyé au serveur"** — le moteur de cohérence offline est **déjà fonctionnel**.
+
+Il a été implémenté en Sessions 39–40 (`CoherenceEvaluator`, `coherence_rules` SQLite, debounce 800ms). Pour bénéficier des correctifs de Session 40 (regex TABLE.FIELD, agrégats virtuels, données cross-formulaires), un `git pull` + rebuild APK + re-téléchargement de la campagne est nécessaire.
+
+### Fichiers modifiés — Session 41
+
+| Fichier | Modification |
+|---------|-------------|
+| `stateduc_flutter/lib/services/api_service.dart` | +236 lignes : DNS cache, `_resolveAndCacheIp()`, `_loadCachedIp()`, `_buildFallbackUrl()`, `_DnsFallbackInterceptor` |
+| `stateduc_mobile/stateduc_flutter/lib/services/api_service.dart` | Miroir identique |
+| `RESTITUTION_TECHNIQUE_STATEDUC_MOBILE.md` | Commit initial (document créé en Session 40, non committé) |
+
+---
+
 ## Session 40 — Correctif moteur cohérence offline : regex TABLE.FIELD + données cross-formulaires + agrégats virtuels (branche `ak_secure`)
 
 ### Symptôme (après Session 39)
