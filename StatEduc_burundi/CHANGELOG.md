@@ -118,6 +118,25 @@ Il a été implémenté en Sessions 39–40 (`CoherenceEvaluator`, `coherence_ru
 | `RESTITUTION_TECHNIQUE_STATEDUC_MOBILE.md` | Commit initial (document créé en Session 40, non committé) |
 
 ---
+### Correctif 41c -- SOLUTION DEFINITIVE : SERVER_ADDR:SERVER_PORT pour le curl interne
+
+**Session 41b** utilisait `127.0.0.1:9191` mais Apache n'ecoute pas sur le port 9191 (c'est le port du reverse proxy/Tomcat frontal). Resultat : curl code 7 "Connection refused".
+
+**Solution finale** dans `config_app.php` :
+```php
+// $_SERVER['SERVER_ADDR'] = IP reelle Apache (127.0.0.1 ou LAN IP)
+// $_SERVER['SERVER_PORT'] = port reel Apache (80, 8080...) -- pas le port proxy externe
+$_sised_server_addr  = $_SERVER['SERVER_ADDR'];
+$_sised_server_port  = (int)$_SERVER['SERVER_PORT'];
+$_sised_scheme_int   = ($_sised_server_port === 443) ? 'https' : 'http';
+$_sised_port_int     = (!in_array($_sised_server_port, [80, 443])) ? ':' . $_sised_server_port : '';
+$SISED_AURL_INTERNAL = $_sised_scheme_int . '://' . $_sised_server_addr . $_sised_port_int . $SISED_URL;
+```
+
+Fonctionne quelle que soit la topologie : Apache direct, reverse proxy, XAMPP, IIS, Tomcat AJP.
+
+---
+
 ### Correctif 41b — Cause racine réelle de l'erreur DNS : curl PHP interne (SERVEUR)
 
 **Important** : le correctif Flutter (Session 41) était basé sur une mauvaise hypothèse.

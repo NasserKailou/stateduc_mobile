@@ -3,16 +3,21 @@ $SISED_SERVER       = 'http://' . $_SERVER['HTTP_HOST']; // Sans / à la fin
 $SISED_PATH         = preg_replace('`\\\`', '/', dirname(__FILE__)) . '/'; // Chemin absolu pour accéder à l'application
 $SISED_URL          = str_replace(preg_replace('`\\\`', '/', $_SERVER['DOCUMENT_ROOT']), '', $SISED_PATH); // URL relative pour accéder à l'application
 $SISED_AURL         = $SISED_SERVER . $SISED_URL; // URL absolue pour accéder à l'application
-// SISED_AURL_INTERNAL : URL locale pour les appels curl internes (data_save.php -> questionnaire_ws.php).
-// PROBLEME PRODUCTION : $SISED_SERVER utilise $_SERVER['HTTP_HOST'] = 'stateduc.ins.ne:9191'.
-// Quand PHP fait un curl vers cette URL depuis le serveur lui-meme, le DNS interne
-// 'stateduc.ins.ne' doit etre resolvable depuis la VM. S'il ne l'est pas (entree
-// /etc/hosts manquante), curl echoue avec : "6 : Could not resolve host: stateduc.ins.ne".
-// SOLUTION : remplacer le hostname par 127.0.0.1 pour les appels curl internes.
-// Le port est conserve depuis HTTP_HOST (ex: 9191) pour que Apache/IIS achemine vers le bon vhost.
-$_sised_host_parts  = explode(':', $_SERVER['HTTP_HOST']);
-$_sised_port        = isset($_sised_host_parts[1]) ? ':' . $_sised_host_parts[1] : '';
-$SISED_AURL_INTERNAL = 'http://127.0.0.1' . $_sised_port . $SISED_URL;
+// SISED_AURL_INTERNAL : URL pour les appels curl internes (data_save.php -> questionnaire_ws.php).
+//
+// Session 41  : 127.0.0.1:9191 -> curl 6 (DNS) -> 41b : 127.0.0.1:9191 -> curl 7 (Connection refused)
+// Cause : le port 9191 est celui du reverse proxy/Tomcat FRONTAL (externe).
+//         Apache lui-meme ecoute sur $_SERVER['SERVER_PORT'] (ex: 80 ou 8080).
+//
+// SOLUTION DEFINITIVE (Session 41c) :
+//   $_SERVER['SERVER_ADDR'] = IP sur laquelle Apache a accepte la requete (127.0.0.1 ou LAN IP)
+//   $_SERVER['SERVER_PORT'] = port reel Apache (80, 8080...) - pas le port proxy externe (9191)
+//   => fonctionne quelle que soit la topologie : direct, proxy, VirtualHost, XAMPP, IIS, Tomcat
+$_sised_server_addr  = $_SERVER['SERVER_ADDR'];
+$_sised_server_port  = (int)$_SERVER['SERVER_PORT'];
+$_sised_scheme_int   = ($_sised_server_port === 443) ? 'https' : 'http';
+$_sised_port_int     = (!in_array($_sised_server_port, [80, 443])) ? ':' . $_sised_server_port : '';
+$SISED_AURL_INTERNAL = $_sised_scheme_int . '://' . $_sised_server_addr . $_sised_port_int . $SISED_URL;
 
 $SISED_PATH_INC     = $SISED_PATH . 'server-side/include/';
 $SISED_PATH_CLS     = $SISED_PATH . 'server-side/classes/';
