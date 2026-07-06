@@ -44,6 +44,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../models/campaign.dart';
 import '../models/school.dart';
@@ -56,6 +57,28 @@ class ApiService {
   String? _serverUrl;
   String? _login;
   String? _password;
+
+  // ─── Cache DNS — résolution IP au moment de l'authentification ───────────────
+  // PROBLÈME : stateduc.ins.ne est un nom DNS interne au réseau MEN.
+  // Si l'agent de collecte se déplace hors du réseau MEN (ex: utilise la 4G
+  // pendant la saisie, puis revient dans l'école pour envoyer via une autre
+  // connexion), le DNS interne peut être inaccessible et la résolution du
+  // hostname échoue avec : SocketException: Failed host lookup 'stateduc.ins.ne'
+  // (code Dio 6 = DioExceptionType.connectionError).
+  //
+  // SOLUTION : À la connexion (authenticate()), on résout une fois le hostname
+  // en IP via InternetAddress.lookup() et on cache l'IP + port dans
+  // SharedPreferences. Lors des requêtes suivantes, si le DNS échoue,
+  // _DnsFallbackInterceptor remplace automatiquement le hostname par l'IP cachée
+  // et rejoue la requête.
+  //
+  // PERSISTANCE : L'IP est stockée dans SharedPreferences sous la clé
+  // 'dns_cache_<hostname>' pour survivre aux redémarrages de l'application.
+  // Elle est rafraîchie à chaque authentification réussie.
+  String? _cachedServerIp; // IP numérique du serveur (ex: '192.168.1.10')
+  int?    _cachedServerPort; // Port extrait de l'URL (ex: 9191)
+
+  static const String _kDnsCacheKeyPrefix = 'dns_cache_';
 
   // ─── Singleton ──────────────────────────────────────────────────────────────
   // UNE SEULE instance partagée par AuthProvider, CampaignProvider et DataEntryProvider.
@@ -112,6 +135,7 @@ class ApiService {
     };
 
     _dio.interceptors.add(_AuthInjectorInterceptor(this));
+    _dio.interceptors.add(_DnsFallbackInterceptor(this));
     _dio.interceptors.add(_buildLogInterceptor());
   }
 
@@ -196,6 +220,132 @@ class ApiService {
     debugPrint('[ApiService] configure → baseUrl=$_serverUrl login=$login');
     debugPrint(
         '[ApiService] Authorization=Basic ${base64Encode(utf8.encode('$login:$password'))}');
+    // Charger le cache DNS persisté (depuis une session précédente)
+    _loadCachedIp();
+  }
+
+  // ─── DNS : chargement du cache persisté ───────────────────────────────────
+  /// Charge l'IP DNS mise en cache depuis SharedPreferences lors du démarrage.
+  /// Permet de réutiliser l'IP entre redémarrages de l'app.
+  Future<void> _loadCachedIp() async {
+    try {
+      final host = _extractHostFromUrl(_serverUrl ?? '');
+      if (host.isEmpty) return;
+      final prefs = await SharedPreferences.getInstance();
+      final cached = prefs.getString('$_kDnsCacheKeyPrefix$host');
+      if (cached != null && cached.isNotEmpty) {
+        final parts = cached.split(':');
+        _cachedServerIp = parts[0];
+        _cachedServerPort = parts.length > 1 ? int.tryParse(parts[1]) : null;
+        debugPrint('[ApiService] DNS cache loaded: $host → $_cachedServerIp:$_cachedServerPort');
+      }
+    } catch (e) {
+      debugPrint('[ApiService] _loadCachedIp error: $e');
+    }
+  }
+
+  // ─── DNS : résolution et mise en cache à l'authentification ──────────────
+  /// Résout le hostname de _serverUrl en IP numérique via InternetAddress.lookup()
+  /// et met l'IP en cache (mémoire + SharedPreferences).
+  ///
+  /// Appelée après une authentification réussie — si le réseau est disponible
+  /// à ce moment-là (ce qui est garanti puisque auth a réussi), la résolution
+  /// doit aboutir.
+  ///
+  /// En cas d'erreur (timeout, exception), la méthode retourne silencieusement
+  /// sans bloquer le flux d'authentification.
+  Future<void> _resolveAndCacheIp() async {
+    try {
+      final host = _extractHostFromUrl(_serverUrl ?? '');
+      if (host.isEmpty) return;
+
+      // Si le host EST déjà une IP numérique, pas besoin de résolution
+      if (_isNumericIp(host)) {
+        _cachedServerIp = host;
+        _cachedServerPort = _extractPortFromUrl(_serverUrl ?? '');
+        debugPrint('[ApiService] _resolveAndCacheIp: host is already IP → $_cachedServerIp');
+        return;
+      }
+
+      debugPrint('[ApiService] _resolveAndCacheIp: resolving $host...');
+      final addresses = await InternetAddress.lookup(host)
+          .timeout(const Duration(seconds: 10));
+
+      if (addresses.isEmpty) {
+        debugPrint('[ApiService] _resolveAndCacheIp: no addresses returned for $host');
+        return;
+      }
+
+      // Préférer une adresse IPv4 (plus fiable sur intranet)
+      final ipv4 = addresses.firstWhere(
+        (a) => a.type == InternetAddressType.IPv4,
+        orElse: () => addresses.first,
+      );
+      _cachedServerIp   = ipv4.address;
+      _cachedServerPort = _extractPortFromUrl(_serverUrl ?? '');
+
+      debugPrint('[ApiService] _resolveAndCacheIp: $host → $_cachedServerIp:$_cachedServerPort');
+
+      // Persister dans SharedPreferences pour les sessions ultérieures
+      final prefs = await SharedPreferences.getInstance();
+      final cacheValue = _cachedServerPort != null
+          ? '$_cachedServerIp:$_cachedServerPort'
+          : _cachedServerIp!;
+      await prefs.setString('$_kDnsCacheKeyPrefix$host', cacheValue);
+      debugPrint('[ApiService] _resolveAndCacheIp: cached to SharedPreferences key=${_kDnsCacheKeyPrefix}$host');
+    } catch (e) {
+      // Non-fatal — si la résolution échoue, on continue sans cache
+      debugPrint('[ApiService] _resolveAndCacheIp error (non-fatal): $e');
+    }
+  }
+
+  // ─── DNS : helpers extraction URL ─────────────────────────────────────────
+  /// Extrait le hostname d'une URL (ex: 'http://stateduc.ins.ne:9191/app/' → 'stateduc.ins.ne')
+  static String _extractHostFromUrl(String url) {
+    try {
+      return Uri.parse(url).host;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  /// Extrait le port d'une URL (ex: 'http://stateduc.ins.ne:9191/app/' → 9191)
+  /// Retourne null si aucun port explicite (utilise le port par défaut du schéma).
+  static int? _extractPortFromUrl(String url) {
+    try {
+      final port = Uri.parse(url).port;
+      // Uri.parse retourne 0 si pas de port explicite (non -1 comme documenté)
+      return (port > 0) ? port : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Vérifie si une chaîne est une adresse IP numérique (IPv4 ou IPv6).
+  static bool _isNumericIp(String host) {
+    // IPv4 : 4 groupes de chiffres séparés par des points
+    final ipv4Regex = RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$');
+    // IPv6 : contient au moins un ':'
+    return ipv4Regex.hasMatch(host) || host.contains(':');
+  }
+
+  /// Construit l'URL de fallback en remplaçant le hostname par l'IP cachée.
+  /// Préserve le schéma (http/https), le port, le chemin et les query params.
+  ///
+  /// Ex: 'http://stateduc.ins.ne:9191/StatEduc/data_save.php/...'
+  ///   → 'http://192.168.1.10:9191/StatEduc/data_save.php/...'
+  String? _buildFallbackUrl(String originalUrl) {
+    if (_cachedServerIp == null) return null;
+    try {
+      final uri = Uri.parse(originalUrl);
+      final fallbackUri = uri.replace(
+        host: _cachedServerIp!,
+        port: _cachedServerPort ?? uri.port,
+      );
+      return fallbackUri.toString();
+    } catch (_) {
+      return null;
+    }
   }
 
   void updateCredentials(String login, String password) {
@@ -236,6 +386,8 @@ class ApiService {
           responseType: ResponseType.plain,
         ),
       );
+      // Note : _resolveAndCacheIp() est appelée plus bas, après le parsing
+      // réussi — on ne résout le DNS que si l'auth a vraiment abouti.
 
       final statusCode = response.statusCode ?? 0;
       debugPrint('[ApiService] authenticate ← HTTP $statusCode');
@@ -288,6 +440,10 @@ class ApiService {
               ? json.decode(userData) as Map<String, dynamic>
               : userData as Map<String, dynamic>;
           debugPrint('[ApiService] authenticate: success → $userMap');
+          // ── DNS cache : résoudre et mettre en cache l'IP du serveur ──────
+          // On lance la résolution en arrière-plan (unawaited) pour ne pas
+          // bloquer le retour de l'User. Si ça échoue, ce n'est pas bloquant.
+          _resolveAndCacheIp();
           return User.fromJson(userMap);
         }
       }
@@ -1117,6 +1273,86 @@ class ApiService {
       // e.message can be null for redirect/unknown errors — provide a useful message
       final msg = e.message ?? e.type.name;
       throw ApiException('Erreur réseau : $msg');
+    }
+  }
+}
+
+
+// ─── Intercepteur de fallback DNS ──────────────────────────────────────────
+// PROBLÈME PRODUCTION : sur le réseau MEN, le hostname 'stateduc.ins.ne' est
+// un DNS interne. Si l'agent de collecte est hors du LAN MEN au moment de
+// l'envoi, la résolution DNS échoue avec :
+//   SocketException: Failed host lookup 'stateduc.ins.ne'
+//   → DioException type=connectionError, code "6" dans l'UI
+//
+// SOLUTION : Cet intercepteur capture les erreurs connectionError dont le
+// message contient 'Failed host lookup'. Il remplace alors le hostname de
+// l'URL par l'IP numérique cachée (résolue lors de l'authentification) et
+// rejoue la requête une fois. Si l'IP est inconnue ou si le fallback échoue
+// aussi, l'erreur originale est propagée normalement.
+//
+// ORDRE dans la chaîne des intercepteurs Dio (ordre d'ajout) :
+//   _AuthInjectorInterceptor → _DnsFallbackInterceptor → LogInterceptor
+// Les onError sont appelés LIFO, donc LogInterceptor voit l'erreur en premier
+// pour la loguer, puis _DnsFallbackInterceptor tente le fallback.
+class _DnsFallbackInterceptor extends Interceptor {
+  final ApiService _service;
+  _DnsFallbackInterceptor(this._service);
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // Condition 1 : doit être une connectionError (code 6 dans l'UI)
+    if (err.type != DioExceptionType.connectionError) {
+      return handler.next(err);
+    }
+
+    // Condition 2 : le message doit indiquer un échec de résolution DNS
+    final msg = err.message?.toLowerCase() ?? '';
+    final isHostLookupFailure =
+        msg.contains('failed host lookup') ||
+        msg.contains('could not resolve host') ||
+        msg.contains('nodename nor servname') || // iOS
+        msg.contains('name or service not known'); // Linux
+
+    if (!isHostLookupFailure) {
+      return handler.next(err);
+    }
+
+    // Condition 3 : on doit avoir une IP cachée
+    if (_service._cachedServerIp == null) {
+      debugPrint('[DnsFallback] No cached IP available, cannot fallback');
+      return handler.next(err);
+    }
+
+    // Construire l'URL de fallback avec l'IP numérique
+    final originalUrl = err.requestOptions.uri.toString();
+    final fallbackUrl = _service._buildFallbackUrl(originalUrl);
+    if (fallbackUrl == null) {
+      debugPrint('[DnsFallback] Could not build fallback URL from $originalUrl');
+      return handler.next(err);
+    }
+
+    debugPrint('[DnsFallback] DNS failure detected: ${err.message}');
+    debugPrint('[DnsFallback] Retrying with IP: $originalUrl → $fallbackUrl');
+
+    // Cloner les options de la requête originale avec la nouvelle URL
+    final fallbackOptions = err.requestOptions.copyWith(
+      path: fallbackUrl,
+      baseUrl: '',  // URL absolue — Dio ignorera baseUrl
+    );
+
+    try {
+      // Rejouer la requête via le client Dio sous-jacent
+      final response = await _service._dio.fetch(fallbackOptions);
+      debugPrint('[DnsFallback] Fallback succeeded: HTTP ${response.statusCode}');
+      handler.resolve(response);
+    } on DioException catch (fallbackErr) {
+      debugPrint('[DnsFallback] Fallback also failed: ${fallbackErr.message}');
+      // Propager l'erreur originale (plus informative pour l'utilisateur)
+      handler.next(err);
+    } catch (e) {
+      debugPrint('[DnsFallback] Fallback unexpected error: $e');
+      handler.next(err);
     }
   }
 }
