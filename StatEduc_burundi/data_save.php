@@ -381,8 +381,27 @@ $app->post('/theme_info_save', function () use ($lib_status, $lib_message, $lib_
 });
 
 $app->get('/test/', function () use($app) {
-echo $GLOBALS['SISED_AURL'];
-});     
+    // Endpoint de diagnostic - Session 42
+    // Accessible via GET http://stateduc.ins.ne:9191/stateduc/data_save.php/test/
+    header('Content-Type: application/json; charset=utf-8');
+    $info = array(
+        'SISED_AURL'          => $GLOBALS['SISED_AURL'],
+        'SISED_AURL_INTERNAL' => $GLOBALS['SISED_AURL_INTERNAL'],
+        'HTTP_HOST'           => isset($_SERVER['HTTP_HOST'])   ? $_SERVER['HTTP_HOST']   : 'N/A',
+        'SERVER_ADDR'         => isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'N/A',
+        'SERVER_PORT'         => isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 'N/A',
+        'SERVER_NAME'         => isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'N/A',
+    );
+    // Test TCP vers l'URL interne
+    $p = parse_url($GLOBALS['SISED_AURL_INTERNAL']);
+    $test_ip   = isset($p['host']) ? $p['host'] : '127.0.0.1';
+    $test_port = isset($p['port']) ? (int)$p['port'] : 80;
+    $en = 0; $es = '';
+    $sock = @fsockopen($test_ip, $test_port, $en, $es, 3);
+    if ($sock !== false) { fclose($sock); $info['tcp_probe'] = 'OK'; }
+    else { $info['tcp_probe'] = 'FAIL: '.$en.' '.$es; }
+    echo json_encode($info, JSON_PRETTY_PRINT);
+});
 
 $app->post('/updateScore/:id', function($id) use($app) { 
 echo $id; 
