@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 48 — Fix _stripContextOnlyHaving ordre (step 7b) + suppression diagnostic CTE crashant
+// VERSION : Session 49 — Fix wrapper SUM-scalaire (mode SCALAR vs EXISTS)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -70,13 +70,22 @@
 //     - parenthèses triples `(((x)))` → `(x)` (normalisées mais conservées)
 //     - opérateurs `Or` / `And` (case insensitive) → `OR` / `AND`
 //
-//  4. RÉSULTAT ATTENDU
-//     La requête originale du serveur retourne le CODE_ETABLISSEMENT si une
-//     violation existe, NULL sinon. Le traducteur encapsule la requête dans
-//     un COUNT(*) pour obtenir un entier :
-//       → 0 = pas de violation
-//       → > 0 = violation détectée
-//     Ce résultat est comparé au critere de la règle (généralement "= 0").
+//  4. RÉSULTAT ATTENDU — DUAL MODE (Session 49)
+//     Le traducteur génère deux modes selon la présence de GROUP BY :
+//
+//     MODE EXISTS (has GROUP BY) — règles de type "existe un établissement violant ?"
+//       Wrapper : SELECT COUNT(*) AS cnt FROM (...) _violations
+//       → count = 0 : pas de violation
+//       → count > 0 : violation détectée
+//       Comparé au critere (généralement "= 0").
+//
+//     MODE SCALAR (pas de GROUP BY, SELECT Sum/COUNT agrégat) — règles de type
+//       "Sum(NB_LATRINES_ELEVES) <= Sum(NB_LATRINES_BON_ETAT) ?"
+//       Wrapper : SELECT COALESCE((SELECT col FROM (...) _s), 0) AS val
+//       → retourne la vraie valeur scalaire
+//       → comparée directement à la valeur scalaire de sql_assoc via _applyOperator
+//
+//     Détection : la SQL contient-elle GROUP BY ? Si non → MODE SCALAR.
 //
 //  5. MAPPING DE TABLE : ELEVES_AGE_NIVEAU_SEXE
 //     Même principe que DONNEES_ETABLISSEMENT — les champs sont extraits
@@ -194,8 +203,9 @@ class SqlTranslator {
   ///   [codeEtab]      → valeur pour \$CODE_ETABLISSEMENT  (ex. '101012071')
   ///   [codeTypeAnnee] → valeur pour \$CODE_TYPE_ANNEE (ex. '2024')
   ///
-  /// La requête traduite wrappée dans SELECT COUNT(*) AS cnt FROM (...) _v
-  /// retourne 0 si aucune violation, > 0 si violation détectée.
+  /// MODE EXISTS (GROUP BY présent) : wrappé dans SELECT COUNT(*) AS cnt FROM (...).
+  /// MODE SCALAR (pas de GROUP BY)  : wrappé dans SELECT COALESCE(val, 0) AS val.
+  /// Voir [TranslationResult.isScalar] pour distinguer les deux modes.
   static TranslationResult? translate({
     required String serverSql,
     required String idCamp,
@@ -272,19 +282,48 @@ class SqlTranslator {
       // → seuls les champs contexte restent → isContextOnly = true → HAVING supprimé.
       translatedSql = _stripContextOnlyHaving(translatedSql);
 
-      // ── Étape 8 : wrapper COUNT(*) ─────────────────────────────────────
-      // La requête originale retourne des lignes si violation.
-      // On encapsule pour obtenir un COUNT.
-      final withClause = 'WITH ${cteParts.join(',\n')}';
-      final countSql =
-          '$withClause\nSELECT COUNT(*) AS cnt FROM (\n$translatedSql\n) _violations';
+      // ── Étape 8 : wrapper — dual mode EXISTS / SCALAR ─────────────────
+      //
+      // SESSION 49 FIX : le wrapper COUNT(*) était toujours utilisé, y compris
+      // pour les règles SUM-scalaires sans GROUP BY. Un SELECT Sum(X) retourne
+      // toujours exactement 1 ligne (même si NULL) → COUNT(*) = 1 toujours
+      // → count1 = 1 et count2 = 1 pour toutes les règles SUM → 1 <= 1 = never
+      // violated, quelle que soit la valeur réelle de Sum(X).
+      //
+      // SOLUTION : détection GROUP BY dans le SQL traduit.
+      //   • GROUP BY présent  → MODE EXISTS  : COUNT(*) wrapper (comportement S45-S48)
+      //   • Pas de GROUP BY   → MODE SCALAR  : COALESCE(val, 0) wrapper retournant
+      //                         la valeur agrégée réelle pour _applyOperator.
+      final hasGroupBy = RegExp(
+        r'\bGROUP\s+BY\b',
+        caseSensitive: false,
+      ).hasMatch(translatedSql);
 
-      debugPrint('[SqlTranslator] translated SQL:\n$countSql');
+      final withClause = 'WITH ${cteParts.join(',\n')}';
+      final String wrappedSql;
+      final bool isScalar;
+
+      if (hasGroupBy) {
+        // MODE EXISTS — requête retourne des lignes si violation
+        wrappedSql =
+            '$withClause\nSELECT COUNT(*) AS cnt FROM (\n$translatedSql\n) _violations';
+        isScalar = false;
+      } else {
+        // MODE SCALAR — requête retourne une seule valeur agrégée
+        // On extrait la première colonne de la sous-requête via COALESCE pour
+        // gérer le cas NULL (aucune donnée → 0).
+        wrappedSql =
+            '$withClause\nSELECT COALESCE((SELECT * FROM (\n$translatedSql\n) _s), 0) AS val';
+        isScalar = true;
+      }
+
+      debugPrint('[SqlTranslator] translated SQL (isScalar=$isScalar):\n$wrappedSql');
 
       return TranslationResult(
-        sql: countSql,
+        sql: wrappedSql,
         usedTables: usedServerTables,
         fieldNames: allFields,
+        isScalar: isScalar,
       );
     } catch (e, st) {
       debugPrint('[SqlTranslator] translation error: $e\n$st');
@@ -637,7 +676,9 @@ class SqlTranslator {
 
 /// Résultat d'une traduction SQL.
 class TranslationResult {
-  /// Le SQL SQLite traduit, encapsulé dans SELECT COUNT(*) AS cnt FROM (...).
+  /// Le SQL SQLite traduit.
+  /// • [isScalar]=false : encapsulé dans SELECT COUNT(*) AS cnt FROM (...).
+  /// • [isScalar]=true  : encapsulé dans SELECT COALESCE(val, 0) AS val.
   final String sql;
 
   /// Tables serveur utilisées dans la requête originale.
@@ -646,10 +687,18 @@ class TranslationResult {
   /// Noms de champs extraits pour le CTE de pivot.
   final Set<String> fieldNames;
 
+  /// True si la requête est en mode SCALAR (pas de GROUP BY) :
+  /// le SQL retourne une seule valeur agrégée (Sum, Count scalaire).
+  /// False si en mode EXISTS (GROUP BY présent) : COUNT(*) des violations.
+  ///
+  /// SESSION 49 : nécessaire pour distinguer les deux modes d'évaluation.
+  final bool isScalar;
+
   const TranslationResult({
     required this.sql,
     required this.usedTables,
     required this.fieldNames,
+    required this.isScalar,
   });
 }
 
@@ -880,13 +929,20 @@ class CoherenceEvaluator {
     );
 
     // Exécuter sql_regle (toujours disponible à ce stade)
-    final count1 = await _execCount(db, r1.sql, 'sql_regle', rule.idRegle);
+    // SESSION 49 : passer isScalar pour que _execCount lise la bonne colonne
+    final count1 = await _execCount(
+      db, r1.sql, 'sql_regle', rule.idRegle,
+      isScalar: r1.isScalar,
+    );
     if (count1 == null) return null;
 
     double count2;
     if (r2 != null) {
       // Les deux côtés sont traduisibles → évaluation complète
-      final c2 = await _execCount(db, r2.sql, 'sql_assoc', rule.idRegle);
+      final c2 = await _execCount(
+        db, r2.sql, 'sql_assoc', rule.idRegle,
+        isScalar: r2.isScalar,
+      );
       if (c2 == null) return null;
       count2 = c2;
     } else if (rule.sqlAssoc.trim().isEmpty) {
@@ -909,21 +965,47 @@ class CoherenceEvaluator {
     return _SqlEvalResult(v1: count1, v2: count2, violated: violated);
   }
 
-  /// Exécute un SQL traduit et retourne la valeur entière du COUNT(*).
-  /// Retourne null en cas d'erreur.
+  /// Exécute un SQL traduit et retourne la valeur numérique du résultat.
+  ///
+  /// • [isScalar]=false (mode EXISTS) : lit la colonne `cnt` (COUNT(*)).
+  /// • [isScalar]=true  (mode SCALAR) : lit la colonne `val` (valeur agrégée réelle).
+  ///
+  /// SESSION 49 : ajout du paramètre [isScalar] pour distinguer les deux modes.
+  /// Le mode SCALAR est nécessaire pour les règles Sum(X) sans GROUP BY, où
+  /// COUNT(*) retournait toujours 1 (1 ligne agrégée même si NULL) → jamais violé.
   ///
   /// FIX Session 48 : suppression du bloc diagnostic CTE. Le regex (.+?) non-greedy
   /// s'arrêtait au premier ')' rencontré dans le CTE (ex: END) dans MAX(CASE...END))
   /// → SQL tronqué → erreur SQLiteLog (1) near "SELECT": syntax error.
-  /// Le diagnostic ne bloquait pas l'évaluation (catch vide) mais polluait les logs.
   Future<double?> _execCount(
-      Database db, String sql, String label, int idRegle) async {
+      Database db, String sql, String label, int idRegle,
+      {bool isScalar = false}) async {
     try {
       final rows = await db.rawQuery(sql);
-      final count = Sqflite.firstIntValue(rows);
-      debugPrint(
-          '[CoherenceEval] rawQuery $label rule=$idRegle → count=$count');
-      return count?.toDouble();
+      if (rows.isEmpty) {
+        debugPrint(
+            '[CoherenceEval] rawQuery $label rule=$idRegle → empty result');
+        return isScalar ? 0.0 : 0.0;
+      }
+      if (isScalar) {
+        // MODE SCALAR : première colonne de la première ligne = valeur agrégée
+        final firstRow = rows.first;
+        final rawVal = firstRow.values.first;
+        final val = rawVal == null
+            ? 0.0
+            : (rawVal is num
+                ? rawVal.toDouble()
+                : double.tryParse(rawVal.toString()) ?? 0.0);
+        debugPrint(
+            '[CoherenceEval] rawQuery $label rule=$idRegle (SCALAR) → val=$val');
+        return val;
+      } else {
+        // MODE EXISTS : colonne cnt = COUNT(*)
+        final count = Sqflite.firstIntValue(rows);
+        debugPrint(
+            '[CoherenceEval] rawQuery $label rule=$idRegle (EXISTS) → count=$count');
+        return count?.toDouble();
+      }
     } catch (e) {
       debugPrint(
           '[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL: $sql');
