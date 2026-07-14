@@ -4,6 +4,87 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 49] — 2026-07-14 — Fix wrapper SUM-scalaire : mode SCALAR vs EXISTS
+
+### Contexte
+Après Sessions 47+48, les règles 483/484/485 (latrines, surfaces) retournaient toujours `violated=false`.
+Logs de référence :
+```
+[CoherenceEval] rawQuery sql_regle rule=484 → count=1
+[CoherenceEval] rawQuery sql_assoc rule=484 → count=1
+[CoherenceEval] rule=484 path=SQL result=(1.0 <= 1.0) violated=false
+```
+Alors que les vraies données = `NB_LATRINES_ELEVES=50, NB_LATRINES_BON_ETAT=30` → violation réelle attendue.
+
+### Cause racine — Wrapper `COUNT(*)` systématique sur requêtes SUM-scalaires
+
+**Symptôme** : `count1 = 1, count2 = 1` toujours → `!(1 <= 1) = false` → jamais violé.
+
+**Cause** : `translate()` encapsulait TOUTES les requêtes dans `SELECT COUNT(*) AS cnt FROM (...) _violations`, y compris les requêtes SUM-scalaires sans `GROUP BY`.
+
+Un `SELECT Sum(NB_LATRINES_ELEVES) ...` sans `GROUP BY` retourne **toujours exactement 1 ligne** (même si `Sum=NULL`).
+`COUNT(*)` de 1 ligne = `1` toujours → `count1=1` et `count2=1` pour les deux côtés → `1 <= 1 → True` → `!(True) = False` → never violated.
+
+**Ce bug affecte toutes les règles de type :**
+```sql
+-- sql_regle :
+SELECT Sum(NB_LATRINES_ELEVES) AS SommeDeNB_LATRINES_ELEVES
+FROM DONNEES_ETABLISSEMENT
+WHERE (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+-- ← PAS de GROUP BY → SUM-scalaire
+```
+
+### Fix — Dual-mode wrapper (MODE EXISTS vs MODE SCALAR)
+
+**Fichier** : `coherence_evaluator.dart` — étape 8 de `translate()` + `_execCount()`.
+
+**Détection** : présence de `GROUP BY` dans le SQL traduit (après step 7/7b).
+
+```
+GROUP BY présent  → MODE EXISTS  : SELECT COUNT(*) AS cnt FROM (...) _violations
+                    _execCount() lit la colonne `cnt` (Sqflite.firstIntValue)
+                    count > 0 → violation
+
+Pas de GROUP BY   → MODE SCALAR  : SELECT COALESCE((SELECT * FROM (...) _s), 0) AS val
+                    _execCount() lit firstRow.values.first (double)
+                    valeur réelle → comparée directement via _applyOperator
+```
+
+**`TranslationResult`** : ajout du champ `isScalar: bool` pour distinguer les deux modes à l'exécution.
+
+**`_execCount()`** : ajout du paramètre `{bool isScalar = false}` :
+- `isScalar=false` → `Sqflite.firstIntValue(rows)?.toDouble()`
+- `isScalar=true`  → `firstRow.values.first` converti en `double`
+
+**`_evaluateViaSql()`** : passe `isScalar: r1.isScalar` et `isScalar: r2.isScalar` aux appels `_execCount`.
+
+### Exemple concret — Règle 483 (NB_LATRINES_ELEVES <= NB_LATRINES_BON_ETAT)
+
+**Avant fix :**
+```
+sql_regle COUNT(*) = 1  sql_assoc COUNT(*) = 1
+!(1.0 <= 1.0) = False  ← BUG
+```
+
+**Après fix :**
+```
+sql_regle SCALAR val = 50.0  sql_assoc SCALAR val = 30.0
+!(50.0 <= 30.0) = True  ← CORRECT (violation détectée)
+```
+
+### Validation (Python SQLite, 4/4 tests)
+- T1 Bug COUNT(*) toujours 1 → violated=False (bug démontré) ✓
+- T2 Fix SCALAR NB_LATRINES_ELEVES=50 > NB_LATRINES_BON_ETAT=30 → violated=True ✓
+- T3 Cohérent : NB_LATRINES_ELEVES=20 <= NB_LATRINES_BON_ETAT=30 → violated=False ✓
+- T4 Aucune donnée latrines → COALESCE(NULL, 0)=0 vs 0 → not violated ✓
+
+### Pas de régression
+- Règles MODE EXISTS (GROUP BY présent) → COUNT(*) wrapper conservé identique (Sessions 45-48)
+- Règles SUM-scalaires cohérentes (v1 <= v2) → SCALAR mode retourne not violated correctement
+- Cas données absentes → COALESCE(0) → not violated (conservatif, pas de faux positifs)
+
+---
+
 ## [Session 48] — 2026-07-14 — Fix _stripContextOnlyHaving ordre + suppression diagnostic CTE crashant
 
 ### Contexte
