@@ -4,6 +4,37 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 48] — 2026-07-14 — Fix _stripContextOnlyHaving ordre + suppression diagnostic CTE crashant
+
+### Contexte
+Après Session 47, les logs montrent encore `HAVING (((CODE_ETABLISSEMENT)=20952)...)` non supprimé dans le SQL traduit pour les règles avec qualificateurs `TABLE.FIELD` (ex: électricité), et des erreurs `SQLiteLog (1) near "SELECT": syntax error` répétées.
+
+### Bug 1 — CRITIQUE — `_stripContextOnlyHaving` appelé AVANT la suppression des qualificateurs
+
+**Symptôme** : Le HAVING reste présent dans le SQL traduit pour les règles utilisant `DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT` (syntaxe qualifiée) → `count=0` → violation non détectée.
+
+**Cause** : `_stripContextOnlyHaving` était appelé dans `_translateSyntax()` (step 10), **avant** la suppression des qualificateurs `TABLE.FIELD` (step 7 dans `translate()`). Le body du HAVING contenait encore `DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT` → le regex trouvait `DONNEES_ETABLISSEMENT` comme identifiant → n'appartient pas à `_contextFields` → `isContextOnly = false` → HAVING gardé.
+
+**Fix** : Déplacement de l'appel `_stripContextOnlyHaving()` de `_translateSyntax()` step 10 vers `translate()` **step 7b**, c'est-à-dire immédiatement APRÈS la boucle de suppression des qualificateurs. Après step 7 : `DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT` → `CODE_ETABLISSEMENT` → `isContextOnly = true` → HAVING supprimé.
+
+### Bug 2 — Diagnostic CTE crashe SQLite (erreurs dans les logs)
+
+**Symptôme** : `E/SQLiteLog: (1) near "SELECT": syntax error in "WITH DONNEES_ETABLISSEMENT AS ( SELECT MAX(CASE WHEN UPPER(field_name) SELECT * FROM ..."` — 3 fois par règle.
+
+**Cause** : Le bloc diagnostic dans `_execCount()` utilisait le regex `(.+?)` (non-greedy avec `dotAll: true`) pour extraire le body du CTE. Ce regex s'arrêtait au **premier `)` trouvé** dans le SQL — qui est le `)` de `MAX(CASE WHEN...END)` — produisant un CTE tronqué → SQL invalide → crash SQLite. Le `catch (_) {}` empêchait le blocage de l'évaluation mais polluait les logs avec 3 fausses erreurs par règle.
+
+**Fix** : Suppression complète du bloc diagnostic CTE dans `_execCount()`. Le vrai `rawQuery` fonctionne correctement ; seul le diagnostic était défaillant.
+
+### Validation (Python SQLite, 6/6 tests)
+- Électricité violation (qualificateurs + `$CODE_ETABLISSEMENT`): count=1 ✓
+- Latrines violation (qualificateurs + `$CODE_ETABLISSEMENT`): count=1 ✓
+- Domaine violation (sans qualificateurs, entier hardcodé): count=1 ✓
+- Électricité cohérent: count=0 (pas de régression) ✓
+- Latrines cohérent: count=0 (pas de régression) ✓
+- Domaine cohérent: count=0 (pas de régression) ✓
+
+---
+
 ## [Session 47] — 2026-07-14 — Fix HAVING type-mismatch TEXT/INTEGER (0 violations systématique)
 
 ### Contexte
