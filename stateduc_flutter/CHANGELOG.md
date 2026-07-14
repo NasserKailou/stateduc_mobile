@@ -4,6 +4,59 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 46] — 2026-07-14 — Corrections critiques moteur cohérence offline (4 bugs)
+
+### Contexte
+Tests en mode debug (Session 45) ont révélé 4 bugs bloquants empêchant toute détection de violation.
+
+### Bug 1 — CRITIQUE — `\1` littéral dans SQL (SQLite crash)
+**Fichier** : `coherence_evaluator.dart` — méthode `translate()`, étape 7
+
+**Symptôme** : `E/SQLiteLog: unrecognized token: "\"` — toutes les règles 483/484/... échouaient avec SQL contenant `Sum(\1)`.
+
+**Cause** : `String.replaceAll(RegExp, String)` en Dart **ne supporte pas** les backreferences `\1` dans la chaîne de remplacement — le `\1` est inséré tel quel dans le SQL.
+
+**Fix** : Remplacement de `replaceAll(regex, r'\1')` par `replaceAllMapped(regex, (m) => m.group(1)!)`.
+
+### Bug 2 — Champs WHERE non extraits pour le CTE
+**Fichier** : `coherence_evaluator.dart` — méthode `_extractAllFieldNames()`
+
+**Symptôme** : `DOMAINE_DELIMITE` et `SUPERFICIE_DOMAINE` absents du CTE → colonnes NULL → WHERE toujours faux → violations jamais détectées.
+
+**Cause** : L'extraction ne cherchait que les champs qualifiés (`TABLE.FIELD`) et les clauses GROUP BY/HAVING, pas les identifiants nus dans WHERE.
+
+**Fix** : Ajout d'une extraction des identifiants non qualifiés dans la clause WHERE (via regex avec `dotAll: true`).
+
+### Bug 3 — Nom de table inclus dans les champs du CTE
+**Fichier** : `coherence_evaluator.dart` — méthode `_extractAllFieldNames()`
+
+**Symptôme** : `DONNEES_ETABLISSEMENT` apparaissait dans les champs extraits → colonne CTE inutile.
+
+**Cause** : Pas de filtre excluant les noms de tables serveur (`_knownServerTables`) lors de l'extraction.
+
+**Fix** : Ajout de `!serverTables.contains(name)` dans les trois boucles d'extraction.
+
+### Bug 4 — `sql_assoc` non traduisible → skip complet (règles 487, 488)
+**Fichier** : `coherence_evaluator.dart` — méthode `_evaluateViaSql()`
+
+**Symptôme** : Règles 487 et 488 jamais évaluées car `sql_assoc` ne contient pas `DONNEES_ETABLISSEMENT`.
+
+**Cause** : `if (r2 == null) return null` causait le fallback même quand `sql_regle` était traduisible.
+
+**Fix** : Si `sql_assoc` non traduisible ou vide → `count2 = 0` (compare `count1` violations à 0). Correct pour critere `= 0` (la règle est violée si count violations > 0).
+
+### UI — Bannière offline style "Contrôle de cohérence"
+**Fichier** : `school_data_screen.dart` — widget `_OfflineCoherenceBanner`
+
+Refonte visuelle pour ressembler au dialog serveur (screenshot utilisateur) :
+- Titre : **"Contrôle de cohérence"** (comme le dialog serveur)
+- Sous-titre : *"Contrôle local — non encore envoyé au serveur"* (distinction claire)
+- Compteur : "N incohérence(s) détectée(s) :" (même format)
+- Icônes rouges `error_outline` par violation (identique au dialog serveur)
+- Fond blanc avec bordure orange et ombre légère
+
+---
+
 ## [Session 45] — 2026-07-14 — Moteur de cohérence offline SQL réel sur SQLite
 
 ### Objectif

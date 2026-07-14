@@ -861,6 +861,9 @@ class _FilterSelector extends StatelessWidget {
 ///
 /// La bannière est indépendante du contrôle serveur (data_controle.php) ;
 /// elle permet de corriger les données avant l'envoi au serveur.
+///
+/// Style calqué sur le dialog server-side "Contrôle de cohérence" (screenshot)
+/// avec mention explicite "contrôle local" pour distinguer les deux contrôles.
 class _OfflineCoherenceBanner extends StatelessWidget {
   const _OfflineCoherenceBanner({
     required this.errors,
@@ -874,60 +877,103 @@ class _OfflineCoherenceBanner extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.orange.shade50,
-        border: Border.all(color: Colors.orange.shade300),
+        color: Colors.white,
+        border: Border.all(color: Colors.orange.shade400, width: 1.5),
         borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.shade100,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: ExpansionTile(
-        leading: const Icon(Icons.warning_amber_rounded,
-            color: Colors.orange, size: 22),
-        title: Text(
-          '${errors.length} incohérence(s) locale(s)',
-          style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.deepOrange),
-        ),
-        subtitle: const Text(
-          'Contrôle offline — non envoyé au serveur',
-          style: TextStyle(fontSize: 11, color: Colors.grey),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.close, size: 16),
-              onPressed: onDismiss,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              tooltip: 'Fermer',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // ── En-tête — style identique au dialog serveur ─────────────────
+          Container(
+            padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade50,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(7)),
             ),
-          ],
-        ),
-        // Détail de chaque violation dans la section expansible
-        children: errors
-            .map((e) => Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                  child: Row(
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded,
+                    color: Colors.orange, size: 20),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 14, color: Colors.deepOrange),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          e.message.isNotEmpty
-                              ? e.message
-                              // Description générique si pas de message configuré
-                              : '${e.libRegle} doit être ${e.critere} ${e.libRegleAssoc} '
-                                  '(valeurs : ${e.value1.toStringAsFixed(0)} / ${e.value2.toStringAsFixed(0)})',
-                          style: const TextStyle(fontSize: 12),
+                      Text(
+                        'Contrôle de cohérence',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Contrôle local — non encore envoyé au serveur',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
                     ],
                   ),
-                ))
-            .toList(),
+                ),
+                // Bouton fermer
+                IconButton(
+                  icon: const Icon(Icons.close, size: 16),
+                  onPressed: onDismiss,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 28, minHeight: 28,
+                  ),
+                  tooltip: 'Fermer',
+                ),
+              ],
+            ),
+          ),
+          // ── Corps — compteur + liste des violations ──────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+            child: Text(
+              '${errors.length} incohérence(s) détectée(s) :',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          // Liste des violations avec icône rouge (identique au dialog serveur)
+          ...errors.map((e) => Padding(
+                padding: const EdgeInsets.fromLTRB(12, 3, 12, 3),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        size: 15, color: Colors.red),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        e.message.isNotEmpty
+                            ? e.message
+                            // Description générique si pas de message configuré
+                            : '${e.libRegle} doit être ${e.critere} ${e.libRegleAssoc} '
+                                '(valeurs : ${e.value1.toStringAsFixed(0)} / ${e.value2.toStringAsFixed(0)})',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
