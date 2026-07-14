@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 49 — Fix wrapper SUM-scalaire (mode SCALAR vs EXISTS)
+// VERSION : Session 50 — Fix WHERE context-only (TEXT/INTEGER mismatch) + empty-SQL guard
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -281,6 +281,30 @@ class SqlTranslator {
       // Après l'étape 7 : DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT → CODE_ETABLISSEMENT
       // → seuls les champs contexte restent → isContextOnly = true → HAVING supprimé.
       translatedSql = _stripContextOnlyHaving(translatedSql);
+
+      // ── Étape 7c : FIX SESSION 50 — supprimer le WHERE redondant de contexte ──
+      //
+      // Même problème que le HAVING (Bug S47/S48) mais dans la clause WHERE.
+      // Les règles SUM-scalaires (pas de GROUP BY) ont un WHERE du type :
+      //   WHERE (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+      // Le CTE retourne des TEXT pour CODE_ETABLISSEMENT ('20952'), mais le
+      // littéral du serveur est INTEGER (20952 sans guillemets).
+      // SQLite : '20952' = 20952 → FALSE → toutes les lignes filtrées → Sum = NULL
+      // → COALESCE(NULL, 0) = 0.0 → les deux côtés valent 0 → jamais violé.
+      //
+      // Le CTE est déjà filtré sur id_etab='20952' donc ce WHERE est redondant.
+      // Supprimer le WHERE s'il ne contient que des champs de contexte.
+      translatedSql = _stripContextOnlyWhere(translatedSql);
+
+      // ── Étape 7d : FIX SESSION 50-B — guard SQL vide ──────────────────────
+      //
+      // Si après les strips le SQL traduit est vide (ex: règle non traduisible
+      // avec HAVING+WHERE intégralement supprimés), éviter de générer un SQL
+      // syntaxiquement invalide tel que SELECT COUNT(*) AS cnt FROM (\n) _violations.
+      if (translatedSql.trim().isEmpty) {
+        debugPrint('[SqlTranslator] translatedSql empty after stripping — aborting translation');
+        return null;
+      }
 
       // ── Étape 8 : wrapper — dual mode EXISTS / SCALAR ─────────────────
       //
@@ -609,6 +633,91 @@ class SqlTranslator {
         return m.group(0)!;
       }
     });
+  }
+
+  /// Supprime la clause WHERE d'une requête traduite si et seulement si ce WHERE
+  /// ne contient que des comparaisons sur des champs de contexte
+  /// (CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF).
+  ///
+  /// FIX SESSION 50-A : même problème TEXT/INTEGER que le HAVING (S47/S48) mais
+  /// dans la clause WHERE des règles SUM-scalaires (sans GROUP BY).
+  /// Ex : WHERE (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+  /// → '20952' (TEXT dans CTE) ≠ 20952 (INTEGER littéral) → SQLite filtre tout
+  /// → Sum(X) = NULL → COALESCE → 0.0 → jamais violé.
+  ///
+  /// Le CTE est déjà filtré sur id_etab='20952' donc ce WHERE est redondant.
+  ///
+  /// STRATÉGIE :
+  ///   1. Si le SQL commence par WITH, on isole le bloc CTE en cherchant la
+  ///      première fermeture de parenthèse à depth=0 (fin du CTE). Le strip
+  ///      s'applique uniquement sur la partie principale (après le CTE) pour
+  ///      éviter de supprimer le WHERE id_camp=... interne au CTE.
+  ///   2. Le lookahead de fin de corps WHERE inclut `\n\s*)` (fin de sous-requête
+  ///      imbriquée dans le wrapper SCALAR COALESCE) ainsi que GROUP BY / HAVING /
+  ///      ORDER BY / LIMIT / fin de chaîne.
+  static String _stripContextOnlyWhere(String sql) {
+    // ── Étape A : isoler la partie principale (hors bloc CTE) ──────────────
+    String ctePart = '';
+    String mainPart = sql;
+
+    if (sql.trimLeft().toUpperCase().startsWith('WITH')) {
+      // Trouver la première fermeture à depth=0 (= fin du bloc CTE)
+      int depth = 0;
+      int firstCteEnd = -1;
+      for (int i = 0; i < sql.length; i++) {
+        if (sql[i] == '(') {
+          depth++;
+        } else if (sql[i] == ')') {
+          depth--;
+          if (depth == 0) {
+            firstCteEnd = i;
+            break;
+          }
+        }
+      }
+      if (firstCteEnd >= 0) {
+        ctePart  = sql.substring(0, firstCteEnd + 1);
+        mainPart = sql.substring(firstCteEnd + 1);
+      }
+    }
+
+    // ── Étape B : appliquer le strip sur mainPart uniquement ───────────────
+    //
+    // Le lookahead arrête le body WHERE sur :
+    //   \n\s*\)   : fermeture de sous-requête (wrapper SCALAR ou EXISTS)
+    //   GROUP BY / HAVING / ORDER BY / LIMIT : clauses SQL suivantes
+    //   $          : fin de chaîne
+    final whereRe = RegExp(
+      r'\bWHERE\b(.+?)(?=\n\s*\)|\bGROUP\s+BY\b|\bHAVING\b|\bORDER\s+BY\b|\bLIMIT\b|$)',
+      caseSensitive: false,
+      dotAll: true,
+    );
+
+    final strippedMain = mainPart.replaceAllMapped(whereRe, (m) {
+      final whereBody = m.group(1)!;
+
+      // Extrait tous les identifiants (mots de 3+ lettres avec underscores)
+      final identRe = RegExp(r'\b([A-Z][A-Z0-9_]+)\b', caseSensitive: false);
+      final identifiers = identRe
+          .allMatches(whereBody)
+          .map((id) => id.group(1)!.toUpperCase())
+          .where((id) => !_isSqlKeyword(id) && id.length > 2)
+          .toSet();
+
+      // Vérifie si tous les identifiants sont des champs de contexte
+      final isContextOnly = identifiers.every((id) => _contextFields.contains(id));
+
+      if (isContextOnly) {
+        // WHERE ne filtre que sur l'établissement/année → redondant sur mobile
+        debugPrint('[SqlTranslator] stripping context-only WHERE: $whereBody');
+        return ''; // Supprime WHERE + body; le lookahead préserve \n) et GROUP BY
+      } else {
+        // WHERE contient une logique métier (champs de données) → on le garde
+        return m.group(0)!;
+      }
+    });
+
+    return ctePart + strippedMain;
   }
 
   // ─── Utilitaire : est-ce un mot-clé SQL ? ────────────────────────────────
