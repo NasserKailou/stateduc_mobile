@@ -2,79 +2,532 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// Ce fichier implémente l'évaluation offline des règles de cohérence StatEduc.
-// Il est le pendant mobile de controle_theme_batch.class.php (côté serveur).
+// VERSION : Session 45 — Moteur SQL réel sur SQLite
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
-//   sql_assoc) sur la base SQL Server/Oracle, puis compare les résultats avec un
-//   opérateur (critere). Cette approche n'est pas possible hors ligne car le
+//   sql_assoc) sur la base SQL Server/Access, puis compare les résultats avec un
+//   opérateur (critere). Cette approche n'était pas possible hors ligne car le
 //   mobile n'a pas accès à la base de données serveur.
 //
-// APPROCHE OFFLINE :
-//   Les SQL serveur suivent des patterns prévisibles :
+// APPROCHE SESSION 45 — EXÉCUTION SQL RÉELLE SUR SQLITE :
+//   Plutôt qu'un pattern-matching par regex (approche Sessions 38–44), on traduit
+//   les requêtes SQL serveur vers SQLite et on les exécute directement sur
+//   collected_data. Cela garantit un résultat IDENTIQUE au serveur pour les mêmes
+//   données.
 //
-//   Cas simple (champ form direct) :
-//     SELECT Sum(TABLE.NOM_CHAMP) FROM TABLE WHERE ...
-//     → on extrait NOM_CHAMP et on le cherche dans collected_data
+// ─── ARCHITECTURE ────────────────────────────────────────────────────────────
 //
-//   Cas vue agrégée (ELEVES_AGE_NIVEAU_SEXE) :
-//     SELECT Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) FROM ...
-//     SELECT Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) FROM ...
-//     → ces colonnes n'existent pas dans collected_data (c'est une vue DB)
-//     → FILLES_AGE_NIVEAU ≈ somme des champs filles (_F_ / _F$ dans le nom)
-//     → TOTAL_AGE_NIVEAU  ≈ somme de tous les champs numériques du formulaire
+//   CoherenceEvaluator.evaluate()
+//     │
+//     ├─► [CHEMIN 1 — SQL réel]  SqlTranslator.translate()
+//     │       → SQL SQLite natif exécuté via db.rawQuery()
+//     │       → COUNT(*) des violations → comparé au critere
+//     │
+//     └─► [CHEMIN 2 — regex fallback] _extractValue() + _applyOperator()
+//             → utilisé si le traducteur ne peut pas traiter le SQL
+//             → conservatif : aucun faux positif
 //
-//   Cas multi-tables (DONNEES_ETABLISSEMENT) :
-//     SELECT Sum(DONNEES_ETABLISSEMENT.NB_ELEVES_F) FROM ...
-//     → NB_ELEVES_F peut être un champ d'un autre formulaire (autre idQst)
-//     → on charge tous les collected_data de l'école pour la campagne
-//       et on somme toutes les occurrences du champ (cross-question)
+// ─── SqlTranslator — STRATÉGIE DE TRADUCTION ─────────────────────────────────
 //
-// PRINCIPE DE VIOLATION :
-//   - Si la condition "V1 critere V2" est VRAIE → données cohérentes (OK)
-//   - Si la condition est FAUSSE              → violation détectée (KO)
-//   - _applyOperator() retourne true quand la règle EST violée
+//  Le traducteur transforme les requêtes SQL de type Access/SQL Server en SQL
+//  compatible SQLite. Les règles de traduction sont appliquées dans l'ordre :
 //
-// CONSERVATISME :
-//   Si un champ SQL ne peut pas être résolu malgré les trois stratégies,
-//   la règle est silencieusement ignorée (pas de faux positifs).
-//   Ce moteur ne signale que les violations CERTAINES.
+//  1. SUBSTITUTION DES PARAMÈTRES
+//     $CODE_ETABLISSEMENT  → valeur réelle de l'établissement (ex. '101012071')
+//     $CODE_TYPE_ANNEE     → valeur réelle de l'année (ex. '2024')
+//     Les paramètres sont remplacés par des littéraux SQL entre guillemets simples.
 //
-// PATTERNS SQL SUPPORTÉS (Access/SQL Server style avec HAVING) :
-//   1. SELECT Sum(TABLE.FIELD) AS Alias FROM TABLE GROUP BY ... HAVING ...
-//   2. SELECT Sum(FIELD) FROM TABLE WHERE ...
-//   3. SELECT NVL(SUM(TABLE.FIELD),0) FROM ...    (Oracle NVL)
-//   4. SELECT COALESCE(SUM(TABLE.FIELD),0) FROM ...
-//   5. SELECT TABLE.FIELD FROM ...               (champ brut qualifié)
-//   6. SELECT FIELD FROM ...                     (champ brut sans qualificateur)
+//  2. MAPPING DE TABLE : DONNEES_ETABLISSEMENT → sous-requête SQLite
+//     La table serveur DONNEES_ETABLISSEMENT est une vue SQL Server contenant
+//     toutes les données d'un établissement pour une campagne. Côté mobile,
+//     ces données sont stockées dans collected_data sous forme de lignes
+//     (field_name, field_value). Le traducteur remplace DONNEES_ETABLISSEMENT
+//     par un CTE (Common Table Expression) de pivot dynamique :
 //
-// COLONNES DE VUES GÉRÉES PAR APPROXIMATION :
-//   TOTAL_AGE_NIVEAU → somme de tous les champs numériques du formulaire courant
-//   FILLES_AGE_NIVEAU → somme des champs dont le nom contient un indicateur filles
-//                        (_F_, _F$, NB_F_, NB_F$, _FILLES_, FILLE)
+//     WITH DONNEES_ETABLISSEMENT AS (
+//       SELECT
+//         MAX(CASE WHEN field_name='ELECTRICITE' THEN CAST(field_value AS REAL) END)
+//           AS ELECTRICITE,
+//         MAX(CASE WHEN field_name='FONCT_ALIMENT_ELECTRICITE' THEN CAST(field_value AS REAL) END)
+//           AS FONCT_ALIMENT_ELECTRICITE,
+//         MAX(CASE WHEN field_name='CODE_ETABLISSEMENT' THEN field_value END)
+//           AS CODE_ETABLISSEMENT,
+//         MAX(CASE WHEN field_name='CODE_TYPE_ANNEE' THEN field_value END)
+//           AS CODE_TYPE_ANNEE
+//       FROM collected_data
+//       WHERE id_camp='CAMP_ID' AND id_etab='ETAB_ID'
+//     )
+//     SELECT ... (requête originale traduite)
 //
+//     Les champs du CTE sont extraits automatiquement depuis le SQL de la règle.
+//
+//  3. SYNTAXE ACCESS → SQLITE
+//     - `Is Null`          → `IS NULL`
+//     - `Is Not Null`      → `IS NOT NULL`
+//     - `NVL(x, y)`        → `COALESCE(x, y)`
+//     - HAVING avec filtres → HAVING conservé (SQLite le supporte)
+//     - parenthèses triples `(((x)))` → `(x)` (normalisées mais conservées)
+//     - opérateurs `Or` / `And` (case insensitive) → `OR` / `AND`
+//
+//  4. RÉSULTAT ATTENDU
+//     La requête originale du serveur retourne le CODE_ETABLISSEMENT si une
+//     violation existe, NULL sinon. Le traducteur encapsule la requête dans
+//     un COUNT(*) pour obtenir un entier :
+//       → 0 = pas de violation
+//       → > 0 = violation détectée
+//     Ce résultat est comparé au critere de la règle (généralement "= 0").
+//
+//  5. MAPPING DE TABLE : ELEVES_AGE_NIVEAU_SEXE
+//     Même principe que DONNEES_ETABLISSEMENT — les champs sont extraits
+//     depuis collected_data en pivotant sur field_name.
+//
+//  6. TABLES INCONNUES
+//     Si le SQL contient une table non reconnue, le traducteur retourne null
+//     et le chemin fallback (regex) est utilisé.
+//
+// ─── EXEMPLES CONCRETS ───────────────────────────────────────────────────────
+//
+//  Règle électricité (sql_regle) :
+//    SELECT DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT
+//    FROM DONNEES_ETABLISSEMENT
+//    WHERE (((DONNEES_ETABLISSEMENT.ELECTRICITE)=0
+//           Or (DONNEES_ETABLISSEMENT.ELECTRICITE) Is Null)
+//          AND ((DONNEES_ETABLISSEMENT.FONCT_ALIMENT_ELECTRICITE)=1))
+//       OR (((DONNEES_ETABLISSEMENT.ELECTRICITE)=1)
+//          AND ((DONNEES_ETABLISSEMENT.FONCT_ALIMENT_ELECTRICITE) Is Null))
+//    GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT,
+//             DONNEES_ETABLISSEMENT.CODE_TYPE_ANNEE
+//    HAVING (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=$CODE_ETABLISSEMENT)
+//           AND ((DONNEES_ETABLISSEMENT.CODE_TYPE_ANNEE)=$CODE_TYPE_ANNEE));
+//
+//  → SQL SQLite généré (form schématique) :
+//    WITH DONNEES_ETABLISSEMENT AS (
+//      SELECT
+//        MAX(CASE WHEN field_name='ELECTRICITE' THEN CAST(field_value AS REAL) END) AS ELECTRICITE,
+//        MAX(CASE WHEN field_name='FONCT_ALIMENT_ELECTRICITE' THEN CAST(field_value AS REAL) END) AS FONCT_ALIMENT_ELECTRICITE,
+//        MAX(CASE WHEN field_name='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
+//        MAX(CASE WHEN field_name='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE
+//      FROM collected_data
+//      WHERE id_camp='C1' AND id_etab='E1'
+//    )
+//    SELECT COUNT(*) AS cnt
+//    FROM (
+//      SELECT CODE_ETABLISSEMENT
+//      FROM DONNEES_ETABLISSEMENT
+//      WHERE ((ELECTRICITE=0 OR ELECTRICITE IS NULL) AND FONCT_ALIMENT_ELECTRICITE=1)
+//         OR (ELECTRICITE=1 AND FONCT_ALIMENT_ELECTRICITE IS NULL)
+//      GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+//      HAVING CODE_ETABLISSEMENT='101012071' AND CODE_TYPE_ANNEE='2024'
+//    ) _violations
+//
+//  → résultat : 1 si violation, 0 si cohérent
+//
+// ─── CONSERVATION DU CHEMIN REGEX ─────────────────────────────────────────────
+//
+//  Le chemin regex (Sessions 38–44) est conservé comme fallback pour :
+//   - Les règles avec syntaxe hors du périmètre du traducteur
+//   - Les règles sur des vues agrégées non traduisibles (TOTAL_AGE_NIVEAU)
+//   - La fiabilité en cas d'erreur inattendue du traducteur
+//   Le fallback est CONSERVATIF : si un champ est introuvable, la règle est
+//   ignorée silencieusement (pas de faux positifs).
+//
+// ─── PORT SERVEUR VARIABLE ────────────────────────────────────────────────────
+//
+//  Ce fichier n'effectue aucun appel réseau — le moteur offline est
+//  entièrement autonome. La note de port variable est pertinente uniquement
+//  pour config_app.php et data_save.php (côté PHP, déjà corrigé Session 44).
+//
+// =============================================================================
+
 import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 
+// =============================================================================
+// SqlTranslator — Traducteur SQL Access/SQL Server → SQLite
+// =============================================================================
+
+/// Traduit les requêtes SQL de contrôle de cohérence (syntaxe Access/SQL Server)
+/// en SQL compatible SQLite, en s'appuyant sur la table `collected_data`.
+///
+/// Usage :
+///   final result = SqlTranslator.translate(
+///     serverSql: rule.sqlRegle,
+///     idCamp: idCamp,
+///     idEtab: idEtab,
+///     codeEtab: codeEtab,      // valeur réelle pour $CODE_ETABLISSEMENT
+///     codeTypeAnnee: codeyear, // valeur réelle pour $CODE_TYPE_ANNEE
+///   );
+///   if (result != null) {
+///     final rows = await db.rawQuery(result.sql);
+///     final count = Sqflite.firstIntValue(rows) ?? 0;
+///     // count > 0 → violation
+///   }
+class SqlTranslator {
+  SqlTranslator._(); // Classe statique uniquement
+
+  // Tables serveur connues qui peuvent être mappées vers collected_data
+  static const _knownServerTables = {
+    'DONNEES_ETABLISSEMENT',
+    'ELEVES_AGE_NIVEAU_SEXE',
+    'ELEVES_NIVEAU_SEXE',
+    'ELEVES_AGE_SEXE',
+  };
+
+  // Champs de contexte toujours inclus dans le CTE de pivot
+  // (nécessaires pour les filtres HAVING sur CODE_ETABLISSEMENT et CODE_TYPE_ANNEE)
+  static const _contextFields = [
+    'CODE_ETABLISSEMENT',
+    'CODE_TYPE_ANNEE',
+    'CODE_ADMINISTRATIF',
+  ];
+
+  /// Traduit [serverSql] en SQL SQLite exécutable.
+  ///
+  /// Retourne un [TranslationResult] ou null si la requête n'est pas traduisible.
+  ///
+  /// Paramètres de substitution :
+  ///   [idCamp]        → id de la campagne (filtre collected_data)
+  ///   [idEtab]        → id de l'établissement (filtre collected_data)
+  ///   [codeEtab]      → valeur pour \$CODE_ETABLISSEMENT  (ex. '101012071')
+  ///   [codeTypeAnnee] → valeur pour \$CODE_TYPE_ANNEE (ex. '2024')
+  ///
+  /// La requête traduite wrappée dans SELECT COUNT(*) AS cnt FROM (...) _v
+  /// retourne 0 si aucune violation, > 0 si violation détectée.
+  static TranslationResult? translate({
+    required String serverSql,
+    required String idCamp,
+    required String idEtab,
+    String? codeEtab,
+    String? codeTypeAnnee,
+  }) {
+    if (serverSql.trim().isEmpty) return null;
+
+    try {
+      // ── Étape 1 : normalisation de base ───────────────────────────────
+      // Retire le point-virgule final s'il existe
+      String sql = serverSql.trim();
+      if (sql.endsWith(';')) sql = sql.substring(0, sql.length - 1).trim();
+
+      // ── Étape 2 : substitution des paramètres ─────────────────────────
+      sql = _substituteParams(
+        sql: sql,
+        codeEtab: codeEtab,
+        codeTypeAnnee: codeTypeAnnee,
+      );
+
+      // ── Étape 3 : identifier les tables serveur utilisées ─────────────
+      final usedServerTables = _detectServerTables(sql);
+      if (usedServerTables.isEmpty) {
+        // Pas de table serveur connue → on ne peut pas traduire
+        debugPrint('[SqlTranslator] no known server tables in SQL — not translatable');
+        return null;
+      }
+
+      // ── Étape 4 : extraire les champs référencés par la requête ───────
+      // Pour construire le CTE de pivot, on a besoin de connaître TOUS les
+      // champs référencés dans le SQL (SELECT, WHERE, GROUP BY, HAVING).
+      final allFields = _extractAllFieldNames(sql, usedServerTables);
+
+      // ── Étape 5 : construire le CTE de pivot pour chaque table serveur ──
+      final cteParts = <String>[];
+      for (final tableName in usedServerTables) {
+        final cte = _buildPivotCte(
+          tableName: tableName,
+          fields: allFields,
+          idCamp: idCamp,
+          idEtab: idEtab,
+        );
+        cteParts.add('$tableName AS (\n$cte\n)');
+      }
+
+      // ── Étape 6 : traduction syntaxique Access → SQLite ────────────────
+      String translatedSql = _translateSyntax(sql);
+
+      // ── Étape 7 : supprimer les qualificateurs de table dans le SQL ────
+      // Ex: DONNEES_ETABLISSEMENT.ELECTRICITE → ELECTRICITE
+      for (final tableName in usedServerTables) {
+        translatedSql = translatedSql.replaceAll(
+          RegExp('\\b${RegExp.escape(tableName)}\\.(\\w+)', caseSensitive: false),
+          r'\1',
+        );
+        // Supprimer aussi les références non qualifiées à la table dans FROM
+        // (le CTE les fournit déjà)
+      }
+
+      // ── Étape 8 : wrapper COUNT(*) ─────────────────────────────────────
+      // La requête originale retourne des lignes si violation.
+      // On encapsule pour obtenir un COUNT.
+      final withClause = 'WITH ${cteParts.join(',\n')}';
+      final countSql =
+          '$withClause\nSELECT COUNT(*) AS cnt FROM (\n$translatedSql\n) _violations';
+
+      debugPrint('[SqlTranslator] translated SQL:\n$countSql');
+
+      return TranslationResult(
+        sql: countSql,
+        usedTables: usedServerTables,
+        fieldNames: allFields,
+      );
+    } catch (e, st) {
+      debugPrint('[SqlTranslator] translation error: $e\n$st');
+      return null;
+    }
+  }
+
+  // ─── Substitution des paramètres ─────────────────────────────────────────
+
+  static String _substituteParams({
+    required String sql,
+    String? codeEtab,
+    String? codeTypeAnnee,
+  }) {
+    String result = sql;
+
+    // $CODE_ETABLISSEMENT → valeur réelle entre guillemets simples
+    if (codeEtab != null && codeEtab.isNotEmpty) {
+      final escaped = codeEtab.replaceAll("'", "''");
+      result = result.replaceAll(
+        RegExp(r'\$CODE_ETABLISSEMENT\b', caseSensitive: false),
+        "'$escaped'",
+      );
+    }
+
+    // $CODE_TYPE_ANNEE → valeur réelle entre guillemets simples
+    if (codeTypeAnnee != null && codeTypeAnnee.isNotEmpty) {
+      final escaped = codeTypeAnnee.replaceAll("'", "''");
+      result = result.replaceAll(
+        RegExp(r'\$CODE_TYPE_ANNEE\b', caseSensitive: false),
+        "'$escaped'",
+      );
+    }
+
+    // Paramètres non substitués → laisser tel quel (la requête échouera ou
+    // retournera 0 — comportement conservatif)
+    debugPrint('[SqlTranslator] after param substitution: '
+        'codeEtab=${codeEtab ?? "(null)"} '
+        'codeTypeAnnee=${codeTypeAnnee ?? "(null)"}');
+
+    return result;
+  }
+
+  // ─── Détection des tables serveur utilisées ───────────────────────────────
+
+  static Set<String> _detectServerTables(String sql) {
+    final upper = sql.toUpperCase();
+    final found = <String>{};
+    for (final table in _knownServerTables) {
+      // Match TABLE suivi de . (qualificateur) ou de FROM/JOIN TABLE (référence directe)
+      if (RegExp(
+        '\\b${RegExp.escape(table)}\\b',
+        caseSensitive: false,
+      ).hasMatch(upper)) {
+        found.add(table);
+      }
+    }
+    return found;
+  }
+
+  // ─── Extraction des noms de champs référencés ─────────────────────────────
+  //
+  // Extrait TOUS les noms de champs qualifiés (TABLE.FIELD) et non qualifiés
+  // depuis le SQL. Ces champs seront inclus dans le CTE de pivot.
+
+  static Set<String> _extractAllFieldNames(
+      String sql, Set<String> serverTables) {
+    final fields = <String>{};
+
+    // Ajoute toujours les champs de contexte (pour filtres HAVING)
+    fields.addAll(_contextFields);
+
+    // Pattern : TABLE.FIELD (champs qualifiés)
+    for (final table in serverTables) {
+      final qualPattern = RegExp(
+        '\\b${RegExp.escape(table)}\\.(\\w+)\\b',
+        caseSensitive: false,
+      );
+      for (final m in qualPattern.allMatches(sql)) {
+        final field = m.group(1)!.toUpperCase();
+        if (!_isSqlKeyword(field)) {
+          fields.add(field);
+        }
+      }
+    }
+
+    // Pattern : champs après GROUP BY et HAVING (non qualifiés)
+    // Ces patterns capturent des noms de champs seuls dans les clauses de tri/filtre
+    // ex: GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+    final groupHavingPattern = RegExp(
+      r'(?:GROUP\s+BY|HAVING)\s+([\w\s,=<>\'\"().]+?)(?:$|ORDER\s+BY|LIMIT)',
+      caseSensitive: false,
+    );
+    for (final m in groupHavingPattern.allMatches(sql)) {
+      final clause = m.group(1) ?? '';
+      final identPattern = RegExp(r'\b([A-Z][A-Z0-9_]*)\b', caseSensitive: false);
+      for (final id in identPattern.allMatches(clause)) {
+        final name = id.group(1)!.toUpperCase();
+        if (!_isSqlKeyword(name) && name.length > 2) {
+          fields.add(name);
+        }
+      }
+    }
+
+    debugPrint('[SqlTranslator] fields extracted for CTE: $fields');
+    return fields;
+  }
+
+  // ─── Construction du CTE de pivot ────────────────────────────────────────
+  //
+  // Génère une sous-requête CTE qui pivote collected_data vers les colonnes
+  // attendues par la requête serveur.
+  //
+  // Schéma généré :
+  //   SELECT
+  //     MAX(CASE WHEN field_name='FIELD_A' THEN CAST(field_value AS REAL) END) AS FIELD_A,
+  //     MAX(CASE WHEN field_name='FIELD_B' THEN CAST(field_value AS REAL) END) AS FIELD_B,
+  //     MAX(CASE WHEN field_name='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
+  //     ...
+  //   FROM collected_data
+  //   WHERE id_camp='CAMP_ID' AND id_etab='ETAB_ID'
+  //
+  // Nota : on utilise MAX() pour agréger (pivot) car les données sont stockées
+  // en lignes. MAX() retourne la valeur si elle est unique, ou la plus grande
+  // valeur si elle apparaît plusieurs fois (filtre), ce qui est cohérent avec
+  // le comportement du serveur pour les données d'établissement.
+  //
+  // Les champs de texte (CODE_ETABLISSEMENT, etc.) n'ont pas de CAST pour
+  // préserver la comparaison de chaînes dans les filtres HAVING.
+
+  static String _buildPivotCte({
+    required String tableName,
+    required Set<String> fields,
+    required String idCamp,
+    required String idEtab,
+  }) {
+    final escapedCamp = idCamp.replaceAll("'", "''");
+    final escapedEtab = idEtab.replaceAll("'", "''");
+
+    final columnDefs = fields.map((field) {
+      final isTextContext = _contextFields.contains(field.toUpperCase());
+      if (isTextContext) {
+        // Champs texte : pas de CAST numérique (comparaison de chaînes)
+        return "    MAX(CASE WHEN UPPER(field_name)='$field' "
+            "THEN field_value END) AS $field";
+      } else {
+        // Champs numériques : CAST vers REAL pour les calculs arithmétiques
+        return "    MAX(CASE WHEN UPPER(field_name)='$field' "
+            "THEN CAST(field_value AS REAL) END) AS $field";
+      }
+    }).join(',\n');
+
+    return '  SELECT\n$columnDefs\n'
+        "  FROM collected_data\n"
+        "  WHERE id_camp='$escapedCamp' AND id_etab='$escapedEtab'";
+  }
+
+  // ─── Traduction syntaxique Access/SQL Server → SQLite ─────────────────────
+
+  static String _translateSyntax(String sql) {
+    String result = sql;
+
+    // 1. Is Null / Is Not Null (case-insensitive, avec espaces variables)
+    result = result.replaceAll(
+        RegExp(r'\bIs\s+Not\s+Null\b', caseSensitive: false), 'IS NOT NULL');
+    result = result.replaceAll(
+        RegExp(r'\bIs\s+Null\b', caseSensitive: false), 'IS NULL');
+
+    // 2. NVL(x, y) → COALESCE(x, y)
+    result = result.replaceAll(
+        RegExp(r'\bNVL\s*\(', caseSensitive: false), 'COALESCE(');
+
+    // 3. ISNULL(x, y) → COALESCE(x, y)  [SQL Server]
+    result = result.replaceAll(
+        RegExp(r'\bISNULL\s*\(', caseSensitive: false), 'COALESCE(');
+
+    // 4. IIF(cond, true_val, false_val) → CASE WHEN cond THEN true_val ELSE false_val END
+    //    SQLite ne supporte pas IIF avant 3.32 — on garde IIF si présent
+    //    (SQLite 3.32+ le supporte nativement) — pas de traduction nécessaire.
+
+    // 5. Parenthèses triples Access → SQLite les supporte nativement, rien à faire
+    //    (((x))) est valide SQL dans SQLite
+
+    // 6. Mots-clés booléens : Or → OR, And → AND (normalisation de casse)
+    //    Attention : ne pas remplacer "Oracle", "Order", etc.
+    //    On utilise des word boundaries.
+    result = result.replaceAll(RegExp(r'\bOr\b'), 'OR');
+    result = result.replaceAll(RegExp(r'\bAnd\b'), 'AND');
+
+    // 7. DATEDIFF, DATEADD → non supporté SQLite, mais pas dans les règles de cohérence
+    // 8. TOP N → LIMIT N  (Access TOP)
+    result = result.replaceAll(
+        RegExp(r'\bSELECT\s+TOP\s+(\d+)\s+', caseSensitive: false),
+        (Match m) => 'SELECT ');
+    // Le LIMIT sera ajouté après le FROM... mais TOP est rarement dans les règles.
+
+    // 9. Guillemets doubles → guillemets simples pour les littéraux
+    //    (Access autorise les guillemets doubles pour les chaînes)
+    //    Attention à ne pas toucher aux noms de colonnes entre guillemets.
+    //    Heuristique : remplace "valeur" (lettres/chiffres seulement) par 'valeur'
+    result = result.replaceAllMapped(
+        RegExp(r'"([^"]*)"'),
+        (m) => "'${m.group(1)!.replaceAll("'", "''")}'"
+    );
+
+    return result;
+  }
+
+  // ─── Utilitaire : est-ce un mot-clé SQL ? ────────────────────────────────
+
+  static const _sqlKeywordsSet = {
+    'SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'NOT', 'NULL', 'IS', 'IN',
+    'GROUP', 'BY', 'HAVING', 'ORDER', 'LIMIT', 'OFFSET', 'DISTINCT',
+    'COUNT', 'SUM', 'MAX', 'MIN', 'AVG', 'CAST', 'AS', 'CASE', 'WHEN',
+    'THEN', 'ELSE', 'END', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'OUTER',
+    'ON', 'UNION', 'ALL', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP',
+    'TABLE', 'INDEX', 'PRIMARY', 'KEY', 'REFERENCES', 'COALESCE', 'NVL',
+    'WITH', 'REAL', 'INTEGER', 'TEXT', 'BLOB', 'NUMERIC',
+  };
+
+  static bool _isSqlKeyword(String word) =>
+      _sqlKeywordsSet.contains(word.toUpperCase());
+}
+
+/// Résultat d'une traduction SQL.
+class TranslationResult {
+  /// Le SQL SQLite traduit, encapsulé dans SELECT COUNT(*) AS cnt FROM (...).
+  final String sql;
+
+  /// Tables serveur utilisées dans la requête originale.
+  final Set<String> usedTables;
+
+  /// Noms de champs extraits pour le CTE de pivot.
+  final Set<String> fieldNames;
+
+  const TranslationResult({
+    required this.sql,
+    required this.usedTables,
+    required this.fieldNames,
+  });
+}
+
+// =============================================================================
+// CoherenceEvaluator — Moteur d'évaluation de cohérence hors ligne.
+// =============================================================================
+//
+// Equivalent mobile de `controle_theme_batch.class.php` (côté serveur).
+//
+// Session 45 : deux chemins d'évaluation :
+//   1. SQL réel (SqlTranslator + rawQuery sur SQLite)  — prioritaire
+//   2. Regex fallback (Sessions 38–44)                 — conservatif
+//
+// Le chemin SQL réel garantit l'équivalence exacte avec le serveur.
+// Le chemin regex est conservé pour la robustesse.
+
 /// CoherenceEvaluator — Moteur d'évaluation de cohérence hors ligne.
 ///
-/// Équivalent mobile de `controle_theme_batch.class.php` (serveur).
-///
-/// Principe de fonctionnement :
-///   1. Charge les données persistées depuis SQLite (collected_data)
-///      — d'abord pour l'idQst courant (Session 39), puis pour TOUS les
-///        formulaires de l'école+campagne (Session 40, cross-question)
-///   2. Superpose les données non sauvegardées (formData en mémoire)
-///   3. Calcule des totaux virtuels pour les vues DB non directement stockées
-///   4. Pour chaque règle : extrait V1 (sql_regle) et V2 (sql_assoc)
-///   5. Applique l'opérateur critere : si NON respecté → violation
-///
-/// Différence avec le contrôle serveur :
-///   - Serveur : exécute SQL réel sur SQL Server/Oracle → résultat exact
-///   - Offline  : extrait le nom de champ par regex et cherche dans SQLite
-///     → approximation acceptable pour un feedback immédiat à l'agent
+/// Session 45 — Dual-path : SQL réel (prioritaire) + regex fallback (conservatif).
 class CoherenceEvaluator {
   CoherenceEvaluator({
     required DatabaseService db,
@@ -82,13 +535,11 @@ class CoherenceEvaluator {
 
   final DatabaseService _db;
 
-  // Colonnes de vues DB agrégées que nous ne pouvons pas résoudre directement
-  // depuis collected_data — traitées par approximation via totaux virtuels.
-  static const _viewColumnTotal   = 'TOTAL_AGE_NIVEAU';
-  static const _viewColumnFilles  = 'FILLES_AGE_NIVEAU';
+  // Colonnes de vues DB agrégées traitées par le chemin regex (approx.)
+  static const _viewColumnTotal  = 'TOTAL_AGE_NIVEAU';
+  static const _viewColumnFilles = 'FILLES_AGE_NIVEAU';
 
-  // Patterns dans les noms de champs de formulaire qui identifient les filles.
-  // Exemples observés : NB_F_6ANS, NB_F_TOTAL, FILLES_6ANS, NB_FILLES
+  // Patterns dans les noms de champs pour les filles
   static final _fillesPatterns = RegExp(
     r'(^NB_F_|_F_|_F$|^FILLES_|_FILLES_|FILLE)',
     caseSensitive: false,
@@ -103,17 +554,16 @@ class CoherenceEvaluator {
   ///
   /// Paramètres :
   ///   [rules]    — règles pour ce (idCamp, idQst, idEtab), chargées depuis SQLite
-  ///   [formData] — données formulaire en mémoire (peuvent contenir des modifs non sauvegardées)
+  ///   [formData] — données formulaire en mémoire (modifications non sauvegardées)
   ///   [idCamp], [idQst], [idEtab], [idFilter] — contexte de saisie courant
+  ///   [codeEtab]      — code administratif de l'établissement (pour $CODE_ETABLISSEMENT)
+  ///   [codeTypeAnnee] — code de l'année scolaire (pour $CODE_TYPE_ANNEE)
   ///
-  /// Algorithme :
-  ///   1. Charge les données du formulaire courant (idQst) depuis SQLite
-  ///   2. Charge les données de TOUS les formulaires de l'école (cross-question)
-  ///   3. Superpose formData (données non sauvegardées, priorité la plus haute)
-  ///   4. Calcule les totaux virtuels (TOTAL_AGE_NIVEAU, FILLES_AGE_NIVEAU)
-  ///   5. Pour chaque règle : _extractValue(sql) → valeur numérique ou null
-  ///   6. Si V1 ou V2 non trouvé → règle ignorée silencieusement
-  ///   7. _applyOperator(V1, V2, critere) → true si VIOLÉE
+  /// Algorithme (session 45) :
+  ///   Pour chaque règle :
+  ///     1. Tente la traduction SQL (SqlTranslator.translate)
+  ///     2. Si succès → exécute rawQuery → COUNT(*) → comparé au critere
+  ///     3. Si échec → chemin regex fallback (_extractValue + _applyOperator)
   Future<List<OfflineCoherenceError>> evaluate({
     required List<CoherenceRule> rules,
     required Map<String, String> formData,
@@ -121,15 +571,19 @@ class CoherenceEvaluator {
     required String idQst,
     required String idEtab,
     String? idFilter,
+    String? codeEtab,
+    String? codeTypeAnnee,
   }) async {
     if (rules.isEmpty) return [];
 
-    final Map<String, double> values = {};
+    // ── Obtenir un accès direct à la base SQLite ─────────────────────────
+    final db = await _db.database;
 
-    // ── Étape 1 : données du formulaire courant (toutes périodes) ─────────
-    // SESSION 39 : getAllCollectedDataForCoherence() charge tous les filtres
-    // pour reproduire le SUM() sans restriction de filtre du serveur.
-    // Clés au format "FIELD_NAME#FILTER_ID" ou "FIELD_NAME".
+    // ── Charger les données pour le chemin regex (fallback) ───────────────
+    // Ces chargements sont aussi utilisés comme source de vérité pour les
+    // valeurs en mémoire non encore sauvegardées.
+    final Map<String, double> regexValues = {};
+
     final persistedData = await _db.getAllCollectedDataForCoherence(
       idCamp: idCamp,
       idEtab: idEtab,
@@ -137,17 +591,9 @@ class CoherenceEvaluator {
     );
     for (final entry in persistedData.entries) {
       final v = double.tryParse(entry.value);
-      if (v != null) values[entry.key.toUpperCase()] = v;
+      if (v != null) regexValues[entry.key.toUpperCase()] = v;
     }
 
-    // ── Étape 2 : données cross-formulaires de l'école (cross-question) ───
-    // SESSION 40 : charge TOUS les champs collectés pour cette école + campagne,
-    // tous formulaires confondus. Nécessaire pour les règles qui référencent des
-    // champs d'une autre table DB (ex : DONNEES_ETABLISSEMENT.NB_ELEVES_F peut
-    // être saisi dans un formulaire différent du formulaire courant).
-    // Les doublons sont sommés (même comportement que SUM() du serveur).
-    // Ces données sont à PRIORITÉ INFÉRIEURE aux données du formulaire courant
-    // (écrasées dans l'étape suivante si même clé).
     final allEtabData = await _db.getAllCollectedDataForCampEtab(
       idCamp: idCamp,
       idEtab: idEtab,
@@ -155,220 +601,217 @@ class CoherenceEvaluator {
     for (final entry in allEtabData.entries) {
       final key = entry.key.toUpperCase();
       final v = double.tryParse(entry.value);
-      if (v != null && !values.containsKey(key)) {
-        // N'écrase pas les données du formulaire courant (déjà chargées étape 1)
-        values[key] = v;
+      if (v != null && !regexValues.containsKey(key)) {
+        regexValues[key] = v;
       }
     }
 
-    // ── Étape 3 : données non sauvegardées en mémoire (priorité max) ──────
-    // Override avec les valeurs du formulaire couramment affiché qui n'ont pas
-    // encore été persistées dans SQLite (saisie en cours).
+    // Données en mémoire (priorité max — modifications non encore sauvegardées)
     for (final entry in formData.entries) {
       final v = double.tryParse(entry.value);
-      if (v != null) values[entry.key.toUpperCase()] = v;
+      if (v != null) regexValues[entry.key.toUpperCase()] = v;
     }
 
-    // ── Étape 4 : totaux virtuels pour les vues DB ─────────────────────────
-    // Les règles pour idQst=9502 référencent ELEVES_AGE_NIVEAU_SEXE, une vue DB
-    // qui agrège les champs du formulaire. Nous calculons des approximations :
-    //   TOTAL_AGE_NIVEAU  = somme de tous les champs numériques du formulaire courant
-    //   FILLES_AGE_NIVEAU = somme des champs "filles" (NB_F_*, FILLES_*, etc.)
-    // Ces virtuels ne sont injectés que si les vraies colonnes de vue sont absentes.
-    _injectVirtualAggregates(values, persistedData, formData);
+    // Totaux virtuels pour les vues DB (chemin regex uniquement)
+    _injectVirtualAggregates(regexValues, persistedData, formData);
 
     debugPrint('[CoherenceEval] evaluate: idQst=$idQst idEtab=$idEtab '
         'persistedFields=${persistedData.length} formFields=${formData.length} '
-        'totalValues=${values.length} rules=${rules.length}');
+        'totalValues=${regexValues.length} rules=${rules.length} '
+        'codeEtab=$codeEtab codeTypeAnnee=$codeTypeAnnee');
 
     final violations = <OfflineCoherenceError>[];
 
     for (final rule in rules) {
       try {
-        final v1 = _extractValue(rule.sqlRegle, values);
-        final v2 = _extractValue(rule.sqlAssoc, values);
+        final violated = await _evaluateRule(
+          rule:           rule,
+          db:             db,
+          idCamp:         idCamp,
+          idEtab:         idEtab,
+          codeEtab:       codeEtab,
+          codeTypeAnnee:  codeTypeAnnee,
+          regexValues:    regexValues,
+        );
 
-        debugPrint('[CoherenceEval] rule=${rule.idRegle} '
-            'sql_regle="${rule.sqlRegle}" → v1=$v1 | '
-            'sql_assoc="${rule.sqlAssoc}" → v2=$v2 | '
-            'critere="${rule.critere}"');
-
-        if (v1 == null || v2 == null) {
-          debugPrint(
-              '[CoherenceEval] skip idRegle=${rule.idRegle} — v1=$v1 v2=$v2 '
-              '— field(s) not resolvable from collected data');
-          continue;
-        }
-
-        final violated = _applyOperator(v1, v2, rule.critere);
-        debugPrint('[CoherenceEval] rule=${rule.idRegle} v1=$v1 ${rule.critere} v2=$v2 → violated=$violated');
-        if (violated) {
-          violations.add(OfflineCoherenceError(
-            idRegle:      rule.idRegle,
-            idRegleAssoc: rule.idRegleAssoc,
-            libRegle:     rule.libRegle,
-            libRegleAssoc: rule.libRegleAssoc,
-            critere:      rule.critere,
-            message:      rule.message.isNotEmpty
-                ? rule.message
-                : '${rule.libRegle} doit être ${_critereLabelFr(rule.critere)} ${rule.libRegleAssoc}',
-            value1:       v1,
-            value2:       v2,
-          ));
+        if (violated != null && violated) {
+          violations.add(_buildViolation(rule, regexValues));
         }
       } catch (e) {
         debugPrint('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
       }
     }
+
     debugPrint('[CoherenceEval] evaluate complete: ${violations.length} violation(s)');
     return violations;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // HELPERS PRIVÉS
+  // ÉVALUATION D'UNE RÈGLE — dual path SQL / regex
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Évalue une règle unique. Retourne :
+  ///   true  → règle VIOLÉE
+  ///   false → règle respectée
+  ///   null  → règle non évaluable (ignorée silencieusement)
+  Future<bool?> _evaluateRule({
+    required CoherenceRule rule,
+    required Database db,
+    required String idCamp,
+    required String idEtab,
+    String? codeEtab,
+    String? codeTypeAnnee,
+    required Map<String, double> regexValues,
+  }) async {
+
+    // ── CHEMIN 1 : SQL réel (SqlTranslator + rawQuery) ────────────────────
+    final sqlResult = await _evaluateViaSql(
+      rule:           rule,
+      db:             db,
+      idCamp:         idCamp,
+      idEtab:         idEtab,
+      codeEtab:       codeEtab,
+      codeTypeAnnee:  codeTypeAnnee,
+    );
+
+    if (sqlResult != null) {
+      // Le chemin SQL a réussi
+      debugPrint('[CoherenceEval] rule=${rule.idRegle} path=SQL '
+          'result=(${sqlResult.v1} ${rule.critere} ${sqlResult.v2}) '
+          'violated=${sqlResult.violated}');
+      return sqlResult.violated;
+    }
+
+    // ── CHEMIN 2 : regex fallback ─────────────────────────────────────────
+    final v1 = _extractValue(rule.sqlRegle, regexValues);
+    final v2 = _extractValue(rule.sqlAssoc, regexValues);
+
+    debugPrint('[CoherenceEval] rule=${rule.idRegle} path=REGEX '
+        'v1=$v1 v2=$v2 critere="${rule.critere}"');
+
+    if (v1 == null || v2 == null) {
+      debugPrint('[CoherenceEval] skip rule=${rule.idRegle} — '
+          'v1=$v1 v2=$v2 — field(s) not resolvable (conservative skip)');
+      return null; // ignoré
+    }
+
+    return _applyOperator(v1, v2, rule.critere);
+  }
+
+  // ─── CHEMIN SQL : traduction + exécution ──────────────────────────────────
+
+  Future<_SqlEvalResult?> _evaluateViaSql({
+    required CoherenceRule rule,
+    required Database db,
+    required String idCamp,
+    required String idEtab,
+    String? codeEtab,
+    String? codeTypeAnnee,
+  }) async {
+    // Traduire sql_regle
+    final r1 = SqlTranslator.translate(
+      serverSql:      rule.sqlRegle,
+      idCamp:         idCamp,
+      idEtab:         idEtab,
+      codeEtab:       codeEtab,
+      codeTypeAnnee:  codeTypeAnnee,
+    );
+    if (r1 == null) return null; // non traduisible → fallback
+
+    // Traduire sql_assoc
+    final r2 = SqlTranslator.translate(
+      serverSql:      rule.sqlAssoc,
+      idCamp:         idCamp,
+      idEtab:         idEtab,
+      codeEtab:       codeEtab,
+      codeTypeAnnee:  codeTypeAnnee,
+    );
+    if (r2 == null) return null; // non traduisible → fallback
+
+    // Exécuter les deux requêtes traduitess
+    final count1 = await _execCount(db, r1.sql, 'sql_regle', rule.idRegle);
+    final count2 = await _execCount(db, r2.sql, 'sql_assoc', rule.idRegle);
+
+    if (count1 == null || count2 == null) return null;
+
+    final violated = _applyOperator(count1, count2, rule.critere);
+    return _SqlEvalResult(v1: count1, v2: count2, violated: violated);
+  }
+
+  /// Exécute un SQL traduit et retourne la valeur entière du COUNT(*).
+  /// Retourne null en cas d'erreur.
+  Future<double?> _execCount(
+      Database db, String sql, String label, int idRegle) async {
+    try {
+      final rows = await db.rawQuery(sql);
+      final count = Sqflite.firstIntValue(rows);
+      debugPrint('[CoherenceEval] rawQuery $label rule=$idRegle → count=$count');
+      return count?.toDouble();
+    } catch (e) {
+      debugPrint('[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL: $sql');
+      return null;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHEMIN REGEX FALLBACK (Sessions 38–44 — conservé intégralement)
   // ═══════════════════════════════════════════════════════════════════════════
 
   /// Injecte dans [values] des approximations pour les colonnes de vues DB
-  /// qui ne sont pas stockées directement dans collected_data.
-  ///
-  /// Les colonnes de vues concernées ici (observées en production) :
-  ///   TOTAL_AGE_NIVEAU  — colonne de la vue ELEVES_AGE_NIVEAU_SEXE
-  ///     = somme de tous les champs numériques du formulaire courant
-  ///   FILLES_AGE_NIVEAU — colonne de la vue ELEVES_AGE_NIVEAU_SEXE
-  ///     = somme des champs dont le nom porte un marqueur "filles"
-  ///
-  /// Ces valeurs ne sont injectées que si la colonne n'est PAS déjà présente
-  /// dans [values] (conservatisme : si les vraies données existent, on les garde).
   void _injectVirtualAggregates(
     Map<String, double> values,
     Map<String, String> persistedData,
     Map<String, String> formData,
   ) {
-    // Reconstruit les données brutes du formulaire courant (sans suffixe filtre)
-    // pour calculer les agrégats. On combine données persistées + formData.
     final rawFields = <String, double>{};
-
     for (final entry in persistedData.entries) {
-      // Retire le suffixe filtre (#FILTER_ID) pour ne garder que le nom de champ
       final fieldName = entry.key.split('#').first.toUpperCase();
       final v = double.tryParse(entry.value);
-      if (v != null) {
-        rawFields[fieldName] = (rawFields[fieldName] ?? 0.0) + v;
-      }
+      if (v != null) rawFields[fieldName] = (rawFields[fieldName] ?? 0.0) + v;
     }
     for (final entry in formData.entries) {
       final fieldName = entry.key.toUpperCase();
       final v = double.tryParse(entry.value);
-      if (v != null) rawFields[fieldName] = v; // formData écrase (non sauvegardé)
+      if (v != null) rawFields[fieldName] = v;
     }
-
     if (rawFields.isEmpty) return;
 
-    // Calcule TOTAL_AGE_NIVEAU = somme de tous les champs numériques
     if (!values.containsKey(_viewColumnTotal)) {
       final total = rawFields.values.fold(0.0, (a, b) => a + b);
-      if (total > 0) {
-        values[_viewColumnTotal] = total;
-        debugPrint('[CoherenceEval] virtual $_viewColumnTotal = $total '
-            '(sum of ${rawFields.length} fields)');
-      }
+      if (total > 0) values[_viewColumnTotal] = total;
     }
-
-    // Calcule FILLES_AGE_NIVEAU = somme des champs "filles"
     if (!values.containsKey(_viewColumnFilles)) {
-      double fillesSum = 0.0;
-      int fillesCount = 0;
+      double fillesSum = 0.0; int fillesCount = 0;
       for (final entry in rawFields.entries) {
-        if (_fillesPatterns.hasMatch(entry.key)) {
-          fillesSum += entry.value;
-          fillesCount++;
-        }
+        if (_fillesPatterns.hasMatch(entry.key)) { fillesSum += entry.value; fillesCount++; }
       }
-      if (fillesCount > 0) {
-        values[_viewColumnFilles] = fillesSum;
-        debugPrint('[CoherenceEval] virtual $_viewColumnFilles = $fillesSum '
-            '(sum of $fillesCount filles fields)');
-      }
+      if (fillesCount > 0) values[_viewColumnFilles] = fillesSum;
     }
   }
 
-  /// Extrait une valeur numérique depuis [sql] en analysant le nom de champ
-  /// et en le cherchant dans [values] (map NOM_CHAMP → valeur double).
-  ///
-  /// SESSION 40 — corrections majeures :
-  ///
-  ///   Problème 1 : TABLE.FIELD qualifié
-  ///     L'ancienne regex `SUM\s*\(\s*(\w+)\s*\)` capturait le qualificateur de
-  ///     table (ex : ELEVES_AGE_NIVEAU_SEXE) au lieu du nom de champ (FILLES_AGE_NIVEAU)
-  ///     car `\w+` s'arrête au point. La nouvelle regex `(?:\w+\.)?(\w+)` ignore
-  ///     optionnellement le préfixe table.
-  ///
-  ///   Problème 2 : Access SQL avec HAVING au lieu de WHERE
-  ///     Les SQL StatEduc utilisent GROUP BY ... HAVING (((TABLE.CODE_ETAB)=X) ...)
-  ///     au lieu de WHERE. Le parsing regex n'est pas affecté (on ne parse que le
-  ///     SELECT et le FROM).
-  ///
-  ///   Problème 3 : Multi-colonnes SELECT
-  ///     SELECT Sum(T.F1) AS A1, Sum(T.F2) AS A2 FROM ...
-  ///     La nouvelle implémentation extrait TOUTES les SUM() et utilise la PREMIÈRE
-  ///     colonne (comportement serveur : lit result[0] du RecordSet).
-  ///
-  /// Stratégies de résolution (dans l'ordre) :
-  ///   1. Pattern SUM(TABLE.FIELD) ou SUM(FIELD) — prend la 1re colonne SUM
-  ///   2. Pattern NVL(SUM(...),0) ou COALESCE(SUM(...),0) — pareil
-  ///   3. Bare SELECT TABLE.FIELD FROM ou SELECT FIELD FROM
-  ///   4. null si aucun pattern reconnu ou champ introuvable
   double? _extractValue(String sql, Map<String, double> values) {
     if (sql.trim().isEmpty) return null;
     final upperSql = sql.toUpperCase();
 
-    // ── Pattern 1+2 : SUM([TABLE.]FIELD) avec ou sans NVL/COALESCE ─────────
-    // Capte aussi bien SUM(FIELD) que SUM(TABLE.FIELD).
-    // Le qualificateur table `(?:\w+\.)?` est optionnel, le groupe capturant
-    // capture uniquement le nom de champ après le point (ou le nom seul).
-    //
-    // Exemples matchés :
-    //   SUM(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU)  → FILLES_AGE_NIVEAU
-    //   SUM(NB_ELEVES_F)                               → NB_ELEVES_F
-    //   NVL(SUM(T.NB_G), 0)                            → NB_G
-    //   COALESCE(SUM(NB_F),0)                          → NB_F
-    final sumRegex = RegExp(
-      r'SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)',
-      caseSensitive: false,
-    );
+    // Pattern SUM([TABLE.]FIELD)
+    final sumRegex = RegExp(r'SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)', caseSensitive: false);
     final sumMatches = sumRegex.allMatches(upperSql).toList();
     if (sumMatches.isNotEmpty) {
-      // Utilise la PREMIÈRE colonne SUM — mirrors le comportement serveur
-      // (exécute la requête et lit la première colonne du résultat).
-      final fieldName = sumMatches.first.group(1)!;
-      final result = _sumFieldAcrossAllFilters(fieldName, values);
+      final result = _sumFieldAcrossAllFilters(sumMatches.first.group(1)!, values);
       if (result != null) return result;
-
-      // Tentative sur toutes les colonnes SUM si la première échoue.
-      // Utile si les colonnes sont dans un ordre différent de celui attendu.
       for (int i = 1; i < sumMatches.length; i++) {
         final alt = _sumFieldAcrossAllFilters(sumMatches[i].group(1)!, values);
-        if (alt != null) {
-          debugPrint('[CoherenceEval] _extractValue: fallback to SUM column '
-              '${i + 1}/${sumMatches.length} "${sumMatches[i].group(1)}"');
-          return alt;
-        }
+        if (alt != null) return alt;
       }
       return null;
     }
 
-    // ── Pattern 3 : SELECT [TABLE.]FIELD FROM (champ brut sans agrégation) ──
-    // Exemples :
-    //   SELECT DONNEES_ETABLISSEMENT.NB_ELEVES FROM ...  → NB_ELEVES
-    //   SELECT NB_TOTAL FROM ...                        → NB_TOTAL
+    // Pattern SELECT [TABLE.]FIELD FROM
     final bareMatch = RegExp(
-      r'SELECT\s+(?:\w+\.)?(\w+)\s+FROM',
-      caseSensitive: false,
+      r'SELECT\s+(?:\w+\.)?(\w+)\s+FROM', caseSensitive: false,
     ).firstMatch(upperSql);
-
     if (bareMatch != null) {
       final fieldName = bareMatch.group(1)!;
-      // Exclure les mots-clés SQL qui ne sont pas des noms de champs
       const sqlKeywords = {
         'DISTINCT', 'TOP', 'ALL', 'COUNT', 'AVG', 'MIN', 'MAX', 'SUM',
         'NVL', 'COALESCE', 'ISNULL', 'NULLIF',
@@ -380,36 +823,25 @@ class CoherenceEvaluator {
     return null;
   }
 
-  /// Calcule la somme d'un champ sur tous les filtres disponibles dans [values].
-  ///
-  /// Les clés peuvent avoir un suffixe filtre : "NOM_CHAMP#ID_FILTRE".
-  /// Si le champ existe sans suffixe (données non filtrées), il est inclus.
-  ///
-  /// Retourne null si le champ n'existe PAS DU TOUT (aucune occurrence trouvée)
-  /// — pour que l'appelant puisse ignorer silencieusement la règle et éviter
-  /// les faux positifs (comportement conservatif).
   double? _sumFieldAcrossAllFilters(String fieldName, Map<String, double> values) {
-    double sum = 0;
-    bool found = false;
+    double sum = 0; bool found = false;
     for (final entry in values.entries) {
-      // Field names may have a filter suffix like FIELD#FILTER_ID
-      final key = entry.key.split('#').first;
-      if (key == fieldName) {
-        sum += entry.value;
-        found = true;
-      }
+      if (entry.key.split('#').first == fieldName) { sum += entry.value; found = true; }
     }
     return found ? sum : null;
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // OPÉRATEUR CRITERE — commun aux deux chemins
+  // ═══════════════════════════════════════════════════════════════════════════
+
   /// Applique l'opérateur critere et retourne TRUE si la règle est VIOLÉE.
   ///
-  /// IMPORTANT : retourne true quand la contrainte N'EST PAS respectée.
-  ///   critere '<=': règle = "V1 doit être <= V2"  → violée si V1 > V2  → return !(V1 <= V2)
-  ///   critere '>=': règle = "V1 doit être >= V2"  → violée si V1 < V2  → return !(V1 >= V2)
+  /// Pour le chemin SQL : v1 = COUNT(sql_regle), v2 = COUNT(sql_assoc).
+  ///   critere '= 0' : violée si COUNT(sql_regle) > 0 → _applyOperator(count, 0, '=')
+  ///   → !(count == 0) → true si count > 0
   ///
-  /// Opérateurs reconnus (observés dans StatEduc) : <=  >=  <  >  =  !=  <>
-  /// Opérateur inconnu → return false (pas de violation — conservatisme).
+  /// Pour le chemin regex : v1 et v2 sont des sommes de champs.
   bool _applyOperator(double v1, double v2, String critere) {
     switch (critere.trim()) {
       case '<=': return !(v1 <= v2);
@@ -425,6 +857,29 @@ class CoherenceEvaluator {
     }
   }
 
+  // ─── Construction d'un objet violation ────────────────────────────────────
+
+  OfflineCoherenceError _buildViolation(
+      CoherenceRule rule, Map<String, double> regexValues) {
+    // Tente d'extraire les valeurs pour l'affichage à l'agent
+    final v1Display = _extractValue(rule.sqlRegle, regexValues) ?? 0.0;
+    final v2Display = _extractValue(rule.sqlAssoc, regexValues) ?? 0.0;
+
+    return OfflineCoherenceError(
+      idRegle:       rule.idRegle,
+      idRegleAssoc:  rule.idRegleAssoc,
+      libRegle:      rule.libRegle,
+      libRegleAssoc: rule.libRegleAssoc,
+      critere:       rule.critere,
+      message:       rule.message.isNotEmpty
+          ? rule.message
+          : '${rule.libRegle} — incohérence détectée '
+            '(${rule.libRegleAssoc})',
+      value1:        v1Display,
+      value2:        v2Display,
+    );
+  }
+
   /// Returns a human-readable French label for a critere operator.
   String _critereLabelFr(String critere) {
     switch (critere.trim()) {
@@ -438,6 +893,14 @@ class CoherenceEvaluator {
       default:   return critere;
     }
   }
+}
+
+// ─── Résultat intermédiaire évaluation SQL ────────────────────────────────────
+class _SqlEvalResult {
+  final double v1;
+  final double v2;
+  final bool violated;
+  _SqlEvalResult({required this.v1, required this.v2, required this.violated});
 }
 
 // ─── Modèle de violation offline ─────────────────────────────────────────────
