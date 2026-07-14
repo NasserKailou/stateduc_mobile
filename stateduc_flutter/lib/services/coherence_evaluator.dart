@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 47 — Fix HAVING type-mismatch (TEXT '20952' ≠ INTEGER 20952)
+// VERSION : Session 48 — Fix _stripContextOnlyHaving ordre (step 7b) + suppression diagnostic CTE crashant
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -66,7 +66,7 @@
 //     - `Is Null`          → `IS NULL`
 //     - `Is Not Null`      → `IS NOT NULL`
 //     - `NVL(x, y)`        → `COALESCE(x, y)`
-//     - HAVING avec filtres → HAVING conservé (SQLite le supporte)
+//     - HAVING contexte seul → SUPPRIMÉ (step 7b — voir _stripContextOnlyHaving)
 //     - parenthèses triples `(((x)))` → `(x)` (normalisées mais conservées)
 //     - opérateurs `Or` / `And` (case insensitive) → `OR` / `AND`
 //
@@ -259,6 +259,18 @@ class SqlTranslator {
           (m) => m.group(1)!,
         );
       }
+
+      // ── Étape 7b : FIX SESSION 48 — supprimer le HAVING redondant de contexte ──
+      //
+      // DOIT être exécuté APRÈS l'étape 7 (suppression des qualificateurs TABLE.)
+      // car le HAVING peut contenir DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT avant
+      // l'étape 7. Si _stripContextOnlyHaving est appelé avant, il trouve
+      // DONNEES_ETABLISSEMENT dans le body du HAVING → isContextOnly = false →
+      // le HAVING est gardé → COUNT toujours 0 → aucune violation détectée.
+      //
+      // Après l'étape 7 : DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT → CODE_ETABLISSEMENT
+      // → seuls les champs contexte restent → isContextOnly = true → HAVING supprimé.
+      translatedSql = _stripContextOnlyHaving(translatedSql);
 
       // ── Étape 8 : wrapper COUNT(*) ─────────────────────────────────────
       // La requête originale retourne des lignes si violation.
@@ -511,35 +523,8 @@ class SqlTranslator {
     result = result.replaceAllMapped(
         RegExp(r'"([^"]*)"'), (m) => "'${m.group(1)!.replaceAll("'", "''")}'");
 
-    // 10. FIX SESSION 47 — Suppression du HAVING redondant de filtrage d'établissement
-    //
-    // CAUSE RACINE du bug "0 violation(s) found" :
-    //   Le SQL serveur est conçu pour un batch multi-établissements. Le HAVING
-    //   filtre sur CODE_ETABLISSEMENT et CODE_TYPE_ANNEE pour isoler UN seul
-    //   établissement. Exemple :
-    //     HAVING (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
-    //
-    //   Sur mobile, le CTE de pivot est déjà filtré :
-    //     FROM collected_data WHERE id_camp='2' AND id_etab='20952'
-    //   → Le CTE ne contient QUE les données de cet établissement.
-    //   → Le HAVING est toujours REDONDANT dans ce contexte.
-    //
-    //   MAIS : collected_data stocke field_value en TEXT. Le pivot produit donc
-    //   CODE_ETABLISSEMENT = '20952' (TEXT). Le HAVING compare à l'entier 20952
-    //   (sans guillemets dans le SQL serveur). En SQLite :
-    //     '20952' = 20952  →  FALSE  (types incompatibles)
-    //   Résultat : HAVING filtre TOUTES les lignes → COUNT = 0 → pas de violation.
-    //
-    // FIX : Supprimer le HAVING si et seulement s'il ne contient QUE des
-    //   comparaisons sur CODE_ETABLISSEMENT et/ou CODE_TYPE_ANNEE et/ou
-    //   CODE_ADMINISTRATIF. Ces champs ne sont présents dans le HAVING que
-    //   pour le filtrage d'établissement, jamais pour une logique métier.
-    //
-    //   Implémentation : regex HAVING ... (end of statement) en vérifiant que
-    //   tous les identifiants du HAVING appartiennent au set des champs contexte.
-    //   Si le HAVING contient d'autres identifiants (SUM, NB_..., etc.), on le
-    //   laisse intact.
-    result = _stripContextOnlyHaving(result);
+    // 10. (réservé — _stripContextOnlyHaving déplacé en step 7b de translate())
+    //     Voir commentaire étape 7b ci-dessus pour l'explication complète.
 
     return result;
   }
@@ -927,33 +912,13 @@ class CoherenceEvaluator {
   /// Exécute un SQL traduit et retourne la valeur entière du COUNT(*).
   /// Retourne null en cas d'erreur.
   ///
-  /// Log de diagnostic : affiche le résultat brut du CTE (valeurs pivotées)
-  /// sur la première exécution (label='sql_regle') pour faciliter le débogage.
+  /// FIX Session 48 : suppression du bloc diagnostic CTE. Le regex (.+?) non-greedy
+  /// s'arrêtait au premier ')' rencontré dans le CTE (ex: END) dans MAX(CASE...END))
+  /// → SQL tronqué → erreur SQLiteLog (1) near "SELECT": syntax error.
+  /// Le diagnostic ne bloquait pas l'évaluation (catch vide) mais polluait les logs.
   Future<double?> _execCount(
       Database db, String sql, String label, int idRegle) async {
     try {
-      // Diagnostic CTE : loguer les valeurs réellement pivotées depuis collected_data
-      // Cela permet de vérifier que le pivot a bien extrait les bons champs.
-      if (label == 'sql_regle') {
-        final cteMatch = RegExp(
-          r'WITH\s+(\w+)\s+AS\s*\((.+?)\)',
-          caseSensitive: false,
-          dotAll: true,
-        ).firstMatch(sql);
-        if (cteMatch != null) {
-          final cteName = cteMatch.group(1)!;
-          final cteBody = cteMatch.group(2)!;
-          try {
-            final cteRows = await db.rawQuery(
-                'WITH $cteName AS ($cteBody) SELECT * FROM $cteName');
-            debugPrint('[SqlTranslator] CTE $cteName pivot (rule=$idRegle): '
-                '${cteRows.isEmpty ? "EMPTY — no data for this camp/etab" : cteRows.first.toString()}');
-          } catch (_) {
-            // Log seulement — ne pas laisser une erreur diagnostic masquer le vrai résultat
-          }
-        }
-      }
-
       final rows = await db.rawQuery(sql);
       final count = Sqflite.firstIntValue(rows);
       debugPrint(
