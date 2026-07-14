@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  StatEduc splash screen — shown by Android while the Flutter engine loads.
+  Brand blue background (#1565C0) with the app logo centered.
+  splash_logo.png is generated from assets/icon/icon.png at 512x512.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid brand blue background -->
+    <item>
+        <color android:color="#FF1565C0"/>
+    </item>
+    <!-- Centered splash logo (512x512 from icon.png) -->
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/splash_logo"/>
+    </item>
+</layer-list>

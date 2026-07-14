@@ -1,0 +1,160 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=1302' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B></B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br></b></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><br></b><script language='javascript' type='text/javascript'>
+var expression_130022 	= "";
+var tot_mes_ligne_130022 	= new Array();
+var tot_mes_col_130022 	= new Array();
+var affich_vertic_mes_130022 	= 0;
+var affiche_sous_totaux_130022 	= 0;
+var tab_mes_130022 	= new Array ("F_PERS_NAT_QUALIF","T_PERS_NAT_QUALIF");
+var tab_ligne_130022	= new Array ("46");
+var tab_col_130022	= new Array ("10","11");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>(#)Ougandais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>(#)Sud Soudan</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN=3 >(#)TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>(#)F</TD>
+		<TD  align='center'>(#)F+M</TD>
+		<TD  align='center'>(#)F</TD>
+		<TD  align='center'>(#)F+M</TD>
+		<TD  align='center'>(#)F</TD>
+		<TD  align='center'>(#)F+M</TD>
+		<TD  align='center'>(#)F + (#)F+M</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >(#)D7 (Ens 1-6)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_46_10' NAME='F_PERS_NAT_QUALIF_0_46_10' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_46_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 130022, 0, 'F_PERS_NAT_QUALIF', tab_ligne_130022, tab_col_130022, 46, 10, tab_mes_130022);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_46_10' NAME='T_PERS_NAT_QUALIF_0_46_10' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_46_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 130022, 0, 'T_PERS_NAT_QUALIF', tab_ligne_130022, tab_col_130022, 46, 10, tab_mes_130022);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_46_11' NAME='F_PERS_NAT_QUALIF_0_46_11' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_46_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 130022, 0, 'F_PERS_NAT_QUALIF', tab_ligne_130022, tab_col_130022, 46, 11, tab_mes_130022);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_46_11' NAME='T_PERS_NAT_QUALIF_0_46_11' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_46_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 130022, 0, 'T_PERS_NAT_QUALIF', tab_ligne_130022, tab_col_130022, 46, 11, tab_mes_130022);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_130022[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_130022_F_PERS_NAT_QUALIF_LIGNE_0_46'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_130022[0][1]	= "TOT_130022_F_PERS_NAT_QUALIF_LIGNE_0_46";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_130022_T_PERS_NAT_QUALIF_LIGNE_0_46'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_130022[0][2]	= "TOT_130022_T_PERS_NAT_QUALIF_LIGNE_0_46";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_130022_ALL_MES_LIGNE_0_46' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='2' bgcolor='#CCCCCC'><br>(#)TOTAL</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_130022[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_130022_F_PERS_NAT_QUALIF_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_130022[0][1]	= "TOT_130022_F_PERS_NAT_QUALIF_COLONNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_130022_T_PERS_NAT_QUALIF_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_130022[0][2]	= "TOT_130022_T_PERS_NAT_QUALIF_COLONNE_0_10";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_130022[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_130022_F_PERS_NAT_QUALIF_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_130022[1][1]	= "TOT_130022_F_PERS_NAT_QUALIF_COLONNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_130022_T_PERS_NAT_QUALIF_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_130022[1][2]	= "TOT_130022_T_PERS_NAT_QUALIF_COLONNE_0_11";
+</script>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_130022_F_PERS_NAT_QUALIF_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_130022_T_PERS_NAT_QUALIF_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_130022_ALL_MES_0' size=5></TD>
+
+	</TR>
+
+	<TR>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_130022_ALL_MES_COLONNE_0_10' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_130022_ALL_MES_COLONNE_0_11' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',130022, 0, tab_mes_130022, tab_ligne_130022, tab_col_130022);
+</script>

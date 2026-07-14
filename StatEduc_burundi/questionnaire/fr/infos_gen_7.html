@@ -1,0 +1,298 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=4107' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>II. INFORMATIONS GENERALES SUR LE CENTRE</B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;<b>2.1.</b> Accès au centre:&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Route accessible à tout véhicule&nbsp;<INPUT NAME='CODE_TYPE_ACCES_0' TYPE='radio'   ID='CODE_TYPE_ACCES_0_6' VALUE=$CODE_TYPE_ACCES_0_6>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Route accessible uniquement véhicule tout terrain&nbsp;<INPUT NAME='CODE_TYPE_ACCES_0' TYPE='radio'   ID='CODE_TYPE_ACCES_0_3' VALUE=$CODE_TYPE_ACCES_0_3>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Piste accessible uniquement à pied&nbsp;<INPUT NAME='CODE_TYPE_ACCES_0' TYPE='radio'   ID='CODE_TYPE_ACCES_0_4' VALUE=$CODE_TYPE_ACCES_0_4>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.2.</b> Le centre a- t-il un  système d?alimentation   électrique  fonctionnel ?	&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='ALIMENT_ELECTRICITE_SYST_FONCT_0' TYPE='radio'   ID='ALIMENT_ELECTRICITE_SYST_FONCT_0_1' VALUE=$ALIMENT_ELECTRICITE_SYST_FONCT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='ALIMENT_ELECTRICITE_SYST_FONCT_0' TYPE='radio'   ID='ALIMENT_ELECTRICITE_SYST_FONCT_0_0' VALUE=$ALIMENT_ELECTRICITE_SYST_FONCT_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='2'  valign=top class='police_gras'>&nbsp;Si oui, a) quel type d’énergie ?&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;REGIDESO&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_1' VALUE=$CODE_TYPE_ENERGIE_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Energie Solaire&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_2' VALUE=$CODE_TYPE_ENERGIE_0_2>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Groupe électrogène&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_4' VALUE=$CODE_TYPE_ENERGIE_0_4>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Energie Eolienne&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_3' VALUE=$CODE_TYPE_ENERGIE_0_3>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Pas d&#8217;accès à l&#8217;électricité&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_6' VALUE=$CODE_TYPE_ENERGIE_0_6>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Autre&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_5' VALUE=$CODE_TYPE_ENERGIE_0_5>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.3. </b>Le centre dispose-t-il d’une infirmerie ou d’un kit médical ?  &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='INFIRMERIE_KIT_MEDIC_0' TYPE='radio'   ID='INFIRMERIE_KIT_MEDIC_0_1' VALUE=$INFIRMERIE_KIT_MEDIC_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='INFIRMERIE_KIT_MEDIC_0' TYPE='radio'   ID='INFIRMERIE_KIT_MEDIC_0_0' VALUE=$INFIRMERIE_KIT_MEDIC_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>2.4.</b> Distance du centre de santé le plus proche (km) : &nbsp;&nbsp;&nbsp;<INPUT NAME='DISTANCE_CENTRE_SANTE_0' TYPE='text' size=5  ID='DISTANCE_CENTRE_SANTE_0' VALUE="$DISTANCE_CENTRE_SANTE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.5.</b>	Le centre a- t-il un  système d?alimentation en eau potable  fonctionnel ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='ALIMENT_EAU_POTABLE_SYST_FONCT_0' TYPE='radio'   ID='ALIMENT_EAU_POTABLE_SYST_FONCT_0_1' VALUE=$ALIMENT_EAU_POTABLE_SYST_FONCT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='ALIMENT_EAU_POTABLE_SYST_FONCT_0' TYPE='radio'   ID='ALIMENT_EAU_POTABLE_SYST_FONCT_0_0' VALUE=$ALIMENT_EAU_POTABLE_SYST_FONCT_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='3'  valign=top class='police_gras'>&nbsp;Si oui, quel type d?alimentation ?: &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Borne fontaine&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_1' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Système de collecte des eaux de pluie&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_2' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_2>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Source aménagée&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_3' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_3>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Source non aménagée&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_4' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_4>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Puits protégé/Forage&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_5' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_5>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Puits non protégé&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_6' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_6>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Branchement privé  &nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_7' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_7>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Pas d&#8217;accès à l&#8217;eau&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_8' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_8>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Autre&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_9' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_9>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.6. </b> Le domaine scolaire est-il délimité?     &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_1' VALUE=$DOMAINE_DELIMITE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_0' VALUE=$DOMAINE_DELIMITE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;                  Si  oui, quelle est sa superficie ?  (en ares) : &nbsp;&nbsp;&nbsp;<INPUT NAME='SUPERFICIE_DOMAINE_0' TYPE='text' size=5  ID='SUPERFICIE_DOMAINE_0' VALUE="$SUPERFICIE_DOMAINE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.7. </b>Le domaine scolaire est-il clôturé ?         &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='CLOTURE_DOMAINE_0' TYPE='radio'   ID='CLOTURE_DOMAINE_0_1' VALUE=$CLOTURE_DOMAINE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='CLOTURE_DOMAINE_0' TYPE='radio'   ID='CLOTURE_DOMAINE_0_0' VALUE=$CLOTURE_DOMAINE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;<b>2.8. </b>Les locaux du centre sont: &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Propres au centre&nbsp;<INPUT NAME='CODE_TYPE_PROPRIETE_LOCAL_0' TYPE='radio'   ID='CODE_TYPE_PROPRIETE_LOCAL_0_1' VALUE=$CODE_TYPE_PROPRIETE_LOCAL_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Empruntés &nbsp;<INPUT NAME='CODE_TYPE_PROPRIETE_LOCAL_0' TYPE='radio'   ID='CODE_TYPE_PROPRIETE_LOCAL_0_2' VALUE=$CODE_TYPE_PROPRIETE_LOCAL_0_2>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;S’ils sont empruntés, à qui appartiennent-ils ?  &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Domaine public&nbsp;<INPUT NAME='CODE_TYPE_PROPRIETAIRE_LOC_0' TYPE='radio'   ID='CODE_TYPE_PROPRIETAIRE_LOC_0_1' VALUE=$CODE_TYPE_PROPRIETAIRE_LOC_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Domaine privé&nbsp;<INPUT NAME='CODE_TYPE_PROPRIETAIRE_LOC_0' TYPE='radio'   ID='CODE_TYPE_PROPRIETAIRE_LOC_0_2' VALUE=$CODE_TYPE_PROPRIETAIRE_LOC_0_2>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Confession religieuse &nbsp;<INPUT NAME='CODE_TYPE_PROPRIETAIRE_LOC_0' TYPE='radio'   ID='CODE_TYPE_PROPRIETAIRE_LOC_0_3' VALUE=$CODE_TYPE_PROPRIETAIRE_LOC_0_3>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>2.9. </b>Les locaux sont-ils tous utilisés par la structure ?   &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='LOCAUX_TOUS_UTILISES_0' TYPE='radio'   ID='LOCAUX_TOUS_UTILISES_0_1' VALUE=$LOCAUX_TOUS_UTILISES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='LOCAUX_TOUS_UTILISES_0' TYPE='radio'   ID='LOCAUX_TOUS_UTILISES_0_0' VALUE=$LOCAUX_TOUS_UTILISES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;a) Sinon : Combien de locaux non utilisés ?      &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LOCAUX_NON_UTILISES_0' TYPE='text' size=5  ID='NB_LOCAUX_NON_UTILISES_0' VALUE="$NB_LOCAUX_NON_UTILISES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD   valign=top >&nbsp;b)	Qui les utilisent ?  Militaire/police&nbsp;&nbsp;&nbsp;<INPUT NAME='LOCAUX_UTIL_MILIT_POLICE_0' TYPE='checkbox'   ID='LOCAUX_UTIL_MILIT_POLICE_0' VALUE=$LOCAUX_UTIL_MILIT_POLICE_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Ecofo &nbsp;&nbsp;&nbsp;<INPUT NAME='LOCAUX_UTIL_ECOFO_0' TYPE='checkbox'   ID='LOCAUX_UTIL_ECOFO_0' VALUE=$LOCAUX_UTIL_ECOFO_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Autres à préciser&nbsp;&nbsp;&nbsp;<INPUT NAME='LOCAUX_UTIL_AUTRES_0' TYPE='text'   ID='LOCAUX_UTIL_AUTRES_0' VALUE="$LOCAUX_UTIL_AUTRES_0" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.10. </b> Le centre possède-t-il un terrain de sport ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='TERRAIN_SPORT_0' TYPE='radio'   ID='TERRAIN_SPORT_0_1' VALUE=$TERRAIN_SPORT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='TERRAIN_SPORT_0' TYPE='radio'   ID='TERRAIN_SPORT_0_0' VALUE=$TERRAIN_SPORT_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>2.11. </b> Le centre a-t-il un jardin scolaire en activité ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='JARDIN_SCOLAIRE_0' TYPE='radio'   ID='JARDIN_SCOLAIRE_0_1' VALUE=$JARDIN_SCOLAIRE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='JARDIN_SCOLAIRE_0' TYPE='radio'   ID='JARDIN_SCOLAIRE_0_0' VALUE=$JARDIN_SCOLAIRE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.12. </b> Le centre a-t-il des latrines fonctionnelles ?       &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='POSSEDE_LATRINES_0' TYPE='radio'   ID='POSSEDE_LATRINES_0_1' VALUE=$POSSEDE_LATRINES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='POSSEDE_LATRINES_0' TYPE='radio'   ID='POSSEDE_LATRINES_0_0' VALUE=$POSSEDE_LATRINES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;Si oui, <br/>a) nombre total   &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_0' TYPE='text' size=5  ID='NB_LATRINES_ELEVES_0' VALUE="$NB_LATRINES_ELEVES_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;<br/>dont  pour filles : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FILLES_0' TYPE='text' size=5  ID='NB_LATRINES_FILLES_0' VALUE="$NB_LATRINES_FILLES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;b.	Nombre de latrines  non fonctionnelles  &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_NON_FONCT_0' TYPE='text' size=5  ID='NB_LATRINES_ELEVES_NON_FONCT_0' VALUE="$NB_LATRINES_ELEVES_NON_FONCT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;b) Nombre de latrines en bon état : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_0' TYPE='text' size=5  ID='NB_LATRINES_BON_ETAT_0' VALUE="$NB_LATRINES_BON_ETAT_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;dont  pour filles en bon état :&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_F_0' TYPE='text'   ID='NB_LATRINES_BON_ETAT_F_0' VALUE="$NB_LATRINES_BON_ETAT_F_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.13. </b> Le centre dispose-t-il d’un home ou des logements des enseignants ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='HOME_ENSEIGNANT_0' TYPE='radio'   ID='HOME_ENSEIGNANT_0_1' VALUE=$HOME_ENSEIGNANT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='HOME_ENSEIGNANT_0' TYPE='radio'   ID='HOME_ENSEIGNANT_0_0' VALUE=$HOME_ENSEIGNANT_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;         Si oui, quel est le  nombre de formateurs  de votre centre qui y sont logés  ?  &nbsp;&nbsp;&nbsp;<INPUT NAME='ENSEIGNANTS_ECOLE_LOGES_0' TYPE='text' size=5  ID='ENSEIGNANTS_ECOLE_LOGES_0' VALUE="$ENSEIGNANTS_ECOLE_LOGES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.14. </b>Le centre dispose-t-il d’un véhicule (voiture ou moto)&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DISPOSE_VEHICULE_0' TYPE='radio'   ID='DISPOSE_VEHICULE_0_1' VALUE=$DISPOSE_VEHICULE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DISPOSE_VEHICULE_0' TYPE='radio'   ID='DISPOSE_VEHICULE_0_0' VALUE=$DISPOSE_VEHICULE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>2.15.</b> Le centre a-t-il un comité des parents d?apprenants ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='EXISTE_CPE_0' TYPE='radio'   ID='EXISTE_CPE_0_1' VALUE=$EXISTE_CPE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='EXISTE_CPE_0' TYPE='radio'   ID='EXISTE_CPE_0_0' VALUE=$EXISTE_CPE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Si oui, combien de réunions tenues au cours de l?année écoulée?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNIONS_TENUES_0' TYPE='text'   ID='NB_REUNIONS_TENUES_0' VALUE="$NB_REUNIONS_TENUES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>2.16.</b>	Le centre  dispose-t-il d?un comité de gestion ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='EXISTE_COMITE_GESTION_0' TYPE='radio'   ID='EXISTE_COMITE_GESTION_0_1' VALUE=$EXISTE_COMITE_GESTION_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='EXISTE_COMITE_GESTION_0' TYPE='radio'   ID='EXISTE_COMITE_GESTION_0_0' VALUE=$EXISTE_COMITE_GESTION_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Si oui, combien de réunions tenues au cours de l?année écoulée?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNIONS_CG_0' TYPE='text'   ID='NB_REUNIONS_CG_0' VALUE="$NB_REUNIONS_CG_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>2.17.</b> Le comité a-t-il déjà reçu une formation / renforcement de capacités ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='CG_FORMATION_0' TYPE='radio'   ID='CG_FORMATION_0_1' VALUE=$CG_FORMATION_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='CG_FORMATION_0' TYPE='radio'   ID='CG_FORMATION_0_0' VALUE=$CG_FORMATION_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;a)	Si oui, la formation était axée sur quoi ?  Gestion de l?école&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='GESTION_ECOLE_CG_0' TYPE='radio'   ID='GESTION_ECOLE_CG_0_1' VALUE=$GESTION_ECOLE_CG_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='GESTION_ECOLE_CG_0' TYPE='radio'   ID='GESTION_ECOLE_CG_0_0' VALUE=$GESTION_ECOLE_CG_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Maintenance des infrastructures&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='MANT_INFRASTR_CG_0' TYPE='radio'   ID='MANT_INFRASTR_CG_0_1' VALUE=$MANT_INFRASTR_CG_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='MANT_INFRASTR_CG_0' TYPE='radio'   ID='MANT_INFRASTR_CG_0_0' VALUE=$MANT_INFRASTR_CG_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;Suivie des performances pédagogiques&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='SUIVIE_PERFORM_PEDA_CG_0' TYPE='radio'   ID='SUIVIE_PERFORM_PEDA_CG_0_1' VALUE=$SUIVIE_PERFORM_PEDA_CG_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='SUIVIE_PERFORM_PEDA_CG_0' TYPE='radio'   ID='SUIVIE_PERFORM_PEDA_CG_0_0' VALUE=$SUIVIE_PERFORM_PEDA_CG_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Plaidoyer/sensibilisation&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PLAIDOYER_SENSIB_CG_0' TYPE='radio'   ID='PLAIDOYER_SENSIB_CG_0_1' VALUE=$PLAIDOYER_SENSIB_CG_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PLAIDOYER_SENSIB_CG_0' TYPE='radio'   ID='PLAIDOYER_SENSIB_CG_0_0' VALUE=$PLAIDOYER_SENSIB_CG_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Autre à préciser&nbsp;&nbsp;&nbsp;<INPUT NAME='AUTRES_FORMATIONS_CGE_0' TYPE='text'   ID='AUTRES_FORMATIONS_CGE_0' VALUE="$AUTRES_FORMATIONS_CGE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;b)	La formation était appuyée par quel bailleur?&nbsp;&nbsp;&nbsp;<INPUT NAME='BAILLEUR_FORMATION_CG_0' TYPE='text'   ID='BAILLEUR_FORMATION_CG_0' VALUE="$BAILLEUR_FORMATION_CG_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;c)	Quand  est ce que la formation a eu lieu ? (année)&nbsp;&nbsp;&nbsp;<INPUT NAME='ANNEE_FORMATION_CG_0' TYPE='text'   ID='ANNEE_FORMATION_CG_0' VALUE="$ANNEE_FORMATION_CG_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>2.18.</b> Les performances (les réussites lors de l?évaluation certificative) du centre sont-elles suivies par les membres du comité de gestion?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='PERFO_PEDA_ECOLECG_0' TYPE='radio'   ID='PERFO_PEDA_ECOLECG_0_1' VALUE=$PERFO_PEDA_ECOLECG_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='PERFO_PEDA_ECOLECG_0' TYPE='radio'   ID='PERFO_PEDA_ECOLECG_0_0' VALUE=$PERFO_PEDA_ECOLECG_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;    2.19. L?école possède-t-elle  des poubelles pour la gestion des menstrues ou autres déchets&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0' TYPE='radio'   ID='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_1' VALUE=$POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0' TYPE='radio'   ID='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_0' VALUE=$POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_0>
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

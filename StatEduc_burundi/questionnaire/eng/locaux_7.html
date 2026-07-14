@@ -1,0 +1,235 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('(#)Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=4207' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B></B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=2 class='ligne-paire' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%28%23%29N%C2%B0+du+local%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='(#)N° du local+++++++++++++++'></TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>(#)3.1 <br/>Utilisation</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%28%23%29Ann%C3%A9e+mise+en+service+3%2B%2B%2B' alt='(#)Année mise en service 3+++'></TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%28%23%29Superficie%28en+m%C2%B2%29+3.3%2B%2B%2B%2B%2B' alt='(#)Superficie(en m²) 3.3+++++'></TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%28%23%29Capacit%C3%A9+d%E2%80%99accueil+3.%2B%2B%2B' alt='(#)Capacité d’accueil 3.+++'></TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%28%23%29Places+assises+r%C3%A9elles+%2B%2B%2B' alt='(#)Places assises réelles +++'></TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'>(#)3.6 <br/>Nature des murs</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'>(#)3.7 <br/>Etat des murs</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'>(#)3.8 <br/>Etat du toit</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'>(#)3.9 <br/>Etat des portes</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'>(#)3.10 <br/>Etat des fenêtres</TD>
+		<TD ROWSPAN=17 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'>(#)3.11 <br/>Etat du sol</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=%28%23%29Salles+mixtes+%28Classe+et' alt='(#)Salles mixtes (Classe et' align='center'></TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'><img src='client-side/image/text.php?text=%28%23%29Salles+mixtes+%28Classe+et' alt='(#)Salles mixtes (Classe et' align='center'></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,15)'>$NUMERO_LOCAL_0</TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='CODE_TYPE_LOCAL_0_19' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_3' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='CODE_TYPE_LOCAL_0_20' NAME=CODE_TYPE_LOCAL_0 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_0_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_4' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='ANNEE_MISE_SERVICE_0' NAME=ANNEE_MISE_SERVICE_0 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_5' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='SUPERFICIE_0' NAME=SUPERFICIE_0 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_6' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='CAPACITE_ACCUEIL_0' NAME=CAPACITE_ACCUEIL_0 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_7' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='PLACES_ASSISES_REELLES_0' NAME=PLACES_ASSISES_REELLES_0 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_0"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,15)'>$NUMERO_LOCAL_1</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='CODE_TYPE_LOCAL_1_19' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_19></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_3' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='CODE_TYPE_LOCAL_1_20' NAME=CODE_TYPE_LOCAL_1 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_1_20></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_4' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='ANNEE_MISE_SERVICE_1' NAME=ANNEE_MISE_SERVICE_1 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_5' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='SUPERFICIE_1' NAME=SUPERFICIE_1 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_6' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='CAPACITE_ACCUEIL_1' NAME=CAPACITE_ACCUEIL_1 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_7' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='PLACES_ASSISES_REELLES_1' NAME=PLACES_ASSISES_REELLES_1 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_1"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,15)'>$NUMERO_LOCAL_2</TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='CODE_TYPE_LOCAL_2_19' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_3' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='CODE_TYPE_LOCAL_2_20' NAME=CODE_TYPE_LOCAL_2 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_2_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_4' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='ANNEE_MISE_SERVICE_2' NAME=ANNEE_MISE_SERVICE_2 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_5' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='SUPERFICIE_2' NAME=SUPERFICIE_2 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_6' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='CAPACITE_ACCUEIL_2' NAME=CAPACITE_ACCUEIL_2 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_7' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='PLACES_ASSISES_REELLES_2' NAME=PLACES_ASSISES_REELLES_2 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_2"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_3_0' onClick='MiseEvidenceLigneFrame(3,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_3_1' onClick='MiseEvidenceLigneFrame(3,15)'>$NUMERO_LOCAL_3</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_2' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='CODE_TYPE_LOCAL_3_19' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_19></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_3' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='CODE_TYPE_LOCAL_3_20' NAME=CODE_TYPE_LOCAL_3 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_3_20></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_4' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='ANNEE_MISE_SERVICE_3' NAME=ANNEE_MISE_SERVICE_3 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_5' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='SUPERFICIE_3' NAME=SUPERFICIE_3 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_6' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='CAPACITE_ACCUEIL_3' NAME=CAPACITE_ACCUEIL_3 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_7' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='PLACES_ASSISES_REELLES_3' NAME=PLACES_ASSISES_REELLES_3 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_3"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_4_0' onClick='MiseEvidenceLigneFrame(4,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_4_1' onClick='MiseEvidenceLigneFrame(4,15)'>$NUMERO_LOCAL_4</TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_2' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='CODE_TYPE_LOCAL_4_19' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_3' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='CODE_TYPE_LOCAL_4_20' NAME=CODE_TYPE_LOCAL_4 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_4_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_4' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='ANNEE_MISE_SERVICE_4' NAME=ANNEE_MISE_SERVICE_4 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_5' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='SUPERFICIE_4' NAME=SUPERFICIE_4 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_6' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='CAPACITE_ACCUEIL_4' NAME=CAPACITE_ACCUEIL_4 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_7' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='PLACES_ASSISES_REELLES_4' NAME=PLACES_ASSISES_REELLES_4 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_4"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_5_0' onClick='MiseEvidenceLigneFrame(5,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_5_1' onClick='MiseEvidenceLigneFrame(5,15)'>$NUMERO_LOCAL_5</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_2' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='CODE_TYPE_LOCAL_5_19' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_19></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_3' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='CODE_TYPE_LOCAL_5_20' NAME=CODE_TYPE_LOCAL_5 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_5_20></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_4' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='ANNEE_MISE_SERVICE_5' NAME=ANNEE_MISE_SERVICE_5 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_5' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='SUPERFICIE_5' NAME=SUPERFICIE_5 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_6' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='CAPACITE_ACCUEIL_5' NAME=CAPACITE_ACCUEIL_5 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_7' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='PLACES_ASSISES_REELLES_5' NAME=PLACES_ASSISES_REELLES_5 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_5"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_6_0' onClick='MiseEvidenceLigneFrame(6,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_6_1' onClick='MiseEvidenceLigneFrame(6,15)'>$NUMERO_LOCAL_6</TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_2' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='CODE_TYPE_LOCAL_6_19' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_3' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='CODE_TYPE_LOCAL_6_20' NAME=CODE_TYPE_LOCAL_6 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_6_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_4' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='ANNEE_MISE_SERVICE_6' NAME=ANNEE_MISE_SERVICE_6 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_5' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='SUPERFICIE_6' NAME=SUPERFICIE_6 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_6' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='CAPACITE_ACCUEIL_6' NAME=CAPACITE_ACCUEIL_6 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_7' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='PLACES_ASSISES_REELLES_6' NAME=PLACES_ASSISES_REELLES_6 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_6"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_7_0' onClick='MiseEvidenceLigneFrame(7,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_7_1' onClick='MiseEvidenceLigneFrame(7,15)'>$NUMERO_LOCAL_7</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_2' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='CODE_TYPE_LOCAL_7_19' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_19></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_3' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='CODE_TYPE_LOCAL_7_20' NAME=CODE_TYPE_LOCAL_7 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_7_20></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_4' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='ANNEE_MISE_SERVICE_7' NAME=ANNEE_MISE_SERVICE_7 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_5' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='SUPERFICIE_7' NAME=SUPERFICIE_7 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_6' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='CAPACITE_ACCUEIL_7' NAME=CAPACITE_ACCUEIL_7 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_7' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='PLACES_ASSISES_REELLES_7' NAME=PLACES_ASSISES_REELLES_7 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_7"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_8_0' onClick='MiseEvidenceLigneFrame(8,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_8_1' onClick='MiseEvidenceLigneFrame(8,15)'>$NUMERO_LOCAL_8</TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_2' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='CODE_TYPE_LOCAL_8_19' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_3' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='CODE_TYPE_LOCAL_8_20' NAME=CODE_TYPE_LOCAL_8 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_8_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_4' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='ANNEE_MISE_SERVICE_8' NAME=ANNEE_MISE_SERVICE_8 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_5' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='SUPERFICIE_8' NAME=SUPERFICIE_8 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_6' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='CAPACITE_ACCUEIL_8' NAME=CAPACITE_ACCUEIL_8 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_7' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='PLACES_ASSISES_REELLES_8' NAME=PLACES_ASSISES_REELLES_8 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_8"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_9_0' onClick='MiseEvidenceLigneFrame(9,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_9_1' onClick='MiseEvidenceLigneFrame(9,15)'>$NUMERO_LOCAL_9</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_2' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='CODE_TYPE_LOCAL_9_19' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_19></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_3' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='CODE_TYPE_LOCAL_9_20' NAME=CODE_TYPE_LOCAL_9 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_9_20></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_4' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='ANNEE_MISE_SERVICE_9' NAME=ANNEE_MISE_SERVICE_9 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_5' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='SUPERFICIE_9' NAME=SUPERFICIE_9 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_6' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='CAPACITE_ACCUEIL_9' NAME=CAPACITE_ACCUEIL_9 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_7' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='PLACES_ASSISES_REELLES_9' NAME=PLACES_ASSISES_REELLES_9 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_9"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_10_0' onClick='MiseEvidenceLigneFrame(10,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_10 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_10_1' onClick='MiseEvidenceLigneFrame(10,15)'>$NUMERO_LOCAL_10</TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_2' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='CODE_TYPE_LOCAL_10_19' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_3' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='CODE_TYPE_LOCAL_10_20' NAME=CODE_TYPE_LOCAL_10 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_10_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_4' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='ANNEE_MISE_SERVICE_10' NAME=ANNEE_MISE_SERVICE_10 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_10"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_5' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='SUPERFICIE_10' NAME=SUPERFICIE_10 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_10"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_6' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='CAPACITE_ACCUEIL_10' NAME=CAPACITE_ACCUEIL_10 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_10"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_10_7' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='PLACES_ASSISES_REELLES_10' NAME=PLACES_ASSISES_REELLES_10 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_10"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_11_0' onClick='MiseEvidenceLigneFrame(11,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_11 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_11_1' onClick='MiseEvidenceLigneFrame(11,15)'>$NUMERO_LOCAL_11</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_2' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='CODE_TYPE_LOCAL_11_19' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_19></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_3' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='CODE_TYPE_LOCAL_11_20' NAME=CODE_TYPE_LOCAL_11 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_11_20></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_4' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='ANNEE_MISE_SERVICE_11' NAME=ANNEE_MISE_SERVICE_11 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_11"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_5' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='SUPERFICIE_11' NAME=SUPERFICIE_11 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_11"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_6' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='CAPACITE_ACCUEIL_11' NAME=CAPACITE_ACCUEIL_11 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_11"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_11_7' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='PLACES_ASSISES_REELLES_11' NAME=PLACES_ASSISES_REELLES_11 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_11"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_12_0' onClick='MiseEvidenceLigneFrame(12,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_12 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_12_1' onClick='MiseEvidenceLigneFrame(12,15)'>$NUMERO_LOCAL_12</TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_2' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='CODE_TYPE_LOCAL_12_19' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_3' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='CODE_TYPE_LOCAL_12_20' NAME=CODE_TYPE_LOCAL_12 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_12_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_4' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='ANNEE_MISE_SERVICE_12' NAME=ANNEE_MISE_SERVICE_12 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_12"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_5' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='SUPERFICIE_12' NAME=SUPERFICIE_12 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_12"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_6' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='CAPACITE_ACCUEIL_12' NAME=CAPACITE_ACCUEIL_12 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_12"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_12_7' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='PLACES_ASSISES_REELLES_12' NAME=PLACES_ASSISES_REELLES_12 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_12"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_13_0' onClick='MiseEvidenceLigneFrame(13,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_13 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_13_1' onClick='MiseEvidenceLigneFrame(13,15)'>$NUMERO_LOCAL_13</TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_2' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='CODE_TYPE_LOCAL_13_19' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_19></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_3' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='CODE_TYPE_LOCAL_13_20' NAME=CODE_TYPE_LOCAL_13 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_13_20></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_4' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='ANNEE_MISE_SERVICE_13' NAME=ANNEE_MISE_SERVICE_13 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_13"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_5' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='SUPERFICIE_13' NAME=SUPERFICIE_13 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_13"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_6' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='CAPACITE_ACCUEIL_13' NAME=CAPACITE_ACCUEIL_13 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_13"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_13_7' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='PLACES_ASSISES_REELLES_13' NAME=PLACES_ASSISES_REELLES_13 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_13"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_14_0' onClick='MiseEvidenceLigneFrame(14,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_14 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_14_1' onClick='MiseEvidenceLigneFrame(14,15)'>$NUMERO_LOCAL_14</TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_2' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='CODE_TYPE_LOCAL_14_19' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_19></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_3' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='CODE_TYPE_LOCAL_14_20' NAME=CODE_TYPE_LOCAL_14 TYPE='radio' VALUE=$CODE_TYPE_LOCAL_14_20></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_4' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='ANNEE_MISE_SERVICE_14' NAME=ANNEE_MISE_SERVICE_14 TYPE='text'size=5 VALUE="$ANNEE_MISE_SERVICE_14"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_5' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='SUPERFICIE_14' NAME=SUPERFICIE_14 TYPE='text'style = 'width:30px' VALUE="$SUPERFICIE_14"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_6' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='CAPACITE_ACCUEIL_14' NAME=CAPACITE_ACCUEIL_14 TYPE='text'style = 'width:30px' VALUE="$CAPACITE_ACCUEIL_14"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_14_7' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='PLACES_ASSISES_REELLES_14' NAME=PLACES_ASSISES_REELLES_14 TYPE='text'style = 'width:30px' VALUE="$PLACES_ASSISES_REELLES_14"></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
