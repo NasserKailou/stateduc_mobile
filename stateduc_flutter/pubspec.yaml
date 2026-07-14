@@ -1,0 +1,51 @@
+name: stateduc_mobile
+description: StatEduc Mobile - Application de collecte de données éducatives
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  # Flutter 3.35.4 embarque Dart 3.9.2
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP client avec intercepteurs Basic Auth
+  dio: ^5.7.0
+
+  # State management
+  provider: ^6.1.2
+
+  # Base de données locale SQLite (remplace localStorage)
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+
+  # Stockage sécurisé PIN + credentials (Keystore/Keychain)
+  flutter_secure_storage: ^9.2.2
+
+  # Préférences simples (cache settings non-sensibles)
+  shared_preferences: ^2.3.2
+
+  # Détection connectivité réseau
+  connectivity_plus: ^6.1.0
+
+  # Rendu HTML dynamique des formulaires serveur
+  flutter_html: ^3.0.0-beta.2
+
+  # WebView pour rendu fidèle des formulaires HTML serveur
+  webview_flutter: ^4.10.0
+
+  # Icônes Material
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/icon/

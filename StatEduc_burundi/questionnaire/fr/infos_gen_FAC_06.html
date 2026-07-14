@@ -1,0 +1,179 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=5806' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>II . INFORMATIONS GENERALES   <span style='font-weight: bold; font-size: 16px; background-color:#00FF00; color:#000000; text-align:center;'>Pour Faculté/Institut/Département:</span> </B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.1. La faculté/institut  a-t-il une bibliothèque/ou des bibliothèques ?  &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='BIBLIOTHEQUE_0' TYPE='radio'   ID='BIBLIOTHEQUE_0_1' VALUE=$BIBLIOTHEQUE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='BIBLIOTHEQUE_0' TYPE='radio'   ID='BIBLIOTHEQUE_0_0' VALUE=$BIBLIOTHEQUE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp; Nombre d’ouvrages disponibles dans la/les bibliothèques &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_OUVRAGES_0' TYPE='text' size=5  ID='NB_OUVRAGES_0' VALUE="$NB_OUVRAGES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.2. La faculté/institut dispose-t-il de centres de recherche ?              &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='CENTRES_RECH_FAC_0' TYPE='radio'   ID='CENTRES_RECH_FAC_0_1' VALUE=$CENTRES_RECH_FAC_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='CENTRES_RECH_FAC_0' TYPE='radio'   ID='CENTRES_RECH_FAC_0_0' VALUE=$CENTRES_RECH_FAC_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp; Si oui, combien ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CENTRES_RECH_FAC_0' TYPE='text' size=5  ID='NB_CENTRES_RECH_FAC_0' VALUE="$NB_CENTRES_RECH_FAC_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp; Sous forme associative : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CENTRES_ASSOC_0' TYPE='text' size=5  ID='NB_CENTRES_ASSOC_0' VALUE="$NB_CENTRES_ASSOC_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;sous forme institutionnelle :&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CENTRES_INSTIT_0' TYPE='text' size=5  ID='NB_CENTRES_INSTIT_0' VALUE="$NB_CENTRES_INSTIT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.3. Les domaines de recherche suivants sont-il existants ?&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;                  -   Recherche Fondamentale :    &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='RECH_FOND_0' TYPE='radio'   ID='RECH_FOND_0_1' VALUE=$RECH_FOND_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='RECH_FOND_0' TYPE='radio'   ID='RECH_FOND_0_0' VALUE=$RECH_FOND_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  Si oui, quels domaines précis ? &nbsp;&nbsp;&nbsp;<INPUT NAME='DOMAINES_RECH_FOND_0' TYPE='text' style = 'width:300px'  ID='DOMAINES_RECH_FOND_0' VALUE="$DOMAINES_RECH_FOND_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  -   Recherche appliquée : &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='RECH_APPLIQ_0' TYPE='radio'   ID='RECH_APPLIQ_0_1' VALUE=$RECH_APPLIQ_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='RECH_APPLIQ_0' TYPE='radio'   ID='RECH_APPLIQ_0_0' VALUE=$RECH_APPLIQ_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  Si oui, quels domaines précis ? &nbsp;&nbsp;&nbsp;<INPUT NAME='DOMAINES_RECH_APPLIQ_0' TYPE='text' style = 'width:300px'  ID='DOMAINES_RECH_APPLIQ_0' VALUE="$DOMAINES_RECH_APPLIQ_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  -   Développement expérimental : &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='RECH_DEV_EXPER_0' TYPE='radio'   ID='RECH_DEV_EXPER_0_1' VALUE=$RECH_DEV_EXPER_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='RECH_DEV_EXPER_0' TYPE='radio'   ID='RECH_DEV_EXPER_0_0' VALUE=$RECH_DEV_EXPER_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  Si oui, quels domaines précis ? &nbsp;&nbsp;&nbsp;<INPUT NAME='DOMAINES_RECH_DEV_EXPER_0' TYPE='text' style = 'width:300px'  ID='DOMAINES_RECH_DEV_EXPER_0' VALUE="$DOMAINES_RECH_DEV_EXPER_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.4. Nombre global d’heures consacrées à la recherche (heures) : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_HEURES_RECH_0' TYPE='text' size=5  ID='NB_HEURES_RECH_0' VALUE="$NB_HEURES_RECH_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.5. Nombre de publications annuelles &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_PUBLICATIONS_0' TYPE='text' size=5  ID='NB_PUBLICATIONS_0' VALUE="$NB_PUBLICATIONS_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.6. La faculté/institut  dispose-t-il de laboratoires ?    &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='LABORATOIRE_0' TYPE='radio'   ID='LABORATOIRE_0_1' VALUE=$LABORATOIRE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='LABORATOIRE_0' TYPE='radio'   ID='LABORATOIRE_0_0' VALUE=$LABORATOIRE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.7. La faculté/institut  dispose-t- il d’ateliers des travaux pratiques ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DISPOSE_TP_0' TYPE='radio'   ID='DISPOSE_TP_0_1' VALUE=$DISPOSE_TP_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DISPOSE_TP_0' TYPE='radio'   ID='DISPOSE_TP_0_0' VALUE=$DISPOSE_TP_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;2.8. La faculté/institut  dispose-t-il de configurations  informatiques pour son administration ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='CONFIG_INFOMATIQ_ADM_0' TYPE='radio'   ID='CONFIG_INFOMATIQ_ADM_0_1' VALUE=$CONFIG_INFOMATIQ_ADM_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='CONFIG_INFOMATIQ_ADM_0' TYPE='radio'   ID='CONFIG_INFOMATIQ_ADM_0_0' VALUE=$CONFIG_INFOMATIQ_ADM_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;si oui, combien ?  &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CONFIG_INFOMATIQ_ADM_0' TYPE='text' size=5  ID='NB_CONFIG_INFOMATIQ_ADM_0' VALUE="$NB_CONFIG_INFOMATIQ_ADM_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;2.9. La faculté/institut  dispose-t-il de configurations  informatiques pour les étudiants ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='CONFIG_INFOMATIQ_ETUD_0' TYPE='radio'   ID='CONFIG_INFOMATIQ_ETUD_0_1' VALUE=$CONFIG_INFOMATIQ_ETUD_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='CONFIG_INFOMATIQ_ETUD_0' TYPE='radio'   ID='CONFIG_INFOMATIQ_ETUD_0_0' VALUE=$CONFIG_INFOMATIQ_ETUD_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;si oui, combien ?  &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CONFIG_INFOMATIQ_ETUD_0' TYPE='text' size=5  ID='NB_CONFIG_INFOMATIQ_ETUD_0' VALUE="$NB_CONFIG_INFOMATIQ_ETUD_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.10. La faculté/institut dispose-t-il d’un accès à internet pour l’administration ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='ACCES_INTERNET_ADM_0' TYPE='radio'   ID='ACCES_INTERNET_ADM_0_1' VALUE=$ACCES_INTERNET_ADM_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='ACCES_INTERNET_ADM_0' TYPE='radio'   ID='ACCES_INTERNET_ADM_0_0' VALUE=$ACCES_INTERNET_ADM_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.11. La faculté/institut dispose-t-il d’un accès à internet pour les étudiants ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='ACCES_INTERNET_ETUD_0' TYPE='radio'   ID='ACCES_INTERNET_ETUD_0_1' VALUE=$ACCES_INTERNET_ETUD_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='ACCES_INTERNET_ETUD_0' TYPE='radio'   ID='ACCES_INTERNET_ETUD_0_0' VALUE=$ACCES_INTERNET_ETUD_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.12. Si oui, l’accès à internet pour les étudiants est-il gratuit ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='ACCES_INTERNET_ETUD_GRATUIT_0' TYPE='radio'   ID='ACCES_INTERNET_ETUD_GRATUIT_0_1' VALUE=$ACCES_INTERNET_ETUD_GRATUIT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='ACCES_INTERNET_ETUD_GRATUIT_0' TYPE='radio'   ID='ACCES_INTERNET_ETUD_GRATUIT_0_0' VALUE=$ACCES_INTERNET_ETUD_GRATUIT_0_0>
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
