@@ -4,6 +4,105 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 50] — 2026-07-14 — Fix WHERE context-only (TEXT/INTEGER) + garde SQL vide
+
+### Contexte
+Session 49 avait corrigé le wrapper `COUNT(*)` → mode SCALAR pour les règles SUM-scalaires.
+Les logs confirmaient `isScalar=true` mais continuaient à retourner `val=0.0` des deux côtés :
+```
+[CoherenceEval] rawQuery sql_regle rule=483 (SCALAR) → val=0.0
+[CoherenceEval] rawQuery sql_assoc rule=483 (SCALAR) → val=0.0
+[CoherenceEval] rule=483 path=SQL result=(0.0 <= 0.0) violated=false
+```
+
+### Cause racine — Bug S50-A : mismatch TEXT/INTEGER dans WHERE
+
+**SQL généré (après fix S49) :**
+```sql
+SELECT COALESCE((SELECT * FROM (
+SELECT Sum(NB_LATRINES_FILLES) AS SommeDeNB_LATRINES_FILLES
+FROM DONNEES_ETABLISSEMENT
+WHERE (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+) _s), 0) AS val
+```
+
+**Cause** : Le WHERE filtre `CODE_ETABLISSEMENT=20952` avec un **littéral INTEGER** (pas de guillemets).
+Mais le CTE produit des TEXT : `CODE_ETABLISSEMENT = '20952'`.
+
+SQLite : `'20952' = 20952` → **FALSE** → toutes les lignes filtrées → `Sum(NB_LATRINES_FILLES) = NULL`
+→ `COALESCE(NULL, 0) = 0.0` → les deux côtés valent 0 → `!(0 <= 0) = false` → jamais violé.
+
+**C'est le même bug TEXT/INTEGER que S47 (HAVING) — mais dans la clause WHERE.**
+`_stripContextOnlyHaving()` ne traitait pas le WHERE.
+
+Le CTE est déjà filtré sur `id_etab='20952'` → le WHERE de contexte est entièrement redondant.
+
+### Fix — Bug S50-A : `_stripContextOnlyWhere()` (étape 7c)
+
+**Fichier** : `coherence_evaluator.dart` — nouvelle méthode statique + appel étape 7c.
+
+**Stratégie** :
+1. Si le SQL commence par `WITH`, isoler le bloc CTE (première fermeture à depth=0).
+   Le strip s'applique **uniquement sur la partie principale** (après le CTE) pour ne pas
+   supprimer le `WHERE id_camp=... AND id_etab=...` interne au CTE.
+2. Regex WHERE body stop avec lookahead : `\n\s*\)` (fin de sous-requête dans wrapper SCALAR),
+   `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`, ou fin de chaîne.
+3. Si le body WHERE ne contient que des identifiants de contexte (CODE_ETABLISSEMENT,
+   CODE_TYPE_ANNEE, CODE_ADMINISTRATIF), supprimer le WHERE entier.
+
+**SQL généré après fix :**
+```sql
+SELECT COALESCE((SELECT * FROM (
+SELECT Sum(NB_LATRINES_FILLES) AS SommeDeNB_LATRINES_FILLES
+FROM DONNEES_ETABLISSEMENT
+        ← WHERE supprimé : context-only, redondant avec id_etab CTE
+) _s), 0) AS val
+```
+
+**Résultat** : `Sum(NB_LATRINES_FILLES) = 50.0` → `COALESCE(50.0, 0) = 50.0` → valeur réelle.
+
+### Fix — Bug S50-B : garde SQL vide (étape 7d)
+
+Ajout d'un guard avant l'étape 8 :
+```dart
+if (translatedSql.trim().isEmpty) {
+  debugPrint('[SqlTranslator] translatedSql empty after stripping — aborting translation');
+  return null;
+}
+```
+Évite de générer `SELECT COUNT(*) AS cnt FROM (\n) _violations` qui causerait une
+`OperationalError SQLite` si les strips étape 7b/7c retournaient un SQL vide.
+
+### Validation (Python SQLite, 9/9 tests)
+- T1 Sum(NB_LATRINES_FILLES) context-only WHERE supprimé → val=50 ✓
+- T2 Sum(NB_LATRINES_ELEVES) context-only WHERE supprimé → val=100 ✓
+- T3 critère <= : 50<=100 → not violated ✓
+- T4 VIOLATION filles=150 > élèves=100 → violated=True ✓
+- T5 WHERE métier (NB_LATRINES_FILLES > 0) → conservé ✓
+- T6 WHERE context-only + GROUP BY → WHERE supprimé, GROUP BY préservé ✓
+- T7/T8/T9 CTE interne WHERE id_camp=... → non touché ✓
+
+### Logs attendus après fix
+```
+[SqlTranslator] stripping context-only WHERE: (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+[CoherenceEval] rawQuery sql_regle rule=483 (SCALAR) → val=50.0
+[CoherenceEval] rawQuery sql_assoc rule=483 (SCALAR) → val=100.0
+[CoherenceEval] rule=483 path=SQL result=(50.0 <= 100.0) violated=false
+```
+Ou, si filles > élèves :
+```
+[CoherenceEval] rawQuery sql_regle rule=483 (SCALAR) → val=150.0
+[CoherenceEval] rawQuery sql_assoc rule=483 (SCALAR) → val=100.0
+[CoherenceEval] rule=483 path=SQL result=(150.0 <= 100.0) violated=true ← CORRECT
+```
+
+### Pas de régression
+- Règles MODE EXISTS (GROUP BY présent) → non touchées
+- WHERE avec logique métier (champs non-contexte) → conservé
+- WHERE interne au CTE (`id_camp, id_etab`) → non touché (split CTE/main)
+
+---
+
 ## [Session 49] — 2026-07-14 — Fix wrapper SUM-scalaire : mode SCALAR vs EXISTS
 
 ### Contexte
