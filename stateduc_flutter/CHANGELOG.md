@@ -4,6 +4,43 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 45] — 2026-07-14 — Moteur de cohérence offline SQL réel sur SQLite
+
+### Objectif
+Remplace l'évaluation regex (Sessions 38–44) par un moteur d'exécution SQL réel.
+Les requêtes SQL de cohérence (Access/SQL Server) sont traduites et exécutées directement
+sur la base SQLite locale, garantissant l'équivalence exacte avec le contrôle serveur.
+
+### Nouveautés
+
+####  (classe statique dans )
+Traduit les requêtes SQL Access/SQL Server vers SQLite :
+- Substitution des paramètres : ,  → valeurs réelles
+- Mapping de table :  → CTE de pivot dynamique sur 
+- Traduction syntaxique :  → ,  → 
+-  → ,  → 
+- Wrapper  : la requête retourne un entier (0 = OK, >0 = violation)
+
+####  — Dual-path
+1. **Chemin SQL réel** (prioritaire) :  + 
+2. **Chemin regex fallback** (conservatif) : extraction regex + 
+
+#### 
+Passe maintenant  et  au moteur pour la substitution des paramètres.
+
+### Règles validées
+- Règle électricité :  vs  (cas concret Session 45)
+- Règle clôture/superficie :  vs 
+
+### Tests
+-  : 15 tests unitaires du traducteur SQL (pur Dart, sans DB)
+
+### Conservation
+- Le contrôle serveur (data_controle.php via API) est intégralement conservé (additive)
+- Le chemin regex est conservé comme fallback pour la robustesse
+
+---
+
 ## [Unreleased] — 2026-06-17 — Session 21 : correction cohérence hors ligne
 
 ### 🔴 Fix — `coherence_evaluator.dart` : `_sumFieldAcrossAllFilters` retournait `0` au lieu de `null`

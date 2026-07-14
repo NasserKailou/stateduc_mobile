@@ -839,14 +839,18 @@ class DataEntryProvider extends ChangeNotifier {
         return;
       }
 
-      // Lance l'évaluation des règles sur les données du formulaire courant
+      // Lance l'évaluation des règles sur les données du formulaire courant.
+      // Session 45 : codeEtab et codeTypeAnnee sont passés pour la substitution
+      // des paramètres $CODE_ETABLISSEMENT et $CODE_TYPE_ANNEE dans le SQL.
       _offlineCoherenceErrors = await _evaluator.evaluate(
-        rules:    rules,
-        formData: _formData,
-        idCamp:   _idCamp!,
-        idQst:    _selectedQuestion!.idQst,
-        idEtab:   _idEtab!,
-        idFilter: _selectedFilter?.idFilter,
+        rules:          rules,
+        formData:       _formData,
+        idCamp:         _idCamp!,
+        idQst:          _selectedQuestion!.idQst,
+        idEtab:         _idEtab!,
+        idFilter:       _selectedFilter?.idFilter,
+        codeEtab:       _codeEtab,    // ex. '101012071' → $CODE_ETABLISSEMENT
+        codeTypeAnnee:  _codeyear,    // ex. '2024'       → $CODE_TYPE_ANNEE
       );
 
       debugPrint('[DataEntry] checkCoherenceOffline: '
