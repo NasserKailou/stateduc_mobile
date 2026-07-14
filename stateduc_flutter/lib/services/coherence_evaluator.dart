@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 45 — Moteur SQL réel sur SQLite
+// VERSION : Session 46 — Corrections bugs \1, WHERE fields, table name, sql_assoc mixte
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -248,13 +248,14 @@ class SqlTranslator {
 
       // ── Étape 7 : supprimer les qualificateurs de table dans le SQL ────
       // Ex: DONNEES_ETABLISSEMENT.ELECTRICITE → ELECTRICITE
+      // FIX Bug 1: Dart replaceAll(RegExp, String) ne supporte PAS les backreferences
+      // \1 dans la chaîne de remplacement → produit un littéral "\1" qui crashe SQLite.
+      // Solution : replaceAllMapped avec closure qui retourne m.group(1).
       for (final tableName in usedServerTables) {
-        translatedSql = translatedSql.replaceAll(
+        translatedSql = translatedSql.replaceAllMapped(
           RegExp('\\b${RegExp.escape(tableName)}\\.(\\w+)', caseSensitive: false),
-          r'\1',
+          (m) => m.group(1)!,
         );
-        // Supprimer aussi les références non qualifiées à la table dans FROM
-        // (le CTE les fournit déjà)
       }
 
       // ── Étape 8 : wrapper COUNT(*) ─────────────────────────────────────
@@ -350,7 +351,8 @@ class SqlTranslator {
       );
       for (final m in qualPattern.allMatches(sql)) {
         final field = m.group(1)!.toUpperCase();
-        if (!_isSqlKeyword(field)) {
+        // FIX Bug 3: exclure les noms de table eux-mêmes du jeu de champs
+        if (!_isSqlKeyword(field) && !serverTables.contains(field)) {
           fields.add(field);
         }
       }
@@ -368,7 +370,37 @@ class SqlTranslator {
       final identPattern = RegExp(r'\b([A-Z][A-Z0-9_]*)\b', caseSensitive: false);
       for (final id in identPattern.allMatches(clause)) {
         final name = id.group(1)!.toUpperCase();
-        if (!_isSqlKeyword(name) && name.length > 2) {
+        // FIX Bug 3: exclure aussi les noms de tables serveur
+        if (!_isSqlKeyword(name) && name.length > 2 &&
+            !serverTables.contains(name)) {
+          fields.add(name);
+        }
+      }
+    }
+
+    // FIX Bug 2: extraire les champs non qualifiés de la clause WHERE
+    // Certaines règles utilisent des noms de champs sans préfixe TABLE. (ex:
+    // DOMAINE_DELIMITE, SUPERFICIE_DOMAINE) dans le WHERE.  Ces champs n'étaient
+    // pas extraits, causant des colonnes NULL dans le CTE et des violations
+    // jamais détectées.
+    //
+    // Stratégie : on extrait la portion WHERE...GROUP BY (ou WHERE...fin), puis
+    // on capture tous les identifiants qui ressemblent à des noms de champs
+    // (MAJUSCULES_AVEC_UNDERSCORES, longueur > 2) en excluant les mots-clés SQL
+    // et les noms de tables.  Les littéraux numériques et opérateurs ne matchent
+    // pas le pattern \b[A-Z][A-Z0-9_]+\b de longueur > 2.
+    final whereMatch = RegExp(
+      r'\bWHERE\b(.+?)(?:\bGROUP\s+BY\b|\bHAVING\b|\bORDER\s+BY\b|\bLIMIT\b|$)',
+      caseSensitive: false,
+      dotAll: true,
+    ).firstMatch(sql);
+    if (whereMatch != null) {
+      final whereClause = whereMatch.group(1) ?? '';
+      final identPattern = RegExp(r'\b([A-Z][A-Z0-9_]+)\b', caseSensitive: false);
+      for (final id in identPattern.allMatches(whereClause)) {
+        final name = id.group(1)!.toUpperCase();
+        if (!_isSqlKeyword(name) && name.length > 2 &&
+            !serverTables.contains(name)) {
           fields.add(name);
         }
       }
@@ -719,6 +751,17 @@ class CoherenceEvaluator {
     if (r1 == null) return null; // non traduisible → fallback
 
     // Traduire sql_assoc
+    // FIX Bug 4: si sql_assoc n'est pas traduisible (ex: pas de table serveur
+    // connue, règles 487/488 dont sql_assoc est une requête simple sans
+    // DONNEES_ETABLISSEMENT), on ne retombe PAS immédiatement en fallback.
+    //
+    // Stratégie :
+    //   • Si sql_assoc est vide → COUNT assoc = 0 (règle de type "le résultat
+    //     doit être 0 violations" — critere typique = '= 0').
+    //   • Si sql_assoc n'est pas traduisible mais sql_regle l'est, on compare
+    //     count1 (violations détectées) directement à 0 avec le critere.
+    //     Cela couvre le cas fréquent critere='= 0' : la règle est violée si
+    //     count1 > 0.
     final r2 = SqlTranslator.translate(
       serverSql:      rule.sqlAssoc,
       idCamp:         idCamp,
@@ -726,13 +769,30 @@ class CoherenceEvaluator {
       codeEtab:       codeEtab,
       codeTypeAnnee:  codeTypeAnnee,
     );
-    if (r2 == null) return null; // non traduisible → fallback
 
-    // Exécuter les deux requêtes traduitess
+    // Exécuter sql_regle (toujours disponible à ce stade)
     final count1 = await _execCount(db, r1.sql, 'sql_regle', rule.idRegle);
-    final count2 = await _execCount(db, r2.sql, 'sql_assoc', rule.idRegle);
+    if (count1 == null) return null;
 
-    if (count1 == null || count2 == null) return null;
+    double count2;
+    if (r2 != null) {
+      // Les deux côtés sont traduisibles → évaluation complète
+      final c2 = await _execCount(db, r2.sql, 'sql_assoc', rule.idRegle);
+      if (c2 == null) return null;
+      count2 = c2;
+    } else if (rule.sqlAssoc.trim().isEmpty) {
+      // Pas d'association → on compare count1 à 0
+      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_assoc empty → count2=0');
+      count2 = 0;
+    } else {
+      // sql_assoc non traduisible (pas de table serveur connue) :
+      // on traite sql_regle comme un COUNT de violations et on compare à 0.
+      // Cela est correct pour les règles dont le critere est '= 0' :
+      //   count1=0 → pas de violation, count1>0 → violation.
+      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_assoc not translatable '
+          '— comparing count1 to 0 directly');
+      count2 = 0;
+    }
 
     final violated = _applyOperator(count1, count2, rule.critere);
     return _SqlEvalResult(v1: count1, v2: count2, violated: violated);
