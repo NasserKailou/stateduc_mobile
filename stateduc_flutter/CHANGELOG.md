@@ -4,6 +4,92 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 48] — 2026-07-14 — Fix _stripContextOnlyHaving ordre + suppression diagnostic CTE crashant
+
+### Contexte
+Après Session 47, les logs montrent encore `HAVING (((CODE_ETABLISSEMENT)=20952)...)` non supprimé dans le SQL traduit pour les règles avec qualificateurs `TABLE.FIELD` (ex: électricité), et des erreurs `SQLiteLog (1) near "SELECT": syntax error` répétées.
+
+### Bug 1 — CRITIQUE — `_stripContextOnlyHaving` appelé AVANT la suppression des qualificateurs
+
+**Symptôme** : Le HAVING reste présent dans le SQL traduit pour les règles utilisant `DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT` (syntaxe qualifiée) → `count=0` → violation non détectée.
+
+**Cause** : `_stripContextOnlyHaving` était appelé dans `_translateSyntax()` (step 10), **avant** la suppression des qualificateurs `TABLE.FIELD` (step 7 dans `translate()`). Le body du HAVING contenait encore `DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT` → le regex trouvait `DONNEES_ETABLISSEMENT` comme identifiant → n'appartient pas à `_contextFields` → `isContextOnly = false` → HAVING gardé.
+
+**Fix** : Déplacement de l'appel `_stripContextOnlyHaving()` de `_translateSyntax()` step 10 vers `translate()` **step 7b**, c'est-à-dire immédiatement APRÈS la boucle de suppression des qualificateurs. Après step 7 : `DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT` → `CODE_ETABLISSEMENT` → `isContextOnly = true` → HAVING supprimé.
+
+### Bug 2 — Diagnostic CTE crashe SQLite (erreurs dans les logs)
+
+**Symptôme** : `E/SQLiteLog: (1) near "SELECT": syntax error in "WITH DONNEES_ETABLISSEMENT AS ( SELECT MAX(CASE WHEN UPPER(field_name) SELECT * FROM ..."` — 3 fois par règle.
+
+**Cause** : Le bloc diagnostic dans `_execCount()` utilisait le regex `(.+?)` (non-greedy avec `dotAll: true`) pour extraire le body du CTE. Ce regex s'arrêtait au **premier `)` trouvé** dans le SQL — qui est le `)` de `MAX(CASE WHEN...END)` — produisant un CTE tronqué → SQL invalide → crash SQLite. Le `catch (_) {}` empêchait le blocage de l'évaluation mais polluait les logs avec 3 fausses erreurs par règle.
+
+**Fix** : Suppression complète du bloc diagnostic CTE dans `_execCount()`. Le vrai `rawQuery` fonctionne correctement ; seul le diagnostic était défaillant.
+
+### Validation (Python SQLite, 6/6 tests)
+- Électricité violation (qualificateurs + `$CODE_ETABLISSEMENT`): count=1 ✓
+- Latrines violation (qualificateurs + `$CODE_ETABLISSEMENT`): count=1 ✓
+- Domaine violation (sans qualificateurs, entier hardcodé): count=1 ✓
+- Électricité cohérent: count=0 (pas de régression) ✓
+- Latrines cohérent: count=0 (pas de régression) ✓
+- Domaine cohérent: count=0 (pas de régression) ✓
+
+---
+
+## [Session 47] — 2026-07-14 — Fix HAVING type-mismatch TEXT/INTEGER (0 violations systématique)
+
+### Contexte
+Après les 4 corrections Session 46, le contrôle offline retournait encore systématiquement 0 violation pour id_etab=20952, id_camp=2, CODE_TYPE_ANNEE=21 — un établissement ayant des incohérences réelles (latrines, domaine).
+
+### Cause racine identifiée — Incompatibilité de type TEXT/INTEGER dans SQLite HAVING
+
+**Symptôme** : `[CoherenceEval] rawQuery sql_regle rule=489 → count=0` sur toutes les règles.
+
+**Analyse des logs** : Le SQL généré contenait :
+```sql
+GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+HAVING (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+```
+
+**Cause** : `collected_data.field_value` est de type **TEXT**. Le pivot CTE produit donc
+`CODE_ETABLISSEMENT = '20952'` (TEXT). Le SQL serveur compare avec `CODE_ETABLISSEMENT = 20952`
+(entier littéral — sans guillemets, car ces valeurs ne sont pas des paramètres `$` mais des constantes
+injectées par le batch serveur pour le filtrage multi-établissements).
+
+En SQLite : `'20952' (TEXT) = 20952 (INTEGER)` → **FALSE** (types incompatibles).
+→ Le HAVING filtre TOUTES les lignes → COUNT = 0 → aucune violation détectée.
+
+**Validation Python** : simulation SQLite reproduit exactement le bug (count=0 avec HAVING, count=1 sans).
+
+### Fix — `_stripContextOnlyHaving()` : suppression du HAVING redondant de contexte
+
+**Fichier** : `coherence_evaluator.dart` — nouvelle méthode statique `_stripContextOnlyHaving()`,
+appelée comme étape 10 dans `_translateSyntax()`.
+
+**Justification** : Sur mobile, le CTE de pivot est déjà filtré sur `(id_camp, id_etab)` → le HAVING
+de filtrage d'établissement est **toujours trivial** (il ne filtre jamais de lignes réelles car le CTE
+ne contient que les données d'UN seul établissement). Le supprimer est donc à la fois correct et
+nécessaire pour éviter la comparaison TEXT/INTEGER.
+
+**Logique** : Si le HAVING ne contient QUE des identifiants appartenant à
+`{CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF}` → suppression du HAVING.
+Si le HAVING contient d'autres identifiants (SUM, NB_ELEVES, etc.) → conservation intacte.
+
+### Diagnostic — Log CTE pivot dans `_execCount()`
+
+Ajout d'un log diagnostique pour visualiser les valeurs réellement pivotées depuis `collected_data` :
+```
+[SqlTranslator] CTE DONNEES_ETABLISSEMENT pivot (rule=489): {CODE_ETABLISSEMENT: 20952, ...}
+```
+Permet de vérifier instantanément que le pivot a bien extrait les bons champs et valeurs.
+
+### Validation finale (Python SQLite, 4/4 tests)
+- Rule 489 (latrines) données violées : count=1 ✓
+- Rule 488 (domaine) données violées : count=1 ✓
+- Rule 489 données cohérentes : count=0 ✓ (pas de régression)
+- Rule 488 données cohérentes : count=0 ✓ (pas de régression)
+
+---
+
 ## [Session 46] — 2026-07-14 — Corrections critiques moteur cohérence offline (4 bugs)
 
 ### Contexte
