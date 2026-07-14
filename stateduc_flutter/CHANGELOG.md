@@ -4,6 +4,61 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 47] — 2026-07-14 — Fix HAVING type-mismatch TEXT/INTEGER (0 violations systématique)
+
+### Contexte
+Après les 4 corrections Session 46, le contrôle offline retournait encore systématiquement 0 violation pour id_etab=20952, id_camp=2, CODE_TYPE_ANNEE=21 — un établissement ayant des incohérences réelles (latrines, domaine).
+
+### Cause racine identifiée — Incompatibilité de type TEXT/INTEGER dans SQLite HAVING
+
+**Symptôme** : `[CoherenceEval] rawQuery sql_regle rule=489 → count=0` sur toutes les règles.
+
+**Analyse des logs** : Le SQL généré contenait :
+```sql
+GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+HAVING (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+```
+
+**Cause** : `collected_data.field_value` est de type **TEXT**. Le pivot CTE produit donc
+`CODE_ETABLISSEMENT = '20952'` (TEXT). Le SQL serveur compare avec `CODE_ETABLISSEMENT = 20952`
+(entier littéral — sans guillemets, car ces valeurs ne sont pas des paramètres `$` mais des constantes
+injectées par le batch serveur pour le filtrage multi-établissements).
+
+En SQLite : `'20952' (TEXT) = 20952 (INTEGER)` → **FALSE** (types incompatibles).
+→ Le HAVING filtre TOUTES les lignes → COUNT = 0 → aucune violation détectée.
+
+**Validation Python** : simulation SQLite reproduit exactement le bug (count=0 avec HAVING, count=1 sans).
+
+### Fix — `_stripContextOnlyHaving()` : suppression du HAVING redondant de contexte
+
+**Fichier** : `coherence_evaluator.dart` — nouvelle méthode statique `_stripContextOnlyHaving()`,
+appelée comme étape 10 dans `_translateSyntax()`.
+
+**Justification** : Sur mobile, le CTE de pivot est déjà filtré sur `(id_camp, id_etab)` → le HAVING
+de filtrage d'établissement est **toujours trivial** (il ne filtre jamais de lignes réelles car le CTE
+ne contient que les données d'UN seul établissement). Le supprimer est donc à la fois correct et
+nécessaire pour éviter la comparaison TEXT/INTEGER.
+
+**Logique** : Si le HAVING ne contient QUE des identifiants appartenant à
+`{CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF}` → suppression du HAVING.
+Si le HAVING contient d'autres identifiants (SUM, NB_ELEVES, etc.) → conservation intacte.
+
+### Diagnostic — Log CTE pivot dans `_execCount()`
+
+Ajout d'un log diagnostique pour visualiser les valeurs réellement pivotées depuis `collected_data` :
+```
+[SqlTranslator] CTE DONNEES_ETABLISSEMENT pivot (rule=489): {CODE_ETABLISSEMENT: 20952, ...}
+```
+Permet de vérifier instantanément que le pivot a bien extrait les bons champs et valeurs.
+
+### Validation finale (Python SQLite, 4/4 tests)
+- Rule 489 (latrines) données violées : count=1 ✓
+- Rule 488 (domaine) données violées : count=1 ✓
+- Rule 489 données cohérentes : count=0 ✓ (pas de régression)
+- Rule 488 données cohérentes : count=0 ✓ (pas de régression)
+
+---
+
 ## [Session 46] — 2026-07-14 — Corrections critiques moteur cohérence offline (4 bugs)
 
 ### Contexte

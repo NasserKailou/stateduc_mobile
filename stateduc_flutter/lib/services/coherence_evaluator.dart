@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 46 — Corrections bugs \1, WHERE fields, table name, sql_assoc mixte
+// VERSION : Session 47 — Fix HAVING type-mismatch (TEXT '20952' ≠ INTEGER 20952)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -222,7 +222,8 @@ class SqlTranslator {
       final usedServerTables = _detectServerTables(sql);
       if (usedServerTables.isEmpty) {
         // Pas de table serveur connue → on ne peut pas traduire
-        debugPrint('[SqlTranslator] no known server tables in SQL — not translatable');
+        debugPrint(
+            '[SqlTranslator] no known server tables in SQL — not translatable');
         return null;
       }
 
@@ -253,7 +254,8 @@ class SqlTranslator {
       // Solution : replaceAllMapped avec closure qui retourne m.group(1).
       for (final tableName in usedServerTables) {
         translatedSql = translatedSql.replaceAllMapped(
-          RegExp('\\b${RegExp.escape(tableName)}\\.(\\w+)', caseSensitive: false),
+          RegExp('\\b${RegExp.escape(tableName)}\\.(\\w+)',
+              caseSensitive: false),
           (m) => m.group(1)!,
         );
       }
@@ -362,16 +364,18 @@ class SqlTranslator {
     // Ces patterns capturent des noms de champs seuls dans les clauses de tri/filtre
     // ex: GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
     final groupHavingPattern = RegExp(
-      r'(?:GROUP\s+BY|HAVING)\s+([\w\s,=<>\'\"().]+?)(?:$|ORDER\s+BY|LIMIT)',
+      r'''(?:GROUP\s+BY|HAVING)\s+([\w\s,=<>'"().]+?)(?:$|ORDER\s+BY|LIMIT)''',
       caseSensitive: false,
     );
     for (final m in groupHavingPattern.allMatches(sql)) {
       final clause = m.group(1) ?? '';
-      final identPattern = RegExp(r'\b([A-Z][A-Z0-9_]*)\b', caseSensitive: false);
+      final identPattern =
+          RegExp(r'\b([A-Z][A-Z0-9_]*)\b', caseSensitive: false);
       for (final id in identPattern.allMatches(clause)) {
         final name = id.group(1)!.toUpperCase();
         // FIX Bug 3: exclure aussi les noms de tables serveur
-        if (!_isSqlKeyword(name) && name.length > 2 &&
+        if (!_isSqlKeyword(name) &&
+            name.length > 2 &&
             !serverTables.contains(name)) {
           fields.add(name);
         }
@@ -396,10 +400,12 @@ class SqlTranslator {
     ).firstMatch(sql);
     if (whereMatch != null) {
       final whereClause = whereMatch.group(1) ?? '';
-      final identPattern = RegExp(r'\b([A-Z][A-Z0-9_]+)\b', caseSensitive: false);
+      final identPattern =
+          RegExp(r'\b([A-Z][A-Z0-9_]+)\b', caseSensitive: false);
       for (final id in identPattern.allMatches(whereClause)) {
         final name = id.group(1)!.toUpperCase();
-        if (!_isSqlKeyword(name) && name.length > 2 &&
+        if (!_isSqlKeyword(name) &&
+            name.length > 2 &&
             !serverTables.contains(name)) {
           fields.add(name);
         }
@@ -493,7 +499,7 @@ class SqlTranslator {
 
     // 7. DATEDIFF, DATEADD → non supporté SQLite, mais pas dans les règles de cohérence
     // 8. TOP N → LIMIT N  (Access TOP)
-    result = result.replaceAll(
+    result = result.replaceAllMapped(
         RegExp(r'\bSELECT\s+TOP\s+(\d+)\s+', caseSensitive: false),
         (Match m) => 'SELECT ');
     // Le LIMIT sera ajouté après le FROM... mais TOP est rarement dans les règles.
@@ -503,23 +509,141 @@ class SqlTranslator {
     //    Attention à ne pas toucher aux noms de colonnes entre guillemets.
     //    Heuristique : remplace "valeur" (lettres/chiffres seulement) par 'valeur'
     result = result.replaceAllMapped(
-        RegExp(r'"([^"]*)"'),
-        (m) => "'${m.group(1)!.replaceAll("'", "''")}'"
-    );
+        RegExp(r'"([^"]*)"'), (m) => "'${m.group(1)!.replaceAll("'", "''")}'");
+
+    // 10. FIX SESSION 47 — Suppression du HAVING redondant de filtrage d'établissement
+    //
+    // CAUSE RACINE du bug "0 violation(s) found" :
+    //   Le SQL serveur est conçu pour un batch multi-établissements. Le HAVING
+    //   filtre sur CODE_ETABLISSEMENT et CODE_TYPE_ANNEE pour isoler UN seul
+    //   établissement. Exemple :
+    //     HAVING (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+    //
+    //   Sur mobile, le CTE de pivot est déjà filtré :
+    //     FROM collected_data WHERE id_camp='2' AND id_etab='20952'
+    //   → Le CTE ne contient QUE les données de cet établissement.
+    //   → Le HAVING est toujours REDONDANT dans ce contexte.
+    //
+    //   MAIS : collected_data stocke field_value en TEXT. Le pivot produit donc
+    //   CODE_ETABLISSEMENT = '20952' (TEXT). Le HAVING compare à l'entier 20952
+    //   (sans guillemets dans le SQL serveur). En SQLite :
+    //     '20952' = 20952  →  FALSE  (types incompatibles)
+    //   Résultat : HAVING filtre TOUTES les lignes → COUNT = 0 → pas de violation.
+    //
+    // FIX : Supprimer le HAVING si et seulement s'il ne contient QUE des
+    //   comparaisons sur CODE_ETABLISSEMENT et/ou CODE_TYPE_ANNEE et/ou
+    //   CODE_ADMINISTRATIF. Ces champs ne sont présents dans le HAVING que
+    //   pour le filtrage d'établissement, jamais pour une logique métier.
+    //
+    //   Implémentation : regex HAVING ... (end of statement) en vérifiant que
+    //   tous les identifiants du HAVING appartiennent au set des champs contexte.
+    //   Si le HAVING contient d'autres identifiants (SUM, NB_..., etc.), on le
+    //   laisse intact.
+    result = _stripContextOnlyHaving(result);
 
     return result;
+  }
+
+  /// Supprime le HAVING d'une requête traduite si et seulement si ce HAVING
+  /// ne contient que des comparaisons sur des champs de contexte
+  /// (CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF).
+  ///
+  /// Justification : le CTE de pivot est déjà filtré sur (id_camp, id_etab),
+  /// donc le HAVING de filtrage d'établissement est toujours trivial sur mobile
+  /// et cause un faux-négatif systématique à cause de l'incompatibilité de type
+  /// TEXT vs INTEGER entre field_value (TEXT) et les littéraux numériques du SQL
+  /// serveur (ex: CODE_ETABLISSEMENT=20952 au lieu de CODE_ETABLISSEMENT='20952').
+  static String _stripContextOnlyHaving(String sql) {
+    // Trouve la clause HAVING (après le dernier GROUP BY)
+    final havingRe = RegExp(
+      r'(\bHAVING\b)(.+?)(?:;|$)',
+      caseSensitive: false,
+      dotAll: true,
+    );
+
+    return sql.replaceAllMapped(havingRe, (m) {
+      final havingBody = m.group(2)!;
+
+      // Extrait tous les identifiants (mots de 3+ lettres avec underscores)
+      final identRe = RegExp(r'\b([A-Z][A-Z0-9_]+)\b', caseSensitive: false);
+      final identifiers = identRe
+          .allMatches(havingBody)
+          .map((id) => id.group(1)!.toUpperCase())
+          .where((id) => !_isSqlKeyword(id) && id.length > 2)
+          .toSet();
+
+      // Vérifie si tous les identifiants sont des champs de contexte
+      final isContextOnly = identifiers
+          .every((id) => _contextFields.contains(id));
+
+      if (isContextOnly) {
+        // HAVING ne filtre que sur l'établissement/année → redondant sur mobile
+        debugPrint('[SqlTranslator] stripping context-only HAVING: $havingBody');
+        return ''; // Supprime le HAVING entier
+      } else {
+        // HAVING contient une logique métier (SUM, COUNT, etc.) → on le garde
+        return m.group(0)!;
+      }
+    });
   }
 
   // ─── Utilitaire : est-ce un mot-clé SQL ? ────────────────────────────────
 
   static const _sqlKeywordsSet = {
-    'SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'NOT', 'NULL', 'IS', 'IN',
-    'GROUP', 'BY', 'HAVING', 'ORDER', 'LIMIT', 'OFFSET', 'DISTINCT',
-    'COUNT', 'SUM', 'MAX', 'MIN', 'AVG', 'CAST', 'AS', 'CASE', 'WHEN',
-    'THEN', 'ELSE', 'END', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'OUTER',
-    'ON', 'UNION', 'ALL', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP',
-    'TABLE', 'INDEX', 'PRIMARY', 'KEY', 'REFERENCES', 'COALESCE', 'NVL',
-    'WITH', 'REAL', 'INTEGER', 'TEXT', 'BLOB', 'NUMERIC',
+    'SELECT',
+    'FROM',
+    'WHERE',
+    'AND',
+    'OR',
+    'NOT',
+    'NULL',
+    'IS',
+    'IN',
+    'GROUP',
+    'BY',
+    'HAVING',
+    'ORDER',
+    'LIMIT',
+    'OFFSET',
+    'DISTINCT',
+    'COUNT',
+    'SUM',
+    'MAX',
+    'MIN',
+    'AVG',
+    'CAST',
+    'AS',
+    'CASE',
+    'WHEN',
+    'THEN',
+    'ELSE',
+    'END',
+    'JOIN',
+    'LEFT',
+    'RIGHT',
+    'INNER',
+    'OUTER',
+    'ON',
+    'UNION',
+    'ALL',
+    'INSERT',
+    'UPDATE',
+    'DELETE',
+    'CREATE',
+    'DROP',
+    'TABLE',
+    'INDEX',
+    'PRIMARY',
+    'KEY',
+    'REFERENCES',
+    'COALESCE',
+    'NVL',
+    'WITH',
+    'REAL',
+    'INTEGER',
+    'TEXT',
+    'BLOB',
+    'NUMERIC',
   };
 
   static bool _isSqlKeyword(String word) =>
@@ -568,7 +692,7 @@ class CoherenceEvaluator {
   final DatabaseService _db;
 
   // Colonnes de vues DB agrégées traitées par le chemin regex (approx.)
-  static const _viewColumnTotal  = 'TOTAL_AGE_NIVEAU';
+  static const _viewColumnTotal = 'TOTAL_AGE_NIVEAU';
   static const _viewColumnFilles = 'FILLES_AGE_NIVEAU';
 
   // Patterns dans les noms de champs pour les filles
@@ -619,7 +743,7 @@ class CoherenceEvaluator {
     final persistedData = await _db.getAllCollectedDataForCoherence(
       idCamp: idCamp,
       idEtab: idEtab,
-      idQst:  idQst,
+      idQst: idQst,
     );
     for (final entry in persistedData.entries) {
       final v = double.tryParse(entry.value);
@@ -657,13 +781,13 @@ class CoherenceEvaluator {
     for (final rule in rules) {
       try {
         final violated = await _evaluateRule(
-          rule:           rule,
-          db:             db,
-          idCamp:         idCamp,
-          idEtab:         idEtab,
-          codeEtab:       codeEtab,
-          codeTypeAnnee:  codeTypeAnnee,
-          regexValues:    regexValues,
+          rule: rule,
+          db: db,
+          idCamp: idCamp,
+          idEtab: idEtab,
+          codeEtab: codeEtab,
+          codeTypeAnnee: codeTypeAnnee,
+          regexValues: regexValues,
         );
 
         if (violated != null && violated) {
@@ -674,7 +798,8 @@ class CoherenceEvaluator {
       }
     }
 
-    debugPrint('[CoherenceEval] evaluate complete: ${violations.length} violation(s)');
+    debugPrint(
+        '[CoherenceEval] evaluate complete: ${violations.length} violation(s)');
     return violations;
   }
 
@@ -695,15 +820,14 @@ class CoherenceEvaluator {
     String? codeTypeAnnee,
     required Map<String, double> regexValues,
   }) async {
-
     // ── CHEMIN 1 : SQL réel (SqlTranslator + rawQuery) ────────────────────
     final sqlResult = await _evaluateViaSql(
-      rule:           rule,
-      db:             db,
-      idCamp:         idCamp,
-      idEtab:         idEtab,
-      codeEtab:       codeEtab,
-      codeTypeAnnee:  codeTypeAnnee,
+      rule: rule,
+      db: db,
+      idCamp: idCamp,
+      idEtab: idEtab,
+      codeEtab: codeEtab,
+      codeTypeAnnee: codeTypeAnnee,
     );
 
     if (sqlResult != null) {
@@ -742,11 +866,11 @@ class CoherenceEvaluator {
   }) async {
     // Traduire sql_regle
     final r1 = SqlTranslator.translate(
-      serverSql:      rule.sqlRegle,
-      idCamp:         idCamp,
-      idEtab:         idEtab,
-      codeEtab:       codeEtab,
-      codeTypeAnnee:  codeTypeAnnee,
+      serverSql: rule.sqlRegle,
+      idCamp: idCamp,
+      idEtab: idEtab,
+      codeEtab: codeEtab,
+      codeTypeAnnee: codeTypeAnnee,
     );
     if (r1 == null) return null; // non traduisible → fallback
 
@@ -763,11 +887,11 @@ class CoherenceEvaluator {
     //     Cela couvre le cas fréquent critere='= 0' : la règle est violée si
     //     count1 > 0.
     final r2 = SqlTranslator.translate(
-      serverSql:      rule.sqlAssoc,
-      idCamp:         idCamp,
-      idEtab:         idEtab,
-      codeEtab:       codeEtab,
-      codeTypeAnnee:  codeTypeAnnee,
+      serverSql: rule.sqlAssoc,
+      idCamp: idCamp,
+      idEtab: idEtab,
+      codeEtab: codeEtab,
+      codeTypeAnnee: codeTypeAnnee,
     );
 
     // Exécuter sql_regle (toujours disponible à ce stade)
@@ -782,14 +906,16 @@ class CoherenceEvaluator {
       count2 = c2;
     } else if (rule.sqlAssoc.trim().isEmpty) {
       // Pas d'association → on compare count1 à 0
-      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_assoc empty → count2=0');
+      debugPrint(
+          '[CoherenceEval] rule=${rule.idRegle} sql_assoc empty → count2=0');
       count2 = 0;
     } else {
       // sql_assoc non traduisible (pas de table serveur connue) :
       // on traite sql_regle comme un COUNT de violations et on compare à 0.
       // Cela est correct pour les règles dont le critere est '= 0' :
       //   count1=0 → pas de violation, count1>0 → violation.
-      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_assoc not translatable '
+      debugPrint(
+          '[CoherenceEval] rule=${rule.idRegle} sql_assoc not translatable '
           '— comparing count1 to 0 directly');
       count2 = 0;
     }
@@ -800,15 +926,42 @@ class CoherenceEvaluator {
 
   /// Exécute un SQL traduit et retourne la valeur entière du COUNT(*).
   /// Retourne null en cas d'erreur.
+  ///
+  /// Log de diagnostic : affiche le résultat brut du CTE (valeurs pivotées)
+  /// sur la première exécution (label='sql_regle') pour faciliter le débogage.
   Future<double?> _execCount(
       Database db, String sql, String label, int idRegle) async {
     try {
+      // Diagnostic CTE : loguer les valeurs réellement pivotées depuis collected_data
+      // Cela permet de vérifier que le pivot a bien extrait les bons champs.
+      if (label == 'sql_regle') {
+        final cteMatch = RegExp(
+          r'WITH\s+(\w+)\s+AS\s*\((.+?)\)',
+          caseSensitive: false,
+          dotAll: true,
+        ).firstMatch(sql);
+        if (cteMatch != null) {
+          final cteName = cteMatch.group(1)!;
+          final cteBody = cteMatch.group(2)!;
+          try {
+            final cteRows = await db.rawQuery(
+                'WITH $cteName AS ($cteBody) SELECT * FROM $cteName');
+            debugPrint('[SqlTranslator] CTE $cteName pivot (rule=$idRegle): '
+                '${cteRows.isEmpty ? "EMPTY — no data for this camp/etab" : cteRows.first.toString()}');
+          } catch (_) {
+            // Log seulement — ne pas laisser une erreur diagnostic masquer le vrai résultat
+          }
+        }
+      }
+
       final rows = await db.rawQuery(sql);
       final count = Sqflite.firstIntValue(rows);
-      debugPrint('[CoherenceEval] rawQuery $label rule=$idRegle → count=$count');
+      debugPrint(
+          '[CoherenceEval] rawQuery $label rule=$idRegle → count=$count');
       return count?.toDouble();
     } catch (e) {
-      debugPrint('[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL: $sql');
+      debugPrint(
+          '[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL: $sql');
       return null;
     }
   }
@@ -841,9 +994,13 @@ class CoherenceEvaluator {
       if (total > 0) values[_viewColumnTotal] = total;
     }
     if (!values.containsKey(_viewColumnFilles)) {
-      double fillesSum = 0.0; int fillesCount = 0;
+      double fillesSum = 0.0;
+      int fillesCount = 0;
       for (final entry in rawFields.entries) {
-        if (_fillesPatterns.hasMatch(entry.key)) { fillesSum += entry.value; fillesCount++; }
+        if (_fillesPatterns.hasMatch(entry.key)) {
+          fillesSum += entry.value;
+          fillesCount++;
+        }
       }
       if (fillesCount > 0) values[_viewColumnFilles] = fillesSum;
     }
@@ -854,10 +1011,12 @@ class CoherenceEvaluator {
     final upperSql = sql.toUpperCase();
 
     // Pattern SUM([TABLE.]FIELD)
-    final sumRegex = RegExp(r'SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)', caseSensitive: false);
+    final sumRegex =
+        RegExp(r'SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)', caseSensitive: false);
     final sumMatches = sumRegex.allMatches(upperSql).toList();
     if (sumMatches.isNotEmpty) {
-      final result = _sumFieldAcrossAllFilters(sumMatches.first.group(1)!, values);
+      final result =
+          _sumFieldAcrossAllFilters(sumMatches.first.group(1)!, values);
       if (result != null) return result;
       for (int i = 1; i < sumMatches.length; i++) {
         final alt = _sumFieldAcrossAllFilters(sumMatches[i].group(1)!, values);
@@ -868,13 +1027,24 @@ class CoherenceEvaluator {
 
     // Pattern SELECT [TABLE.]FIELD FROM
     final bareMatch = RegExp(
-      r'SELECT\s+(?:\w+\.)?(\w+)\s+FROM', caseSensitive: false,
+      r'SELECT\s+(?:\w+\.)?(\w+)\s+FROM',
+      caseSensitive: false,
     ).firstMatch(upperSql);
     if (bareMatch != null) {
       final fieldName = bareMatch.group(1)!;
       const sqlKeywords = {
-        'DISTINCT', 'TOP', 'ALL', 'COUNT', 'AVG', 'MIN', 'MAX', 'SUM',
-        'NVL', 'COALESCE', 'ISNULL', 'NULLIF',
+        'DISTINCT',
+        'TOP',
+        'ALL',
+        'COUNT',
+        'AVG',
+        'MIN',
+        'MAX',
+        'SUM',
+        'NVL',
+        'COALESCE',
+        'ISNULL',
+        'NULLIF',
       };
       if (sqlKeywords.contains(fieldName)) return null;
       return _sumFieldAcrossAllFilters(fieldName, values);
@@ -883,10 +1053,15 @@ class CoherenceEvaluator {
     return null;
   }
 
-  double? _sumFieldAcrossAllFilters(String fieldName, Map<String, double> values) {
-    double sum = 0; bool found = false;
+  double? _sumFieldAcrossAllFilters(
+      String fieldName, Map<String, double> values) {
+    double sum = 0;
+    bool found = false;
     for (final entry in values.entries) {
-      if (entry.key.split('#').first == fieldName) { sum += entry.value; found = true; }
+      if (entry.key.split('#').first == fieldName) {
+        sum += entry.value;
+        found = true;
+      }
     }
     return found ? sum : null;
   }
@@ -904,13 +1079,19 @@ class CoherenceEvaluator {
   /// Pour le chemin regex : v1 et v2 sont des sommes de champs.
   bool _applyOperator(double v1, double v2, String critere) {
     switch (critere.trim()) {
-      case '<=': return !(v1 <= v2);
-      case '>=': return !(v1 >= v2);
-      case '<':  return !(v1 <  v2);
-      case '>':  return !(v1 >  v2);
-      case '=':  return !(v1 == v2);
+      case '<=':
+        return !(v1 <= v2);
+      case '>=':
+        return !(v1 >= v2);
+      case '<':
+        return !(v1 < v2);
+      case '>':
+        return !(v1 > v2);
+      case '=':
+        return !(v1 == v2);
       case '!=':
-      case '<>': return !(v1 != v2);
+      case '<>':
+        return !(v1 != v2);
       default:
         debugPrint('[CoherenceEval] unknown critere "$critere" — skipping');
         return false;
@@ -926,31 +1107,38 @@ class CoherenceEvaluator {
     final v2Display = _extractValue(rule.sqlAssoc, regexValues) ?? 0.0;
 
     return OfflineCoherenceError(
-      idRegle:       rule.idRegle,
-      idRegleAssoc:  rule.idRegleAssoc,
-      libRegle:      rule.libRegle,
+      idRegle: rule.idRegle,
+      idRegleAssoc: rule.idRegleAssoc,
+      libRegle: rule.libRegle,
       libRegleAssoc: rule.libRegleAssoc,
-      critere:       rule.critere,
-      message:       rule.message.isNotEmpty
+      critere: rule.critere,
+      message: rule.message.isNotEmpty
           ? rule.message
           : '${rule.libRegle} — incohérence détectée '
-            '(${rule.libRegleAssoc})',
-      value1:        v1Display,
-      value2:        v2Display,
+              '(${rule.libRegleAssoc})',
+      value1: v1Display,
+      value2: v2Display,
     );
   }
 
   /// Returns a human-readable French label for a critere operator.
   String _critereLabelFr(String critere) {
     switch (critere.trim()) {
-      case '<=': return 'inférieur ou égal à';
-      case '>=': return 'supérieur ou égal à';
-      case '<':  return 'strictement inférieur à';
-      case '>':  return 'strictement supérieur à';
-      case '=':  return 'égal à';
+      case '<=':
+        return 'inférieur ou égal à';
+      case '>=':
+        return 'supérieur ou égal à';
+      case '<':
+        return 'strictement inférieur à';
+      case '>':
+        return 'strictement supérieur à';
+      case '=':
+        return 'égal à';
       case '!=':
-      case '<>': return 'différent de';
-      default:   return critere;
+      case '<>':
+        return 'différent de';
+      default:
+        return critere;
     }
   }
 }
@@ -969,8 +1157,8 @@ class _SqlEvalResult {
 /// Équivalent de CoherenceError (version serveur) mais avec les valeurs calculées
 /// V1 et V2 pour affichage à l'agent de collecte.
 class OfflineCoherenceError {
-  final int    idRegle;
-  final int    idRegleAssoc;
+  final int idRegle;
+  final int idRegleAssoc;
   final String libRegle;
   final String libRegleAssoc;
   final String critere;
