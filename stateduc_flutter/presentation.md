@@ -32,10 +32,10 @@ Internet / LAN utilisateur
   PHP Slim v2 → data_save.php → curl interne → questionnaire_ws.php
 ```
 
-### Problème fondamental résolu (Sessions 41–44)
+### Problème fondamental résolu (commit 41–44)
 - Le port 9191 **n'existe pas sur la VM** — c'est le port du Fortinet/proxy externe
 - `curl` depuis la VM vers `127.0.0.1:9191` → **Connection refused** systématiquement
-- Sessions 41 à 43 : tentatives DNS resolve, TCP probe, CURLOPT_RESOLVE — toutes en échec
+- commit 41 à 43 : tentatives DNS resolve, TCP probe, CURLOPT_RESOLVE — toutes en échec
 - **Session 44 : solution définitive**
 
 ---
@@ -82,7 +82,7 @@ $SISED_HOST_HEADER = $_SERVER['HTTP_HOST'];
 POST /stateduc/data_save.php/theme_save/{login}/{id_camp}/{id_sys}/{id_qst}/{id_etab}/{id_filter}/{id_annee}
 ```
 
-### Modifications cumulées (Sessions 3, 5, 11, 12, 12b, 13, 44)
+### Modifications cumulées (commit 3, 5, 11, 12, 12b, 13, 44)
 
 | Session | Modification | Problème résolu |
 |---------|-------------|----------------|
@@ -110,12 +110,12 @@ $curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
 **Rôle** : Permet à l'app mobile de récupérer les données déjà saisies depuis le serveur.  
 **Utilité** : Pré-remplissage des formulaires avec les données validées côté serveur.
 
-### Modifications (Session 44)
+### Modifications (commit 44)
 ```php
 // Même correction que data_save.php :
 $curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
 
-// + Timeouts ajoutés (absents avant Session 44)
+// + Timeouts ajoutés (absents avant commit 44)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15);
 $curl->setOpt(CURLOPT_TIMEOUT, 60);
 ```
@@ -137,7 +137,7 @@ $curl->setOpt(CURLOPT_TIMEOUT, 60);
 GET /stateduc/data_rules.php/theme_rules/{login}/{id_camp}/{id_sys}/{id_theme}/{id_etab}/null/{id_annee}
 ```
 
-### Modification clé (Session 10) — Décomposition `id_theme` composite
+### Modification clé (commit 10) — Décomposition `id_theme` composite
 ```php
 // L'app envoie id_theme COMPOSITE (ex: 15602 = thème 1560 + secteur 2)
 // Avant : WHERE ID_THEME = 15602 → 0 lignes → nb_regles: 0
@@ -175,7 +175,7 @@ $str_theme_id = substr($id_theme, 0, strlen($id_theme) - strlen($id_sector));
 **Rôle** : Exécute le contrôle de cohérence serveur après envoi des données.  
 **Utilité** : Validation officielle côté serveur (base SQL Server/Access) après synchronisation.
 
-### Réécriture complète (Session 11)
+### Réécriture complète (commit 11)
 
 **Avant** : passait `id_theme` composite comme `ctrl_id` → `WHERE ID_ASSOC_REG_THM = 15702` → 0 lignes → fatal PHP 500.
 
@@ -196,26 +196,26 @@ function controle_run_for_theme($raw_theme_id, ...) {
 
 ---
 
-## SLIDE 7 — `questionnaire_ws.php` — Bootstrap session curl
+## SLIDE 7 — `questionnaire_ws.php` — Bootstrap commit curl
 
 ### Fichier : `StatEduc_burundi/questionnaire_ws.php`
 **Rôle** : Worker PHP exécuté via curl interne depuis data_save.php — réalise l'écriture en base.  
 **Utilité** : Traitement métier complet (grille SQL, arbre, écriture BDD).
 
-### Modification (Session 5) — Bootstrap session curl
+### Modification (commit 5) — Bootstrap commit curl
 
 ```php
-// AVANT : nouvelle session PHP vide → $_SESSION['login'] absent
+// AVANT : nouvelle commit PHP vide → $_commit['login'] absent
 //       → arbre + écritures SQL échouent silencieusement
 
-// APRÈS : injection des variables de session depuis les paramètres GET curl
+// APRÈS : injection des variables de commit depuis les paramètres GET curl
 if (isset($_GET['login'])) {
-    $_SESSION['login']      = $_GET['login'];
-    $_SESSION['langue']     = $_GET['langue'] ?? 'fr';
-    $_SESSION['style']      = 'stateduc.css';   // défaut
-    $_SESSION['valide']     = true;              // bypass auth
-    $_SESSION['code_user']  = 0;
-    $_SESSION['groupe']     = 1;
+    $_commit['login']      = $_GET['login'];
+    $_commit['langue']     = $_GET['langue'] ?? 'fr';
+    $_commit['style']      = 'stateduc.css';   // défaut
+    $_commit['valide']     = true;              // bypass auth
+    $_commit['code_user']  = 0;
+    $_commit['groupe']     = 1;
 }
 ```
 
@@ -225,17 +225,17 @@ if (isset($_GET['login'])) {
 
 ### Tous les fichiers PHP modifiés/créés
 
-| Fichier | Sessions | Rôle | Modifications principales |
+| Fichier | commit | Rôle | Modifications principales |
 |---------|----------|------|--------------------------|
 | `config_app.php` | 41-44 | Configuration globale, URLs internes | `_sised_local_port()`, `SISED_HOST_HEADER`, bypass Fortinet |
-| `data_save.php` | 3,5,11,12,12b,13,44 | Sauvegarde données formulaire | curl interne, `session_write_close`, timeouts, Host header |
+| `data_save.php` | 3,5,11,12,12b,13,44 | Sauvegarde données formulaire | curl interne, `commit_write_close`, timeouts, Host header |
 | `data_reload.php` | 44 | Rechargement données serveur | Host header, timeouts curl |
 | `data_rules.php` | 10 | Fourniture règles cohérence | Décomposition `id_theme` composite |
 | `data_controle.php` | 11 | Contrôle cohérence post-envoi | Réécriture complète, `controle_strip_theme_id` |
-| `questionnaire_ws.php` | 5 | Worker écriture en base | Bootstrap session curl (`$_SESSION` depuis GET) |
+| `questionnaire_ws.php` | 5 | Worker écriture en base | Bootstrap commit curl (`$_commit` depuis GET) |
 
 ### Résultat final côté serveur
-- ✅ Sauvegarde des données fiable (timeouts, session, curl bypass NAT)
+- ✅ Sauvegarde des données fiable (timeouts, commit, curl bypass NAT)
 - ✅ Rechargement depuis serveur fonctionnel
 - ✅ Règles de cohérence correctement distribuées au mobile
 - ✅ Contrôle cohérence serveur fonctionnel post-envoi
@@ -250,7 +250,7 @@ if (isset($_GET['login'])) {
 
 ### Projet : StatEduc Mobile
 **Technologie** : Flutter/Dart, Android (APK)  
-**Architecture** : MVC/Provider — réécriture complète depuis Cordova/JavaScript (Sessions 1–3)  
+**Architecture** : MVC/Provider — réécriture complète depuis Cordova/JavaScript (commit 1–3)  
 **Versions** : Gradle 8.14.x, AGP 8.11.1, Kotlin 2.2.20, compileSdk 36
 
 ### Stack technique
@@ -287,9 +287,9 @@ stateduc_flutter/
 ### Fonctionnalités
 - **PIN 4–8 chiffres** + question de sécurité (stockage sécurisé `flutter_secure_storage`)
 - **Basic Auth HTTP** : `Authorization: Basic base64(login:password)`
-- `codeyear` + `libyear` sauvegardés dans stockage sécurisé ET SQLite (Session 12)
+- `codeyear` + `libyear` sauvegardés dans stockage sécurisé ET SQLite (commit 12)
 
-### Bug critique résolu (Session 12)
+### Bug critique résolu (commit 12)
 ```dart
 // AVANT : getStoredUser() retournait codeyear='' après déverrouillage PIN
 // → URL sans /id_annee → data_save.php ne trouvait pas l'année → 0 écritures DB
@@ -300,8 +300,8 @@ await _storage.write(key: _kCodeyear, value: user.codeyear);
 ```
 
 ### Écran PIN (`pin_screen.dart`)
-- Drapeau du Burundi (`assets/icon/Flag_of_country.png`) — Sessions 8, 18
-- Deux lignes institutionnelles italiques : *"République du Burundi"* / *"Ministère de l'Éducation Nationale"* — Session 21
+- Drapeau du Burundi (`assets/icon/Flag_of_country.png`) — commit 8, 18
+- Deux lignes institutionnelles italiques : *"République du Burundi"* / *"Ministère de l'Éducation Nationale"* — commit 21
 
 ---
 
@@ -328,7 +328,7 @@ await _storage.write(key: _kCodeyear, value: user.codeyear);
 ### Méthodes clés ajoutées
 - `getAllCollectedDataForCoherence()` — données pour moteur cohérence
 - `getAllCollectedDataForCampEtab()` — toutes données d'un établissement/campagne
-- `getDistinctEtabQstWithData()` — envoi global campagne (Session 17)
+- `getDistinctEtabQstWithData()` — envoi global campagne (commit 17)
 
 ---
 
@@ -339,14 +339,14 @@ await _storage.write(key: _kCodeyear, value: user.codeyear);
 
 ### Configuration évolutive
 
-| Paramètre | Session 1 | Session 12b | Session 17 | Session 19 |
+| Paramètre | commit 1 | commit 12b | commit 17 | commit 19 |
 |-----------|-----------|-------------|------------|------------|
 | `connectTimeout` | 60s | 60s | 60s | 60s |
 | `receiveTimeout` | 180s | 300s | 300s | **600s** |
 | `sendTimeout` | 120s | 300s | 300s | **null** |
 | Retry | aucun | aucun | aucun | **3 tentatives** |
 
-### Retry automatique (Session 19)
+### Retry automatique (commit 19)
 ```dart
 // 3 essais au total, délai progressif 5s × tentative
 // Ne réessaie PAS sur : ApiException (401, 404), connectionTimeout
@@ -355,7 +355,7 @@ static const int _kMaxRetries = 2;
 static const int _kRetryDelay = 5;
 ```
 
-### SSL bypass (Session 1)
+### SSL bypass (commit 1)
 ```dart
 // Certificats auto-signés intranet MEN
 client.badCertificateCallback = (cert, host, port) => true;
@@ -381,7 +381,7 @@ client.badCertificateCallback = (cert, host, port) => true;
 9. Stockage SQLite               → DatabaseService.insertAll()
 ```
 
-### Navigation hiérarchique — Triple stratégie (Session 3)
+### Navigation hiérarchique — Triple stratégie (commit 3)
 
 | Stratégie | Mécanisme | Cas couvert |
 |-----------|-----------|-------------|
@@ -413,7 +413,7 @@ client.badCertificateCallback = (cert, host, port) => true;
 
 ### Fixes critiques appliqués
 
-| Session | Bug | Fix |
+| commit | Bug | Fix |
 |---------|-----|-----|
 | 1 | Encodage Mojibake | `ResponseType.bytes` + décodage Latin-1 explicite |
 | 5 | Radios non pré-sélectionnés | Étapes 4a/4b dans `_preprocessHtml()` |
@@ -432,15 +432,15 @@ client.badCertificateCallback = (cert, host, port) => true;
 ### Fonctionnalités principales
 
 **Saisie et persistance :**
-- `updateField()` — debounce 800 ms → déclenche cohérence offline (Session 18)
+- `updateField()` — debounce 800 ms → déclenche cohérence offline (commit 18)
 - `saveLocally()` — persistance SQLite immédiate
 - `sendToServer()` — POST REST avec retry × 3, suivi tentative en UI
 
-**Envoi global (Sessions 17) :**
+**Envoi global (commit 17) :**
 - `sendAllFormsForSchool()` — tous formulaires d'un établissement
 - `sendAllFormsForCampaign()` — tous formulaires de toute la campagne
 
-**Rechargement serveur intelligent (Session 17) :**
+**Rechargement serveur intelligent (commit 17) :**
 - `_autoReloadFromServerBackground()` — fusion locale/serveur
 - `forceOverwrite=true` pour formulaire d'identification (serveur a priorité)
 
@@ -448,13 +448,13 @@ client.badCertificateCallback = (cert, host, port) => true;
 
 | Événement | Délai | Depuis |
 |-----------|-------|--------|
-| Saisie d'un champ (debounce) | 0.8s | Session 18 |
-| Sauvegarde locale | Immédiat | Sessions 1-16 |
-| Ouverture formulaire rempli | Immédiat | Session 17 |
-| Changement de filtre/période | Immédiat | Session 18 |
-| Règles reçues du serveur | Arrière-plan | Session 17 |
-| Données serveur fusionnées | Arrière-plan | Session 18 |
-| Envoi serveur | Post-POST | Sessions 1-16 |
+| Saisie d'un champ (debounce) | 0.8s | commit 18 |
+| Sauvegarde locale | Immédiat | commit 1-16 |
+| Ouverture formulaire rempli | Immédiat | commit 17 |
+| Changement de filtre/période | Immédiat | commit 18 |
+| Règles reçues du serveur | Arrière-plan | commit 17 |
+| Données serveur fusionnées | Arrière-plan | commit 18 |
+| Envoi serveur | Post-POST | commit 1-16 |
 
 ---
 
@@ -463,12 +463,12 @@ client.badCertificateCallback = (cert, host, port) => true;
 ### Fichier : `lib/screens/data_entry/school_data_screen.dart`
 **Rôle** : Écran principal de saisie par établissement. Affiche le formulaire WebView + bannières.
 
-### En-tête établissement (Session 3)
+### En-tête établissement (commit 3)
 ```
 Année en session · Hiérarchie admin · Établissement/ID/Code · Statut · Type secteur
 ```
 
-### Bannière cohérence offline — `_OfflineCoherenceBanner` (Session 46)
+### Bannière cohérence offline — `_OfflineCoherenceBanner` (commit 46)
 ```dart
 // Fond blanc, bordure orange, titre "Contrôle de cohérence"
 // Sous-titre "Contrôle local — non encore envoyé au serveur"
@@ -476,7 +476,7 @@ Année en session · Hiérarchie admin · Établissement/ID/Code · Statut · Ty
 // Structure identique au dialog cohérence serveur (screenshot utilisateur)
 ```
 
-### Indicateur de cohérence en cours (Session 18)
+### Indicateur de cohérence en cours (commit 18)
 ```dart
 if (entry.isCheckingOffline)
   const LinearProgressIndicator(),   // barre de progression pendant l'évaluation
@@ -485,8 +485,8 @@ if (entry.hasOfflineCoherenceErrors)
 ```
 
 ### Menu contextuel (⋮)
-- "Vérifier la cohérence" — contrôle offline immédiat (Session 21)
-- "Envoyer tous les formulaires" — envoi global établissement (Session 17)
+- "Vérifier la cohérence" — contrôle offline immédiat (commit 21)
+- "Envoyer tous les formulaires" — envoi global établissement (commit 17)
 
 ---
 
@@ -494,9 +494,9 @@ if (entry.hasOfflineCoherenceErrors)
 
 ### Fichier : `lib/services/coherence_evaluator.dart`
 **Rôle** : Équivalent mobile de `controle_theme_batch.class.php` — évalue les règles SQL hors ligne.  
-**Version actuelle** : Session 49
+**Version actuelle** : commit 49
 
-### Dual-path (Session 45)
+### Dual-path (commit 45)
 ```
 evaluate()
     │
@@ -520,7 +520,7 @@ evaluate()
 6. Traduction syntaxique (Is Null, NVL, Or/And...)
 7. Suppression qualificateurs TABLE.FIELD → FIELD
 7b. _stripContextOnlyHaving() — suppression HAVING redondant
-8. Wrapper dual-mode EXISTS/SCALAR (SESSION 49)
+8. Wrapper dual-mode EXISTS/SCALAR (commit 49)
 ```
 
 ---
@@ -557,11 +557,11 @@ WITH DONNEES_ETABLISSEMENT AS (
 
 ---
 
-## SLIDE 19 — Moteur de cohérence — Bugs résolus (Sessions 45–49)
+## SLIDE 19 — Moteur de cohérence — Bugs résolus (commit 45–49)
 
 ### Tableau complet des bugs et fixes
 
-| Session | Bug | Cause racine | Fix |
+| commit | Bug | Cause racine | Fix |
 |---------|-----|-------------|-----|
 | 46 | `\1` littéral dans SQL → crash SQLite | Dart `replaceAll(RegExp, r'\1')` ne supporte pas les backreferences | `replaceAllMapped((m) => m.group(1)!)` |
 | 46 | WHERE champs non extraits pour CTE | Extraction cherchait seulement TABLE.FIELD + GROUP BY/HAVING | Ajout extraction WHERE avec `dotAll: true` |
@@ -574,7 +574,7 @@ WITH DONNEES_ETABLISSEMENT AS (
 
 ---
 
-## SLIDE 20 — Moteur de cohérence — Session 49 : Fix SUM-scalaire
+## SLIDE 20 — Moteur de cohérence — commit 49 : Fix SUM-scalaire
 
 ### Le bug — Logs réels de l'application
 ```
@@ -621,7 +621,7 @@ if (hasGroupBy) {
 
 ### Tableau de toutes les fonctionnalités implémentées
 
-| Fonctionnalité | Session | Fichier(s) | Description |
+| Fonctionnalité | commit | Fichier(s) | Description |
 |----------------|---------|-----------|-------------|
 | Authentification Basic Auth | 1 | `api_service.dart` | Login + PIN sécurisé |
 | Téléchargement campagne (9 étapes) | 1–3 | `campaign_provider.dart` | Progress bar |
@@ -649,16 +649,16 @@ if (hasGroupBy) {
 
 | Commit | Branche | Description |
 |--------|---------|-------------|
-| `1db4be2` | `ak_main` | Session 17 : timeout, cohérence, envoi global |
-| `d1a18a9` | `ak_secure` | Sessions 47+48 : HAVING fix (TEXT/INTEGER + ordre) |
-| `20f0a41` | `ak_main` | Session 48 : mirror synchronisé |
-| `d670850` | `ak_secure` | **Session 49 : dual-mode scalar/EXISTS wrapper** |
-| `a7bda92` | `ak_main` | **Session 49 : mirror synchronisé** |
+| `1db4be2` | `ak_main` | commit 17 : timeout, cohérence, envoi global |
+| `d1a18a9` | `ak_secure` | commit 47+48 : HAVING fix (TEXT/INTEGER + ordre) |
+| `20f0a41` | `ak_main` | commit 48 : mirror synchronisé |
+| `d670850` | `ak_secure` | **commit 49 : dual-mode scalar/EXISTS wrapper** |
+| `a7bda92` | `ak_main` | **commit 49 : mirror synchronisé** |
 
 ### Pull Request active
 **PR #2** : `ak_main → main`  
 URL : https://github.com/NasserKailou/stateduc_mobile/pull/2  
-Titre : *"fix(coherence): sessions 45-49 — moteur cohérence offline SQLite complet"*
+Titre : *"fix(coherence): commit 45-49 — moteur cohérence offline SQLite complet"*
 
 ---
 
@@ -669,7 +669,7 @@ Titre : *"fix(coherence): sessions 45-49 — moteur cohérence offline SQLite co
 - Couvre : substitution paramètres, extraction champs, CTE pivot, traduction syntaxique
 
 ### Validations Python SQLite
-| Session | Tests | Résultat |
+| commit | Tests | Résultat |
 |---------|-------|---------|
 | 47 | 4/4 | HAVING TEXT/INTEGER ✓ |
 | 48 | 6/6 | Qualifier order + CTE diagnostic ✓ |
@@ -716,14 +716,14 @@ CoherenceEvaluator.evaluate(
 ## SLIDE 25 — Roadmap et prochaines étapes
 
 ### Terminé ✅
-- [x] Moteur cohérence offline complet (Sessions 45–49)
-- [x] Fix NAT/Fortinet curl interne (Session 44)
-- [x] Envoi global établissement + campagne (Session 17)
-- [x] Retry automatique × 3 avec suivi UI (Session 19)
-- [x] Bannière violations offline (Session 46)
+- [x] Moteur cohérence offline complet (commit 45–49)
+- [x] Fix NAT/Fortinet curl interne (commit 44)
+- [x] Envoi global établissement + campagne (commit 17)
+- [x] Retry automatique × 3 avec suivi UI (commit 19)
+- [x] Bannière violations offline (commit 46)
 
 ### En cours / À valider
-- [ ] Build APK de production avec Session 49 — vérifier règles 483/484/485 sur appareil
+- [ ] Build APK de production avec commit 49 — vérifier règles 483/484/485 sur appareil
 - [ ] Exécuter `flutter test` en CI (15 tests unitaires créés mais jamais lancés)
 
 ### Déployé en production (PHP)
@@ -733,5 +733,5 @@ CoherenceEvaluator.evaluate(
 
 ---
 
-*Fin du document — StatEduc Mobile — Sessions 1 à 49 — 2026-07-14*  
+*Fin du document — StatEduc Mobile — commit 1 à 49 — 2026-07-14*  
 *Sources : `stateduc_flutter/CHANGELOG.md`, `StatEduc_burundi/CHANGELOG.md`, `stateduc_flutter/architecture_technique.md`, `recapitulatif.md`, `notepresentation.md`, `administration.md`*
