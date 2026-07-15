@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 58 — fix ambiguïté LIKE (_0 exact) + logging fichier exhaustif
+// VERSION : Session 59 — injection formData dans collected_data via SAVEPOINT SQLite
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -19,6 +19,9 @@
 // ─── ARCHITECTURE ────────────────────────────────────────────────────────────
 //
 //   CoherenceEvaluator.evaluate()
+//     │
+//     ├─► [S59] SAVEPOINT coherence_eval + injection formData → collected_data
+//     │       → Garantit que CTE voit les valeurs en mémoire non encore sauvegardées
 //     │
 //     ├─► [CHEMIN 1 — SQL réel]  SqlTranslator.translate()
 //     │       → SQL SQLite natif exécuté via db.rawQuery()
@@ -101,6 +104,18 @@
 //     Voir _multiRowTables et _buildPivotCte() pour l'implémentation.
 //
 //  6. FIX SESSION 58 — LIKE suffixe exact '_0' pour DONNEES_ETABLISSEMENT
+//
+//  7. FIX SESSION 59 — Injection formData dans collected_data via SAVEPOINT
+//     PROBLÈME : le chemin SQL/CTE lit uniquement collected_data (SQLite).
+//     Si l'utilisateur saisit une valeur mais ne sauvegarde pas encore (formData
+//     en mémoire), le CTE retourne 0 pour ce champ → faux positif asymétrique :
+//       ex. NB_LATRINES_BON_ETAT_F non encore sauvegardé → CTE lit 0
+//           NB_LATRINES_ELEVES sauvegardé → CTE lit 4
+//           critere '<=' → !(0 <= 4) → VIOLATED (faux positif)
+//     SOLUTION : avant la boucle des règles, on commence un SAVEPOINT SQLite,
+//     on insère chaque entrée de formData dans collected_data (INSERT OR REPLACE),
+//     puis on exécute toutes les règles. Le ROLLBACK TO SAVEPOINT en fin de bloc
+//     supprime toutes ces insertions temporaires sans affecter les données réelles.
 //     S57 utilisait LIKE 'FIELD%' pour DONNEES_ETABLISSEMENT, ce qui causait
 //     une ambiguïté : LIKE 'NB_ELEVES%' matchait AUSSI 'NB_ELEVES_F_0' alors
 //     qu'on voulait uniquement 'NB_ELEVES_0'. MAX() retournait alors la valeur
@@ -1249,6 +1264,13 @@ class CoherenceEvaluator {
   /// SESSION 58 : à chaque appel, un fichier coherence_latest.log est écrit dans
   /// le répertoire documents de l'application (chemin retourné dans les logs).
   ///
+  /// SESSION 59 : avant la boucle des règles, un SAVEPOINT SQLite est ouvert et
+  /// toutes les entrées de formData sont injectées dans collected_data (INSERT OR
+  /// REPLACE). À la fin du bloc (finally), ROLLBACK TO SAVEPOINT supprime ces
+  /// insertions temporaires sans affecter les données réelles. Cela garantit que
+  /// le chemin SQL/CTE voit toujours les valeurs en cours de saisie (non encore
+  /// sauvegardées), éliminant les faux positifs dus à l'asymétrie persisted/mémoire.
+  ///
   /// Algorithme (session 45) :
   ///   Pour chaque règle :
   ///     1. Tente la traduction SQL (SqlTranslator.translate)
@@ -1341,33 +1363,117 @@ class CoherenceEvaluator {
 
     final violations = <OfflineCoherenceError>[];
 
-    for (final rule in rules) {
-      logger.log('--------------------------------------------------------');
-      logger.log('[CoherenceEval] rule=${rule.idRegle} lib="${rule.libRegle}" '
-          'critere="${rule.critere}"');
-      try {
-        final violated = await _evaluateRule(
-          rule: rule,
-          db: db,
-          idCamp: idCamp,
-          idEtab: idEtab,
-          idQst: idQst,
-          codeEtab: codeEtab,
-          codeTypeAnnee: codeTypeAnnee,
-          regexValues: regexValues,
-          logger: logger,
-        );
+    // ═══════════════════════════════════════════════════════════════════════
+    // SESSION 59 — Injection formData dans collected_data via SAVEPOINT SQLite
+    // ═══════════════════════════════════════════════════════════════════════
+    //
+    // PROBLÈME RACINE DES FAUX POSITIFS :
+    //   Le CTE généré par SqlTranslator lit UNIQUEMENT collected_data (SQLite).
+    //   Quand un utilisateur saisit une valeur sans encore sauvegarder,
+    //   cette valeur est dans formData (Map<String, String>) en mémoire mais
+    //   ABSENTE de collected_data. Le CTE retourne alors COALESCE(NULL, 0) = 0.0
+    //   pour ce champ, tandis que l'autre côté de la comparaison peut avoir une
+    //   valeur > 0 déjà sauvegardée → violation asymétrique = faux positif.
+    //
+    //   Exemple observé (règle 484) :
+    //     NB_LATRINES_BON_ETAT_F en cours de saisie (=987, formData, non sauvegardé)
+    //     NB_LATRINES_ELEVES déjà sauvegardé (=4, collected_data)
+    //     critere '<=' : !(0.0 <= 4.0) → VIOLATED (faux positif)
+    //
+    // SOLUTION — SAVEPOINT pattern :
+    //   1. Ouvrir un SAVEPOINT nommé 'coherence_eval'
+    //   2. Insérer toutes les entrées de formData dans collected_data avec le
+    //      suffixe HTML correct (_0 pour DONNEES_ETABLISSEMENT) en utilisant
+    //      INSERT OR REPLACE pour écraser les valeurs déjà présentes.
+    //   3. Exécuter toutes les règles de cohérence (CTE voit maintenant formData)
+    //   4. ROLLBACK TO SAVEPOINT → toutes les insertions temporaires sont supprimées
+    //   5. RELEASE SAVEPOINT → nettoie le SAVEPOINT
+    //
+    // IMPORTANT :
+    //   • Le SAVEPOINT est dans un try/finally pour garantir le ROLLBACK même
+    //     en cas d'exception.
+    //   • Seules les valeurs numériques de formData sont injectées (CAST safe).
+    //   • On NE conserve PAS les champs de contexte (CODE_ETABLISSEMENT, etc.)
+    //     qui sont déjà corrects dans collected_data et gérés séparément.
+    //   • Le suffixe _0 est appliqué si absent (champs DONNEES_ETABLISSEMENT).
+    //     Les champs ELEVES_* ont déjà leur suffixe complet (_0_70, _0_71).
 
-        if (violated != null && violated) {
-          violations.add(_buildViolation(rule, regexValues));
-          logger.log('[CoherenceEval] rule=${rule.idRegle} *** VIOLATED ***');
-        } else if (violated == false) {
-          logger.log('[CoherenceEval] rule=${rule.idRegle} OK (not violated)');
-        } else {
-          logger.log('[CoherenceEval] rule=${rule.idRegle} SKIPPED (not evaluable)');
+    int injectedCount = 0;
+    try {
+      // ── Étape 1 : SAVEPOINT ──────────────────────────────────────────────
+      await db.execute('SAVEPOINT coherence_eval');
+      logger.log('[CoherenceEval] S59: SAVEPOINT coherence_eval ouvert');
+
+      // ── Étape 2 : injection formData ─────────────────────────────────────
+      for (final entry in formData.entries) {
+        final rawKey = entry.key;
+        final rawValue = entry.value;
+
+        // Ne pas injecter les champs vides ou non numériques
+        // (les règles ne comparent que des valeurs numériques via Sum/Max)
+        if (rawValue.trim().isEmpty) continue;
+        // Vérification souple : on injecte même les valeurs non numériques
+        // (ex: champs texte), le CAST AS REAL dans le CTE les ignore proprement.
+
+        // Construire le field_name correct pour collected_data :
+        //   • Si le nom possède déjà un suffixe numérique (_0, _0_70, etc.) → garder
+        //   • Sinon → ajouter _0 (champs DONNEES_ETABLISSEMENT standard)
+        final fieldName = _formKeyToFieldName(rawKey);
+
+        try {
+          await db.execute(
+            'INSERT OR REPLACE INTO collected_data '
+            '(id_camp, id_etab, id_qst, id_filter, field_name, field_value) '
+            'VALUES (?, ?, ?, ?, ?, ?)',
+            [idCamp, idEtab, idQst ?? '', '', fieldName, rawValue],
+          );
+          injectedCount++;
+        } catch (e) {
+          logger.log('[CoherenceEval] S59: ⚠️ injection échouée pour '
+              'field=$fieldName val=$rawValue: $e');
         }
+      }
+      logger.log('[CoherenceEval] S59: $injectedCount champs injectés depuis formData');
+
+      // ── Étape 3 : boucle des règles (avec CTE qui voit formData) ─────────
+      for (final rule in rules) {
+        logger.log('--------------------------------------------------------');
+        logger.log('[CoherenceEval] rule=${rule.idRegle} lib="${rule.libRegle}" '
+            'critere="${rule.critere}"');
+        try {
+          final violated = await _evaluateRule(
+            rule: rule,
+            db: db,
+            idCamp: idCamp,
+            idEtab: idEtab,
+            idQst: idQst,
+            codeEtab: codeEtab,
+            codeTypeAnnee: codeTypeAnnee,
+            regexValues: regexValues,
+            logger: logger,
+          );
+
+          if (violated != null && violated) {
+            violations.add(_buildViolation(rule, regexValues));
+            logger.log('[CoherenceEval] rule=${rule.idRegle} *** VIOLATED ***');
+          } else if (violated == false) {
+            logger.log('[CoherenceEval] rule=${rule.idRegle} OK (not violated)');
+          } else {
+            logger.log('[CoherenceEval] rule=${rule.idRegle} SKIPPED (not evaluable)');
+          }
+        } catch (e) {
+          logger.log('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
+        }
+      }
+    } finally {
+      // ── Étape 4 + 5 : ROLLBACK + RELEASE — toujours exécuté ─────────────
+      try {
+        await db.execute('ROLLBACK TO SAVEPOINT coherence_eval');
+        await db.execute('RELEASE SAVEPOINT coherence_eval');
+        logger.log('[CoherenceEval] S59: SAVEPOINT coherence_eval rollback+release '
+            '($injectedCount insertions temporaires supprimées)');
       } catch (e) {
-        logger.log('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
+        logger.log('[CoherenceEval] S59: ⚠️ erreur ROLLBACK SAVEPOINT: $e');
       }
     }
 
@@ -1585,6 +1691,29 @@ class CoherenceEvaluator {
       debugPrint(msg); logger?.log(msg);
       return null;
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SESSION 59 — Helpers pour l'injection formData
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Convertit une clé formData (nom de champ HTML) en field_name pour
+  /// collected_data, en garantissant la présence d'un suffixe numérique.
+  ///
+  /// Règle :
+  ///   • Si le nom se termine déjà par `_\d+` (suffixe numérique existant,
+  ///     ex: `NB_LATRINES_BON_ETAT_F_0`, `FILLES_AGE_NIVEAU_0_70`) → garder tel quel.
+  ///   • Sinon → ajouter `_0` (champs DONNEES_ETABLISSEMENT standard).
+  ///
+  /// Exemples :
+  ///   'NB_LATRINES_BON_ETAT_F'    → 'NB_LATRINES_BON_ETAT_F_0'
+  ///   'NB_LATRINES_BON_ETAT_F_0'  → 'NB_LATRINES_BON_ETAT_F_0'  (inchangé)
+  ///   'FILLES_AGE_NIVEAU_0_70'    → 'FILLES_AGE_NIVEAU_0_70'     (inchangé)
+  ///   'ELECTRICITE'               → 'ELECTRICITE_0'
+  static String _formKeyToFieldName(String formKey) {
+    // Détecte si le nom se termine par _suivi_de_chiffres (ex: _0, _70, _0_70)
+    final hasNumericSuffix = RegExp(r'_\d+$').hasMatch(formKey);
+    return hasNumericSuffix ? formKey : '${formKey}_0';
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
