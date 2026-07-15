@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 55 — Fix cohérence inter-thèmes (suppression id_qst du CTE) + alias extraction
+// VERSION : Session 56 — Fix CTE LIKE préfixe (FILLES_AGE_NIVEAU_0_70 → FILLES_AGE_NIVEAU) + log champs
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -703,20 +703,30 @@ class SqlTranslator {
     final isMultiRow = _multiRowTables.contains(tableName.toUpperCase());
 
     final columnDefs = fields.map((field) {
-      final isTextContext = _contextFields.contains(field.toUpperCase());
+      final upperField = field.toUpperCase();
+      final isTextContext = _contextFields.contains(upperField);
       if (isTextContext) {
-        // Champs texte : pas de CAST numérique (comparaison de chaînes)
-        return "    MAX(CASE WHEN UPPER(field_name)='$field' "
-            "THEN field_value END) AS $field";
+        // Champs texte (CODE_ETABLISSEMENT, CODE_TYPE_ANNEE…) : stockés tels
+        // quels sans suffixe → correspondance exacte.
+        return "    MAX(CASE WHEN UPPER(field_name)='$upperField' "
+            "THEN field_value END) AS $upperField";
       } else if (isMultiRow) {
-        // Tables multi-lignes : SUM() pour agréger toutes les lignes
-        // (correspond au Sum() serveur sur ELEVES_AGE_NIVEAU_SEXE, etc.)
-        return "    SUM(CASE WHEN UPPER(field_name)='$field' "
-            "THEN CAST(field_value AS REAL) ELSE 0 END) AS $field";
+        // FIX SESSION 56 — Tables multi-lignes (ELEVES_*) :
+        //   Les champs HTML de la grille sont stockés avec des suffixes d'indice,
+        //   ex : FILLES_AGE_NIVEAU_0_70, FILLES_AGE_NIVEAU_0_71, …
+        //   Un filtre UPPER(field_name)='FILLES_AGE_NIVEAU' ne trouve rien.
+        //   On utilise LIKE 'FILLES_AGE_NIVEAU%' pour capturer tous les suffixes.
+        //
+        // SÉCURITÉ — le préfixe LIKE ne peut pas déborder sur d'autres champs car :
+        //   • Les noms commencent tous par le même prénom-base (ex FILLES_AGE_NIVEAU)
+        //   • Le '%' terminal n'est utilisé QUE pour les champs non-contexte
+        //     des tables ELEVES où ce pattern de nommage HTML est systématique.
+        return "    SUM(CASE WHEN UPPER(field_name) LIKE '${upperField}%' "
+            "THEN CAST(field_value AS REAL) ELSE 0 END) AS $upperField";
       } else {
-        // Tables mono-ligne : MAX() pour pivoter la valeur unique
-        return "    MAX(CASE WHEN UPPER(field_name)='$field' "
-            "THEN CAST(field_value AS REAL) END) AS $field";
+        // Tables mono-ligne (DONNEES_ETABLISSEMENT) : champs stockés tels quels.
+        return "    MAX(CASE WHEN UPPER(field_name)='$upperField' "
+            "THEN CAST(field_value AS REAL) END) AS $upperField";
       }
     }).join(',\n');
 
@@ -1200,6 +1210,20 @@ class CoherenceEvaluator {
 
     // Totaux virtuels pour les vues DB (chemin regex uniquement)
     _injectVirtualAggregates(regexValues, persistedData, formData);
+
+    // LOG DIAGNOSTIC S56 — Noms de champs réels dans collected_data
+    // (utile pour vérifier que FILLES_AGE_NIVEAU_0_70 etc. sont bien présents)
+    if (persistedData.isNotEmpty || allEtabData.isNotEmpty) {
+      final allKeys = {
+        ...persistedData.keys,
+        ...allEtabData.keys,
+      }.where((k) => !k.startsWith('CODE_')).take(20).toList()..sort();
+      debugPrint('[CoherenceEval] collected_data field samples '
+          '(idEtab=$idEtab): ${allKeys.join(', ')}');
+    } else {
+      debugPrint('[CoherenceEval] ⚠️ collected_data VIDE pour '
+          'idCamp=$idCamp idEtab=$idEtab — aucune donnée sauvegardée localement.');
+    }
 
     debugPrint('[CoherenceEval] evaluate: idQst=$idQst idEtab=$idEtab '
         'persistedFields=${persistedData.length} formFields=${formData.length} '

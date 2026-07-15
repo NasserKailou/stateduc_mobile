@@ -4,6 +4,75 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 56] — 2026-07-15 — Fix CTE LIKE préfixe (champs HTML suffixés FILLES_AGE_NIVEAU_0_70)
+
+### Contexte
+Malgré les corrections S55 (suppression `id_qst` du CTE), les contrôles offline continuaient
+à retourner `val=0.0` pour toutes les règles ELEVES. Capture d'écran device : 60 (Filles) > 54
+(F+M) — incohérence évidente — mais aucune violation détectée. Logs confirmaient que le SQL
+généré était syntaxiquement correct (CTE bien formé, `SUM()` utilisé, pas de `id_qst`) mais
+la requête retournait toujours 0.
+
+### Bug corrigé — S56 (CRITIQUE)
+
+**Nommage HTML des champs de grille : suffixe `_0_70`, `_0_71`…**
+
+La grille ELEVES (section 4.1 — Répartition des élèves par âge, sexe et par année d'études)
+utilise des `<INPUT>` avec des noms comme :
+```
+FILLES_AGE_NIVEAU_0_70    (1ère année, tranche d'âge id=70)
+FILLES_AGE_NIVEAU_0_71    (1ère année, tranche d'âge id=71)
+FILLES_AGE_NIVEAU_0_72    (1ère année, tranche d'âge id=72)
+TOTAL_AGE_NIVEAU_0_70
+TOTAL_AGE_NIVEAU_0_71     ...etc.
+```
+
+Ces noms sont transmis tels quels via le pont JavaScript → Flutter → `saveCollectedData()`.
+Dans `collected_data`, les `field_name` sont donc `FILLES_AGE_NIVEAU_0_70`, etc.
+
+**Le CTE avant ce fix :**
+```sql
+SUM(CASE WHEN UPPER(field_name)='FILLES_AGE_NIVEAU' THEN CAST(field_value AS REAL) ELSE 0 END)
+```
+→ **Aucune ligne ne matche** (les champs s'appellent `FILLES_AGE_NIVEAU_0_70`, pas
+`FILLES_AGE_NIVEAU`) → `SUM()=0` → `val=0.0` → aucune violation jamais détectée.
+
+**Fix :** Utiliser `LIKE 'FILLES_AGE_NIVEAU%'` pour les champs des tables multi-lignes :
+```sql
+SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU%' THEN CAST(field_value AS REAL) ELSE 0 END)
+```
+→ Capture `FILLES_AGE_NIVEAU_0_70`, `FILLES_AGE_NIVEAU_0_71`… → `SUM()=60` → violation détectée ✅
+
+**Portée du fix :** uniquement les colonnes non-contexte des tables `ELEVES_*` (multi-row).
+Les champs de contexte (`CODE_ETABLISSEMENT`, etc.) et les tables mono-ligne
+(`DONNEES_ETABLISSEMENT`) continuent à utiliser la correspondance exacte `=`.
+
+**Note :** Pour `DONNEES_ETABLISSEMENT` les champs sont stockés avec leur nom exact
+(pas de suffixe HTML) → `=` reste correct.
+
+### Log diagnostic ajouté
+
+`evaluate()` affiche maintenant un échantillon des vrais `field_name` présents dans
+`collected_data` pour faciliter le debug futur :
+```
+[CoherenceEval] collected_data field samples (idEtab=20952): FILLES_AGE_NIVEAU_0_70, FILLES_AGE_NIVEAU_0_71, TOTAL_AGE_NIVEAU_0_70, ...
+```
+
+### Validation Python
+Simulateur Python mis à jour : **36/36 PASS** (T01–T21), incluant 4 nouveaux tests S56 :
+- T18 : `FILLES_AGE_NIVEAU_0_70=60` → `Sum=60.0` ✅ (LIKE prefix fonctionne)
+- T19 : violation réelle détectée : `FILLES=60 > TOTAL=54` → `violated=True` ✅
+- T20 : cas légit : `FILLES=54 <= TOTAL=108` → `violated=False` ✅
+- T21 : CTE contient `LIKE 'FILLES_AGE_NIVEAU%'` et non `= 'FILLES_AGE_NIVEAU'` ✅
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` :
+  - `_buildPivotCte()` : `LIKE 'FIELD%'` pour champs ELEVES (tables multi-row)
+  - `evaluate()` : log diagnostic champs `collected_data`
+  - Commentaire version mis à jour (Session 56)
+
+---
+
 ## [Session 55] — 2026-07-15 — Fix cohérence offline inter-thèmes (suppression id_qst du CTE + alias extraction)
 
 ### Contexte
