@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 50 — Fix WHERE context-only (TEXT/INTEGER mismatch) + empty-SQL guard
+// VERSION : Session 55 — Fix cohérence inter-thèmes (suppression id_qst du CTE) + alias extraction
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -223,6 +223,7 @@ class SqlTranslator {
   /// Paramètres de substitution :
   ///   [idCamp]        → id de la campagne (filtre collected_data)
   ///   [idEtab]        → id de l'établissement (filtre collected_data)
+  ///   [idQst]         → id de la question (filtre optionnel CTE par formulaire)
   ///   [codeEtab]      → valeur pour \$CODE_ETABLISSEMENT  (ex. '101012071')
   ///   [codeTypeAnnee] → valeur pour \$CODE_TYPE_ANNEE (ex. '2024')
   ///
@@ -234,6 +235,7 @@ class SqlTranslator {
     required String serverSql,
     required String idCamp,
     required String idEtab,
+    String? idQst,
     String? codeEtab,
     String? codeTypeAnnee,
   }) {
@@ -274,6 +276,7 @@ class SqlTranslator {
           fields: allFields,
           idCamp: idCamp,
           idEtab: idEtab,
+          idQst: idQst,
         );
         cteParts.add('$tableName AS (\n$cte\n)');
       }
@@ -392,15 +395,28 @@ class SqlTranslator {
 
       if (hasGroupByFinal) {
         // MODE EXISTS — requête retourne des lignes si violation
+        // COUNT(*) = 0 si aucune violation, > 0 si violation détectée.
         wrappedSql =
             '$withClause\nSELECT COUNT(*) AS cnt FROM (\n$translatedSql\n) _violations';
         isScalar = false;
       } else {
-        // MODE SCALAR — requête retourne une seule valeur agrégée
-        // On extrait la première colonne de la sous-requête via COALESCE pour
-        // gérer le cas NULL (aucune donnée → 0).
+        // MODE SCALAR — requête retourne une seule valeur agrégée (Sum, Count, etc.)
+        //
+        // SESSION 54 FIX : certaines règles ont un SELECT multi-colonnes agrégées :
+        //   SELECT Sum(FILLES_AGE_NIVEAU) AS SommeX, Sum(TOTAL_AGE_NIVEAU) AS SommeY
+        // Le wrapper  SELECT (__scalar_val)  exige une sous-requête mono-colonne.
+        // SQLite error : "sub-select returns 2 columns - expected 1".
+        //
+        // Le serveur compare val_sql[0][0] vs val_sql_assoc[0][0] — toujours la
+        // PREMIÈRE valeur de la PREMIÈRE ligne. On réduit donc le SELECT à sa
+        // première colonne avant de construire le wrapper.
+        //
+        // Stratégie : réécrire SELECT col1, col2, ... FROM T → SELECT col1 FROM T
+        // en utilisant _keepFirstSelectColumn().
+        final scalarSql = _keepFirstSelectColumn(translatedSql);
+        debugPrint('[SqlTranslator] SCALAR: kept first column only:\n$scalarSql');
         wrappedSql =
-            '$withClause\nSELECT COALESCE((SELECT * FROM (\n$translatedSql\n) _s), 0) AS val';
+            '$withClause\nSELECT COALESCE((__scalar_val), 0) AS val\nFROM (\n  SELECT (\n$scalarSql\n  ) AS __scalar_val\n) _wrapper';
         isScalar = true;
       }
 
@@ -416,6 +432,68 @@ class SqlTranslator {
       debugPrint('[SqlTranslator] translation error: $e\n$st');
       return null;
     }
+  }
+
+  /// Réduit le SELECT d'une requête à sa première colonne uniquement.
+  ///
+  /// Utilisé en MODE SCALAR pour les règles dont le SELECT contient plusieurs
+  /// colonnes agrégées (ex: `Sum(X) AS a, Sum(Y) AS b`). Le wrapper SCALAR
+  /// `SELECT (sub-query)` exige que la sous-requête retourne exactement 1 colonne.
+  /// Le serveur compare toujours `val_sql[0][0]` — la première valeur.
+  ///
+  /// Exemple :
+  ///   SELECT Sum(FILLES_AGE_NIVEAU) AS SommeX, Sum(TOTAL_AGE_NIVEAU) AS SommeY
+  ///   FROM ELEVES_AGE_NIVEAU_SEXE
+  /// →
+  ///   SELECT Sum(FILLES_AGE_NIVEAU) AS SommeX
+  ///   FROM ELEVES_AGE_NIVEAU_SEXE
+  ///
+  /// Si le SELECT ne contient qu'une colonne (ou si le pattern ne matche pas),
+  /// retourne le SQL inchangé.
+  static String _keepFirstSelectColumn(String sql) {
+    // Trouve SELECT ... FROM et extrait la liste des colonnes
+    final selRe = RegExp(
+      r'(\bSELECT\b)(.*?)(\bFROM\b)',
+      caseSensitive: false,
+      dotAll: true,
+    );
+    final m = selRe.firstMatch(sql);
+    if (m == null) return sql;
+
+    final selectKw  = m.group(1)!;   // "SELECT"
+    final colsPart  = m.group(2)!;   // " Sum(X) AS a, Sum(Y) AS b "
+    final fromKw    = m.group(3)!;   // "FROM"
+
+    // Découpe en colonnes de niveau 0 (respecte les parenthèses imbriquées)
+    final cols = <String>[];
+    final buf  = StringBuffer();
+    int depth  = 0;
+    for (int i = 0; i < colsPart.length; i++) {
+      final c = colsPart[i];
+      if (c == '(') {
+        depth++;
+        buf.write(c);
+      } else if (c == ')') {
+        depth--;
+        buf.write(c);
+      } else if (c == ',' && depth == 0) {
+        cols.add(buf.toString());
+        buf.clear();
+      } else {
+        buf.write(c);
+      }
+    }
+    if (buf.isNotEmpty) cols.add(buf.toString());
+
+    if (cols.length <= 1) return sql; // Déjà mono-colonne
+
+    // Ne garder que la première colonne
+    final firstCol = cols.first;
+    final before   = sql.substring(0, m.start);
+    final after    = sql.substring(m.end);
+    debugPrint('[SqlTranslator] _keepFirstSelectColumn: '
+        '${cols.length} cols → kept: "${firstCol.trim()}"');
+    return '$before$selectKw${firstCol.trimRight()} $fromKw$after';
   }
 
   // ─── Substitution des paramètres ─────────────────────────────────────────
@@ -550,6 +628,40 @@ class SqlTranslator {
       }
     }
 
+    // FIX Bug S53-B + S55-B: extraire les champs non qualifiés du SELECT lui-même,
+    // en excluant les alias (tokens après AS).
+    //
+    // Quand le SQL n'utilise PAS de qualificateur TABLE.FIELD (ex:
+    //   SELECT Sum(FILLES_AGE_NIVEAU) FROM ELEVES_AGE_NIVEAU_SEXE
+    // ), le champ FILLES_AGE_NIVEAU n'était pas extrait → colonne manquante
+    // dans le CTE → SQLite : "no such column: FILLES_AGE_NIVEAU".
+    //
+    // FIX S55-B : le scanner S53-B extrayait aussi les ALIAS définis après AS
+    // (ex: AS SommeDeFILLES_AGE_NIVEAU → SOMMEDEFILLES_AGE_NIVEAU ajouté au CTE).
+    // Ces alias n'existent pas dans collected_data → colonne CTE inutile (toujours 0)
+    // et logs pollués. Solution : supprimer les alias AS xxx avant de scanner.
+    final selectMatch = RegExp(
+      r'\bSELECT\b(.+?)\bFROM\b',
+      caseSensitive: false,
+      dotAll: true,
+    ).firstMatch(sql);
+    if (selectMatch != null) {
+      // Supprimer les alias AS xxx avant extraction pour éviter d'ajouter
+      // SommeDeXXX comme champ du CTE (ne correspond à rien dans collected_data)
+      final selectClause = (selectMatch.group(1) ?? '')
+          .replaceAll(RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '');
+      final identPattern =
+          RegExp(r'\b([A-Z][A-Z0-9_]+)\b', caseSensitive: false);
+      for (final id in identPattern.allMatches(selectClause)) {
+        final name = id.group(1)!.toUpperCase();
+        if (!_isSqlKeyword(name) &&
+            name.length > 2 &&
+            !serverTables.contains(name)) {
+          fields.add(name);
+        }
+      }
+    }
+
     debugPrint('[SqlTranslator] fields extracted for CTE: $fields');
     return fields;
   }
@@ -581,6 +693,8 @@ class SqlTranslator {
     required Set<String> fields,
     required String idCamp,
     required String idEtab,
+    // idQst conservé pour la signature mais non utilisé dans le CTE (FIX S55).
+    String? idQst,
   }) {
     final escapedCamp = idCamp.replaceAll("'", "''");
     final escapedEtab = idEtab.replaceAll("'", "''");
@@ -606,6 +720,25 @@ class SqlTranslator {
       }
     }).join(',\n');
 
+    // FIX SESSION 55 — NE PAS filtrer par id_qst dans le CTE de cohérence.
+    //
+    // PROBLÈME INTRODUIT EN S53 :
+    //   Le filtre AND id_qst='...' dans le CTE filtrait sur l'id_qst du formulaire
+    //   COURANT (ex: '9502'). Mais les données des tables ELEVES sont sauvegardées
+    //   sous l'id_qst DU FORMULAIRE ÉLÈVES (ex: '9501'), pas celui du formulaire
+    //   de cohérence. Résultat : le CTE retournait 0 lignes → val=0.0 → aucune
+    //   violation jamais détectée → les contrôles offline ne fonctionnaient pas.
+    //
+    // MODÈLE SERVEUR (controle_theme_batch.class.php) :
+    //   Les requêtes SQL de cohérence s'exécutent sur des VUES SQL Server qui
+    //   contiennent TOUTES les données de l'établissement pour la campagne,
+    //   sans filtrage par thème/questionnaire. Le mobile reproduit ce comportement.
+    //
+    // SOLUTION : filtrer sur (id_camp, id_etab) uniquement — comme le serveur.
+    //   Le CTE agrège toutes les données de l'établissement pour la campagne,
+    //   indépendamment du formulaire d'origine. C'est nécessaire pour les règles
+    //   inter-thèmes (ex: Total filles ≤ Total élèves, où filles vient d'un thème
+    //   et total d'un autre).
     return '  SELECT\n$columnDefs\n'
         "  FROM collected_data\n"
         "  WHERE id_camp='$escapedCamp' AND id_etab='$escapedEtab'";
@@ -1082,6 +1215,7 @@ class CoherenceEvaluator {
           db: db,
           idCamp: idCamp,
           idEtab: idEtab,
+          idQst: idQst,
           codeEtab: codeEtab,
           codeTypeAnnee: codeTypeAnnee,
           regexValues: regexValues,
@@ -1113,6 +1247,7 @@ class CoherenceEvaluator {
     required Database db,
     required String idCamp,
     required String idEtab,
+    String? idQst,
     String? codeEtab,
     String? codeTypeAnnee,
     required Map<String, double> regexValues,
@@ -1123,6 +1258,7 @@ class CoherenceEvaluator {
       db: db,
       idCamp: idCamp,
       idEtab: idEtab,
+      idQst: idQst,
       codeEtab: codeEtab,
       codeTypeAnnee: codeTypeAnnee,
     );
@@ -1158,18 +1294,28 @@ class CoherenceEvaluator {
     required Database db,
     required String idCamp,
     required String idEtab,
+    String? idQst,
     String? codeEtab,
     String? codeTypeAnnee,
   }) async {
+    debugPrint('[CoherenceEval] _evaluateViaSql rule=${rule.idRegle} '
+        'idQst=$idQst idEtab=$idEtab codeEtab=$codeEtab '
+        'critere="${rule.critere}"');
+
     // Traduire sql_regle
     final r1 = SqlTranslator.translate(
       serverSql: rule.sqlRegle,
       idCamp: idCamp,
       idEtab: idEtab,
+      idQst: idQst,
       codeEtab: codeEtab,
       codeTypeAnnee: codeTypeAnnee,
     );
-    if (r1 == null) return null; // non traduisible → fallback
+    if (r1 == null) {
+      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_regle not translatable → regex fallback');
+      return null; // non traduisible → fallback
+    }
+    debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_regle (isScalar=${r1.isScalar}):\n${r1.sql}');
 
     // Traduire sql_assoc
     // FIX Bug 4: si sql_assoc n'est pas traduisible (ex: pas de table serveur
@@ -1187,9 +1333,13 @@ class CoherenceEvaluator {
       serverSql: rule.sqlAssoc,
       idCamp: idCamp,
       idEtab: idEtab,
+      idQst: idQst,
       codeEtab: codeEtab,
       codeTypeAnnee: codeTypeAnnee,
     );
+    if (r2 != null) {
+      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_assoc (isScalar=${r2.isScalar}):\n${r2.sql}');
+    }
 
     // Exécuter sql_regle (toujours disponible à ce stade)
     // SESSION 49 : passer isScalar pour que _execCount lise la bonne colonne
@@ -1225,6 +1375,8 @@ class CoherenceEvaluator {
     }
 
     final violated = _applyOperator(count1, count2, rule.critere);
+    debugPrint('[CoherenceEval] rule=${rule.idRegle} '
+        'v1=$count1 ${rule.critere} v2=$count2 → violated=$violated');
     return _SqlEvalResult(v1: count1, v2: count2, violated: violated);
   }
 

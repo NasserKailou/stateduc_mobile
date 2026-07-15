@@ -4,6 +4,169 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 55] — 2026-07-15 — Fix cohérence offline inter-thèmes (suppression id_qst du CTE + alias extraction)
+
+### Contexte
+Les contrôles de cohérence offline ne se déclenchaient jamais malgré des données incorrectes.
+Les logs device montraient systématiquement `val=0.0` pour les règles 494 et 495 (tables
+`ELEVES_AGE_NIVEAU_SEXE`). L'analyse a révélé deux bugs distincts introduits en Session 53.
+
+### Bugs corrigés
+
+**Bug S55-A (CRITIQUE) — Filtre `id_qst` incorrect dans le CTE de cohérence**
+
+En S53, un filtre `AND id_qst='<idQst_courant>'` avait été ajouté dans `_buildPivotCte()`
+pour éviter l'agrégation multi-formulaires. Ce filtre était correct pour les règles
+intra-thème, mais **brisait les règles inter-thèmes** :
+
+- Les règles de cohérence du thème 9502 référencent des données ELEVES.
+- Les données ELEVES sont sauvegardées sous l'`id_qst` du formulaire ELÈVES (ex: `'9501'`),
+  pas celui du formulaire de cohérence (`'9502'`).
+- Résultat : `WHERE id_camp='2' AND id_etab='20952' AND id_qst='9502'` → **0 lignes** →
+  `SUM() = 0` → `val=0.0` → aucune violation jamais détectée.
+
+**Modèle serveur** (`controle_theme_batch.class.php`) : les vues SQL Server contiennent
+TOUTES les données de l'établissement pour la campagne, sans filtrage par thème.
+Le mobile doit reproduire ce comportement.
+
+**Fix :** Suppression du filtre `id_qst` dans `_buildPivotCte()`. Le CTE filtre désormais
+uniquement sur `(id_camp, id_etab)`, comme le serveur. Le paramètre `idQst` est conservé
+dans la signature pour compatibilité mais n'est plus utilisé dans la requête CTE.
+
+**Bug S55-B (SECONDAIRE) — Extraction d'alias dans `_extractAllFieldNames()`**
+
+Le scanner SELECT de S53-B extrayait tous les identifiants du SELECT, y compris les **alias**
+définis après `AS` (ex: `AS SommeDeFILLES_AGE_NIVEAU` → `SOMMEDEFILLES_AGE_NIVEAU` ajouté
+comme champ du CTE). Ces alias n'existent pas dans `collected_data` → colonne CTE inutile
+(toujours 0) et logs pollués avec des champs fantômes.
+
+Logs avant fix :
+```
+[SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE,
+  CODE_ADMINISTRATIF, TOTAL_AGE_NIVEAU, SOMMEDETOTAL_AGE_NIVEAU}
+```
+`SOMMEDETOTAL_AGE_NIVEAU` est un alias, pas un champ de `collected_data`.
+
+**Fix :** `.replaceAll(RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '')` appliqué sur
+la clause SELECT avant le scan des identifiants. Seuls les vrais noms de champs sont extraits.
+
+### Règle de filtrage par thème
+La demande utilisateur "n'exécuter que les règles du thème courant" est déjà satisfaite au
+niveau de la requête base de données : `getCoherenceRules(idCamp, idQst, idEtab)` dans
+`database_service.dart` (L1324) filtre `WHERE id_camp=? AND id_qst=? AND id_etab=?`.
+Seules les règles du thème courant sont évaluées. Le fix S55-A concerne uniquement les
+**données** agrégées dans le CTE, pas le filtrage des règles elles-mêmes.
+
+### Validation Python
+Simulateur Python mis à jour : **28/28 tests PASS** (T01–T17), incluant 5 nouveaux tests S55 :
+- T13 : données ELEVES dans `id_qst='9501'`, règle dans `id_qst='9502'` → détectée (25 ≤ 50 OK)
+- T14 : violation inter-thèmes : FILLES=60 > TOTAL=50 → violated=True ✅
+- T15 : alias `SOMMEDEFILLES_AGE_NIVEAU` absent du corps CTE ✅
+- T16 : scénario complet règles 494/495 : Sum(FILLES)=33 ≤ Sum(TOTAL)=100 → correct ✅
+- T17 : règles intra-thème non régressées ✅
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` :
+  - `_buildPivotCte()` : suppression filtre `id_qst` du WHERE, suppression variable `escapedQst`
+  - `_extractAllFieldNames()` : strip `AS xxx` avant scan du SELECT
+  - Commentaire version mis à jour (Session 55)
+
+---
+
+## [Session 54] — 2026-07-15 — Fix SCALAR multi-colonnes (_keepFirstSelectColumn)
+
+### Contexte
+Sur device (rule=493), le wrapper SCALAR échouait avec l'erreur SQLite :
+`sub-select returns 2 columns - expected 1`
+La cause : `sql_regle` de la règle 493 contient deux colonnes dans son SELECT :
+`SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE`.
+Le wrapper SCALAR S53 encapsulait ce SELECT multi-colonnes directement dans une
+sous-requête scalaire `SELECT (...) AS __scalar_val` — SQLite exige exactement 1 colonne.
+
+### Bug corrigé
+
+**Bug S54 — SCALAR wrapper crash sur SELECT multi-colonnes**
+Quand `sql_regle` possède `SELECT Sum(X), Sum(Y) FROM ...`, le mode SCALAR (après
+suppression du GROUP BY contexte-only) produisait une sous-requête à 2 colonnes dans
+`SELECT (SELECT Sum(X), Sum(Y) FROM ...) AS __scalar_val`, ce qui est interdit par SQLite.
+
+**Fix :** Nouvelle méthode `_keepFirstSelectColumn()` qui réduit le SELECT à sa première
+colonne avant l'emballage SCALAR. La méthode respecte les parenthèses imbriquées (split
+de niveau 0) pour éviter de couper à l'intérieur d'un appel de fonction.
+
+**Bug secondaire corrigé :** Le regex `(\bSELECT\b)(.*?)(\bFROM\b)` consomme l'espace
+avant `FROM` dans `cols_part`. Sans `trimRight()`, la reconstruction produit
+`SommeDeFILLES_AGE_NIVEAUFROM ELEVES...` (espace manquant → erreur syntaxe SQL).
+Fix : `return '$before$selectKw${firstCol.trimRight()} $fromKw$after';`
+
+**Comportement côté serveur :** Le PHP compare `val_sql[0][0]` vs `val_sql_assoc[0][0]`
+(toujours la première valeur de la première ligne) → conserver uniquement la première
+colonne en mode SCALAR est le comportement correct et cohérent avec le serveur.
+
+### Validation Python
+Simulateur Python mis à jour : **25/25 tests PASS** (T01–T15), incluant 3 nouveaux tests S54 :
+- T13 : `keep_first_select_column` — espace avant FROM préservé, mono-colonne confirmé
+- T14 : SELECT Sum(X), Sum(Y) → réduit à Sum(X) = 11.0 sans erreur SQLite
+- T15 : Règle 493 complète — Sum(FILLES)=11 = Sum(NB_ELEVES_F)=11 → NOT violated
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` — ajout `_keepFirstSelectColumn()` + appel dans SCALAR path
+
+---
+
+## [Session 53] — 2026-07-15 — Fix chaîne complète idQst + extraction champs SELECT + logging
+
+### Contexte
+Malgré les corrections S45→S52, les contrôles offline continuaient à déclencher des faux
+positifs (ex: `33 <= 100` signalé comme violé). Analyse approfondie + simulateur Python
+confirmé : 4 bugs distincts subsistaient dans la chaîne d'évaluation.
+
+### Bugs corrigés
+
+**Bug 1 — CTE sans filtre `id_qst` (cause principale des faux positifs)**
+`_buildPivotCte()` lisait `WHERE id_camp=... AND id_etab=...` sans filtre `id_qst`.
+Pour les tables MULTI-LIGNES (ELEVES_*), le SUM() agrègeait TOUS les formulaires du même
+établissement, pas seulement le formulaire courant → valeurs sur-comptées → comparaisons
+fausses. Fix : ajout du paramètre `idQst?` dans `_buildPivotCte()`, `translate()`,
+`_evaluateViaSql()`, `_evaluateRule()` et propagation depuis `evaluate()`.
+
+**Bug 2 — Champs non qualifiés dans le SELECT non extraits pour le CTE**
+`_extractAllFieldNames()` n'extrayait pas les champs de la clause SELECT quand ils
+n'étaient pas préfixés par `TABLE.` (ex: `Sum(FILLES_AGE_NIVEAU)` sans préfixe).
+Résultat : colonne manquante dans le CTE → erreur SQLite "no such column".
+Fix : scan de la clause SELECT ajouté (FIX Bug S53-B).
+
+**Bug 3 — SCALAR wrapper `SELECT *` multi-colonnes**
+L'ancien wrapper `SELECT COALESCE((SELECT * FROM (...) _s), 0)` échouait si la
+sous-requête retournait plusieurs colonnes (SELECT Sum(X), Sum(Y)).
+Fix : nouveau wrapper `SELECT COALESCE((__scalar_val), 0) AS val FROM (SELECT (...) AS __scalar_val) _wrapper`.
+
+**Bug 4 — `idQst` non propagé dans la chaîne d'appel**
+`evaluate()` passait `idQst` à `_evaluateRule()` mais sans le paramètre — `_evaluateRule()`
+et `_evaluateViaSql()` ne l'avaient pas dans leur signature et ne le transmettaient pas
+à `translate()` → le filtre `id_qst` dans le CTE n'était jamais activé.
+Fix : ajout de `String? idQst` dans `_evaluateRule()` et `_evaluateViaSql()`, avec
+propagation complète vers les deux appels `translate()`.
+
+### Logging amélioré
+`_evaluateViaSql()` affiche maintenant le SQL complet traduit, les valeurs v1/v2,
+le critère et `violated` pour chaque règle — facilite le diagnostic sur device.
+
+### Validation Python
+Simulateur Python complet : **19/19 tests PASS** (T01–T12), couvrant :
+- Filtre id_qst présent/absent dans le CTE
+- Mode SCALAR sans GROUP BY et avec GROUP BY contexte-only
+- Mode EXISTS avec GROUP BY non-contexte
+- Exécution réelle 33 ≤ 100 → NOT violated (le bug rapporté)
+- Isolation id_qst : SUM=20 avec filtre vs SUM=30 sans filtre (cross-form)
+- DONNEES_ETABLISSEMENT violation/non-violation
+- SCALAR wrapper colonne unique
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` — 6 corrections + logging amélioré
+
+---
+
 ## [Session 52] — 2026-07-15 — Fix faux positifs GROUP BY context-only → SCALAR
 
 ### Contexte
