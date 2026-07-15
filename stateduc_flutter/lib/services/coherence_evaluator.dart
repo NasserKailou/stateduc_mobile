@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 57 — LIKE préfixe universel (toutes tables : suffixe _0 HTML partout)
+// VERSION : Session 58 — fix ambiguïté LIKE (_0 exact) + logging fichier exhaustif
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -100,7 +100,16 @@
 //                 SUM → 33  (correct → correspond au Sum() serveur)
 //     Voir _multiRowTables et _buildPivotCte() pour l'implémentation.
 //
-//  6. TABLES INCONNUES
+//  6. FIX SESSION 58 — LIKE suffixe exact '_0' pour DONNEES_ETABLISSEMENT
+//     S57 utilisait LIKE 'FIELD%' pour DONNEES_ETABLISSEMENT, ce qui causait
+//     une ambiguïté : LIKE 'NB_ELEVES%' matchait AUSSI 'NB_ELEVES_F_0' alors
+//     qu'on voulait uniquement 'NB_ELEVES_0'. MAX() retournait alors la valeur
+//     d'un champ incorrect selon l'ordre des lignes dans collected_data.
+//     Fix : utiliser LIKE 'FIELD_0' (suffixe exact) pour DONNEES_ETABLISSEMENT.
+//     Le suffixe est toujours exactement '_0' pour ces champs (HTML input name).
+//     Les tables ELEVES_* gardent LIKE 'FIELD_%' (suffixe _0_70, _0_71, etc.).
+//
+//  7. TABLES INCONNUES
 //     Si le SQL contient une table non reconnue, le traducteur retourne null
 //     et le chemin fallback (regex) est utilisé.
 //
@@ -158,10 +167,59 @@
 //
 // =============================================================================
 
+import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
+
+// =============================================================================
+// CoherenceLogger — Journalisation exhaustive sur fichier
+// =============================================================================
+//
+// Écrit un fichier de log complet lors de chaque appel à evaluate().
+// Chemin : {AppDocumentsDir}/coherence_latest.log (écrasé à chaque run)
+//
+// Utilisation :
+//   final logger = CoherenceLogger(idEtab: idEtab, idCamp: idCamp);
+//   logger.log('message');
+//   await logger.flush();  // Écrit tout sur disque en fin d'evaluate()
+//
+// Le fichier est lisible sur l'appareil via un explorateur de fichiers ou
+// ADB pull. Il contient tous les debugPrint du moteur de cohérence.
+
+class CoherenceLogger {
+  CoherenceLogger({required this.idEtab, required this.idCamp});
+
+  final String idEtab;
+  final String idCamp;
+  final _buf = StringBuffer();
+
+  static const _fileName = 'coherence_latest.log';
+
+  /// Ajoute une ligne de log (timestamp + message).
+  void log(String message) {
+    final now = DateTime.now().toIso8601String();
+    _buf.writeln('$now  $message');
+    // Miroir vers debugPrint pour que les logs apparaissent aussi en console
+    debugPrint(message);
+  }
+
+  /// Écrit le buffer sur disque dans {AppDocumentsDir}/coherence_latest.log.
+  /// Appelé à la fin de evaluate() quel que soit le résultat.
+  Future<void> flush() async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/$_fileName');
+      await file.writeAsString(_buf.toString(), flush: true);
+      // On ne passe PAS par log() pour éviter la boucle infinie
+      debugPrint('[CoherenceLogger] log écrit → ${file.path}');
+    } catch (e) {
+      debugPrint('[CoherenceLogger] ⚠️ erreur écriture log: $e');
+    }
+  }
+}
 
 // =============================================================================
 // SqlTranslator — Traducteur SQL Access/SQL Server → SQLite
@@ -185,6 +243,17 @@ import '../services/database_service.dart';
 ///   }
 class SqlTranslator {
   SqlTranslator._(); // Classe statique uniquement
+
+  // SESSION 58 — Logger de fichier partagé avec CoherenceEvaluator.
+  // Initialisé avant chaque appel à translate() depuis _evaluateViaSql().
+  // Toutes les sorties debugPrint du traducteur sont aussi écrites dans le log.
+  static CoherenceLogger? _logger;
+
+  /// Enregistre un message dans le logger de fichier ET dans debugPrint.
+  static void _log(String msg) {
+    debugPrint(msg);
+    _logger?.log(msg);
+  }
 
   // Tables serveur connues qui peuvent être mappées vers collected_data
   static const _knownServerTables = {
@@ -258,7 +327,7 @@ class SqlTranslator {
       final usedServerTables = _detectServerTables(sql);
       if (usedServerTables.isEmpty) {
         // Pas de table serveur connue → on ne peut pas traduire
-        debugPrint(
+        SqlTranslator._log(
             '[SqlTranslator] no known server tables in SQL — not translatable');
         return null;
       }
@@ -329,7 +398,7 @@ class SqlTranslator {
       // avec HAVING+WHERE intégralement supprimés), éviter de générer un SQL
       // syntaxiquement invalide tel que SELECT COUNT(*) AS cnt FROM (\n) _violations.
       if (translatedSql.trim().isEmpty) {
-        debugPrint('[SqlTranslator] translatedSql empty after stripping — aborting translation');
+        SqlTranslator._log('[SqlTranslator] translatedSql empty after stripping — aborting translation');
         return null;
       }
 
@@ -380,7 +449,7 @@ class SqlTranslator {
       // supprimer le GROUP BY pour obtenir une requête scalaire propre.
       if (isSumScalarGroupBy) {
         translatedSql = _stripContextOnlyGroupBy(translatedSql);
-        debugPrint('[SqlTranslator] Sum-scalar with context-only GROUP BY detected '
+        SqlTranslator._log('[SqlTranslator] Sum-scalar with context-only GROUP BY detected '
             '→ GROUP BY stripped → SCALAR mode');
       }
 
@@ -414,13 +483,13 @@ class SqlTranslator {
         // Stratégie : réécrire SELECT col1, col2, ... FROM T → SELECT col1 FROM T
         // en utilisant _keepFirstSelectColumn().
         final scalarSql = _keepFirstSelectColumn(translatedSql);
-        debugPrint('[SqlTranslator] SCALAR: kept first column only:\n$scalarSql');
+        SqlTranslator._log('[SqlTranslator] SCALAR: kept first column only:\n$scalarSql');
         wrappedSql =
             '$withClause\nSELECT COALESCE((__scalar_val), 0) AS val\nFROM (\n  SELECT (\n$scalarSql\n  ) AS __scalar_val\n) _wrapper';
         isScalar = true;
       }
 
-      debugPrint('[SqlTranslator] translated SQL (isScalar=$isScalar):\n$wrappedSql');
+      SqlTranslator._log('[SqlTranslator] translated SQL (isScalar=$isScalar):\n$wrappedSql');
 
       return TranslationResult(
         sql: wrappedSql,
@@ -429,7 +498,7 @@ class SqlTranslator {
         isScalar: isScalar,
       );
     } catch (e, st) {
-      debugPrint('[SqlTranslator] translation error: $e\n$st');
+      SqlTranslator._log('[SqlTranslator] translation error: $e\n$st');
       return null;
     }
   }
@@ -491,7 +560,7 @@ class SqlTranslator {
     final firstCol = cols.first;
     final before   = sql.substring(0, m.start);
     final after    = sql.substring(m.end);
-    debugPrint('[SqlTranslator] _keepFirstSelectColumn: '
+    SqlTranslator._log('[SqlTranslator] _keepFirstSelectColumn: '
         '${cols.length} cols → kept: "${firstCol.trim()}"');
     return '$before$selectKw${firstCol.trimRight()} $fromKw$after';
   }
@@ -525,7 +594,7 @@ class SqlTranslator {
 
     // Paramètres non substitués → laisser tel quel (la requête échouera ou
     // retournera 0 — comportement conservatif)
-    debugPrint('[SqlTranslator] after param substitution: '
+    SqlTranslator._log('[SqlTranslator] after param substitution: '
         'codeEtab=${codeEtab ?? "(null)"} '
         'codeTypeAnnee=${codeTypeAnnee ?? "(null)"}');
 
@@ -662,7 +731,7 @@ class SqlTranslator {
       }
     }
 
-    debugPrint('[SqlTranslator] fields extracted for CTE: $fields');
+    SqlTranslator._log('[SqlTranslator] fields extracted for CTE: $fields');
     return fields;
   }
 
@@ -708,21 +777,27 @@ class SqlTranslator {
     //   ELEVES_AGE_NIVEAU_SEXE: FILLES_AGE_NIVEAU_0_70,
     //                           TOTAL_AGE_NIVEAU_0_71, …
     //
-    // La distinction MULTI_ROW / MONO_ROW était donc fausse pour le LIKE :
-    // DONNEES_ETABLISSEMENT utilise aussi le suffixe _0.
+    // FIX SESSION 58 — Ambiguïté LIKE pour DONNEES_ETABLISSEMENT :
+    //   S57 utilisait LIKE 'FIELD%' (préfixe libre) pour DONNEES_ETABLISSEMENT.
+    //   Problème : LIKE 'NB_ELEVES%' matche AUSSI 'NB_ELEVES_F_0' en plus de
+    //   'NB_ELEVES_0', car NB_ELEVES est un préfixe de NB_ELEVES_F.
+    //   MAX() retourne alors la valeur du champ le plus grand parmi les deux,
+    //   ce qui donne un résultat incorrect.
     //
-    // Règle unifiée :
-    //   • Champs CONTEXTE (CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF) :
-    //       injectés programmatiquement SANS suffixe → correspondance EXACTE =
-    //   • Tous les autres champs (ELEVES_* ET DONNEES_ETABLISSEMENT) :
-    //       proviennent des INPUT HTML qui portent un suffixe → LIKE 'FIELD%'
+    //   Solution : utiliser LIKE 'FIELD_0' (suffixe exact '_0') pour
+    //   DONNEES_ETABLISSEMENT — le suffixe HTML est toujours exactement '_0'
+    //   pour ces champs (une seule section de formulaire par champ).
+    //   → LIKE 'NB_ELEVES_0'   → matche uniquement NB_ELEVES_0       ✅
+    //   → LIKE 'NB_ELEVES_F_0' → matche uniquement NB_ELEVES_F_0     ✅
     //
-    // Agrégation :
-    //   • Tables ELEVES_* (multi-lignes) : SUM — plusieurs lignes par champ
-    //     (chaque tranche d'âge × niveau est une ligne séparée).
-    //   • DONNEES_ETABLISSEMENT (mono-ligne) : MAX — une seule valeur par champ
-    //     (le suffixe _0 différencie les sections du formulaire, pas les lignes).
-    //     MAX d'une valeur unique = la valeur elle-même.
+    //   Tables ELEVES_* : garde LIKE 'FIELD_%' (suffixe _0_70, _0_71, etc.)
+    //   Le '_' dans LIKE matche un caractère quelconque — FIELD_ exige au moins
+    //   un caractère après le préfixe, ce qui est toujours vrai pour _0_NN.
+    //
+    // Règle finale :
+    //   • Champs CONTEXTE : injectés SANS suffixe → correspondance EXACTE =
+    //   • DONNEES_ETABLISSEMENT (mono-ligne) : MAX + LIKE 'FIELD_0' (exact)
+    //   • Tables ELEVES_* (multi-lignes)     : SUM + LIKE 'FIELD_%' (préfixe)
     final isMultiRow = _multiRowTables.contains(tableName.toUpperCase());
 
     final columnDefs = fields.map((field) {
@@ -733,13 +808,15 @@ class SqlTranslator {
         return "    MAX(CASE WHEN UPPER(field_name)='$upperField' "
             "THEN field_value END) AS $upperField";
       } else if (isMultiRow) {
-        // Tables multi-lignes (ELEVES_*) : SUM + LIKE préfixe.
-        return "    SUM(CASE WHEN UPPER(field_name) LIKE '${upperField}%' "
+        // Tables multi-lignes (ELEVES_*) : SUM + LIKE préfixe '_' (1+ car après).
+        // 'FIELD_%' garantit un caractère après le nom (= _0_70, _0_71, etc.)
+        // et évite de matcher un champ 'FIELDXXX' sans undersccore.
+        return "    SUM(CASE WHEN UPPER(field_name) LIKE '${upperField}_%' "
             "THEN CAST(field_value AS REAL) ELSE 0 END) AS $upperField";
       } else {
-        // Tables mono-ligne (DONNEES_ETABLISSEMENT) : MAX + LIKE préfixe.
-        // Ex : NB_ELEVES_F_0 → LIKE 'NB_ELEVES_F%'
-        return "    MAX(CASE WHEN UPPER(field_name) LIKE '${upperField}%' "
+        // Tables mono-ligne (DONNEES_ETABLISSEMENT) : MAX + LIKE suffixe exact '_0'.
+        // FIX S58 : '_0' évite l'ambiguïté NB_ELEVES_0 vs NB_ELEVES_F_0.
+        return "    MAX(CASE WHEN UPPER(field_name) LIKE '${upperField}_0' "
             "THEN CAST(field_value AS REAL) END) AS $upperField";
       }
     }).join(',\n');
@@ -854,7 +931,7 @@ class SqlTranslator {
 
       if (isContextOnly) {
         // HAVING ne filtre que sur l'établissement/année → redondant sur mobile
-        debugPrint('[SqlTranslator] stripping context-only HAVING: $havingBody');
+        SqlTranslator._log('[SqlTranslator] stripping context-only HAVING: $havingBody');
         return ''; // Supprime le HAVING entier
       } else {
         // HAVING contient une logique métier (SUM, COUNT, etc.) → on le garde
@@ -937,7 +1014,7 @@ class SqlTranslator {
 
       if (isContextOnly) {
         // WHERE ne filtre que sur l'établissement/année → redondant sur mobile
-        debugPrint('[SqlTranslator] stripping context-only WHERE: $whereBody');
+        SqlTranslator._log('[SqlTranslator] stripping context-only WHERE: $whereBody');
         return ''; // Supprime WHERE + body; le lookahead préserve \n) et GROUP BY
       } else {
         // WHERE contient une logique métier (champs de données) → on le garde
@@ -1166,8 +1243,11 @@ class CoherenceEvaluator {
   ///   [rules]    — règles pour ce (idCamp, idQst, idEtab), chargées depuis SQLite
   ///   [formData] — données formulaire en mémoire (modifications non sauvegardées)
   ///   [idCamp], [idQst], [idEtab], [idFilter] — contexte de saisie courant
-  ///   [codeEtab]      — code administratif de l'établissement (pour $CODE_ETABLISSEMENT)
-  ///   [codeTypeAnnee] — code de l'année scolaire (pour $CODE_TYPE_ANNEE)
+  ///   [codeEtab]      — code administratif de l'établissement (pour \$CODE_ETABLISSEMENT)
+  ///   [codeTypeAnnee] — code de l'année scolaire (pour \$CODE_TYPE_ANNEE)
+  ///
+  /// SESSION 58 : à chaque appel, un fichier coherence_latest.log est écrit dans
+  /// le répertoire documents de l'application (chemin retourné dans les logs).
   ///
   /// Algorithme (session 45) :
   ///   Pour chaque règle :
@@ -1185,6 +1265,16 @@ class CoherenceEvaluator {
     String? codeTypeAnnee,
   }) async {
     if (rules.isEmpty) return [];
+
+    // SESSION 58 — Créer le logger de fichier pour ce run
+    final logger = CoherenceLogger(idEtab: idEtab, idCamp: idCamp);
+    logger.log('========================================================');
+    logger.log('[CoherenceEval] === RUN START ===');
+    logger.log('[CoherenceEval] idCamp=$idCamp idQst=$idQst idEtab=$idEtab');
+    logger.log('[CoherenceEval] codeEtab=${codeEtab ?? "(null)"} '
+        'codeTypeAnnee=${codeTypeAnnee ?? "(null)"}');
+    logger.log('[CoherenceEval] rules count: ${rules.length}');
+    logger.log('========================================================');
 
     // ── Obtenir un accès direct à la base SQLite ─────────────────────────
     final db = await _db.database;
@@ -1225,21 +1315,26 @@ class CoherenceEvaluator {
     // Totaux virtuels pour les vues DB (chemin regex uniquement)
     _injectVirtualAggregates(regexValues, persistedData, formData);
 
-    // LOG DIAGNOSTIC S56 — Noms de champs réels dans collected_data
+    // LOG DIAGNOSTIC S56/S58 — Noms de champs réels dans collected_data
     // (utile pour vérifier que FILLES_AGE_NIVEAU_0_70 etc. sont bien présents)
     if (persistedData.isNotEmpty || allEtabData.isNotEmpty) {
       final allKeys = {
         ...persistedData.keys,
         ...allEtabData.keys,
-      }.where((k) => !k.startsWith('CODE_')).take(20).toList()..sort();
-      debugPrint('[CoherenceEval] collected_data field samples '
-          '(idEtab=$idEtab): ${allKeys.join(', ')}');
+      }.where((k) => !k.startsWith('CODE_')).toList()..sort();
+      logger.log('[CoherenceEval] collected_data ALL fields '
+          '(idEtab=$idEtab, total=${allKeys.length}):');
+      // Log par blocs de 30 pour lisibilité
+      for (int i = 0; i < allKeys.length; i += 30) {
+        final chunk = allKeys.skip(i).take(30).join(', ');
+        logger.log('  [$i..${i + 30}] $chunk');
+      }
     } else {
-      debugPrint('[CoherenceEval] ⚠️ collected_data VIDE pour '
+      logger.log('[CoherenceEval] ⚠️ collected_data VIDE pour '
           'idCamp=$idCamp idEtab=$idEtab — aucune donnée sauvegardée localement.');
     }
 
-    debugPrint('[CoherenceEval] evaluate: idQst=$idQst idEtab=$idEtab '
+    logger.log('[CoherenceEval] evaluate: idQst=$idQst idEtab=$idEtab '
         'persistedFields=${persistedData.length} formFields=${formData.length} '
         'totalValues=${regexValues.length} rules=${rules.length} '
         'codeEtab=$codeEtab codeTypeAnnee=$codeTypeAnnee');
@@ -1247,6 +1342,9 @@ class CoherenceEvaluator {
     final violations = <OfflineCoherenceError>[];
 
     for (final rule in rules) {
+      logger.log('--------------------------------------------------------');
+      logger.log('[CoherenceEval] rule=${rule.idRegle} lib="${rule.libRegle}" '
+          'critere="${rule.critere}"');
       try {
         final violated = await _evaluateRule(
           rule: rule,
@@ -1257,18 +1355,29 @@ class CoherenceEvaluator {
           codeEtab: codeEtab,
           codeTypeAnnee: codeTypeAnnee,
           regexValues: regexValues,
+          logger: logger,
         );
 
         if (violated != null && violated) {
           violations.add(_buildViolation(rule, regexValues));
+          logger.log('[CoherenceEval] rule=${rule.idRegle} *** VIOLATED ***');
+        } else if (violated == false) {
+          logger.log('[CoherenceEval] rule=${rule.idRegle} OK (not violated)');
+        } else {
+          logger.log('[CoherenceEval] rule=${rule.idRegle} SKIPPED (not evaluable)');
         }
       } catch (e) {
-        debugPrint('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
+        logger.log('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
       }
     }
 
-    debugPrint(
-        '[CoherenceEval] evaluate complete: ${violations.length} violation(s)');
+    logger.log('========================================================');
+    logger.log('[CoherenceEval] evaluate complete: '
+        '${violations.length} violation(s)');
+    logger.log('=== RUN END ===');
+    // Écriture sur fichier disque — non-bloquant pour l'UI
+    await logger.flush();
+
     return violations;
   }
 
@@ -1289,6 +1398,7 @@ class CoherenceEvaluator {
     String? codeEtab,
     String? codeTypeAnnee,
     required Map<String, double> regexValues,
+    required CoherenceLogger logger,
   }) async {
     // ── CHEMIN 1 : SQL réel (SqlTranslator + rawQuery) ────────────────────
     final sqlResult = await _evaluateViaSql(
@@ -1299,11 +1409,12 @@ class CoherenceEvaluator {
       idQst: idQst,
       codeEtab: codeEtab,
       codeTypeAnnee: codeTypeAnnee,
+      logger: logger,
     );
 
     if (sqlResult != null) {
       // Le chemin SQL a réussi
-      debugPrint('[CoherenceEval] rule=${rule.idRegle} path=SQL '
+      logger.log('[CoherenceEval] rule=${rule.idRegle} path=SQL '
           'result=(${sqlResult.v1} ${rule.critere} ${sqlResult.v2}) '
           'violated=${sqlResult.violated}');
       return sqlResult.violated;
@@ -1313,11 +1424,11 @@ class CoherenceEvaluator {
     final v1 = _extractValue(rule.sqlRegle, regexValues);
     final v2 = _extractValue(rule.sqlAssoc, regexValues);
 
-    debugPrint('[CoherenceEval] rule=${rule.idRegle} path=REGEX '
+    logger.log('[CoherenceEval] rule=${rule.idRegle} path=REGEX '
         'v1=$v1 v2=$v2 critere="${rule.critere}"');
 
     if (v1 == null || v2 == null) {
-      debugPrint('[CoherenceEval] skip rule=${rule.idRegle} — '
+      logger.log('[CoherenceEval] skip rule=${rule.idRegle} — '
           'v1=$v1 v2=$v2 — field(s) not resolvable (conservative skip)');
       return null; // ignoré
     }
@@ -1335,10 +1446,17 @@ class CoherenceEvaluator {
     String? idQst,
     String? codeEtab,
     String? codeTypeAnnee,
+    required CoherenceLogger logger,
   }) async {
-    debugPrint('[CoherenceEval] _evaluateViaSql rule=${rule.idRegle} '
+    logger.log('[CoherenceEval] _evaluateViaSql rule=${rule.idRegle} '
         'idQst=$idQst idEtab=$idEtab codeEtab=$codeEtab '
         'critere="${rule.critere}"');
+    logger.log('[CoherenceEval] sql_regle raw: ${rule.sqlRegle}');
+    logger.log('[CoherenceEval] sql_assoc raw: ${rule.sqlAssoc}');
+
+    // SESSION 58 — Connecter le logger au SqlTranslator pour que toutes ses
+    // sorties soient aussi écrites dans le fichier log de cohérence.
+    SqlTranslator._logger = logger;
 
     // Traduire sql_regle
     final r1 = SqlTranslator.translate(
@@ -1350,10 +1468,10 @@ class CoherenceEvaluator {
       codeTypeAnnee: codeTypeAnnee,
     );
     if (r1 == null) {
-      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_regle not translatable → regex fallback');
+      logger.log('[CoherenceEval] rule=${rule.idRegle} sql_regle not translatable → regex fallback');
       return null; // non traduisible → fallback
     }
-    debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_regle (isScalar=${r1.isScalar}):\n${r1.sql}');
+    logger.log('[CoherenceEval] rule=${rule.idRegle} sql_regle (isScalar=${r1.isScalar}):\n${r1.sql}');
 
     // Traduire sql_assoc
     // FIX Bug 4: si sql_assoc n'est pas traduisible (ex: pas de table serveur
@@ -1376,7 +1494,7 @@ class CoherenceEvaluator {
       codeTypeAnnee: codeTypeAnnee,
     );
     if (r2 != null) {
-      debugPrint('[CoherenceEval] rule=${rule.idRegle} sql_assoc (isScalar=${r2.isScalar}):\n${r2.sql}');
+      logger.log('[CoherenceEval] rule=${rule.idRegle} sql_assoc (isScalar=${r2.isScalar}):\n${r2.sql}');
     }
 
     // Exécuter sql_regle (toujours disponible à ce stade)
@@ -1384,6 +1502,7 @@ class CoherenceEvaluator {
     final count1 = await _execCount(
       db, r1.sql, 'sql_regle', rule.idRegle,
       isScalar: r1.isScalar,
+      logger: logger,
     );
     if (count1 == null) return null;
 
@@ -1393,12 +1512,13 @@ class CoherenceEvaluator {
       final c2 = await _execCount(
         db, r2.sql, 'sql_assoc', rule.idRegle,
         isScalar: r2.isScalar,
+        logger: logger,
       );
       if (c2 == null) return null;
       count2 = c2;
     } else if (rule.sqlAssoc.trim().isEmpty) {
       // Pas d'association → on compare count1 à 0
-      debugPrint(
+      logger.log(
           '[CoherenceEval] rule=${rule.idRegle} sql_assoc empty → count2=0');
       count2 = 0;
     } else {
@@ -1406,14 +1526,14 @@ class CoherenceEvaluator {
       // on traite sql_regle comme un COUNT de violations et on compare à 0.
       // Cela est correct pour les règles dont le critere est '= 0' :
       //   count1=0 → pas de violation, count1>0 → violation.
-      debugPrint(
+      logger.log(
           '[CoherenceEval] rule=${rule.idRegle} sql_assoc not translatable '
           '— comparing count1 to 0 directly');
       count2 = 0;
     }
 
     final violated = _applyOperator(count1, count2, rule.critere);
-    debugPrint('[CoherenceEval] rule=${rule.idRegle} '
+    logger.log('[CoherenceEval] rule=${rule.idRegle} '
         'v1=$count1 ${rule.critere} v2=$count2 → violated=$violated');
     return _SqlEvalResult(v1: count1, v2: count2, violated: violated);
   }
@@ -1432,12 +1552,13 @@ class CoherenceEvaluator {
   /// → SQL tronqué → erreur SQLiteLog (1) near "SELECT": syntax error.
   Future<double?> _execCount(
       Database db, String sql, String label, int idRegle,
-      {bool isScalar = false}) async {
+      {bool isScalar = false,
+      CoherenceLogger? logger}) async {
     try {
       final rows = await db.rawQuery(sql);
       if (rows.isEmpty) {
-        debugPrint(
-            '[CoherenceEval] rawQuery $label rule=$idRegle → empty result');
+        final msg = '[CoherenceEval] rawQuery $label rule=$idRegle → empty result';
+        debugPrint(msg); logger?.log(msg);
         return isScalar ? 0.0 : 0.0;
       }
       if (isScalar) {
@@ -1449,19 +1570,19 @@ class CoherenceEvaluator {
             : (rawVal is num
                 ? rawVal.toDouble()
                 : double.tryParse(rawVal.toString()) ?? 0.0);
-        debugPrint(
-            '[CoherenceEval] rawQuery $label rule=$idRegle (SCALAR) → val=$val');
+        final msg = '[CoherenceEval] rawQuery $label rule=$idRegle (SCALAR) → val=$val';
+        debugPrint(msg); logger?.log(msg);
         return val;
       } else {
         // MODE EXISTS : colonne cnt = COUNT(*)
         final count = Sqflite.firstIntValue(rows);
-        debugPrint(
-            '[CoherenceEval] rawQuery $label rule=$idRegle (EXISTS) → count=$count');
+        final msg = '[CoherenceEval] rawQuery $label rule=$idRegle (EXISTS) → count=$count';
+        debugPrint(msg); logger?.log(msg);
         return count?.toDouble();
       }
     } catch (e) {
-      debugPrint(
-          '[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL: $sql');
+      final msg = '[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL:\n$sql';
+      debugPrint(msg); logger?.log(msg);
       return null;
     }
   }
@@ -1593,7 +1714,7 @@ class CoherenceEvaluator {
       case '<>':
         return !(v1 != v2);
       default:
-        debugPrint('[CoherenceEval] unknown critere "$critere" — skipping');
+      debugPrint('[CoherenceEval] unknown critère "$critere" — skipping');
         return false;
     }
   }

@@ -4,6 +4,115 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 58] — 2026-07-15 — Fix ambiguïté LIKE + Logging fichier exhaustif
+
+### Contexte
+Après S57, la règle 494 (`Sum(FILLES_AGE_NIVEAU) <= Sum(TOTAL_AGE_NIVEAU)`) fonctionnait
+correctement sur device. L'analyse des logs a révélé deux problèmes résiduels :
+
+1. **Ambiguïté LIKE** : `LIKE 'NB_ELEVES%'` matchait à la fois `NB_ELEVES_0` (total élèves)
+   ET `NB_ELEVES_F_0` (élèves filles) dans `DONNEES_ETABLISSEMENT`, car `NB_ELEVES` est un
+   préfixe de `NB_ELEVES_F`. `MAX()` pouvait retourner la mauvaise valeur selon les données.
+
+2. **Logs inaccessibles** : les `debugPrint` n'étaient visibles que dans Android logcat lors
+   d'un débogage USB — impossible à capturer pour analyse asynchrone sur le terrain.
+
+### Bug corrigé A — Ambiguïté LIKE (CRITIQUE)
+
+**Problème S57 :**
+```sql
+-- LIKE 'NB_ELEVES%' matchait NB_ELEVES_0=20 ET NB_ELEVES_F_0=8 → MAX=20 (ok ici)
+-- Mais si NB_ELEVES_HANDI_0=25 existait → MAX=25 pour la colonne NB_ELEVES ← FAUX!
+MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ELEVES%' THEN CAST(field_value AS REAL) END)
+```
+
+**Fix S58 — suffixe exact `_0` pour DONNEES_ETABLISSEMENT :**
+```sql
+-- LIKE 'NB_ELEVES_0'   → matche uniquement NB_ELEVES_0     ✅
+-- LIKE 'NB_ELEVES_F_0' → matche uniquement NB_ELEVES_F_0   ✅ (pas de confusion)
+MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ELEVES_0' THEN CAST(field_value AS REAL) END)
+```
+
+Le suffixe HTML pour `DONNEES_ETABLISSEMENT` est **toujours exactement `_0`** (une seule
+section de formulaire par champ). La pattern `LIKE 'FIELD_0'` est donc à la fois exacte
+et sans ambiguïté. Note : dans SQLite, `_` dans un LIKE matche n'importe quel caractère
+unique — mais la longueur de la chaîne garantit qu'il n'y a pas de match intempestif avec
+des suffixes plus longs (`_0_70`, `_0_71`, etc.).
+
+**Tables ELEVES_* : passage de `LIKE 'FIELD%'` à `LIKE 'FIELD_%'`**
+L'underscore requis entre le nom de champ et le suffixe améliore la robustesse
+(garantit qu'il y a au moins un caractère, correspondant au `_` du suffixe `_0_70`).
+Le comportement fonctionnel reste identique car les champs ELEVES ont toujours un `_`
+avant leurs suffixes numériques.
+
+**Règle unifiée S58 dans `_buildPivotCte()` :**
+| Catégorie | Stockage HTML | Stratégie CTE |
+|-|-|-|
+| Contexte (`CODE_ETABLISSEMENT`, `CODE_TYPE_ANNEE`) | Injecté sans suffixe | `= 'FIELD'` exact |
+| DONNEES_ETABLISSEMENT (mono-row) | Avec suffixe `_0` | `MAX + LIKE 'FIELD_0'` ← **S58** |
+| ELEVES_* (multi-row) | Avec suffixe `_0_70`, `_0_71`… | `SUM + LIKE 'FIELD_%'` ← **S58** |
+
+### Nouveauté B — Logging fichier exhaustif (CoherenceLogger)
+
+**Classe `CoherenceLogger`** ajoutée dans `coherence_evaluator.dart` :
+- À chaque appel de `evaluate()`, crée/écrase `{AppDocumentsDir}/coherence_latest.log`
+- Contenu : TOUS les messages du moteur (SqlTranslator + CoherenceEvaluator)
+  - Champs complets de `collected_data` (sans limite des 20 premiers)
+  - SQL bruts (server), SQL traduits (CTE complet + wrapper)
+  - Résultat de chaque règle : `path=SQL|REGEX`, `v1`, `v2`, `critere`, `violated`
+  - Marqueurs `=== RUN START ===` / `=== RUN END ===` pour délimiter les runs
+- Dépendance ajoutée : `path_provider: ^2.1.4` dans `pubspec.yaml`
+- Le fichier est lisible via explorateur de fichiers Android ou `adb pull`
+
+**Path du fichier sur Android :**
+```
+/data/user/0/com.example.stateduc_mobile/app_flutter/coherence_latest.log
+```
+Ou via `adb` :
+```bash
+adb pull /data/user/0/com.example.stateduc_mobile/app_flutter/coherence_latest.log
+```
+
+**Architecture logger :**
+```dart
+final logger = CoherenceLogger(idEtab: idEtab, idCamp: idCamp);
+// logger.log() → debugPrint() + buffer interne
+// SqlTranslator._logger = logger → toutes ses sorties aussi dans le fichier
+await logger.flush(); // → écrit {AppDocumentsDir}/coherence_latest.log
+```
+
+### Validation Python
+`/tmp/validate_s58.py` — **50/50 PASS** incluant :
+- T01–T06 : Ambiguïté LIKE résolue (`NB_ELEVES_0` vs `NB_ELEVES_F_0` vs `NB_ELEVES_HANDI_0`)
+- T07–T11 : ELEVES_* `LIKE 'FIELD_%'` — comportement correct
+- T12–T16 : Règle 493 (capture d'écran device) — violations correctement détectées/ignorées
+- T17–T20 : Règle 494 (la seule qui fonctionnait) — régression validée
+- T21–T24 : Règle électricité EXISTS — régression validée
+- T25–T31 : LIKE `_0` exact : pas de match sur suffixes longs
+- T32–T35 : CTE ELEVES génère les bonnes patterns `FIELD_%`
+- T36–T43 : Régression S56/S57 complète
+- T44–T50 : Structure CoherenceLogger
+
+### Note sur la capture d'écran device (règle 493)
+La violation affichée sur la capture (F=1 dans la grille ELEVES, F+M=8) est **légitime** :
+le formulaire `infos_gen_1.html` (données générales) n'a pas encore été sauvegardé →
+`NB_ELEVES_F_0` absent de `collected_data` → `MAX(LIKE 'NB_ELEVES_F_0')=NULL=0.0` →
+`Sum(FILLES_AGE_NIVEAU)=1 ≠ NB_ELEVES_F=0` → violation détectée.
+**Correction** : sauvegarder `infos_gen_1.html` avec `NB_ELEVES_F=1` → règle 493 OK.
+Avec S58, si `NB_ELEVES_F_0` est présent, sa valeur est lue sans ambiguïté.
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` :
+  - Classe `CoherenceLogger` ajoutée (avant `SqlTranslator`)
+  - `SqlTranslator._logger` (static) + `_log()` helper qui route vers logger et debugPrint
+  - `_buildPivotCte()` : `LIKE 'FIELD_0'` pour DONNEES_ETABLISSEMENT, `LIKE 'FIELD_%'` pour ELEVES_*
+  - `evaluate()` : crée `CoherenceLogger`, log exhaustif, `await logger.flush()` en fin
+  - `_evaluateRule()`, `_evaluateViaSql()`, `_execCount()` : logger propagé
+  - Commentaire version mis à jour (Session 58)
+- `pubspec.yaml` : `path_provider: ^2.1.4` ajouté
+
+---
+
 ## [Session 57] — 2026-07-15 — Fix CTE LIKE préfixe universel (DONNEES_ETABLISSEMENT : champs HTML suffixés _0)
 
 ### Contexte
