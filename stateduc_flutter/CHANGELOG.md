@@ -4,7 +4,81 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
-## [Session 51] — 2026-07-15 — Fix faux positifs ELEVES (MAX→SUM) + Zoom & Responsive WebView
+## [Session 52] — 2026-07-15 — Fix faux positifs GROUP BY context-only → SCALAR
+
+### Contexte
+Session 51 avait corrigé les faux positifs ELEVES via MAX→SUM dans `_buildPivotCte()`.
+Après recompilation, les contrôles offline se déclenchaient encore sur des valeurs correctes.
+
+**Logs observés :**
+```
+[CoherenceEval] rawQuery sql_regle rule=495 (EXISTS) → count=1
+[CoherenceEval] rawQuery sql_assoc rule=495 (EXISTS) → count=1
+[CoherenceEval] rule=495 path=SQL result=(1.0 < 1.0) violated=true  ← FAUX POSITIF
+```
+
+### Cause racine
+
+**Structure SQL du serveur (règle 495, sql_regle) :**
+```sql
+SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU
+FROM ELEVES_AGE_NIVEAU_SEXE
+GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+HAVING (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
+```
+
+Après les strips S47/S50 (HAVING context-only supprimé) :
+```sql
+SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU
+FROM ELEVES_AGE_NIVEAU_SEXE
+GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+```
+
+- `hasGroupBy = true` → **MODE EXISTS** → `SELECT COUNT(*) AS cnt FROM (...)`
+- Cette requête retourne **toujours 1 ligne** (1 ligne agrégée par établissement)
+- `COUNT(*) = 1` pour `sql_regle` ET `sql_assoc`
+- `_applyOperator(1.0, 1.0, '<')` → `!(1.0 < 1.0)` → `!false` → **`true` = FAUX POSITIF**
+
+### Analyse
+
+Ce pattern `SELECT Sum(X) ... GROUP BY [context_fields_only]` est une requête **Sum-scalaire** :
+- Le serveur groupe par établissement/année pour obtenir la somme de cet établissement
+- Côté mobile, le CTE est déjà filtré par `id_etab` → 1 établissement → **1 seule ligne**
+- → La requête retourne une **valeur scalaire**, pas une liste de violations
+- → Doit être traitée en **MODE SCALAR**, pas EXISTS
+
+### Fix : `_isSumScalarWithContextGroupBy()` + `_stripContextOnlyGroupBy()` (étape 8)
+
+**Fichier** : `coherence_evaluator.dart`
+
+**Nouvelle logique de détection MODE (étape 8) — 3 cas :**
+1. Pas de GROUP BY → **MODE SCALAR** (S49, inchangé)
+2. GROUP BY context-only + SELECT = agrégats purs (Sum/Count/Avg/…) → **MODE SCALAR** (S52 NEW)
+   - GROUP BY supprimé (redondant sur mobile)
+   - Valeur scalaire lue directement via COALESCE wrapper
+3. GROUP BY avec colonne non-contexte → **MODE EXISTS** (S45-S48, inchangé)
+
+**`_isSumScalarWithContextGroupBy(sql)`** :
+- Critère 1 : chaque colonne SELECT est une fonction d'agrégation (`Sum(`, `Count(`, etc.)
+- Critère 2 : chaque colonne GROUP BY est un champ de contexte
+
+**`_stripContextOnlyGroupBy(sql)`** :
+- Supprime `GROUP BY [context_fields_only]` + HAVING résiduel
+- Transforme la requête en SELECT pur sans groupement
+
+**Résultat :**
+```
+Avant fix : rule=495 EXISTS → count=1 vs count=1 → (1<1)=false → violated=true  (FAUX POSITIF)
+Après fix : rule=495 SCALAR → val=22.0 vs val=50.0 → (22<50)=true → violated=false ✓
+Vraie violation : val=60 vs val=40 → (60<50)=false → violated=true ✓
+Règle EXISTS préservée : SELECT CODE_ETAB + WHERE ELEC=0 → isScalar=False ✓
+```
+
+**Validation Python :** 3/3 tests PASS.
+
+---
+
+
 
 ### Contexte
 Session 50 avait corrigé le mismatch TEXT/INTEGER dans WHERE pour les règles SUM-scalaires.

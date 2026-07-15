@@ -70,22 +70,26 @@
 //     - parenthèses triples `(((x)))` → `(x)` (normalisées mais conservées)
 //     - opérateurs `Or` / `And` (case insensitive) → `OR` / `AND`
 //
-//  4. RÉSULTAT ATTENDU — DUAL MODE (Session 49)
-//     Le traducteur génère deux modes selon la présence de GROUP BY :
+//  4. RÉSULTAT ATTENDU — DUAL MODE (Sessions 49 + 52)
+//     Le traducteur génère deux modes selon la structure GROUP BY :
 //
-//     MODE EXISTS (has GROUP BY) — règles de type "existe un établissement violant ?"
+//     MODE EXISTS (GROUP BY avec colonne non-contexte) — règles "existe un étab violant ?"
 //       Wrapper : SELECT COUNT(*) AS cnt FROM (...) _violations
 //       → count = 0 : pas de violation
 //       → count > 0 : violation détectée
 //       Comparé au critere (généralement "= 0").
 //
-//     MODE SCALAR (pas de GROUP BY, SELECT Sum/COUNT agrégat) — règles de type
+//     MODE SCALAR (pas de GROUP BY OU GROUP BY contexte-only + SELECT agrégat pur)
 //       "Sum(NB_LATRINES_ELEVES) <= Sum(NB_LATRINES_BON_ETAT) ?"
 //       Wrapper : SELECT COALESCE((SELECT col FROM (...) _s), 0) AS val
 //       → retourne la vraie valeur scalaire
 //       → comparée directement à la valeur scalaire de sql_assoc via _applyOperator
 //
-//     Détection : la SQL contient-elle GROUP BY ? Si non → MODE SCALAR.
+//     Détection (dans l'ordre) :
+//       1. Pas de GROUP BY → MODE SCALAR (S49)
+//       2. GROUP BY contexte-only + SELECT = Sum/Count/Avg purs → SCALAR (S52)
+//          GROUP BY supprimé (redondant mobile), valeur lue directement
+//       3. Sinon → MODE EXISTS
 //
 //  5. MAPPING DE TABLE : ELEVES_AGE_NIVEAU_SEXE / ELEVES_NIVEAU_SEXE / ELEVES_AGE_SEXE
 //     Ces tables sont MULTI-LIGNES : collected_data contient plusieurs lignes
@@ -222,8 +226,9 @@ class SqlTranslator {
   ///   [codeEtab]      → valeur pour \$CODE_ETABLISSEMENT  (ex. '101012071')
   ///   [codeTypeAnnee] → valeur pour \$CODE_TYPE_ANNEE (ex. '2024')
   ///
-  /// MODE EXISTS (GROUP BY présent) : wrappé dans SELECT COUNT(*) AS cnt FROM (...).
-  /// MODE SCALAR (pas de GROUP BY)  : wrappé dans SELECT COALESCE(val, 0) AS val.
+  /// MODE EXISTS (GROUP BY non-contexte) : wrappé dans SELECT COUNT(*) AS cnt FROM (...).
+  /// MODE SCALAR (pas de GROUP BY, ou GROUP BY contexte-only + SELECT agrégat) :
+  ///   wrappé dans SELECT COALESCE(val, 0) AS val.
   /// Voir [TranslationResult.isScalar] pour distinguer les deux modes.
   static TranslationResult? translate({
     required String serverSql,
@@ -333,20 +338,59 @@ class SqlTranslator {
       // → count1 = 1 et count2 = 1 pour toutes les règles SUM → 1 <= 1 = never
       // violated, quelle que soit la valeur réelle de Sum(X).
       //
-      // SOLUTION : détection GROUP BY dans le SQL traduit.
-      //   • GROUP BY présent  → MODE EXISTS  : COUNT(*) wrapper (comportement S45-S48)
-      //   • Pas de GROUP BY   → MODE SCALAR  : COALESCE(val, 0) wrapper retournant
-      //                         la valeur agrégée réelle pour _applyOperator.
+      // SESSION 52 FIX : un deuxième pattern cause des faux positifs :
+      //   SELECT Sum(X) FROM T GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+      //   → hasGroupBy = true → MODE EXISTS → COUNT(*) = 1 toujours
+      //   → (1 < 1) → !(1 < 1) = true → FAUX POSITIF
+      //
+      //   Ce pattern correspond à une requête Sum-scalaire avec GROUP BY de
+      //   contexte uniquement (le serveur regroupe par établissement pour avoir
+      //   la somme par établissement — contexte unique côté mobile).
+      //   → doit être traité comme SCALAR (lire la valeur réelle Sum(X)).
+      //
+      // RÈGLE DE DÉTECTION MODE (dans l'ordre de priorité) :
+      //
+      //   1. Pas de GROUP BY → MODE SCALAR (règles Sum sans groupement)
+      //
+      //   2. GROUP BY contexte-only ET SELECT = agrégats purs (Sum/Count/Avg/Max/Min)
+      //      → MODE SCALAR : on supprime le GROUP BY (redondant sur mobile où le CTE
+      //        est déjà filtré par établissement) et on lit la valeur agrégée.
+      //      Exemple : SELECT Sum(FILLES_AGE_NIVEAU) FROM ELEVES GROUP BY CODE_ETABLISSEMENT
+      //        → supprime GROUP BY → SELECT Sum(FILLES_AGE_NIVEAU) FROM ELEVES
+      //        → COALESCE wrapper → val = somme réelle
+      //
+      //   3. GROUP BY avec colonne non-contexte → MODE EXISTS (règles de violation
+      //      WHERE qui filtrent les établissements qui violent la condition)
+      //      Exemple : SELECT CODE_ETAB FROM DONNEES WHERE ELEC=0 GROUP BY CODE_ETAB
+      //        → COUNT(*) > 0 → violation détectée
+
       final hasGroupBy = RegExp(
         r'\bGROUP\s+BY\b',
         caseSensitive: false,
       ).hasMatch(translatedSql);
 
+      // Détection du pattern Sum-scalaire avec GROUP BY de contexte (Fix S52)
+      final isSumScalarGroupBy = hasGroupBy &&
+          _isSumScalarWithContextGroupBy(translatedSql);
+
+      // Si GROUP BY contexte-only avec Sum/Count dans SELECT :
+      // supprimer le GROUP BY pour obtenir une requête scalaire propre.
+      if (isSumScalarGroupBy) {
+        translatedSql = _stripContextOnlyGroupBy(translatedSql);
+        debugPrint('[SqlTranslator] Sum-scalar with context-only GROUP BY detected '
+            '→ GROUP BY stripped → SCALAR mode');
+      }
+
       final withClause = 'WITH ${cteParts.join(',\n')}';
       final String wrappedSql;
       final bool isScalar;
 
-      if (hasGroupBy) {
+      // Recalcule hasGroupBy après le strip éventuel du GROUP BY
+      final hasGroupByFinal = !isSumScalarGroupBy &&
+          RegExp(r'\bGROUP\s+BY\b', caseSensitive: false)
+              .hasMatch(translatedSql);
+
+      if (hasGroupByFinal) {
         // MODE EXISTS — requête retourne des lignes si violation
         wrappedSql =
             '$withClause\nSELECT COUNT(*) AS cnt FROM (\n$translatedSql\n) _violations';
@@ -745,6 +789,89 @@ class SqlTranslator {
     });
 
     return ctePart + strippedMain;
+  }
+
+  /// Détecte les requêtes Sum-scalaires avec GROUP BY de contexte uniquement.
+  ///
+  /// Pattern cible (règles de type comparaison de sommes, ex: règle 495) :
+  ///   SELECT Sum(FILLES_AGE_NIVEAU) AS xxx
+  ///   FROM ELEVES_AGE_NIVEAU_SEXE
+  ///   GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+  ///
+  /// Deux critères combinés :
+  ///   1. La liste SELECT ne contient que des fonctions d'agrégation
+  ///      (Sum, Count, Avg, Max, Min) — pas de colonnes simples.
+  ///   2. Le GROUP BY ne contient que des champs de contexte
+  ///      (CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF).
+  ///
+  /// Ces requêtes retournent une seule valeur scalaire par établissement.
+  /// Elles doivent être traitées en MODE SCALAR, pas EXISTS.
+  /// En mode EXISTS COUNT(*) = 1 toujours → (1 < 1) → violated=true → FAUX POSITIF.
+  ///
+  /// Fix Session 52 — règles 483–495 et similaires.
+  static bool _isSumScalarWithContextGroupBy(String sql) {
+    // 1. Extraire la liste SELECT (entre SELECT et FROM)
+    final selMatch = RegExp(
+      r'\bSELECT\b(.+?)\bFROM\b',
+      caseSensitive: false,
+      dotAll: true,
+    ).firstMatch(sql);
+    if (selMatch == null) return false;
+
+    // Supprimer les alias AS xxx puis tester chaque colonne
+    final selectPart = selMatch.group(1)!
+        .replaceAll(RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '');
+    final colParts = selectPart.split(',');
+    for (final col in colParts) {
+      final trimmed = col.trim();
+      if (trimmed.isEmpty) continue;
+      // Chaque colonne doit être une fonction d'agrégation
+      if (!RegExp(r'^(Sum|Count|Avg|Max|Min)\s*\(',
+              caseSensitive: false)
+          .hasMatch(trimmed)) {
+        return false;
+      }
+    }
+
+    // 2. Extraire GROUP BY et vérifier que seuls des champs de contexte y figurent
+    final grpMatch = RegExp(
+      r'\bGROUP\s+BY\b(.+?)(?:\bHAVING\b|\bORDER\s+BY\b|\bLIMIT\b|$)',
+      caseSensitive: false,
+      dotAll: true,
+    ).firstMatch(sql);
+    if (grpMatch == null) return false; // Pas de GROUP BY
+
+    final groupCols = grpMatch.group(1)!.split(',');
+    for (final col in groupCols) {
+      final trimmed = col.trim().toUpperCase();
+      if (!_contextFields.contains(trimmed)) return false;
+    }
+
+    return true;
+  }
+
+  /// Supprime le GROUP BY d'une requête Sum-scalaire dont le GROUP BY ne contient
+  /// que des champs de contexte (résultat de [_isSumScalarWithContextGroupBy]).
+  ///
+  /// Supprime également le HAVING résiduel s'il est présent (déjà supprimé par
+  /// [_stripContextOnlyHaving] dans les étapes précédentes, mais par sécurité).
+  ///
+  /// Fix Session 52 — appliqué dans l'étape 8 de [translate()] AVANT le wrapper.
+  static String _stripContextOnlyGroupBy(String sql) {
+    // Supprime GROUP BY ... jusqu'à HAVING / ORDER BY / LIMIT / fin
+    // HAVING doit avoir été supprimé par _stripContextOnlyHaving (étape 7b)
+    // mais on nettoie aussi HAVING résiduel pour robustesse.
+    String result = sql.replaceAll(
+      RegExp(
+        r'\bGROUP\s+BY\b.+?(?=\bHAVING\b|\bORDER\s+BY\b|\bLIMIT\b|$)',
+        caseSensitive: false,
+        dotAll: true,
+      ),
+      '',
+    );
+    // Supprimer HAVING résiduel context-only s'il reste
+    result = _stripContextOnlyHaving(result);
+    return result.trimRight();
   }
 
   // ─── Utilitaire : est-ce un mot-clé SQL ? ────────────────────────────────
