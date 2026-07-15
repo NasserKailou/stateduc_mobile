@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../models/question.dart';
@@ -111,6 +113,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
             _injectData();
             _refreshMatrixTotals();
             _injectBridge();
+            _enablePinchZoom(); // Active le pinch-to-zoom (Android WebView ignore user-scalable=yes)
           });
         },
         onWebResourceError: (err) {
@@ -465,22 +468,53 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   }
   .grille-add-row:active { background: #0d47a1; }
 
-    /* ── Responsivité : le corps s'adapte à la largeur de l'écran ── */
+  /* ── Responsivité : le corps s'adapte à la largeur de l'écran ── */
   html, body {
     max-width: 100%;
     overflow-x: hidden;   /* le scroll horizontal se fait au niveau des tableaux, pas du body */
+    /* Autorise le pinch-to-zoom : ne pas bloquer le touch-action */
+    touch-action: pan-x pan-y pinch-zoom;
   }
 
-  /* Les formulaires simples (non-grille) passent en colonne sur petit écran */
-  @media (max-width: 600px) {
-    /* Réduit les paddings pour gagner de la place */
-    td, th { padding: 3px 4px; }
-    body { font-size: 12px; }
+  /* ── Smartphone (largeur < 480 px) ── */
+  @media (max-width: 480px) {
+    body { font-size: 11px; margin: 2px; }
+    td, th { padding: 2px 3px; font-size: 11px; }
+    th { min-width: 44px; }
+    input[type=text], input[type=number], textarea, select {
+      max-width: 100%;
+      font-size: 11px;
+      padding: 2px 3px;
+      min-width: 44px;
+    }
+    input[type=radio], input[type=checkbox] {
+      transform: scale(1.1);
+      margin: 2px;
+    }
+  }
 
-    /* Les champs texte des formulaires NON tabulaires prennent toute la largeur */
+  /* ── Mobile standard (480 – 600 px) ── */
+  @media (min-width: 481px) and (max-width: 600px) {
+    body { font-size: 12px; }
+    td, th { padding: 3px 4px; }
     input[type=text], input[type=number], textarea, select {
       max-width: 100%;
     }
+  }
+
+  /* ── Tablette (> 600 px) ── */
+  @media (min-width: 601px) {
+    body { font-size: 14px; margin: 8px; }
+    td, th { padding: 6px 8px; font-size: 13px; }
+    input[type=text], input[type=number], textarea, select {
+      font-size: 14px;
+      padding: 5px 6px;
+    }
+    input[type=radio], input[type=checkbox] {
+      transform: scale(1.4);
+      margin: 6px;
+    }
+    th { min-width: 80px; }
   }
 
   /* Empêche les images/éléments larges de déborder */
@@ -661,6 +695,38 @@ $formHtml
 ''');
   }
 
+  // ── Active le pinch-to-zoom dans le WebView (Android) ─────────────────────
+  //
+  // Android WebView ignore user-scalable=yes dans le viewport meta par défaut.
+  // Cette méthode :
+  //   1. Remplace le meta viewport par une version sans restriction de zoom.
+  //   2. Active explicitement touch-action: pinch-zoom sur html/body.
+  //
+  // Appelée après chaque chargement de page (onPageFinished) pour s'assurer
+  // que le meta est bien en place même après un rechargement du HTML.
+  void _enablePinchZoom() {
+    if (!_pageLoaded) return;
+    // ⚠️  JAVASCRIPT ci-dessous — ne pas utiliser syntaxe Dart ici.
+    _controller.runJavaScript(r'''
+(function() {
+  // 1. Remplace/crée le meta viewport pour autoriser le zoom utilisateur
+  var meta = document.querySelector('meta[name="viewport"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('name', 'viewport');
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content',
+    'width=device-width, initial-scale=1.0, minimum-scale=0.25, maximum-scale=10.0, user-scalable=yes');
+
+  // 2. Supprime toute règle CSS qui bloquerait le zoom (touch-action: manipulation
+  //    bloque le pinch-zoom sur Android ; touch-action: pan-x pan-y pinch-zoom l'autorise)
+  document.documentElement.style.touchAction = 'pan-x pan-y pinch-zoom';
+  document.body.style.touchAction = 'pan-x pan-y pinch-zoom';
+})();
+''');
+  }
+
   // ── Bouton natif "Ajouter une ligne" pour les formulaires grille ───────────
   //
   // Bouton Flutter natif affiché sous le WebView pour les formulaires de type grille.
@@ -810,6 +876,17 @@ $formHtml
     // setBackgroundColor prenne effet dans le moteur WebView.
     final webView = WebViewWidget(
       controller: _controller,
+      // Passe les gestes de pinch (ScaleGestureRecognizer) au WebView.
+      // Sans cela, Flutter intercepte les gestes multi-touch avant qu'ils
+      // atteignent le moteur WebView, empêchant le zoom par pincement.
+      gestureRecognizers: {
+        Factory<OneSequenceGestureRecognizer>(
+          () => ScaleGestureRecognizer(),
+        ),
+        Factory<OneSequenceGestureRecognizer>(
+          () => EagerGestureRecognizer(),
+        ),
+      },
     );
 
     final body = _isRendering

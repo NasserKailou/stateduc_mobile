@@ -87,9 +87,14 @@
 //
 //     Détection : la SQL contient-elle GROUP BY ? Si non → MODE SCALAR.
 //
-//  5. MAPPING DE TABLE : ELEVES_AGE_NIVEAU_SEXE
-//     Même principe que DONNEES_ETABLISSEMENT — les champs sont extraits
-//     depuis collected_data en pivotant sur field_name.
+//  5. MAPPING DE TABLE : ELEVES_AGE_NIVEAU_SEXE / ELEVES_NIVEAU_SEXE / ELEVES_AGE_SEXE
+//     Ces tables sont MULTI-LIGNES : collected_data contient plusieurs lignes
+//     par field_name (une par combinaison âge × niveau × sexe).
+//     → Le CTE utilise SUM(CASE WHEN ...) au lieu de MAX(CASE WHEN ...)
+//     → Exemple : FILLES_AGE_NIVEAU présent sur 3 lignes (10, 11, 12)
+//                 MAX → 12  (sous-évaluation → faux positifs)
+//                 SUM → 33  (correct → correspond au Sum() serveur)
+//     Voir _multiRowTables et _buildPivotCte() pour l'implémentation.
 //
 //  6. TABLES INCONNUES
 //     Si le SQL contient une table non reconnue, le traducteur retourne null
@@ -180,6 +185,20 @@ class SqlTranslator {
   // Tables serveur connues qui peuvent être mappées vers collected_data
   static const _knownServerTables = {
     'DONNEES_ETABLISSEMENT',
+    'ELEVES_AGE_NIVEAU_SEXE',
+    'ELEVES_NIVEAU_SEXE',
+    'ELEVES_AGE_SEXE',
+  };
+
+  // Tables dont les données sont multi-lignes dans collected_data
+  // (une ligne par combinaison âge × niveau × sexe).
+  // → le CTE doit utiliser SUM() pour agréger toutes les lignes,
+  //   sinon MAX() ne retourne que la valeur maximale et non la somme réelle,
+  //   ce qui provoque de faux positifs dans les contrôles offline.
+  // Exemple : FILLES_AGE_NIVEAU stocké en 3 lignes (10, 11, 12)
+  //   MAX → 12  (BUG : sous-évaluation massive)
+  //   SUM → 33  (CORRECT : égal à la somme du serveur)
+  static const _multiRowTables = {
     'ELEVES_AGE_NIVEAU_SEXE',
     'ELEVES_NIVEAU_SEXE',
     'ELEVES_AGE_SEXE',
@@ -496,19 +515,19 @@ class SqlTranslator {
   // Génère une sous-requête CTE qui pivote collected_data vers les colonnes
   // attendues par la requête serveur.
   //
-  // Schéma généré :
-  //   SELECT
-  //     MAX(CASE WHEN field_name='FIELD_A' THEN CAST(field_value AS REAL) END) AS FIELD_A,
-  //     MAX(CASE WHEN field_name='FIELD_B' THEN CAST(field_value AS REAL) END) AS FIELD_B,
-  //     MAX(CASE WHEN field_name='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-  //     ...
-  //   FROM collected_data
-  //   WHERE id_camp='CAMP_ID' AND id_etab='ETAB_ID'
+  // Deux stratégies d'agrégation selon le type de table :
   //
-  // Nota : on utilise MAX() pour agréger (pivot) car les données sont stockées
-  // en lignes. MAX() retourne la valeur si elle est unique, ou la plus grande
-  // valeur si elle apparaît plusieurs fois (filtre), ce qui est cohérent avec
-  // le comportement du serveur pour les données d'établissement.
+  // • Tables MONO-LIGNE (DONNEES_ETABLISSEMENT) :
+  //     MAX(CASE WHEN field_name='X' THEN CAST(field_value AS REAL) END) AS X
+  //   → Une seule ligne par champ → MAX() retourne la valeur unique.
+  //
+  // • Tables MULTI-LIGNES (ELEVES_AGE_NIVEAU_SEXE, ELEVES_NIVEAU_SEXE, ELEVES_AGE_SEXE) :
+  //     SUM(CASE WHEN field_name='X' THEN CAST(field_value AS REAL) ELSE 0 END) AS X
+  //   → Plusieurs lignes par champ (une par combinaison âge×niveau×sexe)
+  //     → SUM() agrège toutes les lignes, ce qui correspond au Sum() serveur.
+  //     → Exemple : FILLES_AGE_NIVEAU stocké en 3 lignes (10, 11, 12)
+  //                 MAX → 12  (BUG : sous-évaluation)
+  //                 SUM → 33  (CORRECT)
   //
   // Les champs de texte (CODE_ETABLISSEMENT, etc.) n'ont pas de CAST pour
   // préserver la comparaison de chaînes dans les filtres HAVING.
@@ -522,14 +541,22 @@ class SqlTranslator {
     final escapedCamp = idCamp.replaceAll("'", "''");
     final escapedEtab = idEtab.replaceAll("'", "''");
 
+    // Détecter si la table est de type multi-lignes (ELEVES_*)
+    final isMultiRow = _multiRowTables.contains(tableName.toUpperCase());
+
     final columnDefs = fields.map((field) {
       final isTextContext = _contextFields.contains(field.toUpperCase());
       if (isTextContext) {
         // Champs texte : pas de CAST numérique (comparaison de chaînes)
         return "    MAX(CASE WHEN UPPER(field_name)='$field' "
             "THEN field_value END) AS $field";
+      } else if (isMultiRow) {
+        // Tables multi-lignes : SUM() pour agréger toutes les lignes
+        // (correspond au Sum() serveur sur ELEVES_AGE_NIVEAU_SEXE, etc.)
+        return "    SUM(CASE WHEN UPPER(field_name)='$field' "
+            "THEN CAST(field_value AS REAL) ELSE 0 END) AS $field";
       } else {
-        // Champs numériques : CAST vers REAL pour les calculs arithmétiques
+        // Tables mono-ligne : MAX() pour pivoter la valeur unique
         return "    MAX(CASE WHEN UPPER(field_name)='$field' "
             "THEN CAST(field_value AS REAL) END) AS $field";
       }
