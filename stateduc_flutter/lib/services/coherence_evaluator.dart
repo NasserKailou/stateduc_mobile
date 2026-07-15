@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 54 — Fix SCALAR wrapper multi-colonnes (_keepFirstSelectColumn)
+// VERSION : Session 55 — Fix cohérence inter-thèmes (suppression id_qst du CTE) + alias extraction
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -628,23 +628,28 @@ class SqlTranslator {
       }
     }
 
-    // FIX Bug S53-B: extraire les champs non qualifiés du SELECT lui-même.
+    // FIX Bug S53-B + S55-B: extraire les champs non qualifiés du SELECT lui-même,
+    // en excluant les alias (tokens après AS).
+    //
     // Quand le SQL n'utilise PAS de qualificateur TABLE.FIELD (ex:
     //   SELECT Sum(FILLES_AGE_NIVEAU) FROM ELEVES_AGE_NIVEAU_SEXE
-    // ), le champ FILLES_AGE_NIVEAU n'était pas extrait par le pattern
-    // TABLE.FIELD car il n'y a pas de préfixe.  Résultat : colonne manquante
+    // ), le champ FILLES_AGE_NIVEAU n'était pas extrait → colonne manquante
     // dans le CTE → SQLite : "no such column: FILLES_AGE_NIVEAU".
     //
-    // On extrait la liste SELECT (entre SELECT et FROM) et on scanne tous les
-    // identifiants à l'intérieur des appels de fonction d'agrégation
-    // (Sum, Count, Avg, Max, Min) ainsi que les colonnes directes.
+    // FIX S55-B : le scanner S53-B extrayait aussi les ALIAS définis après AS
+    // (ex: AS SommeDeFILLES_AGE_NIVEAU → SOMMEDEFILLES_AGE_NIVEAU ajouté au CTE).
+    // Ces alias n'existent pas dans collected_data → colonne CTE inutile (toujours 0)
+    // et logs pollués. Solution : supprimer les alias AS xxx avant de scanner.
     final selectMatch = RegExp(
       r'\bSELECT\b(.+?)\bFROM\b',
       caseSensitive: false,
       dotAll: true,
     ).firstMatch(sql);
     if (selectMatch != null) {
-      final selectClause = selectMatch.group(1) ?? '';
+      // Supprimer les alias AS xxx avant extraction pour éviter d'ajouter
+      // SommeDeXXX comme champ du CTE (ne correspond à rien dans collected_data)
+      final selectClause = (selectMatch.group(1) ?? '')
+          .replaceAll(RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '');
       final identPattern =
           RegExp(r'\b([A-Z][A-Z0-9_]+)\b', caseSensitive: false);
       for (final id in identPattern.allMatches(selectClause)) {
@@ -688,11 +693,11 @@ class SqlTranslator {
     required Set<String> fields,
     required String idCamp,
     required String idEtab,
+    // idQst conservé pour la signature mais non utilisé dans le CTE (FIX S55).
     String? idQst,
   }) {
     final escapedCamp = idCamp.replaceAll("'", "''");
     final escapedEtab = idEtab.replaceAll("'", "''");
-    final escapedQst  = idQst?.replaceAll("'", "''");
 
     // Détecter si la table est de type multi-lignes (ELEVES_*)
     final isMultiRow = _multiRowTables.contains(tableName.toUpperCase());
@@ -715,21 +720,28 @@ class SqlTranslator {
       }
     }).join(',\n');
 
-    // SESSION 53 FIX : filtrer également par id_qst quand disponible.
-    // Cela évite d'agréger des données de plusieurs formulaires (questions)
-    // pour le même établissement — notamment pour les tables MULTI-LIGNES
-    // (ELEVES_*) où un SUM() sans filtre id_qst totaliserait toutes les
-    // périodes / tous les formulaires au lieu du formulaire courant.
+    // FIX SESSION 55 — NE PAS filtrer par id_qst dans le CTE de cohérence.
     //
-    // Pour DONNEES_ETABLISSEMENT (mono-ligne) le filtre est aussi utile
-    // quand les données de plusieurs formulaires ont un champ homonyme.
-    final qstFilter = (escapedQst != null && escapedQst.isNotEmpty)
-        ? " AND id_qst='$escapedQst'"
-        : '';
-
+    // PROBLÈME INTRODUIT EN S53 :
+    //   Le filtre AND id_qst='...' dans le CTE filtrait sur l'id_qst du formulaire
+    //   COURANT (ex: '9502'). Mais les données des tables ELEVES sont sauvegardées
+    //   sous l'id_qst DU FORMULAIRE ÉLÈVES (ex: '9501'), pas celui du formulaire
+    //   de cohérence. Résultat : le CTE retournait 0 lignes → val=0.0 → aucune
+    //   violation jamais détectée → les contrôles offline ne fonctionnaient pas.
+    //
+    // MODÈLE SERVEUR (controle_theme_batch.class.php) :
+    //   Les requêtes SQL de cohérence s'exécutent sur des VUES SQL Server qui
+    //   contiennent TOUTES les données de l'établissement pour la campagne,
+    //   sans filtrage par thème/questionnaire. Le mobile reproduit ce comportement.
+    //
+    // SOLUTION : filtrer sur (id_camp, id_etab) uniquement — comme le serveur.
+    //   Le CTE agrège toutes les données de l'établissement pour la campagne,
+    //   indépendamment du formulaire d'origine. C'est nécessaire pour les règles
+    //   inter-thèmes (ex: Total filles ≤ Total élèves, où filles vient d'un thème
+    //   et total d'un autre).
     return '  SELECT\n$columnDefs\n'
         "  FROM collected_data\n"
-        "  WHERE id_camp='$escapedCamp' AND id_etab='$escapedEtab'$qstFilter";
+        "  WHERE id_camp='$escapedCamp' AND id_etab='$escapedEtab'";
   }
 
   // ─── Traduction syntaxique Access/SQL Server → SQLite ─────────────────────

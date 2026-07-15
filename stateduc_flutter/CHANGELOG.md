@@ -4,6 +4,75 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 55] — 2026-07-15 — Fix cohérence offline inter-thèmes (suppression id_qst du CTE + alias extraction)
+
+### Contexte
+Les contrôles de cohérence offline ne se déclenchaient jamais malgré des données incorrectes.
+Les logs device montraient systématiquement `val=0.0` pour les règles 494 et 495 (tables
+`ELEVES_AGE_NIVEAU_SEXE`). L'analyse a révélé deux bugs distincts introduits en Session 53.
+
+### Bugs corrigés
+
+**Bug S55-A (CRITIQUE) — Filtre `id_qst` incorrect dans le CTE de cohérence**
+
+En S53, un filtre `AND id_qst='<idQst_courant>'` avait été ajouté dans `_buildPivotCte()`
+pour éviter l'agrégation multi-formulaires. Ce filtre était correct pour les règles
+intra-thème, mais **brisait les règles inter-thèmes** :
+
+- Les règles de cohérence du thème 9502 référencent des données ELEVES.
+- Les données ELEVES sont sauvegardées sous l'`id_qst` du formulaire ELÈVES (ex: `'9501'`),
+  pas celui du formulaire de cohérence (`'9502'`).
+- Résultat : `WHERE id_camp='2' AND id_etab='20952' AND id_qst='9502'` → **0 lignes** →
+  `SUM() = 0` → `val=0.0` → aucune violation jamais détectée.
+
+**Modèle serveur** (`controle_theme_batch.class.php`) : les vues SQL Server contiennent
+TOUTES les données de l'établissement pour la campagne, sans filtrage par thème.
+Le mobile doit reproduire ce comportement.
+
+**Fix :** Suppression du filtre `id_qst` dans `_buildPivotCte()`. Le CTE filtre désormais
+uniquement sur `(id_camp, id_etab)`, comme le serveur. Le paramètre `idQst` est conservé
+dans la signature pour compatibilité mais n'est plus utilisé dans la requête CTE.
+
+**Bug S55-B (SECONDAIRE) — Extraction d'alias dans `_extractAllFieldNames()`**
+
+Le scanner SELECT de S53-B extrayait tous les identifiants du SELECT, y compris les **alias**
+définis après `AS` (ex: `AS SommeDeFILLES_AGE_NIVEAU` → `SOMMEDEFILLES_AGE_NIVEAU` ajouté
+comme champ du CTE). Ces alias n'existent pas dans `collected_data` → colonne CTE inutile
+(toujours 0) et logs pollués avec des champs fantômes.
+
+Logs avant fix :
+```
+[SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE,
+  CODE_ADMINISTRATIF, TOTAL_AGE_NIVEAU, SOMMEDETOTAL_AGE_NIVEAU}
+```
+`SOMMEDETOTAL_AGE_NIVEAU` est un alias, pas un champ de `collected_data`.
+
+**Fix :** `.replaceAll(RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '')` appliqué sur
+la clause SELECT avant le scan des identifiants. Seuls les vrais noms de champs sont extraits.
+
+### Règle de filtrage par thème
+La demande utilisateur "n'exécuter que les règles du thème courant" est déjà satisfaite au
+niveau de la requête base de données : `getCoherenceRules(idCamp, idQst, idEtab)` dans
+`database_service.dart` (L1324) filtre `WHERE id_camp=? AND id_qst=? AND id_etab=?`.
+Seules les règles du thème courant sont évaluées. Le fix S55-A concerne uniquement les
+**données** agrégées dans le CTE, pas le filtrage des règles elles-mêmes.
+
+### Validation Python
+Simulateur Python mis à jour : **28/28 tests PASS** (T01–T17), incluant 5 nouveaux tests S55 :
+- T13 : données ELEVES dans `id_qst='9501'`, règle dans `id_qst='9502'` → détectée (25 ≤ 50 OK)
+- T14 : violation inter-thèmes : FILLES=60 > TOTAL=50 → violated=True ✅
+- T15 : alias `SOMMEDEFILLES_AGE_NIVEAU` absent du corps CTE ✅
+- T16 : scénario complet règles 494/495 : Sum(FILLES)=33 ≤ Sum(TOTAL)=100 → correct ✅
+- T17 : règles intra-thème non régressées ✅
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` :
+  - `_buildPivotCte()` : suppression filtre `id_qst` du WHERE, suppression variable `escapedQst`
+  - `_extractAllFieldNames()` : strip `AS xxx` avant scan du SELECT
+  - Commentaire version mis à jour (Session 55)
+
+---
+
 ## [Session 54] — 2026-07-15 — Fix SCALAR multi-colonnes (_keepFirstSelectColumn)
 
 ### Contexte
