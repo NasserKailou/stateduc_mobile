@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 53 — Fix CTE id_qst filter + SCALAR wrapper + logging amélioré
+// VERSION : Session 54 — Fix SCALAR wrapper multi-colonnes (_keepFirstSelectColumn)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -401,12 +401,22 @@ class SqlTranslator {
         isScalar = false;
       } else {
         // MODE SCALAR — requête retourne une seule valeur agrégée (Sum, Count, etc.)
-        // SESSION 53 FIX : utiliser une sous-requête nommée _scalar avec alias
-        // explicite pour éviter l'erreur SQLite "ambiguous column name" quand
-        // SELECT * retourne plusieurs colonnes.
-        // On cible la première colonne via _scalar.col1 alias.
+        //
+        // SESSION 54 FIX : certaines règles ont un SELECT multi-colonnes agrégées :
+        //   SELECT Sum(FILLES_AGE_NIVEAU) AS SommeX, Sum(TOTAL_AGE_NIVEAU) AS SommeY
+        // Le wrapper  SELECT (__scalar_val)  exige une sous-requête mono-colonne.
+        // SQLite error : "sub-select returns 2 columns - expected 1".
+        //
+        // Le serveur compare val_sql[0][0] vs val_sql_assoc[0][0] — toujours la
+        // PREMIÈRE valeur de la PREMIÈRE ligne. On réduit donc le SELECT à sa
+        // première colonne avant de construire le wrapper.
+        //
+        // Stratégie : réécrire SELECT col1, col2, ... FROM T → SELECT col1 FROM T
+        // en utilisant _keepFirstSelectColumn().
+        final scalarSql = _keepFirstSelectColumn(translatedSql);
+        debugPrint('[SqlTranslator] SCALAR: kept first column only:\n$scalarSql');
         wrappedSql =
-            '$withClause\nSELECT COALESCE((__scalar_val), 0) AS val\nFROM (\n  SELECT (\n$translatedSql\n  ) AS __scalar_val\n) _wrapper';
+            '$withClause\nSELECT COALESCE((__scalar_val), 0) AS val\nFROM (\n  SELECT (\n$scalarSql\n  ) AS __scalar_val\n) _wrapper';
         isScalar = true;
       }
 
@@ -422,6 +432,68 @@ class SqlTranslator {
       debugPrint('[SqlTranslator] translation error: $e\n$st');
       return null;
     }
+  }
+
+  /// Réduit le SELECT d'une requête à sa première colonne uniquement.
+  ///
+  /// Utilisé en MODE SCALAR pour les règles dont le SELECT contient plusieurs
+  /// colonnes agrégées (ex: `Sum(X) AS a, Sum(Y) AS b`). Le wrapper SCALAR
+  /// `SELECT (sub-query)` exige que la sous-requête retourne exactement 1 colonne.
+  /// Le serveur compare toujours `val_sql[0][0]` — la première valeur.
+  ///
+  /// Exemple :
+  ///   SELECT Sum(FILLES_AGE_NIVEAU) AS SommeX, Sum(TOTAL_AGE_NIVEAU) AS SommeY
+  ///   FROM ELEVES_AGE_NIVEAU_SEXE
+  /// →
+  ///   SELECT Sum(FILLES_AGE_NIVEAU) AS SommeX
+  ///   FROM ELEVES_AGE_NIVEAU_SEXE
+  ///
+  /// Si le SELECT ne contient qu'une colonne (ou si le pattern ne matche pas),
+  /// retourne le SQL inchangé.
+  static String _keepFirstSelectColumn(String sql) {
+    // Trouve SELECT ... FROM et extrait la liste des colonnes
+    final selRe = RegExp(
+      r'(\bSELECT\b)(.*?)(\bFROM\b)',
+      caseSensitive: false,
+      dotAll: true,
+    );
+    final m = selRe.firstMatch(sql);
+    if (m == null) return sql;
+
+    final selectKw  = m.group(1)!;   // "SELECT"
+    final colsPart  = m.group(2)!;   // " Sum(X) AS a, Sum(Y) AS b "
+    final fromKw    = m.group(3)!;   // "FROM"
+
+    // Découpe en colonnes de niveau 0 (respecte les parenthèses imbriquées)
+    final cols = <String>[];
+    final buf  = StringBuffer();
+    int depth  = 0;
+    for (int i = 0; i < colsPart.length; i++) {
+      final c = colsPart[i];
+      if (c == '(') {
+        depth++;
+        buf.write(c);
+      } else if (c == ')') {
+        depth--;
+        buf.write(c);
+      } else if (c == ',' && depth == 0) {
+        cols.add(buf.toString());
+        buf.clear();
+      } else {
+        buf.write(c);
+      }
+    }
+    if (buf.isNotEmpty) cols.add(buf.toString());
+
+    if (cols.length <= 1) return sql; // Déjà mono-colonne
+
+    // Ne garder que la première colonne
+    final firstCol = cols.first;
+    final before   = sql.substring(0, m.start);
+    final after    = sql.substring(m.end);
+    debugPrint('[SqlTranslator] _keepFirstSelectColumn: '
+        '${cols.length} cols → kept: "${firstCol.trim()}"');
+    return '$before$selectKw${firstCol.trimRight()} $fromKw$after';
   }
 
   // ─── Substitution des paramètres ─────────────────────────────────────────

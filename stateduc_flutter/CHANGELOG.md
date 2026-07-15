@@ -4,6 +4,47 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 54] — 2026-07-15 — Fix SCALAR multi-colonnes (_keepFirstSelectColumn)
+
+### Contexte
+Sur device (rule=493), le wrapper SCALAR échouait avec l'erreur SQLite :
+`sub-select returns 2 columns - expected 1`
+La cause : `sql_regle` de la règle 493 contient deux colonnes dans son SELECT :
+`SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE`.
+Le wrapper SCALAR S53 encapsulait ce SELECT multi-colonnes directement dans une
+sous-requête scalaire `SELECT (...) AS __scalar_val` — SQLite exige exactement 1 colonne.
+
+### Bug corrigé
+
+**Bug S54 — SCALAR wrapper crash sur SELECT multi-colonnes**
+Quand `sql_regle` possède `SELECT Sum(X), Sum(Y) FROM ...`, le mode SCALAR (après
+suppression du GROUP BY contexte-only) produisait une sous-requête à 2 colonnes dans
+`SELECT (SELECT Sum(X), Sum(Y) FROM ...) AS __scalar_val`, ce qui est interdit par SQLite.
+
+**Fix :** Nouvelle méthode `_keepFirstSelectColumn()` qui réduit le SELECT à sa première
+colonne avant l'emballage SCALAR. La méthode respecte les parenthèses imbriquées (split
+de niveau 0) pour éviter de couper à l'intérieur d'un appel de fonction.
+
+**Bug secondaire corrigé :** Le regex `(\bSELECT\b)(.*?)(\bFROM\b)` consomme l'espace
+avant `FROM` dans `cols_part`. Sans `trimRight()`, la reconstruction produit
+`SommeDeFILLES_AGE_NIVEAUFROM ELEVES...` (espace manquant → erreur syntaxe SQL).
+Fix : `return '$before$selectKw${firstCol.trimRight()} $fromKw$after';`
+
+**Comportement côté serveur :** Le PHP compare `val_sql[0][0]` vs `val_sql_assoc[0][0]`
+(toujours la première valeur de la première ligne) → conserver uniquement la première
+colonne en mode SCALAR est le comportement correct et cohérent avec le serveur.
+
+### Validation Python
+Simulateur Python mis à jour : **25/25 tests PASS** (T01–T15), incluant 3 nouveaux tests S54 :
+- T13 : `keep_first_select_column` — espace avant FROM préservé, mono-colonne confirmé
+- T14 : SELECT Sum(X), Sum(Y) → réduit à Sum(X) = 11.0 sans erreur SQLite
+- T15 : Règle 493 complète — Sum(FILLES)=11 = Sum(NB_ELEVES_F)=11 → NOT violated
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` — ajout `_keepFirstSelectColumn()` + appel dans SCALAR path
+
+---
+
 ## [Session 53] — 2026-07-15 — Fix chaîne complète idQst + extraction champs SELECT + logging
 
 ### Contexte
