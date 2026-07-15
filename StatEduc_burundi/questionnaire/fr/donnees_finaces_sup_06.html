@@ -1,0 +1,302 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=5606' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>II. DONNEES FINANCIERES DE L’INSTITUTION <span style='font-weight: bold; font-size: 16px; background-color:#00FFCC; color:#000000; text-align:center'>Pour INSTITUTION uniquement </span>   </B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> 1.1. RECETTES<br></b><script language='javascript' type='text/javascript'>
+var expression_560009 	= "";
+var tot_mes_ligne_560009 	= new Array();
+var tot_mes_col_560009 	= new Array();
+var affich_vertic_mes_560009 	= 0;
+var affiche_sous_totaux_560009 	= 0;
+var tab_mes_560009 	= new Array ("MONTANT_RECETTES");
+var tab_ligne_560009	= new Array ("13","12","14","15","16");
+var tab_col_560009	= new Array ();
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Montant recettes</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Subvention de l’Etat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_RECETTES_0_13' NAME='MONTANT_RECETTES_0_13' TYPE='text' style = 'width:150px' VALUE="$MONTANT_RECETTES_0_13"  onchange="set_TOTAL_MatFrml('form1',560009, 0, tab_mes_560009, tab_ligne_560009, tab_col_560009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Minerval et frais d’inscription</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_RECETTES_0_12' NAME='MONTANT_RECETTES_0_12' TYPE='text' style = 'width:150px' VALUE="$MONTANT_RECETTES_0_12"  onchange="set_TOTAL_MatFrml('form1',560009, 0, tab_mes_560009, tab_ligne_560009, tab_col_560009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Subventions d’organismes privés, de congrégations religieuses</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_RECETTES_0_14' NAME='MONTANT_RECETTES_0_14' TYPE='text' style = 'width:150px' VALUE="$MONTANT_RECETTES_0_14"  onchange="set_TOTAL_MatFrml('form1',560009, 0, tab_mes_560009, tab_ligne_560009, tab_col_560009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Subventions d’ONG, de partenaires techniques et financiers</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_RECETTES_0_15' NAME='MONTANT_RECETTES_0_15' TYPE='text' style = 'width:150px' VALUE="$MONTANT_RECETTES_0_15"  onchange="set_TOTAL_MatFrml('form1',560009, 0, tab_mes_560009, tab_ligne_560009, tab_col_560009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Autofinancement</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_RECETTES_0_16' NAME='MONTANT_RECETTES_0_16' TYPE='text' style = 'width:150px' VALUE="$MONTANT_RECETTES_0_16"  onchange="set_TOTAL_MatFrml('form1',560009, 0, tab_mes_560009, tab_ligne_560009, tab_col_560009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_560009_ALL_MES_0' style = 'width:150px'></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR>1.2. DEPENSES DU SECTEUR PEDAGOGIQUE ET DE LA RECHERCHE<br></b><script language='javascript' type='text/javascript'>
+var expression_560010 	= "";
+var tot_mes_ligne_560010 	= new Array();
+var tot_mes_col_560010 	= new Array();
+var affich_vertic_mes_560010 	= 0;
+var affiche_sous_totaux_560010 	= 0;
+var tab_mes_560010 	= new Array ("MONTANT_DEPENSES");
+var tab_ligne_560010	= new Array ("39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55");
+var tab_col_560010	= new Array ();
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Montant dépenses</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Investissement - Achat mobilier/aménagements locaux</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_39' NAME='MONTANT_DEPENSES_0_39' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_39"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Investissement - Rénovation mobilier</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_40' NAME='MONTANT_DEPENSES_0_40' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_40"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Investissement - Rénovation locaux</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_41' NAME='MONTANT_DEPENSES_0_41' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_41"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Investissement - Matériel pédagogique</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_42' NAME='MONTANT_DEPENSES_0_42' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_42"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Investissement - Matériel informatique/bureautique</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_43' NAME='MONTANT_DEPENSES_0_43' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_43"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Investissement - Formation Enseignants</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_44' NAME='MONTANT_DEPENSES_0_44' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_44"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Investissement - Autres dépenses</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_45' NAME='MONTANT_DEPENSES_0_45' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_45"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Fonctionnement - Salaire enseignants à temps plein</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_46' NAME='MONTANT_DEPENSES_0_46' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_46"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Fonctionnement - Salaire enseignants vacataires</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_47' NAME='MONTANT_DEPENSES_0_47' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_47"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Fonctionnement - Salaire personnel administratif </TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_48' NAME='MONTANT_DEPENSES_0_48' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_48"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Fonctionnement - Salaire personnel autre</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_49' NAME='MONTANT_DEPENSES_0_49' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_49"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Fonctionnement - Achat matériel/fournitures de bureau</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_50' NAME='MONTANT_DEPENSES_0_50' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_50"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Fonctionnement - Sorties /rencontres sportives</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_51' NAME='MONTANT_DEPENSES_0_51' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_51"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Fonctionnement - Publications et  dépenses annexes</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_52' NAME='MONTANT_DEPENSES_0_52' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_52"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Fonctionnement - Echanges d’expériences (missions, voyages d’études, stages,……)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_53' NAME='MONTANT_DEPENSES_0_53' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_53"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Fonctionnement - Dépense effectuée pour la recherche</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_54' NAME='MONTANT_DEPENSES_0_54' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_54"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Fonctionnement - Autres dépenses</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_55' NAME='MONTANT_DEPENSES_0_55' TYPE='text' style = 'width:150px' VALUE="$MONTANT_DEPENSES_0_55"  onchange="set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_560010_ALL_MES_0' style = 'width:150px'></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',560009, 0, tab_mes_560009, tab_ligne_560009, tab_col_560009);
+ set_TOTAL_MatFrml('form1',560010, 0, tab_mes_560010, tab_ligne_560010, tab_col_560010);
+</script>
