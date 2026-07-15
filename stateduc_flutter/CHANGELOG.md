@@ -4,6 +4,96 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 59] — 2026-07-15 — Injection formData via SAVEPOINT SQLite (élimination faux positifs/négatifs)
+
+### Contexte
+Après S58, la règle 494 et les règles ELEVES fonctionnaient. La capture screenshot montre
+3 incohérences détectées sur "Mob-Donnees generales 1" avec `987` saisi dans "dont pour
+filles en bon état". L'analyse a identifié la **cause racine ultime** :
+
+Le chemin SQL/CTE (`SqlTranslator` → `db.rawQuery()`) lit **uniquement `collected_data`**
+(SQLite persisté). Quand l'utilisateur saisit une valeur dans le formulaire sans encore
+sauvegarder, cette valeur est dans `formData` (Map en mémoire) mais **absente de
+`collected_data`**. Le CTE retourne alors `COALESCE(NULL, 0) = 0.0` pour ce champ.
+
+Conséquence :
+- Si le champ saisi n'est pas encore persisté ET qu'il représente la partie gauche d'une
+  comparaison `<=` dont la partie droite EST persistée → résultat asymétrique.
+- Cas 1 (faux négatif) : champ gauche = 0 (car non persisté) < droite → règle non violée
+  alors que la vraie valeur saisie violerait la règle.
+- Cas 2 (faux positif possible) : valeur persistée incohérente avec la saisie en cours.
+
+### Solution — SAVEPOINT SQLite (S59)
+
+Avant la boucle d'évaluation des règles, `evaluate()` ouvre un **SAVEPOINT SQLite** et
+insère toutes les entrées de `formData` dans `collected_data` via `INSERT OR REPLACE`.
+À la fin du bloc (toujours via `finally`), `ROLLBACK TO SAVEPOINT` supprime ces insertions
+temporaires **sans affecter les données réellement persistées**.
+
+```dart
+// SAVEPOINT garantit l'atomicité : injection temporaire → évaluation → rollback
+await db.execute('SAVEPOINT coherence_eval');
+try {
+  for (final entry in formData.entries) {
+    final fieldName = _formKeyToFieldName(entry.key);  // ajoute _0 si absent
+    await db.execute(
+      'INSERT OR REPLACE INTO collected_data '
+      '(id_camp, id_etab, id_qst, id_filter, field_name, field_value) '
+      'VALUES (?, ?, ?, ?, ?, ?)',
+      [idCamp, idEtab, idQst ?? '', '', fieldName, entry.value],
+    );
+  }
+  // ... évaluation de toutes les règles ...
+} finally {
+  await db.execute('ROLLBACK TO SAVEPOINT coherence_eval');
+  await db.execute('RELEASE SAVEPOINT coherence_eval');
+}
+```
+
+**`_formKeyToFieldName()` (nouveau helper) :**
+```dart
+// Si la clé a déjà un suffixe numérique (_0, _0_70, etc.) → garder tel quel
+// Sinon → ajouter _0 (champs DONNEES_ETABLISSEMENT sans suffixe dans formData)
+static String _formKeyToFieldName(String formKey) {
+  final hasNumericSuffix = RegExp(r'_\d+$').hasMatch(formKey);
+  return hasNumericSuffix ? formKey : '${formKey}_0';
+}
+```
+
+### Résultats
+
+Avec S59, le CTE **voit toujours les valeurs en cours de saisie** de `formData`,
+même si elles ne sont pas encore sauvegardées dans SQLite. Les règles de cohérence
+fonctionnent donc **quelques soit l'état de sauvegarde du formulaire**, conformément
+à la demande : *"les incohérences doivent marcher quelques soit la requête définie
+du moment que les critères sont vérifiés"*.
+
+Les 3 violations de la capture screenshot correspondent à `987` > seuils cohérents
+(latrine total, latrine filles, latrine bon état) — ce sont de **vraies violations**
+correctement détectées après S59.
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` :
+  - VERSION → Session 59
+  - `evaluate()` : SAVEPOINT + injection formData + finally ROLLBACK
+  - `_formKeyToFieldName()` : nouveau helper statique
+  - Commentaires/docs complets S59
+
+### Tests
+- `/tmp/validate_s59.py` → **55/55 PASS** (10 blocs : A–J)
+  - Bloc A : `_formKeyToFieldName` (10 cas)
+  - Bloc B : SAVEPOINT inject+rollback SQLite
+  - Bloc C : Règle latrines, faux négatif → violation détectée
+  - Bloc D : NB_LATRINES_BON_ETAT_F <= NB_LATRINES_BON_ETAT (scénario screenshot)
+  - Bloc E : ELEVES SUM multi-lignes non cassées
+  - Bloc F : Intégrité ROLLBACK (0 résidu)
+  - Bloc G : Edge cases (vide, texte, doubles suffixes)
+  - Bloc H : INSERT OR REPLACE idempotence
+  - Bloc I : Scénario screenshot exact (987 → violation)
+  - Bloc J : Régression S58 ambiguïté LIKE _0/_F_0
+
+---
+
 ## [Session 58] — 2026-07-15 — Fix ambiguïté LIKE + Logging fichier exhaustif
 
 ### Contexte
