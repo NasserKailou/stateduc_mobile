@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 56 — Fix CTE LIKE préfixe (FILLES_AGE_NIVEAU_0_70 → FILLES_AGE_NIVEAU) + log champs
+// VERSION : Session 57 — LIKE préfixe universel (toutes tables : suffixe _0 HTML partout)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -699,33 +699,47 @@ class SqlTranslator {
     final escapedCamp = idCamp.replaceAll("'", "''");
     final escapedEtab = idEtab.replaceAll("'", "''");
 
-    // Détecter si la table est de type multi-lignes (ELEVES_*)
+    // FIX SESSION 57 — Tous les champs HTML sont stockés AVEC un suffixe
+    // numérique (_0, _0_70, _0_71, …) quel que soit le type de table.
+    //
+    // Exemples observés dans collected_data (logs device) :
+    //   DONNEES_ETABLISSEMENT : NB_ELEVES_F_0, ELECTRICITE_0,
+    //                           NB_LATRINES_BON_ETAT_0, …
+    //   ELEVES_AGE_NIVEAU_SEXE: FILLES_AGE_NIVEAU_0_70,
+    //                           TOTAL_AGE_NIVEAU_0_71, …
+    //
+    // La distinction MULTI_ROW / MONO_ROW était donc fausse pour le LIKE :
+    // DONNEES_ETABLISSEMENT utilise aussi le suffixe _0.
+    //
+    // Règle unifiée :
+    //   • Champs CONTEXTE (CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF) :
+    //       injectés programmatiquement SANS suffixe → correspondance EXACTE =
+    //   • Tous les autres champs (ELEVES_* ET DONNEES_ETABLISSEMENT) :
+    //       proviennent des INPUT HTML qui portent un suffixe → LIKE 'FIELD%'
+    //
+    // Agrégation :
+    //   • Tables ELEVES_* (multi-lignes) : SUM — plusieurs lignes par champ
+    //     (chaque tranche d'âge × niveau est une ligne séparée).
+    //   • DONNEES_ETABLISSEMENT (mono-ligne) : MAX — une seule valeur par champ
+    //     (le suffixe _0 différencie les sections du formulaire, pas les lignes).
+    //     MAX d'une valeur unique = la valeur elle-même.
     final isMultiRow = _multiRowTables.contains(tableName.toUpperCase());
 
     final columnDefs = fields.map((field) {
       final upperField = field.toUpperCase();
       final isTextContext = _contextFields.contains(upperField);
       if (isTextContext) {
-        // Champs texte (CODE_ETABLISSEMENT, CODE_TYPE_ANNEE…) : stockés tels
-        // quels sans suffixe → correspondance exacte.
+        // Champs de contexte : injectés sans suffixe → = exact.
         return "    MAX(CASE WHEN UPPER(field_name)='$upperField' "
             "THEN field_value END) AS $upperField";
       } else if (isMultiRow) {
-        // FIX SESSION 56 — Tables multi-lignes (ELEVES_*) :
-        //   Les champs HTML de la grille sont stockés avec des suffixes d'indice,
-        //   ex : FILLES_AGE_NIVEAU_0_70, FILLES_AGE_NIVEAU_0_71, …
-        //   Un filtre UPPER(field_name)='FILLES_AGE_NIVEAU' ne trouve rien.
-        //   On utilise LIKE 'FILLES_AGE_NIVEAU%' pour capturer tous les suffixes.
-        //
-        // SÉCURITÉ — le préfixe LIKE ne peut pas déborder sur d'autres champs car :
-        //   • Les noms commencent tous par le même prénom-base (ex FILLES_AGE_NIVEAU)
-        //   • Le '%' terminal n'est utilisé QUE pour les champs non-contexte
-        //     des tables ELEVES où ce pattern de nommage HTML est systématique.
+        // Tables multi-lignes (ELEVES_*) : SUM + LIKE préfixe.
         return "    SUM(CASE WHEN UPPER(field_name) LIKE '${upperField}%' "
             "THEN CAST(field_value AS REAL) ELSE 0 END) AS $upperField";
       } else {
-        // Tables mono-ligne (DONNEES_ETABLISSEMENT) : champs stockés tels quels.
-        return "    MAX(CASE WHEN UPPER(field_name)='$upperField' "
+        // Tables mono-ligne (DONNEES_ETABLISSEMENT) : MAX + LIKE préfixe.
+        // Ex : NB_ELEVES_F_0 → LIKE 'NB_ELEVES_F%'
+        return "    MAX(CASE WHEN UPPER(field_name) LIKE '${upperField}%' "
             "THEN CAST(field_value AS REAL) END) AS $upperField";
       }
     }).join(',\n');

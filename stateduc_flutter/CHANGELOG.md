@@ -4,6 +4,91 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 57] — 2026-07-15 — Fix CTE LIKE préfixe universel (DONNEES_ETABLISSEMENT : champs HTML suffixés _0)
+
+### Contexte
+Malgré la correction S56 (LIKE pour les tables ELEVES multi-row), la règle 493 continuait à
+retourner `sql_assoc val=0.0` sur device. Les logs S56 confirmaient que les champs ELEVES
+étaient désormais lus correctement (`v1=8.0`), mais le côté DONNEES_ETABLISSEMENT restait à
+zéro :
+
+```
+[CoherenceEval] rawQuery sql_assoc rule=493 (SCALAR) → val=0.0
+[CoherenceEval] rule=493 v1=8.0 = v2=0.0 → violated=true
+```
+
+### Root cause
+
+**Nommage HTML des champs DONNEES_ETABLISSEMENT : suffixe `_0`**
+
+La page `infos_gen_1.html` (questionnaire général) stocke ses champs avec un suffixe `_0` :
+```html
+<INPUT NAME='NB_ELEVES_F_0'  ...>
+<INPUT NAME='ELECTRICITE_0'  ...>
+<INPUT NAME='NB_LATRINES_BON_ETAT_0' ...>
+```
+
+Ces noms sont transmis tels quels via le pont JavaScript → Flutter → `saveCollectedData()`.
+Dans `collected_data`, les `field_name` sont donc `NB_ELEVES_F_0`, `ELECTRICITE_0`, etc.
+
+**Le CTE avant ce fix (S56 state) :**
+```sql
+MAX(CASE WHEN UPPER(field_name)='NB_ELEVES_F' THEN CAST(field_value AS REAL) END)
+```
+→ **Aucune ligne ne matche** (le champ s'appelle `NB_ELEVES_F_0`, pas `NB_ELEVES_F`) →
+`MAX()=NULL` → `COALESCE(NULL,0)=0.0` → `val=0.0` → violation incorrecte (faux positif).
+
+### Bug corrigé — S57 (CRITIQUE)
+
+**Extension de la stratégie LIKE aux tables mono-lignes (DONNEES_ETABLISSEMENT)**
+
+Règle unifiée S57 dans `_buildPivotCte()` :
+| Catégorie de champ | Stockage HTML | Stratégie CTE |
+|-|-|-|
+| Contexte (`CODE_ETABLISSEMENT`, `CODE_TYPE_ANNEE`) | Injecté sans suffixe | `= 'FIELD'` exact |
+| ELEVES_* (multi-row) | Avec suffixe `_0_70`, `_0_71`… | `SUM + LIKE 'FIELD%'` |
+| DONNEES_ETABLISSEMENT (mono-row) | Avec suffixe `_0` | `MAX + LIKE 'FIELD%'` ← **NOUVEAU** |
+
+**Avant S57 (S56 state) :**
+```dart
+} else {
+  // Tables mono-ligne : champs stockés tels quels.
+  return "    MAX(CASE WHEN UPPER(field_name)='$upperField' "
+      "THEN CAST(field_value AS REAL) END) AS $upperField";
+}
+```
+
+**Après S57 :**
+```dart
+} else {
+  // Mono-row (DONNEES_ETABLISSEMENT): MAX + LIKE prefix (S57 NEW)
+  // Ex: NB_ELEVES_F_0 → LIKE 'NB_ELEVES_F%'
+  return "    MAX(CASE WHEN UPPER(field_name) LIKE '${upperField}%' "
+      "THEN CAST(field_value AS REAL) END) AS $upperField";
+}
+```
+
+**Impact :** `NB_ELEVES_F_0` matchée par `LIKE 'NB_ELEVES_F%'` → `MAX()=8.0` → `val=8.0` →
+règle 493 : `v1=8.0 <= v2=8.0` → `violated=false` ✅
+
+### Validation Python
+Simulateur Python mis à jour : **50/50 PASS** (T01–T25), incluant 4 nouveaux tests S57 :
+- T22 : `NB_ELEVES_F_0=8` → `MAX(LIKE 'NB_ELEVES_F%')=8.0` ✅ (avant S57 : 0.0)
+- T23 : Règle 493 cross-table : `FILLES=8, NB_ELEVES_F=8` → `NOT violated` ✅ (avant S57 : violated=True ❌)
+- T24 : Règle 493 violation réelle : `FILLES=10 > NB_ELEVES_F=8` → `violated=True` ✅
+- T25 : Plusieurs champs DONNEES_ETABLISSEMENT (`ELECTRICITE_0`, `NB_LATRINES_BON_ETAT_0`) tous capturés via LIKE ✅
+
+Le test T22 a révélé un détail important : le SQL serveur pour `sql_assoc` utilise
+`Max(NB_ELEVES_F)` (agrégat Access/MDB) — non un `SELECT` scalaire nu — ce qui active
+correctement le mode SCALAR (GROUP BY context-only → stripped).
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` :
+  - `_buildPivotCte()` : `MAX + LIKE 'FIELD%'` pour champs DONNEES_ETABLISSEMENT (tables mono-row)
+  - Commentaire version mis à jour (Session 57)
+
+---
+
 ## [Session 56] — 2026-07-15 — Fix CTE LIKE préfixe (champs HTML suffixés FILLES_AGE_NIVEAU_0_70)
 
 ### Contexte
@@ -47,8 +132,9 @@ SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU%' THEN CAST(field_value 
 Les champs de contexte (`CODE_ETABLISSEMENT`, etc.) et les tables mono-ligne
 (`DONNEES_ETABLISSEMENT`) continuent à utiliser la correspondance exacte `=`.
 
-**Note :** Pour `DONNEES_ETABLISSEMENT` les champs sont stockés avec leur nom exact
-(pas de suffixe HTML) → `=` reste correct.
+**Note :** Pour `DONNEES_ETABLISSEMENT` les champs étaient supposés stockés sans suffixe à ce
+stade — cette hypothèse s'est avérée incorrecte (voir Session 57 : tous les champs HTML ont
+un suffixe `_0`). La correction complète a été apportée en S57.
 
 ### Log diagnostic ajouté
 
