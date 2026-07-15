@@ -4,6 +4,59 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 53] — 2026-07-15 — Fix chaîne complète idQst + extraction champs SELECT + logging
+
+### Contexte
+Malgré les corrections S45→S52, les contrôles offline continuaient à déclencher des faux
+positifs (ex: `33 <= 100` signalé comme violé). Analyse approfondie + simulateur Python
+confirmé : 4 bugs distincts subsistaient dans la chaîne d'évaluation.
+
+### Bugs corrigés
+
+**Bug 1 — CTE sans filtre `id_qst` (cause principale des faux positifs)**
+`_buildPivotCte()` lisait `WHERE id_camp=... AND id_etab=...` sans filtre `id_qst`.
+Pour les tables MULTI-LIGNES (ELEVES_*), le SUM() agrègeait TOUS les formulaires du même
+établissement, pas seulement le formulaire courant → valeurs sur-comptées → comparaisons
+fausses. Fix : ajout du paramètre `idQst?` dans `_buildPivotCte()`, `translate()`,
+`_evaluateViaSql()`, `_evaluateRule()` et propagation depuis `evaluate()`.
+
+**Bug 2 — Champs non qualifiés dans le SELECT non extraits pour le CTE**
+`_extractAllFieldNames()` n'extrayait pas les champs de la clause SELECT quand ils
+n'étaient pas préfixés par `TABLE.` (ex: `Sum(FILLES_AGE_NIVEAU)` sans préfixe).
+Résultat : colonne manquante dans le CTE → erreur SQLite "no such column".
+Fix : scan de la clause SELECT ajouté (FIX Bug S53-B).
+
+**Bug 3 — SCALAR wrapper `SELECT *` multi-colonnes**
+L'ancien wrapper `SELECT COALESCE((SELECT * FROM (...) _s), 0)` échouait si la
+sous-requête retournait plusieurs colonnes (SELECT Sum(X), Sum(Y)).
+Fix : nouveau wrapper `SELECT COALESCE((__scalar_val), 0) AS val FROM (SELECT (...) AS __scalar_val) _wrapper`.
+
+**Bug 4 — `idQst` non propagé dans la chaîne d'appel**
+`evaluate()` passait `idQst` à `_evaluateRule()` mais sans le paramètre — `_evaluateRule()`
+et `_evaluateViaSql()` ne l'avaient pas dans leur signature et ne le transmettaient pas
+à `translate()` → le filtre `id_qst` dans le CTE n'était jamais activé.
+Fix : ajout de `String? idQst` dans `_evaluateRule()` et `_evaluateViaSql()`, avec
+propagation complète vers les deux appels `translate()`.
+
+### Logging amélioré
+`_evaluateViaSql()` affiche maintenant le SQL complet traduit, les valeurs v1/v2,
+le critère et `violated` pour chaque règle — facilite le diagnostic sur device.
+
+### Validation Python
+Simulateur Python complet : **19/19 tests PASS** (T01–T12), couvrant :
+- Filtre id_qst présent/absent dans le CTE
+- Mode SCALAR sans GROUP BY et avec GROUP BY contexte-only
+- Mode EXISTS avec GROUP BY non-contexte
+- Exécution réelle 33 ≤ 100 → NOT violated (le bug rapporté)
+- Isolation id_qst : SUM=20 avec filtre vs SUM=30 sans filtre (cross-form)
+- DONNEES_ETABLISSEMENT violation/non-violation
+- SCALAR wrapper colonne unique
+
+### Fichiers modifiés
+- `lib/services/coherence_evaluator.dart` — 6 corrections + logging amélioré
+
+---
+
 ## [Session 52] — 2026-07-15 — Fix faux positifs GROUP BY context-only → SCALAR
 
 ### Contexte
