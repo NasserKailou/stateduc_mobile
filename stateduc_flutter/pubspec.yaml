@@ -30,6 +30,9 @@ dependencies:
   # Détection connectivité réseau
   connectivity_plus: ^6.1.0
 
+  # Accès répertoires système (pour écriture des fichiers log de cohérence)
+  path_provider: ^2.1.4
+
   # Rendu HTML dynamique des formulaires serveur
   flutter_html: ^3.0.0-beta.2
 
