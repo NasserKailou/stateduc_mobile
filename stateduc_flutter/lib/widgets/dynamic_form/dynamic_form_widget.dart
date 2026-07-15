@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../models/question.dart';
@@ -874,19 +872,13 @@ $formHtml
     // Remplace le blanc/gris qui apparaît avant onPageFinished.
     // Le Container blanc assure l'absence de flash gris même avant que
     // setBackgroundColor prenne effet dans le moteur WebView.
+    // Note : gestureRecognizers NON utilisé ici.
+    // EagerGestureRecognizer bloque le rendu WebView (freeze "isn't responding").
+    // ScaleGestureRecognizer seul crée des conflits de scroll.
+    // Le pinch-to-zoom est activé via JavaScript dans _enablePinchZoom()
+    // (meta viewport + touch-action CSS), ce qui est suffisant sur Android.
     final webView = WebViewWidget(
       controller: _controller,
-      // Passe les gestes de pinch (ScaleGestureRecognizer) au WebView.
-      // Sans cela, Flutter intercepte les gestes multi-touch avant qu'ils
-      // atteignent le moteur WebView, empêchant le zoom par pincement.
-      gestureRecognizers: {
-        Factory<OneSequenceGestureRecognizer>(
-          () => ScaleGestureRecognizer(),
-        ),
-        Factory<OneSequenceGestureRecognizer>(
-          () => EagerGestureRecognizer(),
-        ),
-      },
     );
 
     final body = _isRendering
