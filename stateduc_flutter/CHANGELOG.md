@@ -4,7 +4,140 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
-## [Session 50] — 2026-07-14 — Fix WHERE context-only (TEXT/INTEGER) + garde SQL vide
+## [Session 51] — 2026-07-15 — Fix faux positifs ELEVES (MAX→SUM) + Zoom & Responsive WebView
+
+### Contexte
+Session 50 avait corrigé le mismatch TEXT/INTEGER dans WHERE pour les règles SUM-scalaires.
+Les contrôles se déclenchaient désormais, mais continuaient à produire des **faux positifs** :
+la bannière « 1 incohérence(s) locale(s) » s'affichait même lorsque les valeurs saisies
+étaient correctes (ex. : FILLES_AGE_NIVEAU ≤ TOTAL_AGE_NIVEAU vérifiée côté utilisateur).
+
+---
+
+### Bug S51-A : MAX au lieu de SUM pour les tables ELEVES multi-lignes
+
+#### Cause racine
+
+Dans `collected_data`, les tables `ELEVES_AGE_NIVEAU_SEXE`, `ELEVES_NIVEAU_SEXE` et
+`ELEVES_AGE_SEXE` stockent **plusieurs lignes par `field_name`** — une ligne par combinaison
+âge × niveau × sexe :
+
+```
+('2','20952','10502','FILLES_AGE_NIVEAU','10')  ← 6ans/1ère
+('2','20952','10502','FILLES_AGE_NIVEAU','11')  ← 7ans/1ère
+('2','20952','10502','FILLES_AGE_NIVEAU','12')  ← 8ans/2ème
+```
+
+Le CTE pivot généré par `_buildPivotCte()` utilisait `MAX(CASE WHEN ...)` pour tous les champs :
+
+```sql
+MAX(CASE WHEN UPPER(field_name)='FILLES_AGE_NIVEAU' THEN CAST(field_value AS REAL) END)
+-- → MAX(10, 11, 12) = 12  ← BUG : sous-évaluation massive
+```
+
+La règle serveur utilise `Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU)` = 10 + 11 + 12 = **33**.
+Mobile retournait 12 → 12 ≤ 24 (MAX du TOTAL) → jamais violé par chance, mais aussi
+jamais correct. Dans d'autres combinaisons, le seuil TOTAL était aussi sous-évalué différemment,
+entraînant des faux positifs (`12 > 11` alors que `33 ≤ 66`).
+
+**Validation Python :**
+- CTE MAX (BUG) : FILLES = 12.0, TOTAL = 24.0 → sous-évaluation confirmée
+- CTE SUM (FIX) : FILLES = 33.0, TOTAL = 66.0 → correct, violated = False ✓
+- Vraie violation (FILLES=41 > TOTAL=35) : violated = True ✓
+- DONNEES_ETABLISSEMENT (mono-ligne) : MAX conservé, valeurs correctes ✓
+
+#### Fix : `_multiRowTables` + `SUM(CASE WHEN ... ELSE 0 END)`
+
+**Fichier** : `coherence_evaluator.dart`
+
+**Nouvelle constante** :
+```dart
+static const _multiRowTables = {
+  'ELEVES_AGE_NIVEAU_SEXE',
+  'ELEVES_NIVEAU_SEXE',
+  'ELEVES_AGE_SEXE',
+};
+```
+
+**Modification de `_buildPivotCte()`** :
+```dart
+final isMultiRow = _multiRowTables.contains(tableName.toUpperCase());
+
+// Avant (BUG) :
+"    MAX(CASE WHEN UPPER(field_name)='$field' THEN CAST(field_value AS REAL) END) AS $field"
+
+// Après (FIX — tables multi-lignes) :
+"    SUM(CASE WHEN UPPER(field_name)='$field' THEN CAST(field_value AS REAL) ELSE 0 END) AS $field"
+
+// DONNEES_ETABLISSEMENT (mono-ligne) : MAX conservé
+"    MAX(CASE WHEN UPPER(field_name)='$field' THEN CAST(field_value AS REAL) END) AS $field"
+```
+
+**Impact** : Les contrôles offline sur les tables ELEVES comparent désormais la somme réelle
+de toutes les lignes (comme le serveur), éliminant tous les faux positifs.
+
+---
+
+### Fix S51-B : Pinch-to-zoom WebView (Android)
+
+#### Cause racine
+
+Android WebView ignore `user-scalable=yes` dans le viewport meta par défaut.
+Sans configuration supplémentaire, le zoom deux doigts ne fonctionnait pas dans les formulaires.
+
+#### Fix : `dynamic_form_widget.dart`
+
+**1. Nouvelle méthode `_enablePinchZoom()`** appelée dans `onPageFinished` :
+```dart
+void _enablePinchZoom() {
+  _controller.runJavaScript(r'''
+    var meta = document.querySelector('meta[name="viewport"]');
+    meta.setAttribute('content',
+      'width=device-width, initial-scale=1.0, minimum-scale=0.25, maximum-scale=10.0, user-scalable=yes');
+    document.documentElement.style.touchAction = 'pan-x pan-y pinch-zoom';
+    document.body.style.touchAction = 'pan-x pan-y pinch-zoom';
+  ''');
+}
+```
+
+**2. `WebViewWidget` avec `gestureRecognizers`** :
+```dart
+WebViewWidget(
+  controller: _controller,
+  gestureRecognizers: {
+    Factory<OneSequenceGestureRecognizer>(() => ScaleGestureRecognizer()),
+    Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
+  },
+)
+```
+→ Les gestes multi-touch (pinch) sont transmis au moteur WebView au lieu d'être
+  interceptés par l'arbre de gestes Flutter.
+
+**3. CSS responsive multi-breakpoints** :
+- `< 480px` (smartphone compact) : font 11px, paddings réduits, inputs compacts
+- `481–600px` (mobile standard) : font 12px, paddings normaux
+- `> 600px` (tablette) : font 14px, paddings généreux, cellules min-width 80px
+- `touch-action: pan-x pan-y pinch-zoom` sur `html, body` (autorise le pinch CSS)
+
+**4. Imports ajoutés** :
+```dart
+import 'package:flutter/foundation.dart'; // Factory
+import 'package:flutter/gestures.dart';   // ScaleGestureRecognizer, EagerGestureRecognizer
+```
+
+---
+
+### Récapitulatif des fixes S51
+
+| Fix | Fichier | Impact |
+|-----|---------|--------|
+| MAX→SUM pour ELEVES multi-lignes | `coherence_evaluator.dart` | Élimine tous les faux positifs des contrôles offline ELEVES |
+| Zoom deux doigts WebView Android | `dynamic_form_widget.dart` | Zoom/dézoom fonctionnel dans les formulaires de saisie |
+| CSS responsive 3 breakpoints | `dynamic_form_widget.dart` | Formulaires adaptés smartphone compact / mobile / tablette |
+
+---
+
+
 
 ### Contexte
 Session 49 avait corrigé le wrapper `COUNT(*)` → mode SCALAR pour les règles SUM-scalaires.
