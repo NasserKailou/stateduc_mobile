@@ -385,7 +385,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.25, maximum-scale=5.0, user-scalable=yes">
 <style>
   * { box-sizing: border-box; }
   body {
@@ -464,6 +464,28 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     font-weight: bold;
   }
   .grille-add-row:active { background: #0d47a1; }
+
+    /* ── Responsivité : le corps s'adapte à la largeur de l'écran ── */
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;   /* le scroll horizontal se fait au niveau des tableaux, pas du body */
+  }
+
+  /* Les formulaires simples (non-grille) passent en colonne sur petit écran */
+  @media (max-width: 600px) {
+    /* Réduit les paddings pour gagner de la place */
+    td, th { padding: 3px 4px; }
+    body { font-size: 12px; }
+
+    /* Les champs texte des formulaires NON tabulaires prennent toute la largeur */
+    input[type=text], input[type=number], textarea, select {
+      max-width: 100%;
+    }
+  }
+
+  /* Empêche les images/éléments larges de déborder */
+  img { max-width: 100%; height: auto; }
+
 </style>
 <script>
 // Wrap tous les tableaux dans un div défilant après le chargement (pour les tableaux grille larges)
