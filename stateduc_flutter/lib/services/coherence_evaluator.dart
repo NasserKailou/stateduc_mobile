@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 59 — injection formData dans collected_data via SAVEPOINT SQLite
+// VERSION : Session 60 — fix updated_at NOT NULL, NOUVEAUX_INSCRITS, SAVEPOINT ';' prefix
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -113,6 +113,19 @@
 //           NB_LATRINES_ELEVES sauvegardé → CTE lit 4
 //           critere '<=' → !(0 <= 4) → VIOLATED (faux positif)
 //     SOLUTION : avant la boucle des règles, on commence un SAVEPOINT SQLite,
+//
+//  8. FIX SESSION 60 — Trois correctifs critiques bloquants :
+//     A. collected_data.updated_at TEXT NOT NULL sans DEFAULT → INSERT S59
+//        manquait is_sent et updated_at → NOT NULL constraint failed →
+//        0 champs injectés → SAVEPOINT entièrement neutralisé.
+//        Fix : ajouter is_sent=0, updated_at=DateTime.now().toIso8601String().
+//     B. NOUVEAUX_INSCRITS absent de _knownServerTables / _multiRowTables →
+//        règle 496 (FILLES_NV_INCRITES <= TOTAL_NV_INCRITS) toujours SKIPPED.
+//        Champs dans collected_data : FILLES_NV_INCRITES_0_8_4 (suffixe multi-lignes).
+//        Fix : ajouter 'NOUVEAUX_INSCRITS' aux deux sets (SUM + LIKE 'FIELD_%').
+//     C. SAVEPOINT ROLLBACK sans préfixe ';' → warning silencieux Android API ≤ 27
+//        pouvant laisser le SAVEPOINT ouvert → données temporaires non supprimées.
+//        Fix : préfixer ';' à 'ROLLBACK TO SAVEPOINT' et 'RELEASE SAVEPOINT'.
 //     on insère chaque entrée de formData dans collected_data (INSERT OR REPLACE),
 //     puis on exécute toutes les règles. Le ROLLBACK TO SAVEPOINT en fin de bloc
 //     supprime toutes ces insertions temporaires sans affecter les données réelles.
@@ -214,11 +227,39 @@ class CoherenceLogger {
   static const _fileName = 'coherence_latest.log';
 
   /// Ajoute une ligne de log (timestamp + message).
+  ///
+  /// S60 FIX E — Android logcat tronque debugPrint à ~4000 caractères.
+  /// Les SQL traduits (CTE + wrapper) peuvent dépasser cette limite.
+  /// On découpe les messages longs en tranches de 800 caractères pour
+  /// que chaque tranche soit affichée intégralement dans logcat.
+  /// Le fichier .log reçoit le message complet sans troncature.
   void log(String message) {
     final now = DateTime.now().toIso8601String();
     _buf.writeln('$now  $message');
-    // Miroir vers debugPrint pour que les logs apparaissent aussi en console
-    debugPrint(message);
+    // Miroir vers debugPrint — découpage en tranches de 800 car. pour Android logcat
+    const _kChunkSize = 800;
+    if (message.length <= _kChunkSize) {
+      debugPrint(message);
+    } else {
+      // Découpe le message en lignes naturelles d'abord, puis en tranches
+      final lines = message.split('\n');
+      final buf = StringBuffer();
+      for (final line in lines) {
+        if (buf.length + line.length + 1 > _kChunkSize) {
+          if (buf.isNotEmpty) { debugPrint(buf.toString()); buf.clear(); }
+        }
+        buf.writeln(line);
+        if (buf.length > _kChunkSize) {
+          // Ligne individuelle trop longue → trancher brutalement
+          final s = buf.toString();
+          for (int i = 0; i < s.length; i += _kChunkSize) {
+            debugPrint(s.substring(i, (i + _kChunkSize).clamp(0, s.length)));
+          }
+          buf.clear();
+        }
+      }
+      if (buf.isNotEmpty) debugPrint(buf.toString().trimRight());
+    }
   }
 
   /// Écrit le buffer sur disque dans {AppDocumentsDir}/coherence_latest.log.
@@ -276,6 +317,10 @@ class SqlTranslator {
     'ELEVES_AGE_NIVEAU_SEXE',
     'ELEVES_NIVEAU_SEXE',
     'ELEVES_AGE_SEXE',
+    // S60 FIX B — règle 496 (FILLES_NV_INCRITES <= TOTAL_NV_INCRITS) était SKIPPED
+    // car NOUVEAUX_INSCRITS n'était pas reconnu → traducteur retournait null → regex
+    // fallback avec v1=null v2=null. Champs : FILLES_NV_INCRITES_0_8_4 (multi-lignes).
+    'NOUVEAUX_INSCRITS',
   };
 
   // Tables dont les données sont multi-lignes dans collected_data
@@ -290,6 +335,9 @@ class SqlTranslator {
     'ELEVES_AGE_NIVEAU_SEXE',
     'ELEVES_NIVEAU_SEXE',
     'ELEVES_AGE_SEXE',
+    // S60 FIX B — NOUVEAUX_INSCRITS : données multi-lignes (une par catégorie).
+    // Suffixe HTML : _0_8_4 → SUM + LIKE 'FIELD_%' (même stratégie que ELEVES_*).
+    'NOUVEAUX_INSCRITS',
   };
 
   // Champs de contexte toujours inclus dans le CTE de pivot
@@ -1421,15 +1469,20 @@ class CoherenceEvaluator {
         final fieldName = _formKeyToFieldName(rawKey);
 
         try {
+          // S60 FIX A — INSERT manquait is_sent et updated_at.
+          // collected_data.updated_at est TEXT NOT NULL sans DEFAULT →
+          // DatabaseException(NOT NULL constraint failed: collected_data.updated_at)
+          // → toutes les injections échouaient → 0 champs injectés → S59 neutralisé.
           await db.execute(
             'INSERT OR REPLACE INTO collected_data '
-            '(id_camp, id_etab, id_qst, id_filter, field_name, field_value) '
-            'VALUES (?, ?, ?, ?, ?, ?)',
-            [idCamp, idEtab, idQst ?? '', '', fieldName, rawValue],
+            '(id_camp, id_etab, id_qst, id_filter, field_name, field_value, is_sent, updated_at) '
+            'VALUES (?, ?, ?, ?, ?, ?, 0, ?)',
+            [idCamp, idEtab, idQst ?? '', '', fieldName, rawValue,
+             DateTime.now().toIso8601String()],
           );
           injectedCount++;
         } catch (e) {
-          logger.log('[CoherenceEval] S59: ⚠️ injection échouée pour '
+          logger.log('[CoherenceEval] S60: ⚠️ injection échouée pour '
               'field=$fieldName val=$rawValue: $e');
         }
       }
@@ -1467,13 +1520,18 @@ class CoherenceEvaluator {
       }
     } finally {
       // ── Étape 4 + 5 : ROLLBACK + RELEASE — toujours exécuté ─────────────
+      //
+      // S60 FIX C — Android API ≤ 27 : sqflite.execSQL() peut ignorer silencieusement
+      // ROLLBACK TO SAVEPOINT sans le préfixe ';'. Résultat possible : SAVEPOINT non
+      // annulé → insertions temporaires non supprimées → pollution de collected_data.
+      // Le préfixe ';' est géré correctement par toutes les versions de SQLite Android.
       try {
-        await db.execute('ROLLBACK TO SAVEPOINT coherence_eval');
-        await db.execute('RELEASE SAVEPOINT coherence_eval');
-        logger.log('[CoherenceEval] S59: SAVEPOINT coherence_eval rollback+release '
+        await db.execute(';ROLLBACK TO SAVEPOINT coherence_eval');
+        await db.execute(';RELEASE SAVEPOINT coherence_eval');
+        logger.log('[CoherenceEval] S60: SAVEPOINT coherence_eval rollback+release '
             '($injectedCount insertions temporaires supprimées)');
       } catch (e) {
-        logger.log('[CoherenceEval] S59: ⚠️ erreur ROLLBACK SAVEPOINT: $e');
+        logger.log('[CoherenceEval] S60: ⚠️ erreur ROLLBACK SAVEPOINT: $e');
       }
     }
 
@@ -1628,14 +1686,26 @@ class CoherenceEvaluator {
           '[CoherenceEval] rule=${rule.idRegle} sql_assoc empty → count2=0');
       count2 = 0;
     } else {
-      // sql_assoc non traduisible (pas de table serveur connue) :
-      // on traite sql_regle comme un COUNT de violations et on compare à 0.
-      // Cela est correct pour les règles dont le critere est '= 0' :
-      //   count1=0 → pas de violation, count1>0 → violation.
-      logger.log(
-          '[CoherenceEval] rule=${rule.idRegle} sql_assoc not translatable '
-          '— comparing count1 to 0 directly');
-      count2 = 0;
+      // S60 FIX D — sql_assoc peut être un littéral numérique pur (ex: '0', '1').
+      // Dans ce cas, double.tryParse() retourne la valeur directement.
+      // Règles 486–489 : sql_assoc='0', critere='=' → la règle est violée si
+      // count1 (COUNT des établissements violant la condition WHERE) != 0.
+      // Cette branche couvre aussi le cas générique sql_assoc non traduisible :
+      // on compare count1 à la valeur littérale si elle est numérique,
+      // sinon on compare à 0 (comportement conservatif identique au cas vide).
+      final literalValue = double.tryParse(rule.sqlAssoc.trim());
+      if (literalValue != null) {
+        logger.log(
+            '[CoherenceEval] rule=${rule.idRegle} sql_assoc is numeric literal '
+            '${rule.sqlAssoc.trim()} → count2=$literalValue');
+        count2 = literalValue;
+      } else {
+        // sql_assoc non traduisible et non numérique → compare count1 à 0
+        logger.log(
+            '[CoherenceEval] rule=${rule.idRegle} sql_assoc not translatable '
+            '— comparing count1 to 0 directly');
+        count2 = 0;
+      }
     }
 
     final violated = _applyOperator(count1, count2, rule.critere);

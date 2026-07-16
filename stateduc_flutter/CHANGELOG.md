@@ -4,6 +4,133 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 60] — 2026-07-16 — Cinq correctifs critiques moteur offline (updated_at, NOUVEAUX_INSCRITS, SAVEPOINT ';', sql_assoc littéral, debugPrint)
+
+### Contexte
+Les logs console Android (après S59) révèlent que le SAVEPOINT S59 n'injectait **0 champ**
+(NOT NULL constraint sur `updated_at`). En parallèle, la règle 496 restait toujours SKIPPED
+(`NOUVEAUX_INSCRITS` table inconnue), et des warnings Android API ≤ 27 sur le ROLLBACK
+risquaient de laisser des données temporaires non supprimées.
+
+---
+
+### Fix A — CRITIQUE : INSERT collected_data manquait `updated_at` + `is_sent`
+
+**Root cause** : `collected_data.updated_at TEXT NOT NULL` n'a pas de valeur DEFAULT.
+L'INSERT S59 ne fournissait que 6 colonnes → `DatabaseException(NOT NULL constraint failed:
+collected_data.updated_at)` → chaque injection échouait → 0 champs injectés → S59 était
+entièrement neutralisé malgré le SAVEPOINT ouvert.
+
+**Fix** :
+```dart
+// AVANT (S59 — cassé) :
+'INSERT OR REPLACE INTO collected_data '
+'(id_camp, id_etab, id_qst, id_filter, field_name, field_value) '
+'VALUES (?, ?, ?, ?, ?, ?)',
+[idCamp, idEtab, idQst ?? '', '', fieldName, rawValue],
+
+// APRÈS (S60 — correct) :
+'INSERT OR REPLACE INTO collected_data '
+'(id_camp, id_etab, id_qst, id_filter, field_name, field_value, is_sent, updated_at) '
+'VALUES (?, ?, ?, ?, ?, ?, 0, ?)',
+[idCamp, idEtab, idQst ?? '', '', fieldName, rawValue,
+ DateTime.now().toIso8601String()],
+```
+
+---
+
+### Fix B — CRITIQUE : `NOUVEAUX_INSCRITS` absent de `_knownServerTables` / `_multiRowTables`
+
+**Root cause** : La table `NOUVEAUX_INSCRITS` n'était pas dans les sets de tables connues.
+`SqlTranslator._detectServerTables()` retournait `{}` → `translate()` retournait null →
+chemin regex fallback avec `v1=null v2=null` → règle 496 toujours SKIPPED.
+
+**Champs observés** : `FILLES_NV_INCRITES_0_8_4`, `TOTAL_NV_INCRITS_0_8_4` (suffixe `_0_8_4`
+→ table multi-lignes → CTE doit utiliser `SUM + LIKE 'FIELD_%'`).
+
+**Fix** :
+```dart
+static const _knownServerTables = {
+  'DONNEES_ETABLISSEMENT',
+  'ELEVES_AGE_NIVEAU_SEXE',
+  'ELEVES_NIVEAU_SEXE',
+  'ELEVES_AGE_SEXE',
+  'NOUVEAUX_INSCRITS',   // S60 FIX B
+};
+
+static const _multiRowTables = {
+  'ELEVES_AGE_NIVEAU_SEXE',
+  'ELEVES_NIVEAU_SEXE',
+  'ELEVES_AGE_SEXE',
+  'NOUVEAUX_INSCRITS',   // S60 FIX B — suffixe _0_8_4 → SUM + LIKE 'FIELD_%'
+};
+```
+
+---
+
+### Fix C — IMPORTANT : SAVEPOINT ROLLBACK/RELEASE sans préfixe `;` sur Android API ≤ 27
+
+**Root cause** : Sur Android API ≤ 27, `sqflite.execSQL('ROLLBACK TO SAVEPOINT x')` peut
+ignorer silencieusement la commande sans le préfixe `;`. Conséquence : le SAVEPOINT reste
+ouvert et les insertions temporaires de formData ne sont pas supprimées → pollution possible
+de `collected_data` avec des valeurs intermédiaires.
+
+**Fix** :
+```dart
+// AVANT (S59) :
+await db.execute('ROLLBACK TO SAVEPOINT coherence_eval');
+await db.execute('RELEASE SAVEPOINT coherence_eval');
+
+// APRÈS (S60) :
+await db.execute(';ROLLBACK TO SAVEPOINT coherence_eval');
+await db.execute(';RELEASE SAVEPOINT coherence_eval');
+```
+
+---
+
+### Fix D — `sql_assoc` littéral numérique (règles 486–489)
+
+**Analyse** : Pour les règles 486–489, `sql_assoc='0'` est un littéral numérique pur, pas
+une requête SQL. La branche précédente (`sql_assoc not translatable → count2=0`) était
+fonctionnellement équivalente pour `critere='='`, mais ne distinguait pas le cas numérique
+du cas non-traduisible. On parse maintenant explicitement avec `double.tryParse(sql_assoc)`
+pour un comportement correct et des logs clairs.
+
+```dart
+final literalValue = double.tryParse(rule.sqlAssoc.trim());
+if (literalValue != null) {
+  count2 = literalValue;  // '0' → 0.0, '1' → 1.0, etc.
+} else {
+  count2 = 0;  // fallback conservatif
+}
+```
+
+---
+
+### Fix E — debugPrint tronqué sur Android logcat (cosmétique)
+
+**Cause** : Android logcat tronque `debugPrint` à ~4000 caractères. Les SQL traduits
+(CTE + wrapper EXISTS/SCALAR) peuvent dépasser cette limite, corrompant les logs.
+
+**Fix** : `CoherenceLogger.log()` découpe maintenant les messages en tranches de 800 char.
+Le fichier `coherence_latest.log` reçoit le message complet sans troncature.
+
+---
+
+### Fichiers modifiés
+
+| Fichier | Modification |
+|---------|-------------|
+| `lib/services/coherence_evaluator.dart` | Fix A (INSERT), Fix B (NOUVEAUX_INSCRITS), Fix C (ROLLBACK ';'), Fix D (sql_assoc numérique), Fix E (debugPrint chunking) |
+
+### Validation
+
+```
+/tmp/validate_s60.py → 74/74 PASS
+```
+
+---
+
 ## [Session 59] — 2026-07-15 — Injection formData via SAVEPOINT SQLite (élimination faux positifs/négatifs)
 
 ### Contexte
