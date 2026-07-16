@@ -4,6 +4,106 @@ Historique complet de toutes les modifications apportées à l'application Flutt
 
 ---
 
+## [Session 61] — 2026-07-16 — Fix log interleaving : SqlTranslator._logger statique → paramètre local
+
+### Contexte
+
+Après S60, l'analyse des logs Android a révélé que des blocs `[SqlTranslator] translated SQL`
+**fantômes** apparaissaient dans les sections rule=486/487/488/489 : un SQL avec un CTE incomplet
+(champs manquants) s'intercalait visuellement entre les vrais logs de la règle en cours.
+
+**Root cause** : `SqlTranslator._logger` était un champ `static` partagé entre tous les appels
+`translate()`. L'assignation `SqlTranslator._logger = logger` dans `_evaluateViaSql()` (S58)
+était effectuée **avant** les deux appels à `translate()` (sql_regle + sql_assoc), mais le
+logger restait affecté **après** le retour de `translate()`. Dans certaines configurations
+Android Studio / logcat, les logs `debugPrint()` d'un `translate()` appartenant à la règle N+1
+s'affichaient dans la section de la règle N, rendant le débogage très confus.
+
+**Note importante** : Ce bug était **purement cosmétique** — il n'affectait PAS l'évaluation
+des règles (les bons SQL étaient toujours exécutés, les résultats étaient corrects). Mais il
+rendait les logs de débogage illisibles et pouvait faire croire à un bug de traduction SQL.
+
+---
+
+### Fix — `translate()` reçoit désormais `logger` en paramètre, save/restore via try/finally
+
+```dart
+// AVANT (S58/S60 — _logger statique persistait entre les appels) :
+SqlTranslator._logger = logger;  // affecté une fois dans _evaluateViaSql()
+final r1 = SqlTranslator.translate(serverSql: rule.sqlRegle, ...);
+final r2 = SqlTranslator.translate(serverSql: rule.sqlAssoc, ...);
+// → après translate(sql_regle), _logger reste affecté → logs de la règle suivante
+//   peuvent s'intercaler visuellement
+
+// APRÈS (S61 — logger isolé par appel translate()) :
+final r1 = SqlTranslator.translate(
+  serverSql: rule.sqlRegle, ..., logger: logger);   // logger passé ici
+final r2 = SqlTranslator.translate(
+  serverSql: rule.sqlAssoc, ..., logger: logger);   // logger passé ici
+```
+
+Et dans `translate()` lui-même, le pattern save/restore garantit l'isolation :
+
+```dart
+static TranslationResult? translate({
+  ...
+  CoherenceLogger? logger,     // S61 — paramètre optionnel
+}) {
+  if (serverSql.trim().isEmpty) return null;  // retour avant toute mutation
+  
+  // S61 FIX — sauvegarder/restaurer dans un try/finally
+  final prevLogger = SqlTranslator._logger;
+  SqlTranslator._logger = logger;
+  try {
+    // ... toute la logique de traduction ...
+    return TranslationResult(...);
+  } catch (e, st) {
+    SqlTranslator._log('[SqlTranslator] translation error: $e\n$st');
+    return null;
+  } finally {
+    SqlTranslator._logger = prevLogger;  // restauration garantie
+  }
+}
+```
+
+#### Effet sur les logs
+
+Avant (S60) — rule=486 :
+```
+[SqlTranslator] translated SQL (isScalar=false): [SQL correct rule=486]
+[SqlTranslator] translated SQL (isScalar=false): [SQL FANTÔME — CTE incomplet]  ← confus
+[CoherenceEval] rule=486 sql_regle (isScalar=false): [SQL correct]
+```
+
+Après (S61) — rule=486 :
+```
+[CoherenceEval] --- translating sql_regle rule=486 ---    ← séparateur explicite
+[SqlTranslator] translated SQL (isScalar=false): [SQL correct rule=486]
+[CoherenceEval] rule=486 sql_regle (isScalar=false): [SQL correct]
+[CoherenceEval] --- translating sql_assoc rule=486 ---    ← séparateur explicite
+[SqlTranslator] no known server tables in SQL — not translatable
+```
+
+Des séparateurs `--- translating sql_regle/sql_assoc rule=N ---` ont été ajoutés dans
+`_evaluateViaSql()` pour clarifier davantage quelle traduction est en cours.
+
+---
+
+### Fichiers modifiés
+
+| Fichier | Modification |
+|---------|-------------|
+| `lib/services/coherence_evaluator.dart` | Fix log interleaving : `translate()` accepte `logger`, save/restore try/finally, séparateurs logs |
+
+### Validation
+
+```
+/tmp/validate_s61.py → 43/43 PASS
+/tmp/validate_s60.py → 74/74 PASS (régressions : aucune)
+```
+
+---
+
 ## [Session 60] — 2026-07-16 — Cinq correctifs critiques moteur offline (updated_at, NOUVEAUX_INSCRITS, SAVEPOINT ';', sql_assoc littéral, debugPrint)
 
 ### Contexte
