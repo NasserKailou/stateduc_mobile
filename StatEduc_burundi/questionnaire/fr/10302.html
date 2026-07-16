@@ -1,0 +1,243 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=10302' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>8.1. Effectif du personnel par catégorie, fonction et sexe </B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> 8.1.  Effectif du personnel par catégorie, fonction et sexe <br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Directeur  </TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_2' NAME='F_PERS_FONC_NAT_0_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_2"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_2' NAME='T_PERS_FONC_NAT_0_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_2"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Maître responsable</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_3' NAME='F_PERS_FONC_NAT_0_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_3"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_3' NAME='T_PERS_FONC_NAT_0_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_3"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Bibliothécaire</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_12' NAME='F_PERS_FONC_NAT_0_12' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_12"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_12' NAME='T_PERS_FONC_NAT_0_12' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Secrétaire</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_5' NAME='F_PERS_FONC_NAT_0_5' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_5' NAME='T_PERS_FONC_NAT_0_5' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_5"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Secrétaire/comptable</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_43' NAME='F_PERS_FONC_NAT_0_43' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_43"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_43' NAME='T_PERS_FONC_NAT_0_43' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_43"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Comptable</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_34' NAME='F_PERS_FONC_NAT_0_34' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_34"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_34' NAME='T_PERS_FONC_NAT_0_34' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_34"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Titulaire (1-6)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_7' NAME='F_PERS_FONC_NAT_0_7' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_7' NAME='T_PERS_FONC_NAT_0_7' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_7"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Titulaire (7-9)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_39' NAME='F_PERS_FONC_NAT_0_39' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_39"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_39' NAME='T_PERS_FONC_NAT_0_39' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_39"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Suppléant (1-6)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_8' NAME='F_PERS_FONC_NAT_0_8' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_8' NAME='T_PERS_FONC_NAT_0_8' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_8"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Enseignants Bénévoles</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_42' NAME='F_PERS_FONC_NAT_0_42' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_42"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_42' NAME='T_PERS_FONC_NAT_0_42' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_42"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Encadreur (7-9)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_41' NAME='F_PERS_FONC_NAT_0_41' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_41"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_41' NAME='T_PERS_FONC_NAT_0_41' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_41"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Planton (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_22' NAME='F_PERS_FONC_NAT_0_22' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_22"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_22' NAME='T_PERS_FONC_NAT_0_22' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_22"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Veilleur (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_23' NAME='F_PERS_FONC_NAT_0_23' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_23"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_23' NAME='T_PERS_FONC_NAT_0_23' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_23"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Chauffeur (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_25' NAME='F_PERS_FONC_NAT_0_25' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_25"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_25' NAME='T_PERS_FONC_NAT_0_25' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_25"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Planton (PFP)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_14' NAME='F_PERS_FONC_NAT_0_14' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_14"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_14' NAME='T_PERS_FONC_NAT_0_14' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_14"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Veilleur (PF</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_15' NAME='F_PERS_FONC_NAT_0_15' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_15"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_15' NAME='T_PERS_FONC_NAT_0_15' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_15"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Chauffeur (PFP)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_17' NAME='F_PERS_FONC_NAT_0_17' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_17"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_17' NAME='T_PERS_FONC_NAT_0_17' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_17"  tabindex=''>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
