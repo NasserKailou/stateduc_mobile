@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 60 — fix updated_at NOT NULL, NOUVEAUX_INSCRITS, SAVEPOINT ';' prefix
+// VERSION : Session 61 — fix SqlTranslator._logger static → paramètre translate() local
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -113,6 +113,19 @@
 //           NB_LATRINES_ELEVES sauvegardé → CTE lit 4
 //           critere '<=' → !(0 <= 4) → VIOLATED (faux positif)
 //     SOLUTION : avant la boucle des règles, on commence un SAVEPOINT SQLite,
+//
+//  9. FIX SESSION 61 — SqlTranslator._logger statique → log interleaving
+//     PROBLÈME : _logger était un champ statique de SqlTranslator, partagé entre
+//     tous les appels translate(). En console Android, les logs de translate(sql_regle=N)
+//     et translate(sql_regle=N+1) se mélangeaient visuellement : un bloc "translated SQL"
+//     fantôme apparaissait dans la section rule=N (provenant de rule=N+1), rendant
+//     le débogage très confus (mais n'affectant pas l'évaluation réelle).
+//     FIX : ajouter le paramètre optionnel `logger` à translate(). Au début de chaque
+//     appel translate(), on sauvegarde l'ancien _logger, on affecte le nouveau, et on
+//     restaure dans un try/finally. Cela confine les logs SqlTranslator exactement à
+//     la durée de l'appel translate() qui les a générés.
+//     La ligne `SqlTranslator._logger = logger` dans _evaluateViaSql() est supprimée
+//     (remplacée par le passage de logger comme paramètre à translate()).
 //
 //  8. FIX SESSION 60 — Trois correctifs critiques bloquants :
 //     A. collected_data.updated_at TEXT NOT NULL sans DEFAULT → INSERT S59
@@ -300,9 +313,9 @@ class CoherenceLogger {
 class SqlTranslator {
   SqlTranslator._(); // Classe statique uniquement
 
-  // SESSION 58 — Logger de fichier partagé avec CoherenceEvaluator.
-  // Initialisé avant chaque appel à translate() depuis _evaluateViaSql().
-  // Toutes les sorties debugPrint du traducteur sont aussi écrites dans le log.
+  // SESSION 61 — Logger de fichier passé en paramètre à translate() au lieu d'un
+  // champ statique. Sauvegardé/restauré dans un try/finally pour que les logs de
+  // chaque appel translate() restent bien isolés (plus d'interleaving entre règles).
   static CoherenceLogger? _logger;
 
   /// Enregistre un message dans le logger de fichier ET dans debugPrint.
@@ -370,8 +383,16 @@ class SqlTranslator {
     String? idQst,
     String? codeEtab,
     String? codeTypeAnnee,
+    // S61 FIX — logger passé en paramètre pour isoler les logs par appel translate().
+    // Sauvegardé/restauré dans un try/finally pour éviter tout interleaving.
+    CoherenceLogger? logger,
   }) {
     if (serverSql.trim().isEmpty) return null;
+
+    // S61 FIX — sauvegarder le logger précédent et affecter le nouveau pour la durée
+    // de cet appel translate(). Restauration garantie dans le finally ci-dessous.
+    final prevLogger = SqlTranslator._logger;
+    SqlTranslator._logger = logger;
 
     try {
       // ── Étape 1 : normalisation de base ───────────────────────────────
@@ -563,6 +584,10 @@ class SqlTranslator {
     } catch (e, st) {
       SqlTranslator._log('[SqlTranslator] translation error: $e\n$st');
       return null;
+    } finally {
+      // S61 FIX — restaurer le logger précédent pour ne pas polluer les appels
+      // translate() ultérieurs (ex: sql_assoc du même _evaluateViaSql()).
+      SqlTranslator._logger = prevLogger;
     }
   }
 
@@ -1618,11 +1643,11 @@ class CoherenceEvaluator {
     logger.log('[CoherenceEval] sql_regle raw: ${rule.sqlRegle}');
     logger.log('[CoherenceEval] sql_assoc raw: ${rule.sqlAssoc}');
 
-    // SESSION 58 — Connecter le logger au SqlTranslator pour que toutes ses
-    // sorties soient aussi écrites dans le fichier log de cohérence.
-    SqlTranslator._logger = logger;
-
-    // Traduire sql_regle
+    // S61 FIX — logger passé directement à translate() au lieu d'être affecté
+    // globalement. Le champ statique _logger est désormais sauvegardé/restauré dans
+    // un try/finally à l'intérieur de translate() — chaque appel translate() est
+    // entièrement isolé. Plus d'interleaving de logs entre règles consécutives.
+    logger.log('[CoherenceEval] --- translating sql_regle rule=${rule.idRegle} ---');
     final r1 = SqlTranslator.translate(
       serverSql: rule.sqlRegle,
       idCamp: idCamp,
@@ -1630,6 +1655,7 @@ class CoherenceEvaluator {
       idQst: idQst,
       codeEtab: codeEtab,
       codeTypeAnnee: codeTypeAnnee,
+      logger: logger,
     );
     if (r1 == null) {
       logger.log('[CoherenceEval] rule=${rule.idRegle} sql_regle not translatable → regex fallback');
@@ -1649,6 +1675,7 @@ class CoherenceEvaluator {
     //     count1 (violations détectées) directement à 0 avec le critere.
     //     Cela couvre le cas fréquent critere='= 0' : la règle est violée si
     //     count1 > 0.
+    logger.log('[CoherenceEval] --- translating sql_assoc rule=${rule.idRegle} ---');
     final r2 = SqlTranslator.translate(
       serverSql: rule.sqlAssoc,
       idCamp: idCamp,
@@ -1656,6 +1683,7 @@ class CoherenceEvaluator {
       idQst: idQst,
       codeEtab: codeEtab,
       codeTypeAnnee: codeTypeAnnee,
+      logger: logger,
     );
     if (r2 != null) {
       logger.log('[CoherenceEval] rule=${rule.idRegle} sql_assoc (isScalar=${r2.isScalar}):\n${r2.sql}');
