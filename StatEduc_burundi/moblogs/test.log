@@ -1,0 +1,7 @@
+2026/05/31 02:38:33;28:Operation timed out after 120015 milliseconds with 273434797932544 bytes received;http://10.170.57.15:8083/StatEduc_MEN_2025/questionnaire_ws.php?sector=2&theme=15702&code_etab=70&type_ent_stat=2&annee=23&login=test&langue=fr&filtre=0;
+2026/05/31 02:40:15;2;2;15702;70;0;KOSAVE;
+2026/05/31 02:42:14;2;2;15702;70;0;KOSAVE;
+2026/05/31 02:43:40;2;2;15702;70;0;KOSAVE;
+2026/05/31 03:20:58;28:Operation timed out after 120000 milliseconds with 277695405490176 bytes received;http://10.170.57.15:8083/StatEduc_MEN_2025/questionnaire_ws.php?sector=2&theme=15702&code_etab=70&type_ent_stat=2&annee=23&login=test&langue=fr&filtre=0;
+2026/05/31 03:24:51;2;2;15802;70;0;OKSAVE;
+2026/05/31 03:25:41;2;2;15802;70;0;OKSAVE;

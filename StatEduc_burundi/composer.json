@@ -1,0 +1,8 @@
+{
+    "config": {
+        "vendor-dir": "server-side/lib"
+    },
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.12"
+    }
+}

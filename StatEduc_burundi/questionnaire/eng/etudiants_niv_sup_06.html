@@ -1,0 +1,243 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('(#)Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=6106' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B></B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=3 class='ligne-paire' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='++++++++++++++++++'></TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='++++++++++++++++++'></TD>
+		<TD ROWSPAN=22 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN= class='ligne-paire'></TD>
+	</TR>
+	<TR  style='height:25px;'>
+	</TR>
+	<TR></TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_0' NAME=CODE_TYPE_FILIERE_0>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_0-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_0' NAME=CODE_TYPE_ELEVES_CATEG_0>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_1' NAME=CODE_TYPE_FILIERE_1>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_1-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_1' NAME=CODE_TYPE_ELEVES_CATEG_1>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_2' NAME=CODE_TYPE_FILIERE_2>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_2-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_2' NAME=CODE_TYPE_ELEVES_CATEG_2>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_3_0' onClick='MiseEvidenceLigneFrame(3,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_3_1' onClick='MiseEvidenceLigneFrame(3,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_3' NAME=CODE_TYPE_FILIERE_3>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_3-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_2' onClick='MiseEvidenceLigneFrame(3,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_3' NAME=CODE_TYPE_ELEVES_CATEG_3>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_4_0' onClick='MiseEvidenceLigneFrame(4,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_4_1' onClick='MiseEvidenceLigneFrame(4,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_4' NAME=CODE_TYPE_FILIERE_4>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_4-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_2' onClick='MiseEvidenceLigneFrame(4,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_4' NAME=CODE_TYPE_ELEVES_CATEG_4>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_5_0' onClick='MiseEvidenceLigneFrame(5,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_5_1' onClick='MiseEvidenceLigneFrame(5,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_5' NAME=CODE_TYPE_FILIERE_5>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_5-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_2' onClick='MiseEvidenceLigneFrame(5,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_5' NAME=CODE_TYPE_ELEVES_CATEG_5>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_6_0' onClick='MiseEvidenceLigneFrame(6,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_6_1' onClick='MiseEvidenceLigneFrame(6,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_6' NAME=CODE_TYPE_FILIERE_6>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_6-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_2' onClick='MiseEvidenceLigneFrame(6,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_6' NAME=CODE_TYPE_ELEVES_CATEG_6>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_7_0' onClick='MiseEvidenceLigneFrame(7,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_7_1' onClick='MiseEvidenceLigneFrame(7,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_7' NAME=CODE_TYPE_FILIERE_7>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_7-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_2' onClick='MiseEvidenceLigneFrame(7,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_7' NAME=CODE_TYPE_ELEVES_CATEG_7>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_8_0' onClick='MiseEvidenceLigneFrame(8,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_8_1' onClick='MiseEvidenceLigneFrame(8,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_8' NAME=CODE_TYPE_FILIERE_8>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_8-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_2' onClick='MiseEvidenceLigneFrame(8,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_8' NAME=CODE_TYPE_ELEVES_CATEG_8>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_9_0' onClick='MiseEvidenceLigneFrame(9,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_9_1' onClick='MiseEvidenceLigneFrame(9,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_9' NAME=CODE_TYPE_FILIERE_9>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_9-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_2' onClick='MiseEvidenceLigneFrame(9,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_9' NAME=CODE_TYPE_ELEVES_CATEG_9>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_10_0' onClick='MiseEvidenceLigneFrame(10,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_10 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_10_1' onClick='MiseEvidenceLigneFrame(10,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_10' NAME=CODE_TYPE_FILIERE_10>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_10-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_10_2' onClick='MiseEvidenceLigneFrame(10,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_10' NAME=CODE_TYPE_ELEVES_CATEG_10>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_11_0' onClick='MiseEvidenceLigneFrame(11,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_11 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_11_1' onClick='MiseEvidenceLigneFrame(11,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_11' NAME=CODE_TYPE_FILIERE_11>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_11-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_11_2' onClick='MiseEvidenceLigneFrame(11,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_11' NAME=CODE_TYPE_ELEVES_CATEG_11>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_12_0' onClick='MiseEvidenceLigneFrame(12,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_12 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_12_1' onClick='MiseEvidenceLigneFrame(12,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_12' NAME=CODE_TYPE_FILIERE_12>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_12-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_12_2' onClick='MiseEvidenceLigneFrame(12,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_12' NAME=CODE_TYPE_ELEVES_CATEG_12>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_13_0' onClick='MiseEvidenceLigneFrame(13,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_13 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_13_1' onClick='MiseEvidenceLigneFrame(13,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_13' NAME=CODE_TYPE_FILIERE_13>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_13-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_13_2' onClick='MiseEvidenceLigneFrame(13,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_13' NAME=CODE_TYPE_ELEVES_CATEG_13>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_14_0' onClick='MiseEvidenceLigneFrame(14,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_14 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_14_1' onClick='MiseEvidenceLigneFrame(14,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_14' NAME=CODE_TYPE_FILIERE_14>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_14-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_14_2' onClick='MiseEvidenceLigneFrame(14,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_14' NAME=CODE_TYPE_ELEVES_CATEG_14>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_15_0' onClick='MiseEvidenceLigneFrame(15,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_15 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_15_1' onClick='MiseEvidenceLigneFrame(15,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_15' NAME=CODE_TYPE_FILIERE_15>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_15-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_15_2' onClick='MiseEvidenceLigneFrame(15,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_15' NAME=CODE_TYPE_ELEVES_CATEG_15>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_16_0' onClick='MiseEvidenceLigneFrame(16,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_16 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_16_1' onClick='MiseEvidenceLigneFrame(16,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_16' NAME=CODE_TYPE_FILIERE_16>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_16-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_16_2' onClick='MiseEvidenceLigneFrame(16,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_16' NAME=CODE_TYPE_ELEVES_CATEG_16>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_17_0' onClick='MiseEvidenceLigneFrame(17,18)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_17 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_17_1' onClick='MiseEvidenceLigneFrame(17,18)'><SELECT style='width:200px'  ID='CODE_TYPE_FILIERE_17' NAME=CODE_TYPE_FILIERE_17>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_610004_CODE_TYPE_FILIERE_17-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_17_2' onClick='MiseEvidenceLigneFrame(17,18)'><SELECT style = 'width:100px'  ID='CODE_TYPE_ELEVES_CATEG_17' NAME=CODE_TYPE_ELEVES_CATEG_17>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
