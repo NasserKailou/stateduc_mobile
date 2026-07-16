@@ -2,19 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ark.android.stateduc">
 
-    <!-- ── Permissions (mirrors original config.xml) ─────────────────────── -->
+    <!-- ── Permissions ───────────────────────────────────────────────────── -->
+    <!-- NOTE S62: Permissions SMS (SEND_SMS, READ_SMS, RECEIVE_SMS) supprimées.
+         Elles étaient des vestiges de l'ancienne app Cordova (hazems-cordova-plugin-sms)
+         et ne sont plus utilisées dans Flutter. Leur présence déclenchait un blocage
+         Google PlayProtect sévère ("Appli bloquée — données sensibles / fraude financière")
+         sur toute installation hors Play Store. -->
 
     <!-- Network -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
-    <!-- SMS (replaces hazems-cordova-plugin-sms) -->
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.READ_SMS"/>
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
-
-    <!-- Vibration (replaces cordova-plugin-vibration) -->
+    <!-- Vibration -->
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
