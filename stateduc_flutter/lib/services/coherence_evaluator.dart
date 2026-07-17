@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 63 — traduction IIF() et SWITCH() → CASE WHEN … END (universelle)
+// VERSION : Session 64 — SCALAR wrapper universel (row[0][0] semantics, multi-column safe)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -135,6 +135,37 @@
 //     Exemple :
 //       IIF(A=1, IIF(B=2, 'x', 'y'), 'z')
 //       → CASE WHEN A=1 THEN CASE WHEN B=2 THEN 'x' ELSE 'y' END ELSE 'z' END
+//
+// 11. FIX SESSION 64 — SCALAR wrapper universel : suppression de _keepFirstSelectColumn
+//     PROBLÈME : le wrapper SCALAR `SELECT (subquery) AS __scalar_val` exige une
+//     sous-requête mono-colonne. Pour contourner cela, `_keepFirstSelectColumn`
+//     réduisait le SELECT à sa première colonne. Mais quand sql_regle et sql_assoc
+//     ont toutes les deux le même premier champ (ex: `Sum(FILLES_AGE_NIVEAU)`) dans
+//     leur SELECT, les deux côtés retournent la même valeur → la comparaison est
+//     toujours `182 <= 182` → la règle n'est JAMAIS violée localement (alors que le
+//     serveur détecte correctement la violation car sql_assoc commence par TOTAL).
+//
+//     ROOT CAUSE : le serveur lit `val_sql[0][0]` = première cellule de la première
+//     ligne, indépendamment pour chaque SQL. L'ordre des colonnes dans SELECT est
+//     donc CRITIQUE : sql_regle peut commencer par FILLES et sql_assoc par TOTAL.
+//     `_keepFirstSelectColumn` les réduit tous les deux à FILLES → 182 = 182.
+//
+//     SOLUTION : nouveau wrapper SCALAR sans sous-requête scalaire :
+//       WITH ... (
+//         SELECT * FROM ( original_sql_full ) _s LIMIT 1
+//       )
+//     Le résultat est une ligne avec toutes ses colonnes. Dans `_execCount`
+//     (SCALAR mode), on lit déjà `rows.first.values.first` — la PREMIÈRE colonne
+//     de la PREMIÈRE ligne, exactement comme le serveur. Ainsi :
+//       • sql_regle retourne [FILLES=182, TOTAL=300] → val=182
+//       • sql_assoc retourne [TOTAL=300, FILLES=182] → val=300
+//       • critere '<=' → !(182 <= 300) = false → pas violé  (correct)
+//       • si FILLES=350, TOTAL=300 → !(350 <= 300) = true → VIOLATED ✅
+//
+//     Le changement supprime l'appel à `_keepFirstSelectColumn` dans le chemin
+//     SCALAR et remplace le wrapper par le pattern `SELECT * FROM (...) LIMIT 1`.
+//     La méthode `_keepFirstSelectColumn` est conservée mais n'est plus appelée
+//     (marquée @visibleForTesting pour ne pas casser les tests existants).
 //
 //  9. FIX SESSION 61 — SqlTranslator._logger statique → log interleaving
 //     PROBLÈME : _logger était un champ statique de SqlTranslator, partagé entre
@@ -575,23 +606,30 @@ class SqlTranslator {
             '$withClause\nSELECT COUNT(*) AS cnt FROM (\n$translatedSql\n) _violations';
         isScalar = false;
       } else {
-        // MODE SCALAR — requête retourne une seule valeur agrégée (Sum, Count, etc.)
+        // MODE SCALAR — requête retourne une valeur agrégée (Sum, Count, etc.)
         //
-        // SESSION 54 FIX : certaines règles ont un SELECT multi-colonnes agrégées :
-        //   SELECT Sum(FILLES_AGE_NIVEAU) AS SommeX, Sum(TOTAL_AGE_NIVEAU) AS SommeY
-        // Le wrapper  SELECT (__scalar_val)  exige une sous-requête mono-colonne.
-        // SQLite error : "sub-select returns 2 columns - expected 1".
+        // SESSION 64 FIX : nouveau wrapper universel, multi-colonne safe.
         //
-        // Le serveur compare val_sql[0][0] vs val_sql_assoc[0][0] — toujours la
-        // PREMIÈRE valeur de la PREMIÈRE ligne. On réduit donc le SELECT à sa
-        // première colonne avant de construire le wrapper.
+        // Ancien problème (S54→S63) : le wrapper corélé `SELECT (subquery)` exigeait
+        // une sous-requête mono-colonne → _keepFirstSelectColumn réduisait le SELECT
+        // à la PREMIÈRE colonne. Mais si sql_regle et sql_assoc ont le même premier
+        // champ (ex: FILLES pour les deux), les deux côtés retournaient FILLES=182
+        // et on comparait 182<=182 → jamais violé.
         //
-        // Stratégie : réécrire SELECT col1, col2, ... FROM T → SELECT col1 FROM T
-        // en utilisant _keepFirstSelectColumn().
-        final scalarSql = _keepFirstSelectColumn(translatedSql);
-        SqlTranslator._log('[SqlTranslator] SCALAR: kept first column only:\n$scalarSql');
+        // Nouveau wrapper : SELECT * FROM (original_sql) _s LIMIT 1
+        // Retourne UNE ligne avec TOUTES les colonnes du SELECT original.
+        // Dans _execCount (SCALAR), on lit rows.first.values.first — première
+        // colonne de la première ligne, exactement comme le serveur (val_sql[0][0]).
+        //
+        // sql_regle : SELECT Sum(FILLES) AS a, Sum(TOTAL) AS b → [a=182, b=300] → 182
+        // sql_assoc : SELECT Sum(TOTAL) AS a, Sum(FILLES) AS b → [a=300, b=182] → 300
+        // critère '<=' → !(182 <= 300) → false = OK  |  si FILLES=350 → !(350<=300) → VIOLATED ✅
+        //
+        // COALESCE sur la valeur lue dans _execCount (déjà géré : null → 0.0).
+        // Pas de COALESCE dans le wrapper (supprimé : inutile avec SELECT *).
+        SqlTranslator._log('[SqlTranslator] SCALAR: building multi-column-safe wrapper');
         wrappedSql =
-            '$withClause\nSELECT COALESCE((__scalar_val), 0) AS val\nFROM (\n  SELECT (\n$scalarSql\n  ) AS __scalar_val\n) _wrapper';
+            '$withClause\nSELECT * FROM (\n$translatedSql\n) _scalar LIMIT 1';
         isScalar = true;
       }
 
@@ -1929,7 +1967,13 @@ class CoherenceEvaluator {
   /// Exécute un SQL traduit et retourne la valeur numérique du résultat.
   ///
   /// • [isScalar]=false (mode EXISTS) : lit la colonne `cnt` (COUNT(*)).
-  /// • [isScalar]=true  (mode SCALAR) : lit la colonne `val` (valeur agrégée réelle).
+  /// • [isScalar]=true  (mode SCALAR) : lit `rows.first.values.first` —
+  ///   première cellule de la première ligne, identique à `val_sql[0][0]` serveur.
+  ///   Depuis S64, le wrapper SCALAR génère `SELECT * FROM (...) LIMIT 1` (multi-
+  ///   colonne safe) : le SELECT complet est exécuté, et c'est l'ordre des colonnes
+  ///   dans le SELECT ORIGINAL qui détermine quelle valeur est lue. sql_regle et
+  ///   sql_assoc peuvent donc commencer par des colonnes DIFFÉRENTES → comparaison
+  ///   correcte même si les deux partagent les mêmes tables.
   ///
   /// SESSION 49 : ajout du paramètre [isScalar] pour distinguer les deux modes.
   /// Le mode SCALAR est nécessaire pour les règles Sum(X) sans GROUP BY, où
