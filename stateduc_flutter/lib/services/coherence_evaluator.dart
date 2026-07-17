@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 65 — CTE _cd déduplication cross-id_qst (priorité id_qst courant + fallback inter-thème)
+// VERSION : Session 66 — _execCount SCALAR : values.last (sql_assoc multi-colonnes faux négatif)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -181,6 +181,23 @@
 //     SCALAR et remplace le wrapper par le pattern `SELECT * FROM (...) LIMIT 1`.
 //     La méthode `_keepFirstSelectColumn` est conservée mais n'est plus appelée
 //     (marquée @visibleForTesting pour ne pas casser les tests existants).
+//
+// 13. FIX SESSION 66 — _execCount SCALAR multi-colonnes : values.first → values.last
+//     PROBLÈME : sql_assoc pour la Rule 494 (et règles similaires) retourne
+//     DEUX colonnes : Sum(FILLES_AGE_NIVEAU), Sum(TOTAL_AGE_NIVEAU).
+//     `_execCount` lisait `rows.first.values.first` = Sum(FILLES), pas Sum(TOTAL).
+//     Résultat : count2 = Sum(FILLES) = count1 → critère '<=' toujours satisfait
+//     → la règle ne se déclenche JAMAIS même si FILLES > TOTAL (faux négatif).
+//
+//     Pattern serveur Access observé :
+//       sql_regle = SELECT Sum(A)               → 1 colonne → val1 = Sum(A)
+//       sql_assoc = SELECT Sum(A), Sum(TOTAL)   → 2 colonnes → val2 = Sum(TOTAL)
+//     La DERNIÈRE colonne de sql_assoc est toujours la valeur totale de référence.
+//     Pour sql_assoc à 1 colonne : values.last == values.first → inchangé.
+//
+//     FIX : `rows.first.values.last` au lieu de `rows.first.values.first`.
+//     SQLite (sqflite) retourne les colonnes dans l'ordre du SELECT → safe.
+//     Régression Rule 496 : sql_assoc = Sum(TOTAL_NV) → 1 col → last=first ✅
 //
 //  9. FIX SESSION 61 — SqlTranslator._logger statique → log interleaving
 //     PROBLÈME : _logger était un champ statique de SqlTranslator, partagé entre
@@ -686,11 +703,13 @@ class SqlTranslator {
         //
         // Nouveau wrapper : SELECT * FROM (original_sql) _s LIMIT 1
         // Retourne UNE ligne avec TOUTES les colonnes du SELECT original.
-        // Dans _execCount (SCALAR), on lit rows.first.values.first — première
-        // colonne de la première ligne, exactement comme le serveur (val_sql[0][0]).
+        // Dans _execCount (SCALAR), on lit rows.first.values.last — DERNIÈRE
+        // colonne de la première ligne (S66 fix). Pour sql_assoc multi-colonnes
+        // ex: SELECT Sum(FILLES), Sum(TOTAL), la DERNIÈRE est la valeur totale.
+        // Pour 1 colonne : values.last == values.first → inchangé.
         //
-        // sql_regle : SELECT Sum(FILLES) AS a, Sum(TOTAL) AS b → [a=182, b=300] → 182
-        // sql_assoc : SELECT Sum(TOTAL) AS a, Sum(FILLES) AS b → [a=300, b=182] → 300
+        // sql_regle : SELECT Sum(FILLES) → [FILLES=182] → last=182
+        // sql_assoc : SELECT Sum(FILLES), Sum(TOTAL) → [FILLES=182, TOTAL=300] → last=300
         // critère '<=' → !(182 <= 300) → false = OK  |  si FILLES=350 → !(350<=300) → VIOLATED ✅
         //
         // COALESCE sur la valeur lue dans _execCount (déjà géré : null → 0.0).
@@ -2005,13 +2024,13 @@ class CoherenceEvaluator {
   /// Exécute un SQL traduit et retourne la valeur numérique du résultat.
   ///
   /// • [isScalar]=false (mode EXISTS) : lit la colonne `cnt` (COUNT(*)).
-  /// • [isScalar]=true  (mode SCALAR) : lit `rows.first.values.first` —
-  ///   première cellule de la première ligne, identique à `val_sql[0][0]` serveur.
+  /// • [isScalar]=true  (mode SCALAR) : lit `rows.first.values.last` —
+  ///   DERNIÈRE cellule de la première ligne (SESSION 66 : .last remplace .first).
   ///   Depuis S64, le wrapper SCALAR génère `SELECT * FROM (...) LIMIT 1` (multi-
-  ///   colonne safe) : le SELECT complet est exécuté, et c'est l'ordre des colonnes
-  ///   dans le SELECT ORIGINAL qui détermine quelle valeur est lue. sql_regle et
-  ///   sql_assoc peuvent donc commencer par des colonnes DIFFÉRENTES → comparaison
-  ///   correcte même si les deux partagent les mêmes tables.
+  ///   colonne safe) : le SELECT complet est exécuté. sql_assoc peut avoir N colonnes
+  ///   (ex: Sum(FILLES), Sum(TOTAL)) — la DERNIÈRE est toujours la valeur totale de
+  ///   référence. Pour sql_regle et sql_assoc à 1 colonne : values.last == values.first.
+  ///   SQLite retourne les colonnes dans l'ordre du SELECT → deterministe.
   ///
   /// SESSION 49 : ajout du paramètre [isScalar] pour distinguer les deux modes.
   /// Le mode SCALAR est nécessaire pour les règles Sum(X) sans GROUP BY, où
@@ -2032,9 +2051,15 @@ class CoherenceEvaluator {
         return isScalar ? 0.0 : 0.0;
       }
       if (isScalar) {
-        // MODE SCALAR : première colonne de la première ligne = valeur agrégée
+        // MODE SCALAR : DERNIÈRE colonne de la première ligne = valeur agrégée.
+        //
+        // SESSION 66 FIX — values.last au lieu de values.first :
+        // sql_assoc peut avoir N colonnes (ex: Sum(FILLES), Sum(TOTAL)).  La
+        // DERNIÈRE est toujours la valeur de référence (total) sur le serveur.
+        // Pour sql_regle et sql_assoc à 1 colonne : values.last == values.first.
+        // SQLite retourne les colonnes dans l'ordre du SELECT → deterministe.
         final firstRow = rows.first;
-        final rawVal = firstRow.values.first;
+        final rawVal = firstRow.values.last;  // S66 : .last (pas .first)
         final val = rawVal == null
             ? 0.0
             : (rawVal is num
