@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 61 — fix SqlTranslator._logger static → paramètre translate() local
+// VERSION : Session 63 — traduction IIF() et SWITCH() → CASE WHEN … END (universelle)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -69,6 +69,8 @@
 //     - `Is Null`          → `IS NULL`
 //     - `Is Not Null`      → `IS NOT NULL`
 //     - `NVL(x, y)`        → `COALESCE(x, y)`
+//     - `IIF(c, t, f)`     → `CASE WHEN c THEN t ELSE f END`  [SESSION 63]
+//     - `SWITCH(c1,v1,…)`  → `CASE WHEN c1 THEN v1 … END`    [SESSION 63]
 //     - HAVING contexte seul → SUPPRIMÉ (step 7b — voir _stripContextOnlyHaving)
 //     - parenthèses triples `(((x)))` → `(x)` (normalisées mais conservées)
 //     - opérateurs `Or` / `And` (case insensitive) → `OR` / `AND`
@@ -113,6 +115,26 @@
 //           NB_LATRINES_ELEVES sauvegardé → CTE lit 4
 //           critere '<=' → !(0 <= 4) → VIOLATED (faux positif)
 //     SOLUTION : avant la boucle des règles, on commence un SAVEPOINT SQLite,
+//
+// 10. FIX SESSION 63 — Traduction IIF() et SWITCH() → CASE WHEN … END
+//     PROBLÈME : `IIF(cond, true_val, false_val)` est une fonction MS Access
+//     non disponible dans SQLite avant la version 3.32.0 (2020). De nombreux
+//     appareils Android (API ≤ 28) embarquent SQLite 3.22 ou 3.28 → erreur
+//     "no such function: IIF" lors de rawQuery().
+//     `SWITCH(c1,v1,c2,v2,…)` est une fonction Access exclusive, sans équivalent
+//     natif SQLite (dans aucune version). Non traduit = SQL invalide systématique.
+//
+//     SOLUTION : traduction dans _translateSyntax() via parser de parenthèses :
+//       IIF(cond, t, f)         → CASE WHEN cond THEN t ELSE f END
+//       SWITCH(c1,v1,c2,v2,…)  → CASE WHEN c1 THEN v1 WHEN c2 THEN v2 … END
+//       SWITCH(…,True,default)  → … ELSE default END
+//
+//     Parser _parseArgs() : extrait les arguments en respectant les parenthèses
+//     imbriquées et les littéraux chaînes (guillemets simples et doubles).
+//     Gère les IIF/SWITCH imbriqués par itérations successives (innermost first).
+//     Exemple :
+//       IIF(A=1, IIF(B=2, 'x', 'y'), 'z')
+//       → CASE WHEN A=1 THEN CASE WHEN B=2 THEN 'x' ELSE 'y' END ELSE 'z' END
 //
 //  9. FIX SESSION 61 — SqlTranslator._logger statique → log interleaving
 //     PROBLÈME : _logger était un champ statique de SqlTranslator, partagé entre
@@ -953,8 +975,16 @@ class SqlTranslator {
         RegExp(r'\bISNULL\s*\(', caseSensitive: false), 'COALESCE(');
 
     // 4. IIF(cond, true_val, false_val) → CASE WHEN cond THEN true_val ELSE false_val END
-    //    SQLite ne supporte pas IIF avant 3.32 — on garde IIF si présent
-    //    (SQLite 3.32+ le supporte nativement) — pas de traduction nécessaire.
+    //    SESSION 63 : IIF n'est disponible nativement dans SQLite qu'à partir de
+    //    la version 3.32.0 (2020). De nombreux appareils Android (API ≤ 28) embarquent
+    //    SQLite 3.22 ou 3.28 → "no such function: IIF" lors de rawQuery().
+    //    On traduit systématiquement pour garantir la compatibilité universelle.
+    result = _translateIif(result);
+
+    // 4b. SWITCH(cond1, val1, cond2, val2, ...) → CASE WHEN … END
+    //     SESSION 63 : SWITCH() est une fonction MS Access exclusive, sans équivalent
+    //     natif SQLite. Doit toujours être traduit.
+    result = _translateSwitch(result);
 
     // 5. Parenthèses triples Access → SQLite les supporte nativement, rien à faire
     //    (((x))) est valide SQL dans SQLite
@@ -983,6 +1013,160 @@ class SqlTranslator {
     //     Voir commentaire étape 7b ci-dessus pour l'explication complète.
 
     return result;
+  }
+
+  // ─── SESSION 63 : Traduction IIF() → CASE WHEN … END ─────────────────────
+  //
+  // IIF(cond, true_val, false_val) → CASE WHEN cond THEN true_val ELSE false_val END
+  //
+  // Algorithme :
+  //   1. Cherche la prochaine occurrence de IIF( (case-insensitive)
+  //   2. À partir de la '(' ouvrante, extrait les 3 arguments via _parseArgs()
+  //      (parser à profondeur variable — gère les IIF/expressions imbriquées)
+  //   3. Remplace le bloc IIF(...) par CASE WHEN cond THEN t ELSE f END
+  //   4. Répète jusqu'à ce qu'il n'y ait plus d'IIF (gère les IIF imbriqués)
+  static String _translateIif(String sql) {
+    String result = sql;
+    const maxIterations = 20; // Protection contre boucle infinie
+    for (int iter = 0; iter < maxIterations; iter++) {
+      final iifRe = RegExp(r'\bIIF\s*\(', caseSensitive: false);
+      final m = iifRe.firstMatch(result);
+      if (m == null) break; // Plus d'IIF à traduire
+
+      final openParen = result.indexOf('(', m.start);
+      if (openParen < 0) break;
+
+      final args = _parseArgs(result, openParen);
+      if (args == null || args.length < 3) {
+        // Structure invalide — ne pas traduire pour éviter corruption
+        SqlTranslator._log('[SqlTranslator] IIF: args invalides (${args?.length ?? 0}) — skip');
+        break;
+      }
+
+      final cond     = args[0].trim();
+      final trueVal  = args[1].trim();
+      final falseVal = args[2].trim();
+
+      final closePos = _findClosingParen(result, openParen);
+      if (closePos < 0) break;
+
+      final replacement = 'CASE WHEN $cond THEN $trueVal ELSE $falseVal END';
+      SqlTranslator._log('[SqlTranslator] IIF→CASE: IIF($cond, $trueVal, $falseVal) → $replacement');
+      result = result.substring(0, m.start)
+               + replacement
+               + result.substring(closePos + 1);
+    }
+    return result;
+  }
+
+  // ─── SESSION 63 : Traduction SWITCH() → CASE WHEN … END ──────────────────
+  //
+  // SWITCH(c1, v1, c2, v2, …, True, default) → CASE WHEN c1 THEN v1 … ELSE default END
+  //
+  // La condition 'True' (littéral booléen Access) sert de clause DEFAULT/ELSE.
+  // Si aucune condition 'True' n'est présente, le CASE n'a pas de ELSE.
+  static String _translateSwitch(String sql) {
+    String result = sql;
+    const maxIterations = 20;
+    for (int iter = 0; iter < maxIterations; iter++) {
+      final swRe = RegExp(r'\bSWITCH\s*\(', caseSensitive: false);
+      final m = swRe.firstMatch(result);
+      if (m == null) break;
+
+      final openParen = result.indexOf('(', m.start);
+      if (openParen < 0) break;
+
+      final args = _parseArgs(result, openParen);
+      if (args == null || args.length < 2) {
+        SqlTranslator._log('[SqlTranslator] SWITCH: args invalides — skip');
+        break;
+      }
+
+      final closePos = _findClosingParen(result, openParen);
+      if (closePos < 0) break;
+
+      final buf = StringBuffer('CASE');
+      String? elseClause;
+      for (int i = 0; i + 1 < args.length; i += 2) {
+        final cond = args[i].trim();
+        final val  = args[i + 1].trim();
+        // 'True' (littéral Access) = clause DEFAULT
+        if (RegExp(r'^True$', caseSensitive: false).hasMatch(cond)) {
+          elseClause = val;
+        } else {
+          buf.write(' WHEN $cond THEN $val');
+        }
+      }
+      if (elseClause != null) buf.write(' ELSE $elseClause');
+      buf.write(' END');
+
+      final replacement = buf.toString();
+      SqlTranslator._log('[SqlTranslator] SWITCH→CASE: SWITCH(${args.join(', ')}) → $replacement');
+      result = result.substring(0, m.start)
+               + replacement
+               + result.substring(closePos + 1);
+    }
+    return result;
+  }
+
+  // ─── SESSION 63 : Parser d'arguments à profondeur variable ───────────────
+  //
+  // Extrait les arguments d'un appel de fonction à partir de l'index de la '('
+  // ouvrante. Respecte :
+  //   • les parenthèses imbriquées (profondeur > 1 = à l'intérieur d'un argument)
+  //   • les littéraux entre guillemets simples ' … '
+  //   • les littéraux entre guillemets doubles " … "
+  //
+  // Retourne null si la structure est malformée (pas de ')' fermant trouvé).
+  static List<String>? _parseArgs(String sql, int openParen) {
+    final args    = <String>[];
+    final buf     = StringBuffer();
+    int   depth   = 0;
+    bool  inSQ    = false; // in single quote
+    bool  inDQ    = false; // in double quote
+
+    for (int i = openParen; i < sql.length; i++) {
+      final c = sql[i];
+
+      if (c == "'" && !inDQ) { inSQ = !inSQ; buf.write(c); continue; }
+      if (c == '"' && !inSQ) { inDQ = !inDQ; buf.write(c); continue; }
+      if (inSQ || inDQ) { buf.write(c); continue; }
+
+      if (c == '(') {
+        depth++;
+        if (depth == 1) continue; // '(' ouvrante de niveau 0 : délimiteur, pas dans un arg
+        buf.write(c);
+      } else if (c == ')') {
+        depth--;
+        if (depth == 0) {
+          args.add(buf.toString());
+          return args; // ')' fermante de niveau 0 : fin de la liste
+        }
+        buf.write(c);
+      } else if (c == ',' && depth == 1) {
+        args.add(buf.toString());
+        buf.clear();
+      } else {
+        buf.write(c);
+      }
+    }
+    return null; // Parenthèse non fermée
+  }
+
+  // ─── SESSION 63 : Trouve l'index de la ')' fermante correspondant à openParen ─
+  static int _findClosingParen(String sql, int openParen) {
+    int  depth = 0;
+    bool inSQ  = false;
+    bool inDQ  = false;
+    for (int i = openParen; i < sql.length; i++) {
+      final c = sql[i];
+      if (c == "'" && !inDQ) { inSQ = !inSQ; continue; }
+      if (c == '"' && !inSQ) { inDQ = !inDQ; continue; }
+      if (inSQ || inDQ) continue;
+      if (c == '(') depth++;
+      else if (c == ')') { depth--; if (depth == 0) return i; }
+    }
+    return -1;
   }
 
   /// Supprime le HAVING d'une requête traduite si et seulement si ce HAVING
