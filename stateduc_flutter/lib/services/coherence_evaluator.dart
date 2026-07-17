@@ -2,7 +2,7 @@
 // coherence_evaluator.dart — Moteur d'évaluation de cohérence HORS LIGNE
 // =============================================================================
 //
-// VERSION : Session 64 — SCALAR wrapper universel (row[0][0] semantics, multi-column safe)
+// VERSION : Session 65 — CTE _cd déduplication cross-id_qst (priorité id_qst courant + fallback inter-thème)
 //
 // CONTEXTE :
 //   Le serveur évalue la cohérence en exécutant des requêtes SQL (sql_regle et
@@ -137,6 +137,21 @@
 //       → CASE WHEN A=1 THEN CASE WHEN B=2 THEN 'x' ELSE 'y' END ELSE 'z' END
 //
 // 11. FIX SESSION 64 — SCALAR wrapper universel : suppression de _keepFirstSelectColumn
+//
+// 12. FIX SESSION 65 — CTE _cd déduplication cross-id_qst
+//     PROBLÈME : _buildPivotCte filtrait sur (id_camp, id_etab) uniquement.
+//     Pour les tables multi-lignes (NOUVEAUX_INSCRITS, ELEVES_*), la même
+//     combinaison (id_camp, id_etab) peut avoir des entrées sous plusieurs
+//     id_qst différents (questionnaires distincts pour le même établissement).
+//     SUM(...) additionnait TOUTES les lignes → inflation (ex: 46 au lieu de 1).
+//     FIX : ajout d'un CTE _cd en tête de WITH clause :
+//       1ère partie : toutes les lignes du questionnaire courant (id_qst courant),
+//                    dédupliquées par MAX(id) per field_name exact
+//       2ème partie : lignes des AUTRES questionnaires SEULEMENT pour les field_names
+//                    absents du questionnaire courant (règles inter-thèmes)
+//                    → dédupliquées par MAX(id) per field_name exact
+//     Tous les CTE de pivot lisent FROM _cd au lieu de FROM collected_data.
+//     Le SAVEPOINT inject ses données sous id_qst courant → 1ère partie → prioritaire ✅
 //     PROBLÈME : le wrapper SCALAR `SELECT (subquery) AS __scalar_val` exige une
 //     sous-requête mono-colonne. Pour contourner cela, `_keepFirstSelectColumn`
 //     réduisait le SELECT à sa première colonne. Mais quand sql_regle et sql_assoc
@@ -474,15 +489,68 @@ class SqlTranslator {
       // champs référencés dans le SQL (SELECT, WHERE, GROUP BY, HAVING).
       final allFields = _extractAllFieldNames(sql, usedServerTables);
 
-      // ── Étape 5 : construire le CTE de pivot pour chaque table serveur ──
-      final cteParts = <String>[];
+      // ── Étape 5 : construire le CTE _cd (dédup cross-id_qst) + CTE pivots ──
+      //
+      // SESSION 65 FIX — CTE _cd : base de déduplication cross-id_qst.
+      // _cd sélectionne UNE ligne par UPPER(field_name) exact pour cet établissement,
+      // en donnant la priorité à l'id_qst courant (règle inter-thème : si le champ
+      // n'existe pas dans le questionnaire courant, on prend la valeur d'un autre
+      // questionnaire). MAX(id) garantit que SAVEPOINT (inséré en dernier) gagne.
+      final escapedCampStep5 = idCamp.replaceAll("'", "''");
+      final escapedEtabStep5 = idEtab.replaceAll("'", "''");
+      final escapedQstStep5  = (idQst ?? '').replaceAll("'", "''");
+
+      final String cdCte;
+      if (idQst != null && idQst.isNotEmpty) {
+        // Version avec id_qst courant connu — priorité questionnaire courant + fallback
+        cdCte = "_cd AS (\n"
+            "  SELECT field_name, field_value\n"
+            "  FROM collected_data\n"
+            "  WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "    AND id_qst='$escapedQstStep5'\n"
+            "    AND id IN (\n"
+            "      SELECT MAX(id) FROM collected_data\n"
+            "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "        AND id_qst='$escapedQstStep5'\n"
+            "      GROUP BY UPPER(field_name)\n"
+            "    )\n"
+            "  UNION ALL\n"
+            "  SELECT field_name, field_value\n"
+            "  FROM collected_data\n"
+            "  WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "    AND id_qst != '$escapedQstStep5'\n"
+            "    AND UPPER(field_name) NOT IN (\n"
+            "      SELECT UPPER(field_name) FROM collected_data\n"
+            "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "        AND id_qst='$escapedQstStep5'\n"
+            "    )\n"
+            "    AND id IN (\n"
+            "      SELECT MAX(id) FROM collected_data\n"
+            "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "        AND id_qst != '$escapedQstStep5'\n"
+            "      GROUP BY UPPER(field_name)\n"
+            "    )\n"
+            ")";
+      } else {
+        // Version sans id_qst (fallback simple : MAX(id) par field_name exact)
+        cdCte = "_cd AS (\n"
+            "  SELECT field_name, field_value\n"
+            "  FROM collected_data\n"
+            "  WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "    AND id IN (\n"
+            "      SELECT MAX(id) FROM collected_data\n"
+            "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "      GROUP BY UPPER(field_name)\n"
+            "    )\n"
+            ")";
+      }
+
+      // Les CTE de pivot lisent depuis _cd (pas de collected_data direct)
+      final cteParts = <String>[cdCte];
       for (final tableName in usedServerTables) {
         final cte = _buildPivotCte(
           tableName: tableName,
           fields: allFields,
-          idCamp: idCamp,
-          idEtab: idEtab,
-          idQst: idQst,
         );
         cteParts.add('$tableName AS (\n$cte\n)');
       }
@@ -908,44 +976,34 @@ class SqlTranslator {
   static String _buildPivotCte({
     required String tableName,
     required Set<String> fields,
-    required String idCamp,
-    required String idEtab,
-    // idQst conservé pour la signature mais non utilisé dans le CTE (FIX S55).
-    String? idQst,
   }) {
-    final escapedCamp = idCamp.replaceAll("'", "''");
-    final escapedEtab = idEtab.replaceAll("'", "''");
-
+    // SESSION 65 FIX — _buildPivotCte lit maintenant depuis _cd au lieu de
+    // collected_data directement. _cd est un CTE injecté en tête de WITH par
+    // translate() — il déduplique les données cross-id_qst en donnant la
+    // priorité au questionnaire courant (id_qst prioritaire + fallback inter-thème).
+    //
+    // Avant S65 : FROM collected_data WHERE id_camp=X AND id_etab=Y
+    //   → additionnait TOUTES les lignes de TOUS les questionnaires pour le même
+    //     établissement → SUM inflaté (ex: 46 au lieu de 1 pour FILLES_NV_INCRITES)
+    //
+    // Après S65 : FROM _cd
+    //   → _cd contient UNE ligne par UPPER(field_name) exact, avec priorité
+    //     questionnaire courant → pas de doublon cross-id_qst ✅
+    //
+    // Les paramètres idCamp, idEtab, idQst ont été déplacés dans l'étape 5 de
+    // translate() où le CTE _cd est construit, non plus dans _buildPivotCte.
+    //
     // FIX SESSION 57 — Tous les champs HTML sont stockés AVEC un suffixe
     // numérique (_0, _0_70, _0_71, …) quel que soit le type de table.
     //
-    // Exemples observés dans collected_data (logs device) :
-    //   DONNEES_ETABLISSEMENT : NB_ELEVES_F_0, ELECTRICITE_0,
-    //                           NB_LATRINES_BON_ETAT_0, …
-    //   ELEVES_AGE_NIVEAU_SEXE: FILLES_AGE_NIVEAU_0_70,
-    //                           TOTAL_AGE_NIVEAU_0_71, …
-    //
-    // FIX SESSION 58 — Ambiguïté LIKE pour DONNEES_ETABLISSEMENT :
-    //   S57 utilisait LIKE 'FIELD%' (préfixe libre) pour DONNEES_ETABLISSEMENT.
-    //   Problème : LIKE 'NB_ELEVES%' matche AUSSI 'NB_ELEVES_F_0' en plus de
-    //   'NB_ELEVES_0', car NB_ELEVES est un préfixe de NB_ELEVES_F.
-    //   MAX() retourne alors la valeur du champ le plus grand parmi les deux,
-    //   ce qui donne un résultat incorrect.
-    //
-    //   Solution : utiliser LIKE 'FIELD_0' (suffixe exact '_0') pour
-    //   DONNEES_ETABLISSEMENT — le suffixe HTML est toujours exactement '_0'
-    //   pour ces champs (une seule section de formulaire par champ).
+    // FIX SESSION 58 — LIKE 'FIELD_0' (suffixe exact) pour DONNEES_ETABLISSEMENT.
     //   → LIKE 'NB_ELEVES_0'   → matche uniquement NB_ELEVES_0       ✅
     //   → LIKE 'NB_ELEVES_F_0' → matche uniquement NB_ELEVES_F_0     ✅
-    //
-    //   Tables ELEVES_* : garde LIKE 'FIELD_%' (suffixe _0_70, _0_71, etc.)
-    //   Le '_' dans LIKE matche un caractère quelconque — FIELD_ exige au moins
-    //   un caractère après le préfixe, ce qui est toujours vrai pour _0_NN.
     //
     // Règle finale :
     //   • Champs CONTEXTE : injectés SANS suffixe → correspondance EXACTE =
     //   • DONNEES_ETABLISSEMENT (mono-ligne) : MAX + LIKE 'FIELD_0' (exact)
-    //   • Tables ELEVES_* (multi-lignes)     : SUM + LIKE 'FIELD_%' (préfixe)
+    //   • Tables ELEVES_* / NOUVEAUX_INSCRITS (multi-lignes) : SUM + LIKE 'FIELD_%'
     final isMultiRow = _multiRowTables.contains(tableName.toUpperCase());
 
     final columnDefs = fields.map((field) {
@@ -956,9 +1014,9 @@ class SqlTranslator {
         return "    MAX(CASE WHEN UPPER(field_name)='$upperField' "
             "THEN field_value END) AS $upperField";
       } else if (isMultiRow) {
-        // Tables multi-lignes (ELEVES_*) : SUM + LIKE préfixe '_' (1+ car après).
-        // 'FIELD_%' garantit un caractère après le nom (= _0_70, _0_71, etc.)
-        // et évite de matcher un champ 'FIELDXXX' sans undersccore.
+        // Tables multi-lignes (ELEVES_*, NOUVEAUX_INSCRITS) : SUM + LIKE préfixe '_'.
+        // 'FIELD_%' garantit un caractère après le nom (= _0_70, _0_71, _0_8_4, etc.)
+        // et évite de matcher un champ 'FIELDXXX' sans underscore.
         return "    SUM(CASE WHEN UPPER(field_name) LIKE '${upperField}_%' "
             "THEN CAST(field_value AS REAL) ELSE 0 END) AS $upperField";
       } else {
@@ -969,28 +1027,8 @@ class SqlTranslator {
       }
     }).join(',\n');
 
-    // FIX SESSION 55 — NE PAS filtrer par id_qst dans le CTE de cohérence.
-    //
-    // PROBLÈME INTRODUIT EN S53 :
-    //   Le filtre AND id_qst='...' dans le CTE filtrait sur l'id_qst du formulaire
-    //   COURANT (ex: '9502'). Mais les données des tables ELEVES sont sauvegardées
-    //   sous l'id_qst DU FORMULAIRE ÉLÈVES (ex: '9501'), pas celui du formulaire
-    //   de cohérence. Résultat : le CTE retournait 0 lignes → val=0.0 → aucune
-    //   violation jamais détectée → les contrôles offline ne fonctionnaient pas.
-    //
-    // MODÈLE SERVEUR (controle_theme_batch.class.php) :
-    //   Les requêtes SQL de cohérence s'exécutent sur des VUES SQL Server qui
-    //   contiennent TOUTES les données de l'établissement pour la campagne,
-    //   sans filtrage par thème/questionnaire. Le mobile reproduit ce comportement.
-    //
-    // SOLUTION : filtrer sur (id_camp, id_etab) uniquement — comme le serveur.
-    //   Le CTE agrège toutes les données de l'établissement pour la campagne,
-    //   indépendamment du formulaire d'origine. C'est nécessaire pour les règles
-    //   inter-thèmes (ex: Total filles ≤ Total élèves, où filles vient d'un thème
-    //   et total d'un autre).
-    return '  SELECT\n$columnDefs\n'
-        "  FROM collected_data\n"
-        "  WHERE id_camp='$escapedCamp' AND id_etab='$escapedEtab'";
+    // SESSION 65 : lit depuis _cd (CTE de déduplication) au lieu de collected_data
+    return '  SELECT\n$columnDefs\n  FROM _cd';
   }
 
   // ─── Traduction syntaxique Access/SQL Server → SQLite ─────────────────────
