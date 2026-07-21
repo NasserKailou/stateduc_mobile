@@ -933,7 +933,18 @@
 						$donnees_ligne [] = $matr[$i][$champ_group];
 					}else{
 						$donnees_ligne []='';
-					}                   
+					}
+					// Colonnes 6-10 optionnelles — liaison école+campagne (session 68)
+					$champ_code_etab  = 6;  // code_etab  ex. "101012071"
+					$champ_id_camp    = 7;  // id_camp    ex. "12"
+					$champ_id_systeme = 8;  // id_systeme ex. "1"
+					$champ_id_annee   = 9;  // id_annee   ex. "2024"
+					$champ_id_chaine  = 10; // id_chaine  ex. "1"
+					$donnees_ligne [] = (isset($matr[$i][$champ_code_etab])  && $matr[$i][$champ_code_etab]<>'')  ? trim($matr[$i][$champ_code_etab])  : '';
+					$donnees_ligne [] = (isset($matr[$i][$champ_id_camp])    && $matr[$i][$champ_id_camp]<>'')    ? trim($matr[$i][$champ_id_camp])    : '';
+					$donnees_ligne [] = (isset($matr[$i][$champ_id_systeme]) && $matr[$i][$champ_id_systeme]<>'') ? trim($matr[$i][$champ_id_systeme]) : '';
+					$donnees_ligne [] = (isset($matr[$i][$champ_id_annee])   && $matr[$i][$champ_id_annee]<>'')   ? trim($matr[$i][$champ_id_annee])   : '';
+					$donnees_ligne [] = (isset($matr[$i][$champ_id_chaine])  && $matr[$i][$champ_id_chaine]<>'')  ? trim($matr[$i][$champ_id_chaine])  : '';
 					$this->donnees_post_excel[]= $donnees_ligne;                     
 					
 				//}
@@ -1340,8 +1351,42 @@
 							array_push($tab, '<span class="error">'.$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user').'</span>'); 
 							$logData .= ";".$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user');
 						} else {
-							array_push($tab, '<span class="success">OK</span>'); 	
-							$logData .= ";OK";
+							// Liaison école+campagne (session 68) : INSERT DICO_FIXE_REGROUPEMENT
+							// $tab[7]=code_etab, $tab[8]=id_camp, $tab[9]=id_systeme,
+							// $tab[10]=id_annee, $tab[11]=id_chaine
+							$regroup_warning = '';
+							if (!empty($tab[7]) && !empty($tab[8]) && !empty($tab[9])) {
+								$code_etab  = $this->conn->qstr($tab[7]);
+								$id_camp    = intval($tab[8]);
+								$id_systeme = intval($tab[9]);
+								$id_annee   = intval($tab[10]);
+								$id_chaine  = intval($tab[11]);
+								// Vérifie que le code_etab existe dans la nomenclature
+								$chk_etab = 'SELECT COUNT(*) FROM DICO_NOMENCLATURE WHERE ID_REGROUP='.$code_etab;
+								$etab_exists = ($this->conn->GetOne($chk_etab) > 0);
+								if ($etab_exists) {
+									// Détermine ID_STATUS depuis ADMIN_USERS (le code_groupe = champ_systeme)
+									$id_status = 1; // valeur par défaut
+									$id_type_regroup = 5; // école = type 5 (valeur typ. Burundi)
+									$sql_regroup = 'INSERT INTO DICO_FIXE_REGROUPEMENT '
+										. '(ID_USER, ID_CAMPAGNE, ID_STATUS, ID_SYSTEME, ID_CHAINE, ID_ANNEE, '
+										. 'ID_PERIODE, ID_TYPE_REGROUP, ID_REGROUP, ID_REGROUP_PARENTS, '
+										. 'ID_TYPE_REGROUP_PARENTS, ID_SYSTEMES) '
+										. 'VALUES ('.$tab[0].', '.$id_camp.', '.$id_status.', '
+										. $id_systeme.', '.$id_chaine.', '.$id_annee.', '
+										. '0, '.$id_type_regroup.', '.$code_etab.', '
+										. $code_etab.', '.$id_type_regroup.', '.$this->conn->qstr((string)$id_systeme).')' ;
+									if ($this->conn->Execute($sql_regroup)===false) {
+										$regroup_warning = ' [WARN: école non liée: ERR_SQL_REGROUP]';
+									} else {
+										$regroup_warning = ' [École liée OK]';
+									}
+								} else {
+									$regroup_warning = ' [WARN: code_etab introuvable: '.$tab[7].']' ;
+								}
+							}
+							array_push($tab, '<span class="success">OK'.$regroup_warning.'</span>'); 	
+							$logData .= ";OK".$regroup_warning;
 						}							
 					}
 				}

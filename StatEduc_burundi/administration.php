@@ -305,6 +305,11 @@ if (isset($_GET['val'])) {
             require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
         break;
 				
+        case 'download_user_template' :
+            require_once 'common.php';
+            require_once $GLOBALS['SISED_PATH_INC'] . 'administration/download_user_excel_template.php';
+        break;
+
         case 'download_file' :            
             require_once 'common.php';
             require_once $GLOBALS['SISED_PATH_LIB'] . 'telecharger.php';

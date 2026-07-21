@@ -110,6 +110,8 @@ if (isset($_POST["import"])) {
 	$html .= ' <button type="submit" id="submit" name="import" class="btn-submit">'.$user->recherche_libelle_page('ImportButton',$_SESSION['langue'],'user').'</button>';
 	$html .= '</div>';
 	$html .= '</form>';	   
+	// Bouton téléchargement du canevas Excel (session 68)
+	$html .= '<div style="margin-top:8px;"><a class="btn btn-default" href="'.$GLOBALS["SISED_URL"].'administration.php?val=download_user_template" style="text-decoration:none;">&#11015; Télécharger le canevas Excel (11 colonnes)</a></div>';
 	$html .= '</div>';
 	
 	$html .= '<div id="response" class="';
@@ -122,10 +124,10 @@ if (isset($_POST["import"])) {
 		$html .= '<caption>';
 		$html .=  $user->recherche_libelle_page('ResultImport',$_SESSION['langue'],'user');
 		$html .= '</caption>';
-		$html .= '<thead><tr class="ligne-titre"><th>Num</th><th>Nom utilisateur</th><th>Email</th><th>Tel</th><th>Login</th><th>Groupe</th><th>Message</th></tr></thead>';
+		$html .= '<thead><tr class="ligne-titre"><th>Num</th><th>Nom utilisateur</th><th>Email</th><th>Tel</th><th>Login</th><th>Groupe</th><th>Code étab.</th><th>Camp.</th><th>Message</th></tr></thead>';
 		foreach ($importResult as $key=>$tab) {
 			$classLigne = ($key % 2 === 1)?'ligne-paire-left':'ligne-impaire-left';
-			$html .= '<tr class="'.$classLigne.'"><td>'.($key+1).'</td><td>'.$tab[1].'</td><td>'.$tab[2].'</td><td>'.$tab[3].'</td><td>'.$tab[4].'</td><td>'.$tab[6].'</td><td>'.$tab[7].'</td></tr>';
+			$html .= '<tr class="'.$classLigne.'"><td>'.($key+1).'</td><td>'.$tab[1].'</td><td>'.$tab[2].'</td><td>'.$tab[3].'</td><td>'.$tab[4].'</td><td>'.$tab[6].'</td><td>'.$tab[7].'</td><td>'.$tab[8].'</td><td>'.$tab[12].'</td></tr>';
 		}
 		$html .= '</table>';
 	}
