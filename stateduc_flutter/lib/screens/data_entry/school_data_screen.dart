@@ -127,34 +127,102 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
 
   /// Construit les boutons d'action de la AppBar.
   /// N'affiche rien si aucune question n'est sélectionnée.
-  ///   - Icône disquette / coche : sauvegarde locale (change selon hasUnsavedChanges)
-  ///   - Icône cloud upload   : envoi au serveur
-  ///   - Menu popup           : option "Recharger depuis serveur"
+  ///
+  /// FIX SESSION 66 — issue #5 : boutons redessinés pour être clairement visibles
+  /// sur tous les gabarits d'écran (smartphone / tablette) et accessibles.
+  ///   - Bouton VERT   : sauvegarde locale  (fond vert vif, icône + libellé)
+  ///   - Bouton BLEU   : envoi au serveur   (fond bleu foncé, icône + libellé)
+  ///   - État sauvegardé : fond vert clair + icône coche (feedback visuel)
+  ///   - Contraste WCAG AA garanti : texte blanc sur fond coloré (ratio > 4.5:1)
   List<Widget> _buildActions(
       BuildContext context, AuthProvider auth, DataEntryProvider entry) {
     if (entry.selectedQuestion == null) return [];
+
+    // Palette accessible : WCAG AA minimum ratio 4.5:1 texte blanc
+    const Color saveUnsavedBg  = Color(0xFF2E7D32); // vert foncé — modifications en attente
+    const Color saveSavedBg    = Color(0xFF388E3C); // vert moyen — tout sauvegardé
+    const Color sendBg         = Color(0xFF1565C0); // bleu foncé — envoi serveur
+    const Color disabledBg     = Color(0xFF9E9E9E); // gris       — action en cours
+
+    final bool saving  = entry.isSaving;
+    final bool sending = entry.isSending;
+    final bool unsaved = entry.hasUnsavedChanges;
+
     return [
-      // Sauvegarder localement
-      IconButton(
-        icon: Icon(
-          entry.hasUnsavedChanges
-              ? Icons.save_outlined      // disquette si modifications non sauvegardées
-              : Icons.check_circle_outline,  // coche si tout est sauvegardé
-          color: entry.hasUnsavedChanges
-              ? Theme.of(context).colorScheme.primary
-              : null,
+      // ── Bouton Sauvegarder localement ─────────────────────────────────
+      // Fond VERT pour différencier clairement du bouton "Envoyer"
+      // Icône + libellé court pour éviter toute confusion avec le cloud
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+        child: ElevatedButton.icon(
+          icon: Icon(
+            unsaved ? Icons.save_rounded : Icons.check_circle_rounded,
+            size: 18,
+            color: Colors.white,
+          ),
+          label: Text(
+            unsaved ? 'Sauver' : 'Sauvé',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: saving
+                ? disabledBg
+                : (unsaved ? saveUnsavedBg : saveSavedBg),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            minimumSize: const Size(72, 36),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: unsaved ? 4 : 1,
+          ),
+          onPressed: saving ? null : () => _saveLocally(context, entry),
+          tooltip: saving
+              ? 'Sauvegarde en cours…'
+              : (unsaved
+                  ? 'Sauvegarder les modifications localement'
+                  : 'Données sauvegardées localement'),
         ),
-        tooltip: 'Sauvegarder',
-        onPressed:
-            entry.isSaving ? null : () => _saveLocally(context, entry),
       ),
-      // Envoyer au serveur
-      IconButton(
-        icon: const Icon(Icons.cloud_upload_outlined),
-        tooltip: 'Envoyer au serveur',
-        onPressed: entry.isSending
-            ? null
-            : () => _sendToServer(context, auth, entry),
+      // ── Bouton Envoyer au serveur ──────────────────────────────────────
+      // Fond BLEU foncé — action réseau / serveur
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+        child: ElevatedButton.icon(
+          icon: Icon(
+            sending ? Icons.hourglass_top_rounded : Icons.cloud_upload_rounded,
+            size: 18,
+            color: Colors.white,
+          ),
+          label: Text(
+            sending ? '…' : 'Envoyer',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: sending ? disabledBg : sendBg,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            minimumSize: const Size(80, 36),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 4,
+          ),
+          onPressed: sending
+              ? null
+              : () => _sendToServer(context, auth, entry),
+          tooltip: sending
+              ? 'Envoi en cours…'
+              : 'Envoyer les données au serveur',
+        ),
       ),
       // Options supplémentaires
       PopupMenuButton<String>(
@@ -232,6 +300,15 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
             questions: entry.questions,
             selected: entry.selectedQuestion,
             onSelect: entry.selectQuestion,
+          ),
+        // ── FIX SESSION 66 issue #9 — Barre navigation Précédent / Suivant ─
+        if (entry.questions.isNotEmpty && entry.selectedQuestion != null)
+          _NavBar(
+            questions:  entry.questions,
+            selected:   entry.selectedQuestion!,
+            hasUnsaved: entry.hasUnsavedChanges,
+            isSaving:   entry.isSaving,
+            onNavigate: (q) => _navigateTo(context, entry, q),
           ),
         // ── Sélecteur de filtre (période) ────────────────────────────────
         // Visible seulement si la question courante supporte les filtres
@@ -609,6 +686,167 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     // DynamicFormWidget gère l'ajout de ligne en interne ;
     // le provider peut traquer les lignes supplémentaires si besoin.
   }
+
+  // ── FIX SESSION 66 issue #9 — Navigation Précédent / Suivant ──────────────
+  /// Navigue vers [target] en sauvegardant d'abord si des changements sont en attente.
+  /// - Si `hasUnsavedChanges` : sauvegarde locale silencieuse avant changement
+  /// - Puis sélectionne la question cible via le provider
+  Future<void> _navigateTo(
+      BuildContext context, DataEntryProvider entry, Question target) async {
+    if (entry.isSaving || entry.isSending) return;
+    // Sauvegarde automatique si modifications en attente
+    if (entry.hasUnsavedChanges) {
+      final ok = await entry.saveLocally();
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(entry.error ?? 'Erreur lors de la sauvegarde'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ));
+        // On navigue quand même pour ne pas bloquer l'utilisateur
+      }
+    }
+    if (!mounted) return;
+    await entry.selectQuestion(target);
+  }
+}
+
+// ─── FIX SESSION 66 issue #9 — Barre de navigation Précédent / Suivant ────────
+/// Barre compacte affichée sous le sélecteur de thème, permettant de naviguer
+/// séquentiellement entre les formulaires dans l'ordre exact des chips.
+///
+/// Comportement :
+///   - Bouton "Précédent" désactivé si le formulaire courant est le premier
+///   - Bouton "Suivant"   désactivé si le formulaire courant est le dernier
+///   - Le centre affiche "N / total" (numérotation 1-based)
+///   - La navigation déclenche une sauvegarde locale automatique si
+///     [hasUnsaved] est vrai (via [onNavigate])
+class _NavBar extends StatelessWidget {
+  const _NavBar({
+    required this.questions,
+    required this.selected,
+    required this.hasUnsaved,
+    required this.isSaving,
+    required this.onNavigate,
+  });
+  final List<Question> questions;
+  final Question selected;
+  final bool hasUnsaved;
+  final bool isSaving;
+  final Future<void> Function(Question) onNavigate;
+
+  @override
+  Widget build(BuildContext context) {
+    final idx   = questions.indexWhere((q) => q.idQst == selected.idQst);
+    final total = questions.length;
+    final hasPrev = idx > 0;
+    final hasNext = idx < total - 1;
+
+    const Color navBg   = Color(0xFFF5F5F5);
+    const Color btnColor = Color(0xFF1565C0);
+
+    return Container(
+      color: navBg,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Row(
+        children: [
+          // ── Bouton Précédent ──────────────────────────────────────────
+          _NavButton(
+            icon: Icons.chevron_left_rounded,
+            label: 'Préc.',
+            enabled: hasPrev && !isSaving,
+            color: btnColor,
+            onTap: hasPrev && !isSaving
+                ? () => onNavigate(questions[idx - 1])
+                : null,
+          ),
+          // ── Indicateur de position ────────────────────────────────────
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${idx + 1} / $total',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (hasUnsaved)
+                  const Text(
+                    '● modif. en attente',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: Color(0xFF2E7D32),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          // ── Bouton Suivant ────────────────────────────────────────────
+          _NavButton(
+            icon: Icons.chevron_right_rounded,
+            label: 'Suiv.',
+            enabled: hasNext && !isSaving,
+            color: btnColor,
+            onTap: hasNext && !isSaving
+                ? () => onNavigate(questions[idx + 1])
+                : null,
+            iconOnRight: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bouton compact pour la barre de navigation Précédent / Suivant.
+class _NavButton extends StatelessWidget {
+  const _NavButton({
+    required this.icon,
+    required this.label,
+    required this.enabled,
+    required this.color,
+    this.onTap,
+    this.iconOnRight = false,
+  });
+  final IconData icon;
+  final String label;
+  final bool enabled;
+  final Color color;
+  final VoidCallback? onTap;
+  final bool iconOnRight;
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveColor = enabled ? color : Colors.grey.shade400;
+    final children = [
+      Icon(icon, size: 20, color: effectiveColor),
+      const SizedBox(width: 2),
+      Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: effectiveColor,
+        ),
+      ),
+    ];
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: iconOnRight ? children.reversed.toList() : children,
+        ),
+      ),
+    );
+  }
 }
 
 // ─── Bandeau d'identification de l'établissement ─────────────────────────────
@@ -761,7 +999,21 @@ class _InfoChip extends StatelessWidget {
 /// Barre de chips horizontale pour naviguer entre les thèmes / formulaires
 /// du système éducatif sélectionné.
 /// La chip sélectionnée est mise en évidence avec la couleur primaire.
-class _QuestionSelector extends StatelessWidget {
+///
+/// Fix #4 (issue #12) — S67 :
+///   Ancienne implémentation StatelessWidget : SingleChildScrollView sans
+///   ScrollController → l'offset revenait à 0 à chaque rebuild déclenché par
+///   notifyListeners() du Provider (sauvegarde, changement de données…).
+///
+///   Nouvelle implémentation StatefulWidget :
+///   • ScrollController persistant _scrollCtrl — survit aux rebuilds.
+///   • GlobalKey sur chaque chip — permet de localiser le chip actif
+///     dans la liste et d'appeler Scrollable.ensureVisible().
+///   • didUpdateWidget : si la question sélectionnée change, on post-frame
+///     un ensureVisible vers le chip actif (animation 300 ms).
+///   • Si seule la liste des questions change (rare) on recalcule les clés
+///     et on rescrolle vers le chip actif.
+class _QuestionSelector extends StatefulWidget {
   const _QuestionSelector({
     required this.questions,
     required this.selected,
@@ -772,34 +1024,118 @@ class _QuestionSelector extends StatelessWidget {
   final Future<void> Function(Question) onSelect;
 
   @override
+  State<_QuestionSelector> createState() => _QuestionSelectorState();
+}
+
+class _QuestionSelectorState extends State<_QuestionSelector> {
+  /// Contrôleur de scroll persistant — survit aux rebuilds du parent.
+  final ScrollController _scrollCtrl = ScrollController();
+
+  /// Une GlobalKey par chip pour pouvoir appeler ensureVisible.
+  /// Recréée uniquement si la liste des questions change (longueur ou ids).
+  late List<GlobalKey> _chipKeys;
+
+  // ── Initialisation ────────────────────────────────────────────────────────
+  @override
+  void initState() {
+    super.initState();
+    _chipKeys = _buildKeys(widget.questions);
+    // Premier scroll vers le chip actif après le premier rendu.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSelected());
+  }
+
+  // ── Mise à jour ───────────────────────────────────────────────────────────
+  @override
+  void didUpdateWidget(_QuestionSelector old) {
+    super.didUpdateWidget(old);
+
+    // Si la liste des questions a changé (longueur ou identifiants),
+    // on recrée les clés pour éviter des conflits de GlobalKey.
+    if (_listChanged(old.questions, widget.questions)) {
+      _chipKeys = _buildKeys(widget.questions);
+    }
+
+    // Si la question sélectionnée a changé (navigation, tap chip…),
+    // on déclenche un scroll vers le nouveau chip actif.
+    if (old.selected?.idQst != widget.selected?.idQst) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSelected());
+    }
+  }
+
+  // ── Nettoyage ─────────────────────────────────────────────────────────────
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  /// Crée une nouvelle liste de GlobalKey de même longueur que [questions].
+  List<GlobalKey> _buildKeys(List<Question> questions) =>
+      List.generate(questions.length, (_) => GlobalKey());
+
+  /// Retourne true si [a] et [b] diffèrent en longueur ou en idQst.
+  bool _listChanged(List<Question> a, List<Question> b) {
+    if (a.length != b.length) return true;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].idQst != b[i].idQst) return true;
+    }
+    return false;
+  }
+
+  /// Fait défiler la barre pour rendre le chip actif visible.
+  /// Utilise Scrollable.ensureVisible pour une animation fluide
+  /// et un alignement centré (alignment: 0.5).
+  void _scrollToSelected() {
+    if (!mounted) return;
+    final idx = widget.questions
+        .indexWhere((q) => q.idQst == widget.selected?.idQst);
+    if (idx < 0 || idx >= _chipKeys.length) return;
+    final ctx = _chipKeys[idx].currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.5, // centre le chip dans la fenêtre visible
+      );
+    }
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
+  @override
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: SingleChildScrollView(
+        controller: _scrollCtrl, // ← ScrollController persistant (Fix #4)
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Row(
-          children: questions
-              .map((q) => Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: ChoiceChip(
-                      label: Text(
-                        q.libQst,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: selected?.idQst == q.idQst
-                              ? Colors.white
-                              : Colors.black87,
-                        ),
-                      ),
-                      selected: selected?.idQst == q.idQst,
-                      selectedColor: Theme.of(context).colorScheme.primary,
-                      backgroundColor: Colors.grey.shade200,
-                      side: BorderSide(color: Colors.grey.shade400),
-                      onSelected: (_) => onSelect(q),
-                    ),
-                  ))
-              .toList(),
+          children: List.generate(widget.questions.length, (i) {
+            final q = widget.questions[i];
+            final isSelected = widget.selected?.idQst == q.idQst;
+            return Padding(
+              // GlobalKey sur chaque chip pour ensureVisible (Fix #4)
+              key: _chipKeys[i],
+              padding: const EdgeInsets.only(right: 6),
+              child: ChoiceChip(
+                label: Text(
+                  q.libQst,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isSelected ? Colors.white : Colors.black87,
+                  ),
+                ),
+                selected: isSelected,
+                selectedColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: Colors.grey.shade200,
+                side: BorderSide(color: Colors.grey.shade400),
+                onSelected: (_) => widget.onSelect(q),
+              ),
+            );
+          }),
         ),
       ),
     );

@@ -397,31 +397,76 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
     background: #fff;
     color: #000;
   }
+
+  /* ── FIX SESSION 66 issue #7 — Anti-chevauchement champs de saisie ──────
+   * ROOT CAUSE : les cellules td avec white-space:nowrap + input width:100%
+   * se chevauchaient quand plusieurs colonnes tenaient dans un espace étroit.
+   * SOLUTION :
+   *   1. td : position:relative + overflow:visible → pas de clip
+   *   2. input dans td : position:static, largeur fixe explicite (min-width)
+   *   3. conteneur .div-table-questionnaire : scroll horizontal natif
+   *   4. td/input : largeur MINIMUM garantie (60px ou 80px) pour éviter
+   *      les chevauchements même en cas de `width:100%` sur petit écran
+   * ─────────────────────────────────────────────────────────────────────── */
+
   /* Défilement horizontal pour les tableaux de grille larges */
-  body > form, body > table, .div-table-questionnaire {
+  .div-table-questionnaire {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+    /* Marges pour éviter que le scroll masque les bords */
+    padding-bottom: 4px;
+  }
+  body > form, body > table {
     overflow-x: auto;
     display: block;
     -webkit-overflow-scrolling: touch;
   }
-  table { border-collapse: collapse; min-width: 100%; }
+
+  table {
+    border-collapse: collapse;
+    /* NE PAS mettre min-width:100% ici — le wrapper défilant gère la largeur */
+    table-layout: auto;   /* colonne adaptée au contenu, pas de chevauchement */
+  }
   td, th {
     border: 1px solid #ccc;
     padding: 4px 6px;
     vertical-align: middle;
-    white-space: nowrap;
-  }
-  th { background: #dce6f1; font-weight: bold; font-size: 12px; }
-  /* Autoriser le retour à la ligne dans les cellules d'en-tête */
-  th { white-space: normal; min-width: 60px; }
-  input[type=text], input[type=number], textarea, select {
-    width: 100%;
+    /* FIX : nowrap sur td provoque chevauchement → normal pour les données */
+    white-space: normal;
+    /* Largeur minimum pour garantir la lisibilité même en scroll horizontal */
     min-width: 60px;
+    word-break: break-word;    /* évite le débordement des longs textes */
+  }
+  th {
+    background: #dce6f1;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: normal;   /* retour à la ligne dans les en-têtes */
+    min-width: 60px;
+  }
+  /* Cellules de saisie numérique : largeur fixe réduite */
+  td.num, th.num { min-width: 52px; max-width: 90px; }
+
+  input[type=text], input[type=number], textarea, select {
+    /* FIX : width:100% dans une td peut déborder → on utilise une largeur adaptative */
+    width: 100%;
+    min-width: 52px;
+    max-width: 100%;
     padding: 4px;
     border: 1px solid #aaa;
     border-radius: 3px;
     font-size: 13px;
     background: #fff;
     color: #000;
+    /* Empêche l'input de grossir sa cellule au-delà de son contenu */
+    box-sizing: border-box;
+  }
+  /* Inputs courts pour saisie numérique (colonnes étroites) */
+  input[type=number] {
+    min-width: 48px;
+    text-align: right;
   }
   input[type=text].error, input[type=number].error,
   textarea.error, select.error {
@@ -470,14 +515,13 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   html, body {
     max-width: 100%;
     overflow-x: hidden;   /* le scroll horizontal se fait au niveau des tableaux, pas du body */
-    /* Autorise le pinch-to-zoom : ne pas bloquer le touch-action */
     touch-action: pan-x pan-y pinch-zoom;
   }
 
   /* ── Smartphone (largeur < 480 px) ── */
   @media (max-width: 480px) {
     body { font-size: 11px; margin: 2px; }
-    td, th { padding: 2px 3px; font-size: 11px; }
+    td, th { padding: 2px 3px; font-size: 11px; min-width: 44px; }
     th { min-width: 44px; }
     input[type=text], input[type=number], textarea, select {
       max-width: 100%;
@@ -485,6 +529,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       padding: 2px 3px;
       min-width: 44px;
     }
+    input[type=number] { min-width: 40px; }
     input[type=radio], input[type=checkbox] {
       transform: scale(1.1);
       margin: 2px;
@@ -494,7 +539,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   /* ── Mobile standard (480 – 600 px) ── */
   @media (min-width: 481px) and (max-width: 600px) {
     body { font-size: 12px; }
-    td, th { padding: 3px 4px; }
+    td, th { padding: 3px 4px; min-width: 52px; }
     input[type=text], input[type=number], textarea, select {
       max-width: 100%;
     }
@@ -503,7 +548,7 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   /* ── Tablette (> 600 px) ── */
   @media (min-width: 601px) {
     body { font-size: 14px; margin: 8px; }
-    td, th { padding: 6px 8px; font-size: 13px; }
+    td, th { padding: 6px 8px; font-size: 13px; min-width: 72px; }
     input[type=text], input[type=number], textarea, select {
       font-size: 14px;
       padding: 5px 6px;
@@ -520,15 +565,34 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
 
 </style>
 <script>
-// Wrap tous les tableaux dans un div défilant après le chargement (pour les tableaux grille larges)
+// FIX SESSION 66 issue #7 — Wrap tables + correction positionnement
+// Exécuté après DOMContentLoaded pour garantir que le DOM est prêt
 document.addEventListener('DOMContentLoaded', function() {
+  // 1. Wrap tous les tableaux dans un div défilant (tableaux grille larges)
   document.querySelectorAll('table').forEach(function(tbl) {
-    if (!tbl.parentElement.classList.contains('div-table-questionnaire')) {
+    if (!tbl.parentElement || !tbl.parentElement.classList.contains('div-table-questionnaire')) {
       var wrapper = document.createElement('div');
       wrapper.className = 'div-table-questionnaire';
       tbl.parentNode.insertBefore(wrapper, tbl);
       wrapper.appendChild(tbl);
     }
+  });
+
+  // 2. FIX CHEVAUCHEMENT : forcer les inputs dans les td à ne pas dépasser
+  //    la largeur de leur cellule parente. Correction pour les anciens formulaires
+  //    qui utilisent width: inline style ou des attributs SIZE dépassant la cellule.
+  document.querySelectorAll('td input[type=text], td input[type=number], td select, td textarea').forEach(function(el) {
+    el.style.width = '100%';
+    el.style.minWidth = '44px';
+    el.style.boxSizing = 'border-box';
+    // Supprime les attributs SIZE/WIDTH inline qui forcent une largeur absolue
+    if (el.hasAttribute('size')) el.removeAttribute('size');
+  });
+
+  // 3. Forcer table-layout:auto sur tous les tableaux pour éviter les chevauchements
+  document.querySelectorAll('table').forEach(function(tbl) {
+    tbl.style.tableLayout = 'auto';
+    tbl.style.borderCollapse = 'collapse';
   });
 });
 </script>
