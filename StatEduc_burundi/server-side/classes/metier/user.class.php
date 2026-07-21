@@ -1356,32 +1356,52 @@
 							// Liaison école+campagne (session 68+69) : INSERT DICO_FIXE_REGROUPEMENT
 							// $tab[7]=code_etab, $tab[8]=id_camp, $tab[9]=id_systeme,
 							// $tab[10]=id_annee, $tab[11]=id_chaine, $tab[12]=id_periode
-							$regroup_warning = '';
-							if (!empty($tab[7]) && !empty($tab[8]) && !empty($tab[9])) {
-								$code_etab  = $this->conn->qstr($tab[7]);
-								$id_camp    = intval($tab[8]);
-								$id_systeme = intval($tab[9]);
-								$id_annee   = intval($tab[10]);
-								$id_chaine  = intval($tab[11]);
-								// Bug #2 fix (session 69) : lire id_periode depuis col L ($tab[12])
-								$id_periode = (!empty($tab[12])) ? intval($tab[12]) : 0;
-								// Bug #1 fix (session 69) : supprimer vérification DICO_NOMENCLATURE
-								// (DICO_NOMENCLATURE = nomenclature géographique, pas référentiel établissements)
-								// On tente directement l'INSERT et on rapporte succès/échec SQL.
-									$id_status = 1; // valeur par défaut
-									$id_type_regroup = 5; // école = type 5 (valeur typ. Burundi)
-									$sql_regroup = 'INSERT INTO DICO_FIXE_REGROUPEMENT '
-										. '(ID_USER, ID_CAMPAGNE, ID_STATUS, ID_SYSTEME, ID_CHAINE, ID_ANNEE, '
-										. 'ID_PERIODE, ID_TYPE_REGROUP, ID_REGROUP, ID_REGROUP_PARENTS, '
-										. 'ID_TYPE_REGROUP_PARENTS, ID_SYSTEMES) '
-										. 'VALUES ('.$tab[0].', '.$id_camp.', '.$id_status.', '
-										. $id_systeme.', '.$id_chaine.', '.$id_annee.', '
-										. $id_periode.', '.$id_type_regroup.', '.$code_etab.', '
-										. $code_etab.', '.$id_type_regroup.', '.$this->conn->qstr((string)$id_systeme).')' ;
-									if ($this->conn->Execute($sql_regroup)===false) {
-										$regroup_warning = ' [WARN: école non liée: ERR_SQL_REGROUP]';
+								$regroup_warning = '';
+								if (!empty($tab[7]) && !empty($tab[8]) && !empty($tab[9])) {
+									$code_etab       = $this->conn->qstr($tab[7]);
+									$id_camp         = intval($tab[8]);
+									$id_systeme      = intval($tab[9]);
+									$id_annee        = intval($tab[10]);
+									$id_chaine       = intval($tab[11]);
+									$id_periode      = (!empty($tab[12])) ? intval($tab[12]) : 0;
+									$id_status       = 1;
+									$id_type_regroup = 5;
+									$str_systeme     = $this->conn->qstr((string)$id_systeme);
+
+									// Vérifier si la ligne existe déjà (évite doublon PK)
+									$sql_chk = 'SELECT COUNT(*) FROM DICO_FIXE_REGROUPEMENT'
+										.' WHERE ID_USER='.$tab[0]
+										.' AND ID_CAMPAGNE='.$id_camp
+										.' AND ID_SYSTEME='.$id_systeme
+										.' AND ID_CHAINE='.$id_chaine
+										.' AND ID_ANNEE='.$id_annee
+										.' AND ID_PERIODE='.$id_periode
+										.' AND ID_TYPE_REGROUP='.$id_type_regroup
+										.' AND ID_REGROUP='.$code_etab;
+									$exists = intval($this->conn->GetOne($sql_chk));
+
+									if ($exists > 0) {
+										$regroup_warning = ' [École déjà liée — doublon ignoré]';
 									} else {
-										$regroup_warning = ' [École liée OK]';
+										$sql_regroup = 'INSERT INTO DICO_FIXE_REGROUPEMENT '
+											. '(ID_USER, ID_CAMPAGNE, ID_STATUS, ID_SYSTEME, ID_CHAINE, ID_ANNEE, '
+											. 'ID_PERIODE, ID_TYPE_REGROUP, ID_REGROUP, ID_REGROUP_PARENTS, '
+											. 'ID_TYPE_REGROUP_PARENTS, ID_SYSTEMES) '
+											. 'VALUES ('.$tab[0].', '.$id_camp.', '.$id_status.', '
+											. $id_systeme.', '.$id_chaine.', '.$id_annee.', '
+											. $id_periode.', '.$id_type_regroup.', '.$code_etab.', '
+											. $code_etab.', '.$id_type_regroup.', '.$str_systeme.')';
+										if ($this->conn->Execute($sql_regroup) === false) {
+											// Récupérer le message d'erreur SQL précis
+											$db_err = '';
+											if (method_exists($this->conn, 'ErrorMsg')) {
+												$db_err = $this->conn->ErrorMsg();
+											}
+											$regroup_warning = ' [WARN: école non liée: '
+												. htmlspecialchars(substr($db_err, 0, 120)) . ']';
+										} else {
+											$regroup_warning = ' [École liée OK]';
+										}
 									}
 								}
 							array_push($tab, '<span class="success">OK'.$regroup_warning.'</span>'); 	
