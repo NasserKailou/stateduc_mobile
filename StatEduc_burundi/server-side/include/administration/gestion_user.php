@@ -1,16 +1,16 @@
 <script language="JavaScript" src="<?php echo $GLOBALS['SISED_URL_JSC']; ?>js.js"></script>
 <?php 
 
-use PhpOffice\PhpSpreadsheet\Reader\Xls;
-
 include $GLOBALS['SISED_PATH_LIB'] . 'lib.inc.php';
 include $GLOBALS['SISED_PATH_LIB'] . 'navigation.inc.php';     
-require_once ($GLOBALS['SISED_PATH_LIB'].'autoload.php');
 
 $GLOBALS['conn'] = $GLOBALS['conn_dico'] ;
 $importResult = array();
 $listUserFileName = "";
 if (isset($_POST["import"])) {
+
+    // PhpSpreadsheet chargÃ© uniquement lors d'un import (Ã©vite erreur fatale si lib absente)
+    require_once ($GLOBALS['SISED_PATH_LIB'].'autoload.php');
 
     $allowedFileType = [
         'application/vnd.ms-excel',
@@ -34,7 +34,7 @@ if (isset($_POST["import"])) {
 		
 		if (isset($_SESSION['instance_nomenc'] )){
 			$user   =   $_SESSION['instance_nomenc'];   
-			// Récupération de la valeur du post
+			// Rï¿½cupï¿½ration de la valeur du post
     		$user->get_excel_data($spreadSheetAry, $sheetCount);  
 			
 			$importResult = $user->maj_bdd_excel($targetPath);  
@@ -52,13 +52,13 @@ if (isset($_POST["import"])) {
         $user   =   $_SESSION['instance_nomenc'];        
     }      
    
-    // Récupération de la valeur du post
+    // Rï¿½cupï¿½ration de la valeur du post
     $user->get_post_template($_POST);
 
     // compraison
     $user->comparer($user->matrice_donnees_template,$user->donnees_post);
     
-    // maj dans la base de données  
+    // maj dans la base de donnï¿½es  
 		 
    $user->maj_bdd($user->matrice_donnees_bdd);
    unset($_SESSION['instance_nomenc']);   
@@ -137,11 +137,11 @@ if (isset($_POST["import"])) {
 	
 	$html .= '<table width="50%" class="center-table">';
 	
-	// gestion des entêtes des menus
+	// gestion des entï¿½tes des menus
 	$html .= '<caption>';
 	$html .=  $user->recherche_libelle_page('IdEntete',$_SESSION['langue'],'user');
 	$html .= '</caption>';
-	// Fin de la gestion des entêtes
+	// Fin de la gestion des entï¿½tes
 	   
 	$html .= '<tr>';
 	$html .= '<td align="center">';
@@ -152,7 +152,7 @@ if (isset($_POST["import"])) {
 	
 	$html .= $user->entete_template; 
   
-   	// recherche des libellés des entêtes du template
+   	// recherche des libellï¿½s des entï¿½tes du template
 	$user->id_name        =   $user->recherche_libelle_page('DescIdNom',$_SESSION['langue'],'user');
 	$user->lib_name       =   'login';
 	$user->lib_name_long  =   $user->recherche_libelle_page('DescLibNom',$_SESSION['langue'],'user');
