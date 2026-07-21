@@ -154,74 +154,78 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
       // Icône + libellé court pour éviter toute confusion avec le cloud
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-        child: ElevatedButton.icon(
-          icon: Icon(
-            unsaved ? Icons.save_rounded : Icons.check_circle_rounded,
-            size: 18,
-            color: Colors.white,
-          ),
-          label: Text(
-            unsaved ? 'Sauver' : 'Sauvé',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: saving
-                ? disabledBg
-                : (unsaved ? saveUnsavedBg : saveSavedBg),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-            minimumSize: const Size(72, 36),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            elevation: unsaved ? 4 : 1,
-          ),
-          onPressed: saving ? null : () => _saveLocally(context, entry),
-          tooltip: saving
+        child: Tooltip(
+          message: saving
               ? 'Sauvegarde en cours…'
               : (unsaved
                   ? 'Sauvegarder les modifications localement'
                   : 'Données sauvegardées localement'),
+          child: ElevatedButton.icon(
+            icon: Icon(
+              unsaved ? Icons.save_rounded : Icons.check_circle_rounded,
+              size: 18,
+              color: Colors.white,
+            ),
+            label: Text(
+              unsaved ? 'Sauver' : 'Sauvé',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: saving
+                  ? disabledBg
+                  : (unsaved ? saveUnsavedBg : saveSavedBg),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+              minimumSize: const Size(72, 36),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              elevation: unsaved ? 4 : 1,
+            ),
+            onPressed: saving ? null : () => _saveLocally(context, entry),
+          ),
         ),
       ),
       // ── Bouton Envoyer au serveur ──────────────────────────────────────
       // Fond BLEU foncé — action réseau / serveur
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-        child: ElevatedButton.icon(
-          icon: Icon(
-            sending ? Icons.hourglass_top_rounded : Icons.cloud_upload_rounded,
-            size: 18,
-            color: Colors.white,
-          ),
-          label: Text(
-            sending ? '…' : 'Envoyer',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: sending ? disabledBg : sendBg,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-            minimumSize: const Size(80, 36),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            elevation: 4,
-          ),
-          onPressed: sending
-              ? null
-              : () => _sendToServer(context, auth, entry),
-          tooltip: sending
+        child: Tooltip(
+          message: sending
               ? 'Envoi en cours…'
               : 'Envoyer les données au serveur',
+          child: ElevatedButton.icon(
+            icon: Icon(
+              sending ? Icons.hourglass_top_rounded : Icons.cloud_upload_rounded,
+              size: 18,
+              color: Colors.white,
+            ),
+            label: Text(
+              sending ? '…' : 'Envoyer',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: sending ? disabledBg : sendBg,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+              minimumSize: const Size(80, 36),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              elevation: 4,
+            ),
+            onPressed: sending
+                ? null
+                : () => _sendToServer(context, auth, entry),
+          ),
         ),
       ),
       // Options supplémentaires
