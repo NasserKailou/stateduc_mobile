@@ -1383,6 +1383,7 @@
 									} else {
 										$regroup_warning = ' [École liée OK]';
 									}
+								}
 							array_push($tab, '<span class="success">OK'.$regroup_warning.'</span>'); 	
 							$logData .= ";OK".$regroup_warning;
 						}							
