@@ -4,18 +4,10 @@ import 'package:flutter/foundation.dart';
 ///
 /// Signification : si la valeur du champ [sourceField] n'est PAS [triggerValue],
 /// alors les champs [targetFields] doivent être désactivés (grisés + non saisissables).
-///
-/// Exemples :
-///   - "Si oui, quelle est sa superficie ?"
-///       → ConditionalRule(sourceField: "DOMAINE_DELIMITE_0", triggerValue: "1",
-///                         targetFields: ["SUPERFICIE_DOMAINE_0"])
-///   - "Si non, collabore-t-elle avec un centre spécialisé ?"
-///       → ConditionalRule(sourceField: "DETECTER_ENFANT_HANDI_0", triggerValue: "0",
-///                         targetFields: ["CSPEC_DIAGNO_CASDOUTEUX_0"])
 class ConditionalRule {
-  final String sourceField;        // champ source Oui/Non (ex. "DOMAINE_DELIMITE_0")
-  final String triggerValue;       // valeur qui ACTIVE les champs dépendants : "1" (si oui) ou "0" (si non)
-  final List<String> targetFields; // champs à désactiver si la condition n'est PAS satisfaite
+  final String sourceField;        // champ source Oui/Non
+  final String triggerValue;       // "1" (si oui) ou "0" (si non)
+  final List<String> targetFields; // champs à désactiver si condition non satisfaite
 
   const ConditionalRule({
     required this.sourceField,
@@ -30,111 +22,111 @@ class ConditionalRule {
 
 /// Parseur de règles conditionnelles extraites du HTML brut d'un formulaire StatEduc.
 ///
-/// ─── Stratégie de détection ────────────────────────────────────────────────
+/// ─── Topologies détectées ──────────────────────────────────────────────────
 ///
-/// Les formulaires StatEduc-Burundi utilisent un pattern purement textuel pour
-/// indiquer les dépendances conditionnelles entre champs :
-///   • Labels commençant par "Si oui"  → condition triggerValue = "1"
-///   • Labels commençant par "Si non" ou "Sinon" → condition triggerValue = "0"
+/// T1 — Même TR, deux TD côte à côte :
+///   <TR>
+///     <TD>...Oui <INPUT NAME='ELECTRICITE_0'>...Non...</TD>
+///     <TD>Si oui, ...fonctionne-t-il ? <INPUT NAME='FONCT_ALIMENT_ELECTRICITE_0'></TD>
+///   </TR>
 ///
-/// Il n'y a PAS d'attributs data-* ni de marqueurs programmatiques dans le HTML.
+/// T2 — TR suivant introduit par "Si oui/non/Sinon" :
+///   <TR>...<INPUT NAME='DOMAINE_DELIMITE_0'>...</TR>
+///   <TR>Si oui, superficie... <INPUT NAME='SUPERFICIE_DOMAINE_0'></TR>
+///   → Couvre aussi les préfixes : "a) Si oui", "b) Si oui", "   Si oui"
 ///
-/// ─── Deux topologies détectées dans infos_gen_1.html ──────────────────────
+/// T2-src — TR conditionnel qui est lui-même un champ source Oui/Non :
+///   <TR>...<INPUT NAME='EXISTE_LAVAGE_MAINS_0'>... Si oui, à proximité?
+///          <INPUT NAME='LAVAGE_MAINS_PROX_LATRINES_0'></TR>
+///   → Le TR source précédent devient la source, ce champ binaire devient cible
+///   → Le contexte propagé ensuite (T3) pointe vers le TR source, pas vers ce TR
 ///
-/// 1. **Même TR, deux TD côte à côte** (ELECTRICITE_0 / EAU_POTABLE_0) :
-///    <TR>
-///      <TD>...Oui<INPUT NAME='ELECTRICITE_0'...>Non<INPUT...></TD>
-///      <TD>&nbsp;Si oui, le système...Oui<INPUT NAME='FONCT_ALIMENT_ELECTRICITE_0'...></TD>
-///    </TR>
-///    → Le TD "source" (sans "Si oui/non") précède le TD "target" dans la même TR.
+/// T3 — Propagation de contexte (sous-questions sans marqueur "Si") :
+///   Après un TR conditionnel (T2/T2-src), les TR suivants qui :
+///     • ne contiennent PAS de champ source Oui/Non propre
+///     • ne débutent PAS par "Si oui/non/Sinon" (ne déclenchent pas T2)
+///     • ne sont pas des TR d'espacement
+///     • ne commencent PAS par un marqueur de nouvelle question <b>N.N
+///   sont rattachés au même source conditionnel, jusqu'au prochain TR qui :
+///     • contient un INPUT radio Oui/Non autonome (nouveau champ source)
+///     • ou commence par un marqueur de nouvelle question principale
 ///
-/// 2. **TR suivant** (DOMAINE_DELIMITE_0, LATRINES_DISPOSE_0, etc.) :
-///    <TR>...<TD>...<INPUT NAME='DOMAINE_DELIMITE_0'...></TD></TR>
-///    <TR><TD>...Si oui, quelle est sa superficie...<INPUT NAME='SUPERFICIE_DOMAINE_0'...></TD></TR>
-///    (séparés parfois par un TR td_space_blanc vide)
-///
-/// ─── Algorithme ────────────────────────────────────────────────────────────
-///
-/// On travaille sur des "blocs TR" extraits séquentiellement.
-/// Pour chaque TR :
-///   a) Chercher des TD contenant "Si oui/non/Sinon" → topologie 1 (même TR)
-///   b) Vérifier si le texte de ce TR commence par "Si oui/non/Sinon"
-///      → topologie 2 (ce TR est dépendant du TR précédent portant le champ source)
-///
-/// ─── Robustesse ────────────────────────────────────────────────────────────
-/// • Insensible à la casse (Si Oui / SI OUI / si oui)
-/// • Ignore les TR d'espacement (td_space_blanc, vides)
-/// • Gère plusieurs champs cibles dans un même TR dépendant
-/// • Ne lève jamais d'exception — retourne une liste vide en cas d'erreur
+///   Exemples :
+///   LATRINES_DISPOSE_0 → [NB_LATRINES_ELEVES_0, NB_LATRINES_FILLES_0,
+///                          NB_LATRINES_ELEVES_NON_FONCT_0, NB_LATRINES_BON_ETAT_0,
+///                          NB_LATRINES_BON_ETAT_F_0]
+///   EXISTE_LAVAGE_MAINS_0 → [LAVAGE_MAINS_PROX_LATRINES_0,
+///                             NB_INSTALL_LAVAGE_MAINS_T_0, NB_INSTALL_LAVAGE_MAINS_F_0,
+///                             NB_LAVAGE_MAINS_FONCT_T_0, NB_LAVAGE_MAINS_FONCT_F_0]
 class ConditionalRulesParser {
-  // Préfixes "Si oui" (trigger = "1")
-  static final RegExp _siOuiRe =
-      RegExp(r'^\s*(?:&nbsp;|\s)*\s*si\s+oui\b', caseSensitive: false);
+  // ── Regex "Si oui" ──────────────────────────────────────────────────────────
+  // Accepte : "Si oui", "a) Si oui", "b) Si oui", "&nbsp; Si oui", espaces, etc.
+  // Le caractère avant "si" peut être : espaces, &nbsp;, ponctuation a-z), chiffres)
+  static final RegExp _siOuiRe = RegExp(
+    r'(?:^|[\s\xa0])[a-z]?\)?\s*(?:&nbsp;|\s)*si\s+oui\b',
+    caseSensitive: false,
+  );
 
-  // Préfixes "Si non" ou "Sinon" (trigger = "0")
-  static final RegExp _siNonRe =
-      RegExp(r'^\s*(?:&nbsp;|\s)*\s*(si\s+non|sinon)\b', caseSensitive: false);
+  // "Si non" ou "Sinon"
+  static final RegExp _siNonRe = RegExp(
+    r'(?:^|[\s\xa0])[a-z]?\)?\s*(?:&nbsp;|\s)*(?:si\s+non|sinon)\b',
+    caseSensitive: false,
+  );
 
-  // Extrait la valeur de base d'un NAME= d'input radio Oui/Non.
-  // Ex. : NAME='ELECTRICITE_0' → "ELECTRICITE_0"
-  //       NAME='ELECTRICITE_0_1' → on veut le baseName sans le suffixe _N final
+  // Marqueur de nouvelle question principale : <b>N.N  (ex: <b>2.4, <b>3.1)
+  // → stoppe la propagation T3 vers les sections suivantes
+  static final RegExp _newQRe = RegExp(
+    r'<b>\s*\d+\.\d+',
+    caseSensitive: false,
+  );
+
+  // Détecte un champ radio Oui/Non source : INPUT type=radio avec _0 ou _1 en VALUE
+  // Critère : le TD/TR contient au moins 2 INPUT TYPE=radio avec le même NAME de base
+  static final RegExp _radioInputRe =
+      RegExp(r"""<INPUT\b[^>]*TYPE=['"]?radio['"]?[^>]*>""", caseSensitive: false);
+
   static final RegExp _nameAttrRe =
       RegExp(r"""NAME=['"]?([A-Za-z_][A-Za-z0-9_]*)['"]?""", caseSensitive: false);
 
-  // Texte visible d'un TD (retire les balises HTML, décodes les entités basiques)
+  // ── Utilitaires ────────────────────────────────────────────────────────────
+
   static String _tdText(String td) {
-    // Retire toutes les balises HTML
     var text = td.replaceAll(RegExp(r'<[^>]*>'), ' ');
-    // Décode entités basiques
     text = text
         .replaceAll('&nbsp;', ' ')
+        .replaceAll('\xa0', ' ')
         .replaceAll('&lt;', '<')
         .replaceAll('&gt;', '>')
         .replaceAll('&amp;', '&')
-        .replaceAll('&#8217;', "'");
-    // Compresse les espaces
+        .replaceAll('&#8217;', "'")
+        .replaceAll('&#8216;', "'");
     return text.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
-  /// Extrait tous les NAME= d'INPUT présents dans un bloc HTML donné.
-  /// Retourne les noms de base (sans suffixe _N final s'il s'agit d'options
-  /// radio numérotées comme _0_1, _0_0).
   static List<String> _extractFieldNames(String html) {
     final names = <String>[];
     for (final m in _nameAttrRe.allMatches(html)) {
       final raw = m.group(1)!;
-      // Normalise : retire le dernier segment numérique si le nom se termine
-      // par _<chiffres> et que le segment précédent est aussi numérique
-      // (pattern radio : FIELD_0_1, FIELD_0_0 → on garde FIELD_0)
       final normalized = _normalizeFieldName(raw);
-      if (!names.contains(normalized)) {
-        names.add(normalized);
-      }
+      if (!names.contains(normalized)) names.add(normalized);
     }
     return names;
   }
 
-  /// Normalise un nom de champ radio en retirant le suffixe d'option.
+  /// Normalise : retire le dernier segment numérique si les deux derniers le sont.
   /// ELECTRICITE_0_1 → ELECTRICITE_0
-  /// ELECTRICITE_0_0 → ELECTRICITE_0
-  /// NB_LATRINES_ELEVES_0 → NB_LATRINES_ELEVES_0  (pas de suffixe option)
+  /// NB_LATRINES_ELEVES_0 → NB_LATRINES_ELEVES_0 (inchangé)
   static String _normalizeFieldName(String name) {
-    // Si le nom se termine par _<chiffres>, et que la partie avant se termine
-    // aussi par _<chiffres>, on retire le dernier segment (suffixe option radio)
     final parts = name.split('_');
     if (parts.length >= 3) {
-      final lastPart = parts.last;
-      final secondToLast = parts[parts.length - 2];
-      // Critère : les deux derniers segments sont numériques → retirer le dernier
-      if (RegExp(r'^\d+$').hasMatch(lastPart) &&
-          RegExp(r'^\d+$').hasMatch(secondToLast)) {
+      if (RegExp(r'^\d+$').hasMatch(parts.last) &&
+          RegExp(r'^\d+$').hasMatch(parts[parts.length - 2])) {
         return parts.sublist(0, parts.length - 1).join('_');
       }
     }
     return name;
   }
 
-  /// Vérifie si un bloc TR est un TR d'espacement (vide ou td_space_blanc).
   static bool _isSpacerTr(String tr) {
     final text = _tdText(tr);
     return text.isEmpty ||
@@ -142,62 +134,51 @@ class ConditionalRulesParser {
         tr.toLowerCase().contains('td_space_blanc');
   }
 
-  /// Extrait les blocs <TR>...</TR> du HTML (insensible à la casse, imbrications simples).
-  /// Note : les TR imbriqués ne sont pas attendus dans les formulaires StatEduc.
   static List<String> _extractTrBlocks(String html) {
     final blocks = <String>[];
     final openRe = RegExp(r'<TR\b[^>]*>', caseSensitive: false);
     final closeRe = RegExp(r'</TR\s*>', caseSensitive: false);
-
     int pos = 0;
     while (pos < html.length) {
       final openMatch = openRe.firstMatch(html.substring(pos));
       if (openMatch == null) break;
       final openStart = pos + openMatch.start;
       final openEnd = pos + openMatch.end;
-
       final closeMatch = closeRe.firstMatch(html.substring(openEnd));
       if (closeMatch == null) break;
       final closeEnd = openEnd + closeMatch.end;
-
       blocks.add(html.substring(openStart, closeEnd));
       pos = closeEnd;
     }
     return blocks;
   }
 
-  /// Extrait les blocs <TD>...</TD> d'un TR (premier niveau, non imbriqués).
   static List<String> _extractTdBlocks(String tr) {
     final blocks = <String>[];
     final openRe = RegExp(r'<TD\b[^>]*>', caseSensitive: false);
     final closeRe = RegExp(r'</TD\s*>', caseSensitive: false);
-
     int pos = 0;
     while (pos < tr.length) {
       final openMatch = openRe.firstMatch(tr.substring(pos));
       if (openMatch == null) break;
       final openStart = pos + openMatch.start;
       final openEnd = pos + openMatch.end;
-
       final closeMatch = closeRe.firstMatch(tr.substring(openEnd));
       if (closeMatch == null) break;
       final closeEnd = openEnd + closeMatch.end;
-
       blocks.add(tr.substring(openStart, closeEnd));
       pos = closeEnd;
     }
     return blocks;
   }
 
-  /// Point d'entrée principal.
-  ///
-  /// [html] : le HTML brut du formulaire (tel que stocké dans SQLite).
-  /// Retourne une liste de [ConditionalRule], potentiellement vide.
+  // ── Point d'entrée ─────────────────────────────────────────────────────────
+
   static List<ConditionalRule> parse(String html) {
     try {
       return _doParse(html);
     } catch (e, st) {
-      debugPrint('[ConditionalRulesParser] Erreur de parsing : $e\n$st');
+      debugPrint('[ConditionalRulesParser] Erreur : $e\n$st');
       return [];
     }
   }
@@ -206,144 +187,214 @@ class ConditionalRulesParser {
     final rules = <ConditionalRule>[];
     final trBlocks = _extractTrBlocks(html);
 
-    // Liste des TR non-spacers avec leurs index dans trBlocks (pour look-back)
-    // Chaque entrée : (index original dans trBlocks, String trHtml)
-    final nonSpacerTrs = <({int idx, String html})>[];
-
+    // Liste des TR non-spacers (index original + html)
+    final nonSpacers = <({int idx, String html})>[];
     for (var i = 0; i < trBlocks.length; i++) {
-      final tr = trBlocks[i];
-      if (!_isSpacerTr(tr)) {
-        nonSpacerTrs.add((idx: i, html: tr));
+      if (!_isSpacerTr(trBlocks[i])) {
+        nonSpacers.add((idx: i, html: trBlocks[i]));
       }
     }
 
-    // ── Passe 1 : topologie « même TR, deux TD côte à côte » ─────────────────
-    // Ex. : TD[0]=source Oui/Non, TD[1]="Si oui, ..."
-    for (final entry in nonSpacerTrs) {
+    // ── Passe 1 : T1 — même TR, deux TD côte à côte ──────────────────────────
+    // TD source (Oui/Non) + TD suivant commençant par "Si oui/non"
+    // On enregistre les indices k (dans nonSpacers) traités par T1
+    // pour éviter qu'ils soient retraités comme T2-src dans la Passe 2.
+    final t1TrIndices = <int>{};
+    for (var ki = 0; ki < nonSpacers.length; ki++) {
+      final entry = nonSpacers[ki];
       final tdBlocks = _extractTdBlocks(entry.html);
-      // Cherche parmi les TD un TD "Si oui/non" et son TD précédent
       for (var j = 1; j < tdBlocks.length; j++) {
         final tdText = _tdText(tdBlocks[j]);
-        String? triggerValue;
+        String? trigger;
         if (_siOuiRe.hasMatch(tdText)) {
-          triggerValue = '1';
+          trigger = '1';
         } else if (_siNonRe.hasMatch(tdText)) {
-          triggerValue = '0';
+          trigger = '0';
         }
-        if (triggerValue == null) continue;
+        if (trigger == null) continue;
 
-        // TD précédent = source probable
         final sourceTd = tdBlocks[j - 1];
         final sourceFields = _extractFieldNames(sourceTd);
         if (sourceFields.isEmpty) continue;
-
         final targetFields = _extractFieldNames(tdBlocks[j]);
         if (targetFields.isEmpty) continue;
 
-        // Le champ source est celui qui a les inputs radio Oui/Non
-        // (on prend le premier champ du TD source)
         final sourceField = sourceFields.first;
-
-        // Évite les doublons
-        final alreadyExists = rules.any(
-          (r) => r.sourceField == sourceField && r.triggerValue == triggerValue,
-        );
-        if (!alreadyExists) {
-          rules.add(ConditionalRule(
-            sourceField: sourceField,
-            triggerValue: triggerValue!,
-            targetFields: List.unmodifiable(targetFields),
-          ));
-          debugPrint(
-            '[ConditionalRulesParser] Règle (même TR): $sourceField → '
-            'trigger=$triggerValue → targets=$targetFields',
-          );
-        }
+        _mergeRule(rules, sourceField, trigger, targetFields, 'T1');
+        t1TrIndices.add(ki);
       }
     }
 
-    // ── Passe 2 : topologie « TR suivant » ───────────────────────────────────
-    // Pour chaque TR non-spacer, vérifier si son texte visible commence par
-    // "Si oui" / "Si non" / "Sinon". Si oui, son champ source est dans le
-    // dernier TR non-spacer précédent (look-back).
-    for (var k = 1; k < nonSpacerTrs.length; k++) {
-      final currentTr = nonSpacerTrs[k].html;
+    // ── Passe 2 : T2 — TR suivant introduit par "Si oui/non/Sinon" ──────────
+    // + T2-src : TR conditionnel qui est lui-même un champ source Oui/Non
+    // + T3 : propagation de contexte aux TR fils sans marqueur "Si"
+    //
+    // Contexte actif : (ctxSource, ctxTrigger) — le source conditionnel courant.
+    // T2-src : quand on trouve un TR binaire qui est aussi conditionnel,
+    //   • on crée une règle T2-src liant src_back → ce champ binaire
+    //   • on met le contexte à (src_back, trigger) pour que T3 propage les TR fils
+    //     vers src_back (et non vers ce champ binaire lui-même)
+    String? ctxSource;
+    String? ctxTrigger;
+
+    for (var k = 0; k < nonSpacers.length; k++) {
+      final currentTr = nonSpacers[k].html;
       final currentText = _tdText(currentTr);
 
-      String? triggerValue;
+      // Détecter si ce TR est un nouveau TR source Oui/Non (champ binaire)
+      final radioNames = _getOuiNonFieldNames(currentTr);
+      final isBinaryTr = radioNames.isNotEmpty;
+
+      // Détecter "Si oui/non" dans ce TR
+      String? trigger;
       if (_siOuiRe.hasMatch(currentText)) {
-        triggerValue = '1';
+        trigger = '1';
       } else if (_siNonRe.hasMatch(currentText)) {
-        triggerValue = '0';
+        trigger = '0';
       }
-      if (triggerValue == null) continue;
 
-      // Si ce TR a déjà été traité en topologie 1 (TD côte à côte), sauter
-      // Pour éviter la double détection, on vérifie que le TR entier ne contient
-      // PAS un TD "Si oui" précédé d'un autre TD source dans la même ligne.
-      // (Les topologie 1 ont leur "Si oui" dans un TD secondaire du même TR,
-      //  les topologie 2 ont tout leur contenu dans un seul TD principal.)
-      final tdBlocks = _extractTdBlocks(currentTr);
-      final conditionalTdCount = tdBlocks.where((td) {
-        final t = _tdText(td);
-        return _siOuiRe.hasMatch(t) || _siNonRe.hasMatch(t);
-      }).length;
+      // Détecter si ce TR marque une nouvelle question principale (stoppe T3)
+      final isNewQ = _newQRe.hasMatch(currentTr);
 
-      // Si la même TR a déjà un TD source visible (topologie 1), ignorer
-      if (conditionalTdCount < tdBlocks.length && conditionalTdCount > 0) {
-        // topologie 1 possible : le TD conditionnel n'est PAS le seul TD
-        // → déjà prise en charge en passe 1, on saute
+      if (isBinaryTr) {
+        // ── T2-src : ce TR est lui-même conditionnel (contient "Si oui/non")
+        //            ET n'est pas déjà traité par T1 (t1TrIndices)
+        //            ET il y a un TR précédent non-spacer
+        if (trigger != null && !t1TrIndices.contains(k) && k > 0) {
+          final srcBack = _findLastSourceField(nonSpacers, k);
+          if (srcBack != null && srcBack != radioNames.first) {
+            // Ce champ binaire est une cible du champ source précédent
+            _mergeRule(rules, srcBack, trigger, [radioNames.first], 'T2-src');
+            // La propagation T3 suivante se fait depuis src_back (pas depuis ce champ)
+            ctxSource = srcBack;
+            ctxTrigger = trigger;
+          } else {
+            // Pas de src_back distinct → ce TR devient simplement le nouveau source
+            ctxSource = radioNames.first;
+            ctxTrigger = null;
+          }
+        } else {
+          // Nouveau champ source binaire sans condition → réinitialiser le contexte
+          ctxSource = radioNames.first;
+          ctxTrigger = null;
+        }
+        continue; // passer au TR suivant
+      }
+
+      // Ce TR n'est PAS un champ source Oui/Non
+
+      // Stopper la propagation T3 si nouvelle question principale sans "Si"
+      if (isNewQ && trigger == null) {
+        ctxSource = null;
+        ctxTrigger = null;
         continue;
       }
 
-      // Remonter pour trouver le TR source (dernier non-spacer avant ce TR)
-      final prevTr = nonSpacerTrs[k - 1].html;
-      final sourceFields = _extractFieldNames(prevTr);
-      if (sourceFields.isEmpty) continue;
-
-      final targetFields = _extractFieldNames(currentTr);
-      if (targetFields.isEmpty) continue;
-
-      // Le champ source est le premier champ radio du TR précédent
-      final sourceField = sourceFields.first;
-
-      // Évite les doublons avec passe 1
-      final alreadyExists = rules.any(
-        (r) => r.sourceField == sourceField && r.triggerValue == triggerValue,
-      );
-      if (!alreadyExists) {
-        rules.add(ConditionalRule(
-          sourceField: sourceField,
-          triggerValue: triggerValue!,
-          targetFields: List.unmodifiable(targetFields),
-        ));
-        debugPrint(
-          '[ConditionalRulesParser] Règle (TR suivant): $sourceField → '
-          'trigger=$triggerValue → targets=$targetFields',
-        );
-      } else {
-        // Si la règle existe déjà pour ce source+trigger, ajouter les cibles manquantes
-        final existingIdx = rules.indexWhere(
-          (r) => r.sourceField == sourceField && r.triggerValue == triggerValue,
-        );
-        if (existingIdx >= 0) {
-          final existing = rules[existingIdx];
-          final mergedTargets = List<String>.from(existing.targetFields);
-          for (final t in targetFields) {
-            if (!mergedTargets.contains(t)) mergedTargets.add(t);
+      if (trigger != null) {
+        // T2 : TR conditionnel → lier au dernier TR source trouvé (look-back)
+        final sourceField = _findLastSourceField(nonSpacers, k);
+        if (sourceField != null) {
+          final targetFields = _extractFieldNames(currentTr);
+          if (targetFields.isNotEmpty) {
+            _mergeRule(rules, sourceField, trigger, targetFields, 'T2');
+            // Activer propagation T3 depuis ce source
+            ctxSource = sourceField;
+            ctxTrigger = trigger;
           }
-          rules[existingIdx] = ConditionalRule(
-            sourceField: existing.sourceField,
-            triggerValue: existing.triggerValue,
-            targetFields: List.unmodifiable(mergedTargets),
-          );
         }
+      } else if (ctxSource != null && ctxTrigger != null) {
+        // T3 : propagation de contexte — ce TR est un "fils" du contexte actif
+        final targetFields = _extractFieldNames(currentTr);
+        if (targetFields.isNotEmpty) {
+          _mergeRule(rules, ctxSource!, ctxTrigger!, targetFields, 'T3');
+        }
+        // Continuer la propagation (ne pas réinitialiser ctxSource)
       }
+      // Ni trigger ni contexte actif : TR autonome, ignorer
     }
 
     debugPrint(
-      '[ConditionalRulesParser] ${rules.length} règle(s) extraite(s) du HTML.',
+      '[ConditionalRulesParser] ${rules.length} règle(s) extraite(s).',
     );
+    for (final r in rules) {
+      debugPrint('  $r');
+    }
     return rules;
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  /// Fusionne les targetFields dans une règle existante ou crée une nouvelle règle.
+  static void _mergeRule(
+    List<ConditionalRule> rules,
+    String sourceField,
+    String triggerValue,
+    List<String> newTargets,
+    String topology,
+  ) {
+    final idx = rules.indexWhere(
+      (r) => r.sourceField == sourceField && r.triggerValue == triggerValue,
+    );
+    if (idx < 0) {
+      rules.add(ConditionalRule(
+        sourceField: sourceField,
+        triggerValue: triggerValue,
+        targetFields: List.unmodifiable(newTargets),
+      ));
+      debugPrint(
+        '[ConditionalRulesParser] [$topology] $sourceField → '
+        'trigger=$triggerValue → $newTargets',
+      );
+    } else {
+      final existing = rules[idx];
+      final merged = List<String>.from(existing.targetFields);
+      var added = false;
+      for (final t in newTargets) {
+        if (!merged.contains(t)) {
+          merged.add(t);
+          added = true;
+        }
+      }
+      if (added) {
+        rules[idx] = ConditionalRule(
+          sourceField: existing.sourceField,
+          triggerValue: existing.triggerValue,
+          targetFields: List.unmodifiable(merged),
+        );
+        debugPrint(
+          '[ConditionalRulesParser] [$topology] Merge $sourceField += $newTargets',
+        );
+      }
+    }
+  }
+
+  /// Extrait les noms de base des champs radio Oui/Non (exactement 2 options)
+  /// présents dans un TR.
+  static List<String> _getOuiNonFieldNames(String trHtml) {
+    final radioMatches = _radioInputRe.allMatches(trHtml).toList();
+    final nameCounts = <String, int>{};
+    for (final m in radioMatches) {
+      final nameM = _nameAttrRe.firstMatch(m.group(0)!);
+      if (nameM == null) continue;
+      final base = _normalizeFieldName(nameM.group(1)!);
+      nameCounts[base] = (nameCounts[base] ?? 0) + 1;
+    }
+    return nameCounts.entries
+        .where((e) => e.value >= 2)
+        .map((e) => e.key)
+        .toList();
+  }
+
+  /// Remonte dans la liste des TR non-spacers pour trouver le dernier champ
+  /// source Oui/Non (avant la position k).
+  static String? _findLastSourceField(
+    List<({int idx, String html})> nonSpacers,
+    int k,
+  ) {
+    for (var j = k - 1; j >= 0; j--) {
+      final names = _getOuiNonFieldNames(nonSpacers[j].html);
+      if (names.isNotEmpty) return names.first;
+    }
+    return null;
   }
 }

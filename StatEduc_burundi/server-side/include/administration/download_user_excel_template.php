@@ -16,8 +16,9 @@
  *   I (8)  ID_SYSTEME     — Identifiant secteur (ex: 1)
  *   J (9)  ID_ANNEE       — Identifiant année scolaire (ex: 2024)
  *   K (10) ID_CHAINE      — Identifiant chaîne (ex: 1)
+ *   L (11) ID_PERIODE     — Identifiant période (ex: 1 = Annuelle)
  *
- * Colonnes G-K optionnelles : si vides, seul le compte ADMIN_USERS est créé
+ * Colonnes G-L optionnelles : si vides, seul le compte ADMIN_USERS est créé
  * (comportement identique à l'import 6 colonnes existant).
  */
 
@@ -49,6 +50,7 @@ $headers = [
     'I1' => 'ID_SYSTEME',
     'J1' => 'ID_ANNEE',
     'K1' => 'ID_CHAINE',
+    'L1' => 'ID_PERIODE',
 ];
 
 foreach ($headers as $cell => $label) {
@@ -64,14 +66,14 @@ $styleOblig = [
 ];
 $sheet->getStyle('A1:F1')->applyFromArray($styleOblig);
 
-// Style en-têtes optionnels (G-K) : fond orange, texte blanc, gras
+// Style en-têtes optionnels (G-L) : fond orange, texte blanc, gras
 $styleOpt = [
     'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
     'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'C55A11']],
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'wrapText' => true],
     'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'AAAAAA']]],
 ];
-$sheet->getStyle('G1:K1')->applyFromArray($styleOpt);
+$sheet->getStyle('G1:L1')->applyFromArray($styleOpt);
 
 // Ligne exemple
 $sheet->setCellValue('A2', 'Jean Dupont');
@@ -85,23 +87,24 @@ $sheet->setCellValue('H2', '12');
 $sheet->setCellValue('I2', '1');
 $sheet->setCellValue('J2', '2024');
 $sheet->setCellValue('K2', '1');
+$sheet->setCellValue('L2', '1');
 
 // Style ligne exemple : fond gris clair
 $styleEx = [
     'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F2F2F2']],
     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'CCCCCC']]],
 ];
-$sheet->getStyle('A2:K2')->applyFromArray($styleEx);
+$sheet->getStyle('A2:L2')->applyFromArray($styleEx);
 
 // Largeurs colonnes
-$colWidths = ['A'=>28,'B'=>30,'C'=>18,'D'=>18,'E'=>18,'F'=>14,'G'=>18,'H'=>12,'I'=>14,'J'=>12,'K'=>12];
+$colWidths = ['A'=>28,'B'=>30,'C'=>18,'D'=>18,'E'=>18,'F'=>14,'G'=>18,'H'=>12,'I'=>14,'J'=>12,'K'=>12,'L'=>12];
 foreach ($colWidths as $col => $w) {
     $sheet->getColumnDimension($col)->setWidth($w);
 }
 
 // Ligne de note
 $sheet->setCellValue('A4', '* Colonnes A-F : OBLIGATOIRES');
-$sheet->setCellValue('A5', '* Colonnes G-K (fond orange) : OPTIONNELLES — liaison automatique école+campagne dans DICO_FIXE_REGROUPEMENT');
+$sheet->setCellValue('A5', '* Colonnes G-L (fond orange) : OPTIONNELLES — liaison automatique école+campagne+période dans DICO_FIXE_REGROUPEMENT');
 $sheet->setCellValue('A6', '* La ligne 1 (en-têtes) et cette section de notes ne doivent PAS être modifiées.');
 $sheet->setCellValue('A7', '* Saisir les utilisateurs à partir de la ligne 2 (supprimer la ligne exemple si nécessaire).');
 $sheet->getStyle('A4:K7')->applyFromArray([
