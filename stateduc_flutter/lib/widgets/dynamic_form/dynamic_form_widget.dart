@@ -44,6 +44,7 @@ class DynamicFormWidget extends StatefulWidget {
     required this.rules,
     required this.onFieldChanged,
     this.onAddGridRow,
+    this.disabledFields = const {},
   });
 
   final String html;
@@ -52,6 +53,10 @@ class DynamicFormWidget extends StatefulWidget {
   final List<ValidationRule> rules;
   final void Function(String fieldName, String value) onFieldChanged;
   final void Function(String tableId)? onAddGridRow;
+
+  /// Ensemble des noms de champs à désactiver (Fix #5 — questions conditionnelles).
+  /// Transmis par DataEntryProvider.disabledFields.
+  final Set<String> disabledFields;
 
   @override
   State<DynamicFormWidget> createState() => _DynamicFormWidgetState();
@@ -112,6 +117,10 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
             _refreshMatrixTotals();
             _injectBridge();
             _enablePinchZoom(); // Active le pinch-to-zoom (Android WebView ignore user-scalable=yes)
+            // Applique l'état désactivé initial (Fix #5 — questions conditionnelles)
+            if (widget.disabledFields.isNotEmpty) {
+              _injectDisabledFields(widget.disabledFields);
+            }
           });
         },
         onWebResourceError: (err) {
@@ -143,6 +152,10 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
       _injectData();
       _refreshMatrixTotals();
       _injectValidationErrors();
+    }
+    // Réinjecte l'état disable/enable quand disabledFields change (Fix #5)
+    if (_pageLoaded && old.disabledFields != widget.disabledFields) {
+      _injectDisabledFields(widget.disabledFields);
     }
   }
 
@@ -753,6 +766,76 @@ $formHtml
     var els = document.querySelectorAll('[name="' + name + '"]');
     els.forEach(function(el) { el.classList.add('error'); });
   }
+})();
+''');
+  }
+
+  // ── Désactive/réactive les champs conditionnels (Fix #5) ──────────────────
+  //
+  // Injecte du JavaScript pour désactiver visuellement et fonctionnellement
+  // les champs dont les noms sont dans [disabled].
+  //
+  // Comportement :
+  //   • Les champs désactivés sont grisés (background #f0f0f0, couleur #aaa)
+  //     et portent l'attribut HTML disabled (exclus du POST côté serveur).
+  //   • La ligne TR parente est mise à 50% d'opacité pour signaler visuellement
+  //     que la question entière est inactive.
+  //   • Les champs non présents dans [disabled] sont ré-activés (disabled=false,
+  //     styles restaurés) pour gérer le cas "l'utilisateur change d'avis".
+  //
+  // Correspondance des noms :
+  //   Un champ "ELECTRICITE_0" dans [disabled] correspond aux inputs dont
+  //   le NAME commence par "ELECTRICITE_0" (gère les variantes _1, _0 etc.).
+  void _injectDisabledFields(Set<String> disabled) {
+    if (!_pageLoaded) return;
+    final jsonList = json.encode(disabled.toList());
+    // ⚠️  JAVASCRIPT ci-dessous (jusqu'à ''') — ne pas utiliser syntaxe Dart ici.
+    _controller.runJavaScript('''
+(function() {
+  var disabledFields = $jsonList;
+
+  document.querySelectorAll('input, textarea, select').forEach(function(el) {
+    if (!el.name) return;
+    var elName = el.name;
+
+    // Vérifie si ce champ doit être désactivé
+    var shouldDisable = false;
+    for (var i = 0; i < disabledFields.length; i++) {
+      var baseField = disabledFields[i];
+      // Correspond si le nom commence par le champ de base
+      if (elName === baseField || elName.indexOf(baseField) === 0) {
+        shouldDisable = true;
+        break;
+      }
+    }
+
+    if (shouldDisable) {
+      el.disabled = true;
+      el.style.background = '#f0f0f0';
+      el.style.color = '#aaa';
+      el.style.cursor = 'not-allowed';
+      el.style.opacity = '0.6';
+      // Réduit l'opacité de la ligne TR parente
+      var tr = el.closest('tr') || el.closest('TR');
+      if (tr) tr.style.opacity = '0.5';
+    } else {
+      el.disabled = false;
+      el.style.background = '';
+      el.style.color = '';
+      el.style.cursor = '';
+      el.style.opacity = '';
+      // Restaure l'opacité du TR si aucun champ désactivé dans cette ligne
+      var tr = el.closest('tr') || el.closest('TR');
+      if (tr) {
+        var hasDisabledInRow = false;
+        var rowInputs = tr.querySelectorAll('input, textarea, select');
+        for (var j = 0; j < rowInputs.length; j++) {
+          if (rowInputs[j].disabled) { hasDisabledInRow = true; break; }
+        }
+        if (!hasDisabledInRow) tr.style.opacity = '';
+      }
+    }
+  });
 })();
 ''');
   }

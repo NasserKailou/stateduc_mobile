@@ -392,6 +392,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
           : [],
       onFieldChanged: entry.updateField,
       onAddGridRow: _onAddGridRow,
+      disabledFields: entry.disabledFields,  // Fix #5 — questions conditionnelles
     );
   }
 

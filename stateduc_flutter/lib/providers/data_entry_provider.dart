@@ -5,6 +5,7 @@ import '../models/user.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 import '../services/coherence_evaluator.dart';
+import '../services/conditional_rules_parser.dart';
 
 /// DataEntryProvider — gestionnaire de l'état de saisie des données d'un formulaire.
 ///
@@ -107,6 +108,12 @@ class DataEntryProvider extends ChangeNotifier {
   // Évite d'évaluer la cohérence à chaque frappe — attend 800 ms d'inactivité.
   Timer? _coherenceDebounce;
 
+  // ─── Questions conditionnelles (Fix #5) ─────────────────────────────────────
+  // Règles extraites du HTML du formulaire courant lors de selectQuestion().
+  // Réévaluées à chaque updateField() pour les champs sources.
+  List<ConditionalRule> _conditionalRules = [];
+  Set<String> _disabledFields = {};
+
   // ─── Getters ─────────────────────────────────────────────────────────────────
   String? get idCamp              => _idCamp;
   String? get idEtab              => _idEtab;
@@ -141,6 +148,10 @@ class DataEntryProvider extends ChangeNotifier {
   List<OfflineCoherenceError> get offlineCoherenceErrors  => List.unmodifiable(_offlineCoherenceErrors);
   bool                        get isCheckingOffline        => _isCheckingOffline;
   bool get hasOfflineCoherenceErrors => _offlineCoherenceErrors.isNotEmpty;
+
+  /// Ensemble des noms de champs actuellement désactivés (Fix #5 — questions conditionnelles).
+  /// Mis à jour à chaque appel de updateField() sur un champ source.
+  Set<String> get disabledFields => Set.unmodifiable(_disabledFields);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INITIALISATION — configure le contexte pour un établissement + système donnés
@@ -191,6 +202,8 @@ class DataEntryProvider extends ChangeNotifier {
     _error          = null;
     _successMessage = null;
     _isFirstQuestion = false;
+    _conditionalRules = [];       // Fix #5 — réinitialisation à chaque école
+    _disabledFields   = {};       // Fix #5
     _isLoading      = true;
     notifyListeners();
 
@@ -371,6 +384,14 @@ class DataEntryProvider extends ChangeNotifier {
       if (_formData.isNotEmpty) {
         Future(() => checkCoherenceOffline());
       }
+
+      // ── Questions conditionnelles (Fix #5) ─────────────────────────────
+      // Parse les règles du formulaire courant et évalue l'état initial
+      // des champs désactivés selon les données déjà chargées.
+      _conditionalRules = _formHtml != null
+          ? ConditionalRulesParser.parse(_formHtml!)
+          : [];
+      _disabledFields = _evaluateConditions(_formData, _conditionalRules);
     } catch (e) {
       _error = 'Erreur chargement formulaire : ${e.toString()}';
     } finally {
@@ -590,6 +611,19 @@ class DataEntryProvider extends ChangeNotifier {
     _formData[fieldName] = value;
     _hasUnsavedChanges   = true;
     _validationErrors.remove(fieldName);
+
+    // ── Réévaluation des questions conditionnelles (Fix #5) ──────────────
+    // Si le champ modifié est un champ source d'une règle conditionnelle,
+    // recalcule l'ensemble des champs désactivés et notifie immédiatement
+    // pour que DynamicFormWidget injecte le nouveau JS disable.
+    final baseFieldName = fieldName.replaceAll(RegExp(r'_\d+$'), '');
+    final affectsConditional = _conditionalRules.any(
+      (r) => r.sourceField == fieldName || r.sourceField.startsWith(baseFieldName),
+    );
+    if (affectsConditional) {
+      _disabledFields = _evaluateConditions(_formData, _conditionalRules);
+    }
+
     notifyListeners();
     // ── Déclenchement debounced de la cohérence offline ──────────────────
     // Attend 800 ms après la dernière frappe avant d'évaluer, pour éviter
@@ -605,6 +639,73 @@ class DataEntryProvider extends ChangeNotifier {
         checkCoherenceOffline();
       }
     });
+  }
+
+  // ── Évaluation des champs désactivés (Fix #5) ─────────────────────────────
+  //
+  // Pour chaque règle conditionnelle :
+  //   • On lit la valeur actuelle du champ source dans [data].
+  //   • Si la valeur correspond à [rule.triggerValue] → les targetFields
+  //     sont ACTIVÉS (retirés de l'ensemble disabled).
+  //   • Si la valeur NE correspond PAS à [rule.triggerValue], OU si elle est
+  //     vide (aucune sélection) → les targetFields sont DÉSACTIVÉS.
+  //
+  // Convention de stockage des radios dans _formData :
+  //   Les radios Oui/Non sont stockés avec le nom complet de l'input
+  //   ex. "ELECTRICITE_0_1" → value "1" quand Oui est coché
+  //   Mais la convention du pont JS (FieldChanged) envoie :
+  //     name = "ELECTRICITE_0_1"  value = "1"   (radio coché)
+  //   Donc _formData peut contenir :
+  //     "ELECTRICITE_0_1" = "1"    (Oui coché)
+  //     "ELECTRICITE_0_0" = "0"    ← NON, le pont envoie value de l'option cochée
+  //
+  //   En réalité le pont envoie : name = NAME complet ex. "ELECTRICITE_0"
+  //   et value = la valeur de l'option cochée (ex. "1" ou "0").
+  //   Voir _injectBridge() dans dynamic_form_widget.dart :
+  //     if (el.checked) notify(name, el.value);
+  //   Donc _formData["ELECTRICITE_0"] = "1" quand Oui est coché.
+  //
+  //   Mais les IDs d'option dans le HTML sont ELECTRICITE_0_1 / ELECTRICITE_0_0,
+  //   et VALUE=$ELECTRICITE_0_1 (non résolu → remplacé par "1" par _preprocessHtml).
+  //   Le NAME de l'input est "ELECTRICITE_0" (le champ source de notre règle).
+  //
+  // Résolution : on cherche la valeur dans _formData en testant :
+  //   1. data[rule.sourceField]               → ex. data["ELECTRICITE_0"] = "1"
+  //   2. data[rule.sourceField + "_0"]        → (cas où suffix _0 manquant)
+  //   3. Parcours de toutes les clés commençant par rule.sourceField
+  //
+  Set<String> _evaluateConditions(
+    Map<String, String> data,
+    List<ConditionalRule> rules,
+  ) {
+    final disabled = <String>{};
+    for (final rule in rules) {
+      // Recherche de la valeur courante du champ source
+      String? currentValue = data[rule.sourceField];
+
+      // Fallback : cherche avec suffixe _0
+      currentValue ??= data['${rule.sourceField}_0'];
+
+      // Fallback : parcourt les clés qui commencent par le sourceField
+      if (currentValue == null) {
+        for (final entry in data.entries) {
+          if (entry.key.startsWith(rule.sourceField) && entry.value.isNotEmpty) {
+            currentValue = entry.value;
+            break;
+          }
+        }
+      }
+
+      if (currentValue == null || currentValue.isEmpty) {
+        // Aucune sélection → désactiver les dépendants (conservateur)
+        disabled.addAll(rule.targetFields);
+      } else if (currentValue != rule.triggerValue) {
+        // Sélection différente du trigger → désactiver
+        disabled.addAll(rule.targetFields);
+      }
+      // Si currentValue == rule.triggerValue → activer (ne pas ajouter à disabled)
+    }
+    return disabled;
   }
 
   /// Valide un seul champ selon ses règles.
