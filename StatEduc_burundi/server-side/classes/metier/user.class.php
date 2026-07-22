@@ -1353,22 +1353,65 @@
 							array_push($tab, '<span class="error">'.$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user').'</span>'); 
 							$logData .= ";".$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user');
 						} else {
-							// Liaison école+campagne (session 68+69) : INSERT DICO_FIXE_REGROUPEMENT
-							// $tab[7]=code_etab, $tab[8]=id_camp, $tab[9]=id_systeme,
-							// $tab[10]=id_annee, $tab[11]=id_chaine, $tab[12]=id_periode
+							// Liaison école+campagne : INSERT DICO_FIXE_REGROUPEMENT
+							// Colonnes Excel G-L → $tab[7..12] :
+							//   $tab[7]=CODE_ETAB, $tab[8]=ID_CAMP, $tab[9]=ID_SYSTEME,
+							//   $tab[10]=ID_ANNEE, $tab[11]=ID_CHAINE, $tab[12]=ID_PERIODE
 								$regroup_warning = '';
 								if (!empty($tab[7]) && !empty($tab[8]) && !empty($tab[9])) {
-									$code_etab       = $this->conn->qstr($tab[7]);
+
+									$raw_code_etab   = trim($tab[7]);
+									$code_etab_q     = $this->conn->qstr($raw_code_etab);
 									$id_camp         = intval($tab[8]);
 									$id_systeme      = intval($tab[9]);
 									$id_annee        = intval($tab[10]);
 									$id_chaine       = intval($tab[11]);
 									$id_periode      = (!empty($tab[12])) ? intval($tab[12]) : 0;
-									$id_status       = 1;
-									$id_type_regroup = 5;
-									$str_systeme     = $this->conn->qstr((string)$id_systeme);
 
-									// Vérifier si la ligne existe déjà (évite doublon PK)
+									// Valeurs validées sur données réelles (DICO_FIX_REGROUPEMENT)
+									$id_status       = 2; // valeur réelle : 2
+									$id_type_regroup = 0; // valeur réelle : 0 (établissement)
+
+									// ----------------------------------------------------------------
+									// Récupérer USER_PRIV, ID_REGROUP_PARENTS, ID_TYPE_REGROUP_PARENTS
+									// depuis un enregistrement existant de la même campagne/chaîne.
+									// D'abord on cherche exactement ce code école, sinon n'importe quel
+									// enregistrement de la même campagne+chaîne (modèle générique).
+									// ----------------------------------------------------------------
+									$sql_tpl = 'SELECT TOP 1 USER_PRIV, ID_REGROUP_PARENTS,'
+										.' ID_TYPE_REGROUP_PARENTS'
+										.' FROM DICO_FIXE_REGROUPEMENT'
+										.' WHERE ID_CAMPAGNE='.$id_camp
+										.' AND ID_CHAINE='.$id_chaine
+										.' AND ID_ANNEE='.$id_annee
+										.' AND ID_SYSTEME='.$id_systeme
+										.' AND ID_REGROUP='.$code_etab_q;
+									$tpl = $this->conn->GetRow($sql_tpl);
+
+									// Si pas de résultat pour ce code école précis → modèle générique
+									if (empty($tpl)) {
+										$sql_tpl2 = 'SELECT TOP 1 USER_PRIV, ID_REGROUP_PARENTS,'
+											.' ID_TYPE_REGROUP_PARENTS'
+											.' FROM DICO_FIXE_REGROUPEMENT'
+											.' WHERE ID_CAMPAGNE='.$id_camp
+											.' AND ID_CHAINE='.$id_chaine
+											.' AND ID_ANNEE='.$id_annee
+											.' AND ID_SYSTEME='.$id_systeme;
+										$tpl = $this->conn->GetRow($sql_tpl2);
+									}
+
+									$user_priv              = isset($tpl['USER_PRIV'])
+										? $tpl['USER_PRIV'] : '';
+									$id_regroup_parents     = isset($tpl['ID_REGROUP_PARENTS'])
+										? $tpl['ID_REGROUP_PARENTS'] : '';
+									$id_type_regroup_par    = isset($tpl['ID_TYPE_REGROUP_PARENTS'])
+										? $tpl['ID_TYPE_REGROUP_PARENTS'] : '';
+
+									$user_priv_q         = $this->conn->qstr($user_priv);
+									$regroup_parents_q   = $this->conn->qstr($id_regroup_parents);
+									$type_regroup_par_q  = $this->conn->qstr($id_type_regroup_par);
+
+									// Vérifier doublon PK avant INSERT
 									$sql_chk = 'SELECT COUNT(*) FROM DICO_FIXE_REGROUPEMENT'
 										.' WHERE ID_USER='.$tab[0]
 										.' AND ID_CAMPAGNE='.$id_camp
@@ -1377,28 +1420,38 @@
 										.' AND ID_ANNEE='.$id_annee
 										.' AND ID_PERIODE='.$id_periode
 										.' AND ID_TYPE_REGROUP='.$id_type_regroup
-										.' AND ID_REGROUP='.$code_etab;
+										.' AND ID_REGROUP='.$code_etab_q;
 									$exists = intval($this->conn->GetOne($sql_chk));
 
 									if ($exists > 0) {
 										$regroup_warning = ' [École déjà liée — doublon ignoré]';
 									} else {
-										$sql_regroup = 'INSERT INTO DICO_FIXE_REGROUPEMENT '
-											. '(ID_USER, ID_CAMPAGNE, ID_STATUS, ID_SYSTEME, ID_CHAINE, ID_ANNEE, '
-											. 'ID_PERIODE, ID_TYPE_REGROUP, ID_REGROUP, ID_REGROUP_PARENTS, '
-											. 'ID_TYPE_REGROUP_PARENTS, ID_SYSTEMES) '
-											. 'VALUES ('.$tab[0].', '.$id_camp.', '.$id_status.', '
-											. $id_systeme.', '.$id_chaine.', '.$id_annee.', '
-											. $id_periode.', '.$id_type_regroup.', '.$code_etab.', '
-											. $code_etab.', '.$id_type_regroup.', '.$str_systeme.')';
+										// INSERT avec les colonnes RÉELLES de DICO_FIXE_REGROUPEMENT
+										$sql_regroup =
+											'INSERT INTO DICO_FIXE_REGROUPEMENT'
+											.' (USER_PRIV, ID_CAMPAGNE, ID_STATUS, ID_USER,'
+											.'  ID_SYSTEME, ID_CHAINE, ID_ANNEE, ID_PERIODE,'
+											.'  ID_TYPE_REGROUP, ID_REGROUP,'
+											.'  ID_REGROUP_PARENTS, ID_TYPE_REGROUP_PARENTS)'
+											.' VALUES ('
+											.$user_priv_q.', '
+											.$id_camp.', '
+											.$id_status.', '
+											.$tab[0].', '
+											.$id_systeme.', '
+											.$id_chaine.', '
+											.$id_annee.', '
+											.$id_periode.', '
+											.$id_type_regroup.', '
+											.$code_etab_q.', '
+											.$regroup_parents_q.', '
+											.$type_regroup_par_q.')';
+
 										if ($this->conn->Execute($sql_regroup) === false) {
-											// Récupérer le message d'erreur SQL précis
-											$db_err = '';
-											if (method_exists($this->conn, 'ErrorMsg')) {
-												$db_err = $this->conn->ErrorMsg();
-											}
+											$db_err = method_exists($this->conn, 'ErrorMsg')
+												? $this->conn->ErrorMsg() : '';
 											$regroup_warning = ' [WARN: école non liée: '
-												. htmlspecialchars(substr($db_err, 0, 120)) . ']';
+												. htmlspecialchars(substr($db_err, 0, 150)) . ']';
 										} else {
 											$regroup_warning = ' [École liée OK]';
 										}
