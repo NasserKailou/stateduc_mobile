@@ -1,6 +1,6 @@
 # Note de Présentation — StatEduc Mobile MEN
 ## Transfert de Compétences aux Bénéficiaires
-**Dernière mise à jour : Session 18 — Juin 2026**
+**Version : 1.0 — Juillet 2026**
 
 ---
 
@@ -101,7 +101,7 @@ Envoi au serveur (formulaire / école / campagne complète)
 > Équivalent mobile de `controle_theme_batch.class.php`. Évalue les règles de cohérence sur les données SQLite + mémoire.
 
 **`data_entry_provider.dart`** — Chef d'orchestre de la saisie
-> Coordonne tout le cycle de vie d'un formulaire. Déclenche la cohérence offline à 7 moments différents (session 18).
+> Coordonne tout le cycle de vie d'un formulaire. Déclenche la cohérence offline à 7 moments différents.
 
 **`dynamic_form_widget.dart`** — Afficheur de formulaires
 > Affiche les formulaires HTML du serveur dans un WebView, corrige le mojibake.
@@ -128,15 +128,15 @@ Envoi au serveur (formulaire / école / campagne complète)
 
 ## 5. Points techniques critiques
 
-### 🔴 Anti-deadlock Apache (session 12b)
+### 🔴 Anti-deadlock Apache
 `session_write_close()` libère le verrou de session PHP avant l'appel curl interne vers questionnaire_ws.php. Sans cela, timeout de 3+ minutes sur tous les envois.
 
 ### 🕐 Timeouts Dio (configuration actuelle)
 | Paramètre | Valeur | Corrigé en |
 |-----------|--------|-----------|
-| `connectTimeout` | 60 s | Sessions initiales |
-| `receiveTimeout` | 300 s | Session 12b |
-| `sendTimeout` | **300 s** | Session 17 *(était 120 s)* |
+| `connectTimeout` | 60 s | Valeur initiale |
+| `receiveTimeout` | 300 s | Corrigé (augmenté) |
+| `sendTimeout` | **300 s** | Corrigé (augmenté depuis 120 s) |
 
 ### 📅 yearCode — Contournement session PHP
 Le code de l'année scolaire est passé **dans l'URL** car l'application mobile n'a pas de session PHP persistante :
@@ -167,24 +167,24 @@ Vérification automatique que les données saisies sont **logiquement cohérente
 ### Deux niveaux de contrôle
 
 **Niveau 1 — Hors ligne (offline)** : Sur la tablette, SANS Internet
-- Déclenché automatiquement à **7 moments** distincts (session 18)
+- Déclenché automatiquement à **7 moments** distincts
 - Affiche une bannière d'avertissement + indicateur de progression
 
 **Niveau 2 — Serveur** : Après envoi des données au serveur
 - Plus précis (données réelles en base Oracle/MySQL)
 - Dialogue avec le détail de chaque violation
 
-### Les 7 déclenchements de la cohérence offline (session 18)
+### Les 7 déclenchements de la cohérence offline
 
-| Événement | Délai | Depuis |
-|-----------|-------|--------|
-| Frappe dans un champ | 800 ms (debounce) | **Session 18** |
-| Bouton "Sauvegarder" | Immédiat | Sessions 1-16 |
-| Ouverture formulaire déjà saisi | Immédiat | Session 17 |
-| Changement de période/filtre | Immédiat | **Session 18** |
-| Règles reçues du serveur | Arrière-plan | Session 17 |
-| Données serveur fusionnées | Arrière-plan | **Session 18** |
-| Envoi serveur réussi | Via API serveur | Sessions 1-16 |
+| Événement | Délai |
+|-----------|-------|
+| Frappe dans un champ | 800 ms (debounce) |
+| Bouton "Sauvegarder" | Immédiat |
+| Ouverture formulaire déjà saisi | Immédiat |
+| Changement de période/filtre | Immédiat |
+| Règles reçues du serveur | Arrière-plan |
+| Données serveur fusionnées | Arrière-plan |
+| Envoi serveur réussi | Via API serveur |
 
 ---
 
@@ -260,34 +260,34 @@ git checkout ak_main
 | Document | Contenu | Audience |
 |---------|---------|----------|
 | `administration.md` | Guide A→Z : installation, PIN, campagne, saisie, envoi, dépannage | Administrateurs, superviseurs |
-| `recapitulatif.md` | Architecture, correctifs, guide développeur (sessions 1-20) | Développeurs, mainteneurs |
-| `stateduc_flutter/CHANGELOG.md` | Historique détaillé Flutter (sessions 1-20) | Développeurs |
+| `recapitulatif.md` | Architecture, correctifs, guide développeur | Développeurs, mainteneurs |
+| `stateduc_flutter/CHANGELOG.md` | Historique détaillé des modifications Flutter | Développeurs |
 | `StatEduc_MEN_2025/CHANGELOG.md` | Historique des modifications PHP | Développeurs PHP |
 | Code source | Tous les fichiers commentés en français | Développeurs |
 | PR #1 | https://github.com/NasserKailou/stateduc_mobile/pull/1 | Équipe projet |
 
 ---
 
-## 10. Résultats obtenus — Sessions 1-18
+## 10. Résultats obtenus
 
-| Objectif | Résultat | Session |
-|---------|---------|---------|
-| Application fonctionne hors ligne | ✅ SQLite, formulaires mis en cache | 1-5 |
-| Données envoyées au serveur existant | ✅ API PHP compatible sans modification | 3-14 |
-| Anti-deadlock Apache | ✅ `session_write_close()` avant curl interne | 12b |
-| Données toujours écrites en DB | ✅ `codeyear` persisté + URL 8 segments | 12 |
-| Contrôles de cohérence serveur | ✅ Post-envoi via `data_controle.php` | 11 |
-| Correction mojibake encodage | ✅ Détection et correction automatiques | 14 |
-| Cohérence offline — règles téléchargées | ✅ `data_rules.php` + `yearCode` passé | 14 |
-| Timeout robuste | ✅ `sendTimeout` 300s, `receiveTimeout` 300s | 17 |
-| Page d'identification pré-remplie | ✅ `forceOverwrite` pour tous types de campagne | 17 |
-| Envoi global établissement | ✅ Tous les formulaires d'une école en 1 clic | 17 |
-| Envoi global campagne | ✅ Tous les établissements en 1 opération | 17 |
-| Paramètres lisibles | ✅ TabBar Serveur/PIN/Sécurité contrasté | 17 |
-| Identité visuelle Burundi | ✅ Drapeau du Burundi à l'écran d'accueil | **18** |
-| Cohérence offline en temps réel | ✅ 7 déclencheurs dont debounce saisie | **18** |
-| Code documenté en français | ✅ Tous les fichiers source commentés | 15-16 |
+| Objectif | Résultat |
+|---------|----------|
+| Application fonctionne hors ligne | ✅ SQLite, formulaires mis en cache |
+| Données envoyées au serveur existant | ✅ API PHP compatible sans modification |
+| Anti-deadlock Apache | ✅ `session_write_close()` avant curl interne |
+| Données toujours écrites en DB | ✅ `codeyear` persisté + URL 8 segments |
+| Contrôles de cohérence serveur | ✅ Post-envoi via `data_controle.php` |
+| Correction mojibake encodage | ✅ Détection et correction automatiques |
+| Cohérence offline — règles téléchargées | ✅ `data_rules.php` + `yearCode` passé |
+| Timeout robuste | ✅ `sendTimeout` 300s, `receiveTimeout` 300s |
+| Page d'identification pré-remplie | ✅ `forceOverwrite` pour tous types de campagne |
+| Envoi global établissement | ✅ Tous les formulaires d'une école en 1 clic |
+| Envoi global campagne | ✅ Tous les établissements en 1 opération |
+| Paramètres lisibles | ✅ TabBar Serveur/PIN/Sécurité contrasté |
+| Identité visuelle Burundi | ✅ Drapeau du Burundi à l'écran d'accueil |
+| Cohérence offline en temps réel | ✅ 7 déclencheurs dont debounce saisie |
+| Code documenté en français | ✅ Tous les fichiers source commentés |
 
 ---
 
-*Document de transfert de compétences — Projet StatEduc Mobile MEN — Sessions 1-18 — Juin 2026*
+*Document de transfert de compétences — Projet StatEduc Mobile MEN — Abdoul Nasser Kailou — Juillet 2026*

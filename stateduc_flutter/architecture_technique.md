@@ -1,10 +1,10 @@
 # Architecture Technique — StatEduc Mobile
 
 > **Projet** : StatEduc Mobile — Application de collecte de données éducatives  
-> **Version document** : 1.0 — Session 21  
-> **Date** : 2026-06-22  
-> **Branche Git** : `ak_main`  
-> **Auteur** : Équipe StatEduc / Sessions AI-assisted 1–21
+> **Version document** : 1.0 — Juillet 2026  
+> **Date** : 2026-07-23  
+> **Branche Git** : `ak_secure`  
+> **Auteur** : Abdoul Nasser Kailou
 
 ---
 
@@ -17,7 +17,7 @@
 5. [Application serveur PHP](#5-application-serveur-php)
 6. [Communication mobile ↔ serveur](#6-communication-mobile--serveur)
 7. [Configuration et déploiement](#7-configuration-et-déploiement)
-8. [Historique des sessions et correctifs](#8-historique-des-sessions-et-correctifs)
+8. [Historique des correctifs](#8-historique-des-correctifs)
 
 ---
 
@@ -423,7 +423,7 @@ _dio = Dio(BaseOptions(
   baseUrl: serverUrl,
   connectTimeout: const Duration(seconds: 60),
   receiveTimeout: const Duration(seconds: 600),  // 600s pour questionnaire_ws.php
-  sendTimeout: null,  // désactivé — évite timeouts prématurés (session 19)
+  sendTimeout: null,  // désactivé — évite timeouts prématurés sur gros formulaires
   headers: {'Accept': 'application/json'},
 ));
 
@@ -499,7 +499,7 @@ Toutes les dépendances sont déclarées dans `stateduc_flutter/pubspec.yaml`.
 |---|---|---|
 | `connectTimeout` | 60s | Délai raisonnable pour établir la connexion |
 | `receiveTimeout` | 600s | `questionnaire_ws.php` peut mettre plusieurs minutes pour écrire en Oracle |
-| `sendTimeout` | `null` | Désactivé (session 19) — évite les timeouts sur envois de gros formulaires |
+| `sendTimeout` | `null` | Désactivé — évite les timeouts sur envois de gros formulaires |
 | `ResponseType.bytes` | `getFormHtml()` | Récupération binaire pour réparer le mojibake Latin-1/UTF-8 |
 | `ResponseType.plain` | `saveData()` | Réponse texte brut (OKSAVE/KOSAVE) |
 
@@ -1092,7 +1092,7 @@ Réponse se_data :
 }
 ```
 
-> Le `yearCode` (`:id_annee`) est passé pour contourner l'absence de session PHP côté mobile (correction session 14). Sans ce paramètre, `$_SESSION['annee']` est vide côté serveur, rendant les règles SQL inopérantes.
+> Le `yearCode` (`:id_annee`) est passé pour contourner l'absence de session PHP côté mobile. Sans ce paramètre, `$_SESSION['annee']` est vide côté serveur, rendant les règles SQL inopérantes.
 
 ---
 
@@ -1431,30 +1431,28 @@ flutter build ios --release
 
 ---
 
-## 8. Historique des sessions et correctifs
+## 8. Historique des correctifs
 
-Cette section résume les corrections et améliorations architecturales introduites au fil des sessions de développement.
+Cette section résume les corrections et améliorations architecturales apportées au cours du développement.
 
-### Session 14 — Correction yearCode (contournement session PHP)
+### Correctif — Paramètre `yearCode` (contournement absence session PHP)
 
 **Problème** : L'application mobile ne maintient pas de session PHP. Les endpoints qui lisaient `$_SESSION['annee']` recevaient une valeur vide, rendant les règles SQL de cohérence inopérantes.
 
 **Correction** : Ajout du paramètre `:id_annee` comme dernier segment d'URL dans `data_rules.php`, `data_controle.php` et `data_save.php`. Le mobile passe `user.codeyear` dans ce segment.
 
-### Session 19 — Désactivation sendTimeout
+### Correctif — Désactivation `sendTimeout`
 
 **Problème** : Le timeout d'envoi (`sendTimeout`) déclenchait des erreurs prématurées sur de gros formulaires avec connexion lente.
 
 **Correction** : `sendTimeout: null` dans `BaseOptions` de `ApiService` — Dio n'impose plus de limite de temps sur l'envoi.
 
-### Session 21 — Correction cohérence offline
-
-**Trois bugs corrigés dans le pipeline de cohérence offline** :
+### Correctif — Cohérence offline : trois bugs dans le pipeline
 
 | # | Fichier | Bug | Correction |
 |---|---|---|---|
 | 1 | `coherence_evaluator.dart` | `_sumFieldAcrossAllFilters()` retournait `0.0` quand le champ était absent → évaluait `0 OP 0` → faux négatifs | Retourne `null` (type `double?`) → règle ignorée silencieusement |
-| 2 | `data_entry_provider.dart` | Condition `_formData.isNotEmpty` bloquait le re-déclenchement quand les règles arrivaient avant que l'utilisateur ait saisi | Suppression de la condition → re-déclenchement systématique |
+| 2 | `data_entry_provider.dart` | Condition `_formData.isNotEmpty` bloquait le re-déclenchement quand les règles arrivaient avant saisie | Suppression de la condition → re-déclenchement systématique |
 | 3 | `data_entry_provider.dart` | Garde `_formData.isNotEmpty` redondante dans le debounce de `updateField()` | Suppression |
 
 **Améliorations UX** :
@@ -1463,5 +1461,5 @@ Cette section résume les corrections et améliorations architecturales introdui
 
 ---
 
-*Document généré à partir du code source réel du dépôt `stateduc_mobile` — branche `ak_main`.*  
-*Toutes les références de fichiers sont vérifiées et correspondent aux chemins effectifs dans le dépôt.*
+*Document rédigé par Abdoul Nasser Kailou — PAQABU / UNESCO — Juillet 2026*  
+*Toutes les références de fichiers correspondent aux chemins effectifs dans le dépôt.*

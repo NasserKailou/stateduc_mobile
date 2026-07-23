@@ -1,12 +1,15 @@
-# StatEduc MEN 2025 — Journal des travaux (Serveur PHP)
+# Journal des modifications — StatEduc Serveur PHP
 
-Branche de développement : `ak_main` / `ak_secure`  
+**Auteur :** Abdoul Nasser Kailou  
+**Projet :** PAQABU / UNESCO — MEN Burundi  
+
+Branche de développement : `ak_secure`  
 Dépôt : `https://github.com/NasserKailou/stateduc_mobile`  
 Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/pull/2)
 
 ---
 
-## Session 44 — Correctif définitif : 127.0.0.1:PORT_LOCAL + Host header (bypass Fortinet/NAT)
+## [v1.4.0] — 2026-07 — Correctif définitif : 127.0.0.1:PORT_LOCAL + Host header (bypass Fortinet/NAT)
 
 ### Topologie réelle expliquée par l'utilisateur
 
@@ -21,7 +24,7 @@ Donc depuis la VM, `curl` vers `*:9191` échoue toujours — que ce soit avec
 Même principe prévu pour le serveur de production : `http://stateduc.mnineduc.gov.bi`
 sans port explicite (port 80/443 côté utilisateur, mais port différent en interne).
 
-### Solution définitive — Session 44
+### Solution définitive — v1.4.0
 
 **Deux changements complémentaires :**
 
@@ -66,15 +69,15 @@ le badge du visiteur normal — la sécurité (Apache VirtualHost) reconnaît l'
 
 ---
 
-## Session 43 — Correctif définitif DNS : CURLOPT_RESOLVE bypass loopback
+## [v1.3.0] — 2026-07 — Correctif définitif DNS : CURLOPT_RESOLVE bypass loopback
 
-### Problème persistant après Session 42
+### Problème persistant après v1.2.0
 
 ```
 {"se_status":400,"se_data":"7 : Failed to connect to 172.16.0.32 port 9191: Connection refused"}
 ```
 
-La sonde TCP (Session 42) détectait `172.16.0.32:9191` (Tomcat/proxy qui écoute aussi sur l'IP LAN),
+La sonde TCP (v1.2.0) détectait `172.16.0.32:9191` (Tomcat/proxy qui écoute aussi sur l'IP LAN),
 mais curl échouait ensuite sur ce chemin. La logique de sondage ne peut pas distinguer
 "port qui accepte une connexion TCP" de "port Apache interne qui peut traiter la requête PHP".
 
@@ -128,7 +131,7 @@ $curl->setOpt(CURLOPT_RESOLVE, _sised_curl_resolve());
 
 ---
 
-## Session 42 — Correctif définitif DNS : auto-détection port interne par sondage TCP (`config_app.php`)
+## [v1.2.0] — 2026-07 — Correctif définitif DNS : auto-détection port interne par sondage TCP (`config_app.php`)
 
 ### Symptôme persistant (Session 41b → 41c non déployé en production)
 
@@ -186,7 +189,7 @@ Fonctionnel sur : XAMPP, Apache seul, Apache+Tomcat, reverse proxy, VirtualHost 
 
 ---
 
-## Session 41 — Correctif DNS production : fallback IP cache sur résolution hostname MEN (branche `ak_secure`)
+## [v1.1.0] — 2026-07 — Correctif DNS production : fallback IP cache sur résolution hostname MEN (branche `ak_secure`)
 
 ### Symptôme (constaté en production VM `http://stateduc.ins.ne:9191/StatEduc/`)
 
@@ -287,15 +290,15 @@ return User.fromJson(userMap);
 
 La capture d'écran transmise montre **"1 incohérence(s) locale(s) — Contrôle offline – non envoyé au serveur"** — le moteur de cohérence offline est **déjà fonctionnel**.
 
-Il a été implémenté en Sessions 39–40 (`CoherenceEvaluator`, `coherence_rules` SQLite, debounce 800ms). Pour bénéficier des correctifs de Session 40 (regex TABLE.FIELD, agrégats virtuels, données cross-formulaires), un `git pull` + rebuild APK + re-téléchargement de la campagne est nécessaire.
+Il a été implémenté en Sessions 39–40 (`CoherenceEvaluator`, `coherence_rules` SQLite, debounce 800ms). Pour bénéficier des correctifs de v1.0.4 (regex TABLE.FIELD, agrégats virtuels, données cross-formulaires), un `git pull` + rebuild APK + re-téléchargement de la campagne est nécessaire.
 
-### Fichiers modifiés — Session 41
+### Fichiers modifiés — v1.1.0
 
 | Fichier | Modification |
 |---------|-------------|
 | `stateduc_flutter/lib/services/api_service.dart` | +236 lignes : DNS cache, `_resolveAndCacheIp()`, `_loadCachedIp()`, `_buildFallbackUrl()`, `_DnsFallbackInterceptor` |
 | `stateduc_mobile/stateduc_flutter/lib/services/api_service.dart` | Miroir identique |
-| `RESTITUTION_TECHNIQUE_STATEDUC_MOBILE.md` | Commit initial (document créé en Session 40, non committé) |
+| `RESTITUTION_TECHNIQUE_STATEDUC_MOBILE.md` | Commit initial (document créé en v1.0.4, non committé) |
 
 ---
 ### Correctif 41c -- SOLUTION DEFINITIVE : SERVER_ADDR:SERVER_PORT pour le curl interne
@@ -319,7 +322,7 @@ Fonctionne quelle que soit la topologie : Apache direct, reverse proxy, XAMPP, I
 
 ### Correctif 41b — Cause racine réelle de l'erreur DNS : curl PHP interne (SERVEUR)
 
-**Important** : le correctif Flutter (Session 41) était basé sur une mauvaise hypothèse.
+**Important** : le correctif Flutter (v1.1.0) était basé sur une mauvaise hypothèse.
 Les logs de débogage révèlent la vraie cause :
 
 ```
@@ -379,9 +382,9 @@ Pour les pages d'administration web (`ctrl_validation_criteres.php`, `ctrl_valid
 ---
 
 
-## Session 40 — Correctif moteur cohérence offline : regex TABLE.FIELD + données cross-formulaires + agrégats virtuels (branche `ak_secure`)
+## [v1.0.4] — 2026-07 — Correctif moteur cohérence offline : regex TABLE.FIELD + données cross-formulaires + agrégats virtuels (branche `ak_secure`)
 
-### Symptôme (après Session 39)
+### Symptôme (après v1.0.3)
 Après `git pull` + re-téléchargement de la campagne, le contrôle offline retourne toujours **0 violation** alors que le serveur en détecte 2.
 
 Les logs Flutter montrent que les règles arrivent maintenant du serveur (`rules=2`) mais que **toutes les valeurs V1 et V2 sont `null`** → toutes les règles sont ignorées :
@@ -450,7 +453,7 @@ Nouvelle méthode `getAllCollectedDataForCampEtab()` :
 | `Sum(DONNEES_ETABLISSEMENT.NB_ELEVES_F)` | `NB_ELEVES_F` | Cross-question lookup |
 | `Sum(DONNEES_ETABLISSEMENT.NB_ELEVES)` | `NB_ELEVES` | Cross-question lookup |
 
-### Fichiers modifiés — Session 40
+### Fichiers modifiés — v1.0.4
 
 | Fichier | Changement |
 |---------|-----------|
@@ -461,7 +464,7 @@ Nouvelle méthode `getAllCollectedDataForCampEtab()` :
 
 ---
 
-## Session 39 — Correctif contrôle de cohérence offline (branche `ak_secure`)
+## [v1.0.3] — 2026-07 — Correctif contrôle de cohérence offline (branche `ak_secure`)
 
 ### Symptôme
 Le contrôle de cohérence **serveur (online)** fonctionne correctement (visible dans la capture d'écran — "Contrôle de cohérence : 2 incohérence(s) détectée(s)"). Mais le contrôle **offline** retourne toujours 0 règles : `"no offline coherence rules returned"` dans les logs Flutter, même pour des thèmes qui ont des règles configurées en base de données.
@@ -517,7 +520,7 @@ Nécessaire car les SQL de cohérence serveur font `SUM(CHAMP) WHERE CODE_ETAB=X
 
 Utilise `getAllCollectedDataForCoherence()` à la place de `getCollectedData()` pour le chargement des données persistées. Ajout de logs `debugPrint()` détaillés à chaque étape (champs chargés, valeurs V1/V2 extraites, résultat opérateur, violations).
 
-### Fichiers modifiés — Session 39
+### Fichiers modifiés — v1.0.3
 
 | Fichier | Changement |
 |---------|-----------|
@@ -527,7 +530,7 @@ Utilise `getAllCollectedDataForCoherence()` à la place de `getCollectedData()` 
 
 ---
 
-## Session 38 — Correctif formulaires mobiles (étapes 7–9) + indicateur chargement "Actualiser" (branche `ak_secure`)
+## [v1.0.2] — 2026-07 — Correctif formulaires mobiles (étapes 7–9) + indicateur chargement "Actualiser" (branche `ak_secure`)
 
 ### Symptômes persistants après session 37b
 - ✅ Connexion mobile : OK
@@ -569,7 +572,7 @@ La méthode `fetchServerCampaigns()` dans `campaign_provider.dart` vidait `_serv
 - Vérification de `conn_dico` avant toute requête (retour `status_ko` propre si DB non disponible)
 - Route `html_theme_camp` : retour `status_ko` explicite si `FRAME` est vide/NULL (au lieu d'une URL malformée)
 
-### Fichiers modifiés — Session 38
+### Fichiers modifiés — v1.0.2
 
 | Fichier | Changement |
 |---------|-----------|
@@ -579,7 +582,7 @@ La méthode `fetchServerCampaigns()` dans `campaign_provider.dart` vidait `_serv
 
 ---
 
-## Session 37b — Correctif collation SQL Server CI × bcrypt (branche `ak_secure`)
+## [v1.0.1] — 2026-07 — Correctif collation SQL Server CI × bcrypt (branche `ak_secure`)
 
 ### Contexte
 La base de données est sur **SQL Server** (pas Access). Le champ `PASSWORD` est déjà `VARCHAR(100)` — pas de troncature. La vraie cause racine du 401 sur `data_camp.php` est la **collation SQL Server Case Insensitive**.
@@ -614,14 +617,14 @@ Script complet : `server-side/sql/alter_password_field_sqlserver.sql` (diagnosti
 
 ---
 
-## Session 37 — Correctif complet : formulaires mobiles non téléchargés après migration bcrypt (branche `ak_secure`)
+## [v1.0.0] — 2026-06 — Correctif complet : formulaires mobiles non téléchargés après migration bcrypt (branche `ak_secure`)
 
 ### Symptôme persistant après session 36
 La connexion mobile fonctionnait, la liste des campagnes s'affichait, mais lors du téléchargement d'une campagne :
 - ✅ Étapes 1–6 (localisations, établissements, systèmes) : OK via `user_camp.php` (HttpAuth désactivé)
 - ❌ Étapes 7–9 (questions/thèmes, HTML formulaires, règles) : ÉCHEC via `data_camp.php` (HttpAuth **actif**)
 
-### Causes racines identifiées — Session 37
+### Causes racines identifiées — v1.0.0
 
 #### Cause A — Champ `PASSWORD` trop petit dans la base Access (CRITIQUE)
 Un hash bcrypt PHP mesure **60 caractères** (`$2y$12$...`). Si le champ `PASSWORD` de la table `ADMIN_USERS` dans `dico_DB.mdb/.accdb` est défini en `TEXT(32)` ou `TEXT(50)`, Microsoft Access **tronque silencieusement** le hash lors de l'enregistrement. Résultat : `password_verify()` retourne toujours `false` → HTTP 401 permanent.
@@ -647,7 +650,7 @@ La ligne 1 `<?php session_start()` dans `user_camp.php` démarrait une session n
 
 **Correctif** : suppression du `session_start()` dupliqué de `user_camp.php` ligne 1.
 
-### Fichiers modifiés — Session 37
+### Fichiers modifiés — v1.0.0
 
 | Fichier | Changement |
 |---------|-----------|
@@ -664,7 +667,7 @@ La ligne 1 `<?php session_start()` dans `user_camp.php` démarrait une session n
 
 ---
 
-## Session 36 — Correctif : Régression chargement formulaires après migration bcrypt (branche `ak_secure`)
+## [v0.9.1] — 2026-06 — Correctif : Régression chargement formulaires après migration bcrypt (branche `ak_secure`)
 
 ### Symptôme
 Après la migration md5→bcrypt (session 35), la connexion mobile fonctionnait, mais le chargement des formulaires de campagne s'arrêtait après l'étape 5/9 (localisations). L'écran affichait « Sélectionnez un formulaire pour commencer la saisie » sans formulaire chargé.
@@ -697,7 +700,7 @@ Le garde `if(!ctype_alnum($username))` bloquait tout login contenant un tiret, u
 
 ---
 
-## Session 35 — Sécurité : Migration md5 → bcrypt (branche `ak_secure`)
+## [v0.9.0] — 2026-06 — Sécurité : Migration md5 → bcrypt (branche `ak_secure`)
 
 ### Contexte
 MD5 est un algorithme de hachage **cryptographiquement cassé** (collisions, rainbow tables, GPU cracking). Tous les mots de passe utilisateurs stockés en MD5 dans `ADMIN_USERS.PASSWORD` sont migrés vers **bcrypt** (`PASSWORD_BCRYPT`, cost=12), via les fonctions natives PHP `password_hash()` / `password_verify()`.

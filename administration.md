@@ -1,6 +1,6 @@
 # Guide d'administration — StatEduc Mobile
 ## Application mobile de collecte de données éducatives — MEN Burundi
-**Version : Session 20 — Juin 2026**
+**Version : 1.0 — Juillet 2026**
 **Public cible : Administrateurs, superviseurs de collecte, agents techniques MEN**
 
 ---
@@ -755,5 +755,5 @@ Depuis l'écran campagne (liste des établissements) :
 
 ---
 
-*Guide d'administration StatEduc Mobile — MEN Burundi — Sessions 1-20 — Juin 2026*
+*Guide d'administration StatEduc Mobile — MEN Burundi — v1.0 — Juillet 2026*
 *Document à utiliser comme support de formation pour les administrateurs et superviseurs de collecte.*

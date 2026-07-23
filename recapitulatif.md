@@ -1,9 +1,9 @@
 # Récapitulatif Technique — StatEduc Mobile MEN
 **Projet :** Application mobile de collecte statistique pour le Ministère de l'Éducation Nationale du Burundi
 **Dépôt :** https://github.com/NasserKailou/stateduc_mobile
-**Branche principale :** `ak_main`
-**Date :** Juin 2026
-**Dernière session :** Session 20 — en-tête institutionnel + administration.md + docs mis à jour
+**Branche principale :** `ak_secure`
+**Date :** Juillet 2026
+**Auteur :** Abdoul Nasser Kailou
 
 ---
 
@@ -50,24 +50,24 @@ StatEduc Mobile est une application Flutter qui permet aux agents de collecte du
 ### Fichiers Flutter/Dart (mobile)
 | Fichier | Dernière modif. | Description |
 |---------|-----------------|-------------|
-| `stateduc_flutter/lib/services/api_service.dart` | **Session 19** | Service HTTP central — `sendTimeout=null`, `receiveTimeout=600s`, `_withRetry<T>()` + `onRetry` callback |
-| `stateduc_flutter/lib/services/coherence_evaluator.dart` | Session 15 | Moteur évaluation cohérence offline |
-| `stateduc_flutter/lib/services/database_service.dart` | Session 17 | Service SQLite — 13 tables + `getDistinctEtabQstWithData()` |
-| `stateduc_flutter/lib/providers/data_entry_provider.dart` | **Session 19** | Provider saisie — debounce cohérence offline, `kMaxSendAttempts=3`, `_sendAttempt`, `finally` reset |
-| `stateduc_flutter/lib/providers/campaign_provider.dart` | Session 16 | Provider gestion campagnes |
-| `stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart` | Session 16 | Widget WebView formulaires HTML |
-| `stateduc_flutter/lib/screens/login/pin_screen.dart` | **Session 20** | En-tête institutionnel ("République du Burundi" + "Ministère de l'Éducation Nationale") en italique avant le drapeau |
-| `stateduc_flutter/lib/screens/schools/campaign_detail_screen.dart` | Session 17 | Écran navigation établissements — bouton envoi global campagne |
-| `stateduc_flutter/lib/screens/data_entry/school_data_screen.dart` | **Session 19** | `LinearProgressIndicator` pendant `isCheckingOffline` ; overlay "Envoi… (tentative N/3)" |
-| `stateduc_flutter/lib/screens/settings/settings_screen.dart` | Session 17 | Paramètres — TabBar contrasté |
+| `stateduc_flutter/lib/services/api_service.dart` | Juillet 2026 | Service HTTP central — `sendTimeout=null`, `receiveTimeout=600s`, `_withRetry<T>()` + `onRetry` callback |
+| `stateduc_flutter/lib/services/coherence_evaluator.dart` | Juillet 2026 | Moteur évaluation cohérence offline |
+| `stateduc_flutter/lib/services/database_service.dart` | Juillet 2026 | Service SQLite — 13 tables + `getDistinctEtabQstWithData()` |
+| `stateduc_flutter/lib/providers/data_entry_provider.dart` | Juillet 2026 | Provider saisie — debounce cohérence offline, `kMaxSendAttempts=3`, `_sendAttempt`, `finally` reset |
+| `stateduc_flutter/lib/providers/campaign_provider.dart` | Juillet 2026 | Provider gestion campagnes |
+| `stateduc_flutter/lib/widgets/dynamic_form/dynamic_form_widget.dart` | Juillet 2026 | Widget WebView formulaires HTML |
+| `stateduc_flutter/lib/screens/login/pin_screen.dart` | Juillet 2026 | En-tête institutionnel ("République du Burundi" + "Ministère de l'Éducation Nationale") en italique avant le drapeau |
+| `stateduc_flutter/lib/screens/schools/campaign_detail_screen.dart` | Juillet 2026 | Écran navigation établissements — bouton envoi global campagne |
+| `stateduc_flutter/lib/screens/data_entry/school_data_screen.dart` | Juillet 2026 | `LinearProgressIndicator` pendant `isCheckingOffline` ; overlay "Envoi… (tentative N/3)" |
+| `stateduc_flutter/lib/screens/settings/settings_screen.dart` | Juillet 2026 | Paramètres — TabBar contrasté |
 
 ### Documents
 | Fichier | Dernière modif. | Description |
 |---------|-----------------|-------------|
-| `administration.md` | **Session 20** | Guide complet administrateur A→Z (nouveau) |
-| `notepresentation.md` | Session 18 | Note transfert de compétences (bénéficiaires) |
-| `recapitulatif.md` | **Session 20** | Architecture, correctifs, guide développeur (ce fichier) |
-| `stateduc_flutter/CHANGELOG.md` | **Session 20** | Historique détaillé des modifications Flutter |
+| `administration.md` | Juillet 2026 | Guide complet administrateur A→Z |
+| `notepresentation.md` | Juillet 2026 | Note transfert de compétences (bénéficiaires) |
+| `recapitulatif.md` | Juillet 2026 | Architecture, correctifs, guide développeur (ce fichier) |
+| `stateduc_flutter/CHANGELOG.md` | Juillet 2026 | Historique détaillé des modifications Flutter |
 
 ---
 
@@ -92,7 +92,7 @@ DataEntryProvider.sendAllFormsForCampaign()  — envoi global tous établissemen
     │  2. Récupération yearCode : URL (mobile) > $_SESSION['annee'] > PARAM_DEFAUT
     │  3. session_write_close()  ← ANTI-DEADLOCK (libère le verrou session Apache)
     │  4. CURL interne POST → questionnaire_ws.php
-    │     CURLOPT_TIMEOUT = 120s (augmenté session 14, était 60s)
+    │     CURLOPT_TIMEOUT = 120s (augmenté, était 60s)
     │
     ▼ questionnaire_ws.php
     │  1. Chargement du thème PHP (include fichier thème)
@@ -188,11 +188,11 @@ Map<String,double> values = {
 // critere = "<="  →  violated = !(90.0 <= 85.0) = true   → VIOLATION
 ```
 
-### 4.4 Fix sessions 17-18 — déclenchement cohérence offline
+### Correctifs déclenchement cohérence offline
 
-**Session 17** : deux déclenchements ajoutés (règles arrivées + ouverture formulaire).
+**Amélioration 1** : deux déclenchements ajoutés (règles arrivées + ouverture formulaire).
 
-**Session 18** : audit révèle que les contrôles restaient absents pendant la saisie active.
+**Amélioration 2** : audit révèle que les contrôles restaient absents pendant la saisie active.
 Quatre déclenchements supplémentaires ajoutés :
 
 ```dart
@@ -460,11 +460,11 @@ dependencies:
 |---------|-------|---------|
 | `administration.md` | Guide complet A→Z : installation, PIN, campagne, saisie, envoi, dépannage | Administrateurs, superviseurs collecte |
 | `notepresentation.md` | Support de transfert de compétences, présentation bénéficiaires | Formateurs, bénéficiaires MEN |
-| `recapitulatif.md` | Architecture technique, correctifs par session, guide développeur | Développeurs, mainteneurs |
-| `stateduc_flutter/CHANGELOG.md` | Historique complet des modifications Flutter session par session | Développeurs |
+| `recapitulatif.md` | Architecture technique, correctifs, guide développeur | Développeurs, mainteneurs |
+| `stateduc_flutter/CHANGELOG.md` | Historique complet des modifications Flutter | Développeurs |
 | `StatEduc_MEN_2025/CHANGELOG.md` | Historique des modifications PHP serveur | Développeurs PHP |
-| PR #1 GitHub | Suivi des changements par session avec commentaires | Équipe projet |
+| PR #2 GitHub | Suivi des changements avec commentaires | Équipe projet |
 
 ---
 
-*Document mis à jour — Projet StatEduc Mobile MEN Burundi — Sessions 1-20 — Juin 2026*
+*Document rédigé par Abdoul Nasser Kailou — Projet StatEduc Mobile MEN Burundi — Juillet 2026*

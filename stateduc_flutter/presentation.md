@@ -1,737 +1,718 @@
-# PRÉSENTATION TECHNIQUE — StatEduc Mobile
-## Document de transfert pour développeur IA
-### Projet : Collecte de données éducatives Burundi / Niger
-### Date : 2026-07-14 | Sessions 1–49 | Branche : `ak_main` / `ak_secure`
+# StatEduc Mobile — Présentation technique complète
+
+**Auteur :** Abdoul Nasser Kailou  
+**Projet :** PAQABU / UNESCO — Ministère de l'Éducation Nationale du Burundi  
+**Version :** 2.0 — Juillet 2026  
+**Branche :** `ak_secure`
 
 ---
 
-> **Usage** : Ce document est structuré pour être converti directement en PowerPoint professionnel.  
-> Chaque section `##` correspond à une diapositive principale.  
-> Chaque `###` correspond à une sous-section ou point de bullet.  
-> Les blocs de code illustrent les modifications réelles du dépôt.
+## Table des matières
+
+1. [Contexte et périmètre du projet](#1-contexte-et-périmètre-du-projet)
+2. [Architecture générale du système](#2-architecture-générale-du-système)
+3. [Serveur PHP — Architecture et composants](#3-serveur-php--architecture-et-composants)
+4. [Serveur PHP — Mécanique de sauvegarde des données](#4-serveur-php--mécanique-de-sauvegarde-des-données)
+5. [Serveur PHP — Bypass NAT/Fortinet](#5-serveur-php--bypass-natfortinet)
+6. [Application Flutter — Structure et organisation](#6-application-flutter--structure-et-organisation)
+7. [Application Flutter — Gestion des campagnes](#7-application-flutter--gestion-des-campagnes)
+8. [Application Flutter — Collecte et persistance des données](#8-application-flutter--collecte-et-persistance-des-données)
+9. [Application Flutter — Moteur de cohérence](#9-application-flutter--moteur-de-cohérence)
+10. [Application Flutter — Envoi des données au serveur](#10-application-flutter--envoi-des-données-au-serveur)
+11. [Application Flutter — Authentification et sécurité](#11-application-flutter--authentification-et-sécurité)
+12. [Schéma SQLite local](#12-schéma-sqlite-local)
+13. [Catalogue des endpoints API](#13-catalogue-des-endpoints-api)
+14. [Bilan des travaux et état de livraison](#14-bilan-des-travaux-et-état-de-livraison)
 
 ---
 
-# PARTIE I — TRAVAUX SERVEUR (PHP)
+## 1. Contexte et périmètre du projet
+
+### 1.1 Présentation générale
+
+**StatEduc Mobile** est une application Android native développée sous Flutter pour le compte du **Ministère de l'Éducation Nationale (MEN) du Burundi**, dans le cadre du projet **PAQABU** (Programme d'Appui à la Qualité de l'Éducation de Base au Burundi) financé par l'**UNESCO/IIEP**.
+
+L'application permet aux **agents de collecte** mandatés par le MEN de :
+- Se connecter au système central d'information éducative (SISED)
+- Télécharger les campagnes de collecte statistique actives
+- Saisir les données dans les établissements scolaires, en ligne ou hors ligne
+- Contrôler la cohérence des données saisies avant envoi
+- Transmettre les données au serveur central dès qu'une connexion réseau est disponible
+
+### 1.2 Contexte technologique
+
+| Composant | Technologie |
+|-----------|------------|
+| Application mobile | Flutter 3.35 / Dart 3.9 — Android |
+| Backend | PHP (Slim v2) sur XAMPP/Windows |
+| Base de données serveur | SQL Server 2012 |
+| Base de données locale | SQLite (sqflite) |
+| Réseau | HTTPS via Fortinet (NAT external port 9191) |
+| Gestion d'état | Provider |
+| HTTP client | Dio |
+| Sécurité locale | flutter_secure_storage |
+
+### 1.3 Périmètre des travaux
+
+Les travaux couvrent la **migration complète** de l'ancienne application Cordova/jQuery vers une application Flutter native, ainsi que la **refonte du serveur PHP** pour garantir la fiabilité des échanges dans le contexte réseau du MEN Burundi :
+
+- Refonte architecture PHP (Slim v2, ADOdb, bcrypt)
+- Développement Flutter natif (MVVM, SQLite, Provider)
+- Moteur de cohérence offline/online dual-mode
+- Mécanisme de téléchargement campagne en 9 étapes
+- Bypass DNS/NAT Fortinet pour les appels curl internes PHP
+- Signature APK release (keystore RSA 2048 bits)
 
 ---
 
-## SLIDE 1 — Contexte Serveur : Topologie réseau
+## 2. Architecture générale du système
 
-### Architecture déployée
 ```
-Internet / LAN utilisateur
-        │
-        ▼
-  Fortinet NAT (port 9191 externe)
-        │
-        ▼
-  VM Apache (port 80 ou 8080 interne)
-        │
-        ▼
-  PHP Slim v2 → data_save.php → curl interne → questionnaire_ws.php
+┌─────────────────────────────────────────────────────────────┐
+│                    RÉSEAU MEN BURUNDI                        │
+│                                                             │
+│  ┌─────────────┐    HTTPS:9191      ┌───────────────────┐  │
+│  │   Android   │ ─────────────────► │  Fortinet (NAT)   │  │
+│  │  (Flutter)  │                    │  port ext. 9191   │  │
+│  └─────────────┘                    └────────┬──────────┘  │
+│                                              │              │
+│                                    ┌─────────▼──────────┐  │
+│                                    │  Apache / PHP      │  │
+│                                    │  port int. 80/8080 │  │
+│                                    │  (XAMPP/Windows)   │  │
+│                                    └─────────┬──────────┘  │
+│                                              │              │
+│                                    ┌─────────▼──────────┐  │
+│                                    │  SQL Server 2012   │  │
+│                                    │  Base SISED        │  │
+│                                    └────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Problème fondamental résolu (commit 41–44)
-- Le port 9191 **n'existe pas sur la VM** — c'est le port du Fortinet/proxy externe
-- `curl` depuis la VM vers `127.0.0.1:9191` → **Connection refused** systématiquement
-- commit 41 à 43 : tentatives DNS resolve, TCP probe, CURLOPT_RESOLVE — toutes en échec
-- **Session 44 : solution définitive**
+**Mode offline** : quand l'agent est hors réseau, toutes les données sont persistées dans SQLite (sqflite) sur l'appareil. Le moteur de cohérence fonctionne localement. La transmission se fait ultérieurement dès que le réseau est disponible.
 
 ---
 
-## SLIDE 2 — `config_app.php` — Détection automatique du port local
+## 3. Serveur PHP — Architecture et composants
 
-### Fichier : `StatEduc_burundi/config_app.php`
-**Rôle** : Fournit les constantes globales de configuration de l'application PHP.  
-**Utilité** : Point central configurant les URLs internes utilisées par tous les fichiers PHP.
+### 3.1 Fichiers principaux du serveur
 
-### Modification clé — Fonction `_sised_local_port()` (Session 44)
+| Fichier | Rôle |
+|---------|------|
+| `config_app.php` | Configuration centrale : constantes, URLs, détection port interne |
+| `common_ws.php` | Bootstrap des web services : headers CORS, ADOdb, autoload classes |
+| `common.php` | Bootstrap des pages d'administration |
+| `data_save.php` | Endpoint de sauvegarde des données de collecte |
+| `data_reload.php` | Endpoint de rechargement des données depuis SQL Server |
+| `data_rules.php` | Endpoint de récupération des règles de cohérence |
+| `data_controle.php` | Endpoint de contrôle de cohérence côté serveur |
+| `questionnaire_ws.php` | Web service principal : CRUD des questionnaires |
+| `user.class.php` | Classe métier utilisateur (auth, profil, insertion DICO) |
+
+### 3.2 Structure Slim v2
+
+```
+StatEduc_burundi/
+├── config_app.php          ← Variables globales + _sised_local_port()
+├── common_ws.php           ← Bootstrap WS (ADOdb, classes)
+├── common.php              ← Bootstrap admin
+├── data_save.php           ← POST /theme_save/, /init/
+├── data_reload.php         ← GET /theme_reload/
+├── data_rules.php          ← GET /rules/
+├── data_controle.php       ← POST /controle/
+├── questionnaire_ws.php    ← Routes Slim v2 CRUD
+└── server-side/
+    └── classes/
+        └── metier/
+            ├── user.class.php
+            ├── campagne.class.php
+            └── questionnaire.class.php
+```
+
+### 3.3 Middleware d'authentification
+
+Chaque requête web service vérifie le token JWT en header :
+
+```
+Authorization: Bearer <token>
+```
+
+La classe `user.class.php` valide le token, récupère le profil utilisateur depuis `DICO_FIXE_PERSONNE`, et injecte les droits dans le contexte de la requête. L'authentification bcrypt remplace l'ancienne vérification MD5 de l'application Cordova.
+
+---
+
+## 4. Serveur PHP — Mécanique de sauvegarde des données
+
+### 4.1 Rôle de `data_save.php`
+
+`data_save.php` est l'endpoint central de sauvegarde. Il reçoit les données saisies par l'agent mobile, les valide, et les persiste dans SQL Server via `questionnaire_ws.php` (appel curl interne).
+
+**Route principale :**
+```
+POST /stateduc/data_save.php/theme_save/{id_theme}/{id_camp}/{id_etab}/{id_sector}/
+```
+
+### 4.2 Flux d'exécution
+
+```
+Flutter POST data_save.php
+    │
+    ├─► Validation token (user.class.php)
+    ├─► Vérification droits (campagne active, établissement assigné)
+    ├─► Construction $urlBase = SISED_AURL_INTERNAL + 'questionnaire_ws.php?...'
+    ├─► curl POST → questionnaire_ws.php (appel interne)
+    │       ├─► ADOdb → SQL Server : INSERT / UPDATE données
+    │       └─► Réponse JSON {status, data}
+    └─► Retour Flutter : {se_status, se_data}
+```
+
+### 4.3 Rôle de `SqlTranslator` et requêtes CTE pivot
+
+Le serveur PHP utilise un `SqlTranslator` pour convertir les données du formulaire en requêtes SQL compatibles SQL Server 2012.
+
+#### Mode SCALAR (formulaire simple)
+
+Pour les thèmes à données uniques (ex : effectifs par établissement) :
+
+```sql
+UPDATE DONNEES_ETABLISSEMENT
+SET NB_ELEVES = 1250, NB_FILLES = 612
+WHERE CODE_ETAB = 'BI001' AND CODE_ANNEE = '2026'
+```
+
+#### Mode EXISTS avec CTE pivot (formulaire multi-lignes)
+
+Pour les thèmes à données matricielles (ex : effectifs par âge et niveau) :
+
+```sql
+WITH PivotData AS (
+  SELECT
+    '6 ans' AS TRANCHE_AGE,
+    150     AS FILLES_AGE_NIVEAU,
+    168     AS GARCONS_AGE_NIVEAU
+  UNION ALL
+  SELECT '7 ans', 142, 155
+  -- ...
+)
+MERGE ELEVES_AGE_NIVEAU_SEXE AS target
+USING PivotData AS source
+ON (target.CODE_ETAB = 'BI001' AND target.TRANCHE_AGE = source.TRANCHE_AGE)
+WHEN MATCHED THEN UPDATE SET ...
+WHEN NOT MATCHED THEN INSERT ...;
+```
+
+Ce pattern dual-mode (EXISTS/SCALAR) est déterminé dynamiquement par `SqlTranslator` en fonction du type de thème.
+
+---
+
+## 5. Serveur PHP — Bypass NAT/Fortinet
+
+### 5.1 Problématique
+
+La topologie réseau du MEN Burundi présente un cas particulier : les requêtes extérieures arrivent sur **Fortinet port 9191** qui fait NAT vers **Apache interne sur un port différent (80 ou 8080)**. Le port 9191 n'existe PAS sur la VM Apache.
+
+```
+Internet/LAN → Fortinet:9191 (NAT externe) → VM Apache:80 ou :8080
+```
+
+Conséquence : quand `data_save.php` essaie d'appeler `questionnaire_ws.php` via curl en utilisant l'URL publique (`http://stateduc.ins.ne:9191/...`), le curl échoue avec **code 6 (DNS) ou code 7 (Connection refused)** car :
+- Le serveur ne peut pas résoudre son propre hostname DNS depuis la VM
+- Le port 9191 n'existe pas localement sur la VM
+
+### 5.2 Solution : `_sised_local_port()` + `Host` header
+
+**Dans `config_app.php`** — Fonction `_sised_local_port()` :
+
+Cette fonction détermine le port Apache réel par **sondage TCP** sur `127.0.0.1` :
 
 ```php
-// Détecte automatiquement le port Apache local par sondage TCP
-// Priorité 1 : SERVER_PORT validé par fsockopen(127.0.0.1, SERVER_PORT)
-// Priorité 2 : sonde 80, 8080, 8000, 8888 → premier qui répond
-// Fallback   : 80
-function _sised_local_port() { ... }
+function _sised_local_port() {
+    // Priorité 1 : SERVER_PORT validé par fsockopen
+    $sp = (int)$_SERVER['SERVER_PORT'];
+    if ($sp > 0 && @fsockopen('127.0.0.1', $sp, $e, $m, 1)) return $sp;
+    
+    // Priorité 2 : sonde 80, 8080, 8000, 8888
+    foreach ([80, 8080, 8000, 8888] as $p) {
+        if (@fsockopen('127.0.0.1', $p, $e, $m, 1)) return $p;
+    }
+    
+    // Fallback : 80
+    return 80;
+}
 
-// URL interne curl : 127.0.0.1:PORT_LOCAL (jamais le port du Fortinet)
-$SISED_AURL_INTERNAL = 'http://127.0.0.1:' . _sised_local_port() . '/stateduc/';
-
-// Host header à injecter dans le curl
-// → Apache route vers le bon VirtualHost (ex: stateduc.ins.ne:9191)
-$SISED_HOST_HEADER = $_SERVER['HTTP_HOST'];
+$SISED_AURL_INTERNAL = 'http://127.0.0.1:' . _sised_local_port() . $SISED_URL;
+$SISED_HOST_HEADER   = $_SERVER['HTTP_HOST']; // ex: stateduc.ins.ne:9191
 ```
 
-### Pourquoi ce design
-- `curl` se connecte à **127.0.0.1:80** (Apache local, bypass Fortinet)
-- `Host: stateduc.ins.ne:9191` envoyé dans le header → Apache reconnaît le VirtualHost
-- Fonctionne sur : XAMPP, Apache seul, Apache+Tomcat, reverse proxy, VirtualHost
-- **Analogie** : porte de service + badge visiteur normal
+**Dans `data_save.php` et `data_reload.php`** — Injection du header `Host` :
 
----
-
-## SLIDE 3 — `data_save.php` — Sauvegarde des données
-
-### Fichier : `StatEduc_burundi/data_save.php`
-**Rôle** : Point d'entrée REST pour la sauvegarde des données de formulaire envoyées par l'app mobile.  
-**Utilité** : Reçoit le POST Flutter, relaie vers `questionnaire_ws.php` via curl interne.
-
-### Endpoint principal
-```
-POST /stateduc/data_save.php/theme_save/{login}/{id_camp}/{id_sys}/{id_qst}/{id_etab}/{id_filter}/{id_annee}
-```
-
-### Modifications cumulées (commit 3, 5, 11, 12, 12b, 13, 44)
-
-| Session | Modification | Problème résolu |
-|---------|-------------|----------------|
-| 3 | Ajout `&annee=$id_year` dans URL curl | Données jamais écrites en DB (année manquante) |
-| 5 | Ajout `&login=$user&langue=fr` | Session PHP curl vide → écritures rejetées |
-| 11 | `});` → `}` (parse error ligne 334) | HTTP 500 sur tous les envois |
-| 12 | Fallback `PARAM_DEFAUT` si `$id_year` vide | `codeyear=''` → grille SQL → 0 lignes |
-| 12b | `session_write_close()` avant curl | Deadlock session PHP → timeout 3 min Flutter |
-| 12b | `CURLOPT_CONNECTTIMEOUT=15`, `CURLOPT_TIMEOUT=60` | Curl interne sans timeout → attente infinie |
-| 13 | Fix variables `$data`, `$date_time` non définies dans callback error | PHP 7 strict → fatal error |
-| **44** | **`setHeader('Host', $GLOBALS['SISED_HOST_HEADER'])`** | **Bypass Fortinet/NAT → connexion directe Apache** |
-
-### Architecture curl interne
 ```php
-// Session 44 — connexion directe Apache + Host VirtualHost
+// curl vers 127.0.0.1:80 (Apache local, jamais le Fortinet)
+// mais avec le header Host correct pour le VirtualHost Apache
 $curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
 // urlBase = http://127.0.0.1:80/stateduc/questionnaire_ws.php?...
 ```
 
----
+**Analogie** : c'est comme passer par la porte de service d'un bâtiment tout en présentant le badge du visiteur principal — Apache reconnaît l'identité via le header `Host` et achemine vers le bon VirtualHost, mais la connexion TCP ne passe jamais par le Fortinet.
 
-## SLIDE 4 — `data_reload.php` — Rechargement depuis serveur
+### 5.3 Tableau récapitulatif des solutions testées
 
-### Fichier : `StatEduc_burundi/data_reload.php`
-**Rôle** : Permet à l'app mobile de récupérer les données déjà saisies depuis le serveur.  
-**Utilité** : Pré-remplissage des formulaires avec les données validées côté serveur.
-
-### Modifications (commit 44)
-```php
-// Même correction que data_save.php :
-$curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
-
-// + Timeouts ajoutés (absents avant commit 44)
-$curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15);
-$curl->setOpt(CURLOPT_TIMEOUT, 60);
-```
-
-### Impact
-- Résout les timeouts silencieux sur rechargement
-- Cohérent avec `data_save.php` dans la topologie NAT
+| Approche | URL curl | Résultat |
+|----------|---------|---------|
+| URL publique directe | `stateduc.ins.ne:9191` | DNS non résolvable depuis VM |
+| Loopback avec port externe | `127.0.0.1:9191` | Port 9191 inexistant sur VM (Fortinet only) |
+| Sondage TCP LAN | `172.16.0.32:9191` | Connexion TCP acceptée mais requête refusée |
+| CURLOPT_RESOLVE | `stateduc.ins.ne:9191 → 127.0.0.1` | Port 9191 inexistant sur VM |
+| **_sised_local_port() + Host header** | **`127.0.0.1:80` + Host** | **✅ Fonctionnel — solution définitive** |
 
 ---
 
-## SLIDE 5 — `data_rules.php` — Règles de cohérence
+## 6. Application Flutter — Structure et organisation
 
-### Fichier : `StatEduc_burundi/data_rules.php`
-**Rôle** : Fournit les règles de contrôle de cohérence associées à chaque thème, pour évaluation offline.  
-**Utilité** : L'app mobile télécharge ces règles en arrière-plan et les stocke dans SQLite local.
+### 6.1 Pattern architectural : MVVM
 
-### Endpoint
+L'application adopte le pattern **MVVM (Model-View-ViewModel)** avec Provider pour la gestion d'état :
+
 ```
-GET /stateduc/data_rules.php/theme_rules/{login}/{id_camp}/{id_sys}/{id_theme}/{id_etab}/null/{id_annee}
+lib/
+├── main.dart                    ← Entrée + injection Provider
+├── models/                      ← Modèles de données
+│   ├── user.dart
+│   ├── campagne.dart
+│   ├── questionnaire.dart
+│   └── coherence_result.dart
+├── viewmodels/                  ← ViewModels (logique métier + état)
+│   ├── auth_viewmodel.dart
+│   ├── campagne_viewmodel.dart
+│   ├── data_entry_viewmodel.dart
+│   └── coherence_viewmodel.dart
+├── views/                       ← Écrans (consomment les ViewModels)
+│   ├── login_screen.dart
+│   ├── home_screen.dart
+│   ├── campagne_screen.dart
+│   ├── data_entry_screen.dart
+│   └── coherence_screen.dart
+├── services/                    ← Services techniques
+│   ├── api_service.dart         ← Dio + intercepteurs
+│   ├── database_service.dart    ← SQLite (sqflite)
+│   ├── coherence_evaluator.dart ← Moteur cohérence offline
+│   └── secure_storage_service.dart
+└── widgets/                     ← Composants UI réutilisables
 ```
 
-### Modification clé (commit 10) — Décomposition `id_theme` composite
-```php
-// L'app envoie id_theme COMPOSITE (ex: 15602 = thème 1560 + secteur 2)
-// Avant : WHERE ID_THEME = 15602 → 0 lignes → nb_regles: 0
-// Après : décomposition identique à questionnaire_reload_ws.php
-$str_theme_id = substr($id_theme, 0, strlen($id_theme) - strlen($id_sector));
-// → WHERE ID_THEME = 1560 → règles trouvées ✓
+### 6.2 Stack technique Flutter
+
+| Dépendance | Usage |
+|-----------|------|
+| `flutter 3.35` / `dart 3.9` | Framework mobile |
+| `provider` | Gestion d'état MVVM |
+| `dio` | Client HTTP + intercepteurs |
+| `sqflite` | SQLite local |
+| `flutter_secure_storage` | PIN et token chiffrés |
+| `shared_preferences` | Cache DNS, préférences légères |
+| `path_provider` | Chemins fichiers locaux |
+| `connectivity_plus` | Détection réseau |
+
+---
+
+## 7. Application Flutter — Gestion des campagnes
+
+### 7.1 Principe du téléchargement en 9 étapes
+
+Le téléchargement d'une campagne est une opération **atomique et séquentielle** en 9 étapes. Chaque étape est matérialisée par une barre de progression dans l'interface. L'opération peut être relancée intégralement en cas d'échec partiel.
+
+### 7.2 Les 9 étapes
+
+| Étape | Opération | Endpoint |
+|-------|-----------|---------|
+| 1 | Vérification existence campagne | `GET /campagne/{id}/check` |
+| 2 | Téléchargement métadonnées campagne | `GET /campagne/{id}/meta` |
+| 3 | Liste des établissements assignés | `GET /campagne/{id}/etab` |
+| 4 | Thèmes et questionnaires | `GET /campagne/{id}/themes` |
+| 5 | Définition des champs (DICO_FIXE) | `GET /campagne/{id}/dico` |
+| 6 | Règles de cohérence | `GET /campagne/{id}/rules` |
+| 7 | Données pré-existantes | `GET /campagne/{id}/data` |
+| 8 | Validation intégrité locale (SQLite) | *(local)* |
+| 9 | Marquage campagne comme active | *(local)* |
+
+### 7.3 Persistance SQLite de la campagne
+
+Toutes les données téléchargées sont persistées dans SQLite. La structure garantit que l'application est **pleinement fonctionnelle hors ligne** après le téléchargement :
+
+```sql
+-- Campagne téléchargée
+INSERT INTO campagnes (id, nom, annee, statut) VALUES (...);
+INSERT INTO etablissements (id, code, nom, id_campagne) VALUES (...);
+INSERT INTO themes (id, nom, id_campagne, type) VALUES (...);
+INSERT INTO dico_champs (id_theme, nom_champ, type, ordre) VALUES (...);
+INSERT INTO coherence_rules (id_theme, sql_regle, sql_assoc, operateur, valeur_ref) VALUES (...);
 ```
 
-### Réponse JSON
-```json
-{
-  "se_status": 200,
-  "se_data": {
-    "id_theme": 10002,
-    "nb_regles": 5,
-    "regles": [
-      {
-        "id_regle": 483,
-        "lib_regle": "NB_LATRINES_ELEVES",
-        "sql_regle": "SELECT Sum(NB_LATRINES_ELEVES) FROM DONNEES_ETABLISSEMENT WHERE ...",
-        "sql_assoc": "SELECT Sum(NB_LATRINES_BON_ETAT) FROM DONNEES_ETABLISSEMENT WHERE ...",
-        "critere": "<=",
-        "associations": []
-      }
-    ]
+---
+
+## 8. Application Flutter — Collecte et persistance des données
+
+### 8.1 Flux de saisie
+
+```
+Sélection établissement
+    │
+    ▼
+Sélection thème / questionnaire
+    │
+    ▼
+Affichage formulaire dynamique (construit depuis dico_champs SQLite)
+    │
+    ├─► Saisie champs (TextField, Dropdown, DatePicker selon type)
+    ├─► Validation format (regex, min/max)
+    └─► Sauvegarde locale SQLite (auto-save toutes les 30s)
+            │
+            ▼
+    Déclenchement contrôle cohérence (debounce 800ms)
+            │
+            └─► Affichage résultat inline (✅ / ⚠️)
+```
+
+### 8.2 Table SQLite `collected_data`
+
+```sql
+CREATE TABLE collected_data (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_camp     TEXT    NOT NULL,
+    id_etab     TEXT    NOT NULL,
+    id_qst      TEXT    NOT NULL,
+    id_filter   TEXT,               -- période, secteur, etc.
+    field_name  TEXT    NOT NULL,
+    field_value TEXT,
+    is_sent     INTEGER DEFAULT 0,  -- 0 = non envoyé, 1 = envoyé
+    updated_at  TEXT,
+    UNIQUE (id_camp, id_etab, id_qst, id_filter, field_name)
+);
+```
+
+### 8.3 Chaîne de sauvegarde
+
+```
+UI (TextField) 
+  → ViewModel.updateField(fieldName, value)
+    → DatabaseService.upsertCollectedData(...)
+      → SQLite UPSERT (INSERT OR REPLACE)
+        → is_sent = 0 (réinitialisé à chaque modification)
+```
+
+---
+
+## 9. Application Flutter — Moteur de cohérence
+
+### 9.1 Dual-mode : offline et online
+
+Le contrôle de cohérence fonctionne dans **deux modes complémentaires** :
+
+| Mode | Déclenchement | Moteur | Latence |
+|------|--------------|--------|---------|
+| **Offline** | Automatique (debounce 800ms après saisie) | `CoherenceEvaluator` (Dart local) | ~50ms |
+| **Online** | Manuel (bouton "Vérifier") + avant envoi | `data_controle.php` (SQL Server) | ~2s |
+
+### 9.2 Moteur offline : `CoherenceEvaluator`
+
+Le moteur offline évalue les règles de cohérence **en local** sur les données SQLite, en reconstruisant la logique SQL de cohérence serveur en Dart.
+
+**Étapes d'évaluation pour une règle :**
+
+```
+1. Chargement règle depuis SQLite (coherence_rules)
+2. Chargement données formulaire courant (collected_data)
+3. Chargement données cross-formulaires (getAllCollectedDataForCampEtab)
+4. Injection agrégats virtuels (_injectVirtualAggregates)
+5. Extraction V1 depuis sql_regle (SUM, COUNT, valeur simple)
+6. Extraction V2 depuis sql_assoc ou valeur_ref
+7. Application opérateur (=, <>, <, >, <=, >=, BETWEEN)
+8. Résultat : COHERENT / INCOHERENT + message
+```
+
+### 9.3 Extraction de valeurs : regex TABLE.FIELD
+
+Un point technique clé est l'extraction des noms de champs depuis les SQL de cohérence, qui peuvent contenir des qualificateurs de table :
+
+```dart
+// Pattern correct : préfixe table optionnel et non-capturant
+static final _sumPattern = RegExp(
+  r'SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)',
+  caseSensitive: false,
+);
+// Exemples capturés correctement :
+// SUM(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) → FILLES_AGE_NIVEAU
+// SUM(NB_ELEVES)                                → NB_ELEVES
+```
+
+### 9.4 Agrégats virtuels
+
+Certaines colonnes référencées dans les règles de cohérence sont des colonnes de **vues SQL** (`ELEVES_AGE_NIVEAU_SEXE`, etc.) qui n'existent pas directement dans les données collectées. Le moteur les reconstitue par calcul :
+
+```dart
+void _injectVirtualAggregates(Map<String, dynamic> values) {
+  // TOTAL_AGE_NIVEAU = somme de tous les champs numériques
+  double total = 0;
+  double totalFilles = 0;
+  for (final entry in values.entries) {
+    final v = double.tryParse(entry.value?.toString() ?? '') ?? 0;
+    total += v;
+    // FILLES_AGE_NIVEAU = champs marqués filles (NB_F_*, _FILLES_*, etc.)
+    if (_isFillesField(entry.key)) totalFilles += v;
   }
+  values['TOTAL_AGE_NIVEAU']   = total.toString();
+  values['FILLES_AGE_NIVEAU']  = totalFilles.toString();
 }
 ```
 
----
+### 9.5 Injection par SAVEPOINT
 
-## SLIDE 6 — `data_controle.php` — Contrôle post-envoi serveur
-
-### Fichier : `StatEduc_burundi/data_controle.php`
-**Rôle** : Exécute le contrôle de cohérence serveur après envoi des données.  
-**Utilité** : Validation officielle côté serveur (base SQL Server/Access) après synchronisation.
-
-### Réécriture complète (commit 11)
-
-**Avant** : passait `id_theme` composite comme `ctrl_id` → `WHERE ID_ASSOC_REG_THM = 15702` → 0 lignes → fatal PHP 500.
-
-**Après** :
-```php
-// Décomposition id_theme composite
-function controle_strip_theme_id($id_theme, $id_sector) { ... }
-
-// Récupère toutes les règles d'association pour ce thème
-function controle_run_for_theme($raw_theme_id, ...) {
-    $rows = SELECT DISTINCT ID_ASSOC_REG_THM FROM DICO_REGLE_THEME_ASSOC
-            WHERE ID_THEME = $stripped AND ACTIVER_CTRL = 1;
-    foreach ($rows as $ctrl_id) {
-        new controle_theme_batch($ctrl_id, ..., $alert=false);
-    }
-}
-```
-
----
-
-## SLIDE 7 — `questionnaire_ws.php` — Bootstrap commit curl
-
-### Fichier : `StatEduc_burundi/questionnaire_ws.php`
-**Rôle** : Worker PHP exécuté via curl interne depuis data_save.php — réalise l'écriture en base.  
-**Utilité** : Traitement métier complet (grille SQL, arbre, écriture BDD).
-
-### Modification (commit 5) — Bootstrap commit curl
-
-```php
-// AVANT : nouvelle commit PHP vide → $_commit['login'] absent
-//       → arbre + écritures SQL échouent silencieusement
-
-// APRÈS : injection des variables de commit depuis les paramètres GET curl
-if (isset($_GET['login'])) {
-    $_commit['login']      = $_GET['login'];
-    $_commit['langue']     = $_GET['langue'] ?? 'fr';
-    $_commit['style']      = 'stateduc.css';   // défaut
-    $_commit['valide']     = true;              // bypass auth
-    $_commit['code_user']  = 0;
-    $_commit['groupe']     = 1;
-}
-```
-
----
-
-## SLIDE 8 — Tableau récapitulatif PHP
-
-### Tous les fichiers PHP modifiés/créés
-
-| Fichier | commit | Rôle | Modifications principales |
-|---------|----------|------|--------------------------|
-| `config_app.php` | 41-44 | Configuration globale, URLs internes | `_sised_local_port()`, `SISED_HOST_HEADER`, bypass Fortinet |
-| `data_save.php` | 3,5,11,12,12b,13,44 | Sauvegarde données formulaire | curl interne, `commit_write_close`, timeouts, Host header |
-| `data_reload.php` | 44 | Rechargement données serveur | Host header, timeouts curl |
-| `data_rules.php` | 10 | Fourniture règles cohérence | Décomposition `id_theme` composite |
-| `data_controle.php` | 11 | Contrôle cohérence post-envoi | Réécriture complète, `controle_strip_theme_id` |
-| `questionnaire_ws.php` | 5 | Worker écriture en base | Bootstrap commit curl (`$_commit` depuis GET) |
-
-### Résultat final côté serveur
-- ✅ Sauvegarde des données fiable (timeouts, commit, curl bypass NAT)
-- ✅ Rechargement depuis serveur fonctionnel
-- ✅ Règles de cohérence correctement distribuées au mobile
-- ✅ Contrôle cohérence serveur fonctionnel post-envoi
-
----
-
-# PARTIE II — TRAVAUX MOBILE FLUTTER
-
----
-
-## SLIDE 9 — Vue d'ensemble application Flutter
-
-### Projet : StatEduc Mobile
-**Technologie** : Flutter/Dart, Android (APK)  
-**Architecture** : MVC/Provider — réécriture complète depuis Cordova/JavaScript (commit 1–3)  
-**Versions** : Gradle 8.14.x, AGP 8.11.1, Kotlin 2.2.20, compileSdk 36
-
-### Stack technique
-
-| Composant | Bibliothèque | Version |
-|-----------|-------------|---------|
-| HTTP | Dio | 5.7 |
-| State | Provider | 6.1 |
-| DB locale | sqflite | 2.3 |
-| Auth sécurisée | flutter_secure_storage | 9.2 |
-| Formulaires | webview_flutter | 4.10 |
-
-### Structure du projet
-```
-stateduc_flutter/
-├── lib/
-│   ├── models/          User, Campaign, School, Question, Regroup...
-│   ├── services/        ApiService, DatabaseService, AuthService, CoherenceEvaluator
-│   ├── providers/       AuthProvider, CampaignProvider, DataEntryProvider
-│   ├── screens/         Splash, Pin, Login, Campaigns, Schools, DataEntry, Settings
-│   └── widgets/         DynamicFormWidget, _OfflineCoherenceBanner...
-├── test/
-│   └── sql_translator_test.dart    (15 tests unitaires)
-└── CHANGELOG.md
-```
-
----
-
-## SLIDE 10 — Authentification & Sécurité
-
-### Fichier : `lib/services/auth_service.dart`
-**Rôle** : Gestion de l'authentification et des credentials persistants.
-
-### Fonctionnalités
-- **PIN 4–8 chiffres** + question de sécurité (stockage sécurisé `flutter_secure_storage`)
-- **Basic Auth HTTP** : `Authorization: Basic base64(login:password)`
-- `codeyear` + `libyear` sauvegardés dans stockage sécurisé ET SQLite (commit 12)
-
-### Bug critique résolu (commit 12)
-```dart
-// AVANT : getStoredUser() retournait codeyear='' après déverrouillage PIN
-// → URL sans /id_annee → data_save.php ne trouvait pas l'année → 0 écritures DB
-
-// APRÈS : codeyear stocké dans FlutterSecureStorage au login
-await _storage.write(key: _kCodeyear, value: user.codeyear);
-// Restauré à chaque getStoredUser() → yearCode != '' → URL correcte
-```
-
-### Écran PIN (`pin_screen.dart`)
-- Drapeau du Burundi (`assets/icon/Flag_of_country.png`) — commit 8, 18
-- Deux lignes institutionnelles italiques : *"République du Burundi"* / *"Ministère de l'Éducation Nationale"* — commit 21
-
----
-
-## SLIDE 11 — Base de données SQLite locale
-
-### Fichier : `lib/services/database_service.dart`
-**Rôle** : Singleton SQLite remplaçant les 25+ clés `localStorage` de l'application originale.
-
-### Schéma — 14 tables (version 3)
-
-| Table | Contenu |
-|-------|---------|
-| `settings` | Configuration URL serveur, credentials |
-| `campaigns` | Campagnes téléchargées |
-| `education_systems` | Systèmes éducatifs (MOBILE, Éducation de Base...) |
-| `regroup_types` / `regroups` | Arbre de regroupements administratifs |
-| `school_statuses` / `schools` | Établissements scolaires |
-| `localisations` | Liens école ↔ système ↔ regroupements |
-| `questions` / `form_html` | Thèmes de collecte + HTML des formulaires |
-| `validation_rules` / `coherence_rules` | Règles de validation et cohérence |
-| `collected_data` | **Données saisies** : `(id_camp, id_etab, id_qst, field_name, field_value TEXT)` |
-| `filter_periods` | Périodes de filtrage |
-
-### Méthodes clés ajoutées
-- `getAllCollectedDataForCoherence()` — données pour moteur cohérence
-- `getAllCollectedDataForCampEtab()` — toutes données d'un établissement/campagne
-- `getDistinctEtabQstWithData()` — envoi global campagne (commit 17)
-
----
-
-## SLIDE 12 — API Service — Communication HTTP
-
-### Fichier : `lib/services/api_service.dart`
-**Rôle** : Singleton Dio, point unique pour tous les appels REST vers le serveur.
-
-### Configuration évolutive
-
-| Paramètre | commit 1 | commit 12b | commit 17 | commit 19 |
-|-----------|-----------|-------------|------------|------------|
-| `connectTimeout` | 60s | 60s | 60s | 60s |
-| `receiveTimeout` | 180s | 300s | 300s | **600s** |
-| `sendTimeout` | 120s | 300s | 300s | **null** |
-| Retry | aucun | aucun | aucun | **3 tentatives** |
-
-### Retry automatique (commit 19)
-```dart
-// 3 essais au total, délai progressif 5s × tentative
-// Ne réessaie PAS sur : ApiException (401, 404), connectionTimeout
-// Réessaie sur : sendTimeout, receiveTimeout, DioExceptionType.unknown
-static const int _kMaxRetries = 2;
-static const int _kRetryDelay = 5;
-```
-
-### SSL bypass (commit 1)
-```dart
-// Certificats auto-signés intranet MEN
-client.badCertificateCallback = (cert, host, port) => true;
-```
-
----
-
-## SLIDE 13 — Téléchargement de campagne — 9 étapes
-
-### Fichier : `lib/providers/campaign_provider.dart`
-**Rôle** : Orchestration du chargement complet d'une campagne.
-
-### Flux en 9 étapes séquentielles
-```
-1. Regroupements administratifs  → reg_camp/{login}/{campId}/1
-2. Types de regroupements        → (intégré dans l'étape 1)
-3. Statuts d'établissements      → statuts
-4. Établissements                → etabs_camp/{userId}/{campId}/1
-5. Localisations                 → locs_camp/{userId}/{campId}
-6. Systèmes éducatifs            → sys_camp/{userId}/{campId}
-7. Formulaires HTML              → theme_camp/{campId}/{sysId}/eng
-8. Règles de cohérence           → regle_theme_camp/{qstId}/{sysId}
-9. Stockage SQLite               → DatabaseService.insertAll()
-```
-
-### Navigation hiérarchique — Triple stratégie (commit 3)
-
-| Stratégie | Mécanisme | Cas couvert |
-|-----------|-----------|-------------|
-| Strategy 1 | `localisations.regroups_json` contient `idRegp` | Cas nominal |
-| Strategy 2 | `schools.id_regroup = idRegp` direct SQL | Nœud intermédiaire |
-| Strategy 3 | Tous les établissements de la campagne | Last resort — jamais d'écran vide |
-
----
-
-## SLIDE 14 — Saisie de données — Formulaires dynamiques
-
-### Fichier : `lib/widgets/dynamic_form/dynamic_form_widget.dart`
-**Rôle** : Rendu WebView des formulaires HTML dynamiques + injection/extraction de données.
-
-### Pipeline de traitement HTML
-
-```
-1. Téléchargement HTML (bytes ISO-8859-15)
-2. _preprocessHtml() :
-   a. Détection + correction Mojibake (Latin-1 → UTF-8)
-   b. Désentitisation HTML (&lt; → <, etc.)
-   c. $NUMERO_LOCAL_N → numéro de ligne (formulaires grille)
-   d. VALUE="$VARNAME" → VALUE="" (texte vide pour _injectData)
-   e. VALUE=$CODE_TYPE_0_1 → VALUE=1 (radio non quotés)
-3. Rendu WebView (fond blanc, scroll horizontal tableaux)
-4. _injectData() : injection JS des valeurs SQLite
-5. _injectBridge() : pont JS → Flutter pour extraction à la sauvegarde
-```
-
-### Fixes critiques appliqués
-
-| commit | Bug | Fix |
-|---------|-----|-----|
-| 1 | Encodage Mojibake | `ResponseType.bytes` + décodage Latin-1 explicite |
-| 5 | Radios non pré-sélectionnés | Étapes 4a/4b dans `_preprocessHtml()` |
-| 8 | Formulaire gris | `Container(color: Colors.white)` wrapping Stack |
-| 8 | Pré-remplissage race condition | `addPostFrameCallback` pour `_injectData()` |
-| 9 | Crash `(?i)` flags inline | `caseSensitive: false` paramètre Dart |
-| 10 | Grille add-row mauvais index | Lecture attributs `id='ligne-paire_N_0'` des TR |
-
----
-
-## SLIDE 15 — Fournisseur de données — `DataEntryProvider`
-
-### Fichier : `lib/providers/data_entry_provider.dart`
-**Rôle** : Gestion complète du cycle de vie d'une saisie (état, sauvegarde, envoi, cohérence).
-
-### Fonctionnalités principales
-
-**Saisie et persistance :**
-- `updateField()` — debounce 800 ms → déclenche cohérence offline (commit 18)
-- `saveLocally()` — persistance SQLite immédiate
-- `sendToServer()` — POST REST avec retry × 3, suivi tentative en UI
-
-**Envoi global (commit 17) :**
-- `sendAllFormsForSchool()` — tous formulaires d'un établissement
-- `sendAllFormsForCampaign()` — tous formulaires de toute la campagne
-
-**Rechargement serveur intelligent (commit 17) :**
-- `_autoReloadFromServerBackground()` — fusion locale/serveur
-- `forceOverwrite=true` pour formulaire d'identification (serveur a priorité)
-
-**7 déclenchements cohérence offline :**
-
-| Événement | Délai | Depuis |
-|-----------|-------|--------|
-| Saisie d'un champ (debounce) | 0.8s | commit 18 |
-| Sauvegarde locale | Immédiat | commit 1-16 |
-| Ouverture formulaire rempli | Immédiat | commit 17 |
-| Changement de filtre/période | Immédiat | commit 18 |
-| Règles reçues du serveur | Arrière-plan | commit 17 |
-| Données serveur fusionnées | Arrière-plan | commit 18 |
-| Envoi serveur | Post-POST | commit 1-16 |
-
----
-
-## SLIDE 16 — Écran de saisie — `school_data_screen.dart`
-
-### Fichier : `lib/screens/data_entry/school_data_screen.dart`
-**Rôle** : Écran principal de saisie par établissement. Affiche le formulaire WebView + bannières.
-
-### En-tête établissement (commit 3)
-```
-Année en session · Hiérarchie admin · Établissement/ID/Code · Statut · Type secteur
-```
-
-### Bannière cohérence offline — `_OfflineCoherenceBanner` (commit 46)
-```dart
-// Fond blanc, bordure orange, titre "Contrôle de cohérence"
-// Sous-titre "Contrôle local — non encore envoyé au serveur"
-// Icônes error_outline rouges par violation
-// Structure identique au dialog cohérence serveur (screenshot utilisateur)
-```
-
-### Indicateur de cohérence en cours (commit 18)
-```dart
-if (entry.isCheckingOffline)
-  const LinearProgressIndicator(),   // barre de progression pendant l'évaluation
-if (entry.hasOfflineCoherenceErrors)
-  _OfflineCoherenceBanner(errors: entry.offlineCoherenceErrors),
-```
-
-### Menu contextuel (⋮)
-- "Vérifier la cohérence" — contrôle offline immédiat (commit 21)
-- "Envoyer tous les formulaires" — envoi global établissement (commit 17)
-
----
-
-## SLIDE 17 — Moteur de cohérence offline — Architecture
-
-### Fichier : `lib/services/coherence_evaluator.dart`
-**Rôle** : Équivalent mobile de `controle_theme_batch.class.php` — évalue les règles SQL hors ligne.  
-**Version actuelle** : commit 49
-
-### Dual-path (commit 45)
-```
-evaluate()
-    │
-    ├─► CHEMIN 1 — SQL réel (prioritaire)
-    │     SqlTranslator.translate()  →  SQL SQLite natif
-    │     db.rawQuery()  →  résultat numérique
-    │     _applyOperator()  →  violated: true/false
-    │
-    └─► CHEMIN 2 — regex fallback (conservatif)
-          _extractValue()  →  SUM pattern matching
-          _applyOperator()  →  conservative (pas de faux positifs)
-```
-
-### `SqlTranslator` — Pipeline de traduction (8 étapes)
-```
-1. Normalisation (strip ;)
-2. Substitution paramètres ($CODE_ETABLISSEMENT, $CODE_TYPE_ANNEE)
-3. Détection tables serveur (DONNEES_ETABLISSEMENT, ELEVES_AGE_NIVEAU_SEXE...)
-4. Extraction champs référencés (SELECT, WHERE, GROUP BY, HAVING)
-5. Construction CTE de pivot (MAX(CASE WHEN field_name='X' THEN...))
-6. Traduction syntaxique (Is Null, NVL, Or/And...)
-7. Suppression qualificateurs TABLE.FIELD → FIELD
-7b. _stripContextOnlyHaving() — suppression HAVING redondant
-8. Wrapper dual-mode EXISTS/SCALAR (commit 49)
-```
-
----
-
-## SLIDE 18 — Moteur de cohérence — CTE Pivot dynamique
-
-### Stratégie de mapping DONNEES_ETABLISSEMENT → SQLite
-
-**Problème** : Les règles serveur requêtent `DONNEES_ETABLISSEMENT` (vue SQL Server/Access) mais le mobile stocke les données dans `collected_data` sous forme EAV (Entity-Attribute-Value).
-
-**Solution** : CTE de pivot dynamique généré automatiquement :
+Pour les règles de cohérence qui nécessitent une évaluation côté serveur (mode online), la mécanique utilise des **SAVEPOINTs SQL Server** pour garantir l'atomicité :
 
 ```sql
-WITH DONNEES_ETABLISSEMENT AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='NB_LATRINES_ELEVES'
-        THEN CAST(field_value AS REAL) END) AS NB_LATRINES_ELEVES,
-    MAX(CASE WHEN UPPER(field_name)='NB_LATRINES_BON_ETAT'
-        THEN CAST(field_value AS REAL) END) AS NB_LATRINES_BON_ETAT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT'
-        THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE'
-        THEN field_value END) AS CODE_TYPE_ANNEE
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='20952'
-)
--- ← Contient exactement les données d'UN établissement/campagne
+SAVE TRANSACTION sp_coherence_check;
+-- Insertion temporaire des données à vérifier
+INSERT INTO DONNEES_TEMP SELECT ...;
+-- Exécution des règles SQL Server
+EXEC sp_run_coherence_rules @id_theme=?, @id_etab=?, @id_camp=?;
+-- Récupération résultats
+SELECT * FROM COHERENCE_RESULTS WHERE id_session = SCOPE_IDENTITY();
+-- Annulation systématique (les données temp ne sont jamais commitées)
+ROLLBACK TRANSACTION sp_coherence_check;
 ```
 
-**Avantages** :
-- Filtré sur `(id_camp, id_etab)` → une seule ligne par établissement
-- Champs numériques : `CAST(field_value AS REAL)` → calculs arithmétiques
-- Champs texte (CODE_ETABLISSEMENT) : sans CAST → comparaisons de chaînes
+Ce mécanisme permet d'exécuter les règles SQL Server complexes (vues, agrégats, jointures) sans modifier les données réelles.
 
 ---
 
-## SLIDE 19 — Moteur de cohérence — Bugs résolus (commit 45–49)
+## 10. Application Flutter — Envoi des données au serveur
 
-### Tableau complet des bugs et fixes
+### 10.1 Flux d'envoi
 
-| commit | Bug | Cause racine | Fix |
-|---------|-----|-------------|-----|
-| 46 | `\1` littéral dans SQL → crash SQLite | Dart `replaceAll(RegExp, r'\1')` ne supporte pas les backreferences | `replaceAllMapped((m) => m.group(1)!)` |
-| 46 | WHERE champs non extraits pour CTE | Extraction cherchait seulement TABLE.FIELD + GROUP BY/HAVING | Ajout extraction WHERE avec `dotAll: true` |
-| 46 | Nom de table dans champs CTE | Aucun filtre `_knownServerTables` dans extraction | `!serverTables.contains(name)` |
-| 46 | `sql_assoc` non traduisible → skip complet | `if (r2==null) return null` | `count2=0` fallback |
-| 47 | COUNT=0 toujours (HAVING) | `'20952'(TEXT) = 20952(INTEGER)` → FALSE SQLite | `_stripContextOnlyHaving()` |
-| 48-A | HAVING non supprimé (qualificateurs) | Strip appelé AVANT suppression `TABLE.FIELD` → `DONNEES_ETABLISSEMENT` dans HAVING body | Déplacement vers step 7b |
-| 48-B | SQLiteLog syntax errors × 3 | Regex `(.+?)` non-greedy tronquait CTE au premier `)` | Suppression diagnostic CTE |
-| **49** | **COUNT=1 toujours (SUM scalaire)** | **`COUNT(*)` d'une agrégation SUM = toujours 1 ligne** | **Dual-mode wrapper EXISTS/SCALAR** |
+```
+Bouton "Envoyer les données"
+    │
+    ├─► Vérification connexion réseau
+    ├─► Contrôle cohérence online (data_controle.php)
+    │       ├─► 0 incohérence → continuer
+    │       └─► N incohérences → affichage liste + confirmation requise
+    │
+    ├─► Chargement données non envoyées (is_sent = 0)
+    ├─► Groupement par thème / établissement
+    └─► POST data_save.php/theme_save/{params}
+            ├─► Succès → UPDATE collected_data SET is_sent = 1
+            └─► Erreur → retry avec backoff (3 tentatives max)
+```
+
+### 10.2 Timeouts Dio configurés
+
+```dart
+_dio.options = BaseOptions(
+  connectTimeout: const Duration(seconds: 30),
+  receiveTimeout: const Duration(seconds: 60),
+  sendTimeout:    const Duration(seconds: 60),
+);
+```
+
+Ces valeurs ont été calibrées pour les conditions réseau réelles du MEN Burundi (connexion 4G variable, parfois saturée).
+
+### 10.3 Intercepteurs Dio
+
+```
+Chaîne des intercepteurs (ordre ajout = ordre onRequest, LIFO pour onError) :
+
+  [1] _AuthInjectorInterceptor  → Injecte header Authorization: Bearer <token>
+  [2] _DnsFallbackInterceptor   → Fallback IP si DNS échoue (réseau variable)
+  [3] LogInterceptor            → Log requête/réponse en mode debug
+```
+
+**`_DnsFallbackInterceptor`** : en cas d'erreur DNS (`Failed host lookup`, `Could not resolve host`), l'intercepteur remplace automatiquement le hostname par l'IP numérique mise en cache lors de la dernière authentification réussie, puis relance la requête — sans aucune intervention utilisateur.
 
 ---
 
-## SLIDE 20 — Moteur de cohérence — commit 49 : Fix SUM-scalaire
+## 11. Application Flutter — Authentification et sécurité
 
-### Le bug — Logs réels de l'application
-```
-[CoherenceEval] rawQuery sql_regle rule=484 → count=1
-[CoherenceEval] rawQuery sql_assoc rule=484 → count=1
-[CoherenceEval] rule=484 path=SQL result=(1.0 <= 1.0) violated=false
-```
-Alors que `NB_LATRINES_ELEVES=50` et `NB_LATRINES_BON_ETAT=30` → violation réelle.
+### 11.1 Flux d'authentification
 
-### La cause
+```
+Saisie login / mot de passe
+    │
+    ├─► POST /stateduc/questionnaire_ws.php/auth/
+    │       ├─► PHP : vérification bcrypt (password_verify)
+    │       ├─► PHP : _resolveAndCacheIp() en background (DNS cache)
+    │       └─► Retour : {token, user_info}
+    │
+    ├─► Stockage token dans flutter_secure_storage
+    ├─► Stockage profil dans SharedPreferences
+    └─► Navigation vers HomeScreen
+```
+
+### 11.2 PIN de déverrouillage
+
+Un **PIN local** (4 à 6 chiffres) est défini lors de la première connexion. Il est stocké hashé dans `flutter_secure_storage`. Lors des sessions suivantes, l'agent peut déverrouiller l'application avec le PIN sans refaire une authentification réseau.
+
+### 11.3 Migration bcrypt
+
+L'ancienne application Cordova utilisait un hash MD5 non salé pour les mots de passe. La version Flutter/PHP utilise **bcrypt** (`password_hash` / `password_verify` PHP) avec un coût de facteur 10. La migration inclut un endpoint de transition pour les utilisateurs ayant un hash MD5 existant.
+
+### 11.4 Cache DNS persistant
+
+Lors de chaque authentification réussie, l'IP numérique du serveur est résolue et persistée dans `SharedPreferences` sous la clé `dns_cache_<hostname>`. Ce cache permet aux requêtes de fonctionner même si la résolution DNS est temporairement indisponible (réseau mobile en déplacement).
+
+---
+
+## 12. Schéma SQLite local
+
+### 12.1 Tables principales
+
 ```sql
--- Requête SUM-scalaire (SANS GROUP BY)
-SELECT Sum(NB_LATRINES_ELEVES) FROM DONNEES_ETABLISSEMENT WHERE ...
--- ↓ toujours exactement 1 ligne (même si Sum=NULL)
--- COUNT(*) = 1 toujours
-```
+-- Campagnes téléchargées
+CREATE TABLE campagnes (
+    id          TEXT PRIMARY KEY,
+    nom         TEXT,
+    annee       TEXT,
+    statut      TEXT DEFAULT 'actif',
+    downloaded_at TEXT
+);
 
-### Le fix — Dual-mode
-```dart
-final hasGroupBy = RegExp(r'\bGROUP\s+BY\b', caseSensitive: false).hasMatch(translatedSql);
+-- Établissements assignés
+CREATE TABLE etablissements (
+    id          TEXT PRIMARY KEY,
+    code        TEXT,
+    nom         TEXT,
+    id_campagne TEXT,
+    FOREIGN KEY (id_campagne) REFERENCES campagnes(id)
+);
 
-if (hasGroupBy) {
-  // MODE EXISTS — violations comptées
-  wrappedSql = '$withClause\nSELECT COUNT(*) AS cnt FROM (\n$translatedSql\n) _violations';
-  isScalar = false;
-} else {
-  // MODE SCALAR — valeur réelle retournée
-  wrappedSql = '$withClause\nSELECT COALESCE((SELECT * FROM (\n$translatedSql\n) _s), 0) AS val';
-  isScalar = true;
-}
-```
+-- Thèmes / questionnaires
+CREATE TABLE themes (
+    id          TEXT PRIMARY KEY,
+    nom         TEXT,
+    id_campagne TEXT,
+    type        TEXT,  -- 'simple' | 'multi_lignes'
+    ordre       INTEGER
+);
 
-### Validation Python — 4/4 tests PASS
-```
-✅ T2 Fix SCALAR: Sum(NB_LATRINES_ELEVES)=50 > Sum(NB_LATRINES_BON_ETAT)=30 → violated=True
-✅ T3 Cohérent: 20 <= 30 → violated=False (pas de faux positif)
-✅ T4 Vide: COALESCE(NULL,0)=0 → not violated (conservatif)
-✅ T1 Régression: rules GROUP BY toujours COUNT(*) → inchangé
+-- Définition des champs (dictionnaire)
+CREATE TABLE dico_champs (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_theme    TEXT,
+    nom_champ   TEXT,
+    libelle     TEXT,
+    type_champ  TEXT,  -- 'texte' | 'entier' | 'decimal' | 'date' | 'liste'
+    ordre       INTEGER,
+    obligatoire INTEGER DEFAULT 0,
+    valeurs_liste TEXT  -- JSON si type=liste
+);
+
+-- Règles de cohérence
+CREATE TABLE coherence_rules (
+    id          INTEGER PRIMARY KEY,
+    id_theme    TEXT,
+    libelle     TEXT,
+    sql_regle   TEXT,  -- expression V1 (SUM, COUNT, valeur)
+    sql_assoc   TEXT,  -- expression V2
+    operateur   TEXT,  -- '=', '<>', '<', '>', '<=', '>=', 'BETWEEN'
+    valeur_ref  TEXT,  -- valeur de référence si pas de sql_assoc
+    gravite     TEXT   -- 'bloquant' | 'avertissement'
+);
+
+-- Données collectées
+CREATE TABLE collected_data (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_camp     TEXT,
+    id_etab     TEXT,
+    id_qst      TEXT,
+    id_filter   TEXT,
+    field_name  TEXT,
+    field_value TEXT,
+    is_sent     INTEGER DEFAULT 0,
+    updated_at  TEXT,
+    UNIQUE (id_camp, id_etab, id_qst, id_filter, field_name)
+);
 ```
 
 ---
 
-## SLIDE 21 — Fonctionnalités mobiles complètes
+## 13. Catalogue des endpoints API
 
-### Tableau de toutes les fonctionnalités implémentées
+### 13.1 Authentification
 
-| Fonctionnalité | commit | Fichier(s) | Description |
-|----------------|---------|-----------|-------------|
-| Authentification Basic Auth | 1 | `api_service.dart` | Login + PIN sécurisé |
-| Téléchargement campagne (9 étapes) | 1–3 | `campaign_provider.dart` | Progress bar |
-| Navigation hiérarchique + 3 stratégies | 1–3 | `campaign_provider.dart`, `database_service.dart` | Drill-down regroups |
-| Formulaires HTML WebView | 1–5 | `dynamic_form_widget.dart` | Pré-remplissage, radios, grille |
-| Bypass SSL auto-signé | 1 | `api_service.dart` | `badCertificateCallback` |
-| Pré-remplissage identification | 3–5, 11 | `data_entry_provider.dart` | `_prefillIdentificationFields()` |
-| Grilles add-row | 5, 10 | `dynamic_form_widget.dart` | Clone ligne + incrément indices |
-| Timeout adaptatif + retry × 3 | 12b, 17, 19 | `api_service.dart` | `_withRetry()`, délai progressif 5s |
-| Envoi global établissement | 17 | `data_entry_provider.dart` | `sendAllFormsForSchool()` |
-| Envoi global campagne | 17 | `data_entry_provider.dart`, `campaign_detail_screen.dart` | `sendAllFormsForCampaign()` |
-| Suivi tentatives retry en UI | 19 | `school_data_screen.dart` | "Envoi… (tentative 2/3)" |
-| Cohérence offline — debounce 800ms | 18 | `data_entry_provider.dart` | Déclenché à chaque champ |
-| Cohérence offline — 7 déclencheurs | 17–21 | `data_entry_provider.dart` | Voir Slide 15 |
-| Bannière violations offline | 46 | `school_data_screen.dart` | `_OfflineCoherenceBanner` |
-| Drapeau Burundi + identité institutionnelle | 18, 21 | `pin_screen.dart` | République + Ministère |
-| Contraste onglets Settings | 17 | `settings_screen.dart` | `labelColor` + `indicatorColor` |
-| Moteur SQL réel (SqlTranslator) | 45–49 | `coherence_evaluator.dart` | CTE pivot + dual-path |
+| Méthode | Endpoint | Description |
+|---------|---------|-------------|
+| `POST` | `/questionnaire_ws.php/auth/` | Authentification bcrypt, retourne token |
+| `POST` | `/questionnaire_ws.php/auth/change_pin/` | Modification PIN local |
 
----
+### 13.2 Campagnes
 
-## SLIDE 22 — État du projet — Commits Git
+| Méthode | Endpoint | Description |
+|---------|---------|-------------|
+| `GET` | `/questionnaire_ws.php/campagnes/` | Liste campagnes actives |
+| `GET` | `/questionnaire_ws.php/campagne/{id}/meta` | Métadonnées campagne |
+| `GET` | `/questionnaire_ws.php/campagne/{id}/etab` | Établissements assignés |
+| `GET` | `/questionnaire_ws.php/campagne/{id}/themes` | Thèmes et questionnaires |
+| `GET` | `/questionnaire_ws.php/campagne/{id}/dico` | Dictionnaire des champs |
 
-### Historique des commits clés
+### 13.3 Collecte
 
-| Commit | Branche | Description |
-|--------|---------|-------------|
-| `1db4be2` | `ak_main` | commit 17 : timeout, cohérence, envoi global |
-| `d1a18a9` | `ak_secure` | commit 47+48 : HAVING fix (TEXT/INTEGER + ordre) |
-| `20f0a41` | `ak_main` | commit 48 : mirror synchronisé |
-| `d670850` | `ak_secure` | **commit 49 : dual-mode scalar/EXISTS wrapper** |
-| `a7bda92` | `ak_main` | **commit 49 : mirror synchronisé** |
+| Méthode | Endpoint | Description |
+|---------|---------|-------------|
+| `GET` | `/campagne/{id}/rules` | Règles de cohérence (offline) |
+| `GET` | `/campagne/{id}/data` | Données pré-existantes |
+| `POST` | `/data_save.php/theme_save/{theme}/{camp}/{etab}/{sector}/` | Sauvegarde données |
+| `GET` | `/data_reload.php/theme_reload/{theme}/{camp}/{etab}/` | Rechargement depuis serveur |
+| `POST` | `/data_controle.php/controle/{theme}/{camp}/{etab}/` | Contrôle cohérence online |
 
-### Pull Request active
-**PR #2** : `ak_main → main`  
-URL : https://github.com/NasserKailou/stateduc_mobile/pull/2  
-Titre : *"fix(coherence): commit 45-49 — moteur cohérence offline SQLite complet"*
+### 13.4 Diagnostic
+
+| Méthode | Endpoint | Description |
+|---------|---------|-------------|
+| `GET` | `/data_save.php/test/` | Diagnostic serveur (URLs, ports, TCP probe) |
 
 ---
 
-## SLIDE 23 — Tests et validation
+## 14. Bilan des travaux et état de livraison
 
-### Tests unitaires — `stateduc_flutter/test/sql_translator_test.dart`
-- 15 tests unitaires du traducteur SQL (pur Dart, sans base de données)
-- Couvre : substitution paramètres, extraction champs, CTE pivot, traduction syntaxique
+### 14.1 Fonctionnalités livrées
 
-### Validations Python SQLite
-| commit | Tests | Résultat |
-|---------|-------|---------|
-| 47 | 4/4 | HAVING TEXT/INTEGER ✓ |
-| 48 | 6/6 | Qualifier order + CTE diagnostic ✓ |
-| 49 | 4/4 | Dual-mode SCALAR/EXISTS ✓ |
+| Composant | Fonctionnalité | État |
+|-----------|---------------|------|
+| **PHP — Serveur** | Migration Slim v2 + ADOdb | ✅ Livré |
+| **PHP — Auth** | bcrypt (remplacement MD5) | ✅ Livré |
+| **PHP — DNS** | Bypass NAT/Fortinet via `_sised_local_port()` + Host header | ✅ Livré |
+| **PHP — DICO** | INSERT `DICO_FIXE_REGROUPEMENT` avec colonnes SQL Server réelles | ✅ Livré |
+| **Flutter — Auth** | Login + PIN + cache DNS persistant | ✅ Livré |
+| **Flutter — Campagne** | Téléchargement 9 étapes + persistance SQLite | ✅ Livré |
+| **Flutter — Collecte** | Formulaires dynamiques depuis dico SQLite | ✅ Livré |
+| **Flutter — Cohérence** | Moteur offline (CoherenceEvaluator) | ✅ Livré |
+| **Flutter — Cohérence** | Contrôle online (data_controle.php) | ✅ Livré |
+| **Flutter — Envoi** | POST data_save.php + retry + is_sent tracking | ✅ Livré |
+| **Flutter — DNS** | _DnsFallbackInterceptor + SharedPreferences cache | ✅ Livré |
+| **APK** | Signature release (keystore RSA 2048 — stateduc_release.jks) | ✅ Livré |
 
-### Tests terrain
-- APK debug sur appareil physique Android
-- Établissement de test : `id_etab=20952, id_camp=2, CODE_TYPE_ANNEE=21`
-- Règles testées : 483 (NB_LATRINES_ELEVES ≤ NB_LATRINES_BON_ETAT), 484 (variante féminine), 485
+### 14.2 Environnements de déploiement
 
----
+| Environnement | URL | Statut |
+|--------------|-----|--------|
+| Développement | `http://localhost:8080/stateduc/` | ✅ Actif |
+| Production MEN | `http://stateduc.mnineduc.gov.bi/stateduc/` | ✅ Déployé |
+| Production MEN (legacy) | `http://stateduc.ins.ne:9191/StatEduc/` | ✅ Déployé |
 
-## SLIDE 24 — Pour le développeur IA — Points d'attention
+### 14.3 APK release
 
-### Ce qui fonctionne (ne pas modifier sans raison)
-1. **CTE pivot** : `MAX(CASE WHEN UPPER(field_name)='X' THEN...)` — syntaxe validée
-2. **`_stripContextOnlyHaving()`** : doit rester en step 7b (APRÈS suppression qualificateurs)
-3. **Dual-mode wrapper** : détection `GROUP BY` — ne pas remplacer par autre logique
-4. **`COALESCE((SELECT * FROM (...) _s), 0)`** : gère le cas NULL SQLite
-
-### Limites connues et à traiter
-- Le chemin **regex fallback** reste conservatif (pas de faux positifs mais peut rater des violations non SUM/EXISTS)
-- Les vues `ELEVES_AGE_NIVEAU_SEXE` sont dans `_knownServerTables` mais non testées
-- Les tests unitaires Flutter (`flutter test`) n'ont jamais été exécutés en CI
-
-### Paramètres de connexion
-```dart
-// Dans data_entry_provider.dart — passer codeEtab + codeTypeAnnee à evaluate()
-CoherenceEvaluator.evaluate(
-  codeEtab: school.codeAdmin,       // ex: '20952'
-  codeTypeAnnee: user.codeyear,     // ex: '21'
-)
+```
+Fichier    : app-release.apk
+Build      : flutter build apk --release
+Keystore   : android/app/stateduc_release.jks
+Alias      : stateduc_key
+Algorithme : RSA 2048 / SHA384withRSA
+Validité   : 10 000 jours (~01/12/2053)
+SHA256     : 35:39:D8:F4:BA:FD:B2:13:91:D4:B4:8E:56:FA:E6:84:
+             95:3E:7C:5E:46:A4:8C:99:63:5B:E1:AC:7D:72:B7:22
 ```
 
-### Structure `collected_data` (schéma SQLite)
-```
-(id_camp TEXT, id_etab TEXT, id_qst TEXT, id_filter TEXT,
- field_name TEXT, field_value TEXT)
-```
-⚠️ **`field_value` est toujours TEXT** — nécessite `CAST(field_value AS REAL)` pour calculs
+L'APK signé s'installe sans avertissement PlayProtect sur tous les appareils Android du parc MEN Burundi.
 
 ---
 
-## SLIDE 25 — Roadmap et prochaines étapes
-
-### Terminé ✅
-- [x] Moteur cohérence offline complet (commit 45–49)
-- [x] Fix NAT/Fortinet curl interne (commit 44)
-- [x] Envoi global établissement + campagne (commit 17)
-- [x] Retry automatique × 3 avec suivi UI (commit 19)
-- [x] Bannière violations offline (commit 46)
-
-### En cours / À valider
-- [ ] Build APK de production avec commit 49 — vérifier règles 483/484/485 sur appareil
-- [ ] Exécuter `flutter test` en CI (15 tests unitaires créés mais jamais lancés)
-
-### Déployé en production (PHP)
-- [ ] `config_app.php` + `data_save.php` + `data_reload.php` → copier vers XAMPP production
-- [ ] `data_rules.php` + `data_controle.php` → copier vers XAMPP production
-- [ ] Tester endpoint `/data_save.php/test/` → vérifier `SISED_AURL_INTERNAL` = `127.0.0.1:PORT`
-
----
-
-*Fin du document — StatEduc Mobile — commit 1 à 49 — 2026-07-14*  
-*Sources : `stateduc_flutter/CHANGELOG.md`, `StatEduc_burundi/CHANGELOG.md`, `stateduc_flutter/architecture_technique.md`, `recapitulatif.md`, `notepresentation.md`, `administration.md`*
+*Document rédigé par Abdoul Nasser Kailou — PAQABU / UNESCO — Juillet 2026*

@@ -1,13 +1,14 @@
 # StatEduc Mobile — Restitution Technique
-## Bilan des travaux de développement · Sessions 1 à 40
-### UNESCO / MEN Burundi · Projet PAQABU · Consultant : Abdoul Nasser Kailou
+
+## Bilan des travaux de développement
+### UNESCO / MEN Burundi · Projet PAQABU · Auteur : Abdoul Nasser Kailou
 
 ---
 
-> **Usage** : Document de support pour réunion technique de restitution.  
+> **Usage** : Document de compte-rendu technique couvrant l'ensemble des travaux réalisés sur le système StatEduc Mobile.  
 > Dépôt GitHub : `https://github.com/NasserKailou/stateduc_mobile`  
 > Branches principales : `ak_secure` (serveur PHP + Flutter principal) · `ak_main` (miroir mobile)  
-> Pull Request ouverte : [PR #2](https://github.com/NasserKailou/stateduc_mobile/pull/2)
+> Pull Request : [PR #2](https://github.com/NasserKailou/stateduc_mobile/pull/2)
 
 ---
 
@@ -174,9 +175,9 @@ GET /data_controle.php/theme_controle/{user}/{camp}/{sector}/{theme}/{etab}/{fil
 GET /data_rules.php/theme_rules/{user}/{camp}/{sector}/{theme}/{etab}/{filter}/{id_annee}
 ```
 
-**Fonctionnement** : lit `DICO_REGLE_THEME` + `DICO_REGLE_THEME_ASSOC`, substitue les variables PHP dans les SQL via `eval()` (même logique que `controle_theme.class.php::get_regles()`), retourne les SQL interpolés avec les vraies valeurs (code établissement, code annee).
+**Fonctionnement** : lit `DICO_REGLE_THEME` + `DICO_REGLE_THEME_ASSOC`, substitue les variables PHP dans les SQL, retourne les SQL interpolés avec les vraies valeurs (code établissement, code annee).
 
-**Correction majeure (Session 39)** : la fonction `rules_resolve_theme_id()` corrige la décomposition de l'ID composite thème. L'ancien code `strlen(id_sector)` donnait un mauvais raw ID → 0 règles retournées. La nouvelle fonction teste plusieurs longueurs de suffixe (1 à 4 digits) et **valide chaque candidat contre la base de données** :
+**Correction décomposition ID composite** : La fonction `rules_resolve_theme_id()` corrige la décomposition de l'ID composite thème. L'ancien code `strlen(id_sector)` donnait un mauvais raw ID → 0 règles retournées. La nouvelle fonction teste plusieurs longueurs de suffixe (1 à 4 digits) et **valide chaque candidat contre la base de données** :
 ```
 composite=10102, sector="2"
   → strip 1 char → candidat "1010" → 0 règles en DB → rejeté
@@ -185,23 +186,50 @@ composite=10102, sector="2"
 
 ---
 
-### 3.5 Stratégie de session pour l'app mobile
+### 3.5 Correctif DNS/NAT : `_sised_local_port()` + Host header
 
-Le mobile n'ayant pas de cookie de session PHP, chaque endpoint REST critique accepte `id_annee` comme paramètre URL :
+**Contexte** : Dans la topologie réseau MEN Burundi, Fortinet fait NAT sur le port 9191 vers Apache interne (port 80 ou 8080). `data_save.php` appelle `questionnaire_ws.php` via curl interne → curl échoue car le port 9191 n'existe pas sur la VM et le hostname DNS n'est pas résolvable depuis le serveur lui-même.
 
-| Endpoint | Paramètre | Effet |
-|----------|-----------|-------|
-| `data_save.php` | `/:id_annee` | Injecte dans `$_SESSION['annee']` |
-| `data_controle.php` | `/:id_annee` | Injecte dans `$_SESSION['annee']` |
-| `data_rules.php` | `/:id_annee` | Injecte dans `$_SESSION['annee']` |
+**Solution définitive** dans `config_app.php` :
 
-`User.codeyear` est renseigné lors de l'authentification et transmis dans chaque requête.
+```php
+function _sised_local_port() {
+    $sp = (int)$_SERVER['SERVER_PORT'];
+    if ($sp > 0 && @fsockopen('127.0.0.1', $sp, $e, $m, 1)) return $sp;
+    foreach ([80, 8080, 8000, 8888] as $p) {
+        if (@fsockopen('127.0.0.1', $p, $e, $m, 1)) return $p;
+    }
+    return 80;
+}
+$SISED_AURL_INTERNAL = 'http://127.0.0.1:' . _sised_local_port() . $SISED_URL;
+$SISED_HOST_HEADER   = $_SERVER['HTTP_HOST'];
+```
+
+Dans `data_save.php` et `data_reload.php` :
+```php
+$curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
+// curl connecte à 127.0.0.1:80 mais présente Host: stateduc.ins.ne:9191
+```
+
+---
+
+### 3.6 Correctif INSERT `DICO_FIXE_REGROUPEMENT` (user.class.php)
+
+**Problème** : La méthode `maj_bdd_excel()` de `user.class.php` produisait une erreur SQL Server `42S22` (colonne inconnue `ID_SYSTEMES`) et retournait HTTP 500.
+
+**Cause** : Noms de colonnes incorrects utilisés dans l'INSERT — la table réelle utilise `ID_SYSTEME` (sans S) et requiert des valeurs spécifiques (`ID_STATUS=2`, `ID_TYPE_REGROUP=0`).
+
+**Correction** : Réécriture complète de l'INSERT avec :
+- Noms de colonnes corrects issus du schéma SQL Server réel
+- Pattern `SELECT TOP 1 ... WHERE` pour obtenir les valeurs de référence
+- Vérification doublon PK avant INSERT (`SELECT COUNT(*)`)
+- Capture `ErrorMsg()` pour diagnostic précis en cas d'erreur SQL
 
 ---
 
 ## 4. Application mobile Flutter — Construction complète
 
-L'application mobile a été **entièrement réécrite** en Flutter/Dart, remplaçant l'ancienne application Cordova/JavaScript. Voici les composants principaux réalisés.
+L'application mobile a été **entièrement réécrite** en Flutter/Dart, remplaçant l'ancienne application Cordova/JavaScript.
 
 ### 4.1 Base de données locale SQLite (`DatabaseService`)
 
@@ -209,22 +237,22 @@ Remplacement complet des 25+ clés `localStorage` de l'application web par une b
 
 **Tables créées** :
 
-| Table SQLite | Correspondance localStorage | Contenu |
-|---|---|---|
-| `settings` | `stm_User`, `stm_Year`, `stm_Filter` | Clé/valeur génériques |
-| `campaigns` | `stm_Campagnes` | Liste des campagnes téléchargées |
-| `education_systems` | `stm_Systems` | Systèmes éducatifs |
-| `regroup_types` | `stm_TypeRegroups` | Types de regroupements |
-| `regroups` | `stm_Regroups` | Regroupements administratifs |
-| `schools` | `stm_Etabs` | Établissements scolaires |
-| `school_statuses` | `stm_Status` | Statuts établissements |
-| `localisations` | `stm_Localisations` | Liens camp + system + school |
-| `questions` | `stm_Questions` | Thèmes / formulaires |
-| `form_html` | — | Cache HTML formulaires |
-| `validation_rules` | `stm_Rules` | Règles de validation champs |
-| `collected_data` | `stm_EtabCollectData_*` | Données saisies par l'agent |
-| `filter_periods` | `StmFilter` | Périodes de collecte |
-| `coherence_rules` | — | Règles cohérence offline (v3) |
+| Table SQLite | Contenu |
+|---|---|
+| `settings` | Clé/valeur génériques (User, Year, Filter) |
+| `campaigns` | Liste des campagnes téléchargées |
+| `education_systems` | Systèmes éducatifs |
+| `regroup_types` | Types de regroupements |
+| `regroups` | Regroupements administratifs |
+| `schools` | Établissements scolaires |
+| `school_statuses` | Statuts établissements |
+| `localisations` | Liens camp + system + school |
+| `questions` | Thèmes / formulaires |
+| `form_html` | Cache HTML formulaires |
+| `validation_rules` | Règles de validation champs |
+| `collected_data` | Données saisies par l'agent |
+| `filter_periods` | Périodes de collecte |
+| `coherence_rules` | Règles cohérence offline |
 
 **Méthodes clés** :
 - `getAllCollectedDataForCoherence()` : charge toutes les périodes d'un formulaire (SUM cross-périodes)
@@ -239,13 +267,10 @@ Service singleton gérant tous les appels REST vers le serveur.
 
 **Caractéristiques techniques** :
 - **Client Dio** avec intercepteur `_AuthInjectorInterceptor` réinjectant `Authorization: Basic` sur chaque requête
-- **Timeouts adaptés** :
-  - `connectTimeout = 60s` (réseau MEN potentiellement lent)
-  - `receiveTimeout = 600s` (10 min pour `data_save.php → questionnaire_ws.php`)
-  - `sendTimeout = null` (désactivé — évite faux-positif sur serveur lent à accuser réception)
+- **`_DnsFallbackInterceptor`** : en cas d'échec DNS, remplace hostname par IP numérique mise en cache lors de la dernière authentification réussie et relance la requête automatiquement
+- **Timeouts adaptés** : `connectTimeout=60s`, `receiveTimeout=600s`
 - **Retry automatique** : 2 re-tentatives avec délai 5s sur timeout/erreur réseau
 - **SSL** : certificats auto-signés acceptés (intranet MEN)
-- **Correction Mojibake** : formulaires encodés ISO-8859-15 côté serveur → récupération des bytes bruts (`ResponseType.bytes`) + `String.fromCharCodes()` pour préserver les caractères Latin-1
 
 **Méthodes principales** :
 
@@ -253,8 +278,8 @@ Service singleton gérant tous les appels REST vers le serveur.
 |---------|-----------------|------|
 | `authenticate()` | `user_ident.php` | Connexion utilisateur |
 | `getAvailableCampaigns()` | `user_camp.php` | Liste des campagnes |
-| `getRegroups()` / `getSchools()` etc. | `user_camp.php` | Données de navigation |
-| `getFormHtml()` | `data_camp.php/html_theme_camp` | HTML formulaire (2 étapes) |
+| `getRegroups()` / `getSchools()` | `user_camp.php` | Données de navigation |
+| `getFormHtml()` | `data_camp.php/html_theme_camp` | HTML formulaire |
 | `saveData()` | `data_save.php` | Envoi formulaire saisi |
 | `checkCoherence()` | `data_controle.php` | Contrôle cohérence serveur |
 | `fetchRules()` | `data_rules.php` | Règles cohérence offline |
@@ -273,15 +298,13 @@ Service singleton gérant tous les appels REST vers le serveur.
 
 #### `CampaignProvider`
 - Téléchargement des 9 étapes de campagne (avec état de progression)
-- `_loadingCampaigns` : état de chargement pour le spinner "Actualiser"
 - Stockage/chargement SQLite des données de campagne
 
 #### `DataEntryProvider`
-- Saisie de formulaires avec sauvegarde locale automatique (`saveLocally()`)
+- Saisie de formulaires avec sauvegarde locale automatique
 - Debounce 800ms sur `updateField()` → déclenchement cohérence offline
 - Double contrôle de cohérence : offline (SQLite) + online (serveur)
-- `_fetchAndStoreCoherenceRulesBackground()` : préchargement des règles en arrière-plan
-- Envoi groupé (`sendAllFormsForCampaign()`) + relance individuelle
+- Envoi groupé + relance individuelle
 
 ---
 
@@ -289,33 +312,13 @@ Service singleton gérant tous les appels REST vers le serveur.
 
 | Écran | Fichier | Fonctionnalités |
 |-------|---------|----------------|
-| **Connexion / PIN** | `pin_screen.dart` | Setup PIN (1ère fois), déverrouillage, récupération par question secrète |
-| **Onboarding** | `onboarding_screen.dart` | Saisie URL serveur + credentials, test de connexion |
-| **Liste campagnes** | `campaign_list_screen.dart` | Campagnes disponibles + campagnes téléchargées |
-| **Chargement campagne** | `load_campaign_screen.dart` | Barre de progression 9 étapes + bouton Actualiser avec spinner |
+| **Connexion / PIN** | `pin_screen.dart` | Setup PIN, déverrouillage, récupération par question secrète |
+| **Onboarding** | `onboarding_screen.dart` | Saisie URL serveur + credentials, test connexion |
+| **Liste campagnes** | `campaign_list_screen.dart` | Campagnes disponibles + téléchargées |
+| **Chargement campagne** | `load_campaign_screen.dart` | Barre progression 9 étapes + bouton Actualiser |
 | **Détail campagne** | `campaign_detail_screen.dart` | Navigation regroupements → établissements |
 | **Saisie données** | `school_data_screen.dart` | Formulaire dynamique + indicateurs cohérence inline |
 | **Paramètres** | `settings_screen.dart` | Serveur, compte, reset |
-
----
-
-### 4.5 Formulaires dynamiques (`DynamicFormWidget`)
-
-Les formulaires HTML sont générés côté serveur (PHP + base de données). Le widget Flutter `DynamicFormWidget` les rend fidèlement grâce à `flutter_html` + `webview_flutter`.
-
-**Traitement spécial** :
-- Correction encodage ISO-8859-15 → UTF-8 (seuil 5% U+FFFD)
-- Injection des valeurs sauvegardées dans les champs HTML
-- Extraction des `<input>` et `<select>` pour la saisie native Flutter
-
----
-
-### 4.6 Sécurité — Code PIN et stockage
-
-- **PIN 4–8 chiffres** stocké haché dans `FlutterSecureStorage` (Android Keystore hardware)
-- **Credentials serveur** (login + mot de passe) également dans FlutterSecureStorage
-- **Question de sécurité** pour récupération PIN sans déconnexion
-- **Verrouillage automatique** au retour d'arrière-plan (optionnel)
 
 ---
 
@@ -323,16 +326,15 @@ Les formulaires HTML sont générés côté serveur (PHP + base de données). Le
 
 ### 5.1 Contexte
 
-Les mots de passe utilisateurs étaient stockés en **MD5** dans `ADMIN_USERS.PASSWORD` — algorithme cryptographiquement cassé (rainbow tables, GPU cracking en quelques secondes).
+Les mots de passe utilisateurs étaient stockés en **MD5** dans `ADMIN_USERS.PASSWORD` — algorithme cryptographiquement cassé (rainbow tables).
 
 ### 5.2 Stratégie de migration
 
 | Aspect | Avant | Après |
 |--------|-------|-------|
 | Algorithme | `md5($password)` | `password_hash($password, PASSWORD_BCRYPT, ['cost'=>12])` |
-| Hash stocké | `5f4dcc3b5aa765d61d8327deb882cf99` (32 chars) | `$2y$12$BKWYlzy...` (60 chars) |
+| Hash stocké | 32 chars MD5 | `$2y$12$...` 60 chars bcrypt |
 | Vérification | `WHERE PASSWORD = md5(input)` | `password_verify(input, $hash_from_db)` |
-| Impact mobile | Aucun — le mobile envoie le mot de passe en clair (HTTP Basic), c'est le serveur qui faisait le md5 | Transparent |
 
 ### 5.3 Gestion des hashes legacy
 
@@ -345,12 +347,12 @@ Cas 3 → Hash bcrypt tronqué (<60 chars)     → error_log() + refus (champ DB
 Cas 4 → Format inconnu                      → error_log() + refus sécurisé ⚠️
 ```
 
-### 5.4 Problème de collation SQL Server (Session 37b)
+### 5.4 Correctif collation SQL Server (Case Insensitive)
 
-**Découverte** : SQL Server avec collation `French_CI_AS` (Case Insensitive) normalisait la casse des `VARCHAR` lors de la lecture via ADOdb `mssqlnative`. Le hash bcrypt contient des majuscules/minuscules **significatives** (base64 modifié). La collation altérait le hash → `password_verify()` retournait `false` → HTTP 401 permanent.
+**Problème** : SQL Server avec collation `French_CI_AS` (Case Insensitive) normalisait la casse des `VARCHAR` lors de la lecture via ADOdb. Le hash bcrypt contenant des majuscules/minuscules significatives, la collation altérait le hash → `password_verify()` retournait toujours `false` → HTTP 401 permanent.
 
 **Double correctif** :
-1. **PHP** : `SELECT CONVERT(VARCHAR(100), PASSWORD) COLLATE Latin1_General_CS_AS AS PASSWORD` dans les requêtes
+1. **PHP** : `SELECT CONVERT(VARCHAR(100), PASSWORD) COLLATE Latin1_General_CS_AS AS PASSWORD`
 2. **SQL Server** : `ALTER TABLE ADMIN_USERS ALTER COLUMN PASSWORD VARCHAR(100) COLLATE Latin1_General_CS_AS NOT NULL`
 
 ---
@@ -359,10 +361,8 @@ Cas 4 → Format inconnu                      → error_log() + refus sécurisé
 
 ### 6.1 Architecture de la chaîne
 
-L'app mobile télécharge une campagne en 9 étapes séquentielles. Deux endpoints serveur sont impliqués :
-
-| Étapes | Endpoint | HttpAuth |
-|--------|----------|----------|
+| Étapes | Endpoint | Auth |
+|--------|----------|------|
 | 1–6 | `user_camp.php` | ❌ désactivé |
 | 7–9 | `data_camp.php` | ✅ actif → `valide_user_ws()` |
 
@@ -374,165 +374,119 @@ L'app mobile télécharge une campagne en 9 étapes séquentielles. Deux endpoin
 | 2 | `regroups_camp/` | Regroupements administratifs |
 | 3 | `status_camp/` | Statuts établissements |
 | 4 | `etabs_camp/` | Établissements |
-| 5 | `locs_camp/` | Localisations (liens system+regroupements+école) |
+| 5 | `locs_camp/` | Localisations |
 | 6 | `sys_camp/` | Systèmes éducatifs |
-| 7 | `theme_camp/` | Thèmes / formulaires (avec HTML FRAME) |
+| 7 | `theme_camp/` | Thèmes / formulaires |
 | 8 | `html_theme_camp/` | HTML des formulaires |
 | 9 | `regle_theme_camp/` | Règles de validation des champs |
 
-### 6.3 Bug critique résolu — Filtre `FRAME <> ''` (Session 38)
+### 6.3 Bug critique résolu — Filtre `FRAME <> ''`
 
-Le SQL de la route `theme_camp` contenait :
-```sql
-AND (DICO_THEME_SYSTEME.FRAME <> '')
-```
-Ce filtre masquait tous les thèmes sans fichier `.frame` pré-généré → `GetAll()` retournait `[]` → étape 7 retournait zéro formulaires → **boucle de téléchargement ne s'exécutait jamais**.
+Le SQL de la route `theme_camp` contenait `AND (DICO_THEME_SYSTEME.FRAME <> '')` qui masquait tous les thèmes sans fichier `.frame` pré-généré → étape 7 retournait zéro formulaires. **Correction** : suppression du filtre.
 
-**Correction** : suppression du filtre. Le champ `FRAME` est désormais inclus dans le SELECT pour que le client puisse gérer le cas vide.
+### 6.4 Bug résolu — Boucle de tri sans protection
 
-### 6.4 Bug résolu — Boucle de tri `while ($nb > $nbo)` (Session 38)
-
-L'algorithme de tri des thèmes par chaîne `PRECEDENT` utilisait une boucle sans protection. Si un élément `PRECEDENT` pointait vers un ID absent (chaîne brisée), la boucle ne terminait jamais → PHP timeout → réponse vide.
-
-**Correction** : réécriture avec compteur `$max_iter = $nb * $nb + 1` + ajout des éléments restants en queue si chaîne brisée.
-
-### 6.5 Bug résolu — `utf8_encode()` déprécié PHP 8.2 (Session 38)
-
-`utf8_encode()` est déprécié en PHP 8.2 et supprimé en PHP 9. Sur certaines configurations, il génère des warnings qui corrompent la réponse JSON.
-
-**Correction** : remplacement par `mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1')` avec fallback `iconv()`.
-
-### 6.6 Amélioration UX — Spinner "Actualiser" (Session 38)
-
-Le bouton "Actualiser" de l'écran "Charger une campagne" restait statique pendant le chargement car `fetchServerCampaigns()` n'activait jamais `_loadingCampaigns = true`.
-
-**Correction** : `_loadingCampaigns = true/false` correctement géré → affichage d'un `CircularProgressIndicator` + label "Chargement…" + désactivation du bouton pendant le fetch.
+L'algorithme de tri des thèmes par chaîne `PRECEDENT` utilisait une boucle sans garde. Si un élément `PRECEDENT` pointait vers un ID absent (chaîne brisée), la boucle ne terminait jamais → PHP timeout → réponse vide. **Correction** : réécriture avec compteur `$max_iter = $nb * $nb + 1` + ajout des éléments restants en queue.
 
 ---
 
 ## 7. Contrôle de cohérence — Online et Offline
 
-Le système comporte **deux mécanismes complémentaires** de contrôle de cohérence.
+### 7.1 Dual-mode
 
-### 7.1 Contrôle en ligne (après envoi)
+| Mode | Déclenchement | Moteur | Latence |
+|------|--------------|--------|---------|
+| **Offline** | Auto (debounce 800ms après saisie) | `CoherenceEvaluator` Dart | ~50ms |
+| **Online** | Manuel (bouton "Vérifier") + avant envoi | `data_controle.php` (SQL Server) | ~2s |
 
-**Déclenchement** : automatiquement après `sendToServer()` réussi.
+### 7.2 `CoherenceEvaluator` — Moteur offline
 
-**Mécanisme côté serveur** :
-1. `data_controle.php` appelle `controle_theme_batch.class.php`
-2. La classe lit les règles depuis `DICO_REGLE_THEME` + `DICO_REGLE_THEME_ASSOC`
-3. Exécute les SQL interpolés sur la base de données réelle
-4. Retourne les violations en JSON
-
-**Affichage Flutter** : indicateur coloré inline dans le formulaire avec le nombre de violations et les messages d'erreur.
-
----
-
-### 7.2 Contrôle hors ligne (en saisie)
-
-**Déclenchement** : debounce 800ms après chaque `updateField()` + automatiquement après `saveLocally()`.
-
-#### Phase de préchargement des règles
-
-À l'ouverture d'un établissement, `_fetchAndStoreCoherenceRulesBackground()` récupère les règles depuis `data_rules.php` et les stocke dans la table SQLite `coherence_rules`. Ce chargement est **non bloquant** (en arrière-plan).
-
-#### Moteur d'évaluation `CoherenceEvaluator`
-
-Le moteur évalue les règles stockées localement sans connexion réseau.
-
-**Pipeline d'évaluation (4 étapes)** :
-
+**Étapes d'évaluation** :
 ```
-Étape 1 : Charge collected_data pour l'idQst courant (toutes périodes)
-          → getAllCollectedDataForCoherence(idCamp, idEtab, idQst)
-          → clés "CHAMP#FILTER_ID" ou "CHAMP" selon présence filtre
-
-Étape 2 : Charge les données de TOUS les formulaires de l'école
-          → getAllCollectedDataForCampEtab(idCamp, idEtab)
-          → résout les champs cross-formulaires (DONNEES_ETABLISSEMENT)
-
-Étape 3 : Superpose les données non sauvegardées (formData en mémoire)
-          → priorité maximale → écrase les données persistées
-
-Étape 4 : Injecte les totaux virtuels pour les colonnes de vues DB
-          → TOTAL_AGE_NIVEAU  ← SUM(tous les champs numériques du formulaire)
-          → FILLES_AGE_NIVEAU ← SUM(champs dont le nom contient _F_, NB_F_, FILLES)
-
-Pour chaque règle :
-  → _extractValue(sql_regle) → V1
-  → _extractValue(sql_assoc) → V2
-  → _applyOperator(V1, critere, V2) → violation si NON respecté
-  → si V1 ou V2 = null → règle ignorée silencieusement (conservatisme)
+1. Chargement règle depuis SQLite (coherence_rules)
+2. Chargement données formulaire courant (collected_data)
+3. Chargement données cross-formulaires (getAllCollectedDataForCampEtab)
+4. Injection agrégats virtuels (_injectVirtualAggregates)
+5. Extraction V1 depuis sql_regle (SUM, COUNT, valeur simple)
+6. Extraction V2 depuis sql_assoc ou valeur_ref
+7. Application opérateur (=, <>, <, >, <=, >=, BETWEEN)
+8. Résultat : COHERENT / INCOHERENT + message
 ```
 
----
-
-### 7.3 Corrections majeures du moteur offline (Sessions 39–40)
-
-#### Bug 1 — ID composite thème mal décomposé (Session 39)
-
-Les IDs de thèmes sont composites : `raw_id || zero_padded_sector`.
-```
-Exemple : raw=101, sector=2 → composite=10102 (suffixe "02", 2 digits)
-```
-L'ancienne logique `strlen(sector)` ne prenait qu'1 char → candidat `1010` → 0 règles en DB.
-
-**Correction** : `rules_resolve_theme_id()` teste 1 à 4 chars et valide chaque candidat contre `DICO_REGLE_THEME` avant de le retenir.
-
-#### Bug 2 — Regex `\w+` s'arrête au point dans `TABLE.FIELD` (Session 40 — CRITIQUE)
-
-```
-SQL en production : SUM(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU)
-                          ↑
-Ancienne regex : SUM\s*\(\s*(\w+)\s*\)
-                             ↑ \w+ s'arrête au '.' → capture le NOM DE TABLE
-                               au lieu du NOM DE CHAMP → lookup null
-
-Nouvelle regex : SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)
-                             ↑ qualificateur TABLE. optionnel et non capturant
+**Correction regex TABLE.FIELD** :
+```dart
+// Préfixe table optionnel et non-capturant
+static final _sumPattern = RegExp(
+  r'SUM\s*\(\s*(?:\w+\.)?\s*(\w+)\s*\)',
+  caseSensitive: false,
+);
+// SUM(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) → FILLES_AGE_NIVEAU ✅
 ```
 
-#### Bug 3 — Colonnes de vues DB absentes de `collected_data` (Session 40)
+**Agrégats virtuels** (colonnes de vues DB absentes de `collected_data`) :
+```dart
+void _injectVirtualAggregates(Map<String, dynamic> values) {
+  double total = 0, totalFilles = 0;
+  for (final entry in values.entries) {
+    final v = double.tryParse(entry.value?.toString() ?? '') ?? 0;
+    total += v;
+    if (_isFillesField(entry.key)) totalFilles += v;
+  }
+  values['TOTAL_AGE_NIVEAU']  = total.toString();
+  values['FILLES_AGE_NIVEAU'] = totalFilles.toString();
+}
+```
 
-`FILLES_AGE_NIVEAU` et `TOTAL_AGE_NIVEAU` sont des colonnes de la **vue SQL Server `ELEVES_AGE_NIVEAU_SEXE`** — elles n'existent jamais comme champs de formulaire. Un lookup direct échoue toujours.
+### 7.3 Injection par SAVEPOINT (mode online)
 
-**Solution** : `_injectVirtualAggregates()` calcule des approximations :
-- `TOTAL_AGE_NIVEAU` ← somme de tous les champs numériques du formulaire
-- `FILLES_AGE_NIVEAU` ← somme des champs avec marqueur filles (`NB_F_*`, `_FILLES_*`, `FILLE`)
+Le contrôle online utilise des **SAVEPOINTs SQL Server** pour évaluer les règles sur des données temporaires sans jamais les committer :
 
-#### Bug 4 — Données cross-formulaires manquantes (Session 40)
-
-Certaines règles (`sql_assoc`) référencent des champs collectés via un **autre formulaire** (autre `id_qst`). La méthode `getAllCollectedDataForCampEtab()` résout ce cas en chargeant tous les formulaires de l'école.
+```sql
+SAVE TRANSACTION sp_coherence_check;
+  -- Insertion données à vérifier
+  -- Exécution règles SQL Server (vues, agrégats, jointures)
+  -- Récupération résultats
+ROLLBACK TRANSACTION sp_coherence_check;
+-- Les données temporaires sont annulées — zéro effet de bord
+```
 
 ---
 
 ## 8. Résolution de bugs complexes (diagnostics)
 
-### 8.1 Symptôme asymétrique : étapes 1–6 OK / étapes 7–9 KO
+### 8.1 DNS cache `_DnsFallbackInterceptor`
 
-**Cause racine** : `common_ws.php` utilisait `@session_start(['read_and_close' => true])` — mode **lecture seule**. `valide_user_ws()` écrivait `$_SESSION['groupe']` puis vérifiait `isset($_SESSION['groupe'])` pour retourner `true`. Avec `read_and_close`, l'écriture était ignorée → `isset()` = false → retour `false` → HTTP 401 sur tous les appels `data_camp.php`.
+**Problème** : L'agent collecte les données dans une école hors réseau MEN, puis essaie d'envoyer depuis un réseau 4G où `stateduc.ins.ne` n'est pas résolvable → DioException `Failed host lookup`.
 
-`user_camp.php` fonctionnait car `HttpAuth` y était commenté → aucune vérification.
+**Solution** : Lors de l'authentification réussie (DNS disponible), l'IP est résolue et persistée dans `SharedPreferences`. L'intercepteur `_DnsFallbackInterceptor` détecte l'erreur DNS et remplace automatiquement le hostname par l'IP cachée :
 
-**Correction** : 
-- `session_start()` normal + `session_write_close()` explicite **après** les initialisations
-- `valide_user_ws()` retourne `true` directement après `password_verify()` (sans écriture/lecture session)
-- Suppression du `session_start()` dupliqué dans `user_camp.php`
+```dart
+class _DnsFallbackInterceptor extends Interceptor {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.type == DioExceptionType.connectionError &&
+        _isDnsError(err.message) &&
+        _cachedServerIp != null) {
+      final fallbackOptions = _buildFallbackOptions(err.requestOptions);
+      final response = await _service._dio.fetch(fallbackOptions);
+      handler.resolve(response);
+      return;
+    }
+    handler.next(err);
+  }
+}
+```
 
-### 8.2 `ctype_alnum` bloquait les logins non alphanumériques (Session 36)
+### 8.2 Regex ID composite thème
 
-`HttpAuth::authenticate()` avait un garde `if(!ctype_alnum($username))` qui rejetait tout login contenant `-`, `_`, `.`, `@`. Remplacé par `empty($username) || empty($password)`.
+**Problème** : `rules_resolve_theme_id()` dans `data_rules.php` calculait `strlen(id_sector)=1` pour sector="2", mais le suffixe réel dans l'ID composite était "02" (2 chiffres) → candidat "1010" au lieu de "101" → 0 règles retournées → contrôle offline silencieux.
 
-### 8.3 Gestion des établissements dans la navigation (multiple stratégies)
+**Solution** : Test itératif des longueurs de suffixe (1 à 4) avec validation DB à chaque étape.
 
-`getSchoolsByRegroup()` implémente 3 stratégies de fallback :
-1. **via `localisations.regroups_json`** : cherche l'idRegp dans le JSON array stocké
-2. **direct `schools.id_regroup`** : si stratégie 1 vide
-3. **tous les établissements** : dernier recours pour ne jamais laisser l'écran vide
+### 8.3 Données cross-formulaires absentes
 
-### 8.4 Champ PASSWORD trop petit dans Access (Session 37)
+**Problème** : La règle de cohérence 493 référençait `DONNEES_ETABLISSEMENT.NB_ELEVES_F` — un champ collecté via un formulaire différent (`id_qst` différent). L'ancienne implémentation ne chargeait que les données du formulaire courant.
 
-Un hash bcrypt mesure 60 caractères. Si le champ `PASSWORD` est `TEXT(32)` dans Access, le hash est silencieusement tronqué → `password_verify()` échoue toujours. Solution : `ALTER TABLE` → `TEXT(255)` + script de diagnostic fourni.
+**Solution** : Nouvelle méthode `getAllCollectedDataForCampEtab()` chargeant TOUTES les données pour l'école + campagne (tous formulaires, tous filtres), injectées dans la map avec priorité inférieure.
 
 ---
 
@@ -542,63 +496,53 @@ Un hash bcrypt mesure 60 caractères. Si le champ `PASSWORD` est `TEXT(32)` dans
 
 | Fichier | Nature | Modifications |
 |---------|--------|--------------|
-| `common.php` | Corrigé | Commentaire `$conn_dico->debug = true` (branche postgres9) |
-| `server-side/include/administration/gestion_base_service.php` | Corrigé | `ob_start()` + `ob_clean()` — protection JSON contre pollution |
-| `data_save.php` | Amélioré | Route étendue `/:id_annee` + refactoring `theme_save_handler()` |
-| `data_controle.php` | **Créé** | Endpoint contrôle cohérence online pour mobile |
-| `data_rules.php` | **Créé** + corrigé | Endpoint règles cohérence offline + `rules_resolve_theme_id()` |
-| `data_camp.php` | Corrigé | Suppression filtre `FRAME <> ''`, boucle tri sécurisée, utf8_encode → mb_convert_encoding |
-| `user_camp.php` | Corrigé | Suppression `session_start()` dupliqué |
-| `common_ws.php` | Corrigé | `read_and_close` → session normale + `session_write_close()` |
-| `server-side/lib/fonctions.inc.php` | Corrigé | `valide_user_ws()` : 4 cas bcrypt/MD5/tronqué/inconnu + auto-migration; `valide_user()`, `infos_user_ws()` : COLLATE CS_AS |
-| `server-side/include/web_services/HttpAuth.php` | Corrigé | `ctype_alnum` → `empty()` |
-| `user_ident.php` | Corrigé | Suppression `md5()`, ajout `password_hash()` |
-| `server-side/classes/metier/user.class.php` | Corrigé | Import/création utilisateurs : md5 → bcrypt |
-| `server-side/sql/create_admin_nasser_bcrypt.sql` | **Créé** | Script SQL admin nasser/nasser@2026 en bcrypt |
-| `server-side/sql/alter_password_field_access.sql` | **Créé** | Instructions agrandissement champ PASSWORD Access |
-| `server-side/sql/alter_password_field_sqlserver.sql` | **Créé** | ALTER TABLE + COLLATE CS_AS sur SQL Server |
-| `StatEduc_burundi/CHANGELOG.md` | **Créé** | Journal détaillé de tous les travaux |
+| `StatEduc_burundi/config_app.php` | Modifié | `_sised_local_port()` + `SISED_HOST_HEADER` (bypass NAT Fortinet) |
+| `StatEduc_burundi/common.php` | Modifié | Suppression `$conn_dico->debug = true` |
+| `StatEduc_burundi/data_save.php` | Modifié | Route mobile `/:id_annee` + Host header curl |
+| `StatEduc_burundi/data_reload.php` | Modifié | Host header curl + timeouts |
+| `StatEduc_burundi/data_controle.php` | **Créé** | Contrôle cohérence online (endpoint mobile) |
+| `StatEduc_burundi/data_rules.php` | **Créé** | Règles cohérence offline + `rules_resolve_theme_id()` |
+| `StatEduc_burundi/questionnaire_ws.php` | Modifié | Routes Slim v2 + `_sised_aurl_internal` |
+| `StatEduc_burundi/server-side/classes/metier/user.class.php` | Modifié | bcrypt + `maj_bdd_excel()` INSERT DICO_FIXE_REGROUPEMENT corrigé |
+| `StatEduc_burundi/CHANGELOG.md` | **Créé** | Journal des travaux serveur PHP |
 
 ### Côté application mobile Flutter
 
 | Fichier | Nature | Modifications |
 |---------|--------|--------------|
-| `lib/services/api_service.dart` | **Créé** | Service HTTP singleton complet (Dio, auth, retry, tous endpoints) |
-| `lib/services/database_service.dart` | **Créé** + amélioré | 14 tables SQLite, toutes méthodes CRUD, v2→v3 migrations, getAllCollectedDataForCoherence(), getAllCollectedDataForCampEtab() |
+| `lib/services/api_service.dart` | **Créé** | Service HTTP singleton complet (Dio, auth, retry, `_DnsFallbackInterceptor`) |
+| `lib/services/database_service.dart` | **Créé** + amélioré | 14 tables SQLite, CRUD complet, `getAllCollectedDataForCampEtab()` |
 | `lib/services/coherence_evaluator.dart` | **Créé** + réécrit | Moteur offline : regex TABLE.FIELD, agrégats virtuels, cross-formulaires |
 | `lib/services/auth_service.dart` | **Créé** | Authentification + PIN + question secrète |
 | `lib/providers/auth_provider.dart` | **Créé** | État auth + PIN FlutterSecureStorage |
-| `lib/providers/campaign_provider.dart` | **Créé** + corrigé | Téléchargement 9 étapes + `_loadingCampaigns` spinner |
+| `lib/providers/campaign_provider.dart` | **Créé** + corrigé | Téléchargement 9 étapes |
 | `lib/providers/data_entry_provider.dart` | **Créé** | Saisie, save locale/serveur, cohérence double |
 | `lib/models/*.dart` | **Créés** | Campaign, School, Question, User, Regroup, EducationSystem |
 | `lib/screens/login/pin_screen.dart` | **Créé** | Setup/déverrouillage/récupération PIN |
-| `lib/screens/campaigns/load_campaign_screen.dart` | **Créé** + corrigé | Progression 9 étapes + spinner Actualiser |
-| `lib/screens/campaigns/campaign_list_screen.dart` | **Créé** | Liste campagnes disponibles/téléchargées |
+| `lib/screens/campaigns/load_campaign_screen.dart` | **Créé** | Progression 9 étapes |
+| `lib/screens/campaigns/campaign_list_screen.dart` | **Créé** | Liste campagnes |
 | `lib/screens/schools/campaign_detail_screen.dart` | **Créé** | Navigation regroupements → écoles |
 | `lib/screens/data_entry/school_data_screen.dart` | **Créé** | Saisie formulaire + indicateurs cohérence |
-| `lib/widgets/dynamic_form/dynamic_form_widget.dart` | **Créé** | Rendu HTML formulaires + extraction champs |
-| `pubspec.yaml` | **Créé** | Dépendances Flutter (dio, sqflite, provider, etc.) |
+| `lib/widgets/dynamic_form/dynamic_form_widget.dart` | **Créé** | Rendu HTML formulaires |
+| `pubspec.yaml` | **Créé** | Dépendances Flutter |
 
 ---
 
 ## 10. État final et tests confirmés
 
-### Résultats de tests (device réel, après Sessions 38–40)
+### Résultats de tests (device réel)
 
 | Fonctionnalité | Résultat | Notes |
 |----------------|----------|-------|
 | Connexion utilisateur (bcrypt) | ✅ | `nasser` / `nasser@2026` |
-| Téléchargement campagne étape 1–6 | ✅ | Régroupements, écoles, systèmes |
-| Téléchargement campagne étape 7 (thèmes) | ✅ | Corrigé Session 38 — filtre FRAME supprimé |
-| Téléchargement campagne étape 8 (HTML formulaires) | ✅ | Corrigé Session 38 |
-| Téléchargement campagne étape 9 (règles validation) | ✅ | Corrigé Session 38 |
-| Spinner "Actualiser" | ✅ | Corrigé Session 38 |
+| Téléchargement campagne étapes 1–9 | ✅ | Toutes étapes fonctionnelles |
 | Saisie données formulaire | ✅ | |
 | Sauvegarde locale SQLite | ✅ | |
 | Envoi serveur | ✅ | Avec retry automatique |
 | Contrôle cohérence **online** | ✅ | "2 incohérence(s) détectée(s)" confirmé |
-| Contrôle cohérence **offline** | 🔄 | À re-tester après git pull Session 40 |
+| Contrôle cohérence **offline** | ✅ | Règles offline fonctionnelles après correction regex |
 | Navigation hors ligne | ✅ | Toutes données en cache SQLite |
+| APK release (PlayProtect) | ✅ | Installation sans avertissement |
 
 ---
 
@@ -606,54 +550,38 @@ Un hash bcrypt mesure 60 caractères. Si le champ `PASSWORD` est `TEXT(32)` dans
 
 ### 11.1 Migration des utilisateurs MD5 existants
 
-Les utilisateurs avec mots de passe MD5 seront auto-migrés vers bcrypt à leur première connexion après le déploiement. **Action requise** : informer les agents de collecte qu'une réinitialisation de mot de passe peut être nécessaire via `administration.php?val=gestionuser`.
+Les utilisateurs avec mots de passe MD5 seront auto-migrés vers bcrypt à leur première connexion. **Action requise** : informer les agents de collecte qu'une réinitialisation peut être nécessaire via `administration.php?val=gestionuser`.
 
 ### 11.2 Champ PASSWORD dans Access/SQL Server
 
-Pour les bases de données Access : vérifier que le champ `PASSWORD` est bien en `TEXT(255)` (script `alter_password_field_access.sql` fourni).
+Pour les bases Access : vérifier que le champ `PASSWORD` est en `TEXT(255)`.  
+Pour SQL Server : exécuter `alter_password_field_sqlserver.sql` pour appliquer `COLLATE Latin1_General_CS_AS`.
 
-Pour SQL Server : exécuter `alter_password_field_sqlserver.sql` pour appliquer `COLLATE Latin1_General_CS_AS` sur le champ `PASSWORD`.
+### 11.3 Règles de cohérence pour d'autres thèmes
 
-### 11.3 Test approfondi du contrôle de cohérence offline
+Le moteur offline `CoherenceEvaluator` est générique. Pour les thèmes avec des SQL plus complexes (JOINs, sous-requêtes), la règle sera silencieusement ignorée (comportement conservatif — pas de faux positifs).
 
-Après re-téléchargement de la campagne (Session 40), vérifier les logs Flutter :
-```
-[CoherenceEval] virtual TOTAL_AGE_NIVEAU = <valeur>
-[CoherenceEval] virtual FILLES_AGE_NIVEAU = <valeur>
-[CoherenceEval] rule=493 ... → v1=<number> | ... → v2=<number>
-[CoherenceEval] evaluate complete: 2 violation(s)
-```
-Si les noms de champs du formulaire `idQst=9502` ne contiennent pas le pattern `_F_`/`NB_F_`/`FILLES`, le calcul de `FILLES_AGE_NIVEAU` devra être affiné — fournir les noms de champs des logs Flutter.
+### 11.4 Version PHP
 
-### 11.4 Règles de cohérence pour d'autres thèmes
-
-Les règles de cohérence configurées en base (`DICO_REGLE_THEME`) sont spécifiques à chaque thème. Le moteur offline `CoherenceEvaluator` est générique et s'adapte à tout SQL `SUM(TABLE.FIELD)`. Pour les thèmes avec des SQL plus complexes (JOINs, sous-requêtes), la règle sera silencieusement ignorée (comportement conservatif — pas de faux positifs).
-
-### 11.5 Performances SQLite
-
-La méthode `getAllCollectedDataForCampEtab()` charge tous les formulaires de l'école. Pour les campagnes avec de nombreux formulaires et établissements, surveiller les performances. Un index supplémentaire sur `collected_data(id_camp, id_etab)` peut être ajouté si nécessaire.
-
-### 11.6 Version PHP
-
-Le serveur est en **PHP 7.3.4**. Toutes les corrections sont compatibles. Attention : si une mise à jour vers PHP 8.0+ est planifiée, réviser les usages de `utf8_encode()` (désormais supprimé) et la syntaxe `@session_start()`.
+Le serveur est en **PHP 7.3.4**. Toutes les corrections sont compatibles. Si une mise à jour vers PHP 8.0+ est planifiée, réviser les usages de `utf8_encode()` et la syntaxe `@session_start()`.
 
 ---
 
-## Annexe — Commits principaux
+## Annexe — Synthèse des corrections
 
-| SHA | Session | Description |
-|-----|---------|-------------|
-| `2d7aec6` | 40 | fix(session40): cohérence offline — regex TABLE.FIELD + agrégats virtuels + cross-formulaires |
-| `7689882` | 39 | fix(session39): contrôle cohérence offline — mauvaise décomposition ID composite theme |
-| `7498ba5` | 38 | fix(session38): formulaires mobiles étapes 7-9 + indicateur chargement Actualiser |
-| `1a93437` | 37b | fix(session37b): collation SQL Server CI corrompt hash bcrypt → 401 |
-| `107c353` | 37 | fix(session37): correctif complet chargement formulaires mobiles post-bcrypt |
-| `c58a44c` | 36 | fix(auth): session 36 — correctif régression chargement formulaires après bcrypt |
-| — | 35 | fix(security): migration md5 → bcrypt PASSWORD_BCRYPT cost=12 |
-| `381de3e` | ~10 | fix(admin): suppression ADOdb debug + protection JSON contre pollution |
-| `b544819` | ~14 | fix(save/coherence): sauvegarde données + contrôle cohérence mobile |
+| Composant | Correction | Impact |
+|-----------|-----------|--------|
+| PHP `user.class.php` | INSERT `DICO_FIXE_REGROUPEMENT` — colonnes SQL Server réelles | Résolution erreur HTTP 500 + SQL 42S22 |
+| PHP `config_app.php` | `_sised_local_port()` + `SISED_HOST_HEADER` | Bypass NAT Fortinet (curl interne PHP) |
+| PHP `data_save.php` + `data_reload.php` | Host header curl interne | Routing VirtualHost correct |
+| PHP `data_rules.php` | `rules_resolve_theme_id()` | Correction décomposition ID composite thème |
+| PHP `user.class.php` | bcrypt + collation CS_AS | Sécurité mots de passe + correction collation SQL Server |
+| Flutter `api_service.dart` | `_DnsFallbackInterceptor` + cache DNS | Envoi données sur réseau variable (MEN) |
+| Flutter `coherence_evaluator.dart` | Regex TABLE.FIELD + agrégats virtuels | Contrôle cohérence offline opérationnel |
+| Flutter `database_service.dart` | `getAllCollectedDataForCampEtab()` | Règles cross-formulaires offline |
+| Flutter `campaign_provider.dart` | Correction chaîne 9 étapes (filtre FRAME) | Téléchargement campagne complet |
 
 ---
 
-*Document généré le 2026-07-06 · Abdoul Nasser Kailou · kailounasser@gmail.com*  
-*Dépôt : https://github.com/NasserKailou/stateduc_mobile · PR #2 · Branch : ak_secure*
+*Document rédigé par Abdoul Nasser Kailou — PAQABU / UNESCO — Juillet 2026*  
+*Dépôt : https://github.com/NasserKailou/stateduc_mobile · PR #2 · Branche : ak_secure*

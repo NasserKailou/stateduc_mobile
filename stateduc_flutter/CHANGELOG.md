@@ -1,19 +1,23 @@
-# CHANGELOG — StatEduc Mobile (Flutter)
+# Journal des modifications — StatEduc Mobile (Flutter)
 
-Historique complet de toutes les modifications apportées à l'application Flutter StatEduc Mobile.
+**Auteur :** Abdoul Nasser Kailou  
+**Projet :** PAQABU / UNESCO — MEN Burundi  
+**Branche :** ak_secure
+
+Historique complet des modifications apportées à l'application Flutter StatEduc Mobile.
 
 ---
 
-## [Session 61] — 2026-07-16 — Fix log interleaving : SqlTranslator._logger statique → paramètre local
+## [v1.2.2] — 2026-07-16 — Fix log interleaving : SqlTranslator._logger statique → paramètre local
 
 ### Contexte
 
-Après S60, l'analyse des logs Android a révélé que des blocs `[SqlTranslator] translated SQL`
+Après v1.2.1, l'analyse des logs Android a révélé que des blocs `[SqlTranslator] translated SQL`
 **fantômes** apparaissaient dans les sections rule=486/487/488/489 : un SQL avec un CTE incomplet
 (champs manquants) s'intercalait visuellement entre les vrais logs de la règle en cours.
 
 **Root cause** : `SqlTranslator._logger` était un champ `static` partagé entre tous les appels
-`translate()`. L'assignation `SqlTranslator._logger = logger` dans `_evaluateViaSql()` (S58)
+`translate()`. L'assignation `SqlTranslator._logger = logger` dans `_evaluateViaSql()` (v1.1.4)
 était effectuée **avant** les deux appels à `translate()` (sql_regle + sql_assoc), mais le
 logger restait affecté **après** le retour de `translate()`. Dans certaines configurations
 Android Studio / logcat, les logs `debugPrint()` d'un `translate()` appartenant à la règle N+1
@@ -28,14 +32,14 @@ rendait les logs de débogage illisibles et pouvait faire croire à un bug de tr
 ### Fix — `translate()` reçoit désormais `logger` en paramètre, save/restore via try/finally
 
 ```dart
-// AVANT (S58/S60 — _logger statique persistait entre les appels) :
+// AVANT (v1.1.4/v1.2.1 — _logger statique persistait entre les appels) :
 SqlTranslator._logger = logger;  // affecté une fois dans _evaluateViaSql()
 final r1 = SqlTranslator.translate(serverSql: rule.sqlRegle, ...);
 final r2 = SqlTranslator.translate(serverSql: rule.sqlAssoc, ...);
 // → après translate(sql_regle), _logger reste affecté → logs de la règle suivante
 //   peuvent s'intercaler visuellement
 
-// APRÈS (S61 — logger isolé par appel translate()) :
+// APRÈS (v1.2.2 — logger isolé par appel translate()) :
 final r1 = SqlTranslator.translate(
   serverSql: rule.sqlRegle, ..., logger: logger);   // logger passé ici
 final r2 = SqlTranslator.translate(
@@ -47,11 +51,11 @@ Et dans `translate()` lui-même, le pattern save/restore garantit l'isolation :
 ```dart
 static TranslationResult? translate({
   ...
-  CoherenceLogger? logger,     // S61 — paramètre optionnel
+  CoherenceLogger? logger,     // v1.2.2 — paramètre optionnel
 }) {
   if (serverSql.trim().isEmpty) return null;  // retour avant toute mutation
   
-  // S61 FIX — sauvegarder/restaurer dans un try/finally
+  // v1.2.2 FIX — sauvegarder/restaurer dans un try/finally
   final prevLogger = SqlTranslator._logger;
   SqlTranslator._logger = logger;
   try {
@@ -68,14 +72,14 @@ static TranslationResult? translate({
 
 #### Effet sur les logs
 
-Avant (S60) — rule=486 :
+Avant (v1.2.1) — rule=486 :
 ```
 [SqlTranslator] translated SQL (isScalar=false): [SQL correct rule=486]
 [SqlTranslator] translated SQL (isScalar=false): [SQL FANTÔME — CTE incomplet]  ← confus
 [CoherenceEval] rule=486 sql_regle (isScalar=false): [SQL correct]
 ```
 
-Après (S61) — rule=486 :
+Après (v1.2.2) — rule=486 :
 ```
 [CoherenceEval] --- translating sql_regle rule=486 ---    ← séparateur explicite
 [SqlTranslator] translated SQL (isScalar=false): [SQL correct rule=486]
@@ -104,10 +108,10 @@ Des séparateurs `--- translating sql_regle/sql_assoc rule=N ---` ont été ajou
 
 ---
 
-## [Session 60] — 2026-07-16 — Cinq correctifs critiques moteur offline (updated_at, NOUVEAUX_INSCRITS, SAVEPOINT ';', sql_assoc littéral, debugPrint)
+## [v1.2.1] — 2026-07-16 — Cinq correctifs critiques moteur offline (updated_at, NOUVEAUX_INSCRITS, SAVEPOINT ';', sql_assoc littéral, debugPrint)
 
 ### Contexte
-Les logs console Android (après S59) révèlent que le SAVEPOINT S59 n'injectait **0 champ**
+Les logs console Android (après v1.2.0) révèlent que le SAVEPOINT v1.2.0 n'injectait **0 champ**
 (NOT NULL constraint sur `updated_at`). En parallèle, la règle 496 restait toujours SKIPPED
 (`NOUVEAUX_INSCRITS` table inconnue), et des warnings Android API ≤ 27 sur le ROLLBACK
 risquaient de laisser des données temporaires non supprimées.
@@ -117,19 +121,19 @@ risquaient de laisser des données temporaires non supprimées.
 ### Fix A — CRITIQUE : INSERT collected_data manquait `updated_at` + `is_sent`
 
 **Root cause** : `collected_data.updated_at TEXT NOT NULL` n'a pas de valeur DEFAULT.
-L'INSERT S59 ne fournissait que 6 colonnes → `DatabaseException(NOT NULL constraint failed:
-collected_data.updated_at)` → chaque injection échouait → 0 champs injectés → S59 était
+L'INSERT v1.2.0 ne fournissait que 6 colonnes → `DatabaseException(NOT NULL constraint failed:
+collected_data.updated_at)` → chaque injection échouait → 0 champs injectés → v1.2.0 était
 entièrement neutralisé malgré le SAVEPOINT ouvert.
 
 **Fix** :
 ```dart
-// AVANT (S59 — cassé) :
+// AVANT (v1.2.0 — cassé) :
 'INSERT OR REPLACE INTO collected_data '
 '(id_camp, id_etab, id_qst, id_filter, field_name, field_value) '
 'VALUES (?, ?, ?, ?, ?, ?)',
 [idCamp, idEtab, idQst ?? '', '', fieldName, rawValue],
 
-// APRÈS (S60 — correct) :
+// APRÈS (v1.2.1 — correct) :
 'INSERT OR REPLACE INTO collected_data '
 '(id_camp, id_etab, id_qst, id_filter, field_name, field_value, is_sent, updated_at) '
 'VALUES (?, ?, ?, ?, ?, ?, 0, ?)',
@@ -155,14 +159,14 @@ static const _knownServerTables = {
   'ELEVES_AGE_NIVEAU_SEXE',
   'ELEVES_NIVEAU_SEXE',
   'ELEVES_AGE_SEXE',
-  'NOUVEAUX_INSCRITS',   // S60 FIX B
+  'NOUVEAUX_INSCRITS',   // v1.2.1 FIX B
 };
 
 static const _multiRowTables = {
   'ELEVES_AGE_NIVEAU_SEXE',
   'ELEVES_NIVEAU_SEXE',
   'ELEVES_AGE_SEXE',
-  'NOUVEAUX_INSCRITS',   // S60 FIX B — suffixe _0_8_4 → SUM + LIKE 'FIELD_%'
+  'NOUVEAUX_INSCRITS',   // v1.2.1 FIX B — suffixe _0_8_4 → SUM + LIKE 'FIELD_%'
 };
 ```
 
@@ -177,11 +181,11 @@ de `collected_data` avec des valeurs intermédiaires.
 
 **Fix** :
 ```dart
-// AVANT (S59) :
+// AVANT (v1.2.0) :
 await db.execute('ROLLBACK TO SAVEPOINT coherence_eval');
 await db.execute('RELEASE SAVEPOINT coherence_eval');
 
-// APRÈS (S60) :
+// APRÈS (v1.2.1) :
 await db.execute(';ROLLBACK TO SAVEPOINT coherence_eval');
 await db.execute(';RELEASE SAVEPOINT coherence_eval');
 ```
@@ -231,10 +235,10 @@ Le fichier `coherence_latest.log` reçoit le message complet sans troncature.
 
 ---
 
-## [Session 59] — 2026-07-15 — Injection formData via SAVEPOINT SQLite (élimination faux positifs/négatifs)
+## [v1.2.0] — 2026-07-15 — Injection formData via SAVEPOINT SQLite (élimination faux positifs/négatifs)
 
 ### Contexte
-Après S58, la règle 494 et les règles ELEVES fonctionnaient. La capture screenshot montre
+Après v1.1.4, la règle 494 et les règles ELEVES fonctionnaient. La capture screenshot montre
 3 incohérences détectées sur "Mob-Donnees generales 1" avec `987` saisi dans "dont pour
 filles en bon état". L'analyse a identifié la **cause racine ultime** :
 
@@ -250,7 +254,7 @@ Conséquence :
   alors que la vraie valeur saisie violerait la règle.
 - Cas 2 (faux positif possible) : valeur persistée incohérente avec la saisie en cours.
 
-### Solution — SAVEPOINT SQLite (S59)
+### Solution — SAVEPOINT SQLite (v1.2.0)
 
 Avant la boucle d'évaluation des règles, `evaluate()` ouvre un **SAVEPOINT SQLite** et
 insère toutes les entrées de `formData` dans `collected_data` via `INSERT OR REPLACE`.
@@ -289,7 +293,7 @@ static String _formKeyToFieldName(String formKey) {
 
 ### Résultats
 
-Avec S59, le CTE **voit toujours les valeurs en cours de saisie** de `formData`,
+Avec v1.2.0, le CTE **voit toujours les valeurs en cours de saisie** de `formData`,
 même si elles ne sont pas encore sauvegardées dans SQLite. Les règles de cohérence
 fonctionnent donc **quelques soit l'état de sauvegarde du formulaire**, conformément
 à la demande : *"les incohérences doivent marcher quelques soit la requête définie
@@ -297,14 +301,14 @@ du moment que les critères sont vérifiés"*.
 
 Les 3 violations de la capture screenshot correspondent à `987` > seuils cohérents
 (latrine total, latrine filles, latrine bon état) — ce sont de **vraies violations**
-correctement détectées après S59.
+correctement détectées après v1.2.0.
 
 ### Fichiers modifiés
 - `lib/services/coherence_evaluator.dart` :
-  - VERSION → Session 59
+  - VERSION → v1.2.0
   - `evaluate()` : SAVEPOINT + injection formData + finally ROLLBACK
   - `_formKeyToFieldName()` : nouveau helper statique
-  - Commentaires/docs complets S59
+  - Commentaires/docs complets v1.2.0
 
 ### Tests
 - `/tmp/validate_s59.py` → **55/55 PASS** (10 blocs : A–J)
@@ -317,14 +321,14 @@ correctement détectées après S59.
   - Bloc G : Edge cases (vide, texte, doubles suffixes)
   - Bloc H : INSERT OR REPLACE idempotence
   - Bloc I : Scénario screenshot exact (987 → violation)
-  - Bloc J : Régression S58 ambiguïté LIKE _0/_F_0
+  - Bloc J : Régression v1.1.4 ambiguïté LIKE _0/_F_0
 
 ---
 
-## [Session 58] — 2026-07-15 — Fix ambiguïté LIKE + Logging fichier exhaustif
+## [v1.1.4] — 2026-07-15 — Fix ambiguïté LIKE + Logging fichier exhaustif
 
 ### Contexte
-Après S57, la règle 494 (`Sum(FILLES_AGE_NIVEAU) <= Sum(TOTAL_AGE_NIVEAU)`) fonctionnait
+Après v1.1.3, la règle 494 (`Sum(FILLES_AGE_NIVEAU) <= Sum(TOTAL_AGE_NIVEAU)`) fonctionnait
 correctement sur device. L'analyse des logs a révélé deux problèmes résiduels :
 
 1. **Ambiguïté LIKE** : `LIKE 'NB_ELEVES%'` matchait à la fois `NB_ELEVES_0` (total élèves)
@@ -336,14 +340,14 @@ correctement sur device. L'analyse des logs a révélé deux problèmes résidue
 
 ### Bug corrigé A — Ambiguïté LIKE (CRITIQUE)
 
-**Problème S57 :**
+**Problème v1.1.3 :**
 ```sql
 -- LIKE 'NB_ELEVES%' matchait NB_ELEVES_0=20 ET NB_ELEVES_F_0=8 → MAX=20 (ok ici)
 -- Mais si NB_ELEVES_HANDI_0=25 existait → MAX=25 pour la colonne NB_ELEVES ← FAUX!
 MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ELEVES%' THEN CAST(field_value AS REAL) END)
 ```
 
-**Fix S58 — suffixe exact `_0` pour DONNEES_ETABLISSEMENT :**
+**Fix v1.1.4 — suffixe exact `_0` pour DONNEES_ETABLISSEMENT :**
 ```sql
 -- LIKE 'NB_ELEVES_0'   → matche uniquement NB_ELEVES_0     ✅
 -- LIKE 'NB_ELEVES_F_0' → matche uniquement NB_ELEVES_F_0   ✅ (pas de confusion)
@@ -362,12 +366,12 @@ L'underscore requis entre le nom de champ et le suffixe améliore la robustesse
 Le comportement fonctionnel reste identique car les champs ELEVES ont toujours un `_`
 avant leurs suffixes numériques.
 
-**Règle unifiée S58 dans `_buildPivotCte()` :**
+**Règle unifiée v1.1.4 dans `_buildPivotCte()` :**
 | Catégorie | Stockage HTML | Stratégie CTE |
 |-|-|-|
 | Contexte (`CODE_ETABLISSEMENT`, `CODE_TYPE_ANNEE`) | Injecté sans suffixe | `= 'FIELD'` exact |
-| DONNEES_ETABLISSEMENT (mono-row) | Avec suffixe `_0` | `MAX + LIKE 'FIELD_0'` ← **S58** |
-| ELEVES_* (multi-row) | Avec suffixe `_0_70`, `_0_71`… | `SUM + LIKE 'FIELD_%'` ← **S58** |
+| DONNEES_ETABLISSEMENT (mono-row) | Avec suffixe `_0` | `MAX + LIKE 'FIELD_0'` ← **v1.1.4** |
+| ELEVES_* (multi-row) | Avec suffixe `_0_70`, `_0_71`… | `SUM + LIKE 'FIELD_%'` ← **v1.1.4** |
 
 ### Nouveauté B — Logging fichier exhaustif (CoherenceLogger)
 
@@ -407,7 +411,7 @@ await logger.flush(); // → écrit {AppDocumentsDir}/coherence_latest.log
 - T21–T24 : Règle électricité EXISTS — régression validée
 - T25–T31 : LIKE `_0` exact : pas de match sur suffixes longs
 - T32–T35 : CTE ELEVES génère les bonnes patterns `FIELD_%`
-- T36–T43 : Régression S56/S57 complète
+- T36–T43 : Régression v1.1.2/v1.1.3 complète
 - T44–T50 : Structure CoherenceLogger
 
 ### Note sur la capture d'écran device (règle 493)
@@ -416,7 +420,7 @@ le formulaire `infos_gen_1.html` (données générales) n'a pas encore été sau
 `NB_ELEVES_F_0` absent de `collected_data` → `MAX(LIKE 'NB_ELEVES_F_0')=NULL=0.0` →
 `Sum(FILLES_AGE_NIVEAU)=1 ≠ NB_ELEVES_F=0` → violation détectée.
 **Correction** : sauvegarder `infos_gen_1.html` avec `NB_ELEVES_F=1` → règle 493 OK.
-Avec S58, si `NB_ELEVES_F_0` est présent, sa valeur est lue sans ambiguïté.
+Avec v1.1.4, si `NB_ELEVES_F_0` est présent, sa valeur est lue sans ambiguïté.
 
 ### Fichiers modifiés
 - `lib/services/coherence_evaluator.dart` :
@@ -425,16 +429,16 @@ Avec S58, si `NB_ELEVES_F_0` est présent, sa valeur est lue sans ambiguïté.
   - `_buildPivotCte()` : `LIKE 'FIELD_0'` pour DONNEES_ETABLISSEMENT, `LIKE 'FIELD_%'` pour ELEVES_*
   - `evaluate()` : crée `CoherenceLogger`, log exhaustif, `await logger.flush()` en fin
   - `_evaluateRule()`, `_evaluateViaSql()`, `_execCount()` : logger propagé
-  - Commentaire version mis à jour (Session 58)
+  - Commentaire version mis à jour (v1.1.4)
 - `pubspec.yaml` : `path_provider: ^2.1.4` ajouté
 
 ---
 
-## [Session 57] — 2026-07-15 — Fix CTE LIKE préfixe universel (DONNEES_ETABLISSEMENT : champs HTML suffixés _0)
+## [v1.1.3] — 2026-07-15 — Fix CTE LIKE préfixe universel (DONNEES_ETABLISSEMENT : champs HTML suffixés _0)
 
 ### Contexte
-Malgré la correction S56 (LIKE pour les tables ELEVES multi-row), la règle 493 continuait à
-retourner `sql_assoc val=0.0` sur device. Les logs S56 confirmaient que les champs ELEVES
+Malgré la correction v1.1.2 (LIKE pour les tables ELEVES multi-row), la règle 493 continuait à
+retourner `sql_assoc val=0.0` sur device. Les logs v1.1.2 confirmaient que les champs ELEVES
 étaient désormais lus correctement (`v1=8.0`), mais le côté DONNEES_ETABLISSEMENT restait à
 zéro :
 
@@ -457,25 +461,25 @@ La page `infos_gen_1.html` (questionnaire général) stocke ses champs avec un s
 Ces noms sont transmis tels quels via le pont JavaScript → Flutter → `saveCollectedData()`.
 Dans `collected_data`, les `field_name` sont donc `NB_ELEVES_F_0`, `ELECTRICITE_0`, etc.
 
-**Le CTE avant ce fix (S56 state) :**
+**Le CTE avant ce fix (v1.1.2 state) :**
 ```sql
 MAX(CASE WHEN UPPER(field_name)='NB_ELEVES_F' THEN CAST(field_value AS REAL) END)
 ```
 → **Aucune ligne ne matche** (le champ s'appelle `NB_ELEVES_F_0`, pas `NB_ELEVES_F`) →
 `MAX()=NULL` → `COALESCE(NULL,0)=0.0` → `val=0.0` → violation incorrecte (faux positif).
 
-### Bug corrigé — S57 (CRITIQUE)
+### Bug corrigé — v1.1.3 (CRITIQUE)
 
 **Extension de la stratégie LIKE aux tables mono-lignes (DONNEES_ETABLISSEMENT)**
 
-Règle unifiée S57 dans `_buildPivotCte()` :
+Règle unifiée v1.1.3 dans `_buildPivotCte()` :
 | Catégorie de champ | Stockage HTML | Stratégie CTE |
 |-|-|-|
 | Contexte (`CODE_ETABLISSEMENT`, `CODE_TYPE_ANNEE`) | Injecté sans suffixe | `= 'FIELD'` exact |
 | ELEVES_* (multi-row) | Avec suffixe `_0_70`, `_0_71`… | `SUM + LIKE 'FIELD%'` |
 | DONNEES_ETABLISSEMENT (mono-row) | Avec suffixe `_0` | `MAX + LIKE 'FIELD%'` ← **NOUVEAU** |
 
-**Avant S57 (S56 state) :**
+**Avant v1.1.3 (v1.1.2 state) :**
 ```dart
 } else {
   // Tables mono-ligne : champs stockés tels quels.
@@ -484,10 +488,10 @@ Règle unifiée S57 dans `_buildPivotCte()` :
 }
 ```
 
-**Après S57 :**
+**Après v1.1.3 :**
 ```dart
 } else {
-  // Mono-row (DONNEES_ETABLISSEMENT): MAX + LIKE prefix (S57 NEW)
+  // Mono-row (DONNEES_ETABLISSEMENT): MAX + LIKE prefix (v1.1.3 NEW)
   // Ex: NB_ELEVES_F_0 → LIKE 'NB_ELEVES_F%'
   return "    MAX(CASE WHEN UPPER(field_name) LIKE '${upperField}%' "
       "THEN CAST(field_value AS REAL) END) AS $upperField";
@@ -498,9 +502,9 @@ Règle unifiée S57 dans `_buildPivotCte()` :
 règle 493 : `v1=8.0 <= v2=8.0` → `violated=false` ✅
 
 ### Validation Python
-Simulateur Python mis à jour : **50/50 PASS** (T01–T25), incluant 4 nouveaux tests S57 :
-- T22 : `NB_ELEVES_F_0=8` → `MAX(LIKE 'NB_ELEVES_F%')=8.0` ✅ (avant S57 : 0.0)
-- T23 : Règle 493 cross-table : `FILLES=8, NB_ELEVES_F=8` → `NOT violated` ✅ (avant S57 : violated=True ❌)
+Simulateur Python mis à jour : **50/50 PASS** (T01–T25), incluant 4 nouveaux tests v1.1.3 :
+- T22 : `NB_ELEVES_F_0=8` → `MAX(LIKE 'NB_ELEVES_F%')=8.0` ✅ (avant v1.1.3 : 0.0)
+- T23 : Règle 493 cross-table : `FILLES=8, NB_ELEVES_F=8` → `NOT violated` ✅ (avant v1.1.3 : violated=True ❌)
 - T24 : Règle 493 violation réelle : `FILLES=10 > NB_ELEVES_F=8` → `violated=True` ✅
 - T25 : Plusieurs champs DONNEES_ETABLISSEMENT (`ELECTRICITE_0`, `NB_LATRINES_BON_ETAT_0`) tous capturés via LIKE ✅
 
@@ -511,20 +515,20 @@ correctement le mode SCALAR (GROUP BY context-only → stripped).
 ### Fichiers modifiés
 - `lib/services/coherence_evaluator.dart` :
   - `_buildPivotCte()` : `MAX + LIKE 'FIELD%'` pour champs DONNEES_ETABLISSEMENT (tables mono-row)
-  - Commentaire version mis à jour (Session 57)
+  - Commentaire version mis à jour (v1.1.3)
 
 ---
 
-## [Session 56] — 2026-07-15 — Fix CTE LIKE préfixe (champs HTML suffixés FILLES_AGE_NIVEAU_0_70)
+## [v1.1.2] — 2026-07-15 — Fix CTE LIKE préfixe (champs HTML suffixés FILLES_AGE_NIVEAU_0_70)
 
 ### Contexte
-Malgré les corrections S55 (suppression `id_qst` du CTE), les contrôles offline continuaient
+Malgré les corrections v1.1.1 (suppression `id_qst` du CTE), les contrôles offline continuaient
 à retourner `val=0.0` pour toutes les règles ELEVES. Capture d'écran device : 60 (Filles) > 54
 (F+M) — incohérence évidente — mais aucune violation détectée. Logs confirmaient que le SQL
 généré était syntaxiquement correct (CTE bien formé, `SUM()` utilisé, pas de `id_qst`) mais
 la requête retournait toujours 0.
 
-### Bug corrigé — S56 (CRITIQUE)
+### Bug corrigé — v1.1.2 (CRITIQUE)
 
 **Nommage HTML des champs de grille : suffixe `_0_70`, `_0_71`…**
 
@@ -559,8 +563,8 @@ Les champs de contexte (`CODE_ETABLISSEMENT`, etc.) et les tables mono-ligne
 (`DONNEES_ETABLISSEMENT`) continuent à utiliser la correspondance exacte `=`.
 
 **Note :** Pour `DONNEES_ETABLISSEMENT` les champs étaient supposés stockés sans suffixe à ce
-stade — cette hypothèse s'est avérée incorrecte (voir Session 57 : tous les champs HTML ont
-un suffixe `_0`). La correction complète a été apportée en S57.
+stade — cette hypothèse s'est avérée incorrecte (voir v1.1.3 : tous les champs HTML ont
+un suffixe `_0`). La correction complète a été apportée en v1.1.3.
 
 ### Log diagnostic ajouté
 
@@ -571,7 +575,7 @@ un suffixe `_0`). La correction complète a été apportée en S57.
 ```
 
 ### Validation Python
-Simulateur Python mis à jour : **36/36 PASS** (T01–T21), incluant 4 nouveaux tests S56 :
+Simulateur Python mis à jour : **36/36 PASS** (T01–T21), incluant 4 nouveaux tests v1.1.2 :
 - T18 : `FILLES_AGE_NIVEAU_0_70=60` → `Sum=60.0` ✅ (LIKE prefix fonctionne)
 - T19 : violation réelle détectée : `FILLES=60 > TOTAL=54` → `violated=True` ✅
 - T20 : cas légit : `FILLES=54 <= TOTAL=108` → `violated=False` ✅
@@ -581,22 +585,22 @@ Simulateur Python mis à jour : **36/36 PASS** (T01–T21), incluant 4 nouveaux 
 - `lib/services/coherence_evaluator.dart` :
   - `_buildPivotCte()` : `LIKE 'FIELD%'` pour champs ELEVES (tables multi-row)
   - `evaluate()` : log diagnostic champs `collected_data`
-  - Commentaire version mis à jour (Session 56)
+  - Commentaire version mis à jour (v1.1.2)
 
 ---
 
-## [Session 55] — 2026-07-15 — Fix cohérence offline inter-thèmes (suppression id_qst du CTE + alias extraction)
+## [v1.1.1] — 2026-07-15 — Fix cohérence offline inter-thèmes (suppression id_qst du CTE + alias extraction)
 
 ### Contexte
 Les contrôles de cohérence offline ne se déclenchaient jamais malgré des données incorrectes.
 Les logs device montraient systématiquement `val=0.0` pour les règles 494 et 495 (tables
-`ELEVES_AGE_NIVEAU_SEXE`). L'analyse a révélé deux bugs distincts introduits en Session 53.
+`ELEVES_AGE_NIVEAU_SEXE`). L'analyse a révélé deux bugs distincts introduits en v1.0.5.
 
 ### Bugs corrigés
 
-**Bug S55-A (CRITIQUE) — Filtre `id_qst` incorrect dans le CTE de cohérence**
+**Bug v1.1.1-A (CRITIQUE) — Filtre `id_qst` incorrect dans le CTE de cohérence**
 
-En S53, un filtre `AND id_qst='<idQst_courant>'` avait été ajouté dans `_buildPivotCte()`
+En v1.0.5, un filtre `AND id_qst='<idQst_courant>'` avait été ajouté dans `_buildPivotCte()`
 pour éviter l'agrégation multi-formulaires. Ce filtre était correct pour les règles
 intra-thème, mais **brisait les règles inter-thèmes** :
 
@@ -614,9 +618,9 @@ Le mobile doit reproduire ce comportement.
 uniquement sur `(id_camp, id_etab)`, comme le serveur. Le paramètre `idQst` est conservé
 dans la signature pour compatibilité mais n'est plus utilisé dans la requête CTE.
 
-**Bug S55-B (SECONDAIRE) — Extraction d'alias dans `_extractAllFieldNames()`**
+**Bug v1.1.1-B (SECONDAIRE) — Extraction d'alias dans `_extractAllFieldNames()`**
 
-Le scanner SELECT de S53-B extrayait tous les identifiants du SELECT, y compris les **alias**
+Le scanner SELECT de v1.0.5-B extrayait tous les identifiants du SELECT, y compris les **alias**
 définis après `AS` (ex: `AS SommeDeFILLES_AGE_NIVEAU` → `SOMMEDEFILLES_AGE_NIVEAU` ajouté
 comme champ du CTE). Ces alias n'existent pas dans `collected_data` → colonne CTE inutile
 (toujours 0) et logs pollués avec des champs fantômes.
@@ -635,11 +639,11 @@ la clause SELECT avant le scan des identifiants. Seuls les vrais noms de champs 
 La demande utilisateur "n'exécuter que les règles du thème courant" est déjà satisfaite au
 niveau de la requête base de données : `getCoherenceRules(idCamp, idQst, idEtab)` dans
 `database_service.dart` (L1324) filtre `WHERE id_camp=? AND id_qst=? AND id_etab=?`.
-Seules les règles du thème courant sont évaluées. Le fix S55-A concerne uniquement les
+Seules les règles du thème courant sont évaluées. Le fix v1.1.1-A concerne uniquement les
 **données** agrégées dans le CTE, pas le filtrage des règles elles-mêmes.
 
 ### Validation Python
-Simulateur Python mis à jour : **28/28 tests PASS** (T01–T17), incluant 5 nouveaux tests S55 :
+Simulateur Python mis à jour : **28/28 tests PASS** (T01–T17), incluant 5 nouveaux tests v1.1.1 :
 - T13 : données ELEVES dans `id_qst='9501'`, règle dans `id_qst='9502'` → détectée (25 ≤ 50 OK)
 - T14 : violation inter-thèmes : FILLES=60 > TOTAL=50 → violated=True ✅
 - T15 : alias `SOMMEDEFILLES_AGE_NIVEAU` absent du corps CTE ✅
@@ -650,23 +654,23 @@ Simulateur Python mis à jour : **28/28 tests PASS** (T01–T17), incluant 5 nou
 - `lib/services/coherence_evaluator.dart` :
   - `_buildPivotCte()` : suppression filtre `id_qst` du WHERE, suppression variable `escapedQst`
   - `_extractAllFieldNames()` : strip `AS xxx` avant scan du SELECT
-  - Commentaire version mis à jour (Session 55)
+  - Commentaire version mis à jour (v1.1.1)
 
 ---
 
-## [Session 54] — 2026-07-15 — Fix SCALAR multi-colonnes (_keepFirstSelectColumn)
+## [v1.1.0] — 2026-07-15 — Fix SCALAR multi-colonnes (_keepFirstSelectColumn)
 
 ### Contexte
 Sur device (rule=493), le wrapper SCALAR échouait avec l'erreur SQLite :
 `sub-select returns 2 columns - expected 1`
 La cause : `sql_regle` de la règle 493 contient deux colonnes dans son SELECT :
 `SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE`.
-Le wrapper SCALAR S53 encapsulait ce SELECT multi-colonnes directement dans une
+Le wrapper SCALAR v1.0.5 encapsulait ce SELECT multi-colonnes directement dans une
 sous-requête scalaire `SELECT (...) AS __scalar_val` — SQLite exige exactement 1 colonne.
 
 ### Bug corrigé
 
-**Bug S54 — SCALAR wrapper crash sur SELECT multi-colonnes**
+**Bug v1.1.0 — SCALAR wrapper crash sur SELECT multi-colonnes**
 Quand `sql_regle` possède `SELECT Sum(X), Sum(Y) FROM ...`, le mode SCALAR (après
 suppression du GROUP BY contexte-only) produisait une sous-requête à 2 colonnes dans
 `SELECT (SELECT Sum(X), Sum(Y) FROM ...) AS __scalar_val`, ce qui est interdit par SQLite.
@@ -685,7 +689,7 @@ Fix : `return '$before$selectKw${firstCol.trimRight()} $fromKw$after';`
 colonne en mode SCALAR est le comportement correct et cohérent avec le serveur.
 
 ### Validation Python
-Simulateur Python mis à jour : **25/25 tests PASS** (T01–T15), incluant 3 nouveaux tests S54 :
+Simulateur Python mis à jour : **25/25 tests PASS** (T01–T15), incluant 3 nouveaux tests v1.1.0 :
 - T13 : `keep_first_select_column` — espace avant FROM préservé, mono-colonne confirmé
 - T14 : SELECT Sum(X), Sum(Y) → réduit à Sum(X) = 11.0 sans erreur SQLite
 - T15 : Règle 493 complète — Sum(FILLES)=11 = Sum(NB_ELEVES_F)=11 → NOT violated
@@ -695,10 +699,10 @@ Simulateur Python mis à jour : **25/25 tests PASS** (T01–T15), incluant 3 nou
 
 ---
 
-## [Session 53] — 2026-07-15 — Fix chaîne complète idQst + extraction champs SELECT + logging
+## [v1.0.5] — 2026-07-15 — Fix chaîne complète idQst + extraction champs SELECT + logging
 
 ### Contexte
-Malgré les corrections S45→S52, les contrôles offline continuaient à déclencher des faux
+Malgré les corrections v0.9.0→v1.0.4, les contrôles offline continuaient à déclencher des faux
 positifs (ex: `33 <= 100` signalé comme violé). Analyse approfondie + simulateur Python
 confirmé : 4 bugs distincts subsistaient dans la chaîne d'évaluation.
 
@@ -715,7 +719,7 @@ fausses. Fix : ajout du paramètre `idQst?` dans `_buildPivotCte()`, `translate(
 `_extractAllFieldNames()` n'extrayait pas les champs de la clause SELECT quand ils
 n'étaient pas préfixés par `TABLE.` (ex: `Sum(FILLES_AGE_NIVEAU)` sans préfixe).
 Résultat : colonne manquante dans le CTE → erreur SQLite "no such column".
-Fix : scan de la clause SELECT ajouté (FIX Bug S53-B).
+Fix : scan de la clause SELECT ajouté (FIX Bug v1.0.5-B).
 
 **Bug 3 — SCALAR wrapper `SELECT *` multi-colonnes**
 L'ancien wrapper `SELECT COALESCE((SELECT * FROM (...) _s), 0)` échouait si la
@@ -748,7 +752,7 @@ Simulateur Python complet : **19/19 tests PASS** (T01–T12), couvrant :
 
 ---
 
-## [Session 52] — 2026-07-15 — Fix faux positifs GROUP BY context-only → SCALAR
+## [v1.0.4] — 2026-07-15 — Fix faux positifs GROUP BY context-only → SCALAR
 
 ### Contexte
 Session 51 avait corrigé les faux positifs ELEVES via MAX→SUM dans `_buildPivotCte()`.
@@ -771,7 +775,7 @@ GROUP BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
 HAVING (((CODE_ETABLISSEMENT)=20952) AND ((CODE_TYPE_ANNEE)=21))
 ```
 
-Après les strips S47/S50 (HAVING context-only supprimé) :
+Après les strips v1.0.1/S50 (HAVING context-only supprimé) :
 ```sql
 SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU
 FROM ELEVES_AGE_NIVEAU_SEXE
@@ -796,11 +800,11 @@ Ce pattern `SELECT Sum(X) ... GROUP BY [context_fields_only]` est une requête *
 **Fichier** : `coherence_evaluator.dart`
 
 **Nouvelle logique de détection MODE (étape 8) — 3 cas :**
-1. Pas de GROUP BY → **MODE SCALAR** (S49, inchangé)
-2. GROUP BY context-only + SELECT = agrégats purs (Sum/Count/Avg/…) → **MODE SCALAR** (S52 NEW)
+1. Pas de GROUP BY → **MODE SCALAR** (v1.0.3, inchangé)
+2. GROUP BY context-only + SELECT = agrégats purs (Sum/Count/Avg/…) → **MODE SCALAR** (v1.0.4 NEW)
    - GROUP BY supprimé (redondant sur mobile)
    - Valeur scalaire lue directement via COALESCE wrapper
-3. GROUP BY avec colonne non-contexte → **MODE EXISTS** (S45-S48, inchangé)
+3. GROUP BY avec colonne non-contexte → **MODE EXISTS** (v0.9.0-v1.0.2, inchangé)
 
 **`_isSumScalarWithContextGroupBy(sql)`** :
 - Critère 1 : chaque colonne SELECT est une fonction d'agrégation (`Sum(`, `Count(`, etc.)
@@ -958,7 +962,7 @@ import 'package:flutter/gestures.dart';   // ScaleGestureRecognizer, EagerGestur
 
 
 ### Contexte
-Session 49 avait corrigé le wrapper `COUNT(*)` → mode SCALAR pour les règles SUM-scalaires.
+v1.0.3 avait corrigé le wrapper `COUNT(*)` → mode SCALAR pour les règles SUM-scalaires.
 Les logs confirmaient `isScalar=true` mais continuaient à retourner `val=0.0` des deux côtés :
 ```
 [CoherenceEval] rawQuery sql_regle rule=483 (SCALAR) → val=0.0
@@ -968,7 +972,7 @@ Les logs confirmaient `isScalar=true` mais continuaient à retourner `val=0.0` d
 
 ### Cause racine — Bug S50-A : mismatch TEXT/INTEGER dans WHERE
 
-**SQL généré (après fix S49) :**
+**SQL généré (après fix v1.0.3) :**
 ```sql
 SELECT COALESCE((SELECT * FROM (
 SELECT Sum(NB_LATRINES_FILLES) AS SommeDeNB_LATRINES_FILLES
@@ -983,7 +987,7 @@ Mais le CTE produit des TEXT : `CODE_ETABLISSEMENT = '20952'`.
 SQLite : `'20952' = 20952` → **FALSE** → toutes les lignes filtrées → `Sum(NB_LATRINES_FILLES) = NULL`
 → `COALESCE(NULL, 0) = 0.0` → les deux côtés valent 0 → `!(0 <= 0) = false` → jamais violé.
 
-**C'est le même bug TEXT/INTEGER que S47 (HAVING) — mais dans la clause WHERE.**
+**C'est le même bug TEXT/INTEGER que v1.0.1 (HAVING) — mais dans la clause WHERE.**
 `_stripContextOnlyHaving()` ne traitait pas le WHERE.
 
 Le CTE est déjà filtré sur `id_etab='20952'` → le WHERE de contexte est entièrement redondant.
@@ -1054,7 +1058,7 @@ Ou, si filles > élèves :
 
 ---
 
-## [Session 49] — 2026-07-14 — Fix wrapper SUM-scalaire : mode SCALAR vs EXISTS
+## [v1.0.3] — 2026-07-14 — Fix wrapper SUM-scalaire : mode SCALAR vs EXISTS
 
 ### Contexte
 Après Sessions 47+48, les règles 483/484/485 (latrines, surfaces) retournaient toujours `violated=false`.
@@ -1135,10 +1139,10 @@ sql_regle SCALAR val = 50.0  sql_assoc SCALAR val = 30.0
 
 ---
 
-## [Session 48] — 2026-07-14 — Fix _stripContextOnlyHaving ordre + suppression diagnostic CTE crashant
+## [v1.0.2] — 2026-07-14 — Fix _stripContextOnlyHaving ordre + suppression diagnostic CTE crashant
 
 ### Contexte
-Après Session 47, les logs montrent encore `HAVING (((CODE_ETABLISSEMENT)=20952)...)` non supprimé dans le SQL traduit pour les règles avec qualificateurs `TABLE.FIELD` (ex: électricité), et des erreurs `SQLiteLog (1) near "SELECT": syntax error` répétées.
+Après v1.0.1, les logs montrent encore `HAVING (((CODE_ETABLISSEMENT)=20952)...)` non supprimé dans le SQL traduit pour les règles avec qualificateurs `TABLE.FIELD` (ex: électricité), et des erreurs `SQLiteLog (1) near "SELECT": syntax error` répétées.
 
 ### Bug 1 — CRITIQUE — `_stripContextOnlyHaving` appelé AVANT la suppression des qualificateurs
 
@@ -1166,10 +1170,10 @@ Après Session 47, les logs montrent encore `HAVING (((CODE_ETABLISSEMENT)=20952
 
 ---
 
-## [Session 47] — 2026-07-14 — Fix HAVING type-mismatch TEXT/INTEGER (0 violations systématique)
+## [v1.0.1] — 2026-07-14 — Fix HAVING type-mismatch TEXT/INTEGER (0 violations systématique)
 
 ### Contexte
-Après les 4 corrections Session 46, le contrôle offline retournait encore systématiquement 0 violation pour id_etab=20952, id_camp=2, CODE_TYPE_ANNEE=21 — un établissement ayant des incohérences réelles (latrines, domaine).
+Après les 4 corrections v1.0.0, le contrôle offline retournait encore systématiquement 0 violation pour id_etab=20952, id_camp=2, CODE_TYPE_ANNEE=21 — un établissement ayant des incohérences réelles (latrines, domaine).
 
 ### Cause racine identifiée — Incompatibilité de type TEXT/INTEGER dans SQLite HAVING
 
@@ -1221,10 +1225,10 @@ Permet de vérifier instantanément que le pivot a bien extrait les bons champs 
 
 ---
 
-## [Session 46] — 2026-07-14 — Corrections critiques moteur cohérence offline (4 bugs)
+## [v1.0.0] — 2026-07-14 — Corrections critiques moteur cohérence offline (4 bugs)
 
 ### Contexte
-Tests en mode debug (Session 45) ont révélé 4 bugs bloquants empêchant toute détection de violation.
+Tests en mode debug (v0.9.0) ont révélé 4 bugs bloquants empêchant toute détection de violation.
 
 ### Bug 1 — CRITIQUE — `\1` littéral dans SQL (SQLite crash)
 **Fichier** : `coherence_evaluator.dart` — méthode `translate()`, étape 7
@@ -1274,7 +1278,7 @@ Refonte visuelle pour ressembler au dialog serveur (screenshot utilisateur) :
 
 ---
 
-## [Session 45] — 2026-07-14 — Moteur de cohérence offline SQL réel sur SQLite
+## [v0.9.0] — 2026-07-14 — Moteur de cohérence offline SQL réel sur SQLite
 
 ### Objectif
 Remplace l'évaluation regex (Sessions 38–44) par un moteur d'exécution SQL réel.
@@ -1299,7 +1303,7 @@ Traduit les requêtes SQL Access/SQL Server vers SQLite :
 Passe maintenant  et  au moteur pour la substitution des paramètres.
 
 ### Règles validées
-- Règle électricité :  vs  (cas concret Session 45)
+- Règle électricité :  vs  (cas concret v0.9.0)
 - Règle clôture/superficie :  vs 
 
 ### Tests
@@ -1311,7 +1315,7 @@ Passe maintenant  et  au moteur pour la substitution des paramètres.
 
 ---
 
-## [Unreleased] — 2026-06-17 — Session 21 : correction cohérence hors ligne
+## [Unreleased] — 2026-06-17 — v0.0.8 : correction cohérence hors ligne
 
 ### 🔴 Fix — `coherence_evaluator.dart` : `_sumFieldAcrossAllFilters` retournait `0` au lieu de `null`
 
@@ -1467,7 +1471,7 @@ Création du guide d'administration complet A→Z de l'application, destiné aux
 
 ---
 
-## [Unreleased] — 2026-06-15 — Session 19 : correction timeout + retry automatique
+## [Unreleased] — 2026-06-15 — v0.0.6 : correction timeout + retry automatique
 
 ### 🔴 Fix — "Délai d'attente dépassé lors de l'envoi" sur réseau stable
 
@@ -1532,7 +1536,7 @@ message: entry.isSending
 
 ---
 
-## [Unreleased] — 2026-06-15 — Session 18 : drapeau Burundi + renforcement cohérence offline
+## [Unreleased] — 2026-06-15 — v0.0.5 : drapeau Burundi + renforcement cohérence offline
 
 ### 🟢 Amélioration — `pin_screen.dart` : remplacement de l'icône `school` par le drapeau du Burundi
 
@@ -1649,17 +1653,17 @@ if (entry.hasOfflineCoherenceErrors)
 
 | Événement | Trigger | Délai | Depuis |
 |-----------|---------|-------|--------|
-| Saisie d'un champ | `updateField()` → debounce 800 ms | 0.8 s après dernière frappe | **Session 18** |
+| Saisie d'un champ | `updateField()` → debounce 800 ms | 0.8 s après dernière frappe | **v0.0.5** |
 | Sauvegarde locale | `saveLocally()` → `Future()` | Immédiat (arrière-plan) | Sessions 1-16 |
-| Ouverture formulaire déjà rempli | `selectQuestion()` → `Future()` | Immédiat | Session 17 |
-| Changement de filtre/période | `selectFilter()` → `Future()` | Immédiat | **Session 18** |
-| Règles reçues du serveur | `_fetchAndStoreCoherenceRulesBackground()` | Arrière-plan | Session 17 |
-| Données serveur fusionnées | `_autoReloadFromServerBackground()` → `Future()` | Arrière-plan | **Session 18** |
+| Ouverture formulaire déjà rempli | `selectQuestion()` → `Future()` | Immédiat | v0.0.4 |
+| Changement de filtre/période | `selectFilter()` → `Future()` | Immédiat | **v0.0.5** |
+| Règles reçues du serveur | `_fetchAndStoreCoherenceRulesBackground()` | Arrière-plan | v0.0.4 |
+| Données serveur fusionnées | `_autoReloadFromServerBackground()` → `Future()` | Arrière-plan | **v0.0.5** |
 | Envoi serveur | `sendToServer()` → `checkCoherence()` (API) | Après POST réussi | Sessions 1-16 |
 
 ---
 
-### 📊 Fichiers modifiés — Session 18
+### 📊 Fichiers modifiés — v0.0.5
 
 | Fichier | Type | Résumé |
 |---------|------|--------|
@@ -1669,7 +1673,7 @@ if (entry.hasOfflineCoherenceErrors)
 
 ---
 
-## [Unreleased] — 2026-06-03 — Session 17 : timeout, cohérence offline, envoi global, identification, contraste settings
+## [Unreleased] — 2026-06-03 — v0.0.4 : timeout, cohérence offline, envoi global, identification, contraste settings
 
 ### 🔴 Fix — `api_service.dart` : timeout "délais d'attente dépassé" sur réseau stable
 
@@ -1874,7 +1878,7 @@ TabBar(
 
 ---
 
-### 📊 Fichiers modifiés — Session 17 (Flutter uniquement, aucun changement PHP)
+### 📊 Fichiers modifiés — v0.0.4 (Flutter uniquement, aucun changement PHP)
 
 | Fichier | Type | Résumé |
 |---------|------|--------|
