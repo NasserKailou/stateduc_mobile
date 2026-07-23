@@ -707,11 +707,28 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
 // Principe : position:absolute dans position:relative, left/top suivent scrollLeft/scrollTop
 document.addEventListener('DOMContentLoaded', function() {
 
+  // ── Retourne vrai si le TR est un TR d'en-tête ─────────────────────────────
+  // Cas 1 : TR avec class='ligne-titre'  (standard)
+  // Cas 2 : TR dans <thead>              (standard)
+  // Cas 3 : TR dont TOUTES les TD/TH ont class='ligne-titre' (ws_mob_9302 !)
+  //          → le serveur met la classe sur les TD, pas sur le TR
+  function isHeaderRow(r) {
+    if (r.classList.contains('ligne-titre')) return true;
+    if (r.parentElement && r.parentElement.tagName === 'THEAD') return true;
+    var cells = r.querySelectorAll('td, th');
+    if (cells.length === 0) return false;
+    var allTitres = true;
+    cells.forEach(function(c) {
+      if (!c.classList.contains('ligne-titre')) allTitres = false;
+    });
+    return allTitres;
+  }
+
   // ── Détecte si un tableau est un tableau 2D éligible au freeze ───────────
   function isFreezable2DTable(tbl) {
     if (tbl.classList.contains('mobile-card-table')) return false;
     if (tbl.classList.contains('frz-tbl')) return false;
-    var rows = tbl.querySelectorAll('tr');
+    var rows = Array.prototype.slice.call(tbl.querySelectorAll('tr'));
     var maxCols = 0;
     for (var i = 0; i < Math.min(rows.length, 5); i++) {
       var cells = rows[i].querySelectorAll('td, th');
@@ -722,10 +739,22 @@ document.addEventListener('DOMContentLoaded', function() {
       if (colCount > maxCols) maxCols = colCount;
     }
     if (maxCols < 4) return false;
-    if (!tbl.querySelector('tr.ligne-titre, thead')) return false;
-    return tbl.querySelector(
-      'tr:not(.ligne-titre) input, tr:not(.ligne-titre) select, tr:not(.ligne-titre) textarea'
-    ) !== null;
+    // Vérifier qu'il existe au moins un TR d'en-tête (3 cas)
+    var hasHeader = false;
+    for (var k = 0; k < rows.length; k++) {
+      if (isHeaderRow(rows[k])) { hasHeader = true; break; }
+    }
+    if (!hasHeader) return false;
+    // Vérifier qu'il y a des inputs dans les lignes NON-en-tête
+    var hasDataInputs = false;
+    for (var m = 0; m < rows.length; m++) {
+      if (!isHeaderRow(rows[m])) {
+        if (rows[m].querySelector('input, select, textarea')) {
+          hasDataInputs = true; break;
+        }
+      }
+    }
+    return hasDataInputs;
   }
 
   // ── Applique le freeze JS-clone sur un tableau 2D ────────────────────────
@@ -750,13 +779,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     tbl.classList.add('frz-tbl');
 
-    // 2. Identifier en-têtes et données
+    // 2. Identifier en-têtes et données (utilise isHeaderRow — 3 cas)
     var allRows  = Array.prototype.slice.call(tbl.querySelectorAll('tr'));
-    var hdrRows  = allRows.filter(function(r) {
-      return r.classList.contains('ligne-titre') ||
-             (r.parentElement && r.parentElement.tagName === 'THEAD');
-    });
-    var dataRows = allRows.filter(function(r) { return hdrRows.indexOf(r) === -1; });
+    var hdrRows  = allRows.filter(function(r) { return isHeaderRow(r); });
+    var dataRows = allRows.filter(function(r) { return !isHeaderRow(r); });
     if (hdrRows.length === 0) return;
 
     // 3. Clone de la ligne d'en-tête ─────────────────────────────────────
@@ -932,10 +958,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Synchronisation au scroll
     wrap.addEventListener('scroll', syncFreeze);
 
-    // Synchronisation initiale : attendre 2 frames pour que le layout soit stable
+    // Synchronisation initiale : 3 RAF + setTimeout 200ms pour Android WebView
+    // Android WebView peut être plus lent à calculer les offsetWidth/offsetHeight
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
-        syncFreeze();
+        requestAnimationFrame(function() {
+          syncFreeze();
+          // Second appel après 300ms pour garantir le layout après rendu complet
+          setTimeout(function() { initialized = false; syncFreeze(); }, 300);
+        });
       });
     });
 
