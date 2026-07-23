@@ -578,77 +578,110 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   /* Empêche les images/éléments larges de déborder */
   img { max-width: 100%; height: auto; }
 
-  /* ── FREEZE 1ère ligne + 1ère colonne pour tableaux 2D ──────────────────
-   * Appliqué uniquement aux tableaux détectés comme bidimensionnels (≥ 4 col,
-   * ligne-titre présente, contient des inputs dans les lignes de données).
-   * Le JS post-DOM injecte la classe 'tbl-freeze-2d' sur ces tableaux et
-   * 'tbl-freeze-wrapper' sur leur conteneur de scroll.
-   * z-index : coin sup-gauche = 4 > en-tête = 3 > 1ère col = 2 > cellules = 1
+  /* ── FREEZE 1ère ligne + 1ère colonne — conteneur de scroll ─────────────
+   * IMPORTANT : position:sticky est cassé dans Android WebView quand un
+   * ancêtre a overflow:auto/hidden (ce qui est le cas ici : body>form,
+   * html/body overflow-x:hidden, .div-table-questionnaire overflow-x:auto).
+   * Solution : clone JS — on crée un élément flottant (position:absolute)
+   * qui reproduit la ligne d'en-tête et la 1ère colonne, puis on synchronise
+   * sa position au scroll via addEventListener('scroll').
    * ────────────────────────────────────────────────────────────────────── */
 
-  /* Conteneur de scroll pour tableaux freeze */
-  .tbl-freeze-wrapper {
-    overflow: auto;                        /* scroll bi-directionnel */
+  /* Conteneur scroll bi-directionnel pour tableaux freeze */
+  .frz-wrap {
+    position: relative;          /* ancre pour les clones position:absolute */
+    overflow: auto;
     -webkit-overflow-scrolling: touch;
     display: block;
     width: 100%;
-    max-height: 70vh;                      /* limite hauteur → scroll vertical activé */
+    max-height: 70vh;
     border: 1px solid #b7c4d8;
-    border-radius: 10px;
+    border-radius: 8px;
     background: #fff;
-    margin: 8px 0 14px;
-    position: relative;
+    margin: 8px 0 12px;
   }
 
-  /* Tableau freeze : les cellules collantes ont besoin que le tableau soit
-     positionné dans un conteneur scrollable (pas body) */
-  .tbl-freeze-2d {
-    border-collapse: separate !important;  /* séparé OBLIGATOIRE pour sticky */
-    border-spacing: 0 !important;
+  /* Tableau à l'intérieur du wrapper freeze */
+  .frz-tbl {
+    border-collapse: collapse;
     table-layout: auto;
     min-width: 100%;
   }
+  /* Marge supérieure pour laisser la place au clone d'en-tête flottant.
+     La hauteur réelle sera injectée par JS après mesure du tr.ligne-titre. */
+  .frz-tbl.frz-has-header { margin-top: 0; }   /* JS ajuste via paddingTop */
 
-  /* ── 1ère ligne : sticky top:0 ── */
-  .tbl-freeze-2d tr.freeze-header-row th,
-  .tbl-freeze-2d tr.freeze-header-row td {
-    position: sticky;
+  /* Clone flottant de la ligne d'en-tête (reproduit le tr.ligne-titre) */
+  .frz-header-clone {
+    position: absolute;
     top: 0;
-    z-index: 3;
-    background: #dce6f1;                   /* fond en-tête (même que ligne-titre) */
-    font-weight: bold;
-    white-space: nowrap;
-    /* Bordure inférieure visible lors du scroll vertical */
-    box-shadow: 0 2px 0 #b7c4d8;
-  }
-
-  /* ── 1ère colonne : sticky left:0 ── */
-  .tbl-freeze-2d td.freeze-first-col,
-  .tbl-freeze-2d th.freeze-first-col {
-    position: sticky;
     left: 0;
-    z-index: 2;
-    background: #f5f7fb;                   /* fond légèrement grisé pour la col label */
-    /* Bordure droite visible lors du scroll horizontal */
-    box-shadow: 2px 0 0 #b7c4d8;
-    min-width: 120px;
-    max-width: 200px;
-    word-break: break-word;
-    white-space: normal;
-  }
-
-  /* ── Coin supérieur gauche : z-index max (intersection header × col1) ── */
-  .tbl-freeze-2d tr.freeze-header-row th.freeze-first-col,
-  .tbl-freeze-2d tr.freeze-header-row td.freeze-first-col {
-    z-index: 4;
+    z-index: 10;
+    overflow: hidden;
     background: #dce6f1;
-    box-shadow: 2px 2px 0 #b7c4d8;        /* bords droit + bas */
+    border-bottom: 2px solid #b7c4d8;
+    pointer-events: none;          /* les inputs restent cliquables sous le clone */
+    box-sizing: border-box;
+    /* hauteur/largeur injectées par JS */
+  }
+  .frz-header-clone table {
+    border-collapse: collapse;
+    table-layout: fixed;           /* mêmes largeurs que le vrai tableau */
+    background: #dce6f1;
+    margin: 0; padding: 0;
+  }
+  .frz-header-clone td, .frz-header-clone th {
+    background: #dce6f1 !important;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 4px 6px;
+    border: 1px solid #b7c4d8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
   }
 
-  /* ── Indicateur scroll — remplace le ::after de table-mobile-scroll ── */
-  .tbl-freeze-wrapper .freeze-scroll-hint {
+  /* Clone flottant de la 1ère colonne */
+  .frz-col-clone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9;
+    overflow: hidden;
+    background: #f5f7fb;
+    border-right: 2px solid #b7c4d8;
+    pointer-events: none;
+    box-sizing: border-box;
+  }
+  .frz-col-clone table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #f5f7fb;
+    margin: 0; padding: 0;
+  }
+  .frz-col-clone td, .frz-col-clone th {
+    background: #f5f7fb !important;
+    font-size: 12px;
+    padding: 4px 6px;
+    border: 1px solid #cdd5e0;
+    border-left: none;
+    white-space: normal;
+    word-break: break-word;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .frz-col-clone tr.frz-header-tr td,
+  .frz-col-clone tr.frz-header-tr th {
+    background: #dce6f1 !important;
+    font-weight: bold;
+    border-bottom: 2px solid #b7c4d8;
+  }
+
+  /* Indicateur de scroll */
+  .frz-hint {
     display: block;
-    padding: 5px 10px 7px;
+    padding: 4px 8px 6px;
     color: #5d6b82;
     font-size: 11px;
     text-align: center;
@@ -658,25 +691,14 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
 
 </style>
 <script>
-// Wrap tables + correction positionnement + freeze header/col pour tableaux 2D
-// Exécuté après DOMContentLoaded pour garantir que le DOM est prêt
+// Wrap tables + correction positionnement + freeze header/col JS-clone (Android WebView safe)
+// Exécuté après DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
 
   // ── Détecte si un tableau est un tableau 2D éligible au freeze ───────────
-  // Critères :
-  //   1. ≥ 4 colonnes dans la 1ère ligne (tableau multi-col réel)
-  //   2. Contient au moins une ligne-titre OU un <thead>
-  //   3. Contient des inputs dans les lignes de données (tableau de saisie)
-  //   4. N'est PAS déjà une mobile-card-table (rendu carte mobile)
-  //   5. N'est PAS imbriqué dans un autre tableau (évite doubles freeze)
+  // Critères : ≥ 4 colonnes, ligne-titre ou thead, inputs dans les données
   function isFreezable2DTable(tbl) {
     if (tbl.classList.contains('mobile-card-table')) return false;
-    // Exclut les tableaux imbriqués (parent direct est une td)
-    // SAUF si le tableau parent contient lui-même une ligne-titre → on traite les enfants
-    if (tbl.parentElement && tbl.parentElement.tagName === 'TD') {
-      // Tableau imbriqué dans une cellule : on l'évalue quand même
-    }
-    // Compte les colonnes de la 1ère ligne non vide
     var rows = tbl.querySelectorAll('tr');
     var maxCols = 0;
     for (var i = 0; i < Math.min(rows.length, 5); i++) {
@@ -688,100 +710,239 @@ document.addEventListener('DOMContentLoaded', function() {
       if (colCount > maxCols) maxCols = colCount;
     }
     if (maxCols < 4) return false;
-    // Doit avoir une ligne titre ou thead
-    var hasHeader = tbl.querySelector('tr.ligne-titre, thead') !== null;
-    if (!hasHeader) return false;
-    // Doit avoir des inputs dans les lignes de données
-    var hasInputs = tbl.querySelector('tr:not(.ligne-titre) input, tr:not(.ligne-titre) select, tr:not(.ligne-titre) textarea') !== null;
-    return hasInputs;
+    if (!tbl.querySelector('tr.ligne-titre, thead')) return false;
+    return tbl.querySelector(
+      'tr:not(.ligne-titre) input, tr:not(.ligne-titre) select, tr:not(.ligne-titre) textarea'
+    ) !== null;
   }
 
-  // ── Applique le freeze sur un tableau 2D ─────────────────────────────────
+  // ── Applique le freeze JS-clone sur un tableau 2D ────────────────────────
   //
-  // Stratégie :
-  //   1. Identifie la (ou les) lignes d'en-tête : tr.ligne-titre ou les tr du <thead>
-  //   2. Identifie la 1ère cellule de CHAQUE ligne (index 0) = colonne libellé
-  //   3. Ajoute les classes freeze-header-row / freeze-first-col
-  //   4. Wraps le tableau dans .tbl-freeze-wrapper (si pas déjà wrappé)
-  //   5. Retire le wrapper table-mobile-scroll existant pour éviter double-wrap
+  // Technique :
+  //   • Wrap le tableau dans .frz-wrap (scroll bi-directionnel, position:relative)
+  //   • Crée .frz-header-clone : copie de la tr.ligne-titre, position:absolute top:0
+  //     → suit scrollLeft pour rester aligné horizontalement
+  //   • Crée .frz-col-clone : copie de la 1ère cellule de chaque ligne,
+  //     position:absolute left:0 → suit scrollTop pour rester aligné verticalement
+  //   • Un paddingTop sur le tableau = hauteur du clone d'en-tête
+  //     pour que la 1ère ligne de données ne soit pas masquée
+  //   • Un paddingLeft sur le tableau = largeur du clone de 1ère colonne
+  //   • Synchronisation via 'scroll' et ResizeObserver (recalcul si taille change)
   function applyFreeze(tbl) {
-    tbl.classList.add('tbl-freeze-2d');
-
-    // Identifie les lignes d'en-tête
-    var rows = Array.prototype.slice.call(tbl.querySelectorAll('tr'));
-    rows.forEach(function(tr) {
-      var isHeader = tr.classList.contains('ligne-titre') ||
-                     (tr.parentElement && tr.parentElement.tagName === 'THEAD');
-      if (isHeader) {
-        tr.classList.add('freeze-header-row');
-        // Marque aussi la 1ère cellule de cette ligne comme coin
-        var firstCell = tr.querySelector('td, th');
-        if (firstCell) firstCell.classList.add('freeze-first-col');
-      } else {
-        // Ligne de données : marque sa 1ère cellule
-        var firstCell = tr.querySelector('td, th');
-        if (firstCell) firstCell.classList.add('freeze-first-col');
-      }
-    });
-
-    // Détermine le wrapper à créer/réutiliser
+    // 1. Wrapper
     var parent = tbl.parentElement;
-    if (parent && parent.classList.contains('tbl-freeze-wrapper')) return; // déjà wrappé
-
-    // Si déjà dans un table-mobile-scroll ou div-table-questionnaire → on le remplace
     var existingWrapper = null;
     if (parent && (parent.classList.contains('table-mobile-scroll') ||
-                   parent.classList.contains('div-table-questionnaire'))) {
+                   parent.classList.contains('div-table-questionnaire') ||
+                   parent.classList.contains('frz-wrap'))) {
+      if (parent.classList.contains('frz-wrap')) return; // déjà wrappé
       existingWrapper = parent;
     }
-
-    var wrapper = document.createElement('div');
-    wrapper.className = 'tbl-freeze-wrapper';
-
+    var wrap = document.createElement('div');
+    wrap.className = 'frz-wrap';
     if (existingWrapper) {
-      // Remplace le wrapper existant par notre wrapper freeze
-      existingWrapper.parentNode.insertBefore(wrapper, existingWrapper);
-      wrapper.appendChild(tbl);
-      // Supprime l'ancien wrapper (maintenant vide)
+      existingWrapper.parentNode.insertBefore(wrap, existingWrapper);
+      wrap.appendChild(tbl);
       if (existingWrapper.parentNode) existingWrapper.parentNode.removeChild(existingWrapper);
     } else {
-      tbl.parentNode.insertBefore(wrapper, tbl);
-      wrapper.appendChild(tbl);
+      tbl.parentNode.insertBefore(wrap, tbl);
+      wrap.appendChild(tbl);
+    }
+    tbl.classList.add('frz-tbl');
+
+    // 2. Identifie la ligne d'en-tête et les lignes de données
+    var allRows  = Array.prototype.slice.call(tbl.querySelectorAll('tr'));
+    var hdrRows  = allRows.filter(function(r) {
+      return r.classList.contains('ligne-titre') ||
+             (r.parentElement && r.parentElement.tagName === 'THEAD');
+    });
+    var dataRows = allRows.filter(function(r) { return hdrRows.indexOf(r) === -1; });
+    if (hdrRows.length === 0) return;
+
+    // 3. Clone de la ligne d'en-tête ─────────────────────────────────────
+    var hClone = document.createElement('div');
+    hClone.className = 'frz-header-clone';
+    var hTable = document.createElement('table');
+    var hTbody = document.createElement('tbody');
+    hdrRows.forEach(function(hdr) {
+      var tr = document.createElement('tr');
+      var cells = hdr.querySelectorAll('td, th');
+      cells.forEach(function(cell) {
+        var td = document.createElement('td');
+        td.innerHTML = cell.innerHTML;
+        if (cell.getAttribute('colspan')) td.setAttribute('colspan', cell.getAttribute('colspan'));
+        tr.appendChild(td);
+      });
+      hTbody.appendChild(tr);
+    });
+    hTable.appendChild(hTbody);
+    hClone.appendChild(hTable);
+    wrap.appendChild(hClone);
+
+    // 4. Clone de la 1ère colonne ─────────────────────────────────────────
+    var cClone = document.createElement('div');
+    cClone.className = 'frz-col-clone';
+    var cTable = document.createElement('table');
+    var cTbody = document.createElement('tbody');
+    // En-têtes (1ère cellule de chaque ligne d'en-tête)
+    hdrRows.forEach(function(hdr) {
+      var tr = document.createElement('tr');
+      tr.className = 'frz-header-tr';
+      var cell = hdr.querySelector('td, th');
+      if (cell) {
+        var td = document.createElement('td');
+        td.innerHTML = cell.innerHTML;
+        tr.appendChild(td);
+      }
+      cTbody.appendChild(tr);
+    });
+    // Données (1ère cellule de chaque ligne de données)
+    dataRows.forEach(function(row) {
+      var tr = document.createElement('tr');
+      var cell = row.querySelector('td, th');
+      if (cell) {
+        var td = document.createElement('td');
+        td.innerHTML = cell.innerHTML;
+        tr.appendChild(td);
+      }
+      cTbody.appendChild(tr);
+    });
+    cTable.appendChild(cTbody);
+    cClone.appendChild(cTable);
+    wrap.appendChild(cClone);
+
+    // 5. Indicateur de scroll
+    var hint = document.createElement('div');
+    hint.className = 'frz-hint';
+    hint.textContent = '\u21c4 d\u00e9filer horizontalement  \u2195 verticalement';
+    wrap.appendChild(hint);
+
+    // 6. Mesure + synchronisation ─────────────────────────────────────────
+    // Appelé à l'init et à chaque scroll/resize
+    function syncFreeze() {
+      // Dimensions réelles du tableau
+      var tblW = tbl.offsetWidth;
+
+      // Hauteur de chaque ligne d'en-tête
+      var hdrH = 0;
+      hdrRows.forEach(function(r) { hdrH += r.offsetHeight; });
+
+      // Largeur de la 1ère colonne (mesurée sur la 1ère ligne de données)
+      var col0W = 0;
+      if (dataRows.length > 0) {
+        var firstCell = dataRows[0].querySelector('td, th');
+        if (firstCell) col0W = firstCell.offsetWidth;
+      }
+      if (col0W === 0 && hdrRows.length > 0) {
+        var firstHdrCell = hdrRows[0].querySelector('td, th');
+        if (firstHdrCell) col0W = firstHdrCell.offsetWidth;
+      }
+
+      var scrollLeft = wrap.scrollLeft;
+      var scrollTop  = wrap.scrollTop;
+
+      // ── Clone en-tête : largeur totale du tableau, suit scrollLeft ──
+      hClone.style.width  = tblW + 'px';
+      hClone.style.height = hdrH + 'px';
+      hClone.style.transform = 'translateX(' + (-scrollLeft) + 'px)';
+      hTable.style.width  = tblW + 'px';
+
+      // Aligne chaque cellule du clone avec la cellule réelle du tableau
+      // (copie les largeurs calculées pour un alignement pixel-perfect)
+      if (hdrRows.length > 0) {
+        var realCells  = hdrRows[0].querySelectorAll('td, th');
+        var cloneCells = hTbody.querySelectorAll('tr:first-child td');
+        for (var i = 0; i < Math.min(realCells.length, cloneCells.length); i++) {
+          cloneCells[i].style.width = realCells[i].offsetWidth + 'px';
+          cloneCells[i].style.minWidth = realCells[i].offsetWidth + 'px';
+        }
+      }
+
+      // ── Padding supérieur du tableau = hauteur de l'en-tête clone ──
+      tbl.style.paddingTop = hdrH + 'px';
+      // Masque les lignes d'en-tête originales (remplacées par le clone)
+      hdrRows.forEach(function(r) { r.style.visibility = 'hidden'; r.style.height = '0px'; });
+      // Restauration : on garde la tr mais on l'écrase visuellement
+      // (visibility:hidden conserve l'espace, permettant au clone de s'aligner)
+
+      // ── Clone 1ère colonne : hauteur totale du tableau, suit scrollTop ──
+      var totalH = tbl.offsetHeight;
+      cClone.style.height    = totalH + 'px';
+      cClone.style.width     = col0W + 'px';
+      cClone.style.transform = 'translateY(' + (-scrollTop) + 'px)';
+      cTable.style.width     = col0W + 'px';
+
+      // Aligne chaque cellule de la colonne clone avec la ligne réelle
+      var cCloneTrs = cTbody.querySelectorAll('tr');
+      // Ligne d'en-tête clones
+      hdrRows.forEach(function(r, idx) {
+        if (cCloneTrs[idx]) {
+          cCloneTrs[idx].style.height = r.offsetHeight + 'px';
+          var tc = cCloneTrs[idx].querySelector('td');
+          if (tc) tc.style.height = r.offsetHeight + 'px';
+        }
+      });
+      // Lignes de données clones
+      var offset = hdrRows.length;
+      dataRows.forEach(function(r, idx) {
+        var ci = offset + idx;
+        if (cCloneTrs[ci]) {
+          cCloneTrs[ci].style.height = r.offsetHeight + 'px';
+          var tc = cCloneTrs[ci].querySelector('td');
+          if (tc) tc.style.height = r.offsetHeight + 'px';
+        }
+      });
+
+      // ── Padding gauche du tableau = largeur de la 1ère colonne ──
+      tbl.style.paddingLeft = col0W + 'px';
+      // Masque la 1ère cellule de chaque ligne (remplacée par le clone)
+      allRows.forEach(function(r) {
+        var fc = r.querySelector('td, th');
+        if (fc) { fc.style.visibility = 'hidden'; }
+      });
+
+      // ── Coin supérieur gauche : le clone de colonne recouvre l'en-tête ──
+      // On réajuste le z-index pour que le coin soit correctement rendu
+      cClone.style.zIndex = '9';
+      hClone.style.zIndex = '10';
     }
 
-    // Ajoute l'indicateur de scroll
-    var hint = document.createElement('div');
-    hint.className = 'freeze-scroll-hint';
-    hint.textContent = '\u21c4 Faites d\u00e9filer horizontalement / \u2195 verticalement';
-    wrapper.appendChild(hint);
+    // Synchronisation au scroll
+    wrap.addEventListener('scroll', syncFreeze);
+
+    // Synchronisation initiale après layout
+    // requestAnimationFrame garantit que le layout est calculé
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        syncFreeze();
+      });
+    });
+
+    // Re-sync si le tableau est redimensionné (ex. rotation écran)
+    if (typeof ResizeObserver !== 'undefined') {
+      var ro = new ResizeObserver(function() { syncFreeze(); });
+      ro.observe(wrap);
+    } else {
+      // Fallback pour navigateurs sans ResizeObserver
+      window.addEventListener('resize', syncFreeze);
+    }
   }
 
   // ── 1. Traitement de tous les tableaux ───────────────────────────────────
-  // On collecte d'abord la liste pour éviter les mutations en itérant
   var allTables = Array.prototype.slice.call(document.querySelectorAll('table'));
-
-  // Sépare tableaux freeze et tableaux normaux
-  var freezeTables = [];
-  var normalTables = [];
+  var freezeTables = [], normalTables = [];
   allTables.forEach(function(tbl) {
-    if (isFreezable2DTable(tbl)) {
-      freezeTables.push(tbl);
-    } else {
-      normalTables.push(tbl);
-    }
+    if (isFreezable2DTable(tbl)) freezeTables.push(tbl);
+    else normalTables.push(tbl);
   });
+  freezeTables.forEach(function(tbl) { applyFreeze(tbl); });
 
-  // Applique le freeze sur les tableaux 2D détectés
-  freezeTables.forEach(function(tbl) {
-    applyFreeze(tbl);
-  });
-
-  // Wrap normal (scroll horizontal seul) pour les autres tableaux non encore wrappés
+  // Wrap normal (scroll horizontal) pour les autres tableaux non wrappés
   normalTables.forEach(function(tbl) {
     if (!tbl.parentElement) return;
     var par = tbl.parentElement;
     if (!par.classList.contains('div-table-questionnaire') &&
-        !par.classList.contains('tbl-freeze-wrapper') &&
+        !par.classList.contains('frz-wrap') &&
         !par.classList.contains('table-mobile-scroll')) {
       var wrapper = document.createElement('div');
       wrapper.className = 'div-table-questionnaire';
@@ -790,21 +951,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // ── 2. FIX CHEVAUCHEMENT : forcer les inputs dans les td à ne pas dépasser
-  //    la largeur de leur cellule parente. Correction pour les anciens formulaires
-  //    qui utilisent width: inline style ou des attributs SIZE dépassant la cellule.
+  // ── 2. FIX CHEVAUCHEMENT inputs ─────────────────────────────────────────
   document.querySelectorAll('td input[type=text], td input[type=number], td select, td textarea').forEach(function(el) {
     el.style.width = '100%';
     el.style.minWidth = '44px';
     el.style.boxSizing = 'border-box';
-    // Supprime les attributs SIZE/WIDTH inline qui forcent une largeur absolue
     if (el.hasAttribute('size')) el.removeAttribute('size');
   });
 
-  // ── 3. Forcer table-layout:auto sur tous les tableaux pour éviter les chevauchements
+  // ── 3. table-layout:auto sur tous les tableaux ──────────────────────────
   document.querySelectorAll('table').forEach(function(tbl) {
     tbl.style.tableLayout = 'auto';
-    tbl.style.borderCollapse = tbl.classList.contains('tbl-freeze-2d') ? 'separate' : 'collapse';
+    tbl.style.borderCollapse = 'collapse';
   });
 });
 </script>
