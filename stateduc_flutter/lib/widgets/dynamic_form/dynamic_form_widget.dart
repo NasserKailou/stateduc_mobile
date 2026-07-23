@@ -392,8 +392,10 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   // Encapsule le fragment HTML du formulaire dans une page complète avec :
   //   - <meta charset="UTF-8"> et viewport pour le mobile
   //   - CSS : mise en forme des champs, tableaux horizontalement défilants,
-  //     champs de total (fond bleu), masquage des éléments Cordova
-  //   - JavaScript : wrapping automatique des tableaux dans des divs défilants
+  //     champs de total (fond bleu), masquage des éléments Cordova,
+  //     freeze sticky 1ère ligne + 1ère colonne pour tableaux 2D
+  //   - JavaScript : détection automatique des tableaux 2D (≥ 4 colonnes +
+  //     ligne-titre + inputs) → freeze header/col ; wrapping normal pour les autres
   String _buildHtmlPage(String formHtml) {
     return '''<!DOCTYPE html>
 <html>
@@ -576,14 +578,211 @@ class _DynamicFormWidgetState extends State<DynamicFormWidget> {
   /* Empêche les images/éléments larges de déborder */
   img { max-width: 100%; height: auto; }
 
+  /* ── FREEZE 1ère ligne + 1ère colonne pour tableaux 2D ──────────────────
+   * Appliqué uniquement aux tableaux détectés comme bidimensionnels (≥ 4 col,
+   * ligne-titre présente, contient des inputs dans les lignes de données).
+   * Le JS post-DOM injecte la classe 'tbl-freeze-2d' sur ces tableaux et
+   * 'tbl-freeze-wrapper' sur leur conteneur de scroll.
+   * z-index : coin sup-gauche = 4 > en-tête = 3 > 1ère col = 2 > cellules = 1
+   * ────────────────────────────────────────────────────────────────────── */
+
+  /* Conteneur de scroll pour tableaux freeze */
+  .tbl-freeze-wrapper {
+    overflow: auto;                        /* scroll bi-directionnel */
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+    max-height: 70vh;                      /* limite hauteur → scroll vertical activé */
+    border: 1px solid #b7c4d8;
+    border-radius: 10px;
+    background: #fff;
+    margin: 8px 0 14px;
+    position: relative;
+  }
+
+  /* Tableau freeze : les cellules collantes ont besoin que le tableau soit
+     positionné dans un conteneur scrollable (pas body) */
+  .tbl-freeze-2d {
+    border-collapse: separate !important;  /* séparé OBLIGATOIRE pour sticky */
+    border-spacing: 0 !important;
+    table-layout: auto;
+    min-width: 100%;
+  }
+
+  /* ── 1ère ligne : sticky top:0 ── */
+  .tbl-freeze-2d tr.freeze-header-row th,
+  .tbl-freeze-2d tr.freeze-header-row td {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: #dce6f1;                   /* fond en-tête (même que ligne-titre) */
+    font-weight: bold;
+    white-space: nowrap;
+    /* Bordure inférieure visible lors du scroll vertical */
+    box-shadow: 0 2px 0 #b7c4d8;
+  }
+
+  /* ── 1ère colonne : sticky left:0 ── */
+  .tbl-freeze-2d td.freeze-first-col,
+  .tbl-freeze-2d th.freeze-first-col {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #f5f7fb;                   /* fond légèrement grisé pour la col label */
+    /* Bordure droite visible lors du scroll horizontal */
+    box-shadow: 2px 0 0 #b7c4d8;
+    min-width: 120px;
+    max-width: 200px;
+    word-break: break-word;
+    white-space: normal;
+  }
+
+  /* ── Coin supérieur gauche : z-index max (intersection header × col1) ── */
+  .tbl-freeze-2d tr.freeze-header-row th.freeze-first-col,
+  .tbl-freeze-2d tr.freeze-header-row td.freeze-first-col {
+    z-index: 4;
+    background: #dce6f1;
+    box-shadow: 2px 2px 0 #b7c4d8;        /* bords droit + bas */
+  }
+
+  /* ── Indicateur scroll — remplace le ::after de table-mobile-scroll ── */
+  .tbl-freeze-wrapper .freeze-scroll-hint {
+    display: block;
+    padding: 5px 10px 7px;
+    color: #5d6b82;
+    font-size: 11px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255,255,255,0), rgba(245,247,251,1));
+    border-top: 1px solid #e8ecf4;
+  }
+
 </style>
 <script>
-// FIX SESSION 66 issue #7 — Wrap tables + correction positionnement
+// Wrap tables + correction positionnement + freeze header/col pour tableaux 2D
 // Exécuté après DOMContentLoaded pour garantir que le DOM est prêt
 document.addEventListener('DOMContentLoaded', function() {
-  // 1. Wrap tous les tableaux dans un div défilant (tableaux grille larges)
-  document.querySelectorAll('table').forEach(function(tbl) {
-    if (!tbl.parentElement || !tbl.parentElement.classList.contains('div-table-questionnaire')) {
+
+  // ── Détecte si un tableau est un tableau 2D éligible au freeze ───────────
+  // Critères :
+  //   1. ≥ 4 colonnes dans la 1ère ligne (tableau multi-col réel)
+  //   2. Contient au moins une ligne-titre OU un <thead>
+  //   3. Contient des inputs dans les lignes de données (tableau de saisie)
+  //   4. N'est PAS déjà une mobile-card-table (rendu carte mobile)
+  //   5. N'est PAS imbriqué dans un autre tableau (évite doubles freeze)
+  function isFreezable2DTable(tbl) {
+    if (tbl.classList.contains('mobile-card-table')) return false;
+    // Exclut les tableaux imbriqués (parent direct est une td)
+    // SAUF si le tableau parent contient lui-même une ligne-titre → on traite les enfants
+    if (tbl.parentElement && tbl.parentElement.tagName === 'TD') {
+      // Tableau imbriqué dans une cellule : on l'évalue quand même
+    }
+    // Compte les colonnes de la 1ère ligne non vide
+    var rows = tbl.querySelectorAll('tr');
+    var maxCols = 0;
+    for (var i = 0; i < Math.min(rows.length, 5); i++) {
+      var cells = rows[i].querySelectorAll('td, th');
+      var colCount = 0;
+      cells.forEach(function(c) {
+        colCount += (parseInt(c.getAttribute('colspan') || '1', 10));
+      });
+      if (colCount > maxCols) maxCols = colCount;
+    }
+    if (maxCols < 4) return false;
+    // Doit avoir une ligne titre ou thead
+    var hasHeader = tbl.querySelector('tr.ligne-titre, thead') !== null;
+    if (!hasHeader) return false;
+    // Doit avoir des inputs dans les lignes de données
+    var hasInputs = tbl.querySelector('tr:not(.ligne-titre) input, tr:not(.ligne-titre) select, tr:not(.ligne-titre) textarea') !== null;
+    return hasInputs;
+  }
+
+  // ── Applique le freeze sur un tableau 2D ─────────────────────────────────
+  //
+  // Stratégie :
+  //   1. Identifie la (ou les) lignes d'en-tête : tr.ligne-titre ou les tr du <thead>
+  //   2. Identifie la 1ère cellule de CHAQUE ligne (index 0) = colonne libellé
+  //   3. Ajoute les classes freeze-header-row / freeze-first-col
+  //   4. Wraps le tableau dans .tbl-freeze-wrapper (si pas déjà wrappé)
+  //   5. Retire le wrapper table-mobile-scroll existant pour éviter double-wrap
+  function applyFreeze(tbl) {
+    tbl.classList.add('tbl-freeze-2d');
+
+    // Identifie les lignes d'en-tête
+    var rows = Array.prototype.slice.call(tbl.querySelectorAll('tr'));
+    rows.forEach(function(tr) {
+      var isHeader = tr.classList.contains('ligne-titre') ||
+                     (tr.parentElement && tr.parentElement.tagName === 'THEAD');
+      if (isHeader) {
+        tr.classList.add('freeze-header-row');
+        // Marque aussi la 1ère cellule de cette ligne comme coin
+        var firstCell = tr.querySelector('td, th');
+        if (firstCell) firstCell.classList.add('freeze-first-col');
+      } else {
+        // Ligne de données : marque sa 1ère cellule
+        var firstCell = tr.querySelector('td, th');
+        if (firstCell) firstCell.classList.add('freeze-first-col');
+      }
+    });
+
+    // Détermine le wrapper à créer/réutiliser
+    var parent = tbl.parentElement;
+    if (parent && parent.classList.contains('tbl-freeze-wrapper')) return; // déjà wrappé
+
+    // Si déjà dans un table-mobile-scroll ou div-table-questionnaire → on le remplace
+    var existingWrapper = null;
+    if (parent && (parent.classList.contains('table-mobile-scroll') ||
+                   parent.classList.contains('div-table-questionnaire'))) {
+      existingWrapper = parent;
+    }
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'tbl-freeze-wrapper';
+
+    if (existingWrapper) {
+      // Remplace le wrapper existant par notre wrapper freeze
+      existingWrapper.parentNode.insertBefore(wrapper, existingWrapper);
+      wrapper.appendChild(tbl);
+      // Supprime l'ancien wrapper (maintenant vide)
+      if (existingWrapper.parentNode) existingWrapper.parentNode.removeChild(existingWrapper);
+    } else {
+      tbl.parentNode.insertBefore(wrapper, tbl);
+      wrapper.appendChild(tbl);
+    }
+
+    // Ajoute l'indicateur de scroll
+    var hint = document.createElement('div');
+    hint.className = 'freeze-scroll-hint';
+    hint.textContent = '\u21c4 Faites d\u00e9filer horizontalement / \u2195 verticalement';
+    wrapper.appendChild(hint);
+  }
+
+  // ── 1. Traitement de tous les tableaux ───────────────────────────────────
+  // On collecte d'abord la liste pour éviter les mutations en itérant
+  var allTables = Array.prototype.slice.call(document.querySelectorAll('table'));
+
+  // Sépare tableaux freeze et tableaux normaux
+  var freezeTables = [];
+  var normalTables = [];
+  allTables.forEach(function(tbl) {
+    if (isFreezable2DTable(tbl)) {
+      freezeTables.push(tbl);
+    } else {
+      normalTables.push(tbl);
+    }
+  });
+
+  // Applique le freeze sur les tableaux 2D détectés
+  freezeTables.forEach(function(tbl) {
+    applyFreeze(tbl);
+  });
+
+  // Wrap normal (scroll horizontal seul) pour les autres tableaux non encore wrappés
+  normalTables.forEach(function(tbl) {
+    if (!tbl.parentElement) return;
+    var par = tbl.parentElement;
+    if (!par.classList.contains('div-table-questionnaire') &&
+        !par.classList.contains('tbl-freeze-wrapper') &&
+        !par.classList.contains('table-mobile-scroll')) {
       var wrapper = document.createElement('div');
       wrapper.className = 'div-table-questionnaire';
       tbl.parentNode.insertBefore(wrapper, tbl);
@@ -591,7 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // 2. FIX CHEVAUCHEMENT : forcer les inputs dans les td à ne pas dépasser
+  // ── 2. FIX CHEVAUCHEMENT : forcer les inputs dans les td à ne pas dépasser
   //    la largeur de leur cellule parente. Correction pour les anciens formulaires
   //    qui utilisent width: inline style ou des attributs SIZE dépassant la cellule.
   document.querySelectorAll('td input[type=text], td input[type=number], td select, td textarea').forEach(function(el) {
@@ -602,10 +801,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (el.hasAttribute('size')) el.removeAttribute('size');
   });
 
-  // 3. Forcer table-layout:auto sur tous les tableaux pour éviter les chevauchements
+  // ── 3. Forcer table-layout:auto sur tous les tableaux pour éviter les chevauchements
   document.querySelectorAll('table').forEach(function(tbl) {
     tbl.style.tableLayout = 'auto';
-    tbl.style.borderCollapse = 'collapse';
+    tbl.style.borderCollapse = tbl.classList.contains('tbl-freeze-2d') ? 'separate' : 'collapse';
   });
 });
 </script>
