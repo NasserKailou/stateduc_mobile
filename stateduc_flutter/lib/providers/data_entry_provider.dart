@@ -947,36 +947,38 @@ class DataEntryProvider extends ChangeNotifier {
       );
 
       if (rules.isEmpty) {
-        debugPrint('[DataEntry] checkCoherenceOffline: aucune règle stockée pour '
-            'idCamp=$_idCamp idQst=${_selectedQuestion!.idQst} idEtab=$_idEtab '
-            '— le fetch background est peut-être encore en cours. '
-            'Le contrôle sera re-déclenché automatiquement à l\'arrivée des règles.');
-        return;
+        // Pas de règles paires en cache : le fetch background est peut-être
+        // encore en cours. On continue quand même pour le moteur générique
+        // ThemeRuleEngine (DICO_REGLE_THEME) qui n'a pas besoin de ces règles.
+        debugPrint('[DataEntry] checkCoherenceOffline: aucune règle paire stockée '
+            'pour idCamp=$_idCamp idQst=${_selectedQuestion!.idQst} idEtab=$_idEtab '
+            '— CoherenceEvaluator skipped, ThemeRuleEngine continue.');
+      } else {
+        // Lance l'évaluation des règles paires sur les données du formulaire courant.
+        // Session 45 : codeEtab et codeTypeAnnee sont passés pour la substitution
+        // des paramètres $CODE_ETABLISSEMENT et $CODE_TYPE_ANNEE dans le SQL.
+        _offlineCoherenceErrors = await _evaluator.evaluate(
+          rules:          rules,
+          formData:       _formData,
+          idCamp:         _idCamp!,
+          idQst:          _selectedQuestion!.idQst,
+          idEtab:         _idEtab!,
+          idFilter:       _selectedFilter?.idFilter,
+          codeEtab:       _codeEtab,    // ex. '101012071' → $CODE_ETABLISSEMENT
+          codeTypeAnnee:  _codeyear,    // ex. '2024'       → $CODE_TYPE_ANNEE
+        );
+        debugPrint('[DataEntry] checkCoherenceOffline: '
+            '${_offlineCoherenceErrors.length} violation(s) (paires) found');
       }
 
-      // Lance l'évaluation des règles sur les données du formulaire courant.
-      // Session 45 : codeEtab et codeTypeAnnee sont passés pour la substitution
-      // des paramètres $CODE_ETABLISSEMENT et $CODE_TYPE_ANNEE dans le SQL.
-      _offlineCoherenceErrors = await _evaluator.evaluate(
-        rules:          rules,
-        formData:       _formData,
-        idCamp:         _idCamp!,
-        idQst:          _selectedQuestion!.idQst,
-        idEtab:         _idEtab!,
-        idFilter:       _selectedFilter?.idFilter,
-        codeEtab:       _codeEtab,    // ex. '101012071' → $CODE_ETABLISSEMENT
-        codeTypeAnnee:  _codeyear,    // ex. '2024'       → $CODE_TYPE_ANNEE
-      );
-
-      debugPrint('[DataEntry] checkCoherenceOffline: '
-          '${_offlineCoherenceErrors.length} violation(s) (paires) found');
-
       // ── Moteur générique ThemeRuleEngine (DICO_REGLE_THEME) ──────────────
-      // Extrait l'id_theme depuis l'idQst de la question sélectionnée.
-      // Convention : idQst peut être "900", "9001", "9002", etc. — on tronque
-      // à 3-4 chiffres de base pour identifier le thème.
+      // Toujours exécuté, même si rules.isEmpty (moteur indépendant).
+      // Mapping idQst → idTheme : prend les 3 premiers chiffres si > 999.
+      // Ex: "900"→900, "9001"→900, "10001"→1000, "1050"→1050.
       final idThemeStr = _selectedQuestion!.idQst;
-      final idTheme    = int.tryParse(idThemeStr) ?? 0;
+      final idThemeFull = int.tryParse(idThemeStr) ?? 0;
+      // Normalise vers l'id_theme connu (multiple de 10 ≤ 4 chiffres)
+      final idTheme = _normalizeIdTheme(idThemeFull);
 
       if (idTheme > 0) {
         try {
@@ -1010,6 +1012,42 @@ class DataEntryProvider extends ChangeNotifier {
       _isCheckingOffline = false;
       notifyListeners();
     }
+  }
+
+  // ── Normalise un idQst numérique vers l'id_theme DICO_REGLE_THEME ──────────
+  //
+  // Les thèmes connus sont : 900, 920, 940, 950, 960, 970, 980, 990,
+  //   1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070.
+  //
+  // Cas :
+  //   "900"   → 900  (correspondance directe)
+  //   "9001"  → 900  (sous-thème : on essaie la troncature à 3 chiffres)
+  //   "9002"  → 900
+  //   "10001" → 1000 (sous-thème 5 chiffres : troncature à 4 chiffres)
+  //   "1050"  → 1050 (correspondance directe 4 chiffres)
+  //   "0"     → 0    (inconnu)
+  //
+  static const _knownThemes = {
+    900, 920, 940, 950, 960, 970, 980, 990,
+    1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070,
+  };
+
+  int _normalizeIdTheme(int raw) {
+    if (raw <= 0) return 0;
+    // Correspondance directe
+    if (_knownThemes.contains(raw)) return raw;
+    // Tente troncature : garder les N premiers chiffres
+    final s = raw.toString();
+    for (int len in [4, 3]) {
+      if (s.length > len) {
+        final candidate = int.tryParse(s.substring(0, len));
+        if (candidate != null && _knownThemes.contains(candidate)) {
+          return candidate;
+        }
+      }
+    }
+    // Retourne la valeur brute — ThemeRuleEngine retournera [] si theme inconnu
+    return raw;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

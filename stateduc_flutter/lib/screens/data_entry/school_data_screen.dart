@@ -9,6 +9,7 @@ import '../../widgets/dynamic_form/dynamic_form_widget.dart';
 import '../../widgets/common/loading_overlay.dart';
 import '../../models/user.dart';  // FilterPeriod
 import '../../services/coherence_evaluator.dart';  // OfflineCoherenceError
+import '../../services/theme_rule_engine.dart';     // ThemeCoherenceError
 
 /// SchoolDataScreen — écran de saisie des données pour un établissement scolaire.
 ///
@@ -292,9 +293,16 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         // déjà saisi. Un spinner indique que le contrôle est en cours.
         if (entry.isCheckingOffline)
           const LinearProgressIndicator(),
+        // Moteur paire (CoherenceEvaluator) — règles de cohérence classiques
         if (entry.hasOfflineCoherenceErrors)
           _OfflineCoherenceBanner(
             errors: entry.offlineCoherenceErrors,
+            onDismiss: entry.clearMessages,
+          ),
+        // Moteur générique (ThemeRuleEngine) — règles DICO_REGLE_THEME
+        if (entry.hasThemeCoherenceErrors)
+          _ThemeCoherenceBanner(
+            errors: entry.themeCoherenceErrors,
             onDismiss: entry.clearMessages,
           ),
         // ── Sélecteur de question (thème) ────────────────────────────────
@@ -1192,6 +1200,126 @@ class _FilterSelector extends StatelessWidget {
 }
 
 // ─── Bannière de violations de cohérence hors ligne ─────────────────────────
+// ─── Bannière DICO_REGLE_THEME (moteur générique ThemeRuleEngine) ────────────
+/// Bannière affichant les violations détectées par [ThemeRuleEngine]
+/// (moteur générique piloté par les métadonnées DICO_REGLE_THEME).
+///
+/// Chaque violation affiche le message associé à la règle.
+/// Distincte visuellement de [_OfflineCoherenceBanner] (bordure rouge foncé
+/// vs orange) pour indiquer qu'il s'agit du moteur de règles métier.
+class _ThemeCoherenceBanner extends StatelessWidget {
+  const _ThemeCoherenceBanner({
+    required this.errors,
+    required this.onDismiss,
+  });
+  final List<ThemeCoherenceError> errors;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.red.shade400, width: 1.5),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.shade50,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // ── En-tête ──────────────────────────────────────────────────────
+          Container(
+            padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(7)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.rule_folder_outlined,
+                    color: Colors.red, size: 20),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Contrôle de cohérence',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Règles métier — contrôle local hors ligne',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 16),
+                  onPressed: onDismiss,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                  tooltip: 'Fermer',
+                ),
+              ],
+            ),
+          ),
+          // ── Compteur ─────────────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+            child: Text(
+              '${errors.length} incohérence(s) détectée(s) :',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          // ── Liste des violations ──────────────────────────────────────────
+          ...errors.map((e) => Padding(
+                padding: const EdgeInsets.fromLTRB(12, 3, 12, 3),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        size: 15, color: Colors.red),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        e.message.isNotEmpty
+                            ? e.message
+                            : 'Règle ${e.idRegle} — incohérence détectée'
+                                '${e.value1 != null && e.value2 != null
+                                    ? ' (${e.value1!.toStringAsFixed(0)} ${e.critere ?? "≠"} ${e.value2!.toStringAsFixed(0)})'
+                                    : ""}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
 /// Bannière expansible affichant les violations de cohérence détectées
 /// par [CoherenceEvaluator] (contrôle offline) après une sauvegarde locale.
 ///
