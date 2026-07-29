@@ -401,6 +401,28 @@ class DatabaseService {
     );
   }
 
+  /// Met à jour le champ [message] de plusieurs règles dans [dico_regle_theme].
+  ///
+  /// [messages] — Map<idRegle, messageCondensé> reçu depuis le serveur
+  ///              (data_rules.php → associations[].message).
+  ///
+  /// Seules les règles avec un message NON VIDE côté serveur sont mises à jour,
+  /// ce qui préserve les libellés DICO_TRADUCTION déjà présents pour les autres.
+  Future<void> updateDicoRegleMessages(Map<int, String> messages) async {
+    if (messages.isEmpty) return;
+    final db = await database;
+    final now = DateTime.now().toIso8601String();
+    await db.transaction((txn) async {
+      for (final entry in messages.entries) {
+        if (entry.value.isEmpty) continue;
+        await txn.execute(
+          'UPDATE dico_regle_theme SET message = ?, synced_at = ? WHERE id_regle = ?',
+          [entry.value, now, entry.key],
+        );
+      }
+    });
+  }
+
   /// Insère ou remplace une liste d'associations de règles.
   Future<void> insertDicoRegleThemeAssoc(
     List<Map<String, dynamic>> assocs,

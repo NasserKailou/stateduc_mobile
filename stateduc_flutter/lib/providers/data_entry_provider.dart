@@ -280,6 +280,28 @@ class DataEntryProvider extends ChangeNotifier {
             await _db.insertCoherenceRules(rules);
             debugPrint('[DataEntry] stored ${rules.length} offline coherence rules '
                 'for qst=${q.idQst} etab=$idEtab year=$yearCode');
+
+            // ── SYNC MESSAGES DICO_REGLE_THEME ────────────────────────────────
+            // data_rules.php retourne pour chaque paire (règle, association) le
+            // message condensé lisible (ex: "INCOHERENCE! EFFECTIF ELEVES F>F+M (4.1)").
+            // Ce message est stocké dans CoherenceRule.message.
+            // On le synchronise vers dico_regle_theme.message pour que
+            // ThemeRuleEngine affiche le même message que le serveur.
+            // Stratégie : pour chaque id_regle distinct, prendre le premier
+            // message non vide parmi toutes ses associations.
+            final msgMap = <int, String>{};
+            for (final r in rules) {
+              if (!msgMap.containsKey(r.idRegle) && r.message.isNotEmpty) {
+                msgMap[r.idRegle] = r.message;
+              }
+            }
+            if (msgMap.isNotEmpty) {
+              await _db.updateDicoRegleMessages(msgMap);
+              debugPrint('[DataEntry] synced ${msgMap.length} messages '
+                  'into dico_regle_theme for qst=${q.idQst}');
+            }
+            // ──────────────────────────────────────────────────────────────────
+
             // ── Re-déclenche le contrôle offline si les règles viennent d'arriver
             // pour la question actuellement affichée.
             // La condition _formData.isNotEmpty a été retirée : on re-déclenche
