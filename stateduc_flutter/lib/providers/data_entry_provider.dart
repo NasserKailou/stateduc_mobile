@@ -934,80 +934,49 @@ class DataEntryProvider extends ChangeNotifier {
   Future<void> checkCoherenceOffline() async {
     if (_idCamp == null || _idEtab == null || _selectedQuestion == null) return;
     _isCheckingOffline      = true;
-    _offlineCoherenceErrors = [];
+    _offlineCoherenceErrors = [];   // Moteur paire désactivé (conservé pour compatibilité)
     _themeCoherenceErrors   = [];
     notifyListeners();
 
     try {
-      // Récupère les règles de cohérence stockées pour ce contexte
-      final rules = await _db.getCoherenceRules(
-        idCamp: _idCamp!,
-        idQst:  _selectedQuestion!.idQst,
-        idEtab: _idEtab!,
-      );
-
-      if (rules.isEmpty) {
-        // Pas de règles paires en cache : le fetch background est peut-être
-        // encore en cours. On continue quand même pour le moteur générique
-        // ThemeRuleEngine (DICO_REGLE_THEME) qui n'a pas besoin de ces règles.
-        debugPrint('[DataEntry] checkCoherenceOffline: aucune règle paire stockée '
-            'pour idCamp=$_idCamp idQst=${_selectedQuestion!.idQst} idEtab=$_idEtab '
-            '— CoherenceEvaluator skipped, ThemeRuleEngine continue.');
-      } else {
-        // Lance l'évaluation des règles paires sur les données du formulaire courant.
-        // Session 45 : codeEtab et codeTypeAnnee sont passés pour la substitution
-        // des paramètres $CODE_ETABLISSEMENT et $CODE_TYPE_ANNEE dans le SQL.
-        _offlineCoherenceErrors = await _evaluator.evaluate(
-          rules:          rules,
-          formData:       _formData,
-          idCamp:         _idCamp!,
-          idQst:          _selectedQuestion!.idQst,
-          idEtab:         _idEtab!,
-          idFilter:       _selectedFilter?.idFilter,
-          codeEtab:       _codeEtab,    // ex. '101012071' → $CODE_ETABLISSEMENT
-          codeTypeAnnee:  _codeyear,    // ex. '2024'       → $CODE_TYPE_ANNEE
-        );
-        debugPrint('[DataEntry] checkCoherenceOffline: '
-            '${_offlineCoherenceErrors.length} violation(s) (paires) found');
-      }
-
-      // ── Moteur générique ThemeRuleEngine (DICO_REGLE_THEME) ──────────────
-      // Toujours exécuté, même si rules.isEmpty (moteur indépendant).
-      // Mapping idQst → idTheme : prend les 3 premiers chiffres si > 999.
-      // Ex: "900"→900, "9001"→900, "10001"→1000, "1050"→1050.
-      final idThemeStr = _selectedQuestion!.idQst;
+      // ── Moteur UNIQUE : ThemeRuleEngine (DICO_REGLE_THEME) ───────────────
+      //
+      // Source de vérité : les règles viennent de la BD serveur dont l'Excel
+      // fichier_incohérence_mobile.xlsx est une extraction directe.
+      // Le moteur paire (CoherenceEvaluator) est désactivé pour éviter les
+      // doublons et les résultats contradictoires.
+      //
+      // Mapping idQst → idTheme :
+      //   "900"   → 900  (direct)
+      //   "9001"  → 900  (sous-thème, troncature 3 chiffres)
+      //   "10001" → 1000 (sous-thème, troncature 4 chiffres)
+      //   "1050"  → 1050 (direct 4 chiffres)
+      final idThemeStr  = _selectedQuestion!.idQst;
       final idThemeFull = int.tryParse(idThemeStr) ?? 0;
-      // Normalise vers l'id_theme connu (multiple de 10 ≤ 4 chiffres)
-      final idTheme = _normalizeIdTheme(idThemeFull);
+      final idTheme     = _normalizeIdTheme(idThemeFull);
 
       if (idTheme > 0) {
-        try {
-          _themeCoherenceErrors = await _themeEngine.evaluateTheme(
-            idTheme:       idTheme,
-            idCamp:        _idCamp!,
-            idEtab:        _idEtab!,
-            idQst:         _selectedQuestion!.idQst,
-            idFilter:      _selectedFilter?.idFilter,
-            codeEtab:      _codeEtab,
-            codeTypeAnnee: _codeyear,
-            formData:      _formData,
-          );
-          debugPrint('[DataEntry] ThemeRuleEngine: '
-              '${_themeCoherenceErrors.length} violation(s) thème found '
-              '(idTheme=$idTheme)');
-        } catch (e) {
-          debugPrint('[DataEntry] ThemeRuleEngine error: $e');
-          _themeCoherenceErrors = [];
-        }
+        _themeCoherenceErrors = await _themeEngine.evaluateTheme(
+          idTheme:       idTheme,
+          idCamp:        _idCamp!,
+          idEtab:        _idEtab!,
+          idQst:         _selectedQuestion!.idQst,
+          idFilter:      _selectedFilter?.idFilter,
+          codeEtab:      _codeEtab,
+          codeTypeAnnee: _codeyear,
+          formData:      _formData,
+        );
+        debugPrint('[DataEntry] ThemeRuleEngine: '
+            '${_themeCoherenceErrors.length} violation(s) found '
+            '(idTheme=$idTheme)');
       } else {
-        _themeCoherenceErrors = [];
-        debugPrint('[DataEntry] idTheme non parseable depuis idQst=$idThemeStr — ThemeRuleEngine skipped');
+        debugPrint('[DataEntry] idTheme inconnu depuis idQst=$idThemeStr '
+            '— ThemeRuleEngine skipped');
       }
 
     } catch (e) {
       debugPrint('[DataEntry] checkCoherenceOffline error: $e');
-      _offlineCoherenceErrors = [];
-      _themeCoherenceErrors   = [];
+      _themeCoherenceErrors = [];
     } finally {
       _isCheckingOffline = false;
       notifyListeners();
