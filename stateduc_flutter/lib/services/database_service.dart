@@ -32,6 +32,7 @@ import '../models/user.dart';
 ///   v1 : schéma initial
 ///   v2 : ajout colonne sort_order dans questions
 ///   v3 : ajout table coherence_rules (session 14 — contrôles offline)
+///   v4 : ajout tables dico_regle_theme + dico_regle_theme_assoc (moteur générique)
 ///
 /// TABLE CRITIQUE — coherence_rules :
 ///   Stocke les règles téléchargées depuis data_rules.php pour l'évaluation offline.
@@ -58,7 +59,7 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
@@ -81,6 +82,11 @@ class DatabaseService {
     if (oldVersion < 3) {
       // v3: coherence_rules table for offline coherence evaluation
       await _createCoherenceRulesTable(db);
+    }
+    if (oldVersion < 4) {
+      // v4: dico_regle_theme + dico_regle_theme_assoc — moteur générique piloté par métadonnées
+      await _createDicoRegleThemeTable(db);
+      await _createDicoRegleThemeAssocTable(db);
     }
   }
 
@@ -267,9 +273,158 @@ class DatabaseService {
 
     // ─── Coherence rules (offline evaluation) ─────────────────────────────
     await _createCoherenceRulesTable(db);
+
+    // ─── Dico règles thème — moteur générique piloté par métadonnées ───────
+    await _createDicoRegleThemeTable(db);
+    await _createDicoRegleThemeAssocTable(db);
   }
 
-  Future<void> _createCoherenceRulesTable(Database db) async {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DICO_REGLE_THEME — Table des règles de cohérence génériques par thème
+  // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // Une règle = une requête SQL autonome (dialecte Access/SQL Server traduit).
+  // Violation si la requête retourne au moins une ligne (résultat non vide).
+  // Extensibilité : ajouter une règle = INSERT dans cette table uniquement.
+  //
+  // SCHÉMA :
+  //   id_regle     — identifiant unique (DICO_REGLE_THEME.ID_REGLE_THEME)
+  //   id_theme     — identifiant du thème (900, 950, etc.)
+  //   sql_regle    — requête SQL complète traduite pour SQLite
+  //   ordre_regle  — ordre d'exécution au sein du thème
+  //   message      — libellé de l'incohérence (DICO_TRADUCTION)
+  //   activer_ctrl — 1=actif, 0=inactif
+  //   synced_at    — horodatage de la dernière synchronisation
+
+  Future<void> _createDicoRegleThemeTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS dico_regle_theme (
+        id_regle     INTEGER PRIMARY KEY,
+        id_theme     INTEGER NOT NULL,
+        sql_regle    TEXT NOT NULL,
+        ordre_regle  INTEGER NOT NULL DEFAULT 0,
+        message      TEXT NOT NULL DEFAULT '',
+        activer_ctrl INTEGER NOT NULL DEFAULT 1,
+        synced_at    TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_dico_regle_theme_theme
+        ON dico_regle_theme (id_theme, ordre_regle)
+    ''');
+  }
+
+  Future<void> _createDicoRegleThemeAssocTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS dico_regle_theme_assoc (
+        id_assoc               INTEGER PRIMARY KEY,
+        id_regle_theme         INTEGER NOT NULL,
+        id_regle_theme_assoc   INTEGER NOT NULL,
+        critere                TEXT NOT NULL DEFAULT '>',
+        activer_ctrl           INTEGER NOT NULL DEFAULT 1
+      )
+    ''');
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_dico_assoc_regle
+        ON dico_regle_theme_assoc (id_regle_theme)
+    ''');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DICO_REGLE_THEME — CRUD
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Insère ou remplace une liste de règles de cohérence par thème.
+  /// Utilise REPLACE pour garantir que la synchronisation est idempotente.
+  Future<void> insertDicoRegleTheme(
+    List<Map<String, dynamic>> rules,
+  ) async {
+    if (rules.isEmpty) return;
+    final db = await database;
+    final now = DateTime.now().toIso8601String();
+    await db.transaction((txn) async {
+      for (final r in rules) {
+        await txn.insert(
+          'dico_regle_theme',
+          {
+            'id_regle':    r['id_regle'],
+            'id_theme':    r['id_theme'],
+            'sql_regle':   r['sql_regle'],
+            'ordre_regle': r['ordre_regle'] ?? r['id_regle'],
+            'message':     r['message']     ?? '',
+            'activer_ctrl': r['activer_ctrl'] ?? 1,
+            'synced_at':   now,
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+  }
+
+  /// Retourne toutes les règles d'un thème, triées par ordre_regle croissant.
+  Future<List<Map<String, dynamic>>> getDicoReglesByTheme(int idTheme) async {
+    final db = await database;
+    return await db.query(
+      'dico_regle_theme',
+      where: 'id_theme = ? AND activer_ctrl = 1',
+      whereArgs: [idTheme],
+      orderBy: 'ordre_regle ASC',
+    );
+  }
+
+  /// Supprime toutes les règles d'un thème (avant re-synchronisation).
+  Future<void> deleteDicoReglesByTheme(int idTheme) async {
+    final db = await database;
+    await db.delete(
+      'dico_regle_theme',
+      where: 'id_theme = ?',
+      whereArgs: [idTheme],
+    );
+  }
+
+  /// Retourne le nombre total de règles dans dico_regle_theme.
+  Future<int> getDicoRegleThemeCount() async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) AS cnt FROM dico_regle_theme'
+    );
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  /// Retourne les associations pour une règle principale donnée.
+  Future<List<Map<String, dynamic>>> getDicoRegleAssoc(int idRegleTheme) async {
+    final db = await database;
+    return await db.query(
+      'dico_regle_theme_assoc',
+      where: 'id_regle_theme = ? AND activer_ctrl = 1',
+      whereArgs: [idRegleTheme],
+    );
+  }
+
+  /// Insère ou remplace une liste d'associations de règles.
+  Future<void> insertDicoRegleThemeAssoc(
+    List<Map<String, dynamic>> assocs,
+  ) async {
+    if (assocs.isEmpty) return;
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final a in assocs) {
+        await txn.insert(
+          'dico_regle_theme_assoc',
+          {
+            'id_assoc':             a['id_assoc'],
+            'id_regle_theme':       a['id_regle_theme'],
+            'id_regle_theme_assoc': a['id_regle_theme_assoc'],
+            'critere':              a['critere'] ?? '>',
+            'activer_ctrl':         a['activer_ctrl'] ?? 1,
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+  }
+
+    Future<void> _createCoherenceRulesTable(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS coherence_rules (
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1381,6 +1536,8 @@ class DatabaseService {
     final db = await database;
     await db.transaction((txn) async {
       for (final table in [
+        'dico_regle_theme_assoc',
+        'dico_regle_theme',
         'coherence_rules',
         'collected_data',
         'filter_periods',

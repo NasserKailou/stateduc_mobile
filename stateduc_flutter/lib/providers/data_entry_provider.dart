@@ -6,6 +6,7 @@ import '../services/api_service.dart';
 import '../services/database_service.dart';
 import '../services/coherence_evaluator.dart';
 import '../services/conditional_rules_parser.dart';
+import '../services/theme_rule_engine.dart';
 
 /// DataEntryProvider — gestionnaire de l'état de saisie des données d'un formulaire.
 ///
@@ -44,11 +45,13 @@ class DataEntryProvider extends ChangeNotifier {
     required ApiService api,
   })  : _db = db,
         _api = api,
-        _evaluator = CoherenceEvaluator(db: db);
+        _evaluator   = CoherenceEvaluator(db: db),
+        _themeEngine = ThemeRuleEngine(db: db);
 
   final DatabaseService _db;
   final ApiService _api;
   final CoherenceEvaluator _evaluator;
+  final ThemeRuleEngine _themeEngine;
 
   // ─── Contexte courant ────────────────────────────────────────────────────────
   String? _idCamp;
@@ -104,6 +107,11 @@ class DataEntryProvider extends ChangeNotifier {
   List<OfflineCoherenceError> _offlineCoherenceErrors = [];
   bool                        _isCheckingOffline       = false;
 
+  // ─── Résultats du moteur générique ThemeRuleEngine ────────────────────────
+  // Rempli après checkCoherenceOffline() si dico_regle_theme contient des règles
+  // pour le thème courant. Complément des règles paire (CoherenceEvaluator).
+  List<ThemeCoherenceError> _themeCoherenceErrors = [];
+
   // ─── Debounce pour le contrôle offline déclenché par updateField() ───────────
   // Évite d'évaluer la cohérence à chaque frappe — attend 800 ms d'inactivité.
   Timer? _coherenceDebounce;
@@ -148,6 +156,11 @@ class DataEntryProvider extends ChangeNotifier {
   List<OfflineCoherenceError> get offlineCoherenceErrors  => List.unmodifiable(_offlineCoherenceErrors);
   bool                        get isCheckingOffline        => _isCheckingOffline;
   bool get hasOfflineCoherenceErrors => _offlineCoherenceErrors.isNotEmpty;
+
+  /// Violations détectées par le moteur générique ThemeRuleEngine.
+  /// Complément de [offlineCoherenceErrors] — règles issues de DICO_REGLE_THEME.
+  List<ThemeCoherenceError> get themeCoherenceErrors   => List.unmodifiable(_themeCoherenceErrors);
+  bool get hasThemeCoherenceErrors => _themeCoherenceErrors.isNotEmpty;
 
   /// Ensemble des noms de champs actuellement désactivés (Fix #5 — questions conditionnelles).
   /// Mis à jour à chaque appel de updateField() sur un champ source.
@@ -922,6 +935,7 @@ class DataEntryProvider extends ChangeNotifier {
     if (_idCamp == null || _idEtab == null || _selectedQuestion == null) return;
     _isCheckingOffline      = true;
     _offlineCoherenceErrors = [];
+    _themeCoherenceErrors   = [];
     notifyListeners();
 
     try {
@@ -955,10 +969,43 @@ class DataEntryProvider extends ChangeNotifier {
       );
 
       debugPrint('[DataEntry] checkCoherenceOffline: '
-          '${_offlineCoherenceErrors.length} violation(s) found');
+          '${_offlineCoherenceErrors.length} violation(s) (paires) found');
+
+      // ── Moteur générique ThemeRuleEngine (DICO_REGLE_THEME) ──────────────
+      // Extrait l'id_theme depuis l'idQst de la question sélectionnée.
+      // Convention : idQst peut être "900", "9001", "9002", etc. — on tronque
+      // à 3-4 chiffres de base pour identifier le thème.
+      final idThemeStr = _selectedQuestion!.idQst;
+      final idTheme    = int.tryParse(idThemeStr) ?? 0;
+
+      if (idTheme > 0) {
+        try {
+          _themeCoherenceErrors = await _themeEngine.evaluateTheme(
+            idTheme:       idTheme,
+            idCamp:        _idCamp!,
+            idEtab:        _idEtab!,
+            idQst:         _selectedQuestion!.idQst,
+            idFilter:      _selectedFilter?.idFilter,
+            codeEtab:      _codeEtab,
+            codeTypeAnnee: _codeyear,
+            formData:      _formData,
+          );
+          debugPrint('[DataEntry] ThemeRuleEngine: '
+              '${_themeCoherenceErrors.length} violation(s) thème found '
+              '(idTheme=$idTheme)');
+        } catch (e) {
+          debugPrint('[DataEntry] ThemeRuleEngine error: $e');
+          _themeCoherenceErrors = [];
+        }
+      } else {
+        _themeCoherenceErrors = [];
+        debugPrint('[DataEntry] idTheme non parseable depuis idQst=$idThemeStr — ThemeRuleEngine skipped');
+      }
+
     } catch (e) {
       debugPrint('[DataEntry] checkCoherenceOffline error: $e');
       _offlineCoherenceErrors = [];
+      _themeCoherenceErrors   = [];
     } finally {
       _isCheckingOffline = false;
       notifyListeners();

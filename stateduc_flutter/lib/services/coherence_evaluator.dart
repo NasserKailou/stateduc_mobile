@@ -410,6 +410,11 @@ class SqlTranslator {
   }
 
   // Tables serveur connues qui peuvent être mappées vers collected_data
+  // SESSION Moteur Générique — ajout de toutes les tables identifiées dans le fichier Excel
+  // DICO_REGLE_THEME (240 règles, 16 thèmes) :
+  //   DONN_GEN_INFOS_SALLES_UTIL, MANUELS_ELEVE, PERS_FONC_NAT, ELEVES_RED_RAPATR_ABAND,
+  //   ELEVES_HANDICAP, NVX_INSCRITS_PRESC, ELEVES_NATIONALITE, ÉTABLISSEMENT (référentiel),
+  //   ETABLISSEMENT_NIVEAU, PERS_NAT_QUALIF
   static const _knownServerTables = {
     'DONNEES_ETABLISSEMENT',
     'ELEVES_AGE_NIVEAU_SEXE',
@@ -419,6 +424,17 @@ class SqlTranslator {
     // car NOUVEAUX_INSCRITS n'était pas reconnu → traducteur retournait null → regex
     // fallback avec v1=null v2=null. Champs : FILLES_NV_INCRITES_0_8_4 (multi-lignes).
     'NOUVEAUX_INSCRITS',
+    // ── Tables identifiées dans DICO_REGLE_THEME (moteur générique) ──────────
+    'DONN_GEN_INFOS_SALLES_UTIL',   // Thème 900 : salles, latrines, eau, électricité
+    'MANUELS_ELEVE',                 // Thème 940 : manuels scolaires par niveau
+    'PERS_FONC_NAT',                 // Thème 1030 : personnel par fonction
+    'PERS_NAT_QUALIF',               // Thème 1030/1040 : personnel qualifié
+    'ELEVES_RED_RAPATR_ABAND',       // Thème 1050/1060 : redoublants / rapatriés
+    'ELEVES_HANDICAP',               // Thème 1050 : élèves handicapés
+    'NVX_INSCRITS_PRESC',            // Thème 1070 : nouveaux inscrits préscolaire
+    'ELEVES_NATIONALITE',            // Thème 1060 : effectifs par nationalité
+    'ETABLISSEMENT',                 // Thème 900/950 : table référentielle établissement
+    'ETABLISSEMENT_NIVEAU',          // Thème 950 : établissement par niveau
   };
 
   // Tables dont les données sont multi-lignes dans collected_data
@@ -436,6 +452,25 @@ class SqlTranslator {
     // S60 FIX B — NOUVEAUX_INSCRITS : données multi-lignes (une par catégorie).
     // Suffixe HTML : _0_8_4 → SUM + LIKE 'FIELD_%' (même stratégie que ELEVES_*).
     'NOUVEAUX_INSCRITS',
+    // ── Tables multi-lignes identifiées dans DICO_REGLE_THEME ────────────────
+    // MANUELS_ELEVE : une ligne par CODE_TYPE_TITRE_ELEVE × CODE_TYPE_NIVEAU
+    'MANUELS_ELEVE',
+    // PERS_FONC_NAT : une ligne par CODE_TYPE_FONCTION (enseignants 7/8/39, etc.)
+    'PERS_FONC_NAT',
+    // PERS_NAT_QUALIF : une ligne par niveau de qualification
+    'PERS_NAT_QUALIF',
+    // ELEVES_RED_RAPATR_ABAND : une ligne par CODE_TYPE_NIVEAU
+    'ELEVES_RED_RAPATR_ABAND',
+    // ELEVES_HANDICAP : une ligne par type de handicap
+    'ELEVES_HANDICAP',
+    // NVX_INSCRITS_PRESC : une ligne par tranche d'âge
+    'NVX_INSCRITS_PRESC',
+    // ELEVES_NATIONALITE : une ligne par nationalité
+    'ELEVES_NATIONALITE',
+    // DONN_GEN_INFOS_SALLES_UTIL : une ligne par CODE_TYPE_NIVEAU
+    'DONN_GEN_INFOS_SALLES_UTIL',
+    // ETABLISSEMENT_NIVEAU : une ligne par CODE_TYPE_NIVEAU
+    'ETABLISSEMENT_NIVEAU',
   };
 
   // Champs de contexte toujours inclus dans le CTE de pivot
@@ -445,6 +480,16 @@ class SqlTranslator {
     'CODE_TYPE_ANNEE',
     'CODE_ADMINISTRATIF',
   ];
+
+  // Tables référentielles (comme ETABLISSEMENT) dont les champs sont stockés
+  // dans collected_data sous leur nom brut (sans suffixe) — identique à DONNEES_ETABLISSEMENT.
+  // Ces tables utilisent MAX() (non multi-lignes) et le filtre LIKE 'FIELD_0'.
+  // ETABLISSEMENT est joinée dans certaines règles (thèmes 900, 950) avec
+  // DONN_GEN_INFOS_SALLES_UTIL ou ELEVES_AGE_NIVEAU_SEXE : on la traite comme
+  // DONNEES_ETABLISSEMENT (pivot mono-ligne, filtre exact '_0').
+  static const _referentialTables = {
+    'ETABLISSEMENT',
+  };
 
   /// Traduit [serverSql] en SQL SQLite exécutable.
   ///
@@ -807,6 +852,23 @@ class SqlTranslator {
     String? codeEtab,
     String? codeTypeAnnee,
   }) {
+    // ── Normalisation des variantes en casse mixte avant substitution ──────
+    // $code_etablissement → $CODE_ETABLISSEMENT (variante minuscule du fichier Excel)
+    sql = sql.replaceAll(
+      RegExp(r'\$code_etablissement\b', caseSensitive: false),
+      r'$CODE_ETABLISSEMENT',
+    );
+    // $code_annee → $CODE_TYPE_ANNEE (variante courte observée dans DICO_REGLE_THEME)
+    sql = sql.replaceAll(
+      RegExp(r'\$code_annee\b', caseSensitive: false),
+      r'$CODE_TYPE_ANNEE',
+    );
+    // $code_type_annee → $CODE_TYPE_ANNEE (casse mixte)
+    sql = sql.replaceAll(
+      RegExp(r'\$code_type_annee\b', caseSensitive: false),
+      r'$CODE_TYPE_ANNEE',
+    );
+
     String result = sql;
 
     // $CODE_ETABLISSEMENT → valeur réelle entre guillemets simples
@@ -1055,6 +1117,21 @@ class SqlTranslator {
   static String _translateSyntax(String sql) {
     String result = sql;
 
+    // 0. dbo. prefix (SQL Server) → supprimer  ex: dbo.DONNEES_ETABLISSEMENT
+    result = result.replaceAll(RegExp(r'\bdbo\.', caseSensitive: false), '');
+
+    // 0b. Crochets Access [FIELD_NAME] → nom brut  ex: [TOTAL_AGE_NIVEAU] → TOTAL_AGE_NIVEAU
+    result = result.replaceAllMapped(
+        RegExp(r'\[([^\]]+)\]'), (m) => m.group(1)!);
+
+    // 0c. TOP (N) PERCENT → supprimer (non supporté SQLite)
+    //     Ex: SELECT TOP (100) PERCENT … → SELECT …
+    result = result.replaceAll(
+        RegExp(r'\bTOP\s*\(\s*\d+\s*\)\s*PERCENT\s*', caseSensitive: false), '');
+    // TOP N PERCENT sans parenthèses
+    result = result.replaceAll(
+        RegExp(r'\bTOP\s+\d+\s+PERCENT\s*', caseSensitive: false), '');
+
     // 1. Is Null / Is Not Null (case-insensitive, avec espaces variables)
     result = result.replaceAll(
         RegExp(r'\bIs\s+Not\s+Null\b', caseSensitive: false), 'IS NOT NULL');
@@ -1089,6 +1166,9 @@ class SqlTranslator {
     //    On utilise des word boundaries.
     result = result.replaceAll(RegExp(r'\bOr\b'), 'OR');
     result = result.replaceAll(RegExp(r'\bAnd\b'), 'AND');
+
+    // 6b. Not In → NOT IN (casse mixte Access)
+    result = result.replaceAll(RegExp(r'\bNot\s+In\b', caseSensitive: false), 'NOT IN');
 
     // 7. DATEDIFF, DATEADD → non supporté SQLite, mais pas dans les règles de cohérence
     // 8. TOP N → LIMIT N  (Access TOP)

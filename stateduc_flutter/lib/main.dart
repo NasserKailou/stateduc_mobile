@@ -11,6 +11,7 @@ import 'providers/data_entry_provider.dart';
 import 'services/auth_service.dart';
 import 'services/api_service.dart';
 import 'services/database_service.dart';
+import 'services/theme_rule_engine.dart';
 import 'screens/splash/splash_screen.dart';
 
 // ─── Global SSL override ─────────────────────────────────────────────────────
@@ -35,6 +36,9 @@ void main() async {
   HttpOverrides.global = _TrustAllCertificates();
   // Touch the database singleton to run _onCreate if first launch
   await DatabaseService().database;
+  // Seeding initial des règles de cohérence génériques depuis les assets JSON.
+  // Idempotent : ne fait rien si la table dico_regle_theme est déjà peuplée.
+  await ThemeRuleSeederHelper.seedIfEmpty(db: DatabaseService());
   runApp(const StatEducApp());
 }
 
