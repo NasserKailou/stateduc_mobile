@@ -59,24 +59,16 @@ class ApiService {
   String? _password;
 
   // ─── Cache DNS — résolution IP au moment de l'authentification ───────────────
-  // PROBLÈME : stateduc.ins.ne est un nom DNS interne au réseau MEN.
-  // Si l'agent de collecte se déplace hors du réseau MEN (ex: utilise la 4G
-  // pendant la saisie, puis revient dans l'école pour envoyer via une autre
-  // connexion), le DNS interne peut être inaccessible et la résolution du
-  // hostname échoue avec : SocketException: Failed host lookup 'stateduc.ins.ne'
-  // (code Dio 6 = DioExceptionType.connectionError).
+  // IMPORTANT : Le fallback DNS→IP est DÉSACTIVÉ pour HTTPS.
+  // Raison : sur les serveurs HTTPS publics (ex: stateduc.mineduc.gov.bi),
+  // le DNS peut retourner 127.0.0.1 (IP locale du serveur). Si on remplace
+  // le hostname par cette IP dans les URLs, BoringSSL rejette la connexion
+  // avec : SSL error 51 — SAN mismatch (cert émis pour le hostname, pas l'IP).
   //
-  // SOLUTION : À la connexion (authenticate()), on résout une fois le hostname
-  // en IP via InternetAddress.lookup() et on cache l'IP + port dans
-  // SharedPreferences. Lors des requêtes suivantes, si le DNS échoue,
-  // _DnsFallbackInterceptor remplace automatiquement le hostname par l'IP cachée
-  // et rejoue la requête.
-  //
-  // PERSISTANCE : L'IP est stockée dans SharedPreferences sous la clé
-  // 'dns_cache_<hostname>' pour survivre aux redémarrages de l'application.
-  // Elle est rafraîchie à chaque authentification réussie.
-  String? _cachedServerIp; // IP numérique du serveur (ex: '192.168.1.10')
-  int?    _cachedServerPort; // Port extrait de l'URL (ex: 9191)
+  // Le fallback DNS→IP reste actif UNIQUEMENT pour HTTP intranet (non-HTTPS)
+  // avec une IP non-loopback (≠ 127.x.x.x et ≠ ::1).
+  String? _cachedServerIp; // IP numérique du serveur (HTTP intranet seulement)
+  int?    _cachedServerPort; // Port extrait de l'URL
 
   static const String _kDnsCacheKeyPrefix = 'dns_cache_';
 
@@ -220,13 +212,41 @@ class ApiService {
     debugPrint('[ApiService] configure → baseUrl=$_serverUrl login=$login');
     debugPrint(
         '[ApiService] Authorization=Basic ${base64Encode(utf8.encode('$login:$password'))}');
-    // Réinitialiser le cache IP en mémoire lors de chaque configure()
-    // (l'URL serveur peut avoir changé HTTP → HTTPS ou vers un autre hôte)
+    // Réinitialiser le cache IP en mémoire — obligatoire lors de chaque configure()
+    // (l'URL serveur peut avoir changé HTTP→HTTPS ou vers un autre hôte)
     _cachedServerIp = null;
     _cachedServerPort = null;
-    // Charger le cache DNS persisté (depuis une session précédente)
-    // _loadCachedIp() vérifie le schéma et ignore le cache pour HTTPS
+    // Pour HTTPS : purger aussi le cache persisté dans SharedPreferences
+    // pour éviter qu'une IP loopback (127.0.0.1) héritée d'une session
+    // précédente ne contamine les requêtes de cette session.
+    _purgeLoopbackDnsCache();
+    // Charger le cache DNS persisté (HTTP intranet seulement)
+    // _loadCachedIp() vérifie le schéma et ignore HTTPS + loopback
     _loadCachedIp();
+  }
+
+  // ─── DNS : purge du cache loopback ────────────────────────────────────────
+  /// Supprime de SharedPreferences toute entrée 'dns_cache_*' dont la valeur
+  /// est une adresse loopback (127.x.x.x ou ::1) ou vide.
+  /// Appelée à chaque configure() pour nettoyer les résidus de sessions
+  /// précédentes où le DNS avait retourné l'IP locale du serveur.
+  Future<void> _purgeLoopbackDnsCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final keys = prefs.getKeys()
+          .where((k) => k.startsWith(_kDnsCacheKeyPrefix))
+          .toList();
+      for (final key in keys) {
+        final val = prefs.getString(key) ?? '';
+        final ip = val.split(':').first;
+        if (ip.isEmpty || ip.startsWith('127.') || ip == '::1') {
+          await prefs.remove(key);
+          debugPrint('[ApiService] _purgeLoopbackDnsCache: removed key=$key (ip=$ip)');
+        }
+      }
+    } catch (e) {
+      debugPrint('[ApiService] _purgeLoopbackDnsCache error (non-fatal): $e');
+    }
   }
 
   // ─── DNS : chargement du cache persisté ───────────────────────────────────
@@ -346,6 +366,25 @@ class ApiService {
   }
 
   // ─── DNS : helpers extraction URL ─────────────────────────────────────────
+  /// Purge TOUTES les entrées 'dns_cache_*' de SharedPreferences.
+  /// Méthode statique publique appelée depuis main() au démarrage pour
+  /// éliminer définitivement tout cache loopback hérité des sessions précédentes.
+  static Future<void> clearAllDnsCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final keys = prefs.getKeys()
+          .where((k) => k.startsWith(_kDnsCacheKeyPrefix))
+          .toList();
+      for (final key in keys) {
+        await prefs.remove(key);
+        debugPrint('[ApiService] clearAllDnsCache: removed key=$key');
+      }
+      debugPrint('[ApiService] clearAllDnsCache: ${keys.length} entrie(s) cleared');
+    } catch (e) {
+      debugPrint('[ApiService] clearAllDnsCache error (non-fatal): $e');
+    }
+  }
+
   /// Extrait le hostname d'une URL (ex: 'http://stateduc.ins.ne:9191/app/' → 'stateduc.ins.ne')
   static String _extractHostFromUrl(String url) {
     try {

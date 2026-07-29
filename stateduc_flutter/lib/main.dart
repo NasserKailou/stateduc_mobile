@@ -36,6 +36,11 @@ void main() async {
   HttpOverrides.global = _TrustAllCertificates();
   // Touch the database singleton to run _onCreate if first launch
   await DatabaseService().database;
+  // CORRECTION SSL-51 : purger le cache DNS SharedPreferences au démarrage.
+  // Un cache 'dns_cache_*' contenant 127.0.0.1 (IP locale du serveur retournée
+  // par le DNS) provoque l'erreur SSL 51 en remplaçant le hostname par l'IP
+  // dans les URL HTTPS. Ce nettoyage est fait une fois à chaque démarrage.
+  await ApiService.clearAllDnsCache();
   // Démarre l'application immédiatement — le seeding JSON est différé
   // après le premier frame pour éviter un ANR (freeze avant runApp).
   // seedIfEmpty() est idempotent : no-op si la table est déjà peuplée.
