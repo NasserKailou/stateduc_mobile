@@ -1505,6 +1505,19 @@ class DataEntryProvider extends ChangeNotifier {
     _error                  = null;
     _successMessage         = null;
     _offlineCoherenceErrors = [];
+    _themeCoherenceErrors   = [];
+    notifyListeners();
+  }
+
+  /// Efface uniquement les violations paire (bannière orange).
+  void clearOfflineCoherenceErrors() {
+    _offlineCoherenceErrors = [];
+    notifyListeners();
+  }
+
+  /// Efface uniquement les violations DICO_REGLE_THEME (bannière rouge).
+  void clearThemeCoherenceErrors() {
+    _themeCoherenceErrors = [];
     notifyListeners();
   }
 

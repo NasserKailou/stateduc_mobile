@@ -297,13 +297,13 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         if (entry.hasOfflineCoherenceErrors)
           _OfflineCoherenceBanner(
             errors: entry.offlineCoherenceErrors,
-            onDismiss: entry.clearMessages,
+            onDismiss: entry.clearOfflineCoherenceErrors,
           ),
         // Moteur générique (ThemeRuleEngine) — règles DICO_REGLE_THEME
         if (entry.hasThemeCoherenceErrors)
           _ThemeCoherenceBanner(
             errors: entry.themeCoherenceErrors,
-            onDismiss: entry.clearMessages,
+            onDismiss: entry.clearThemeCoherenceErrors,
           ),
         // ── Sélecteur de question (thème) ────────────────────────────────
         // Chips horizontales pour naviguer entre les thèmes du système éducatif
