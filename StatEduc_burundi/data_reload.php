@@ -38,6 +38,10 @@ $status_ko = $GLOBALS['PARAM_WS']['STATUS_KO'];
 // Timeout + Host header pour les appels curl internes (Session 44)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15);
 $curl->setOpt(CURLOPT_TIMEOUT, 120);
+// Securite SSL (Session 45) : les appels internes vers 127.0.0.1 n'ont pas besoin
+// de validation TLS (meme machine). Evite erreur cURL 51 si HTTPS utilise en interne.
+$curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
+$curl->setOpt(CURLOPT_SSL_VERIFYHOST, 0);
 // Host header = HTTP_HOST (ex: stateduc.ins.ne:9191) -> VirtualHost Apache correct
 // SISED_AURL_INTERNAL = http://127.0.0.1:PORT_LOCAL/ -> bypass Fortinet/NAT
 // Fonctionne quel que soit le nom de domaine ou la topologie reseau.
