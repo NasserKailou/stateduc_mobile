@@ -36,10 +36,15 @@ void main() async {
   HttpOverrides.global = _TrustAllCertificates();
   // Touch the database singleton to run _onCreate if first launch
   await DatabaseService().database;
-  // Seeding initial des règles de cohérence génériques depuis les assets JSON.
-  // Idempotent : ne fait rien si la table dico_regle_theme est déjà peuplée.
-  await ThemeRuleSeederHelper.seedIfEmpty(db: DatabaseService());
+  // Démarre l'application immédiatement — le seeding JSON est différé
+  // après le premier frame pour éviter un ANR (freeze avant runApp).
+  // seedIfEmpty() est idempotent : no-op si la table est déjà peuplée.
   runApp(const StatEducApp());
+  // Seeding différé : s'exécute après le premier frame Flutter,
+  // sur le main isolate mais hors de la phase de démarrage critique.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    ThemeRuleSeederHelper.seedIfEmpty(db: DatabaseService());
+  });
 }
 
 class StatEducApp extends StatelessWidget {

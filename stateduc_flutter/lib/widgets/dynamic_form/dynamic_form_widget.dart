@@ -892,10 +892,14 @@ $formHtml
   // de champs (certains formulaires ont des numéros de colonnes dans les noms
   // de champs, ex. CODE_TYPE_DISCIPLINE_FORM_1_0 où '1' est la colonne, pas la ligne).
   Widget _buildAddRowButton() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      child: ElevatedButton.icon(
+    // SafeArea(top:false) absorbe le padding bas Android (barre de navigation
+    // gestuelle ou boutons système) pour éviter BOTTOM OVERFLOWED BY N PIXELS.
+    return SafeArea(
+      top: false,
+      child: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: ElevatedButton.icon(
         onPressed: () {
           // Notifie le parent pour qu'il puisse suivre les lignes supplémentaires
           widget.onAddGridRow?.call('native_add');
@@ -1010,7 +1014,8 @@ $formHtml
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
-    );
+    ), // Container
+    ); // SafeArea
   }
 
   @override
