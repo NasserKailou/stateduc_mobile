@@ -343,8 +343,8 @@ class _PinScreenState extends State<PinScreen> {
               autocorrect: false,
               decoration: const InputDecoration(
                 labelText: 'URL du serveur',
-                hintText: 'http://192.168.1.100:8083/StatEduc',
-                helperText: 'Ex : http://192.168.1.100:8083/StatEduc_MEN_2025',
+                hintText: 'https://stateduc.mineduc.gov.bi/',
+                helperText: 'Ex : https://stateduc.mineduc.gov.bi/ ou http://192.168.1.100:8083/StatEduc',
                 helperMaxLines: 2,
                 prefixIcon: Icon(Icons.dns_outlined),
                 border: OutlineInputBorder(),

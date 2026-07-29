@@ -220,22 +220,44 @@ class ApiService {
     debugPrint('[ApiService] configure → baseUrl=$_serverUrl login=$login');
     debugPrint(
         '[ApiService] Authorization=Basic ${base64Encode(utf8.encode('$login:$password'))}');
+    // Réinitialiser le cache IP en mémoire lors de chaque configure()
+    // (l'URL serveur peut avoir changé HTTP → HTTPS ou vers un autre hôte)
+    _cachedServerIp = null;
+    _cachedServerPort = null;
     // Charger le cache DNS persisté (depuis une session précédente)
+    // _loadCachedIp() vérifie le schéma et ignore le cache pour HTTPS
     _loadCachedIp();
   }
 
   // ─── DNS : chargement du cache persisté ───────────────────────────────────
   /// Charge l'IP DNS mise en cache depuis SharedPreferences lors du démarrage.
   /// Permet de réutiliser l'IP entre redémarrages de l'app.
+  ///
+  /// NE CHARGE PAS le cache si le schéma est HTTPS (la substitution hostname→IP
+  /// causerait une erreur SSL 51 en HTTPS).
   Future<void> _loadCachedIp() async {
     try {
+      // Ne pas charger de cache IP pour HTTPS (inutile + dangereux → SSL 51)
+      final scheme = Uri.parse(_serverUrl ?? '').scheme.toLowerCase();
+      if (scheme == 'https') {
+        debugPrint('[ApiService] _loadCachedIp: HTTPS — not loading IP cache');
+        _cachedServerIp = null;
+        return;
+      }
+
       final host = _extractHostFromUrl(_serverUrl ?? '');
       if (host.isEmpty) return;
       final prefs = await SharedPreferences.getInstance();
       final cached = prefs.getString('$_kDnsCacheKeyPrefix$host');
       if (cached != null && cached.isNotEmpty) {
         final parts = cached.split(':');
-        _cachedServerIp = parts[0];
+        final ip = parts[0];
+        // Ne pas charger une IP loopback (non joignable depuis le mobile)
+        if (ip.startsWith('127.') || ip == '::1') {
+          debugPrint('[ApiService] _loadCachedIp: ignoring loopback IP $ip from cache');
+          return;
+        }
+        _cachedServerIp = ip;
         _cachedServerPort = parts.length > 1 ? int.tryParse(parts[1]) : null;
         debugPrint('[ApiService] DNS cache loaded: $host → $_cachedServerIp:$_cachedServerPort');
       }
@@ -252,10 +274,25 @@ class ApiService {
   /// à ce moment-là (ce qui est garanti puisque auth a réussi), la résolution
   /// doit aboutir.
   ///
+  /// LIMITATION : La résolution et le cache IP sont désactivés pour HTTPS.
+  /// En HTTPS, la substitution hostname→IP provoquerait une erreur SSL 51
+  /// (SAN mismatch). De plus, les serveurs HTTPS publics ont un DNS fiable.
+  /// Le mécanisme de fallback IP est réservé au HTTP intranet.
+  ///
   /// En cas d'erreur (timeout, exception), la méthode retourne silencieusement
   /// sans bloquer le flux d'authentification.
   Future<void> _resolveAndCacheIp() async {
     try {
+      // Ne pas résoudre en HTTPS : la substitution hostname→IP causerait
+      // une erreur SSL 51 (SAN mismatch) — certificat émis pour le hostname,
+      // pas pour l'IP résolue.
+      final scheme = Uri.parse(_serverUrl ?? '').scheme.toLowerCase();
+      if (scheme == 'https') {
+        debugPrint('[ApiService] _resolveAndCacheIp: HTTPS detected — '
+            'skipping IP resolution (not needed, would cause SSL SAN mismatch)');
+        return;
+      }
+
       final host = _extractHostFromUrl(_serverUrl ?? '');
       if (host.isEmpty) return;
 
@@ -281,6 +318,15 @@ class ApiService {
         (a) => a.type == InternetAddressType.IPv4,
         orElse: () => addresses.first,
       );
+
+      // Ne pas cacher une adresse loopback (127.x.x.x) — le serveur peut
+      // répondre avec son IP locale qui n'est pas joignable depuis le mobile.
+      if (ipv4.address.startsWith('127.') || ipv4.address == '::1') {
+        debugPrint('[ApiService] _resolveAndCacheIp: resolved to loopback '
+            '(${ipv4.address}) — not caching (not reachable from mobile)');
+        return;
+      }
+
       _cachedServerIp   = ipv4.address;
       _cachedServerPort = _extractPortFromUrl(_serverUrl ?? '');
 
@@ -1291,6 +1337,18 @@ class ApiService {
 // rejoue la requête une fois. Si l'IP est inconnue ou si le fallback échoue
 // aussi, l'erreur originale est propagée normalement.
 //
+// LIMITATION CRITIQUE — HTTPS + substitution hostname→IP :
+//   Quand l'URL est HTTPS et que le serveur répond avec un certificat émis
+//   pour 'stateduc.mineduc.gov.bi' mais que la connexion est établie vers
+//   '127.0.0.1' (ou toute autre IP), BoringSSL lève l'erreur :
+//     SSL error 51: no alternative certificate subject name matches host name
+//   C'est le comportement de l'erreur vue en production.
+//
+//   La substitution hostname→IP est donc DÉSACTIVÉE pour HTTPS :
+//   - Le certificat TLS est validé par rapport au hostname SNI, pas l'IP
+//   - Pour HTTPS public (Internet), le DNS est fiable — pas de fallback nécessaire
+//   - Le fallback IP ne s'applique qu'au HTTP (intranet sans TLS)
+//
 // ORDRE dans la chaîne des intercepteurs Dio (ordre d'ajout) :
 //   _AuthInjectorInterceptor → _DnsFallbackInterceptor → LogInterceptor
 // Les onError sont appelés LIFO, donc LogInterceptor voit l'erreur en premier
@@ -1321,6 +1379,29 @@ class _DnsFallbackInterceptor extends Interceptor {
     // Condition 3 : on doit avoir une IP cachée
     if (_service._cachedServerIp == null) {
       debugPrint('[DnsFallback] No cached IP available, cannot fallback');
+      return handler.next(err);
+    }
+
+    // Condition 4 — HTTPS : ne PAS substituer hostname→IP en HTTPS.
+    // La substitution provoquerait une erreur SSL 51 (SAN mismatch) car le
+    // certificat TLS est émis pour le hostname (ex: 'stateduc.mineduc.gov.bi')
+    // et non pour l'IP (ex: '127.0.0.1'). Le fallback IP est réservé au HTTP
+    // (intranet sans TLS) où il n'y a pas de vérification de certificat.
+    final requestScheme = err.requestOptions.uri.scheme.toLowerCase();
+    if (requestScheme == 'https') {
+      debugPrint('[DnsFallback] HTTPS request — skipping IP fallback to avoid '
+          'SSL SAN mismatch (cert issued for hostname, not IP). '
+          'Cached IP=${_service._cachedServerIp}');
+      return handler.next(err);
+    }
+
+    // Condition 5 — loopback : ne jamais substituer vers 127.x.x.x
+    // (le serveur peut répondre 127.0.0.1 pour son hostname, ce qui n'est
+    // pas joignable depuis le mobile)
+    final cachedIp = _service._cachedServerIp ?? '';
+    if (cachedIp.startsWith('127.') || cachedIp == '::1') {
+      debugPrint('[DnsFallback] Cached IP is loopback ($cachedIp) — '
+          'skipping fallback (loopback not reachable from mobile)');
       return handler.next(err);
     }
 
