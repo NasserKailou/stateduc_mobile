@@ -20,7 +20,7 @@ import 'screens/splash/splash_screen.dart';
 // dans l'application d'accepter ces certificats.
 // NOTE : n'affecte que les connexions via dart:io HttpClient.
 //        Dio est configuré séparément dans ApiService._internal().
-class _TrustAllCertificates extends HttpOverrides {
+class _TrustAllCertificates extends HttpOverrides { 
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
