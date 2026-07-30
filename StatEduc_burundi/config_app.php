@@ -39,17 +39,25 @@ $SISED_AURL         = $SISED_SERVER . $SISED_URL; // URL absolue pour accéder à 
 // $SISED_AURL_INTERNAL  = URL interne (127.0.0.1:port_local)
 // $SISED_HOST_HEADER    = valeur du Host header a passer dans curl
 function _sised_local_port() {
-    // Priorite 1 : SERVER_PORT = port Apache reel (fiable si pas de proxy AJP)
+    // Session 47: CORRECTION SSL-51
+    // Topologie production : Internet -> Nginx:443 (SSL) -> Apache:80 ou :8080 (HTTP)
+    // Les appels curl internes doivent cibler Apache en HTTP, jamais Nginx en HTTPS.
+    // Si on cible https://127.0.0.1, le certificat (pour stateduc.ins.ne) est invalide
+    // pour 127.0.0.1 => erreur cURL 51 "no alternative certificate subject name".
+    // REGLE : exclure le port 443 (et tout port SSL/proxy) de la detection.
+    // Ports HTTP Apache valides pour curl interne : 80, 8080, 8000, 8888.
+    $ports_http_only = array(80, 8080, 8000, 8888);
+    // Priorite 1 : SERVER_PORT si c'est un port HTTP Apache connu (pas 443)
     if (isset($_SERVER['SERVER_PORT'])) {
         $p = (int)$_SERVER['SERVER_PORT'];
-        // Ignorer si c'est le port proxy externe (ex: 9191, 8443, 443 sur proxy)
-        // SERVER_PORT est fiable sur Apache direct ; sur proxy inverse il peut
-        // valoir le port frontal. On le valide par fsockopen.
-        $en = 0; $es = ''; $s = @fsockopen('127.0.0.1', $p, $en, $es, 2);
-        if ($s !== false) { fclose($s); return $p; }
+        if (in_array($p, $ports_http_only)) {
+            $en = 0; $es = ''; $s = @fsockopen('127.0.0.1', $p, $en, $es, 2);
+            if ($s !== false) { fclose($s); return $p; }
+        }
+        // SERVER_PORT est un port proxy/SSL (ex: 443, 9191, 8443) -> ignorer
     }
-    // Priorite 2 : sonder les ports Apache standard
-    foreach (array(80, 8080, 8000, 8888) as $p) {
+    // Priorite 2 : sonder les ports HTTP Apache standard (jamais 443)
+    foreach ($ports_http_only as $p) {
         $en = 0; $es = ''; $s = @fsockopen('127.0.0.1', $p, $en, $es, 2);
         if ($s !== false) { fclose($s); return $p; }
     }
@@ -57,8 +65,11 @@ function _sised_local_port() {
     return 80;
 }
 $_sised_local_port  = _sised_local_port();
-$_sised_local_scheme = ($_sised_local_port === 443) ? 'https' : 'http';
-$_sised_local_ps    = (!in_array($_sised_local_port, array(80, 443))) ? ':' . $_sised_local_port : '';
+// Session 47: scheme TOUJOURS http pour curl interne (127.0.0.1 != certificat SSL)
+// Meme si Apache tourne sur 443 (cas rare), on force http pour eviter SSL-51.
+$_sised_local_scheme = 'http';
+// Port omis seulement pour 80 (HTTP standard) - 443 exclu par _sised_local_port()
+$_sised_local_ps    = ($_sised_local_port != 80) ? ':' . $_sised_local_port : '';
 $SISED_AURL_INTERNAL = $_sised_local_scheme . '://127.0.0.1' . $_sised_local_ps . $SISED_URL;
 // Host header = HTTP_HOST (ex: stateduc.ins.ne:9191) pour que Apache route correctement
 $SISED_HOST_HEADER   = $_SERVER['HTTP_HOST'];
