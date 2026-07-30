@@ -3185,7 +3185,7 @@ class frame_mobile{
 											
 			// Les Locaux par exemple
 			$NB_TOTAL_COL 	= 0;
-			$NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
+			$NB_LIGNE_ECRAN	= (int)$this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
 			$dico        	= $this->tri_fils($this->dico);
 			$affiche_vertic_mes=0;
 			$style_align_middle = '';

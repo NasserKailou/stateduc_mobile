@@ -178,7 +178,7 @@
 		}
 
     function supprime_theme_systeme($num_theme_courant){
-        // Supprime le thème_systeme courant
+        // Supprime le thï¿½me_systeme courant
        
 			  // Suppression des zones systeme du theme systeme
         $requete                = "DELETE FROM DICO_ZONE_SYSTEME WHERE  ID_SYSTEME = ".$_SESSION['filtre_secteur_T_S']."
@@ -217,8 +217,8 @@
     }
 
     function supprime_theme(){
-        // Supprime le thème courant
-        // Supprime également les THEME_SYSTEME associés ainsi que le libellé dans DICO_TRADUCTION
+        // Supprime le thï¿½me courant
+        // Supprime ï¿½galement les THEME_SYSTEME associï¿½s ainsi que le libellï¿½ dans DICO_TRADUCTION
         // TODO: et la suppression en cascade?
         
 				/// sup des regles themes assoc
@@ -245,7 +245,7 @@
 				//echo '<br>'.$requete.'<br>';
 				/// fin sup des table mere theme
 
-				/////////// Récupération des zones du thème à supprimer
+				/////////// Rï¿½cupï¿½ration des zones du thï¿½me ï¿½ supprimer
 				$requete         = "SELECT  ID_ZONE FROM  DICO_ZONE														
 									WHERE     ID_THEME = ".$_SESSION['tab_theme'][$_SESSION['i']][ID].";";
         $all_zones_thm_supp    = $GLOBALS['conn_dico']->GetAll($requete);
@@ -255,9 +255,9 @@
                 SuppCascadeZone($zone['ID_ZONE']);
             }
         }
-				///////////// Fin Récupération des zones du thème à supprimer
+				///////////// Fin Rï¿½cupï¿½ration des zones du thï¿½me ï¿½ supprimer
 
-        // Il faut vérifier s'il existe des fils dans DICO_THEME_SYSTEME
+        // Il faut vï¿½rifier s'il existe des fils dans DICO_THEME_SYSTEME
         $requete                = "SELECT ID, ID_THEME_SYSTEME
                                     FROM DICO_THEME_SYSTEME
                                     WHERE ID = ".$_SESSION['tab_theme'][$_SESSION['i']][ID].";";
@@ -271,7 +271,7 @@
             }
         }
         
-        // Suppression du libellé du thème (nom_interne) dans la table DICO_TRADUCTION
+        // Suppression du libellï¿½ du thï¿½me (nom_interne) dans la table DICO_TRADUCTION
         $requete                = "DELETE FROM DICO_TRADUCTION
                                     WHERE CODE_NOMENCLATURE =".$_SESSION['tab_theme'][$_SESSION['i']][ID]."
                                     AND NOM_TABLE='DICO_THEME';";
@@ -293,8 +293,8 @@
 
     function recherche_nouvel_id($tab_table, $nom_id){
         // Recherche d'une nouvelle valeur de l'ID disponible dans une table 
-        // dont les éléments sont passés dans un tableau en paramètre
-        // Fonction utilisée pour l'ajout d'enregistrements        
+        // dont les ï¿½lï¿½ments sont passï¿½s dans un tableau en paramï¿½tre
+        // Fonction utilisï¿½e pour l'ajout d'enregistrements        
         $nouvel_id              = 0;
         foreach ($tab_table as $ligne){
             if ($nouvel_id < $ligne[$nom_id]){
@@ -308,8 +308,8 @@
 	
 	function recherche_nouvel_ord($tab_table, $chp_ord){
         // Recherche d'une nouvelle valeur de l'ID disponible dans une table 
-        // dont les éléments sont passés dans un tableau en paramètre
-        // Fonction utilisée pour l'ajout d'enregistrements        
+        // dont les ï¿½lï¿½ments sont passï¿½s dans un tableau en paramï¿½tre
+        // Fonction utilisï¿½e pour l'ajout d'enregistrements        
         $nouvel_ord              = 0;
         foreach ($tab_table as $ligne){
             if ($nouvel_ord < $ligne[$chp_ord]){
@@ -322,7 +322,7 @@
     }
 
     function recherche_nouvel_id_theme_systeme(){
-        // Vérification de l'existence du nouveau theme_systeme
+        // Vï¿½rification de l'existence du nouveau theme_systeme
         $requete                = "SELECT ID_THEME_SYSTEME FROM DICO_THEME_SYSTEME
                                     WHERE ID_THEME_SYSTEME = ".$_SESSION['tab_theme'][$_SESSION['i']][ID].$_SESSION['filtre_secteur_T_S'].";";
         $result  = $GLOBALS['conn_dico']->GetAll($requete);
@@ -335,7 +335,7 @@
     }
 
     function ajout_theme(){
-        // Création d'un nouvel enregistrement dans DICO_THEME et dans DICO_TRADUCTION
+        // Crï¿½ation d'un nouvel enregistrement dans DICO_THEME et dans DICO_TRADUCTION
         
         // Il faut d'abord trouver une nouvelle valeur de l'ID disponible dans DICO_THEME 
         $nouvel_id              = recherche_nouvel_id($_SESSION['tab_theme'], 'ID');
@@ -370,14 +370,14 @@
 								break;
 						}
 				}
-        // Création de l'enregistrement dans DICO_THEME
+        // Crï¿½ation de l'enregistrement dans DICO_THEME
         $db                     = $GLOBALS['conn_dico'];
         $requete                = "INSERT INTO DICO_THEME (ID,ORDRE_THEME,ID_TYPE_THEME,CLASSE,ACTION_THEME)
                                     VALUES (".$nouvel_id.", ".$nouvel_ord.", ".$_POST['type_theme'].", $CLASSE, $ACTION_THEME);";
         //print $requete;
         $GLOBALS['conn_dico']->Execute($requete);
         
-        // Création du libellé dans DICO_TRADUCTION
+        // Crï¿½ation du libellï¿½ dans DICO_TRADUCTION
         $requete                = "INSERT INTO DICO_TRADUCTION (CODE_NOMENCLATURE, NOM_TABLE, CODE_LANGUE, LIBELLE)
                                     VALUES (".$nouvel_id.",'DICO_THEME', '".$_SESSION['langue']."', '".$_SESSION['Nouveau']."');";
                                     //VALUES (".$nouvel_id.",'DICO_THEME', '".$_SESSION['langue']."', '".$_SESSION['Nouveau']."', NULL, NULL);";
@@ -388,14 +388,14 @@
     }
 
     function ajout_theme_systeme(){
-        // Création d'un nouvel enregistrement dans DICO_THEME_SYSTEME et dans DICO_TRADUCTION
+        // Crï¿½ation d'un nouvel enregistrement dans DICO_THEME_SYSTEME et dans DICO_TRADUCTION
         // Il faut d'abord trouver une nouvelle valeur de l'ID disponible dans DICO_THEME_SYSTEME.   
         $nouvel_id              = recherche_nouvel_id_theme_systeme();
         if ($nouvel_id == 'Existe'){
-            $_SESSION['message']= 'Ce thème existe dèjà pour ce secteur.';
-            lit_theme_systeme_filtre();            // Lecture du thème_système_filtré du theme courrant
+            $_SESSION['message']= 'Ce thï¿½me existe dï¿½jï¿½ pour ce secteur.';
+            lit_theme_systeme_filtre();            // Lecture du thï¿½me_systï¿½me_filtrï¿½ du theme courrant
         }else{
-            // Création du libellé dans DICO_TRADUCTION
+            // Crï¿½ation du libellï¿½ dans DICO_TRADUCTION
             $db                     = $GLOBALS['conn_dico'];
             $requete                = "INSERT INTO DICO_TRADUCTION
                                         VALUES (".$nouvel_id.",'DICO_THEME_LIB_LONG', '".$_SESSION['langue']."', '".$_SESSION['Nouveau']."', NULL, NULL);";
@@ -409,8 +409,8 @@
             $GLOBALS['conn_dico']->Execute($requete);
 						insert_traduction('DICO_TRADUCTION', $nouvel_id, 'DICO_THEME_LIB_MENU', $_SESSION['langue'], $_SESSION['Nouveau'], 1);
             
-            // Création de l'enregistrement dans DICO_THEME_SYSTEME
-            // le secteur de ce nouveau THEME_SYSTEME est celui par défaut 
+            // Crï¿½ation de l'enregistrement dans DICO_THEME_SYSTEME
+            // le secteur de ce nouveau THEME_SYSTEME est celui par dï¿½faut 
             //$db                     = $GLOBALS['conn'];
 						$NB_LIGNES_FRAME 			= 10;
 						$TAILLE_LIB_VERTICAUX = 0;
@@ -431,8 +431,8 @@
 										$TAILLE_LIB_VERTICAUX = 30;
 										break;
 								}
-								case '3' :{ // formulaire
-										$NB_LIGNES_FRAME = 1;
+								case '3' :{ // grille_ligne â€” Session 46-d: default 10 lignes (was 1, bloquait la generation mobile)
+										$NB_LIGNES_FRAME = 10;
 										break;
 								}
 						}
@@ -449,9 +449,9 @@
     }
 
     function maj_theme(){
-        // Met à jour les éléments du thème courant (après click sur "Enregistrer")
+        // Met ï¿½ jour les ï¿½lï¿½ments du thï¿½me courant (aprï¿½s click sur "Enregistrer")
         
-        // mise à jour du libellé dans DICO_TRADUCTION
+        // mise ï¿½ jour du libellï¿½ dans DICO_TRADUCTION
         $db                     = $GLOBALS['conn_dico'];
         if ($_POST['nom_theme'] <> $_SESSION['tab_theme'][$_SESSION['i']][THEME_LIBELLE]){
             $requete            = "UPDATE DICO_TRADUCTION
@@ -460,7 +460,7 @@
                                     and NOM_TABLE='DICO_THEME';";
             $GLOBALS['conn_dico']->Execute($requete);
         }
-        // mise à jour des autres informations directement sur la table DICO_THEME
+        // mise ï¿½ jour des autres informations directement sur la table DICO_THEME
         /*$requete            = "UPDATE DICO_THEME
                                 SET ACTION_POST = '".$_POST['action_post']."',
                                 ACTION_THEME = '".$_POST['action_theme']."',
@@ -503,7 +503,7 @@
         //print $requete;
         $GLOBALS['conn_dico']->Execute($requete);
 		
-		// Mise à jour du statut des zones à inconnu.
+		// Mise ï¿½ jour du statut des zones ï¿½ inconnu.
 		$requete 	= ' UPDATE    DICO_ZONE
 						SET   ZONE_STATUT =\'\'      
 						WHERE     ID_THEME = '.$_SESSION['tab_theme'][$_SESSION['i']][ID];
@@ -512,9 +512,9 @@
     }
 
     function maj_theme_systeme_filtre(){
-        // Met à jour les éléments du thème_systeme courant (après click sur "Enregistrer")
+        // Met ï¿½ jour les ï¿½lï¿½ments du thï¿½me_systeme courant (aprï¿½s click sur "Enregistrer")
         
-        // mise à jour du libellé dans DICO_TRADUCTION
+        // mise ï¿½ jour du libellï¿½ dans DICO_TRADUCTION
         $db                     = $GLOBALS['conn_dico'];
             $requete            = "UPDATE DICO_TRADUCTION
                                     SET LIBELLE = ".$GLOBALS['conn_dico']->qstr($_POST['libelle_long'])."
@@ -533,7 +533,7 @@
             //print $requete;
         if(!$_POST['taille_lib_verticaux']) $_POST['taille_lib_verticaux'] 	= 0;
 				if(!$_POST['aff_mat_lib_vertic']) 	$_POST['aff_mat_lib_vertic'] 		= 0;
-        // mise à jour des autres informations directement sur la table DICO_THEME_SYSTEME
+        // mise ï¿½ jour des autres informations directement sur la table DICO_THEME_SYSTEME
         if(isset($_POST['filtre_appart_theme'])) $APPARTENANCE = $_POST['filtre_appart_theme'];
 		else $APPARTENANCE = 0;
 		$post_nb_ligne = 'NULL';
@@ -554,8 +554,8 @@
     }
     
     function lit_secteur(){
-        // Chargement des codes et libellés des TYPE_SYSTEME_ENSEIGNEMENT
-        // TODO: à virer de l'accueil
+        // Chargement des codes et libellï¿½s des TYPE_SYSTEME_ENSEIGNEMENT
+        // TODO: ï¿½ virer de l'accueil
         /*$db                      = $GLOBALS['conn'];
         $requete                 = "SELECT T_S_E.CODE_TYPE_SYSTEME_ENSEIGNEMENT, D_TRAD.LIBELLE
                                     FROM TYPE_SYSTEME_ENSEIGNEMENT AS T_S_E,  DICO_TRADUCTION AS D_TRAD
@@ -637,7 +637,7 @@
 		//echo $requete;	
 		$_SESSION['tab_theme']  = $GLOBALS['conn_dico']->GetAll($requete);
 			
-        // Chargement des types de thèmes
+        // Chargement des types de thï¿½mes
         $requete                = "SELECT ID_TYPE_THEME, LIBELLE, LIBELLE_TRAD
                                     FROM DICO_TYPE_THEME
 									WHERE CODE_LANGUE = '".$_SESSION['langue']."'
@@ -649,7 +649,7 @@
     } //FIN lit_theme()
 
     function lit_theme_par_systeme(){
-        // Chargement des thèmes_systeme pour selection des pères et précédents
+        // Chargement des thï¿½mes_systeme pour selection des pï¿½res et prï¿½cï¿½dents
         $requete                = "SELECT D_T_S.ID_THEME_SYSTEME, D_TRAD.LIBELLE, D_T_S.PRECEDENT 
                                     FROM DICO_THEME_SYSTEME AS D_T_S, DICO_THEME AS D_T, DICO_TRADUCTION AS D_TRAD
                                     WHERE D_T_S.ID = D_T.ID
@@ -664,7 +664,7 @@
     } //FIN lit_theme_systeme()
 
     function lit_theme_systeme(){
-        // Chargement des thèmes_systeme pour affichage select "themes_systeme_dispo"
+        // Chargement des thï¿½mes_systeme pour affichage select "themes_systeme_dispo"
         $requete                = "SELECT D_T_S.ID_THEME_SYSTEME, D_T_S.ID, D_T_S.FRAME, D_T_S.NB_LIGNES_FRAME, D_T_S.PERE,
                                     D_T_S.PRECEDENT, D_T_S.TAILLE_MENU, D_T_S.ID_SYSTEME, D_T_S.NB_LIGNES_FRAME, D_TRAD.LIBELLE 
                                     FROM DICO_THEME_SYSTEME AS D_T_S, DICO_TRADUCTION AS D_TRAD
@@ -676,8 +676,8 @@
     } //FIN lit_theme_systeme()
 
     function lit_theme_systeme_filtre(){
-        // Chargement des infos concernant le thème_systeme du secteur_filtre en cours à partir de la BD
-        // Chargement des thèmes_systeme
+        // Chargement des infos concernant le thï¿½me_systeme du secteur_filtre en cours ï¿½ partir de la BD
+        // Chargement des thï¿½mes_systeme
         $requete                = "SELECT D_T_S.ID_THEME_SYSTEME, D_T_S.ID, D_T_S.FRAME, D_T_S.NB_LIGNES_FRAME, D_T_S.PERE,
                                     D_T_S.PRECEDENT, D_T_S.TAILLE_MENU, D_T_S.ID_SYSTEME, 
 									D_T_S.TAILLE_LIB_VERTICAUX, D_T_S.AFF_MAT_LIB_VERTIC, D_T_S.APPARTENANCE, D_TRAD.LIBELLE 
@@ -690,7 +690,7 @@
        // print $requete;
         $_SESSION['tab_theme_systeme_filtre']  = $GLOBALS['conn_dico']->GetRow($requete);
 		//	print_r($_SESSION['tab_theme_systeme_filtre']);
-        // Chargement du libellé menu
+        // Chargement du libellï¿½ menu
         $requete                = "SELECT D_TRAD.LIBELLE 
                                     FROM DICO_THEME_SYSTEME AS D_T_S, DICO_TRADUCTION AS D_TRAD
                                     WHERE D_T_S.ID_THEME_SYSTEME = D_TRAD.CODE_NOMENCLATURE
@@ -705,8 +705,8 @@
     
     
     function genere_theme_courant(){
-        // Cette fonction génére le frame associé au theme_systeme courant
-        // Elle fonctionne à l'image de genere_theme.php mais ici, les tableaux de langues, systems et thèmes
+        // Cette fonction gï¿½nï¿½re le frame associï¿½ au theme_systeme courant
+        // Elle fonctionne ï¿½ l'image de genere_theme.php mais ici, les tableaux de langues, systems et thï¿½mes
         // ne contiennent que les courants.
         //die('here'.$_SESSION['filtre_secteur_T_S']);
         $langues	        	=	array();
@@ -792,17 +792,17 @@
                                     lit_theme_systeme_filtre();
                                 break;
             case recherche_libelle_page('Ajout'):
-								$tmp_choix_affich = $_SESSION['choix_affich'];//Ajout Hebie pour Création d'un nouvel enregistrement dans DICO_THEME_SYSTEME
-								$_SESSION['choix_affich'] = 'all_themes';//Ajout Hebie pour Création d'un nouvel enregistrement dans DICO_THEME_SYSTEME
+								$tmp_choix_affich = $_SESSION['choix_affich'];//Ajout Hebie pour Crï¿½ation d'un nouvel enregistrement dans DICO_THEME_SYSTEME
+								$_SESSION['choix_affich'] = 'all_themes';//Ajout Hebie pour Crï¿½ation d'un nouvel enregistrement dans DICO_THEME_SYSTEME
 								lit_theme();
-								ajout_theme(); // Création d'un nouvel enregistrement dans DICO_THEME et dans DICO_TRADUCTION
+								ajout_theme(); // Crï¿½ation d'un nouvel enregistrement dans DICO_THEME et dans DICO_TRADUCTION
                                 lit_theme(); // Lecture dans la BD pour rafraichir
 								foreach($_SESSION['tab_theme'] as $k=>$row){
                                     if ($row[THEME_LIBELLE] == $_SESSION['Nouveau']){
                                         $_SESSION['i']        = $k; 
                                     }
                                 }
-								//Ajout Hebie pour Création d'un nouvel enregistrement dans DICO_THEME_SYSTEME
+								//Ajout Hebie pour Crï¿½ation d'un nouvel enregistrement dans DICO_THEME_SYSTEME
 								ajout_theme_systeme();
 								$_SESSION['choix_affich'] = $tmp_choix_affich;
 								lit_theme();
@@ -814,10 +814,10 @@
 								//Fin ajout HEBIE
 								lit_theme_systeme();
                                 lit_theme_systeme_filtre();
-								lit_theme_par_systeme();// Ajout Hebie pour Création d'un nouvel enregistrement dans DICO_THEME_SYSTEME
+								lit_theme_par_systeme();// Ajout Hebie pour Crï¿½ation d'un nouvel enregistrement dans DICO_THEME_SYSTEME
                                 break;
             case recherche_libelle_page('Enregistre'):
-                                maj_theme(); // Mise à jour des modifications sur l'enregistrement courant
+                                maj_theme(); // Mise ï¿½ jour des modifications sur l'enregistrement courant
                                 lit_theme(); // Lecture dans la BD pour rafraichir
                                 foreach($_SESSION['tab_theme'] as $k=>$row){
                                     if ($row[THEME_LIBELLE] == $_POST['nom_theme']){
@@ -845,13 +845,13 @@
 		$_SESSION['message']= '';
 		$_SESSION['filtre_secteur_T_S'] = $_SESSION['secteur'];
 		lit_theme(); 
-        // Accès direct au theme_en_cours (par le select)
+        // Accï¿½s direct au theme_en_cours (par le select)
 		if(isset($_GET['theme_from_zones'])) $_SESSION['i']          = get_i_theme($_GET['theme_from_zones']);
-		$_GET['theme_en_cours'] = -99;   // Je ne le met pas à NULL pour pouvoir le tester plus haut
-                                        // et ne pas relancer la requête de chargement
-		lit_theme_systeme();            // Lecture des thème_systèmes du theme courrant
-        lit_theme_systeme_filtre();            // Lecture du thème_système_filtré du theme courrant
-        lit_theme_par_systeme();        // Lecture des thèmes_système du secteur (pour pères et précédents)
+		$_GET['theme_en_cours'] = -99;   // Je ne le met pas ï¿½ NULL pour pouvoir le tester plus haut
+                                        // et ne pas relancer la requï¿½te de chargement
+		lit_theme_systeme();            // Lecture des thï¿½me_systï¿½mes du theme courrant
+        lit_theme_systeme_filtre();            // Lecture du thï¿½me_systï¿½me_filtrï¿½ du theme courrant
+        lit_theme_par_systeme();        // Lecture des thï¿½mes_systï¿½me du secteur (pour pï¿½res et prï¿½cï¿½dents)
     }
     else if (!isset($_GET['theme_en_cours']) and !isset($_POST['btn_theme_systeme']) 
             and !isset($_GET['theme_systeme_en_cours']) and !isset($_GET['filtre_secteur_T_S_en_cours'])){
@@ -859,35 +859,35 @@
 		$_SESSION['message']= '';
         $_SESSION['filtre_secteur_T_S'] = $_SESSION['secteur'];
         // TODO: Pb bizarre avec le tab_seteur
-        //lit_secteur();                  // Lecture des libellés des secteurs (pour affichage à côté des thèmes_systèmes)
-        lit_theme();                    // Lecture des thèmes dans la BD au démarrage
+        //lit_secteur();                  // Lecture des libellï¿½s des secteurs (pour affichage ï¿½ cï¿½tï¿½ des thï¿½mes_systï¿½mes)
+        lit_theme();                    // Lecture des thï¿½mes dans la BD au dï¿½marrage
         if (!isset($_SESSION['theme']) || $_SESSION['theme'] == '')	$_SESSION['i'] = 0;
 		//die('===' .$_SESSION['i'].'===' );
-        lit_theme_systeme();            // Lecture des thème_systèmes dans la BD au démarrage
-        lit_theme_systeme_filtre();     // Lecture du thème_système_filtré du theme courrant
-        lit_theme_par_systeme();        // Lecture des thèmes_système du secteur (pour pères et précédents)
+        lit_theme_systeme();            // Lecture des thï¿½me_systï¿½mes dans la BD au dï¿½marrage
+        lit_theme_systeme_filtre();     // Lecture du thï¿½me_systï¿½me_filtrï¿½ du theme courrant
+        lit_theme_par_systeme();        // Lecture des thï¿½mes_systï¿½me du secteur (pour pï¿½res et prï¿½cï¿½dents)
         
     }else if (isset($_GET['theme_en_cours']) and $_GET['theme_en_cours']<> -99 and !isset($_GET['theme_systeme_en_cours'])
              and !isset($_GET['filtre_secteur_T_S_en_cours'])){
         $_SESSION['message']= '';
         
-		// Accès direct au theme_en_cours (par le select)
+		// Accï¿½s direct au theme_en_cours (par le select)
         $_SESSION['i']          = $_GET['theme_en_cours'];
-        $_GET['theme_en_cours'] = -99;   // Je ne le met pas à NULL pour pouvoir le tester plus haut
-                                        // et ne pas relancer la requête de chargement
-        lit_theme_systeme();            // Lecture des thème_systèmes du theme courrant
+        $_GET['theme_en_cours'] = -99;   // Je ne le met pas ï¿½ NULL pour pouvoir le tester plus haut
+                                        // et ne pas relancer la requï¿½te de chargement
+        lit_theme_systeme();            // Lecture des thï¿½me_systï¿½mes du theme courrant
 		$_SESSION['filtre_secteur_T_S'] = $_SESSION['tab_theme_systeme'][0]['ID_SYSTEME'];
 		if($_SESSION['tab_theme_systeme'][0]['ID_SYSTEME'] != $_SESSION['secteur']){
 			$_SESSION['secteur'] =  $_SESSION['tab_theme_systeme'][0]['ID_SYSTEME'];
 			unset ($_SESSION['hierarchie_regroup']); 
 			unset ($_SESSION['infos_etab']);
 		}
-		lit_theme_systeme_filtre();            // Lecture du thème_système_filtré du theme courrant
+		lit_theme_systeme_filtre();            // Lecture du thï¿½me_systï¿½me_filtrï¿½ du theme courrant
        
     } else if (isset($_GET['theme_systeme_en_cours'])  and !isset($_GET['filtre_secteur_T_S_en_cours'])){ 
         $_SESSION['message']= '';
-        // Accès au theme_systeme_en_cours
-        lit_theme_systeme();            // Lecture des thème_systèmes du theme courrant
+        // Accï¿½s au theme_systeme_en_cours
+        lit_theme_systeme();            // Lecture des thï¿½me_systï¿½mes du theme courrant
         
     } else if (isset($_GET['filtre_secteur_T_S_en_cours']) && $_GET['filtre_secteur_T_S_en_cours']<>''){ 
         $_SESSION['message']= '';
@@ -916,7 +916,7 @@
 		}
 		lit_theme();
 		lit_theme_par_systeme();
-        lit_theme_systeme_filtre();     // Lecture du thème_systèmes du theme courrant et secteur courant
+        lit_theme_systeme_filtre();     // Lecture du thï¿½me_systï¿½mes du theme courrant et secteur courant
     }
 	if (isset($_POST['btn_genere'])){ 
 		genere_theme_courant();
@@ -1116,7 +1116,7 @@
 				 	<?php if($_SESSION['tab_theme'][$_SESSION['i']]['ID_TYPE_THEME'] <> 8){ ?>
                     <tr> 
                         <td><?php if(!in_array($_SESSION['tab_theme'][$_SESSION['i']]['ID_TYPE_THEME'], array(4,5,6))) echo recherche_libelle_page('NbLigne'); else echo recherche_libelle_page('NbColonne'); ?></td>
-                        <td> <input type="text" size="30px" name="nb_ligne" value="<?php if($_SESSION['tab_theme'][$_SESSION['i']]['ID_TYPE_THEME'] == 1) echo '0'; elseif($_SESSION['tab_theme'][$_SESSION['i']]['ID_TYPE_THEME'] == 3) echo '1'; elseif($_SESSION['tab_theme_systeme_filtre']['NB_LIGNES_FRAME'] > 1) echo $_SESSION['tab_theme_systeme_filtre']['NB_LIGNES_FRAME']; else echo '10' ?>"></td>
+                        <td> <input type="text" size="30px" name="nb_ligne" value="<?php if($_SESSION['tab_theme'][$_SESSION['i']]['ID_TYPE_THEME'] == 1) echo '0'; elseif($_SESSION['tab_theme_systeme_filtre']['NB_LIGNES_FRAME'] > 1) echo $_SESSION['tab_theme_systeme_filtre']['NB_LIGNES_FRAME']; else echo '10' ?>"></td>
                     </tr>
 					<?php } ?>
                     <tr> 
@@ -1157,7 +1157,7 @@
             }
             echo ">Questionnaire</option>";
             foreach ($_SESSION['tab_theme_par_systeme'] as $k => $v){
-                if ($v['ID_THEME_SYSTEME'] <> $_SESSION['tab_theme_systeme_filtre']['ID_THEME_SYSTEME']){ // Il est inutile de mettre l'éléement courant dans le combo
+                if ($v['ID_THEME_SYSTEME'] <> $_SESSION['tab_theme_systeme_filtre']['ID_THEME_SYSTEME']){ // Il est inutile de mettre l'ï¿½lï¿½ement courant dans le combo
                     echo "<option value='".$v['ID_THEME_SYSTEME']."'";
                     if ($v['ID_THEME_SYSTEME'] == $_SESSION['tab_theme_systeme_filtre']['PERE']){
                         echo " selected";
@@ -1178,7 +1178,7 @@
             }
             echo ">Premier</option>";
             foreach ($_SESSION['tab_theme_par_systeme'] as $k => $v){
-                if ($v['ID_THEME_SYSTEME'] <> $_SESSION['tab_theme_systeme_filtre']['ID_THEME_SYSTEME']){ // Il est inutile de mettre l'éléement courant dans le combo
+                if ($v['ID_THEME_SYSTEME'] <> $_SESSION['tab_theme_systeme_filtre']['ID_THEME_SYSTEME']){ // Il est inutile de mettre l'ï¿½lï¿½ement courant dans le combo
                     echo "<option value='".$v['ID_THEME_SYSTEME']."'";
                     if ($v['ID_THEME_SYSTEME'] == $_SESSION['tab_theme_systeme_filtre']['PRECEDENT']){
                         echo " selected";

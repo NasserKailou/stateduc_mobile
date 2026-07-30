@@ -73,8 +73,27 @@ foreach ($all_langues as $l) {
 }
 echo "Langues : " . implode(', ', $langues) . "\n";
 
+// ── SESSION 46-d : corriger NB_LIGNES_FRAME=1 bloquant pour grille_ligne ──────
+// Les thèmes de type grille_ligne (ID_TYPE_THEME=3) avaient NB_LIGNES_FRAME=1
+// fixé par un bug dans gestion_theme.php (INSERT + affichage form).
+// On remet à 10 (valeur par défaut raisonnable) pour tous ceux qui ont encore 1.
+echo "=== Correction NB_LIGNES_FRAME pour grille_ligne (ID_TYPE_THEME=3) ===\n";
+$req_fix_nlf = "UPDATE DICO_THEME_SYSTEME
+    SET NB_LIGNES_FRAME = 10
+    WHERE NB_LIGNES_FRAME = 1
+    AND ID IN (SELECT ID FROM DICO_THEME WHERE ID_TYPE_THEME = 3)";
+try {
+    $GLOBALS['conn_dico']->Execute($req_fix_nlf);
+    $affected = $GLOBALS['conn_dico']->Affected_Rows();
+    echo "[FIX NB_LIGNES_FRAME] {$affected} ligne(s) corrigée(s) : NB_LIGNES_FRAME 1→10 pour ID_TYPE_THEME=3\n";
+} catch (Exception $e) {
+    echo "[WARN] Correction NB_LIGNES_FRAME échouée : " . $e->getMessage() . "\n";
+}
+echo "\n";
+
 // ── Récupérer les thèmes de type Grille UNIQUEMENT ───────────────────────────
 // ID_TYPE_THEME pour "Grille" = type dont le LIBELLE = 'Grille' dans DICO_TYPE_THEME
+// ID_TYPE_THEME=3 = grille_ligne — inclus aussi (correction session 46-d)
 // On filtre directement sur les thèmes qui ont une entrée DICO_THEME_SYSTEME.FRAME définie
 // et NB_LIGNES_FRAME > 0 (= vraiment des thèmes grille avec lignes)
 $req_themes_grille = "
@@ -82,20 +101,20 @@ $req_themes_grille = "
     FROM DICO_THEME DT
     INNER JOIN DICO_TYPE_THEME DTT ON DTT.ID_TYPE_THEME = DT.ID_TYPE_THEME
     AND DTT.CODE_LANGUE = '" . $_SESSION['langue'] . "'
-    WHERE DTT.LIBELLE = 'Grille'
+    WHERE DTT.LIBELLE IN ('Grille', 'Grille_ligne', 'grille', 'grille_ligne')
     ORDER BY DT.ID
 ";
 $themes_grille = $GLOBALS['conn_dico']->GetAll($req_themes_grille);
 
 if (!is_array($themes_grille) || count($themes_grille) === 0) {
-    // Fallback : essayer avec ID_TYPE_THEME connu (généralement 2 pour grille)
-    echo "[WARN] Requête type 'Grille' → 0 résultats. Tentative fallback ID_TYPE_THEME=2...\n";
+    // Fallback : essayer avec ID_TYPE_THEME connu (2 = grille_colonne, 3 = grille_ligne)
+    echo "[WARN] Requête type 'Grille' → 0 résultats. Tentative fallback ID_TYPE_THEME IN (2,3)...\n";
     $req_themes_grille = "
         SELECT DISTINCT DT.ID, DT.ID_TYPE_THEME
         FROM DICO_THEME DT
         INNER JOIN DICO_THEME_SYSTEME DTS ON DTS.ID = DT.ID
-        WHERE DT.ID_TYPE_THEME = 2
-        AND DTS.NB_LIGNES_FRAME > 1
+        WHERE DT.ID_TYPE_THEME IN (2, 3)
+        AND DTS.NB_LIGNES_FRAME >= 1
         ORDER BY DT.ID
     ";
     $themes_grille = $GLOBALS['conn_dico']->GetAll($req_themes_grille);
