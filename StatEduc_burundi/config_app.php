@@ -1,5 +1,24 @@
 <?php //Variables sur le serveur
-$SISED_SERVER       = 'http://' . $_SERVER['HTTP_HOST']; // Sans / à la fin
+//$SISED_SERVER       = 'http://' . $_SERVER['HTTP_HOST']; // Sans / à la fin
+
+// Détection HTTPS derrière reverse proxy Nginx
+if (
+    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) 
+    && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+    ||
+    (isset($_SERVER['HTTPS']) 
+    && $_SERVER['HTTPS'] == 'on')
+) {
+    $_SERVER['HTTPS'] = 'on';
+    $_SERVER['SERVER_PORT'] = 443;
+    $SISED_PROTOCOL = 'https://';
+}
+else {
+    $SISED_PROTOCOL = 'http://';
+}
+
+$SISED_SERVER = $SISED_PROTOCOL . $_SERVER['HTTP_HOST']; // Sans / à la fin
+
 $SISED_PATH         = preg_replace('`\\\`', '/', dirname(__FILE__)) . '/'; // Chemin absolu pour accéder à l'application
 $SISED_URL          = str_replace(preg_replace('`\\\`', '/', $_SERVER['DOCUMENT_ROOT']), '', $SISED_PATH); // URL relative pour accéder à l'application
 $SISED_AURL         = $SISED_SERVER . $SISED_URL; // URL absolue pour accéder à l'application
