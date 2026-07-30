@@ -3209,6 +3209,10 @@ class frame_mobile{
 			$mess_alert			= addslashes($mess_alert);
 			
 			$html				  = "";
+			// Session 48 : CSS+JS mobile manquant dans generer_frame_grille()
+			// Même injection que generer_frame_formulaire() L1872 et generer_frame_matrice_*() L793/1111
+			// _get_mobile_css_js() génère le bloc <style>+<script> ET ouvre <div class="se-mobile-frame">
+			$html .= $this->_get_mobile_css_js();
 			$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
 							
 			//$html 	  	 .= "<BR/>"; 
