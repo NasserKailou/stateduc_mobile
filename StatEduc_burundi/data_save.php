@@ -31,10 +31,9 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 // Sans timeout, le curl attend indefiniment si Apache est sature (self-curl deadlock)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15); // echec rapide si connexion impossible
 $curl->setOpt(CURLOPT_TIMEOUT, 120);        // max 120s - questionnaire_ws.php peut prendre >60s sur serveur charge
-// Securite SSL (Session 45) : les appels internes vers 127.0.0.1 n'ont pas besoin
-// de validation TLS (meme machine). Evite erreur cURL 51 si HTTPS utilise en interne.
-$curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
-$curl->setOpt(CURLOPT_SSL_VERIFYHOST, 0);
+// Session 46 : CURLOPT_SSL_VERIFYPEER=false supprime (faille securite).
+// Correction definitive SSL-51 : config_app.php force $_sised_local_scheme='http'
+// -> SISED_AURL_INTERNAL = http://127.0.0.1:PORT/ (jamais https:// vers 127.0.0.1)
 // Host header pour les appels curl internes (Session 44)
 // SISED_AURL_INTERNAL = http://127.0.0.1:PORT_LOCAL/stateduc/ (bypass Fortinet/NAT)
 // Le header Host = HTTP_HOST (ex: stateduc.ins.ne:9191) permet a Apache de router

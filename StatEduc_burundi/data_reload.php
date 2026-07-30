@@ -38,10 +38,9 @@ $status_ko = $GLOBALS['PARAM_WS']['STATUS_KO'];
 // Timeout + Host header pour les appels curl internes (Session 44)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15);
 $curl->setOpt(CURLOPT_TIMEOUT, 120);
-// Securite SSL (Session 45) : les appels internes vers 127.0.0.1 n'ont pas besoin
-// de validation TLS (meme machine). Evite erreur cURL 51 si HTTPS utilise en interne.
-$curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
-$curl->setOpt(CURLOPT_SSL_VERIFYHOST, 0);
+// Session 46 : CURLOPT_SSL_VERIFYPEER=false supprime (faille securite).
+// Correction definitive SSL-51 : config_app.php force $_sised_local_scheme='http'
+// -> SISED_AURL_INTERNAL = http://127.0.0.1:PORT/ (jamais https:// vers 127.0.0.1)
 // Host header = HTTP_HOST (ex: stateduc.ins.ne:9191) -> VirtualHost Apache correct
 // SISED_AURL_INTERNAL = http://127.0.0.1:PORT_LOCAL/ -> bypass Fortinet/NAT
 // Fonctionne quel que soit le nom de domaine ou la topologie reseau.
@@ -51,7 +50,7 @@ $app = new \Slim\Slim();
 
 //$app->add(new \HttpAuth());
 
- // renvoie les thèmes pour une campagne
+ // renvoie les thï¿½mes pour une campagne
 /*$app->get('/theme_data/:user/:id_sector/:id_teme/:id_camp/:id_etab/:id_filter', function ($user, $id_sector, $id_teme, $id_camp, $id_etab, $id_filter) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl) {
 	$msg_ko = $GLOBALS['PARAM_WS']['KO'];
   
@@ -102,7 +101,7 @@ $app = new \Slim\Slim();
 	
 });*/
 
- // renvoie les thèmes pour une campagne
+ // renvoie les thï¿½mes pour une campagne
 $app->get('/theme_data/:user/:id_sector/:id_theme/:id_camp/:id_etab/:id_filter', function ($user, $id_sector, $id_theme, $id_camp, $id_etab, $id_filter) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl) {
 	$msg_ko = $GLOBALS['PARAM_WS']['KO'];
 	
@@ -155,7 +154,7 @@ $app->get('/theme_data/:user/:id_sector/:id_theme/:id_camp/:id_etab/:id_filter',
 	
 });
 
-// Recupération de la liste des filtres
+// Recupï¿½ration de la liste des filtres
 $app->post('/school_data/:user/:id_sector/:id_camp/:id_year/:id_period', function ($user, $id_sector, $id_camp, $id_year, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
 	$msg_ko = $GLOBALS['PARAM_WS']['KO'];
   
@@ -175,7 +174,7 @@ $app->post('/school_data/:user/:id_sector/:id_camp/:id_year/:id_period', functio
 	
 	$lang = $_SESSION['langue'];
 	
-	// liste des thèmes
+	// liste des thï¿½mes
 	$lstThemes = get_camp_themes($id_sector, $id_camp, $lang);
 	$lstThemes = array_change_key_case_recursive($lstThemes, CASE_LOWER);
 	
