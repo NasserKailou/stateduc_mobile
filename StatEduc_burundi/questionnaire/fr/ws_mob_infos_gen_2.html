@@ -1,0 +1,612 @@
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=902&type_ent_stat=2' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='2'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.1.&amp;lt;/b&amp;gt;&amp;lt;span font-size: 16px &amp;gt; Acc&Atilde;&uml;s &Atilde;  l&acirc;€™&Atilde;&copy;cole &amp;lt;/span&amp;gt;:&nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ACCES_0_6'>Route accessible &Atilde;  tout v&Atilde;&copy;hicule</LABEL><INPUT NAME='CODE_TYPE_ACCES_0' TYPE='radio'   ID='CODE_TYPE_ACCES_0_6' VALUE='6' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ACCES_0_3'>Route accessible uniquement v&Atilde;&copy;hicule tout terrain</LABEL><INPUT NAME='CODE_TYPE_ACCES_0' TYPE='radio'   ID='CODE_TYPE_ACCES_0_3' VALUE='3' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ACCES_0_4'>Piste accessible uniquement &Atilde;  pied</LABEL><INPUT NAME='CODE_TYPE_ACCES_0' TYPE='radio'   ID='CODE_TYPE_ACCES_0_4' VALUE='4' data-mini='true'></TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.2.&amp;lt;/b&amp;gt; L&acirc;€™&Atilde;&copy;cole  est-elle aliment&Atilde;&copy;e en &Atilde;&copy;lectricit&Atilde;&copy; ?       &nbsp;&nbsp;&nbsp;<label for="ELECTRICITE_0_1">Oui</label><INPUT NAME='ELECTRICITE_0' TYPE='radio'   ID='ELECTRICITE_0_1' VALUE='1' data-mini='true'>
+<label for="ELECTRICITE_0_0">Non</label><INPUT NAME='ELECTRICITE_0' TYPE='radio'   ID='ELECTRICITE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Si oui, le syst&Atilde;&uml;me d?alimentation fonctionne-t-il ?       &nbsp;&nbsp;&nbsp;<label for="FONCT_ALIMENT_ELECTRICITE_0_1">Oui</label><INPUT NAME='FONCT_ALIMENT_ELECTRICITE_0' TYPE='radio'   ID='FONCT_ALIMENT_ELECTRICITE_0_1' VALUE='1' data-mini='true'>
+<label for="FONCT_ALIMENT_ELECTRICITE_0_0">Non</label><INPUT NAME='FONCT_ALIMENT_ELECTRICITE_0' TYPE='radio'   ID='FONCT_ALIMENT_ELECTRICITE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='3'  valign=top class='police_gras'>&nbsp;Quel type d?alimentation ?&nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ENERGIE_0_1'>REGIDESO</LABEL><INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_1' VALUE='1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ENERGIE_0_2'>Energie Solaire</LABEL><INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_2' VALUE='2' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ENERGIE_0_4'>Groupe &Atilde;&copy;lectrog&Atilde;&uml;ne</LABEL><INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_4' VALUE='4' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ENERGIE_0_3'>Energie Eolienne</LABEL><INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_3' VALUE='3' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ENERGIE_0_6'>Pas d&amp;#8217;acc&Atilde;&uml;s &Atilde;  l&amp;#8217;&Atilde;&copy;lectricit&Atilde;&copy;</LABEL><INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_6' VALUE='6' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ENERGIE_0_5'>Autre</LABEL><INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio'   ID='CODE_TYPE_ENERGIE_0_5' VALUE='5' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.3.&amp;lt;/b&amp;gt; L&acirc;€™&Atilde;&copy;cole est-elle aliment&Atilde;&copy;e en eau potable ?   &nbsp;&nbsp;&nbsp;<label for="EAU_POTABLE_0_1">Oui</label><INPUT NAME='EAU_POTABLE_0' TYPE='radio'   ID='EAU_POTABLE_0_1' VALUE='1' data-mini='true'>
+<label for="EAU_POTABLE_0_0">Non</label><INPUT NAME='EAU_POTABLE_0' TYPE='radio'   ID='EAU_POTABLE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;a) Si oui, le syst&Atilde;&uml;me d&acirc;€™alimentation fonctionne-t-il ?                 &nbsp;&nbsp;&nbsp;<label for="FONCT_ALIMENT_EAU_0_1">Oui</label><INPUT NAME='FONCT_ALIMENT_EAU_0' TYPE='radio'   ID='FONCT_ALIMENT_EAU_0_1' VALUE='1' data-mini='true'>
+<label for="FONCT_ALIMENT_EAU_0_0">Non</label><INPUT NAME='FONCT_ALIMENT_EAU_0' TYPE='radio'   ID='FONCT_ALIMENT_EAU_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='5'  valign=top class='police_gras'>&nbsp;b) Quel type d&acirc;€™alimentation existe-t-il ?&nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_1'>Borne fontaine</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_1' VALUE='1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_2'>Syst&Atilde;&uml;me de collecte des eaux de pluie</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_2' VALUE='2' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_3'>Source am&Atilde;&copy;nag&Atilde;&copy;e</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_3' VALUE='3' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_4'>Source non am&Atilde;&copy;nag&Atilde;&copy;e</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_4' VALUE='4' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_5'>Puits prot&Atilde;&copy;g&Atilde;&copy;/Forage</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_5' VALUE='5' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_6'>Puits non prot&Atilde;&copy;g&Atilde;&copy;</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_6' VALUE='6' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_7'>Branchement priv&Atilde;&copy;  </LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_7' VALUE='7' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_8'>Pas d&amp;#8217;acc&Atilde;&uml;s &Atilde;  l&amp;#8217;eau</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_8' VALUE='8' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ALIMENTATION_EAU_0_9'>Autre</LABEL><INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_9' VALUE='9' data-mini='true'></TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.4.&amp;lt;/b&amp;gt; Le domaine scolaire est-il d&Atilde;&copy;limit&Atilde;&copy; ?  &nbsp;&nbsp;&nbsp;<label for="DOMAINE_DELIMITE_0_1">Oui</label><INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_1' VALUE='1' data-mini='true'>
+<label for="DOMAINE_DELIMITE_0_0">Non</label><INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;         Si  oui, quelle est sa superficie ?  (en ares) : &nbsp;&nbsp;&nbsp;<INPUT NAME='SUPERFICIE_DOMAINE_0' TYPE='text' size=5  ID='SUPERFICIE_DOMAINE_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.5.&amp;lt;/b&amp;gt; Le domaine scolaire est-il cl&Atilde;&acute;tur&Atilde;&copy; ?             &nbsp;&nbsp;&nbsp;<label for="CLOTURE_DOMAINE_0_1">Oui</label><INPUT NAME='CLOTURE_DOMAINE_0' TYPE='radio'   ID='CLOTURE_DOMAINE_0_1' VALUE='1' data-mini='true'>
+<label for="CLOTURE_DOMAINE_0_0">Non</label><INPUT NAME='CLOTURE_DOMAINE_0' TYPE='radio'   ID='CLOTURE_DOMAINE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.6.&amp;lt;/b&amp;gt; L&acirc;€™&Atilde;&copy;cole poss&Atilde;&uml;de-t-elle une cour de r&Atilde;&copy;cr&Atilde;&copy;ation ?           &nbsp;&nbsp;&nbsp;<label for="POCEDE_TERRAIN_JEU_0_1">Oui</label><INPUT NAME='POCEDE_TERRAIN_JEU_0' TYPE='radio'   ID='POCEDE_TERRAIN_JEU_0_1' VALUE='1' data-mini='true'>
+<label for="POCEDE_TERRAIN_JEU_0_0">Non</label><INPUT NAME='POCEDE_TERRAIN_JEU_0' TYPE='radio'   ID='POCEDE_TERRAIN_JEU_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.7.&amp;lt;/b&amp;gt; L&acirc;€™&Atilde;&copy;cole a-t-elle un jardin scolaire en activit&Atilde;&copy; ?        &nbsp;&nbsp;&nbsp;<label for="JARDIN_SCOLAIRE_0_1">Oui</label><INPUT NAME='JARDIN_SCOLAIRE_0' TYPE='radio'   ID='JARDIN_SCOLAIRE_0_1' VALUE='1' data-mini='true'>
+<label for="JARDIN_SCOLAIRE_0_0">Non</label><INPUT NAME='JARDIN_SCOLAIRE_0' TYPE='radio'   ID='JARDIN_SCOLAIRE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.8.&amp;lt;/b&amp;gt; L&apos;&Atilde;&copy;cole dispose-t-elle des latrines/WC ?&nbsp;&nbsp;&nbsp;<label for="LATRINES_DISPOSE_0_1">Oui</label><INPUT NAME='LATRINES_DISPOSE_0' TYPE='radio'   ID='LATRINES_DISPOSE_0_1' VALUE='1' data-mini='true'>
+<label for="LATRINES_DISPOSE_0_0">Non</label><INPUT NAME='LATRINES_DISPOSE_0' TYPE='radio'   ID='LATRINES_DISPOSE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='5'   valign=top >&nbsp; &Acirc; &amp;lt;b&amp;gt;b. &amp;lt;/b&amp;gt;&Acirc;  Si oui, nombre de latrines fonctionnelles   : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_ELEVES_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>dont  pour filles : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FILLES_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_FILLES_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>b)	Nombre de latrines/WC non fonctionnelles&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_NON_FONCT_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_ELEVES_NON_FONCT_0' VALUE="" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;c. &amp;lt;/b&amp;gt;Nombre de latrines/WC en bon &Atilde;&copy;tat : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_0' TYPE='text' Size=2  ID='NB_LATRINES_BON_ETAT_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;  dont pour filles en bon &Atilde;&copy;tat&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_F_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_BON_ETAT_F_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.9.&amp;lt;/b&amp;gt;L&apos;&Atilde;&copy;cole dispose-t-elle des latrines/WC pour enfants vivant avec handicap ? &nbsp;&nbsp;&nbsp;<label for="DISPOSE_LATRINES_HANDI_0_1">Oui</label><INPUT NAME='DISPOSE_LATRINES_HANDI_0' TYPE='radio'   ID='DISPOSE_LATRINES_HANDI_0_1' VALUE='1' data-mini='true'>
+<label for="DISPOSE_LATRINES_HANDI_0_0">Non</label><INPUT NAME='DISPOSE_LATRINES_HANDI_0' TYPE='radio'   ID='DISPOSE_LATRINES_HANDI_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;b)	Nombre de latrines/WC (HANDI) fonctionnelles  &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_TOTAL_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_TOTAL_HANDI_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;  dont pour filles (HANDI)&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FILLES_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_FILLES_HANDI_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='5'   valign=top >&nbsp;b. Nombre de latrines/WC non fonctionnelles (HANDI)&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_NON_FONCT_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_ELEVES_NON_FONCT_HANDI_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>c)	Nombre de latrines/WC (HANDI)  en bon &Atilde;&copy;tat : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_BON_ETAT_HANDI_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>  dont pour filles (HANDI) en bon &Atilde;&copy;tat&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRIN_BON_ETAT_HANDI_F_0' TYPE='text' style = 'width:30px'  ID='NB_LATRIN_BON_ETAT_HANDI_F_0' VALUE="" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.10 &amp;lt;/b&amp;gt;L?&Atilde;&copy;cole dispose-t-elle des installations de lavage des mains ?     &nbsp;&nbsp;&nbsp;<label for="EXISTE_LAVAGE_MAINS_0_1">Oui</label><INPUT NAME='EXISTE_LAVAGE_MAINS_0' TYPE='radio'   ID='EXISTE_LAVAGE_MAINS_0_1' VALUE='1' data-mini='true'>
+<label for="EXISTE_LAVAGE_MAINS_0_0">Non</label><INPUT NAME='EXISTE_LAVAGE_MAINS_0' TYPE='radio'   ID='EXISTE_LAVAGE_MAINS_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;a. &amp;lt;/b&amp;gt;Si oui, ces installations sont-elles &Atilde;  proximit&Atilde;&copy; des latrines/WC&nbsp;&nbsp;&nbsp;<label for="LAVAGE_MAINS_PROX_LATRINES_0_1">Oui</label><INPUT NAME='LAVAGE_MAINS_PROX_LATRINES_0' TYPE='radio'   ID='LAVAGE_MAINS_PROX_LATRINES_0_1' VALUE='1' data-mini='true'>
+<label for="LAVAGE_MAINS_PROX_LATRINES_0_0">Non</label><INPUT NAME='LAVAGE_MAINS_PROX_LATRINES_0' TYPE='radio'   ID='LAVAGE_MAINS_PROX_LATRINES_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'   valign=top >&nbsp;&amp;lt;b&amp;gt;C. &amp;lt;/b&amp;gt;Nombre d?installations de lavage des mains fonctionnelles (*)&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LAVAGE_MAINS_FONCT_T_0' TYPE='text' size=1  ID='NB_LAVAGE_MAINS_FONCT_T_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>dont pour filles&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LAVAGE_MAINS_FONCT_F_0' TYPE='text' size=1  ID='NB_LAVAGE_MAINS_FONCT_F_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>c) Nombre  de lavages des mains non fonctionnelles&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LAVAGE_MAINS_NON_FONCT_T_0' TYPE='text' size=1  ID='NB_LAVAGE_MAINS_NON_FONCT_T_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>dont pour filles non foctionnelles&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LAVAGE_MAINS_NON_FONCT_F_0' TYPE='text' size=1  ID='NB_LAVAGE_MAINS_NON_FONCT_F_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(*Fonctionnel veut dire que l?eau et le savon sont disponibles au point de lavage)&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.11.&amp;lt;/b&amp;gt; L&acirc;€™&Atilde;&copy;cole a-t-elle un comit&Atilde;&copy; des parents d&acirc;€™&Atilde;&copy;l&Atilde;&uml;ves ?     &nbsp;&nbsp;&nbsp;<label for="EXISTE_CPE_0_1">Oui</label><INPUT NAME='EXISTE_CPE_0' TYPE='radio'   ID='EXISTE_CPE_0_1' VALUE='1' data-mini='true'>
+<label for="EXISTE_CPE_0_0">Non</label><INPUT NAME='EXISTE_CPE_0' TYPE='radio'   ID='EXISTE_CPE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp; &Acirc;   &Acirc;   &Acirc;  Si oui, combien de r&Atilde;&copy;unions tenues au courant de l&acirc;€™ann&Atilde;&copy;e derni&Atilde;&uml;re ? &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNIONS_TENUES_0' TYPE='text' style = 'width:30px'  ID='NB_REUNIONS_TENUES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&amp;lt;b&amp;gt;2.12&amp;lt;/b&amp;gt; L&apos;&Atilde;&copy;cole dispose -t-elle d&apos;un comit&Atilde;&copy; de gestion&nbsp;&nbsp;&nbsp;<label for="EXISTE_COMITE_GESTION_0_1">Oui</label><INPUT NAME='EXISTE_COMITE_GESTION_0' TYPE='radio'   ID='EXISTE_COMITE_GESTION_0_1' VALUE='1' data-mini='true'>
+<label for="EXISTE_COMITE_GESTION_0_0">Non</label><INPUT NAME='EXISTE_COMITE_GESTION_0' TYPE='radio'   ID='EXISTE_COMITE_GESTION_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Si oui, combien de r&Atilde;&copy;unions annuelles tenues?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNIONS_ANNUELLES_0' TYPE='text' size=5  ID='NB_REUNIONS_ANNUELLES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;b)	Les performances p&Atilde;&copy;dagogiques (r&Atilde;&copy;sultats scolaires, notes aux examens de fin de cycle, etc.) de l?&Atilde;&copy;cole sont-elles suivies par les membres du comit&Atilde;&copy; de gestion?&nbsp;&nbsp;&nbsp;<label for="PERFO_PEDA_ECOLECG_0_1">Oui</label><INPUT NAME='PERFO_PEDA_ECOLECG_0' TYPE='radio'   ID='PERFO_PEDA_ECOLECG_0_1' VALUE='1' data-mini='true'>
+<label for="PERFO_PEDA_ECOLECG_0_0">Non</label><INPUT NAME='PERFO_PEDA_ECOLECG_0' TYPE='radio'   ID='PERFO_PEDA_ECOLECG_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;c)	Le comit&Atilde;&copy; a-t-il d&Atilde;&copy;j&Atilde;  re&Atilde;&sect;u une formation / renforcement de capacit&Atilde;&copy;s pendant les trois derni&Atilde;&uml;res ann&Atilde;&copy;es? &nbsp;&nbsp;&nbsp;<label for="CG_FORMATION_0_1">Oui</label><INPUT NAME='CG_FORMATION_0' TYPE='radio'   ID='CG_FORMATION_0_1' VALUE='1' data-mini='true'>
+<label for="CG_FORMATION_0_0">Non</label><INPUT NAME='CG_FORMATION_0' TYPE='radio'   ID='CG_FORMATION_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;d)	Si oui, la formation &Atilde;&copy;tait ax&Atilde;&copy;e sur Gestion de l?&Atilde;&copy;cole?&nbsp;&nbsp;&nbsp;<label for="GESTION_ECOLE_CG_0_1">Oui</label><INPUT NAME='GESTION_ECOLE_CG_0' TYPE='radio'   ID='GESTION_ECOLE_CG_0_1' VALUE='1' data-mini='true'>
+<label for="GESTION_ECOLE_CG_0_0">Non</label><INPUT NAME='GESTION_ECOLE_CG_0' TYPE='radio'   ID='GESTION_ECOLE_CG_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;d)	Si oui, la formation &Atilde;&copy;tait ax&Atilde;&copy;e sur Maintenance des infrastructures ?&nbsp;&nbsp;&nbsp;<label for="MANT_INFRASTR_CG_0_1">Oui</label><INPUT NAME='MANT_INFRASTR_CG_0' TYPE='radio'   ID='MANT_INFRASTR_CG_0_1' VALUE='1' data-mini='true'>
+<label for="MANT_INFRASTR_CG_0_0">Non</label><INPUT NAME='MANT_INFRASTR_CG_0' TYPE='radio'   ID='MANT_INFRASTR_CG_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;d)	Si oui, la formation &Atilde;&copy;tait ax&Atilde;&copy;e sur Suivie des performances p&Atilde;&copy;dagogiques ?&nbsp;&nbsp;&nbsp;<label for="SUIVIE_PERFORM_PEDA_CG_0_1">Oui</label><INPUT NAME='SUIVIE_PERFORM_PEDA_CG_0' TYPE='radio'   ID='SUIVIE_PERFORM_PEDA_CG_0_1' VALUE='1' data-mini='true'>
+<label for="SUIVIE_PERFORM_PEDA_CG_0_0">Non</label><INPUT NAME='SUIVIE_PERFORM_PEDA_CG_0' TYPE='radio'   ID='SUIVIE_PERFORM_PEDA_CG_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'   valign=top >&nbsp;d)	Si oui, la formation &Atilde;&copy;tait ax&Atilde;&copy;e sur Pladoyer/sensibilisation ?&nbsp;&nbsp;&nbsp;<label for="PLAIDOYER_SENSIB_CG_0_1">Oui</label><INPUT NAME='PLAIDOYER_SENSIB_CG_0' TYPE='radio'   ID='PLAIDOYER_SENSIB_CG_0_1' VALUE='1' data-mini='true'>
+<label for="PLAIDOYER_SENSIB_CG_0_0">Non</label><INPUT NAME='PLAIDOYER_SENSIB_CG_0' TYPE='radio'   ID='PLAIDOYER_SENSIB_CG_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>e)	La formation &Atilde;&copy;tait appuy&Atilde;&copy;e par quel bailleur?&nbsp;&nbsp;&nbsp;<INPUT NAME='BAILLEUR_FORMATION_CG_0' TYPE='text' style = 'width:100px'  ID='BAILLEUR_FORMATION_CG_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>f)	Quand  est ce que la formation a eu lieu ? (ann&Atilde;&copy;e) :&nbsp;&nbsp;&nbsp;<INPUT NAME='ANNEE_FORMATION_CG_0' TYPE='text' style = 'width:30px'  ID='ANNEE_FORMATION_CG_0' VALUE="" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.13.&amp;lt;/b&amp;gt; L&acirc;€™&Atilde;&copy;cole a-t-elle un home pour enseignants ?  &nbsp;&nbsp;&nbsp;<label for="HOME_ENSEIGNANT_0_1">Oui</label><INPUT NAME='HOME_ENSEIGNANT_0' TYPE='radio'   ID='HOME_ENSEIGNANT_0_1' VALUE='1' data-mini='true'>
+<label for="HOME_ENSEIGNANT_0_0">Non</label><INPUT NAME='HOME_ENSEIGNANT_0' TYPE='radio'   ID='HOME_ENSEIGNANT_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'   valign=top >&nbsp; &Acirc;   &Acirc;   &Acirc;  Si oui, Capacit&Atilde;&copy; d&acirc;€™accueil  : &nbsp;&nbsp;&nbsp;<INPUT NAME='CAPACITE_HOME_0' TYPE='text' size=5  ID='CAPACITE_HOME_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Nombre d&acirc;€™enseignants log&Atilde;&copy;s : &nbsp;&nbsp;&nbsp;<INPUT NAME='ENSEIGNANTS_LOGES_0' TYPE='text' size=5  ID='ENSEIGNANTS_LOGES_0' VALUE="" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>dont enseignants de l&acirc;€™&Atilde;&copy;cole  : &nbsp;&nbsp;&nbsp;<INPUT NAME='ENSEIGNANTS_ECOLE_LOGES_0' TYPE='text' size=5  ID='ENSEIGNANTS_ECOLE_LOGES_0' VALUE="" >
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.14.&amp;lt;/b&amp;gt; Organisation administrative :        &nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ORG_ADMIN_0_1'>Direction</LABEL><INPUT NAME='CODE_TYPE_ORG_ADMIN_0' TYPE='radio'   ID='CODE_TYPE_ORG_ADMIN_0_1' VALUE='1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ORG_ADMIN_0_2'>Succursale</LABEL><INPUT NAME='CODE_TYPE_ORG_ADMIN_0' TYPE='radio'   ID='CODE_TYPE_ORG_ADMIN_0_2' VALUE='2' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.15.&amp;lt;/b&amp;gt; Organisation p&Atilde;&copy;dagogique : &nbsp;</TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ORG_PEDAG_0_1'>simple vacation</LABEL><INPUT NAME='CODE_TYPE_ORG_PEDAG_0' TYPE='radio'   ID='CODE_TYPE_ORG_PEDAG_0_1' VALUE='1' data-mini='true'></TD>
+		<TD class='td_right' nowrap><LABEL for='CODE_TYPE_ORG_PEDAG_0_2'>double vacation</LABEL><INPUT NAME='CODE_TYPE_ORG_PEDAG_0' TYPE='radio'   ID='CODE_TYPE_ORG_PEDAG_0_2' VALUE='2' data-mini='true'></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp; &Acirc;   &Acirc;   &Acirc;  Si double vacation, a)	Combien de ma&Atilde;&reg;tres pratiquent-ils la double vacation ?   &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_MAITRES_VAC_0' TYPE='text' size=5  ID='NB_MAITRES_VAC_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;b) combien de salles de classes concern&Atilde;&copy;es ?  &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CLASSES_VAC_0' TYPE='text' size=5  ID='NB_CLASSES_VAC_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;c)	Combien de salles de classes concern&Atilde;&copy;es mais accueillant des groupes p&Atilde;&copy;dagogiques de niveaux diff&Atilde;&copy;rents ?&nbsp;&nbsp;&nbsp;<INPUT NAME='SDC_DV_NIV_MIXTE_0' TYPE='text' style = 'width:30px'  ID='SDC_DV_NIV_MIXTE_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.16.&amp;lt;/b&amp;gt; Distance de l&acirc;€™&Atilde;&copy;cole au dispensaire/centre de sant&Atilde;&copy;/h&Atilde;&acute;pital le plus proche : &nbsp;&nbsp;&nbsp;<INPUT NAME='DISTANCE_CENTRE_SANTE_0' TYPE='text' style = 'width:30px'  ID='DISTANCE_CENTRE_SANTE_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.17.&amp;lt;/b&amp;gt; L&acirc;€™&Atilde;&copy;cole dispose-t-elle d&acirc;€™une cantine scolaire ?   &nbsp;&nbsp;&nbsp;<label for="DISPOSE_CANTINE_0_1">Oui</label><INPUT NAME='DISPOSE_CANTINE_0' TYPE='radio'   ID='DISPOSE_CANTINE_0_1' VALUE='1' data-mini='true'>
+<label for="DISPOSE_CANTINE_0_0">Non</label><INPUT NAME='DISPOSE_CANTINE_0' TYPE='radio'   ID='DISPOSE_CANTINE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.18.	L&apos;&Atilde;&copy;cole dispose-t-elle d&apos;une biblioth&Atilde;&uml;que ? &nbsp;&nbsp;&nbsp;<label for="DISPOSE_BIBLIO_0_1">Oui</label><INPUT NAME='DISPOSE_BIBLIO_0' TYPE='radio'   ID='DISPOSE_BIBLIO_0_1' VALUE='1' data-mini='true'>
+<label for="DISPOSE_BIBLIO_0_0">Non</label><INPUT NAME='DISPOSE_BIBLIO_0' TYPE='radio'   ID='DISPOSE_BIBLIO_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Si oui, existe-t-il un local destin&Atilde;&copy; &Atilde;  la biblioth&Atilde;&uml;que? &nbsp;&nbsp;&nbsp;<label for="EXISTE_LOCAL_BIBLIO_0_1">Oui</label><INPUT NAME='EXISTE_LOCAL_BIBLIO_0' TYPE='radio'   ID='EXISTE_LOCAL_BIBLIO_0_1' VALUE='1' data-mini='true'>
+<label for="EXISTE_LOCAL_BIBLIO_0_0">Non</label><INPUT NAME='EXISTE_LOCAL_BIBLIO_0' TYPE='radio'   ID='EXISTE_LOCAL_BIBLIO_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.19.	L&apos;&Atilde;&copy;cole dispose-t-elle d?un laboratoire ?&nbsp;&nbsp;&nbsp;<label for="DISPOSE_LABORATOIRE_0_1">Oui</label><INPUT NAME='DISPOSE_LABORATOIRE_0' TYPE='radio'   ID='DISPOSE_LABORATOIRE_0_1' VALUE='1' data-mini='true'>
+<label for="DISPOSE_LABORATOIRE_0_0">Non</label><INPUT NAME='DISPOSE_LABORATOIRE_0' TYPE='radio'   ID='DISPOSE_LABORATOIRE_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='5'  valign=top class='police_gras'>&nbsp;&amp;lt;b&amp;gt;2.20.&amp;lt;/b&amp;gt; Niveau d&acirc;€™&Atilde;&copy;tudes disponible &Atilde;  l&apos;&Atilde;&copy;cole: &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;1&Atilde;&uml;re ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_4' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_4' VALUE='4' data-mini='true'></TD>
+		<TD class='td_right' nowrap>&nbsp;2&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_5' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_5' VALUE='5' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;3&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_6' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_6' VALUE='6' data-mini='true'></TD>
+		<TD class='td_right' nowrap>&nbsp;4&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_7' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_7' VALUE='7' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;5&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_8' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_8' VALUE='8' data-mini='true'></TD>
+		<TD class='td_right' nowrap>&nbsp;6&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_9' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_9' VALUE='9' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;7&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_10' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_10' VALUE='10' data-mini='true'></TD>
+		<TD class='td_right' nowrap>&nbsp;8&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_11' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_11' VALUE='11' data-mini='true'></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;9&Atilde;&uml;me ann&Atilde;&copy;e&nbsp;<INPUT NAME='CODE_TYPE_NIVEAU_0_12' TYPE='checkbox'   ID='CODE_TYPE_NIVEAU_0_12' VALUE='12' data-mini='true'></TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.21.	L&apos;&Atilde;&copy;cole a-t-elle un personnel form&Atilde;&copy; pour d&Atilde;&copy;tecter les enfants vivant avec un handicap ? &nbsp;&nbsp;&nbsp;<label for="DETECTER_ENFANT_HANDI_0_1">Oui</label><INPUT NAME='DETECTER_ENFANT_HANDI_0' TYPE='radio'   ID='DETECTER_ENFANT_HANDI_0_1' VALUE='1' data-mini='true'>
+<label for="DETECTER_ENFANT_HANDI_0_0">Non</label><INPUT NAME='DETECTER_ENFANT_HANDI_0' TYPE='radio'   ID='DETECTER_ENFANT_HANDI_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.22.	Si non, collabore-t-elle avec un centre sp&Atilde;&copy;cialis&Atilde;&copy; pour diagnostiquer les cas douteux ? &nbsp;&nbsp;&nbsp;<label for="CSPEC_DIAGNO_CASDOUTEUX_0_1">Oui</label><INPUT NAME='CSPEC_DIAGNO_CASDOUTEUX_0' TYPE='radio'   ID='CSPEC_DIAGNO_CASDOUTEUX_0_1' VALUE='1' data-mini='true'>
+<label for="CSPEC_DIAGNO_CASDOUTEUX_0_0">Non</label><INPUT NAME='CSPEC_DIAGNO_CASDOUTEUX_0' TYPE='radio'   ID='CSPEC_DIAGNO_CASDOUTEUX_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.23.	L&apos;&Atilde;&copy;cole est-elle en mesure de recevoir des enfants vivant avec handicap  ? &nbsp;&nbsp;&nbsp;<label for="RECEV_ENFANT_BESOINSPEC_0_1">Oui</label><INPUT NAME='RECEV_ENFANT_BESOINSPEC_0' TYPE='radio'   ID='RECEV_ENFANT_BESOINSPEC_0_1' VALUE='1' data-mini='true'>
+<label for="RECEV_ENFANT_BESOINSPEC_0_0">Non</label><INPUT NAME='RECEV_ENFANT_BESOINSPEC_0' TYPE='radio'   ID='RECEV_ENFANT_BESOINSPEC_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;2.24. L&apos;&Atilde;&copy;cole appartient-t-elle &Atilde;  un r&Atilde;&copy;seau scolaire&nbsp;&nbsp;&nbsp;<label for="ECOLE_RESEAU_SCOL_0_1">Oui</label><INPUT NAME='ECOLE_RESEAU_SCOL_0' TYPE='radio'   ID='ECOLE_RESEAU_SCOL_0_1' VALUE='1' data-mini='true'>
+<label for="ECOLE_RESEAU_SCOL_0_0">Non</label><INPUT NAME='ECOLE_RESEAU_SCOL_0' TYPE='radio'   ID='ECOLE_RESEAU_SCOL_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;a.&amp;lt;/b&amp;gt;	Si oui, y a-t-il une &Atilde;&copy;cole du r&Atilde;&copy;seau scolaire qui dispose:  d&apos;un laboratoire ? &nbsp;&nbsp;&nbsp;<label for="DISPOSE_LABORATOIRE_RESEAU_SCOL_0_1">Oui</label><INPUT NAME='DISPOSE_LABORATOIRE_RESEAU_SCOL_0' TYPE='radio'   ID='DISPOSE_LABORATOIRE_RESEAU_SCOL_0_1' VALUE='1' data-mini='true'>
+<label for="DISPOSE_LABORATOIRE_RESEAU_SCOL_0_0">Non</label><INPUT NAME='DISPOSE_LABORATOIRE_RESEAU_SCOL_0' TYPE='radio'   ID='DISPOSE_LABORATOIRE_RESEAU_SCOL_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;b.&amp;lt;/b&amp;gt;	d&apos;une biblioth&Atilde;&uml;que ? &nbsp;&nbsp;&nbsp;<label for="DISPOSE_BIBLIO_RESEAU_SCOL_0_1">Oui</label><INPUT NAME='DISPOSE_BIBLIO_RESEAU_SCOL_0' TYPE='radio'   ID='DISPOSE_BIBLIO_RESEAU_SCOL_0_1' VALUE='1' data-mini='true'>
+<label for="DISPOSE_BIBLIO_RESEAU_SCOL_0_0">Non</label><INPUT NAME='DISPOSE_BIBLIO_RESEAU_SCOL_0' TYPE='radio'   ID='DISPOSE_BIBLIO_RESEAU_SCOL_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;b&amp;gt;2.25.&amp;lt;/b&amp;gt;	L?&Atilde;&copy;cole poss&Atilde;&uml;de-t-elle  des poubelles pour la gestion des menstrues ou autres d&Atilde;&copy;chets&nbsp;&nbsp;&nbsp;<label for="POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_1">Oui</label><INPUT NAME='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0' TYPE='radio'   ID='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_1' VALUE='1' data-mini='true'>
+<label for="POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_0">Non</label><INPUT NAME='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0' TYPE='radio'   ID='POSSEDE_POUBLLE_GESTION_MENSTRUE_DECHET_0_0' VALUE='0' data-mini='true'>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&amp;lt;br&amp;gt;&amp;lt;b&amp;gt;2.26. Effectifs totaux :&amp;lt;/b&amp;gt;&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;El&Atilde;&uml;ves Filles   &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ELEVES_F_0' TYPE='text' size=10  ID='NB_ELEVES_F_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;El&Atilde;&uml;ves&Acirc; &Acirc; &Acirc; Total&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ELEVES_0' TYPE='text' size=10  ID='NB_ELEVES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;Enseignants Femmes     &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_F_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_F_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Enseignants&Acirc; &Acirc; &Acirc; Total&Acirc; &Acirc; &Acirc; &Acirc; &Acirc; &Acirc; &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;Enseignants b&Atilde;&copy;n&Atilde;&copy;voles Femmes&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_BENEVOLES_F_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_BENEVOLES_F_0' VALUE="" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Enseignants b&Atilde;&copy;n&Atilde;&copy;voles Total&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_BENEVOLES_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_BENEVOLES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Total salles de classe &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_SALLES_CLASSE_0' TYPE='text' size=10  ID='NB_SALLES_CLASSE_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Salles de classe emprunt&Atilde;&copy;es&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CLASSES_EMPRUNTEES_0' TYPE='text' size=10  ID='NB_CLASSES_EMPRUNTEES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Dont salles de classe provisoire (urgence /abri de fortune)&nbsp;&nbsp;&nbsp;<INPUT NAME='SDC_PROVISOIRES_0' TYPE='text' size=10  ID='SDC_PROVISOIRES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Salles de classes non utilis&Atilde;&copy;es&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_SALLES_CLASSE_NON_UTIL_0' TYPE='text' size=10  ID='NB_SALLES_CLASSE_NON_UTIL_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;br&amp;gt;&amp;lt;b&amp;gt;2.27. Informations sur les salles de classe utilis&Atilde;&copy;es :&amp;lt;/b&amp;gt;<br></b><script language='javascript' type='text/javascript'>
+var expression_90067 	= "";
+var tot_mes_ligne_90067 	= new Array();
+var tot_mes_col_90067 	= new Array();
+var affich_vertic_mes_90067 	= 0;
+var affiche_sous_totaux_90067 	= 0;
+var tab_mes_90067 	= new Array ("NB_SALLES_CLASSE_UTIL","NB_GP","NB_GP_SUPPL","NB_ENS_TITULAIRE","NB_BANCS_PIPITRES","NB_HEURES_TEMPS_SCOL","NB_MINITES_TEMPS_SCOL");
+var tab_ligne_90067	= new Array ("4","5","6","7","8","9","10","11","12");
+var tab_col_90067	= new Array ();
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=9  CLASS='ligne-titre' align='center'>&nbsp;</TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Salles de classe utilis&Atilde;&copy;es</TD>
+		<TD  align='center'>Nombre de salles de classe propres &Atilde;  l&apos;&Atilde;&copy;cole</TD>
+		<TD  align='center'>Groupes p&Atilde;&copy;dagogiques avec salles de classe au niveau consid&Atilde;&copy;r&Atilde;&copy;</TD>
+		<TD  align='center'>Groupes p&Atilde;&copy;dagogiques utilisant une salle de classe d?un autre niveau</TD>
+		<TD  align='center'>Groupes p&Atilde;&copy;dagogiques d?un autre niveau utilisant une salle de classe de ce niveau</TD>
+		<TD  align='center'>Enseignants titulaires</TD>
+		<TD  align='center'>Bancs pupitres</TD>
+		<TD  align='center'>Temps scolaire journalier(h)</TD>
+		<TD  align='center'>Temps scolaire journalier(min)</TD>
+		<TD  align='center'>Salles de classe utilis&Atilde;&copy;es + Groupes p&Atilde;&copy;dagogiques avec salles de classe au niveau consid&Atilde;&copy;r&Atilde;&copy; + Groupes p&Atilde;&copy;dagogiques utilisant une salle de classe d?un autre niveau + Enseignants titulaires + Bancs pupitres + Temps scolaire journalier(h) + Temps scolaire journalier(min)</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >1&Atilde;&uml;re ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_4' id='NB_SALLES_CLASSE_UTIL_0_4' name='NB_SALLES_CLASSE_UTIL_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_4' id='NB_CLASSES_PROPR_STRUCTURE_0_4' name='NB_CLASSES_PROPR_STRUCTURE_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_#_4' id='NB_GP_0_4' name='NB_GP_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_4' id='NB_GP_SUPPL_0_4' name='NB_GP_SUPPL_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_4' id='SDC_MIXTES_0_4' name='SDC_MIXTES_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_4' id='NB_ENS_TITULAIRE_0_4' name='NB_ENS_TITULAIRE_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_4' id='NB_BANCS_PIPITRES_0_4' name='NB_BANCS_PIPITRES_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_4' id='NB_HEURES_TEMPS_SCOL_0_4' name='NB_HEURES_TEMPS_SCOL_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_4' id='NB_MINITES_TEMPS_SCOL_0_4' name='NB_MINITES_TEMPS_SCOL_0_4' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_4' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >2&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_5' id='NB_SALLES_CLASSE_UTIL_0_5' name='NB_SALLES_CLASSE_UTIL_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_5' id='NB_CLASSES_PROPR_STRUCTURE_0_5' name='NB_CLASSES_PROPR_STRUCTURE_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_#_5' id='NB_GP_0_5' name='NB_GP_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_5' id='NB_GP_SUPPL_0_5' name='NB_GP_SUPPL_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_5' id='SDC_MIXTES_0_5' name='SDC_MIXTES_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_5' id='NB_ENS_TITULAIRE_0_5' name='NB_ENS_TITULAIRE_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_5' id='NB_BANCS_PIPITRES_0_5' name='NB_BANCS_PIPITRES_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_5' id='NB_HEURES_TEMPS_SCOL_0_5' name='NB_HEURES_TEMPS_SCOL_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_5' id='NB_MINITES_TEMPS_SCOL_0_5' name='NB_MINITES_TEMPS_SCOL_0_5' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_5' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >3&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_6' id='NB_SALLES_CLASSE_UTIL_0_6' name='NB_SALLES_CLASSE_UTIL_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_6' id='NB_CLASSES_PROPR_STRUCTURE_0_6' name='NB_CLASSES_PROPR_STRUCTURE_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_#_6' id='NB_GP_0_6' name='NB_GP_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_6' id='NB_GP_SUPPL_0_6' name='NB_GP_SUPPL_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_6' id='SDC_MIXTES_0_6' name='SDC_MIXTES_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_6' id='NB_ENS_TITULAIRE_0_6' name='NB_ENS_TITULAIRE_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_6' id='NB_BANCS_PIPITRES_0_6' name='NB_BANCS_PIPITRES_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_6' id='NB_HEURES_TEMPS_SCOL_0_6' name='NB_HEURES_TEMPS_SCOL_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_6' id='NB_MINITES_TEMPS_SCOL_0_6' name='NB_MINITES_TEMPS_SCOL_0_6' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_6' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >4&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_7' id='NB_SALLES_CLASSE_UTIL_0_7' name='NB_SALLES_CLASSE_UTIL_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_7' id='NB_CLASSES_PROPR_STRUCTURE_0_7' name='NB_CLASSES_PROPR_STRUCTURE_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_#_7' id='NB_GP_0_7' name='NB_GP_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_7' id='NB_GP_SUPPL_0_7' name='NB_GP_SUPPL_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_7' id='SDC_MIXTES_0_7' name='SDC_MIXTES_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_7' id='NB_ENS_TITULAIRE_0_7' name='NB_ENS_TITULAIRE_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_7' id='NB_BANCS_PIPITRES_0_7' name='NB_BANCS_PIPITRES_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_7' id='NB_HEURES_TEMPS_SCOL_0_7' name='NB_HEURES_TEMPS_SCOL_0_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_7' id='NB_MINITES_TEMPS_SCOL_0_7' name='NB_MINITES_TEMPS_SCOL_0_7' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_7' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >5&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_8' id='NB_SALLES_CLASSE_UTIL_0_8' name='NB_SALLES_CLASSE_UTIL_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_8' id='NB_CLASSES_PROPR_STRUCTURE_0_8' name='NB_CLASSES_PROPR_STRUCTURE_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_#_8' id='NB_GP_0_8' name='NB_GP_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_8' id='NB_GP_SUPPL_0_8' name='NB_GP_SUPPL_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_8' id='SDC_MIXTES_0_8' name='SDC_MIXTES_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_8' id='NB_ENS_TITULAIRE_0_8' name='NB_ENS_TITULAIRE_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_8' id='NB_BANCS_PIPITRES_0_8' name='NB_BANCS_PIPITRES_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_8' id='NB_HEURES_TEMPS_SCOL_0_8' name='NB_HEURES_TEMPS_SCOL_0_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_8' id='NB_MINITES_TEMPS_SCOL_0_8' name='NB_MINITES_TEMPS_SCOL_0_8' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_8' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >6&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_9' id='NB_SALLES_CLASSE_UTIL_0_9' name='NB_SALLES_CLASSE_UTIL_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_9' id='NB_CLASSES_PROPR_STRUCTURE_0_9' name='NB_CLASSES_PROPR_STRUCTURE_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_#_9' id='NB_GP_0_9' name='NB_GP_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_9' id='NB_GP_SUPPL_0_9' name='NB_GP_SUPPL_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_9' id='SDC_MIXTES_0_9' name='SDC_MIXTES_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_9' id='NB_ENS_TITULAIRE_0_9' name='NB_ENS_TITULAIRE_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_9' id='NB_BANCS_PIPITRES_0_9' name='NB_BANCS_PIPITRES_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_9' id='NB_HEURES_TEMPS_SCOL_0_9' name='NB_HEURES_TEMPS_SCOL_0_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_9' id='NB_MINITES_TEMPS_SCOL_0_9' name='NB_MINITES_TEMPS_SCOL_0_9' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_9' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >7&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_10' id='NB_SALLES_CLASSE_UTIL_0_10' name='NB_SALLES_CLASSE_UTIL_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_10' id='NB_CLASSES_PROPR_STRUCTURE_0_10' name='NB_CLASSES_PROPR_STRUCTURE_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_#_10' id='NB_GP_0_10' name='NB_GP_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_10' id='NB_GP_SUPPL_0_10' name='NB_GP_SUPPL_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_10' id='SDC_MIXTES_0_10' name='SDC_MIXTES_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_10' id='NB_ENS_TITULAIRE_0_10' name='NB_ENS_TITULAIRE_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_10' id='NB_BANCS_PIPITRES_0_10' name='NB_BANCS_PIPITRES_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_10' id='NB_HEURES_TEMPS_SCOL_0_10' name='NB_HEURES_TEMPS_SCOL_0_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_10' id='NB_MINITES_TEMPS_SCOL_0_10' name='NB_MINITES_TEMPS_SCOL_0_10' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_10' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >8&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_11' id='NB_SALLES_CLASSE_UTIL_0_11' name='NB_SALLES_CLASSE_UTIL_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_11' id='NB_CLASSES_PROPR_STRUCTURE_0_11' name='NB_CLASSES_PROPR_STRUCTURE_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_#_11' id='NB_GP_0_11' name='NB_GP_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_11' id='NB_GP_SUPPL_0_11' name='NB_GP_SUPPL_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_11' id='SDC_MIXTES_0_11' name='SDC_MIXTES_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_11' id='NB_ENS_TITULAIRE_0_11' name='NB_ENS_TITULAIRE_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_11' id='NB_BANCS_PIPITRES_0_11' name='NB_BANCS_PIPITRES_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_11' id='NB_HEURES_TEMPS_SCOL_0_11' name='NB_HEURES_TEMPS_SCOL_0_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_11' id='NB_MINITES_TEMPS_SCOL_0_11' name='NB_MINITES_TEMPS_SCOL_0_11' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_11' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >9&Atilde;&uml;me ann&Atilde;&copy;e</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_UTIL_#_12' id='NB_SALLES_CLASSE_UTIL_0_12' name='NB_SALLES_CLASSE_UTIL_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_12' id='NB_CLASSES_PROPR_STRUCTURE_0_12' name='NB_CLASSES_PROPR_STRUCTURE_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_#_12' id='NB_GP_0_12' name='NB_GP_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_GP_SUPPL_#_12' id='NB_GP_SUPPL_0_12' name='NB_GP_SUPPL_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='SDC_MIXTES_#_12' id='SDC_MIXTES_0_12' name='SDC_MIXTES_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_ENS_TITULAIRE_#_12' id='NB_ENS_TITULAIRE_0_12' name='NB_ENS_TITULAIRE_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_BANCS_PIPITRES_#_12' id='NB_BANCS_PIPITRES_0_12' name='NB_BANCS_PIPITRES_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_HEURES_TEMPS_SCOL_#_12' id='NB_HEURES_TEMPS_SCOL_0_12' name='NB_HEURES_TEMPS_SCOL_0_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MINITES_TEMPS_SCOL_#_12' id='NB_MINITES_TEMPS_SCOL_0_12' name='NB_MINITES_TEMPS_SCOL_0_12' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_LIGNE_0_12' size=10></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '  size=10 NAME='TOT_90067_NB_SALLES_CLASSE_UTIL_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>&nbsp;</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '  size=10 NAME='TOT_90067_NB_GP_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '  size=10 NAME='TOT_90067_NB_GP_SUPPL_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>&nbsp;</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '  size=10 NAME='TOT_90067_NB_ENS_TITULAIRE_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '  size=10 NAME='TOT_90067_NB_BANCS_PIPITRES_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '  size=10 NAME='TOT_90067_NB_HEURES_TEMPS_SCOL_COLONNE_0'></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold; '  size=10 NAME='TOT_90067_NB_MINITES_TEMPS_SCOL_COLONNE_0'></TD>
+		<td align='center'  bgcolor='#CCCCCC'  valign='middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_90067_ALL_MES_0' size=10></TD>
+
+	</TR>
+
+	<TR>
+</TABLE></TD>
+	</TR>
+</TABLE></FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',90067, 0, tab_mes_90067, tab_ligne_90067, tab_col_90067);
+</script>

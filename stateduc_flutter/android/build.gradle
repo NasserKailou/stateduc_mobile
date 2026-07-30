@@ -1,0 +1,21 @@
+// Top-level build.gradle — Flutter 3.x / AGP 8.x compatible
+// Les plugins sont déclarés dans settings.gradle (nouveau style).
+// Ce fichier ne contient que la config partagée des sous-projets.
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
