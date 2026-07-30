@@ -3339,7 +3339,7 @@ class frame_mobile{
 						if(!in_array($element['NOM_GROUPE'], $nom_grp_deja_aff)){
 							$nom_grp_deja_aff[]	=	$element['NOM_GROUPE'];
 							$grp_mat = $element['NOM_GROUPE'];
-							$html	.=	"\t\t<TD class='col_sep' ROWSPAN='".(1+$nb_niv_1)."' style='width: 1px; padding: 1px;'></TD>\n";
+							$html	.=	"\t\t<TD class='col_sep' ROWSPAN='".$nb_niv_1."' style='width: 1px; padding: 1px;'></TD>\n";
 							
 							$mat_dim_colonne[$grp_mat] 	=	$this->get_dims_zone_matricielle('dimension_ligne', $element['ID_TABLE_MERE_THEME'], $dico);
 							if(!(is_array($mat_dim_colonne[$grp_mat]) && count($mat_dim_colonne[$grp_mat]))){
@@ -3441,7 +3441,7 @@ class frame_mobile{
 					}elseif ( ($element['TYPE_OBJET'] == 'liste_radio') or ($element['TYPE_OBJET'] == 'booleen') 
 							or ($element['TYPE_OBJET']=='liste_checkbox') or ($element['TYPE_OBJET']=='text_valeur_multiple')){
 							
-							$html .="\t\t<TD class='col_sep' ROWSPAN='".(1+$nb_niv_1)."' style='width: 1px; padding: 1px;'></TD>\n";
+							$html .="\t\t<TD class='col_sep' ROWSPAN='".$nb_niv_1."' style='width: 1px; padding: 1px;'></TD>\n";
 							$html 			        .= "\t\t<TD style='height:25px;'";
 							
 						// Lecture des libell�s de la table de nomenclature
@@ -3459,7 +3459,7 @@ class frame_mobile{
 						$html   .= "</TD>\n";
 					}elseif($element['TYPE_OBJET'] == 'text' or $element['TYPE_OBJET'] == 'systeme_text' or $element['TYPE_OBJET'] == 'combo' or $element['TYPE_OBJET'] == 'systeme_combo' or $element['TYPE_OBJET'] == 'label' or $element['TYPE_OBJET'] == 'checkbox') {              
 	
-						$html .="\t\t<TD class='col_sep' ROWSPAN='".(1+$nb_niv_1)."' style='width: 1px; padding: 1px;'></TD>\n";
+						$html .="\t\t<TD class='col_sep' ROWSPAN='".$nb_niv_1."' style='width: 1px; padding: 1px;'></TD>\n";
 						$html 		.= "\t\t<TD";
 						$html       .= " ROWSPAN=".$nb_niv_1;
 						$html 		.= " class='".$classe_fond."'>";

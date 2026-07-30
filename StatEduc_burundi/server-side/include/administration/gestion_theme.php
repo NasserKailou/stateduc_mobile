@@ -828,6 +828,8 @@
 								lit_theme_systeme();
                                 lit_theme_systeme_filtre();
                                 lit_theme_par_systeme();//Ajout Hebie pour maj d'un enregistrement dans DICO_THEME_SYSTEME
+								// Session 47: Auto-genération du frame mobile après enregistrement (tous types grille/matrice)
+								genere_theme_courant();
                                 break;
             case 'SupThm':
                                 supprime_theme_systeme($_SESSION['tab_theme_systeme_filtre'][ID_THEME_SYSTEME]);//Ajout Hebie pour suppr d'un enregistrement dans DICO_THEME_SYSTEME
