@@ -3185,7 +3185,7 @@ class frame_mobile{
 											
 			// Les Locaux par exemple
 			$NB_TOTAL_COL 	= 0;
-			$NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+			$NB_LIGNE_ECRAN	= (int)$this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
 			$dico        	= $this->tri_fils($this->dico);
 			$affiche_vertic_mes=0;
 			$style_align_middle = '';
@@ -3597,7 +3597,7 @@ class frame_mobile{
 			
 			// Affichage des zones de saisie
 			// Autant de fois que lignes � affcher (nbre d�fini dans DICO_THEME.NB_LIGNES)
-			for ($j = 0; $j < 1; $j++){
+			for ($j = 0; $j < $NB_LIGNE_ECRAN; $j++){ // Session 46 : NB_LIGNES_FRAME iterations
 	
 				if(!isset($classe_fond)) {
 						$classe_fond = 'ligne-paire';
@@ -3613,10 +3613,10 @@ class frame_mobile{
 	
 				// Pour chaque Ligne
 				$i_TD = 0;
-				$html .= "\t\t<TD class='".$classe_fond."' id='ligne-paire_0_0'><div class='edit_zone'><a href='#' class='ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all ui-btn-inline' id='b_delete_0'>&nbsp;</a></div></TD>\n";
+				$html .= "\t\t<TD class='".$classe_fond."' id='ligne-paire_".$j."_0'><div class='edit_zone'><a href='#' class='ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all ui-btn-inline' id='b_delete_".$j."'>&nbsp;</a></div></TD>\n";
 				//$nb_TD = count($dico);
 				$i_TD++;	
-				$html .= "\t\t<TD class='ligne-paire inc_number' id='ligne-paire_0_1'>1</TD>\n";
+				$html .= "\t\t<TD class='ligne-paire inc_number' id='ligne-paire_".$j."_1'>".($j+1)."</TD>\n";
 						
 				//Ajout HEBIE pour affichage du bouton de modification pour chaque ligne de la grille
 				if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHERS_MANAGEMENT'] && in_array(''.$id_theme.$id_systeme,$GLOBALS['PARAM']['TEACHERS_LIST_THEMES'])){
@@ -3841,11 +3841,18 @@ class frame_mobile{
 							break;
 					   
 						case 'label':
-							$html 	        .= "\t\t<TD ".$style_align_middle." class='".$classe_fond."' id='".$classe_fond.'_'.$j.'_'.$i_TD."' >";
-							$html 	        .= '$'.$element['CHAMP_PERE']."_".$j.""; 
-							$html 	        .= "</TD>\n";
-							$i_TD++;
-							( ($aff_total_vertic == true)  && ($j == 0) ) ? ( $last_tr_tot .= '<td></td>' ) : ( $last_tr_tot .= '' ) ;
+							// Session 46 : colonne ordre ($_j) -> input hidden sur mobile
+							// CHAMP_PERE vide = colonne dimension_ligne auto-geree
+							if (trim($element['CHAMP_PERE']) === '') {
+								// Colonne ordre : hidden, valeur = index ligne (0-base)
+								$html .= "\t\t<input type='hidden' name='_".$j."' id='_".$j."' value='".$j."'>\n";
+							} else {
+								$html 	        .= "\t\t<TD ".$style_align_middle." class='".$classe_fond."' id='".$classe_fond.'_'.$j.'_'.$i_TD."' >";
+								$html 	        .= '$'.$element['CHAMP_PERE']."_".$j.""; 
+								$html 	        .= "</TD>\n";
+								$i_TD++;
+								( ($aff_total_vertic == true)  && ($j == 0) ) ? ( $last_tr_tot .= '<td></td>' ) : ( $last_tr_tot .= '' ) ;
+							}
 							break;
 							
 						case 'hidden_field':
@@ -7782,7 +7789,7 @@ class frame_mobile{
 		// Les Locaux par exemple
 				$affiche_eff 	= 0;
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
@@ -8396,7 +8403,7 @@ if(!isset($classe_fond)) {
 		// Les Locaux par exemple
 				$affiche_eff = 0;
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
@@ -8979,7 +8986,7 @@ if(!isset($classe_fond)) {
 				//echo "<br>$requete<br>";					
 				// Les Locaux par exemple
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
