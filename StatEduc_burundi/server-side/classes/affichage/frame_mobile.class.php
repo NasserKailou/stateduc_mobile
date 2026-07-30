@@ -3185,7 +3185,7 @@ class frame_mobile{
 											
 			// Les Locaux par exemple
 			$NB_TOTAL_COL 	= 0;
-			$NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+			$NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
 			$dico        	= $this->tri_fils($this->dico);
 			$affiche_vertic_mes=0;
 			$style_align_middle = '';
@@ -7789,7 +7789,7 @@ class frame_mobile{
 		// Les Locaux par exemple
 				$affiche_eff 	= 0;
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
@@ -8403,7 +8403,7 @@ if(!isset($classe_fond)) {
 		// Les Locaux par exemple
 				$affiche_eff = 0;
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
@@ -8986,7 +8986,7 @@ if(!isset($classe_fond)) {
 				//echo "<br>$requete<br>";					
 				// Les Locaux par exemple
      		$NB_TOTAL_COL = 0;
-        $NB_LIGNE_ECRAN	= $this->dico[0][NB_LIGNES_FRAME]; //Nombre de lignes � afficher
+        $NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
         $dico        = $this->tri_fils($this->dico);
 				//echo "<pre>";
 				//print_r($dico );
