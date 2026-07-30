@@ -3760,6 +3760,11 @@ class frame_mobile{
 						}
 					}
 					else{
+						// Session 47: col_sep entre colonnes data_line (aligne avec header)
+						if ($element['TYPE_OBJET'] !== 'hidden_field' &&
+						    !($element['TYPE_OBJET'] === 'label' && trim($element['CHAMP_PERE']) === '')) {
+							$html .= "\t\t<TD class='col_sep' style='width: 1px; padding: 1px;'></TD>\n";
+						}
 						switch ($element['TYPE_OBJET']){
 							case 'liste_radio':
 							case 'booleen':
