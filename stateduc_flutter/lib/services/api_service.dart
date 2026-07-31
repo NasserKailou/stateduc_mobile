@@ -744,12 +744,21 @@ class ApiService {
       if (htmlUrl.startsWith('{')) {
         final parsed = json.decode(htmlUrl);
         if (parsed is Map) {
+          // Session 49 : vérifier se_status AVANT d'utiliser se_data
+          // Quand FRAME est vide en DB, serveur renvoie se_status=400, se_data=''
+          // Sans ce check, htmlUrl='', throw ApiException silencieux → formHtml null
+          final seStatus = parsed['se_status'];
+          if (seStatus != null && seStatus != 200) {
+            final seMessage = (parsed['se_message'] ?? 'Formulaire indisponible').toString();
+            debugPrint('[ApiService] getFormHtml step1 — se_status=$seStatus qst=$qstId : $seMessage');
+            throw ApiException('Formulaire indisponible (se_status=$seStatus) : $seMessage');
+          }
           htmlUrl = (parsed['se_data'] ?? '').toString().trim();
         }
       }
 
       if (htmlUrl.isEmpty) {
-        throw ApiException('URL formulaire vide');
+        throw ApiException('URL formulaire vide (se_data absent) pour qst=$qstId');
       }
 
       // If the returned URL is relative, make it absolute

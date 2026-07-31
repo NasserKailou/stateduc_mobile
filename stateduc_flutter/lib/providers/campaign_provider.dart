@@ -422,8 +422,10 @@ class CampaignProvider extends ChangeNotifier {
             final html =
                 await _api.getFormHtml(campaign.idCamp, q.idQst);
             await _db.insertFormHtml(campaign.idCamp, q.idQst, html);
-          } catch (_) {
+          } catch (e) {
             // Échec HTML non fatal — le formulaire sera indisponible hors ligne
+            // Session 49 : log explicite pour diagnostiquer les échecs silencieux
+            debugPrint('[CampaignProvider] getFormHtml FAILED qst=${q.idQst} (${q.libQst}) : $e');
           }
           stepOffset++;
 
