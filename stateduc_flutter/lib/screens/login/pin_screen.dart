@@ -6,9 +6,18 @@ import '../campaigns/campaign_list_screen.dart';
 /// PinScreen — entry point for all auth flows.
 ///
 /// Handles three modes determined by AuthState:
-///   1. firstTimeSetup  → PIN creation + optional security question
+///   1. firstTimeSetup  → PIN creation + 3 mandatory security questions
 ///   2. needsServerLogin → server URL + login/password form
-///   3. pinRequired      → PIN unlock pad + forgot-PIN via security question
+///   3. pinRequired      → PIN unlock pad
+///                          ↳ after ≥3 failed attempts + security configured:
+///                            "PIN oublié ?" → 3-question recovery flow
+///
+/// Session 50: 3-question security system
+///   - Setup: 3 mandatory answers (impossible to finalise without them)
+///   - Unlock: "PIN oublié ?" appears ONLY after 3 consecutive failed attempts
+///             AND if security answers are configured
+///   - Recovery: ≥2/3 correct answers → new PIN (with confirmation)
+///   - Migration: existing accounts without answers → prompt to configure
 ///
 /// Mirrors:
 ///   page_index.js  → init_connexion(), stmPageIndex.displayIndex()
@@ -25,20 +34,34 @@ class _PinScreenState extends State<PinScreen> {
   // ─── Controllers ─────────────────────────────────────────────────────────
   final _pinController = TextEditingController();
   final _confirmPinController = TextEditingController();
-  final _secQController = TextEditingController();
-  final _secAController = TextEditingController();
+
+  // Security answers for setup (3 questions)
+  final _secA1Controller = TextEditingController();
+  final _secA2Controller = TextEditingController();
+  final _secA3Controller = TextEditingController();
 
   final _serverUrlController = TextEditingController();
   final _loginController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _showSecurityQuestion = false;
-  bool _showForgotPin = false;
 
-  // For forgot-PIN flow
-  final _forgotAnswerController = TextEditingController();
+  // Recovery flow state
+  bool _showForgotPin = false;
+  // New-PIN confirmation in recovery
   final _newPinController = TextEditingController();
+  final _confirmNewPinController = TextEditingController();
+  // Recovery answers (3 questions)
+  final _recA1Controller = TextEditingController();
+  final _recA2Controller = TextEditingController();
+  final _recA3Controller = TextEditingController();
+
+  // Migration prompt: shown after server login if security answers not set
+  bool _showMigrationPrompt = false;
+  // Migration setup answers
+  final _migA1Controller = TextEditingController();
+  final _migA2Controller = TextEditingController();
+  final _migA3Controller = TextEditingController();
 
   @override
   void initState() {
@@ -61,13 +84,20 @@ class _PinScreenState extends State<PinScreen> {
   void dispose() {
     _pinController.dispose();
     _confirmPinController.dispose();
-    _secQController.dispose();
-    _secAController.dispose();
+    _secA1Controller.dispose();
+    _secA2Controller.dispose();
+    _secA3Controller.dispose();
     _serverUrlController.dispose();
     _loginController.dispose();
     _passwordController.dispose();
-    _forgotAnswerController.dispose();
     _newPinController.dispose();
+    _confirmNewPinController.dispose();
+    _recA1Controller.dispose();
+    _recA2Controller.dispose();
+    _recA3Controller.dispose();
+    _migA1Controller.dispose();
+    _migA2Controller.dispose();
+    _migA3Controller.dispose();
     super.dispose();
   }
 
@@ -82,6 +112,31 @@ class _PinScreenState extends State<PinScreen> {
           );
         }
         if (auth.isLoggedIn) {
+          // Check migration: logged in but no security answers configured
+          if (!auth.hasSecurityAnswers && !_showMigrationPrompt) {
+            // Schedule migration prompt after frame
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _showMigrationPrompt = true);
+            });
+          }
+          if (_showMigrationPrompt) {
+            return Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  child: Column(
+                    children: [
+                      _buildLogo(),
+                      const SizedBox(height: 32),
+                      _buildMigrationSetup(auth),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
           // Navigate to campaign list
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context).pushReplacement(
@@ -217,9 +272,10 @@ class _PinScreenState extends State<PinScreen> {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SETUP PIN (first time)
+  // SETUP PIN (first time) — 3 mandatory security questions
   // ═══════════════════════════════════════════════════════════════════════════
   Widget _buildSetupPin(AuthProvider auth) {
+    final questions = auth.securityQuestions;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -255,36 +311,68 @@ class _PinScreenState extends State<PinScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Checkbox(
-                  value: _showSecurityQuestion,
-                  onChanged: (v) => setState(() => _showSecurityQuestion = v!),
+            const SizedBox(height: 20),
+            // ── 3 mandatory security questions ───────────────────────────
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primaryContainer
+                    .withOpacity(0.3),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
                 ),
-                const Expanded(child: Text('Ajouter une question de sécurité')),
-              ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.security,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Questions de sécurité (obligatoires)',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Ces réponses vous permettront de récupérer votre PIN si vous l\'oubliez.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant),
+                  ),
+                ],
+              ),
             ),
-            if (_showSecurityQuestion) ...[
-              const SizedBox(height: 8),
-              TextField(
-                controller: _secQController,
-                decoration: const InputDecoration(
-                  labelText: 'Question de sécurité',
-                  prefixIcon: Icon(Icons.help_outline),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _secAController,
-                decoration: const InputDecoration(
-                  labelText: 'Réponse',
-                  prefixIcon: Icon(Icons.question_answer_outlined),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
+            const SizedBox(height: 16),
+            _buildSecurityAnswerField(
+              question: questions[0],
+              controller: _secA1Controller,
+              number: 1,
+            ),
+            const SizedBox(height: 12),
+            _buildSecurityAnswerField(
+              question: questions[1],
+              controller: _secA2Controller,
+              number: 2,
+            ),
+            const SizedBox(height: 12),
+            _buildSecurityAnswerField(
+              question: questions[2],
+              controller: _secA3Controller,
+              number: 3,
+            ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: auth.isLoading ? null : () => _doSetupPin(auth),
@@ -302,6 +390,37 @@ class _PinScreenState extends State<PinScreen> {
     );
   }
 
+  /// Helper: a labeled text field for a security question answer.
+  Widget _buildSecurityAnswerField({
+    required String question,
+    required TextEditingController controller,
+    required int number,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Q$number : $question',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          textCapitalization: TextCapitalization.none,
+          decoration: InputDecoration(
+            labelText: 'Votre réponse',
+            hintText: 'Réponse (insensible à la casse)',
+            prefixIcon: const Icon(Icons.question_answer_outlined),
+            border: const OutlineInputBorder(),
+            helperText: 'Espaces de début/fin ignorés automatiquement',
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _doSetupPin(AuthProvider auth) async {
     final pin = _pinController.text.trim();
     final confirm = _confirmPinController.text.trim();
@@ -315,12 +434,19 @@ class _PinScreenState extends State<PinScreen> {
           const SnackBar(content: Text('Les PIN ne correspondent pas')));
       return;
     }
+    // Validate all 3 security answers are filled
+    final a1 = _secA1Controller.text.trim();
+    final a2 = _secA2Controller.text.trim();
+    final a3 = _secA3Controller.text.trim();
+    if (a1.isEmpty || a2.isEmpty || a3.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Les 3 réponses aux questions de sécurité sont obligatoires')));
+      return;
+    }
     await auth.setupPin(
       pin: pin,
-      securityQuestion:
-          _showSecurityQuestion ? _secQController.text.trim() : null,
-      securityAnswer:
-          _showSecurityQuestion ? _secAController.text.trim() : null,
+      securityAnswers: [a1, a2, a3],
     );
   }
 
@@ -434,17 +560,30 @@ class _PinScreenState extends State<PinScreen> {
               onPinComplete: (pin) async {
                 final ok = await auth.unlockWithPin(pin);
                 if (!ok && mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('PIN incorrect')));
+                  final attempts = auth.failedAttempts;
+                  final remaining = 3 - attempts;
+                  String msg = 'PIN incorrect';
+                  if (attempts < 3) {
+                    msg = 'PIN incorrect ($remaining tentative${remaining > 1 ? 's' : ''} avant récupération)';
+                  } else {
+                    msg = 'PIN incorrect — Utilisez "PIN oublié ?" pour récupérer l\'accès';
+                  }
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(msg)));
                 }
               },
             ),
             const SizedBox(height: 12),
-            // Forgot PIN
-            if (auth.securityQuestion != null)
-              TextButton(
+            // "PIN oublié ?" — visible ONLY after ≥3 failed attempts
+            // AND security answers are configured
+            if (auth.canShowForgotPin)
+              TextButton.icon(
                 onPressed: () => setState(() => _showForgotPin = true),
-                child: const Text('PIN oublié ?'),
+                icon: const Icon(Icons.help_outline, size: 18),
+                label: const Text('PIN oublié ?'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
               ),
             // Server re-login link
             TextButton.icon(
@@ -459,50 +598,98 @@ class _PinScreenState extends State<PinScreen> {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FORGOT PIN
+  // FORGOT PIN — 3-question recovery screen
   // ═══════════════════════════════════════════════════════════════════════════
   Widget _buildForgotPin(AuthProvider auth) {
+    final questions = auth.securityQuestions;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Réinitialiser le PIN',
+            Text('Récupération du PIN',
                 style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
+            Text(
+              'Répondez à au moins 2 questions sur 3 pour réinitialiser votre PIN.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            // Question 1
+            _buildSecurityAnswerField(
+              question: questions[0],
+              controller: _recA1Controller,
+              number: 1,
+            ),
             const SizedBox(height: 12),
-            if (auth.securityQuestion != null) ...[
-              Text('Question : ${auth.securityQuestion}',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _forgotAnswerController,
-                decoration: const InputDecoration(
-                  labelText: 'Votre réponse',
-                  prefixIcon: Icon(Icons.question_answer_outlined),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
+            // Question 2
+            _buildSecurityAnswerField(
+              question: questions[1],
+              controller: _recA2Controller,
+              number: 2,
+            ),
             const SizedBox(height: 12),
+            // Question 3
+            _buildSecurityAnswerField(
+              question: questions[2],
+              controller: _recA3Controller,
+              number: 3,
+            ),
+            const SizedBox(height: 20),
+            // New PIN fields
+            const Divider(),
+            const SizedBox(height: 12),
+            Text('Nouveau code PIN',
+                style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
             TextField(
               controller: _newPinController,
               keyboardType: TextInputType.number,
               obscureText: true,
               maxLength: 8,
               decoration: const InputDecoration(
-                labelText: 'Nouveau PIN',
+                labelText: 'Nouveau PIN (4 à 8 chiffres)',
                 prefixIcon: Icon(Icons.lock_outline),
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _doResetPin(auth),
-              child: const Text('Réinitialiser'),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _confirmNewPinController,
+              keyboardType: TextInputType.number,
+              obscureText: true,
+              maxLength: 8,
+              decoration: const InputDecoration(
+                labelText: 'Confirmer le nouveau PIN',
+                prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: auth.isLoading ? null : () => _doResetPinThreeQ(auth),
+              icon: auth.isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.lock_reset),
+              label: const Text('Réinitialiser le PIN'),
+            ),
+            const SizedBox(height: 8),
             TextButton(
-              onPressed: () => setState(() => _showForgotPin = false),
+              onPressed: () {
+                setState(() => _showForgotPin = false);
+                auth.clearError();
+                _recA1Controller.clear();
+                _recA2Controller.clear();
+                _recA3Controller.clear();
+                _newPinController.clear();
+                _confirmNewPinController.clear();
+              },
               child: const Text('Annuler'),
             ),
           ],
@@ -511,15 +698,151 @@ class _PinScreenState extends State<PinScreen> {
     );
   }
 
-  Future<void> _doResetPin(AuthProvider auth) async {
-    final ok = await auth.resetPinWithSecurityAnswer(
-      _forgotAnswerController.text,
-      _newPinController.text.trim(),
-    );
+  Future<void> _doResetPinThreeQ(AuthProvider auth) async {
+    final newPin = _newPinController.text.trim();
+    final confirmPin = _confirmNewPinController.text.trim();
+
+    if (newPin.length < 4) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Le nouveau PIN doit avoir au moins 4 chiffres')));
+      return;
+    }
+    if (newPin != confirmPin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Les PIN ne correspondent pas')));
+      return;
+    }
+
+    final answers = [
+      _recA1Controller.text,
+      _recA2Controller.text,
+      _recA3Controller.text,
+    ];
+
+    final ok = await auth.resetPinWithThreeAnswers(answers, newPin);
     if (ok && mounted) {
       setState(() => _showForgotPin = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('PIN réinitialisé avec succès')));
+      _recA1Controller.clear();
+      _recA2Controller.clear();
+      _recA3Controller.clear();
+      _newPinController.clear();
+      _confirmNewPinController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('PIN réinitialisé avec succès'),
+          backgroundColor: Colors.green));
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MIGRATION — existing accounts without security answers
+  // Shown once after first successful login when no answers are configured.
+  // ═══════════════════════════════════════════════════════════════════════════
+  Widget _buildMigrationSetup(AuthProvider auth) {
+    final questions = auth.securityQuestions;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.security_update_good,
+                    color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('Configuration sécurité',
+                      style: Theme.of(context).textTheme.titleLarge),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .tertiaryContainer
+                    .withOpacity(0.4),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'Pour renforcer la sécurité de votre compte, veuillez configurer '
+                'les 3 questions de sécurité. Elles vous permettront de récupérer '
+                'votre PIN en cas d\'oubli.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildSecurityAnswerField(
+              question: questions[0],
+              controller: _migA1Controller,
+              number: 1,
+            ),
+            const SizedBox(height: 12),
+            _buildSecurityAnswerField(
+              question: questions[1],
+              controller: _migA2Controller,
+              number: 2,
+            ),
+            const SizedBox(height: 12),
+            _buildSecurityAnswerField(
+              question: questions[2],
+              controller: _migA3Controller,
+              number: 3,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: auth.isLoading ? null : () => _doMigrationSetup(auth),
+              icon: auth.isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.save_outlined),
+              label: const Text('Enregistrer et continuer'),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () {
+                // User skips — dismiss and go to campaigns
+                setState(() => _showMigrationPrompt = false);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const CampaignListScreen()),
+                );
+              },
+              child: const Text('Ignorer pour l\'instant'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _doMigrationSetup(AuthProvider auth) async {
+    final a1 = _migA1Controller.text.trim();
+    final a2 = _migA2Controller.text.trim();
+    final a3 = _migA3Controller.text.trim();
+    if (a1.isEmpty || a2.isEmpty || a3.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Les 3 réponses sont obligatoires')));
+      return;
+    }
+    final ok = await auth.updateThreeSecurityAnswers([a1, a2, a3]);
+    if (ok && mounted) {
+      _migA1Controller.clear();
+      _migA2Controller.clear();
+      _migA3Controller.clear();
+      setState(() => _showMigrationPrompt = false);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Questions de sécurité enregistrées'),
+          backgroundColor: Colors.green));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const CampaignListScreen()),
+      );
     }
   }
 }

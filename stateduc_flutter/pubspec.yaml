@@ -24,6 +24,9 @@ dependencies:
   # Stockage sécurisé PIN + credentials (Keystore/Keychain)
   flutter_secure_storage: ^9.2.2
 
+  # Hachage SHA-256 pour les réponses aux questions de sécurité
+  crypto: ^3.0.3
+
   # Préférences simples (cache settings non-sensibles)
   shared_preferences: ^2.3.2
 

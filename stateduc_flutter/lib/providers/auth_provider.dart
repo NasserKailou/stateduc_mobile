@@ -42,6 +42,10 @@ class AuthProvider extends ChangeNotifier {
   String? _storedLogin;
   String? _securityQuestion;
 
+  // Session 50 additions
+  int _failedAttempts = 0;
+  bool _hasSecurityAnswers = false;
+
   AuthState get state => _state;
   User? get user => _user;
   String? get error => _error;
@@ -50,6 +54,19 @@ class AuthProvider extends ChangeNotifier {
   String? get serverUrl => _serverUrl;
   String? get storedLogin => _storedLogin;
   String? get securityQuestion => _securityQuestion;
+
+  /// Number of consecutive failed PIN attempts for the current account.
+  int get failedAttempts => _failedAttempts;
+
+  /// True if the 3-question security answers have been configured.
+  bool get hasSecurityAnswers => _hasSecurityAnswers;
+
+  /// True if the "PIN oublié ?" button should be visible (≥3 failed attempts
+  /// AND security answers are configured).
+  bool get canShowForgotPin => _failedAttempts >= 3 && _hasSecurityAnswers;
+
+  /// The 3 fixed security question strings (read-only, defined in AuthService).
+  List<String> get securityQuestions => AuthService.kSecurityQuestions;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INITIALIZATION — called from main.dart after Provider tree is ready
@@ -62,6 +79,8 @@ class AuthProvider extends ChangeNotifier {
       _serverUrl = await _auth.getServerUrl();
       _storedLogin = await _auth.getStoredLogin();
       _securityQuestion = await _auth.getSecurityQuestion();
+      _failedAttempts = await _auth.getFailedAttempts();
+      _hasSecurityAnswers = await _auth.hasThreeSecurityAnswers();
 
       final hasPin = await _auth.hasPinConfigured();
       if (!hasPin) {
@@ -87,20 +106,32 @@ class AuthProvider extends ChangeNotifier {
   // FIRST-TIME SETUP
   // ═══════════════════════════════════════════════════════════════════════════
 
-  /// Step 1 of first-time setup: set PIN + optional security question.
+  /// Step 1 of first-time setup: set PIN + 3 mandatory security answers.
   Future<bool> setupPin({
     required String pin,
+    // Legacy optional params — kept for backward compatibility
     String? securityQuestion,
     String? securityAnswer,
+    // New: 3 mandatory answers
+    List<String>? securityAnswers,
   }) async {
     _clearError();
     _setLoading(true);
     try {
       await _auth.setPin(pin);
-      if (securityQuestion != null && securityAnswer != null) {
+
+      // Handle 3-question setup (new path — mandatory)
+      if (securityAnswers != null && securityAnswers.length == 3) {
+        await _auth.setThreeSecurityAnswers(securityAnswers);
+        _hasSecurityAnswers = true;
+        // Also update legacy field for backward compat
+        _securityQuestion = AuthService.kSecurityQuestions[0];
+      } else if (securityQuestion != null && securityAnswer != null) {
+        // Legacy optional path — still supported for backward compat
         await _auth.setSecurityQuestion(securityQuestion, securityAnswer);
         _securityQuestion = securityQuestion;
       }
+
       _state = AuthState.needsServerLogin;
       notifyListeners();
       return true;
@@ -119,16 +150,23 @@ class AuthProvider extends ChangeNotifier {
 
   /// Verifies PIN locally. On success, restores API session and transitions
   /// to loggedIn (offline) or stays at pinRequired if offline restore fails.
+  /// Increments [failedAttempts] on failure, resets on success.
   Future<bool> unlockWithPin(String pin) async {
     _clearError();
     _setLoading(true);
     try {
       final ok = await _auth.verifyPin(pin);
       if (!ok) {
+        // Increment failed attempts counter
+        _failedAttempts = await _auth.incrementFailedAttempts();
         _error = 'PIN incorrect';
         notifyListeners();
         return false;
       }
+      // Successful unlock — reset counter
+      await _auth.resetFailedAttempts();
+      _failedAttempts = 0;
+
       // Restore the User object from secure storage
       final storedUser = await _auth.getStoredUser();
       if (storedUser != null) {
@@ -172,6 +210,8 @@ class AuthProvider extends ChangeNotifier {
       _user = user;
       _serverUrl = serverUrl;
       _storedLogin = login;
+      // Refresh security answers state after login
+      _hasSecurityAnswers = await _auth.hasThreeSecurityAnswers();
       _state = AuthState.loggedIn;
       notifyListeners();
       return true;
@@ -240,7 +280,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Updates the security question and answer.
+  /// Updates the legacy security question and answer (Settings screen).
+  /// Also kept for backward compatibility with settings_screen.dart.
   Future<bool> updateSecurityQuestion(
       String question, String answer) async {
     _clearError();
@@ -256,12 +297,46 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Resets PIN using security answer.
+  /// Updates the 3 security answers (Settings security tab).
+  Future<bool> updateThreeSecurityAnswers(List<String> answers) async {
+    assert(answers.length == 3);
+    _clearError();
+    try {
+      await _auth.setThreeSecurityAnswers(answers);
+      _hasSecurityAnswers = true;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// [LEGACY] Resets PIN using single security answer.
   Future<bool> resetPinWithSecurityAnswer(
       String answer, String newPin) async {
     _clearError();
     try {
       await _auth.resetPinWithSecurityAnswer(answer, newPin);
+      notifyListeners();
+      return true;
+    } on AuthException catch (e) {
+      _error = e.message;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Resets PIN using 3 security answers (≥2/3 required).
+  /// On success: PIN updated + failed attempts reset.
+  Future<bool> resetPinWithThreeAnswers(
+      List<String> answers, String newPin) async {
+    assert(answers.length == 3);
+    _clearError();
+    try {
+      await _auth.resetPinWithThreeAnswers(answers, newPin);
+      _failedAttempts = 0;
       notifyListeners();
       return true;
     } on AuthException catch (e) {

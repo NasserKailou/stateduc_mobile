@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../login/pin_screen.dart';
 
-/// SettingsScreen — Server URL config, PIN change, security question.
+/// SettingsScreen — Server URL config, PIN change, 3-question security setup.
+///
+/// Session 50: Security tab now manages 3 fixed mandatory questions.
 ///
 /// Mirrors:
 ///   page_settings.js → PIN change (change_code), security question change
@@ -26,9 +28,10 @@ class _SettingsScreenState extends State<SettingsScreen>
   final _newPinController = TextEditingController();
   final _confirmPinController = TextEditingController();
 
-  // Security question
-  final _secQController = TextEditingController();
-  final _secAController = TextEditingController();
+  // Security answers for 3-question system (Session 50)
+  final _secA1Controller = TextEditingController();
+  final _secA2Controller = TextEditingController();
+  final _secA3Controller = TextEditingController();
 
   bool _obscureOldPin = true;
   bool _obscureNewPin = true;
@@ -42,9 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       if (auth.serverUrl != null) {
         _serverUrlController.text = auth.serverUrl!;
       }
-      if (auth.securityQuestion != null) {
-        _secQController.text = auth.securityQuestion!;
-      }
+      // Security answers are hashed — not pre-filled (not recoverable for display)
     });
   }
 
@@ -55,8 +56,9 @@ class _SettingsScreenState extends State<SettingsScreen>
     _oldPinController.dispose();
     _newPinController.dispose();
     _confirmPinController.dispose();
-    _secQController.dispose();
-    _secAController.dispose();
+    _secA1Controller.dispose();
+    _secA2Controller.dispose();
+    _secA3Controller.dispose();
     super.dispose();
   }
 
@@ -364,75 +366,134 @@ class _SettingsScreenState extends State<SettingsScreen>
     }
   }
 
-  // ─── Security question tab ──────────────────────────────────────────────────
+  // ─── Security tab — 3 fixed questions (Session 50) ─────────────────────────
   Widget _buildSecurityTab(AuthProvider auth) {
+    final questions = auth.securityQuestions;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Question de sécurité',
+          Text('Questions de sécurité',
               style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          const Text(
-              'La question de sécurité permet de réinitialiser votre PIN si vous l\'oubliez.'),
+          const SizedBox(height: 6),
+          Text(
+            'Ces réponses permettent de récupérer votre PIN en cas d\'oubli '
+            '(au moins 2 correctes sur 3 requises). '
+            'Stockées de façon sécurisée (hachées).',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 6),
+          // Status indicator
+          Row(
+            children: [
+              Icon(
+                auth.hasSecurityAnswers
+                    ? Icons.check_circle_outline
+                    : Icons.warning_amber_outlined,
+                size: 16,
+                color: auth.hasSecurityAnswers
+                    ? Colors.green
+                    : Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                auth.hasSecurityAnswers
+                    ? 'Questions configurées'
+                    : 'Questions non configurées',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: auth.hasSecurityAnswers
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.error,
+                    ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _secQController,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-            decoration: InputDecoration(
-              labelText: 'Question',
-              hintText: 'Ex: Nom de votre école primaire ?',
-              prefixIcon: const Icon(Icons.help_outline),
-              border: const OutlineInputBorder(),
-              filled: true,
-              fillColor:
-                  Theme.of(context).colorScheme.surfaceContainerLowest,
-            ),
+          _buildSettingsAnswerField(
+            question: questions[0],
+            controller: _secA1Controller,
+            number: 1,
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: _secAController,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-            decoration: InputDecoration(
-              labelText: 'Réponse',
-              prefixIcon: const Icon(Icons.question_answer_outlined),
-              border: const OutlineInputBorder(),
-              filled: true,
-              fillColor:
-                  Theme.of(context).colorScheme.surfaceContainerLowest,
-            ),
+          _buildSettingsAnswerField(
+            question: questions[1],
+            controller: _secA2Controller,
+            number: 2,
+          ),
+          const SizedBox(height: 12),
+          _buildSettingsAnswerField(
+            question: questions[2],
+            controller: _secA3Controller,
+            number: 3,
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: () => _doSaveSecurityQ(auth),
-            icon: const Icon(Icons.save_outlined),
-            label: const Text('Enregistrer'),
+            onPressed:
+                auth.isLoading ? null : () => _doSaveThreeSecurityQ(auth),
+            icon: auth.isLoading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.save_outlined),
+            label: const Text('Enregistrer les réponses'),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _doSaveSecurityQ(AuthProvider auth) async {
-    final q = _secQController.text.trim();
-    final a = _secAController.text.trim();
-    if (q.isEmpty || a.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Question et réponse obligatoires')));
+  Widget _buildSettingsAnswerField({
+    required String question,
+    required TextEditingController controller,
+    required int number,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Q$number : $question',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          textCapitalization: TextCapitalization.none,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+          decoration: InputDecoration(
+            labelText: 'Nouvelle réponse',
+            hintText: 'Saisissez pour modifier',
+            prefixIcon: const Icon(Icons.question_answer_outlined),
+            border: const OutlineInputBorder(),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _doSaveThreeSecurityQ(AuthProvider auth) async {
+    final a1 = _secA1Controller.text.trim();
+    final a2 = _secA2Controller.text.trim();
+    final a3 = _secA3Controller.text.trim();
+    if (a1.isEmpty || a2.isEmpty || a3.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Les 3 réponses sont obligatoires')));
       return;
     }
-    await auth.updateSecurityQuestion(q, a);
-    if (mounted) {
-      _secAController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Question de sécurité mise à jour')));
+    final ok = await auth.updateThreeSecurityAnswers([a1, a2, a3]);
+    if (ok && mounted) {
+      _secA1Controller.clear();
+      _secA2Controller.clear();
+      _secA3Controller.clear();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Questions de sécurité mises à jour')));
     }
   }
 }
