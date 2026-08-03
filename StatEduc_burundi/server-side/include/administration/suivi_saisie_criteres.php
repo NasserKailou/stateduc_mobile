@@ -84,10 +84,10 @@
 
 				$depht	=	$arbre->get_depht_regroup($code_regroup);
 				
-				//cr�ation de la liste des coderegs enfants
+				//cr�ation de la liste des coderegs enfants
 				$list_code_reg = $arbre->getchildsid($depht, $code_regroup, $_SESSION['chaine']);
 
-				// On fabrique le "where" de la requ�te sur ETABLISSEMENT_REGROUPEMENT
+				// On fabrique le "where" de la requ�te sur ETABLISSEMENT_REGROUPEMENT
 				$where = get_criteres_where($GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'], $GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'], $list_code_reg);
 				
 				$get_code_admin = '';
@@ -118,7 +118,8 @@
 				}	
 			}
 			foreach($tab_users_checked as $code_user){
-				$requete = 'SELECT CODE_USER, NOM_USER FROM ADMIN_USERS WHERE CODE_USER='.$code_user.';';  
+				// Session 51 : récupère aussi CODE_GROUPE pour le routage mobile dans suivi_saisie_list_etabs.php
+				$requete = 'SELECT CODE_USER, NOM_USER, CODE_GROUPE FROM ADMIN_USERS WHERE CODE_USER='.(int)$code_user.';';  
 				$user = $GLOBALS['conn_dico']->GetRow($requete);
 				if(is_array($user)){
 					$tab_users_run[$code_user] = $user;
@@ -468,7 +469,21 @@
 				<table  style="border:none" cellspacing="0"  cellpadding="0"  width="100%">
                   <tr>
                     <?php 
-						$requete='SELECT CODE_USER, NOM_USER AS LIB_USER FROM ADMIN_USERS WHERE CODE_GROUPE<>4;';            
+						// Session 51 : inclure les agents mobiles (CODE_GROUPE=4) avec distinction visuelle
+						// Les agents classiques (CODE_GROUPE<>4) sont affichés en premier, triés par NOM_USER
+						// Les agents mobiles (CODE_GROUPE=4) suivent avec le label "[Mobile]"
+						$requete='SELECT CODE_USER,
+									CONCAT(NOM_USER, \' [Classique]\') AS LIB_USER,
+									CODE_GROUPE
+								FROM ADMIN_USERS
+								WHERE CODE_GROUPE<>4
+								UNION ALL
+								SELECT CODE_USER,
+									CONCAT(NOM_USER, \' [Mobile]\') AS LIB_USER,
+									CODE_GROUPE
+								FROM ADMIN_USERS
+								WHERE CODE_GROUPE=4
+								ORDER BY CODE_GROUPE, LIB_USER;';
 						$tab_users 	= $GLOBALS['conn_dico']->GetAll($requete);
 					?>
                     

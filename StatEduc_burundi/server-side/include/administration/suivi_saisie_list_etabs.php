@@ -71,6 +71,49 @@
 				}
 			}*/
 		}
+		// === Session 51 : Bloc additionnel pour les agents de collecte mobile (CODE_GROUPE=4) ===
+		// Les agents classiques ont leurs etablissements dans $tab_etabs_users via DICO_TRACE (ci-dessus).
+		// Les agents mobiles n'ecrivent PAS dans DICO_TRACE mais dans DATA_SAVING_LOGS.
+		// Ce bloc interroge DATA_SAVING_LOGS pour chaque agent mobile selectionne,
+		// puis injecte leurs etablissements actifs dans $tab_etabs_users â€” meme structure.
+		foreach($tab_users_run as $_mobile_user){
+			if(!isset($_mobile_user['CODE_GROUPE']) || (int)$_mobile_user['CODE_GROUPE'] !== 4) continue;
+			// Agent mobile : requete sur DATA_SAVING_LOGS
+			// CODE_USER dans DATA_SAVING_LOGS = NOM_USER (login string) d'ADMIN_USERS
+			// On filtre sur STATUT_OPERATION='OKSAVE' pour ne compter que les soumissions reussies
+			if(isset($GLOBALS['PARAM']['FILTRE']) && $GLOBALS['PARAM']['FILTRE']==true){
+				$_req_mobile_etabs = "SELECT DISTINCT DATA_SAVING_LOGS.CODE_ECOLE AS CODE_ETABLISSEMENT
+									FROM DATA_SAVING_LOGS
+									WHERE DATA_SAVING_LOGS.CODE_USER='".$_mobile_user['NOM_USER']."'
+									AND DATA_SAVING_LOGS.CODE_SECTEUR=".$_SESSION['secteur']."
+									AND DATA_SAVING_LOGS.CODE_ANNEE=".$_SESSION['annee']."
+									AND DATA_SAVING_LOGS.CODE_PERIODE=".$_SESSION['filtre']."
+									AND DATA_SAVING_LOGS.STATUT_OPERATION='OKSAVE';";
+			}else{
+				$_req_mobile_etabs = "SELECT DISTINCT DATA_SAVING_LOGS.CODE_ECOLE AS CODE_ETABLISSEMENT
+									FROM DATA_SAVING_LOGS
+									WHERE DATA_SAVING_LOGS.CODE_USER='".$_mobile_user['NOM_USER']."'
+									AND DATA_SAVING_LOGS.CODE_SECTEUR=".$_SESSION['secteur']."
+									AND DATA_SAVING_LOGS.CODE_ANNEE=".$_SESSION['annee']."
+									AND DATA_SAVING_LOGS.STATUT_OPERATION='OKSAVE';";
+			}
+			$_mobile_etabs_actions = $GLOBALS['conn_dico']->GetAll($_req_mobile_etabs);
+			if(is_array($_mobile_etabs_actions)){
+				foreach($_mobile_etabs_actions as $_mobile_etab){
+					$_code_etab_mob = $_mobile_etab['CODE_ETABLISSEMENT'];
+					// Filtrer : conserver uniquement les etablissements du perimetre selectionne
+					if(is_array($_SESSION['suivi_saisie']['tab_etabs_run']) &&
+					   in_array($_code_etab_mob, $_SESSION['suivi_saisie']['tab_etabs_run'])){
+						if(!isset($tab_etabs_users[$_mobile_user['CODE_USER']]))
+							$tab_etabs_users[$_mobile_user['CODE_USER']] = array();
+						if(!in_array($_code_etab_mob, $tab_etabs_users[$_mobile_user['CODE_USER']])){
+							$tab_etabs_users[$_mobile_user['CODE_USER']][] = $_code_etab_mob;
+						}
+					}
+				}
+			}
+		}
+		// === Fin bloc agents mobiles ===
 		foreach($tab_users_run as $user){
 			
 			$tab_etabs_user_run = array();
@@ -131,7 +174,7 @@
 					if( exist_champ_in_table($GLOBALS['PARAM']['CODE_ADMINISTRATIF'], $GLOBALS['PARAM']['ETABLISSEMENT']) ){
 						$get_code_admin	= ' '.$GLOBALS['PARAM']['ETABLISSEMENT'].'.'.$GLOBALS['PARAM']['CODE_ADMINISTRATIF'].' as code_admin, ' ;
 					}
-					//Recherche le code_regroupement à partir du code_etab
+					//Recherche le code_regroupement ï¿½ partir du code_etab
 					$requete    = 'SELECT '.$GLOBALS['PARAM']['ETABLISSEMENT'].'.'.$GLOBALS['PARAM']['NOM_ETABLISSEMENT'].' as nom_etab,'.$get_code_admin
 											.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' as code_regroup 
 								   FROM '.$GLOBALS['PARAM']['ETABLISSEMENT'].', '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'
@@ -143,7 +186,7 @@
 					$nom_etab = $regroup_etab[0]['NOM_ETAB'];
 					if($get_code_admin<>'') $code_admin = $regroup_etab[0]['CODE_ADMIN']; else $code_admin = '';
 				
-					//Recherche de la chaine à partir du code_regroupement et du secteur
+					//Recherche de la chaine ï¿½ partir du code_regroupement et du secteur
 					$requete ='SELECT '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'
 									FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['HIERARCHIE'].','.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' 
 									WHERE '.$GLOBALS['PARAM']['REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'
