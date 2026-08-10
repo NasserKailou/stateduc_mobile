@@ -1,11 +1,22 @@
 /// School (Établissement) model — unified field names matching:
 ///   - JS source:  StmEtab(id, code, nom, status, idRgp); idregroup (lowercase) from server
-///   - DB schema:  schools (id_camp, id_etab, lib_etab, code_etab, id_status, id_regroup)
+///   - DB schema:  schools (id_camp, id_etab, lib_etab, code_etab, id_status, id_regroup,
+///                           lib_localisation)
 ///   - Server JSON: { id, code, nom, status, idregroup }
 ///
 /// From etabs.js:
 ///   stmEtabs.addEtab(value) → new StmEtab(value.id, value.code, value.nom, value.status, value.idregroup)
 ///   NOTE: server uses lowercase "idregroup"!
+///
+/// SESSION 53 FIX — lib_localisation :
+///   Chaîne hiérarchique pré-calculée à la synchronisation depuis le graphe de
+///   regroupements (regroups.id_parent_regp), stockée en DB.
+///   Exemple : "BUHUMUZA / BUTAGANZWA / BISINDE"
+///   Construit par DatabaseService.computeAndStoreLocalisations() juste après
+///   l'insertion des écoles et des regroupements.
+///
+/// - libHierarchy  : reçu du serveur si présent (champ optionnel etabs_camp)
+/// - libLocalisation : calculé localement à partir du graphe regroups (toujours fiable)
 
 class School {
   final String idEtab;     // server: id,        DB: id_etab
@@ -13,8 +24,9 @@ class School {
   final String libEtab;    // server: nom,        DB: lib_etab
   final String? idStatus;  // server: status,     DB: id_status
   final String? idRegroup; // server: idregroup,  DB: id_regroup (LOWERCASE from server!)
-  final String? libStatus;    // resolved status label e.g. "Public"
-  final String? libHierarchy; // geographic hierarchy e.g. "AGADEZ / ADERBISANAT"
+  final String? libStatus;       // resolved status label e.g. "Public"
+  final String? libHierarchy;    // geographic hierarchy from server (optional)
+  final String? libLocalisation; // SESSION 53: pre-computed hierarchy from regroups graph
 
   School({
     required this.idEtab,
@@ -24,6 +36,7 @@ class School {
     this.idRegroup,
     this.libStatus,
     this.libHierarchy,
+    this.libLocalisation,
   });
 
   /// Parses server JSON from /user_camp.php/etabs_camp/{userId}/{campId}/1
@@ -37,30 +50,45 @@ class School {
       idRegroup:    json['idregroup']?.toString() ?? json['id_regroup']?.toString(),
       libStatus:    json['lib_status']?.toString() ?? json['statut']?.toString(),
       libHierarchy: json['lib_hierarchy']?.toString() ?? json['hierarchy']?.toString(),
+      // libLocalisation is never from the server — computed locally
     );
   }
 
-  /// Returns a copy with libStatus and libHierarchy resolved.
-  School copyWith({String? libStatus, String? libHierarchy}) {
+  /// Returns a copy with updated fields.
+  School copyWith({
+    String? libStatus,
+    String? libHierarchy,
+    String? libLocalisation,
+  }) {
     return School(
-      idEtab:       idEtab,
-      codeEtab:     codeEtab,
-      libEtab:      libEtab,
-      idStatus:     idStatus,
-      idRegroup:    idRegroup,
-      libStatus:    libStatus ?? this.libStatus,
-      libHierarchy: libHierarchy ?? this.libHierarchy,
+      idEtab:          idEtab,
+      codeEtab:        codeEtab,
+      libEtab:         libEtab,
+      idStatus:        idStatus,
+      idRegroup:       idRegroup,
+      libStatus:       libStatus       ?? this.libStatus,
+      libHierarchy:    libHierarchy    ?? this.libHierarchy,
+      libLocalisation: libLocalisation ?? this.libLocalisation,
     );
   }
+
+  /// Best available localisation string.
+  /// Priority: libLocalisation (pre-computed graph) → libHierarchy (server) → null
+  String? get bestLocalisation => libLocalisation?.isNotEmpty == true
+      ? libLocalisation
+      : libHierarchy?.isNotEmpty == true
+          ? libHierarchy
+          : null;
 
   Map<String, dynamic> toJson() => {
-    'id_etab':     idEtab,
-    'code_etab':   codeEtab,
-    'lib_etab':    libEtab,
-    'id_status':   idStatus,
-    'id_regroup':  idRegroup,
-    'lib_status':  libStatus,
-    'lib_hierarchy': libHierarchy,
+    'id_etab':          idEtab,
+    'code_etab':        codeEtab,
+    'lib_etab':         libEtab,
+    'id_status':        idStatus,
+    'id_regroup':       idRegroup,
+    'lib_status':       libStatus,
+    'lib_hierarchy':    libHierarchy,
+    'lib_localisation': libLocalisation,
   };
 }
 

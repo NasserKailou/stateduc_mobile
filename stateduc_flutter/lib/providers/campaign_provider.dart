@@ -389,6 +389,14 @@ class CampaignProvider extends ChangeNotifier {
       final schools = await _api.getSchools(userId, campaign.idCamp);
       await _db.insertSchools(campaign.idCamp, schools);
 
+      // Étape 4b — Calcul des localisations hiérarchiques (SESSION 53 FIX)
+      // Pré-calcule lib_localisation pour chaque école en parcourant le graphe
+      // des regroupements (id_regroup → id_parent_regp → ... → racine).
+      // Doit être appelé APRÈS insertRegroups (Étape 1) ET insertSchools (Étape 4)
+      // car les deux tables sont nécessaires au calcul.
+      _setLoadStep(4, 'Calcul des localisations hiérarchiques…');
+      await _db.computeAndStoreLocalisations(campaign.idCamp);
+
       // Étape 5 — Localisations (utilise userId)
       _setLoadStep(5, 'Chargement des localisations…');
       final locs = await _api.getLocalisations(userId, campaign.idCamp);

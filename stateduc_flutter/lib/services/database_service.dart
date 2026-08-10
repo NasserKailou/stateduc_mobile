@@ -34,6 +34,7 @@ import '../models/user.dart';
 ///   v3 : ajout table coherence_rules (session 14 — contrôles offline)
 ///   v4 : ajout tables dico_regle_theme + dico_regle_theme_assoc (moteur générique)
 ///   v5 : ajout colonne sql_assoc dans dico_regle_theme_assoc (Session 52 Fix b)
+///   v6 : ajout colonne lib_localisation dans schools (Session 53 Fix localisation)
 ///
 /// TABLE CRITIQUE — coherence_rules :
 ///   Stocke les règles téléchargées depuis data_rules.php pour l'évaluation offline.
@@ -60,7 +61,7 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
@@ -100,6 +101,21 @@ class DatabaseService {
         );
       } catch (_) {
         // Column may already exist if DB was recreated from v5 schema
+      }
+    }
+    if (oldVersion < 6) {
+      // v6 : SESSION 53 FIX (localisation) — ajout colonne lib_localisation dans schools.
+      // Stocke la chaîne hiérarchique pré-calculée depuis le graphe des regroupements
+      // (schools.id_regroup → regroups.id_parent_regp → ... → racine).
+      // Calculé une fois à la synchronisation par computeAndStoreLocalisations().
+      // Évite de dépendre de locs_camp qui peut référencer une chaîne administrative
+      // différente de celle affichée par le serveur.
+      try {
+        await db.execute(
+          "ALTER TABLE schools ADD COLUMN lib_localisation TEXT NOT NULL DEFAULT ''",
+        );
+      } catch (_) {
+        // Column may already exist if DB was recreated from v6 schema
       }
     }
   }
@@ -179,12 +195,13 @@ class DatabaseService {
     // ─── Schools / Établissements (stm_Etabs) ─────────────────────────────
     await db.execute('''
       CREATE TABLE schools (
-        id_camp     TEXT NOT NULL,
-        id_etab     TEXT NOT NULL,
-        lib_etab    TEXT NOT NULL,
-        code_etab   TEXT,
-        id_status   TEXT,
-        id_regroup  TEXT,
+        id_camp          TEXT NOT NULL,
+        id_etab          TEXT NOT NULL,
+        lib_etab         TEXT NOT NULL,
+        code_etab        TEXT,
+        id_status        TEXT,
+        id_regroup       TEXT,
+        lib_localisation TEXT NOT NULL DEFAULT '',
         PRIMARY KEY (id_camp, id_etab)
       )
     ''');
@@ -816,7 +833,8 @@ class DatabaseService {
       libEtab:   r['lib_etab']   as String,
       codeEtab:  r['code_etab']  as String?,
       idStatus:  r['id_status']  as String?,
-      idRegroup: r['id_regroup'] as String?,
+      idRegroup:       r['id_regroup']       as String?,
+      libLocalisation: r['lib_localisation'] as String?,
     )).toList();
   }
 
@@ -856,11 +874,12 @@ class DatabaseService {
         orderBy: 'lib_etab ASC',
       );
       return allRows.map((r) => School(
-        idEtab:    r['id_etab']    as String,
-        libEtab:   r['lib_etab']   as String,
-        codeEtab:  r['code_etab']  as String?,
-        idStatus:  r['id_status']  as String?,
-        idRegroup: r['id_regroup'] as String?,
+        idEtab:          r['id_etab']          as String,
+        libEtab:         r['lib_etab']         as String,
+        codeEtab:        r['code_etab']        as String?,
+        idStatus:        r['id_status']        as String?,
+        idRegroup:       r['id_regroup']       as String?,
+        libLocalisation: r['lib_localisation'] as String?,
       )).toList();
     }
 
@@ -928,11 +947,12 @@ class DatabaseService {
       );
       debugPrint('[DB] Strategy 1 → ${rows.length} schools returned');
       return rows.map((r) => School(
-        idEtab:    r['id_etab']    as String,
-        libEtab:   r['lib_etab']   as String,
-        codeEtab:  r['code_etab']  as String?,
-        idStatus:  r['id_status']  as String?,
-        idRegroup: r['id_regroup'] as String?,
+        idEtab:          r['id_etab']          as String,
+        libEtab:         r['lib_etab']         as String,
+        codeEtab:        r['code_etab']        as String?,
+        idStatus:        r['id_status']        as String?,
+        idRegroup:       r['id_regroup']       as String?,
+        libLocalisation: r['lib_localisation'] as String?,
       )).toList();
     }
 
@@ -952,11 +972,12 @@ class DatabaseService {
 
     if (directRows.isNotEmpty) {
       return directRows.map((r) => School(
-        idEtab:    r['id_etab']    as String,
-        libEtab:   r['lib_etab']   as String,
-        codeEtab:  r['code_etab']  as String?,
-        idStatus:  r['id_status']  as String?,
-        idRegroup: r['id_regroup'] as String?,
+        idEtab:          r['id_etab']          as String,
+        libEtab:         r['lib_etab']         as String,
+        codeEtab:        r['code_etab']        as String?,
+        idStatus:        r['id_status']        as String?,
+        idRegroup:       r['id_regroup']       as String?,
+        libLocalisation: r['lib_localisation'] as String?,
       )).toList();
     }
 
@@ -973,11 +994,12 @@ class DatabaseService {
 
     debugPrint('[DB] Strategy 3 → ${allRows.length} schools total');
     return allRows.map((r) => School(
-      idEtab:    r['id_etab']    as String,
-      libEtab:   r['lib_etab']   as String,
-      codeEtab:  r['code_etab']  as String?,
-      idStatus:  r['id_status']  as String?,
-      idRegroup: r['id_regroup'] as String?,
+      idEtab:          r['id_etab']          as String,
+      libEtab:         r['lib_etab']         as String,
+      codeEtab:        r['code_etab']        as String?,
+      idStatus:        r['id_status']        as String?,
+      idRegroup:       r['id_regroup']       as String?,
+      libLocalisation: r['lib_localisation'] as String?,
     )).toList();
   }
 
@@ -988,17 +1010,169 @@ class DatabaseService {
       batch.insert(
         'schools',
         {
-          'id_camp':    idCamp,
-          'id_etab':    s.idEtab,
-          'lib_etab':   s.libEtab,
-          'code_etab':  s.codeEtab,
-          'id_status':  s.idStatus,
-          'id_regroup': s.idRegroup,
+          'id_camp':          idCamp,
+          'id_etab':          s.idEtab,
+          'lib_etab':         s.libEtab,
+          'code_etab':        s.codeEtab,
+          'id_status':        s.idStatus,
+          'id_regroup':       s.idRegroup,
+          'lib_localisation': s.libLocalisation ?? '',
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
     await batch.commit(noResult: true);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SESSION 53 FIX — computeAndStoreLocalisations
+  //
+  // Pré-calcule la chaîne de localisation hiérarchique pour CHAQUE établissement
+  // en parcourant le graphe des regroupements depuis la feuille (school.id_regroup)
+  // jusqu'à la racine (id_parent_regp IS NULL / '-1' / '0').
+  //
+  // POURQUOI cette approche est CORRECTE et INTERNATIONALE :
+  //   • school.id_regroup (de etabs_camp) = feuille du graphe de regroupements
+  //     tel que renvoyé par reg_camp pour la chaîne de l'utilisateur.
+  //   • En remontant les parents (id_parent_regp) dans la table regroups,
+  //     on reconstruit exactement la hiérarchie que l'utilisateur voit lors
+  //     de la navigation dans l'arbre des regroupements.
+  //   • C'est vrai quelle que soit la configuration du pays (Burundi, Niger,
+  //     Madagascar…) : le graphe regroups est universel.
+  //
+  // ALGORITHME :
+  //   1. Charge tous les regroups en mémoire (O(1) lookup map).
+  //   2. Pour chaque école, part de id_regroup et remonte via id_parent_regp.
+  //   3. Collecte les lib_regp de chaque nœud (feuille → racine).
+  //   4. Inverse → racine → feuille → "BUHUMUZA / BUTAGANZWA / BISINDE".
+  //   5. Met à jour schools.lib_localisation en DB (batch).
+  //
+  // Appelé dans campaign_provider.loadCampaignFromServer() après l'insertion
+  // des écoles (Étape 4) et des regroupements (Étape 1).
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<void> computeAndStoreLocalisations(String idCamp) async {
+    final db = await database;
+
+    // ── Étape 1 : charge tous les regroups en mémoire ────────────────────────
+    final regroupRows = await db.query(
+      'regroups',
+      where: 'id_camp = ?',
+      whereArgs: [idCamp],
+    );
+    // Map id_regp → row (pour O(1) lookup)
+    final regroupMap = <String, Map<String, dynamic>>{};
+    for (final r in regroupRows) {
+      regroupMap[r['id_regp'] as String] = r;
+    }
+
+    if (regroupMap.isEmpty) {
+      debugPrint('[DB] computeAndStoreLocalisations: aucun regroup pour camp=$idCamp — skip');
+      return;
+    }
+
+    // ── Étape 2 : charge toutes les écoles ───────────────────────────────────
+    final schoolRows = await db.query(
+      'schools',
+      columns: ['id_etab', 'id_regroup'],
+      where: 'id_camp = ?',
+      whereArgs: [idCamp],
+    );
+
+    debugPrint('[DB] computeAndStoreLocalisations: ${schoolRows.length} écoles, '
+        '${regroupMap.length} regroups pour camp=$idCamp');
+
+    // ── Étape 3 : calcule et stocke lib_localisation pour chaque école ──────
+    await db.transaction((txn) async {
+      int computed = 0;
+      int skipped  = 0;
+
+      for (final school in schoolRows) {
+        final idEtab   = school['id_etab']   as String;
+        final idRegroup = school['id_regroup'] as String?;
+
+        if (idRegroup == null || idRegroup.isEmpty) {
+          skipped++;
+          continue;
+        }
+
+        // Remonte la chaîne depuis la feuille jusqu'à la racine
+        final chain = <String>[];
+        String? currentId = idRegroup;
+        final visited = <String>{};
+
+        while (currentId != null && currentId.isNotEmpty && !visited.contains(currentId)) {
+          visited.add(currentId);
+          final row = regroupMap[currentId];
+          if (row == null) break; // ID non trouvé dans le graphe → arrêt
+
+          final libRegp = row['lib_regp'] as String? ?? '';
+          if (libRegp.isNotEmpty) chain.add(libRegp);
+
+          final parent = row['id_parent_regp'] as String?;
+          // Sentinelles de racine : null, '-1', '0', ''
+          if (parent == null || parent == '-1' || parent == '0' || parent.trim().isEmpty) break;
+          currentId = parent;
+        }
+
+        if (chain.isEmpty) {
+          skipped++;
+          continue;
+        }
+
+        // Chaîne construite feuille→racine → inverser pour racine→feuille
+        final libLoc = chain.reversed.join(' / ');
+
+        await txn.update(
+          'schools',
+          {'lib_localisation': libLoc},
+          where: 'id_camp = ? AND id_etab = ?',
+          whereArgs: [idCamp, idEtab],
+        );
+        computed++;
+      }
+
+      debugPrint('[DB] computeAndStoreLocalisations: $computed calculées, '
+          '$skipped ignorées (id_regroup absent)');
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SESSION 53 FIX (v2) — updateSchoolLocalisations
+  //
+  // Applique les chaînes de localisation retournées par le serveur (endpoint
+  // etab_hier) à la table schools.lib_localisation.
+  //
+  // Le serveur utilise la chaîne PRINCIPALE (= $_SESSION['chaine']) qui est
+  // identique à ce qu'affiche questionnaire.php — quel que soit le pays.
+  //
+  // Paramètres :
+  //   idCamp        — identifiant de la campagne
+  //   hierarchies   — Map<etabId, lib_localisation> retournée par getEtabHierarchies()
+  //
+  // Seules les entrées avec lib_localisation non vide sont écrites
+  // (préserve la valeur calculée localement si le serveur n'a rien renvoyé).
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<void> updateSchoolLocalisations(
+      String idCamp, Map<String, String> hierarchies) async {
+    if (hierarchies.isEmpty) return;
+    final db = await database;
+    await db.transaction((txn) async {
+      int updated = 0;
+      for (final entry in hierarchies.entries) {
+        final idEtab = entry.key;
+        final libLoc = entry.value.trim();
+        if (libLoc.isEmpty) continue;
+        final rows = await txn.update(
+          'schools',
+          {'lib_localisation': libLoc},
+          where: 'id_camp = ? AND id_etab = ?',
+          whereArgs: [idCamp, idEtab],
+        );
+        if (rows > 0) updated++;
+      }
+      debugPrint('[DB] updateSchoolLocalisations: $updated écoles mises à jour '
+          'pour camp=$idCamp');
+    });
   }
 
   /// Enriches a list of schools with their [libStatus] resolved from the

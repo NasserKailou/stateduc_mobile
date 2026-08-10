@@ -7,7 +7,6 @@ import '../../models/campaign.dart';
 import '../../models/regroup.dart';
 import '../../models/school.dart';
 import '../../models/education_system.dart';
-import '../../services/database_service.dart';
 import '../data_entry/school_data_screen.dart';
 
 /// CampaignDetailScreen — sélecteur de système éducatif + navigation hiérarchique
@@ -381,46 +380,39 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
 
   /// Ouvre l'écran de saisie [SchoolDataScreen] pour un établissement.
   ///
-  /// SESSION 53 FIX — Chaîne de localisation correcte :
-  ///   La hiérarchie est construite depuis les données réelles de la localisation
-  ///   stockées en SQLite (localisations.regroups_json + regroups.lib_regp),
-  ///   PAS depuis le regroupBreadcrumb de navigation (qui reflète le chemin
-  ///   parcouru par l'utilisateur, pas la localisation réelle de l'établissement).
+  /// SESSION 53 FIX (v2) — Chaîne de localisation correcte (approche pré-calculée) :
   ///
-  /// Exemple : l'utilisateur arrive via BUHUMUZA/BUTAGANZWA/BISINDE mais
-  /// l'établissement est réellement dans CANKUZO/CENDAJURU/Busyana.
-  /// Avant : adminHierarchy = "BUHUMUZA / BUTAGANZWA / BISINDE" (faux)
-  /// Après : adminHierarchy = "CANKUZO / CENDAJURU / Busyana"   (correct)
-  void _openSchool(
-      BuildContext context, CampaignProvider camps, School school) async {
-    // SESSION 53 : Construire la chaîne depuis les données de localisation réelles
-    final db = DatabaseService();
-    String? adminHierarchy;
+  ///   La hiérarchie est pré-calculée à la synchronisation par
+  ///   DatabaseService.computeAndStoreLocalisations() et stockée dans
+  ///   schools.lib_localisation. Elle est déjà disponible dans school.libLocalisation
+  ///   quand on arrive ici — aucun appel DB asynchrone nécessaire.
+  ///
+  ///   Priorité d'affichage (school.bestLocalisation) :
+  ///     1. school.libLocalisation — pré-calculé depuis le graphe regroups
+  ///        (parcours id_regroup → parents → racine)
+  ///     2. school.libHierarchy   — reçu du serveur (optionnel, non toujours présent)
+  ///
+  ///   Fallback si les deux sont absents :
+  ///     3. breadcrumb de navigation (chemin parcouru par l'utilisateur)
+  ///
+  ///   NOTE internationale : l'algorithme fonctionne pour tout pays car il
+  ///   utilise le graphe regroups universel chargé depuis reg_camp.
+  void _openSchool(BuildContext context, CampaignProvider camps, School school) {
+    // Priorité 1 : lib_localisation pré-calculée à la synchronisation
+    String? adminHierarchy = school.bestLocalisation;
 
-    try {
-      adminHierarchy = await db.getRegroupChainForEtab(
-        idCamp:   campaign.idCamp,
-        idSystem: camps.selectedSystem!.idSystem,
-        idEtab:   school.idEtab,
-      );
-    } catch (e) {
-      debugPrint('[CampaignDetail] getRegroupChainForEtab error: $e');
-    }
-
-    // Fallback 1 : breadcrumb de navigation si la localisation DB est vide
+    // Priorité 2 : breadcrumb de navigation (fallback si sync incomplète)
     if ((adminHierarchy == null || adminHierarchy.isEmpty) &&
         camps.regroupBreadcrumb.isNotEmpty) {
       adminHierarchy = camps.regroupBreadcrumb.map((r) => r.libRegp).join(' / ');
-      debugPrint('[CampaignDetail] fallback breadcrumb → $adminHierarchy');
+      debugPrint('[CampaignDetail] localisation: fallback breadcrumb → $adminHierarchy');
     }
 
-    // Fallback 2 : libHierarchy stockée sur le serveur (inscription établissement)
-    if (adminHierarchy == null || adminHierarchy.isEmpty) {
-      adminHierarchy = school.libHierarchy;
-      debugPrint('[CampaignDetail] fallback libHierarchy → $adminHierarchy');
-    }
+    debugPrint('[CampaignDetail] localisation etab=${school.idEtab}: '
+        'libLocalisation="${school.libLocalisation}", '
+        'libHierarchy="${school.libHierarchy}", '
+        'used="$adminHierarchy"');
 
-    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
