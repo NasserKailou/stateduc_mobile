@@ -389,11 +389,10 @@ class CampaignProvider extends ChangeNotifier {
       final schools = await _api.getSchools(userId, campaign.idCamp);
       await _db.insertSchools(campaign.idCamp, schools);
 
-      // Étape 4b — Calcul des localisations hiérarchiques (SESSION 53 FIX)
-      // Pré-calcule lib_localisation pour chaque école en parcourant le graphe
-      // des regroupements (id_regroup → id_parent_regp → ... → racine).
-      // Doit être appelé APRÈS insertRegroups (Étape 1) ET insertSchools (Étape 4)
-      // car les deux tables sont nécessaires au calcul.
+      // Étape 4b — Pré-calcul local des localisations (fallback hors-ligne)
+      // Parcourt le graphe regroups (user's chain) pour pré-remplir lib_localisation.
+      // Peut retourner la mauvaise chaîne administrative si le pays a plusieurs chaînes
+      // (ex. Burundi : Chain 1=OLD vs Chain 2=NEW). Sera corrigé à l'étape 6b.
       _setLoadStep(4, 'Calcul des localisations hiérarchiques…');
       await _db.computeAndStoreLocalisations(campaign.idCamp);
 
@@ -406,6 +405,55 @@ class CampaignProvider extends ChangeNotifier {
       _setLoadStep(6, 'Chargement des systèmes éducatifs…');
       final systems = await _api.getEducationSystems(userId, campaign.idCamp);
       await _db.insertEducationSystems(campaign.idCamp, systems);
+
+      // Étape 6b — SESSION 53 FIX (v2) : localisation depuis la chaîne PRINCIPALE
+      //
+      // L'endpoint etab_hier retourne la hiérarchie calculée avec la chaîne de
+      // référence du serveur (= $_SESSION['chaine'] de questionnaire.php), soit la
+      // PREMIÈRE chaîne de TYPE_CHAINE_REGROUPEMENT ordonnée par ORDRE.
+      //
+      // Cela corrige le problème Burundi : reg_camp utilise la chaîne de l'agent
+      // (Chain 2 = NEW = BUHUMUZA…) alors que questionnaire.php utilise Chain 1
+      // (OLD = CANKUZO…). L'étape 4b avait donc calculé la mauvaise chaîne.
+      //
+      // INTERNATIONAL : fonctionne pour tout pays — la notion de "chaîne primaire"
+      // (première par ORDRE) est universelle dans le schéma StatEduc.
+      //
+      // NON FATAL : si le serveur échoue, on garde les valeurs de l'étape 4b.
+      if (systems.isNotEmpty) {
+        _setLoadStep(6, 'Chargement des localisations officielles…');
+        try {
+          // Récupère la liste de tous les étabs pour cette campagne
+          final allSchools = await _db.getSchools(campaign.idCamp);
+          final etabIds = allSchools.map((s) => s.idEtab).toList();
+
+          if (etabIds.isNotEmpty) {
+            // Appel par système (le serveur filtre la chaîne par système)
+            // En pratique, la chaîne primaire est la même pour tous les systèmes
+            // dans la majorité des pays — on prend le premier système.
+            // Si plusieurs systèmes ont des chaînes différentes, on itère tous.
+            final mergedHierarchies = <String, String>{};
+            for (final system in systems) {
+              final hierMap = await _api.getEtabHierarchies(
+                idSys:   system.idSystem,
+                campId:  campaign.idCamp,
+                etabIds: etabIds,
+              );
+              // Merge — le dernier système gagne si conflit (rare)
+              // On ne remplace que si la valeur est non vide
+              for (final e in hierMap.entries) {
+                if (e.value.isNotEmpty) mergedHierarchies[e.key] = e.value;
+              }
+            }
+            await _db.updateSchoolLocalisations(campaign.idCamp, mergedHierarchies);
+            debugPrint('[CampaignProvider] étape 6b : ${mergedHierarchies.length} '
+                'localisations serveur appliquées pour camp=${campaign.idCamp}');
+          }
+        } catch (e) {
+          // Non fatal — l'étape 4b a déjà calculé une valeur de secours
+          debugPrint('[CampaignProvider] étape 6b SKIPPED (non fatal) : $e');
+        }
+      }
 
       // Étapes 7+ : par système éducatif — questions, HTML du formulaire, règles
       // Nombre total d'étapes = 6 + somme sur tous systèmes de (1 + nb_questions * 2)

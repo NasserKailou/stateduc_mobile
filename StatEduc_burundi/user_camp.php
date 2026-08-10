@@ -101,7 +101,7 @@ $app->get('/new_camp/:user_id/:id_period', function ($user_id, $id_period) use (
 	echo json_encode($rps);
 });
 
-// cherche les syst�mes concern�s par une campagne donn�es pour un utilisateur
+// cherche les syst�mes concern�s par une campagne donn�es pour un utilisateur
 $app->get('/sys_camp/:user_id/:id_camp', function ($user_id, $id_camp) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
 	$status = $GLOBALS['PARAM_WS']['OK'];
 	$sys_list = array();
@@ -120,7 +120,7 @@ $app->get('/sys_camp/:user_id/:id_camp', function ($user_id, $id_camp) use ($lib
 	echo json_encode($rps);
 });
 
-// cherche les regroupements concern�s par une campagne donn�es pour un utilisateur
+// cherche les regroupements concern�s par une campagne donn�es pour un utilisateur
 $app->get('/reg_camp/:user_login/:id_camp/:id_period', function ($user_login, $id_camp, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $arbre) {
 	$status = $GLOBALS['PARAM_WS']['OK'];
 	$reg_list = array();
@@ -195,7 +195,7 @@ $app->get('/reg_camp/:user_login/:id_camp/:id_period', function ($user_login, $i
 	echo json_encode($rps);
 });
 
-// cherche les types de regroupements concern�s par une campagne donn�es pour un utilisateur
+// cherche les types de regroupements concern�s par une campagne donn�es pour un utilisateur
 $app->get('/typ_reg_camp/:user_id/:id_camp/:id_types_reg', function ($user_id, $id_camp, $id_types_reg) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
 	$status = $GLOBALS['PARAM_WS']['OK'];
 	$type_reg_list = array();	
@@ -231,7 +231,7 @@ $app->get('/etabs_status/', function () use ($lib_status, $lib_message, $lib_dat
 	echo json_encode($rps);
 });
 
-// cherche les �tablissements concern�s par une campagne donn�es pour un utilisateur
+// cherche les �tablissements concern�s par une campagne donn�es pour un utilisateur
 $app->get('/etabs_camp/:user_id/:id_camp/:id_period', function ($user_id, $id_camp, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
 	$status = $GLOBALS['PARAM_WS']['OK'];	
 	$etab_list = array();  
@@ -292,11 +292,11 @@ $app->get('/etabs_camp/:user_id/:id_camp/:id_period', function ($user_id, $id_ca
 	}
 	
 	$rps = array($lib_status=>$status_ok,$lib_message=>$status,$lib_data=>$etab_list);
-	// recherche les �tablissements
+	// recherche les �tablissements
 	echo json_encode($rps);
 });
 
-// cherche les �tablissements concern�s par une campagne donn�es pour un utilisateur
+// cherche les �tablissements concern�s par une campagne donn�es pour un utilisateur
 $app->get('/etabs_camp_zip/:user_login/:id_camp/:id_period', function ($user_login, $id_camp, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $app) {
 	$status = $GLOBALS['PARAM_WS']['OK'];	
 	$etab_list = array();  
@@ -391,12 +391,12 @@ $app->get('/etabs_camp_zip/:user_login/:id_camp/:id_period', function ($user_log
 		$app->response->setBody($fData);		
 	} else {	
 		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>'');
-		// recherche les �tablissements
+		// recherche les �tablissements
 		echo json_encode($rps);
 	}
 });
 
-// cherche les chaines de localisation concern�s par une campagne donn�es pour un utilisateur
+// cherche les chaines de localisation concern�s par une campagne donn�es pour un utilisateur
 $app->get('/locs_camp/:user_id/:id_camp', function ($user_id, $id_camp) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
 	$status = $GLOBALS['PARAM_WS']['OK'];		
 	$loc_list = array();
@@ -464,7 +464,7 @@ $app->get('/locs_camp/:user_id/:id_camp', function ($user_id, $id_camp) use ($li
 });
 
 
-// cherche les privil�ges d'un utilisateur
+// cherche les privil�ges d'un utilisateur
 $app->get('/user_priv/:user_login/:id_camp/:id_period', function ($user_login, $id_camp, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $arbre) {
 	$status = $GLOBALS['PARAM_WS']['OK'];
 	$reg_list = array();
@@ -487,6 +487,108 @@ $app->get('/user_priv/:user_login/:id_camp/:id_period', function ($user_login, $
 	$user_privs =	array_change_key_case_recursive($user_privs);
 	$rps = array($lib_status=>$status_ok,$lib_message=>$status,$lib_data=>$user_privs);
 	// recherche les regroupements
+	echo json_encode($rps);
+});
+
+// SESSION 53 FIX — Hiérarchie localisation pour les établissements (mobile)
+// ─────────────────────────────────────────────────────────────────────────────
+// Retourne la chaîne de localisation de chaque établissement en utilisant la
+// CHAÎNE PRINCIPALE (première dans TYPE_CHAINE_REGROUPEMENT ordonnée par ORDRE)
+// qui correspond à ce qu'affiche questionnaire.php ($SESSION['chaine']).
+//
+// Endpoint : GET /user_camp.php/etab_hier/:id_sys/:id_camp/:etab_ids
+//   :id_sys    — identifiant du système éducatif (pour filtrer la chaîne)
+//   :id_camp   — identifiant de la campagne (non utilisé ici, réservé)
+//   :etab_ids  — liste CSV des IDs d'établissements
+//
+// Réponse : { se_status:'ok', se_message:'ok',
+//             se_data: [ { id: "22222", lib_localisation: "CANKUZO / CENDAJURU / Busyana" }, ... ] }
+//
+// Algorithme :
+//   1. Obtenir l'ID de la chaîne principale pour ce système (= $_SESSION['chaine'])
+//   2. Pour chaque étab, trouver son code_regroupement via ETABLISSEMENT_REGROUPEMENT
+//      filtré par la chaîne principale (via jointure HIERARCHIE)
+//   3. Construire la hiérarchie avec arbre->getparentsid()
+//   4. Retourner "PARENT1 / PARENT2 / FEUILLE" pour chaque étab
+//
+// INTERNATIONAL : cette logique est identique à questionnaire.php — elle
+// utilise la chaîne référence du serveur, pas la chaîne de l'agent mobile.
+$app->get('/etab_hier/:id_sys/:id_camp/:etab_ids', function ($id_sys, $id_camp, $etab_ids) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+	$status   = $GLOBALS['PARAM_WS']['OK'];
+	$hier_list = array();
+
+	// 1. Obtenir la chaîne principale pour ce système éducatif
+	//    (= première chaîne ordonnée — correspond à $_SESSION['chaine'] de questionnaire.php)
+	$sql_chaine = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' AS id_chaine'
+		.' FROM '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT']
+		.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].'='.(int)$id_sys
+		.' ORDER BY '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' LIMIT 1';
+	$row_chaine = $GLOBALS['conn_dico']->GetRow($sql_chaine);
+
+	if (!$row_chaine || !isset($row_chaine['id_chaine'])) {
+		// Fallback : chaîne 1 si aucune trouvée pour ce système
+		$id_chaine = 1;
+	} else {
+		$id_chaine = (int)$row_chaine['id_chaine'];
+	}
+
+	// 2. Construire l'arbre pour cette chaîne
+	$arbre = new arbre($id_chaine);
+
+	// 3. Nombre de niveaux de la chaîne
+	$sql_niv = 'SELECT COUNT(*) FROM '.$GLOBALS['PARAM']['HIERARCHIE']
+		.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.$id_chaine;
+	$nb_niveaux = (int)$GLOBALS['conn']->GetOne($sql_niv);
+	$niveau = max(0, $nb_niveaux - 1);
+
+	// 4. Traiter chaque établissement
+	$etab_id_list = array_filter(array_map('trim', explode(',', $etab_ids)), function($v){ return $v !== ''; });
+
+	foreach ($etab_id_list as $etab_id) {
+		$etab_id = (int)$etab_id;
+		if ($etab_id <= 0) continue;
+
+		// Trouver le code_regroupement de l'étab dans la chaîne principale
+		// (joint ETABLISSEMENT_REGROUPEMENT avec REGROUPEMENT et HIERARCHIE filtrée par id_chaine)
+		$sql_reg = 'SELECT ER.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AS code_reg'
+			.' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].' AS ER'
+			.', '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS R'
+			.', '.$GLOBALS['PARAM']['HIERARCHIE'].' AS H'
+			.' WHERE ER.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].'='.$etab_id
+			.' AND ER.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+			.' AND R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'=H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+			.' AND H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.$id_chaine
+			.' AND H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].'=1'
+			.' LIMIT 1';
+		$row_reg = $GLOBALS['conn']->GetRow($sql_reg);
+
+		if (!$row_reg || !isset($row_reg['code_reg'])) {
+			// Pas de correspondance dans cette chaîne — retourne chaîne vide
+			$hier_list[] = array('id' => (string)$etab_id, 'lib_localisation' => '');
+			continue;
+		}
+
+		$code_reg = (int)$row_reg['code_reg'];
+
+		// Construire la hiérarchie via arbre->getparentsid()
+		$hierarchie = $arbre->getparentsid($niveau, $code_reg, $id_chaine);
+
+		$lib_hier = '';
+		if (is_array($hierarchie) && count($hierarchie) > 0) {
+			$parts = array();
+			foreach ($hierarchie as $h) {
+				$lib = isset($h[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']]) 
+					? trim(utf8_encode($h[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']])) 
+					: '';
+				if ($lib !== '') $parts[] = $lib;
+			}
+			$lib_hier = implode(' / ', $parts);
+		}
+
+		$hier_list[] = array('id' => (string)$etab_id, 'lib_localisation' => $lib_hier);
+	}
+
+	$rps = array($lib_status=>$status_ok, $lib_message=>$status, $lib_data=>$hier_list);
 	echo json_encode($rps);
 });
 

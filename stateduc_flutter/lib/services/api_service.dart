@@ -685,6 +685,64 @@ class ApiService {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // ETAB HIERARCHIES — SESSION 53 FIX (localisation)
+  //
+  // GET /user_camp.php/etab_hier/{idSys}/{campId}/{etabIds}
+  //
+  // Retourne la hiérarchie de localisation de chaque établissement en utilisant
+  // la chaîne PRINCIPALE du serveur (= $_SESSION['chaine'] de questionnaire.php),
+  // c.-à-d. la première chaîne de TYPE_CHAINE_REGROUPEMENT ordonnée par ORDRE.
+  //
+  // Cela correspond toujours à ce que questionnaire.php affiche — même si l'agent
+  // mobile appartient à une chaîne différente (ex. Burundi : Chain 1 = OLD, Chain 2 = NEW).
+  //
+  // Paramètres :
+  //   idSys    — ID du système éducatif (pour trouver la chaîne principale)
+  //   campId   — ID de la campagne (réservé / cohérence URL)
+  //   etabIds  — liste des IDs d'étabs (List<String>)
+  //
+  // Réponse se_data : [ { id: "22222", lib_localisation: "PROV / COMM / FEUILLE" }, ... ]
+  //
+  // INTERNATIONAL : fonctionne pour tout pays — utilise la chaîne référence du serveur.
+  // Non fatal si le serveur retourne une erreur (fallback : lib_localisation vide).
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<Map<String, String>> getEtabHierarchies({
+    required String idSys,
+    required String campId,
+    required List<String> etabIds,
+  }) async {
+    if (etabIds.isEmpty) return {};
+
+    // The URL segment cannot be too long — chunk by 100 etabs if needed
+    const chunkSize = 100;
+    final result = <String, String>{};
+
+    for (int i = 0; i < etabIds.length; i += chunkSize) {
+      final chunk = etabIds.sublist(
+          i, i + chunkSize > etabIds.length ? etabIds.length : i + chunkSize);
+      final csvIds = chunk.join(',');
+
+      try {
+        final data =
+            await _get('user_camp.php/etab_hier/$idSys/$campId/$csvIds');
+        if (data is List) {
+          for (final item in data) {
+            final id = (item['id'] ?? '').toString();
+            final lib = (item['lib_localisation'] ?? '').toString().trim();
+            if (id.isNotEmpty && lib.isNotEmpty) {
+              result[id] = lib;
+            }
+          }
+        }
+      } catch (e) {
+        // Non-fatal — fallback to computeAndStoreLocalisations()
+        debugPrint('[API] getEtabHierarchies chunk i=$i FAILED: $e');
+      }
+    }
+    return result;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // EDUCATION SYSTEMS (Secteurs)
   // Source JS: charge_camp.js
   //   getDataFromServer('/user_camp.php/sys_camp/',

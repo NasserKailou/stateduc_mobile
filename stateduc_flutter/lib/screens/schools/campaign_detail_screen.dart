@@ -380,23 +380,29 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
 
   /// Ouvre l'écran de saisie [SchoolDataScreen] pour un établissement.
   ///
-  /// SESSION 53 FIX (v2) — Chaîne de localisation correcte (approche pré-calculée) :
+  /// SESSION 53 FIX (v3) — Chaîne de localisation depuis la chaîne PRINCIPALE du serveur :
   ///
-  ///   La hiérarchie est pré-calculée à la synchronisation par
-  ///   DatabaseService.computeAndStoreLocalisations() et stockée dans
-  ///   schools.lib_localisation. Elle est déjà disponible dans school.libLocalisation
-  ///   quand on arrive ici — aucun appel DB asynchrone nécessaire.
+  ///   La hiérarchie est stockée dans schools.lib_localisation, remplie en deux temps :
+  ///   1. Étape 4b (sync) : computeAndStoreLocalisations() — parcourt le graphe local
+  ///      regroups (chaîne de l'agent). Peut retourner la mauvaise chaîne admin si le
+  ///      pays a plusieurs chaînes (ex. Burundi : Chain 2 NEW = BUHUMUZA…).
+  ///   2. Étape 6b (sync) : getEtabHierarchies() → endpoint etab_hier du serveur.
+  ///      Utilise la chaîne PRINCIPALE (= $_SESSION['chaine'] de questionnaire.php).
+  ///      Écrase la valeur de l'étape 4b avec la bonne valeur (ex. CANKUZO/CENDAJURU/…).
+  ///
+  ///   Résultat dans school.libLocalisation : chaîne officielle = identique au serveur.
   ///
   ///   Priorité d'affichage (school.bestLocalisation) :
-  ///     1. school.libLocalisation — pré-calculé depuis le graphe regroups
-  ///        (parcours id_regroup → parents → racine)
-  ///     2. school.libHierarchy   — reçu du serveur (optionnel, non toujours présent)
+  ///     1. school.libLocalisation — depuis étape 6b (chaîne primaire serveur) ou
+  ///        étape 4b si serveur indisponible (offline)
+  ///     2. school.libHierarchy   — reçu du serveur (optionnel, rarement présent)
   ///
   ///   Fallback si les deux sont absents :
   ///     3. breadcrumb de navigation (chemin parcouru par l'utilisateur)
   ///
-  ///   NOTE internationale : l'algorithme fonctionne pour tout pays car il
-  ///   utilise le graphe regroups universel chargé depuis reg_camp.
+  ///   NOTE internationale : l'endpoint etab_hier fonctionne pour tout pays —
+  ///   il utilise la notion universelle de "chaîne primaire" (première par ORDRE
+  ///   dans TYPE_CHAINE_REGROUPEMENT), identique à questionnaire.php.
   void _openSchool(BuildContext context, CampaignProvider camps, School school) {
     // Priorité 1 : lib_localisation pré-calculée à la synchronisation
     String? adminHierarchy = school.bestLocalisation;
