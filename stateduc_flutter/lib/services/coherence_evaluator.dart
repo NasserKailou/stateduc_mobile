@@ -625,12 +625,38 @@ class SqlTranslator {
       // FIX Bug 1: Dart replaceAll(RegExp, String) ne supporte PAS les backreferences
       // \1 dans la chaîne de remplacement → produit un littéral "\1" qui crashe SQLite.
       // Solution : replaceAllMapped avec closure qui retourne m.group(1).
-      for (final tableName in usedServerTables) {
-        translatedSql = translatedSql.replaceAllMapped(
-          RegExp('\\b${RegExp.escape(tableName)}\\.(\\w+)',
-              caseSensitive: false),
-          (m) => m.group(1)!,
-        );
+      //
+      // SESSION 52 FIX (a2) — JOIN ambiguité de colonne :
+      // Si plusieurs tables sont impliquées dans un INNER/LEFT JOIN, les deux CTE
+      // exposent les mêmes noms de colonnes (ex: CODE_ETABLISSEMENT dans ETABLISSEMENT
+      // et ELEVES_AGE_NIVEAU_SEXE). Après strip des qualificateurs TABLE., SQLite
+      // ne peut pas résoudre l'ambiguïté → DatabaseException(ambiguous column name).
+      //
+      // FIX : au lieu de stripper les qualificateurs, on les remplace par l'alias CTE
+      // correspondant (qui EST le nom de table dans le WITH). Les CTE ont exactement
+      // les mêmes noms que les tables serveur (ETABLISSEMENT, ELEVES_AGE_NIVEAU_SEXE,
+      // etc.), donc TABLE.FIELD → TABLE.FIELD est valide dans SQLite (référence de CTE).
+      //
+      // ATTENTION : on ne strippe QUE si une seule table est utilisée (pas de JOIN).
+      // Si plusieurs tables → on garde les qualificateurs TABLE. pour éviter l'ambiguïté.
+      final hasJoin = usedServerTables.length > 1;
+      if (!hasJoin) {
+        // Cas simple : une seule table → strip des qualificateurs (comportement historique)
+        for (final tableName in usedServerTables) {
+          translatedSql = translatedSql.replaceAllMapped(
+            RegExp('\\b${RegExp.escape(tableName)}\\.(\\w+)',
+                caseSensitive: false),
+            (m) => m.group(1)!,
+          );
+        }
+      } else {
+        // Cas multi-tables (JOIN) : on garde les qualificateurs TABLE.FIELD
+        // pour que SQLite puisse résoudre l'ambiguïté entre les CTE.
+        // Les CTEs dans le WITH clause portent exactement le nom de la table serveur,
+        // donc TABLE.FIELD est résolu comme CTE_NAME.FIELD_COLUMN → valide SQLite.
+        SqlTranslator._log('[SqlTranslator] multi-table JOIN detected '
+            '(${usedServerTables.join(", ")}) — keeping table qualifiers to avoid ambiguity');
+        // On ne strippe pas les qualificateurs.
       }
 
       // ── Étape 7b : FIX SESSION 48 — supprimer le HAVING redondant de contexte ──
@@ -1143,6 +1169,10 @@ class SqlTranslator {
         RegExp(r'\bNVL\s*\(', caseSensitive: false), 'COALESCE(');
 
     // 3. ISNULL(x, y) → COALESCE(x, y)  [SQL Server]
+    // SESSION 52 FIX (a1) : ISNULL est une fonction SQL Server, pas un nom de champ.
+    // Traduit avant l'extraction des champs pour éviter que ISNULL soit extrait
+    // comme nom de champ et génère une colonne nommée ISNULL dans le CTE SQLite
+    // (mot réservé → DatabaseException(near "ISNULL": syntax error)).
     result = result.replaceAll(
         RegExp(r'\bISNULL\s*\(', caseSensitive: false), 'COALESCE(');
 
@@ -1612,6 +1642,63 @@ class SqlTranslator {
     'TEXT',
     'BLOB',
     'NUMERIC',
+    // SESSION 52 FIX (a1) — fonctions SQL Server/Access à exclure de l'extraction
+    // de champs pour le CTE (sinon elles créent des colonnes avec des noms réservés).
+    'ISNULL',
+    'IFNULL',
+    'IIF',
+    'SWITCH',
+    'DATEDIFF',
+    'DATEADD',
+    'CONVERT',
+    'LEN',
+    'LEFT',
+    'RIGHT',
+    'UPPER',
+    'LOWER',
+    'TRIM',
+    'REPLACE',
+    'SUBSTRING',
+    'LIKE',
+    'BETWEEN',
+    'EXISTS',
+    'EXCEPT',
+    'INTERSECT',
+    'TOP',
+    'PERCENT',
+    'PARTITION',
+    'OVER',
+    'ROW_NUMBER',
+    'RANK',
+    'DENSE_RANK',
+    'NTILE',
+    'FULL',
+    'CROSS',
+    'NATURAL',
+    'USING',
+    'SET',
+    'VALUES',
+    'INTO',
+    'VIEW',
+    'TRIGGER',
+    'PROCEDURE',
+    'FUNCTION',
+    'DECLARE',
+    'BEGIN',
+    'COMMIT',
+    'ROLLBACK',
+    'SAVEPOINT',
+    'RELEASE',
+    'PRAGMA',
+    'EXPLAIN',
+    'ANALYZE',
+    'VACUUM',
+    'ATTACH',
+    'DETACH',
+    'REINDEX',
+    'DBO',
+    'EXPR',
+    'EXPR1',
   };
 
   static bool _isSqlKeyword(String word) =>

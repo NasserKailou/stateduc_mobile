@@ -49,6 +49,18 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
                       builder: (_) => const SettingsScreen()),
                 ),
               ),
+              // SESSION 52 — Bouton Accueil : retourne à l'écran de saisie PIN
+              // sans déconnecter l'utilisateur (contrairement au bouton Déconnexion).
+              // Utile pour changer de PIN / revenir à l'accueil rapidement.
+              IconButton(
+                icon: const Icon(Icons.home_outlined),
+                tooltip: 'Accueil (PIN)',
+                onPressed: () => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PinScreen()),
+                  (route) => false,
+                ),
+              ),
               // Logout
               IconButton(
                 icon: const Icon(Icons.logout),
