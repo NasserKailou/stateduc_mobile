@@ -1036,6 +1036,25 @@ class ApiService {
       } else {
         // Text / number / select / checkbox — only _slh_ substitution
         final encodedVal = strVal.replaceAll('/', '_slh_');
+
+        // SESSION 53 FIX — li_ch (liste_checkbox) unchecked suppression
+        // Le bridge JS envoie notify(name, '0') pour une case NON cochée.
+        // Le serveur PHP (grille.class.php) teste :
+        //   isset($matr[$v]) AND trim($matr[$v]) <> ''
+        // '0' satisfait les deux conditions → le serveur traite toutes les
+        // cases comme cochées → INSERT en double → SQL failure → KOSAVE.
+        //
+        // Comportement navigateur attendu : les cases non cochées ne sont
+        // PAS envoyées dans le POST (clé absente).
+        //
+        // Pattern li_ch : NAME = 'FIELDNAME_ligne_valeur' (ex: CODE_TYPE_NIVEAU_0_4)
+        // La clé se termine par _<chiffres>_<chiffres> (ligne = 0, valeur = 4..12).
+        // On ne supprime que si valeur == '0' ET clé correspond au pattern li_ch.
+        if (strVal == '0' && RegExp(r'_\d+_\d+$').hasMatch(key)) {
+          // Case li_ch non cochée → ne pas envoyer (miroir comportement navigateur)
+          return;
+        }
+
         bodyParts.add('$key=$encodedVal');
       }
     });
