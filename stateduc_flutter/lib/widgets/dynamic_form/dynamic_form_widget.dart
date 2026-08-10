@@ -724,7 +724,11 @@ $formHtml
       });
     } else if (el.type === 'checkbox') {
       el.addEventListener('change', function() {
-        notify(name, el.checked ? '1' : '0');
+        // KOSAVE fix (theme 10602 / li_ch) :
+        // Le navigateur n'envoie PAS les cases non cochées dans le POST.
+        // On reproduit ce comportement : '1' si coché, '' si non coché.
+        // api_service.dart filtre ensuite les entrées '' sur pattern li_ch.
+        notify(name, el.checked ? '1' : '');
       });
     } else {
       el.addEventListener('input', function() { notify(name, el.value); });
@@ -995,7 +999,8 @@ $formHtml
       if (el.type === 'radio') {
         el.addEventListener('change', function() { if (el.checked) notify(name, el.value); });
       } else if (el.type === 'checkbox') {
-        el.addEventListener('change', function() { notify(name, el.checked ? '1' : '0'); });
+        // Même fix KOSAVE que _injectBridge : '' pour non coché (pas '0')
+        el.addEventListener('change', function() { notify(name, el.checked ? '1' : ''); });
       } else {
         el.addEventListener('input',  function() { notify(name, el.value); });
         el.addEventListener('change', function() { notify(name, el.value); });

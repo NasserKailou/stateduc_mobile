@@ -1037,20 +1037,27 @@ class ApiService {
         // Text / number / select / checkbox — only _slh_ substitution
         final encodedVal = strVal.replaceAll('/', '_slh_');
 
-        // SESSION 53 FIX — li_ch (liste_checkbox) unchecked suppression
-        // Le bridge JS envoie notify(name, '0') pour une case NON cochée.
-        // Le serveur PHP (grille.class.php) teste :
-        //   isset($matr[$v]) AND trim($matr[$v]) <> ''
-        // '0' satisfait les deux conditions → le serveur traite toutes les
-        // cases comme cochées → INSERT en double → SQL failure → KOSAVE.
+        // SESSION 53/54 FIX — li_ch (liste_checkbox) unchecked suppression
+        // Problème root-cause (theme 10602 / KOSAVE) :
+        //   Le bridge JS envoyait notify(name, '0') pour une case NON cochée.
+        //   Le serveur PHP (grille.class.php li_ch save ~line 5540) teste :
+        //     isset($matr[$v]) AND trim($matr[$v]) <> ''
+        //   '0' satisfait les deux → ALL cases traitées comme cochées →
+        //   INSERT en double → SQL failure → $theme_data_MAJ_ok=false → KOSAVE.
+        //
+        // Fix bridge (dynamic_form_widget.dart) :
+        //   Case non cochée → notify(name, '') au lieu de notify(name, '0').
+        //   Cette valeur '' est stockée dans _formData[name].
         //
         // Comportement navigateur attendu : les cases non cochées ne sont
-        // PAS envoyées dans le POST (clé absente).
+        // PAS envoyées dans le POST (clé absente de la requête).
         //
         // Pattern li_ch : NAME = 'FIELDNAME_ligne_valeur' (ex: CODE_TYPE_NIVEAU_0_4)
-        // La clé se termine par _<chiffres>_<chiffres> (ligne = 0, valeur = 4..12).
-        // On ne supprime que si valeur == '0' ET clé correspond au pattern li_ch.
-        if (strVal == '0' && RegExp(r'_\d+_\d+$').hasMatch(key)) {
+        // La clé se termine par _<chiffres>_<chiffres> (ligne=0, valeur=4..12).
+        // Filtre : valeur == '' OU '0' ET clé correspond au pattern li_ch.
+        // ('' = bridge corrigé ; '0' = sécurité pour anciennes _formData en cache)
+        if ((strVal == '' || strVal == '0') &&
+            RegExp(r'_\d+_\d+$').hasMatch(key)) {
           // Case li_ch non cochée → ne pas envoyer (miroir comportement navigateur)
           return;
         }
