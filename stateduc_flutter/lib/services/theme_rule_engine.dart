@@ -331,34 +331,33 @@ class ThemeRuleEngine {
       final rows = await db.rawQuery(translated.sql);
 
       if (translated.isScalar) {
-        // Mode SCALAR hérité : une règle sans GROUP BY retourne une valeur agrégée.
+        // Mode SCALAR : une règle sans GROUP BY retourne une valeur agrégée.
         //
-        // SESSION 52 FIX (d) — faux positifs règles scalaires pures (Sum(single_field)) :
+        // SESSION 52 FIX (d) — faux positifs règles scalaires de valeur de référence :
         //
-        // AVANT : val != 0 → VIOLÉE (par exemple Sum(NB_LATRINES_ELEVES)=5 → VIOLÉE).
-        // Problème : ces règles sont des RÈGLES DE RÉFÉRENCE (valeurs pour ASSOC),
-        // pas des règles de vérification autonomes. Un Sum(NB_LATRINES_ELEVES)=5
-        // signifie simplement qu'il y a 5 latrines — ce n'est pas une incohérence.
+        // Certaines règles (ex: id=416 msg="NB LATRINES FONC TOTAL") sont des règles
+        // de référence (valeurs pour ASSOC) — elles n'ont PAS le mot "INCOHERENCE"
+        // dans leur message et n'ont PAS d'entrée dans dico_regle_theme_assoc.
+        // Sum(NB_LATRINES_ELEVES)=5 signifie 5 latrines, pas une incohérence.
         //
-        // FIX : distinguer les règles "scalaire de référence" (Sum d'une seule colonne)
-        // des règles "indicateur de violation" (différence, CASE WHEN, sous-requête) :
+        // FIX CORRIGÉ (SESSION 52 rev1) — critère plus précis et safe :
         //
-        //   • Règle de référence (Sum(X)) : val > 0 ne déclenche JAMAIS de violation.
-        //     Ces règles ne devraient être évaluées qu'en mode ASSOC comme règle associée.
-        //     On les ignore silencieusement en mode standalone.
+        //   • Règle de référence (pas d'INCOHERENCE dans le message + SQL Sum pur)
+        //     val > 0 ne déclenche PAS de violation → ignorée silencieusement.
+        //     Ces règles sont ici parce qu'elles n'ont pas d'ASSOC dans la DB locale
+        //     (leurs ASSOC se trouvent dans les données serveur, pas dans le JSON statique).
         //
-        //   • Indicateur de violation (Sum(X-Y), Sum(CASE WHEN...)) :
-        //     val != 0 (positif ou négatif) → violation.
-        //     Comportement conservé pour rétrocompatibilité.
+        //   • Règle de violation réelle ("INCOHERENCE" dans le message, ou arithmétique
+        //     dans le SQL) → comportement normal val != 0 → violation.
         //
-        // NOTE : zero regression — les règles 814-834 n'utilisent PAS ce chemin scalar
-        // standalone (elles sont toutes en mode ASSOC ou EXISTS avec GROUP BY).
+        // NOTE : zéro régression — les règles 814-834 ont toutes "INCOHERENCE" dans
+        // leur message ou ont des ASSOC → ne sont pas affectées par ce skip.
         final val = _readScalarValue(rows);
         if (val != null && val != 0.0) {
-          // Vérifie si c'est une règle scalaire de référence pure (Sum d'une colonne)
-          if (_isPureReferenceScalarSql(sqlRegle)) {
-            logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK — scalaire de référence pure '
-                '(val=$val, standalone skip: pas d\'ASSOC pour cette règle)');
+          // Vérifie si c'est une règle de valeur de référence (pas une règle de violation)
+          if (_isReferenceValueRule(sqlRegle, message)) {
+            logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK — valeur de référence '
+                '(val=$val, standalone skip: message sans INCOHERENCE + Sum pur)');
           } else {
             logger.log('[ThemeRuleEngine] ✗ règle $idRegle VIOLÉE (scalar=$val)');
             return ThemeCoherenceError(
@@ -582,26 +581,32 @@ class ThemeRuleEngine {
     return double.tryParse(raw.toString()) ?? 0.0;
   }
 
-  /// Détermine si un SQL est une règle scalaire de référence pure.
+  /// Détermine si une règle scalaire est une valeur de référence (pas une règle
+  /// de violation autonome).
   ///
-  /// Une règle scalaire de référence pure est un SELECT qui ne fait que retourner
-  /// Sum(single_column) ou Count(column) sans aucune arithmétique, CASE WHEN,
-  /// sous-requête ou comparison embarquée.
+  /// Critères COMBINÉS (les DEUX doivent être vrais) :
+  ///   1. Le message ne contient PAS "INCOHERENCE" — les vraies règles de violation
+  ///      ont systématiquement "INCOHERENCE" dans leur message (convention Burundi).
+  ///      Les règles de référence ont des messages descriptifs (ex: "NB LATRINES FONC TOTAL").
   ///
-  /// Ces règles ne doivent PAS déclencher de violations en mode standalone :
-  /// elles sont conçues pour être utilisées comme règles ASSOCIÉES (valeur de
-  /// référence pour une comparaison dans une autre règle).
+  ///   2. Le SQL ne contient PAS d'arithmétique dans la clause SELECT :
+  ///      Sum(X-Y), Sum(X+Y), Sum(CASE WHEN...) → c'est une différence ou un indicateur
+  ///      → c'est une règle de violation (val != 0 = différence détectée).
+  ///      Sum(X) seul sans opérateur → c'est une valeur de compte (référence).
   ///
-  /// Exemples de règles de référence pure :
-  ///   SELECT Sum(NB_LATRINES_ELEVES) FROM DONNEES_ETABLISSEMENT WHERE (...)
-  ///   SELECT Sum(NB_LATRINES_FILLES) FROM DONNEES_ETABLISSEMENT WHERE (...)
+  /// Exemples de valeurs de référence (skip standalone) :
+  ///   message="NB LATRINES FONC TOTAL"  SQL=Sum(NB_LATRINES_ELEVES)   → référence
+  ///   message="TITULAIRE 1-6 SDC"       SQL=Sum(NB_ENS_TITULAIRE)     → référence
   ///
-  /// Exemples de règles d'indicateur de violation (NE sont PAS des références pures) :
-  ///   SELECT Sum(NB_LATRINES_FILLES - NB_LATRINES_ELEVES) FROM ... (différence)
-  ///   SELECT Sum(CASE WHEN FILLES > TOTAL THEN 1 ELSE 0 END) FROM ... (CASE WHEN)
-  ///   SELECT COUNT(*) FROM ... WHERE FILLES > TOTAL ... (EXISTS)
-  static bool _isPureReferenceScalarSql(String sql) {
-    // 1. Extraire la partie SELECT (entre SELECT et FROM)
+  /// Exemples de règles de violation (ne PAS skip) :
+  ///   message="INCOHERENCE ENTRE A ET B" SQL=Sum(A-B)                  → violation
+  ///   message="NVX INSCRITS TOTAL..."    SQL=Sum(NVX-TOTAL) avec arith  → violation
+  static bool _isReferenceValueRule(String sql, String message) {
+    // Critère 1 : le message ne contient PAS "INCOHERENCE"
+    if (message.toUpperCase().contains('INCOHERENCE')) return false;
+
+    // Critère 2 : le SQL Sum ne contient PAS d'opérateurs arithmétiques
+    // dans la clause SELECT (entre SELECT et FROM).
     final selMatch = RegExp(
       r'\bSELECT\b(.+?)\bFROM\b',
       caseSensitive: false,
@@ -611,30 +616,20 @@ class ThemeRuleEngine {
 
     final selectPart = selMatch.group(1)!.trim();
 
-    // 2. Supprimer les alias AS xxx
+    // Supprime les alias AS xxx pour éviter de confondre les alias avec des opérateurs
     final noAlias = selectPart.replaceAll(
       RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '');
 
-    // 3. Vérifier que chaque colonne est Sum(single_identifier) ou Count(*)
-    //    Pattern : Sum(TABLE.FIELD) ou Sum(FIELD) ou Count(*) ou Count(FIELD)
-    //    PAS d'arithmétique (+, -, *, /) ni de CASE WHEN ni de sous-requête
-    final cols = noAlias.split(',');
-    for (final col in cols) {
-      final trimmed = col.trim();
-      if (trimmed.isEmpty) continue;
+    // Vérifie l'absence d'arithmétique : +, -, *, / dans le SELECT
+    // et l'absence de CASE WHEN (indicateur de violation conditionnel)
+    final hasArithmetic = RegExp(
+      r'[+\-*/]|\bCASE\b|\bWHEN\b',
+      caseSensitive: false,
+    ).hasMatch(noAlias);
 
-      // Match: Sum(TABLE.FIELD) ou Sum(FIELD) — un seul identifiant, pas d'opérateur
-      final pureAgg = RegExp(
-        r'^(Sum|Count|Avg|Min|Max)\s*\(\s*\*?\s*(\w+\.)?\w+\s*\)$',
-        caseSensitive: false,
-      );
-      if (!pureAgg.hasMatch(trimmed)) {
-        // Contient de l'arithmétique, CASE WHEN, ou autre complexité → pas une référence pure
-        return false;
-      }
-    }
+    if (hasArithmetic) return false;  // Contient de l'arithmétique → règle de violation
 
-    return true;
+    return true;  // Pas d'INCOHERENCE + pas d'arithmétique → valeur de référence
   }
 
   /// Applique un opérateur de comparaison.
