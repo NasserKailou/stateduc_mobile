@@ -7,6 +7,7 @@ import '../../models/campaign.dart';
 import '../../models/regroup.dart';
 import '../../models/school.dart';
 import '../../models/education_system.dart';
+import '../../services/database_service.dart';
 import '../data_entry/school_data_screen.dart';
 
 /// CampaignDetailScreen — sélecteur de système éducatif + navigation hiérarchique
@@ -380,20 +381,46 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
 
   /// Ouvre l'écran de saisie [SchoolDataScreen] pour un établissement.
   ///
-  /// Construit la hiérarchie administrative à partir du fil d'Ariane de navigation.
-  /// Ex. : breadcrumb = [AGADEZ, ADERBISANAT, ADEBISSANAT]
-  ///   → adminHierarchy = "AGADEZ / ADERBISANAT / ADEBISSANAT"
+  /// SESSION 53 FIX — Chaîne de localisation correcte :
+  ///   La hiérarchie est construite depuis les données réelles de la localisation
+  ///   stockées en SQLite (localisations.regroups_json + regroups.lib_regp),
+  ///   PAS depuis le regroupBreadcrumb de navigation (qui reflète le chemin
+  ///   parcouru par l'utilisateur, pas la localisation réelle de l'établissement).
   ///
-  /// Si le fil d'Ariane est vide (navigation plate), utilise [school.libHierarchy]
-  /// comme fallback (valeur stockée sur le serveur à l'inscription de l'établissement).
+  /// Exemple : l'utilisateur arrive via BUHUMUZA/BUTAGANZWA/BISINDE mais
+  /// l'établissement est réellement dans CANKUZO/CENDAJURU/Busyana.
+  /// Avant : adminHierarchy = "BUHUMUZA / BUTAGANZWA / BISINDE" (faux)
+  /// Après : adminHierarchy = "CANKUZO / CENDAJURU / Busyana"   (correct)
   void _openSchool(
-      BuildContext context, CampaignProvider camps, School school) {
-    final breadcrumb = camps.regroupBreadcrumb;
-    // Construit la chaîne de hiérarchie administrative depuis le fil d'Ariane
-    final adminHierarchy = breadcrumb.isNotEmpty
-        ? breadcrumb.map((r) => r.libRegp).join(' / ')
-        : school.libHierarchy;  // fallback : valeur stockée dans la BDD serveur
+      BuildContext context, CampaignProvider camps, School school) async {
+    // SESSION 53 : Construire la chaîne depuis les données de localisation réelles
+    final db = DatabaseService.instance;
+    String? adminHierarchy;
 
+    try {
+      adminHierarchy = await db.getRegroupChainForEtab(
+        idCamp:   campaign.idCamp,
+        idSystem: camps.selectedSystem!.idSystem,
+        idEtab:   school.idEtab,
+      );
+    } catch (e) {
+      debugPrint('[CampaignDetail] getRegroupChainForEtab error: $e');
+    }
+
+    // Fallback 1 : breadcrumb de navigation si la localisation DB est vide
+    if ((adminHierarchy == null || adminHierarchy.isEmpty) &&
+        camps.regroupBreadcrumb.isNotEmpty) {
+      adminHierarchy = camps.regroupBreadcrumb.map((r) => r.libRegp).join(' / ');
+      debugPrint('[CampaignDetail] fallback breadcrumb → $adminHierarchy');
+    }
+
+    // Fallback 2 : libHierarchy stockée sur le serveur (inscription établissement)
+    if (adminHierarchy == null || adminHierarchy.isEmpty) {
+      adminHierarchy = school.libHierarchy;
+      debugPrint('[CampaignDetail] fallback libHierarchy → $adminHierarchy');
+    }
+
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(

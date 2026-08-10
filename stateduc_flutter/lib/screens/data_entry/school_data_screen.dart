@@ -287,6 +287,15 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
             isError: false,
             onDismiss: entry.clearMessages,
           ),
+        // SESSION 53 — Avertissement KOSAVE (orange) : données reçues serveur
+        // mais non enregistrées en base (ISOKSAVEINDATABASE absent).
+        if (entry.warningMessage != null)
+          _MessageBanner(
+            message: entry.warningMessage!,
+            isError: false,
+            isWarning: true,
+            onDismiss: entry.clearWarning,
+          ),
         // ── Violations de cohérence hors ligne ───────────────────────────
         // Source de vérité : moteur ThemeRuleEngine (DICO_REGLE_THEME).
         // Un seul panneau affiché — pas de doublon avec le moteur paire.
@@ -1449,30 +1458,40 @@ class _MessageBanner extends StatelessWidget {
     required this.message,
     required this.isError,
     required this.onDismiss,
+    this.isWarning = false,  // SESSION 53 : orange pour KOSAVE
   });
   final String message;
   final bool isError;
+  final bool isWarning;  // SESSION 53
   final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
+    // SESSION 53 : couleur orange pour avertissement KOSAVE
     final color = isError
         ? Theme.of(context).colorScheme.errorContainer
-        : Theme.of(context).colorScheme.secondaryContainer;
+        : isWarning
+            ? Colors.orange.shade100
+            : Theme.of(context).colorScheme.secondaryContainer;
     final textColor = isError
         ? Theme.of(context).colorScheme.onErrorContainer
-        : Theme.of(context).colorScheme.onSecondaryContainer;
+        : isWarning
+            ? Colors.orange.shade900
+            : Theme.of(context).colorScheme.onSecondaryContainer;
+    final icon = isError
+        ? Icons.error_outline
+        : isWarning
+            ? Icons.warning_amber_rounded
+            : Icons.check_circle_outline;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       color: color,
       child: Row(
         children: [
-          Icon(isError ? Icons.error_outline : Icons.check_circle_outline,
-              color: textColor, size: 18),
+          Icon(icon, color: textColor, size: 18),
           const SizedBox(width: 8),
           Expanded(
-              child:
-                  Text(message, style: TextStyle(color: textColor))),
+              child: Text(message, style: TextStyle(color: textColor))),
           IconButton(
             icon: Icon(Icons.close, size: 16, color: textColor),
             onPressed: onDismiss,

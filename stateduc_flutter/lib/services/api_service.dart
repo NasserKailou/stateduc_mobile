@@ -596,7 +596,10 @@ class ApiService {
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<Regroup>> getRegroups(String login, String campId) async {
-    final data = await _get('user_camp.php/reg_camp/$login/$campId/1');
+    // SESSION 53 FIX: encoder le login pour éviter HTTP 400 sur les logins avec espaces
+    // ex. "BUTERA III" → "BUTERA%20III" sans quoi Slim PHP reçoit une URL malformée.
+    final encodedLogin = Uri.encodeComponent(login);
+    final data = await _get('user_camp.php/reg_camp/$encodedLogin/$campId/1');
     if (data is List) {
       return data.map((r) => Regroup.fromJson(r)).toList();
     }
@@ -1002,8 +1005,10 @@ class ApiService {
       // $_SESSION['annee'] and bypass the missing browser session for REST calls.
       // The server has two routes: one with /:id_annee (mobile) and one without (web).
       final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '';
+      // SESSION 53 FIX: encoder le login pour éviter HTTP 400 sur les logins avec espaces
+      final encodedLogin = Uri.encodeComponent(login);
       final response = await _dio.post(
-        'data_save.php/theme_save/$login/$campId/$sysId/$qstId/$etabId/$filterParam/0$anneeSegment',
+        'data_save.php/theme_save/$encodedLogin/$campId/$sysId/$qstId/$etabId/$filterParam/0$anneeSegment',
         data: body,
         options: Options(
           contentType: 'application/x-www-form-urlencoded',
@@ -1038,17 +1043,11 @@ class ApiService {
         }
         if (result['se_data'] == 'OKSAVE') return true;
         if (result['se_data'] == 'KOSAVE') {
-          // KOSAVE = server received data but questionnaire_ws.php did not emit
-          // ISOKSAVEINDATABASE. Common causes:
-          //   1. The theme include file was not found (curfile Inexistant)
-          //   2. The arbre class set theme_data_MAJ_ok=false (DB write failed)
-          //   3. The identification theme has special save logic that requires
-          //      extra session context not available in mobile context.
-          // For now, we treat KOSAVE as a partial failure — local save already done.
-          debugPrint('[ApiService] saveData: KOSAVE — data sent but server DB write may have failed');
-          // Return true so UI doesn't show an error — local save is fine
-          // TODO: in a future version, surface a warning to the user
-          return true;
+          // SESSION 53 FIX: KOSAVE n'est plus silencieux — on lève KosaveException
+          // pour que l'UI affiche un avertissement visible à l'utilisateur.
+          // La sauvegarde locale est déjà faite avant l'appel → données sûres.
+          debugPrint('[ApiService] saveData: KOSAVE — données reçues mais non enregistrées en DB serveur');
+          throw KosaveException(themeId: qstId);
         }
         if (result['se_status'] != null && result['se_status'] != 400) return true;
         debugPrint('[ApiService] saveData: unexpected result → $result');
@@ -1121,9 +1120,11 @@ class ApiService {
     required String? filter, // période filtre (ou null)
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
+    // SESSION 53 FIX: encoder le login pour éviter HTTP 400 sur les logins avec espaces
+    final encodedLogin = Uri.encodeComponent(login);
     try {
       final response = await _dio.get(
-        'data_reload.php/theme_data/$login/$sysId/$qstId/$campId/$etabId/$filterParam',
+        'data_reload.php/theme_data/$encodedLogin/$sysId/$qstId/$campId/$etabId/$filterParam',
         options: Options(responseType: ResponseType.plain),
       );
       final responseStr = response.data.toString().trim();
@@ -1183,8 +1184,10 @@ class ApiService {
   }) async {
     final filterParam  = (filter == null || filter.isEmpty) ? 'null' : filter;
     final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? yearCode : '0';
+    // SESSION 53 FIX: encoder le login pour éviter HTTP 400 sur les logins avec espaces
+    final encodedLogin = Uri.encodeComponent(login);
     final path =
-        'data_rules.php/theme_rules/$login/$campId/$sysId/$qstId/$etabId/$filterParam/$anneeSegment';
+        'data_rules.php/theme_rules/$encodedLogin/$campId/$sysId/$qstId/$etabId/$filterParam/$anneeSegment';
     try {
       final response = await _dio.get(
         path,
@@ -1282,8 +1285,10 @@ class ApiService {
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
     final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '/0';
+    // SESSION 53 FIX: encoder le login pour éviter HTTP 400 sur les logins avec espaces
+    final encodedLogin = Uri.encodeComponent(login);
     final path =
-        'data_controle.php/theme_controle/$login/$campId/$sysId/$qstId/$etabId/$filterParam$anneeSegment';
+        'data_controle.php/theme_controle/$encodedLogin/$campId/$sysId/$qstId/$etabId/$filterParam$anneeSegment';
     try {
       final response = await _dio.get(
         path,
@@ -1570,6 +1575,27 @@ class ApiException implements Exception {
 
   @override
   String toString() => message;
+}
+
+/// SESSION 53 — Exception levée quand le serveur retourne KOSAVE.
+///
+/// KOSAVE = le serveur a reçu les données mais le fichier ACTION_THEME
+/// (questionnaire_ws.php) n'a pas émis "ISOKSAVEINDATABASE".
+/// Causes connues :
+///   1. Le fichier include du thème est introuvable (ACTION_THEME absent)
+///   2. theme_data_MAJ_ok=false (échec DB côté serveur)
+///   3. Le thème d'identification a une logique spéciale nécessitant
+///      un contexte de session PHP non disponible en REST mobile.
+///
+/// La sauvegarde LOCALE a déjà été effectuée avant l'envoi → les données
+/// ne sont PAS perdues. L'utilisateur doit réessayer ou contacter l'admin.
+class KosaveException implements Exception {
+  final String themeId;
+  final String message;
+  KosaveException({required this.themeId, this.message = 'KOSAVE'});
+
+  @override
+  String toString() => 'KOSAVE (thème $themeId) : données reçues mais non enregistrées en base';
 }
 
 /// CoherenceError — Violation de cohérence retournée par data_controle.php.

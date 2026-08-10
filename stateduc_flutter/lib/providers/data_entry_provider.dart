@@ -94,6 +94,8 @@ class DataEntryProvider extends ChangeNotifier {
   bool    _hasUnsavedChanges = false;  // vrai si des modifications non sauvegardées existent
   String? _error;
   String? _successMessage;
+  // SESSION 53 — Message d'avertissement KOSAVE (données reçues mais non enregistrées côté serveur)
+  String? _warningMessage;
 
   // ─── Résultats du contrôle de cohérence serveur ──────────────────────────────
   // Rempli après sendToServer() si le serveur détecte des violations.
@@ -149,6 +151,10 @@ class DataEntryProvider extends ChangeNotifier {
   bool    get hasUnsavedChanges   => _hasUnsavedChanges;
   String? get error               => _error;
   String? get successMessage      => _successMessage;
+  /// SESSION 53 — Message d'avertissement KOSAVE : données reçues par le serveur
+  /// mais non enregistrées en base (ISOKSAVEINDATABASE absent de questionnaire_ws).
+  /// Null si aucun avertissement en cours. L'UI doit l'afficher en orange/jaune.
+  String? get warningMessage      => _warningMessage;
   List<CoherenceError> get coherenceErrors    => List.unmodifiable(_coherenceErrors);
   bool                 get isCheckingCoherence => _isCheckingCoherence;
   bool get hasCoherenceErrors => _coherenceErrors.isNotEmpty;
@@ -861,10 +867,11 @@ class DataEntryProvider extends ChangeNotifier {
     // Sauvegarde locale d'abord (assure la persistance même si l'envoi échoue)
     await saveLocally();
 
-    _isSending      = true;
-    _sendAttempt    = 1;  // première tentative
-    _error          = null;
-    _successMessage = null;
+    _isSending        = true;
+    _sendAttempt      = 1;  // première tentative
+    _error            = null;
+    _successMessage   = null;
+    _warningMessage   = null;  // SESSION 53 : réinitialise l'avertissement KOSAVE
     notifyListeners();
 
     try {
@@ -926,6 +933,25 @@ class DataEntryProvider extends ChangeNotifier {
       }
       notifyListeners();
       return ok;
+    } on KosaveException catch (e) {
+      // SESSION 53 — KOSAVE : données reçues par le serveur mais non enregistrées
+      // en base. La sauvegarde locale est déjà faite → pas de perte de données.
+      // On marque quand même comme "envoyé" en local pour éviter les renvois
+      // répétés, et on affiche un avertissement orange à l'utilisateur.
+      debugPrint('[DataEntry] KOSAVE pour thème ${e.themeId} : ${e.toString()}');
+      try {
+        await _db.markCollectedDataSent(
+          idCamp:   _idCamp!,
+          idEtab:   _idEtab!,
+          idQst:    _selectedQuestion!.idQst,
+          idFilter: _selectedFilter?.idFilter,
+        );
+      } catch (_) { /* non fatal */ }
+      _warningMessage = '⚠ Données envoyées mais non enregistrées sur le serveur '
+          '(thème ${e.themeId}). Vérifiez avec l\'administrateur si les données '
+          'apparaissent côté serveur.';
+      notifyListeners();
+      return true;  // Retourne true : l'envoi a techniquement réussi (KOSAVE ≠ échec réseau)
     } on ApiException catch (e) {
       _error = e.message;
       notifyListeners();
@@ -1226,6 +1252,21 @@ class DataEntryProvider extends ChangeNotifier {
               idFilter: null,
             );
           }
+        } on KosaveException catch (e) {
+          // SESSION 53 — KOSAVE en envoi batch : marquer comme envoyé en local,
+          // avertir mais ne pas bloquer les autres formulaires.
+          debugPrint('[DataEntry] sendAllFormsForSchool KOSAVE qst=${q.idQst}: $e');
+          results[q.idQst] = true;  // Compté comme envoyé (reçu par le serveur)
+          try {
+            await _db.markCollectedDataSent(
+              idCamp:   _idCamp!,
+              idEtab:   _idEtab!,
+              idQst:    q.idQst,
+              idFilter: null,
+            );
+          } catch (_) { /* non fatal */ }
+          _warningMessage = (_warningMessage == null ? '' : '$_warningMessage\n') +
+              '⚠ Thème ${q.idQst} : reçu mais non enregistré côté serveur (KOSAVE)';
         } on ApiException catch (e) {
           results[q.idQst] = false;
           debugPrint('[DataEntry] sendAllFormsForSchool: '
@@ -1491,12 +1532,19 @@ class DataEntryProvider extends ChangeNotifier {
   // HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  /// Efface tous les messages (erreur, succès, violations offline).
+  /// Efface tous les messages (erreur, succès, avertissement KOSAVE, violations offline).
   void clearMessages() {
     _error                  = null;
     _successMessage         = null;
+    _warningMessage         = null;  // SESSION 53
     _offlineCoherenceErrors = [];
     _themeCoherenceErrors   = [];
+    notifyListeners();
+  }
+
+  /// SESSION 53 — Efface uniquement le message d'avertissement KOSAVE.
+  void clearWarning() {
+    _warningMessage = null;
     notifyListeners();
   }
 

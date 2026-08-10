@@ -1026,6 +1026,135 @@ class DatabaseService {
   // LOCALISATIONS
   // ═══════════════════════════════════════════════════════════════════════════
 
+  /// SESSION 53 — Construit la chaîne hiérarchique correcte d'un établissement
+  /// depuis les données stockées en local (localisations + regroups), SANS se
+  /// fier au chemin de navigation de l'utilisateur (regroupBreadcrumb).
+  ///
+  /// Algorithme :
+  ///   1. Cherche la ligne dans `localisations` pour (idCamp, idSystem, idEtab)
+  ///   2. Parse le JSON `regroups_json` → liste d'IDs de regroupements
+  ///   3. Pour chaque ID, retrouve le libellé dans la table `regroups`
+  ///   4. Reconstruit la chaîne ordonnée du plus haut au plus bas niveau
+  ///      en remontant les parents (id_parent_regp) depuis la feuille
+  ///   5. Si localisations vide → tente via schools.id_regroup (fallback)
+  ///
+  /// Retourne la chaîne "PROV / COMMUNE / SECTEUR" ou null si rien trouvé.
+  Future<String?> getRegroupChainForEtab({
+    required String idCamp,
+    required String idSystem,
+    required String idEtab,
+  }) async {
+    final db = await database;
+
+    // ── Étape 1 : récupère la ligne de localisation ──────────────────────────
+    final locRows = await db.query(
+      'localisations',
+      where: 'id_camp = ? AND id_system = ? AND id_etab = ?',
+      whereArgs: [idCamp, idSystem, idEtab],
+      limit: 1,
+    );
+
+    List<String> regroupIds = [];
+
+    if (locRows.isNotEmpty) {
+      // ── Étape 2 : parse regroups_json ──────────────────────────────────────
+      final jsonStr = locRows.first['regroups_json'] as String? ?? '[]';
+      try {
+        final parsed = jsonDecode(jsonStr) as List<dynamic>;
+        regroupIds = parsed.map((e) => e.toString()).where((s) => s.isNotEmpty).toList();
+      } catch (_) {
+        // JSON invalide — tente extraction naïve
+        regroupIds = jsonStr
+            .replaceAll('[', '').replaceAll(']', '').replaceAll('"', '')
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
+    } else {
+      // Fallback : si pas de ligne localisation, utilise schools.id_regroup
+      final schoolRows = await db.query(
+        'schools',
+        columns: ['id_regroup'],
+        where: 'id_camp = ? AND id_etab = ?',
+        whereArgs: [idCamp, idEtab],
+        limit: 1,
+      );
+      if (schoolRows.isNotEmpty && schoolRows.first['id_regroup'] != null) {
+        regroupIds = [(schoolRows.first['id_regroup'] as String)];
+      }
+    }
+
+    if (regroupIds.isEmpty) {
+      debugPrint('[DB] getRegroupChainForEtab: aucun regroupID pour etab=$idEtab');
+      return null;
+    }
+
+    // ── Étape 3 : charge tous les regroups de cette campagne en mémoire ───────
+    // (généralement <200 lignes — très rapide)
+    final allRegroupRows = await db.query(
+      'regroups',
+      where: 'id_camp = ?',
+      whereArgs: [idCamp],
+    );
+    final regroupMap = <String, Map<String, dynamic>>{};
+    for (final r in allRegroupRows) {
+      regroupMap[(r['id_regp'] as String)] = r;
+    }
+
+    // ── Étape 4 : reconstruit la chaîne ordonnée ──────────────────────────────
+    // Le serveur envoie dans regroups_json un mélange de parents et d'enfants.
+    // On détermine le nœud feuille (le plus profond = sans enfant dans les IDs
+    // présents), puis on remonte vers la racine via id_parent_regp.
+    //
+    // Méthode robuste : trouver les IDs qui ne sont parents d'aucun autre ID
+    // présent dans la liste → ce sont les feuilles.
+    final regroupIdSet = regroupIds.toSet();
+
+    // Trouve les IDs qui sont parents d'un autre ID dans la liste
+    final parentIds = <String>{};
+    for (final id in regroupIds) {
+      final row = regroupMap[id];
+      if (row == null) continue;
+      final parent = row['id_parent_regp'] as String?;
+      if (parent != null && regroupIdSet.contains(parent)) {
+        parentIds.add(parent);
+      }
+    }
+
+    // Les feuilles = IDs présents mais pas parents d'un autre ID dans la liste
+    final leafIds = regroupIds.where((id) => !parentIds.contains(id)).toList();
+
+    // Prend la première feuille (normalement il n'y en a qu'une par étab)
+    final startId = leafIds.isNotEmpty ? leafIds.first : regroupIds.last;
+
+    // Remonte la chaîne depuis la feuille jusqu'à la racine
+    final chain = <String>[];
+    String? currentId = startId;
+    final visited = <String>{};
+
+    while (currentId != null && !visited.contains(currentId)) {
+      visited.add(currentId);
+      final row = regroupMap[currentId];
+      if (row == null) break;
+      chain.add(row['lib_regp'] as String);
+      final parent = row['id_parent_regp'] as String?;
+      // Arrêt si root (null, '-1', '0', '')
+      if (parent == null || parent == '-1' || parent == '0' || parent.trim().isEmpty) break;
+      currentId = parent;
+    }
+
+    if (chain.isEmpty) {
+      debugPrint('[DB] getRegroupChainForEtab: chaîne vide pour etab=$idEtab');
+      return null;
+    }
+
+    // La chaîne est construite feuille→racine → inverser pour racine→feuille
+    final result = chain.reversed.join(' / ');
+    debugPrint('[DB] getRegroupChainForEtab etab=$idEtab → "$result"');
+    return result;
+  }
+
   Future<List<Localisation>> getLocalisations(
       String idCamp, String idSystem) async {
     final db = await database;
