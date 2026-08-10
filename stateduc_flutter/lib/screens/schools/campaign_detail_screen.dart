@@ -394,7 +394,7 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
   void _openSchool(
       BuildContext context, CampaignProvider camps, School school) async {
     // SESSION 53 : Construire la chaîne depuis les données de localisation réelles
-    final db = DatabaseService.instance;
+    final db = DatabaseService();
     String? adminHierarchy;
 
     try {
