@@ -344,7 +344,10 @@ class CoherenceLogger {
       final buf = StringBuffer();
       for (final line in lines) {
         if (buf.length + line.length + 1 > _kChunkSize) {
-          if (buf.isNotEmpty) { debugPrint(buf.toString()); buf.clear(); }
+          if (buf.isNotEmpty) {
+            debugPrint(buf.toString());
+            buf.clear();
+          }
         }
         buf.writeln(line);
         if (buf.length > _kChunkSize) {
@@ -425,16 +428,16 @@ class SqlTranslator {
     // fallback avec v1=null v2=null. Champs : FILLES_NV_INCRITES_0_8_4 (multi-lignes).
     'NOUVEAUX_INSCRITS',
     // ── Tables identifiées dans DICO_REGLE_THEME (moteur générique) ──────────
-    'DONN_GEN_INFOS_SALLES_UTIL',   // Thème 900 : salles, latrines, eau, électricité
-    'MANUELS_ELEVE',                 // Thème 940 : manuels scolaires par niveau
-    'PERS_FONC_NAT',                 // Thème 1030 : personnel par fonction
-    'PERS_NAT_QUALIF',               // Thème 1030/1040 : personnel qualifié
-    'ELEVES_RED_RAPATR_ABAND',       // Thème 1050/1060 : redoublants / rapatriés
-    'ELEVES_HANDICAP',               // Thème 1050 : élèves handicapés
-    'NVX_INSCRITS_PRESC',            // Thème 1070 : nouveaux inscrits préscolaire
-    'ELEVES_NATIONALITE',            // Thème 1060 : effectifs par nationalité
-    'ETABLISSEMENT',                 // Thème 900/950 : table référentielle établissement
-    'ETABLISSEMENT_NIVEAU',          // Thème 950 : établissement par niveau
+    'DONN_GEN_INFOS_SALLES_UTIL', // Thème 900 : salles, latrines, eau, électricité
+    'MANUELS_ELEVE', // Thème 940 : manuels scolaires par niveau
+    'PERS_FONC_NAT', // Thème 1030 : personnel par fonction
+    'PERS_NAT_QUALIF', // Thème 1030/1040 : personnel qualifié
+    'ELEVES_RED_RAPATR_ABAND', // Thème 1050/1060 : redoublants / rapatriés
+    'ELEVES_HANDICAP', // Thème 1050 : élèves handicapés
+    'NVX_INSCRITS_PRESC', // Thème 1070 : nouveaux inscrits préscolaire
+    'ELEVES_NATIONALITE', // Thème 1060 : effectifs par nationalité
+    'ETABLISSEMENT', // Thème 900/950 : table référentielle établissement
+    'ETABLISSEMENT_NIVEAU', // Thème 950 : établissement par niveau
   };
 
   // Tables dont les données sont multi-lignes dans collected_data
@@ -560,7 +563,7 @@ class SqlTranslator {
       // questionnaire). MAX(id) garantit que SAVEPOINT (inséré en dernier) gagne.
       final escapedCampStep5 = idCamp.replaceAll("'", "''");
       final escapedEtabStep5 = idEtab.replaceAll("'", "''");
-      final escapedQstStep5  = (idQst ?? '').replaceAll("'", "''");
+      final escapedQstStep5 = (idQst ?? '').replaceAll("'", "''");
 
       final String cdCte;
       if (idQst != null && idQst.isNotEmpty) {
@@ -691,7 +694,8 @@ class SqlTranslator {
       // avec HAVING+WHERE intégralement supprimés), éviter de générer un SQL
       // syntaxiquement invalide tel que SELECT COUNT(*) AS cnt FROM (\n) _violations.
       if (translatedSql.trim().isEmpty) {
-        SqlTranslator._log('[SqlTranslator] translatedSql empty after stripping — aborting translation');
+        SqlTranslator._log(
+            '[SqlTranslator] translatedSql empty after stripping — aborting translation');
         return null;
       }
 
@@ -735,14 +739,15 @@ class SqlTranslator {
       ).hasMatch(translatedSql);
 
       // Détection du pattern Sum-scalaire avec GROUP BY de contexte (Fix S52)
-      final isSumScalarGroupBy = hasGroupBy &&
-          _isSumScalarWithContextGroupBy(translatedSql);
+      final isSumScalarGroupBy =
+          hasGroupBy && _isSumScalarWithContextGroupBy(translatedSql);
 
       // Si GROUP BY contexte-only avec Sum/Count dans SELECT :
       // supprimer le GROUP BY pour obtenir une requête scalaire propre.
       if (isSumScalarGroupBy) {
         translatedSql = _stripContextOnlyGroupBy(translatedSql);
-        SqlTranslator._log('[SqlTranslator] Sum-scalar with context-only GROUP BY detected '
+        SqlTranslator._log(
+            '[SqlTranslator] Sum-scalar with context-only GROUP BY detected '
             '→ GROUP BY stripped → SCALAR mode');
       }
 
@@ -785,13 +790,15 @@ class SqlTranslator {
         //
         // COALESCE sur la valeur lue dans _execCount (déjà géré : null → 0.0).
         // Pas de COALESCE dans le wrapper (supprimé : inutile avec SELECT *).
-        SqlTranslator._log('[SqlTranslator] SCALAR: building multi-column-safe wrapper');
+        SqlTranslator._log(
+            '[SqlTranslator] SCALAR: building multi-column-safe wrapper');
         wrappedSql =
             '$withClause\nSELECT * FROM (\n$translatedSql\n) _scalar LIMIT 1';
         isScalar = true;
       }
 
-      SqlTranslator._log('[SqlTranslator] translated SQL (isScalar=$isScalar):\n$wrappedSql');
+      SqlTranslator._log(
+          '[SqlTranslator] translated SQL (isScalar=$isScalar):\n$wrappedSql');
 
       return TranslationResult(
         sql: wrappedSql,
@@ -835,14 +842,14 @@ class SqlTranslator {
     final m = selRe.firstMatch(sql);
     if (m == null) return sql;
 
-    final selectKw  = m.group(1)!;   // "SELECT"
-    final colsPart  = m.group(2)!;   // " Sum(X) AS a, Sum(Y) AS b "
-    final fromKw    = m.group(3)!;   // "FROM"
+    final selectKw = m.group(1)!; // "SELECT"
+    final colsPart = m.group(2)!; // " Sum(X) AS a, Sum(Y) AS b "
+    final fromKw = m.group(3)!; // "FROM"
 
     // Découpe en colonnes de niveau 0 (respecte les parenthèses imbriquées)
     final cols = <String>[];
-    final buf  = StringBuffer();
-    int depth  = 0;
+    final buf = StringBuffer();
+    int depth = 0;
     for (int i = 0; i < colsPart.length; i++) {
       final c = colsPart[i];
       if (c == '(') {
@@ -864,8 +871,8 @@ class SqlTranslator {
 
     // Ne garder que la première colonne
     final firstCol = cols.first;
-    final before   = sql.substring(0, m.start);
-    final after    = sql.substring(m.end);
+    final before = sql.substring(0, m.start);
+    final after = sql.substring(m.end);
     SqlTranslator._log('[SqlTranslator] _keepFirstSelectColumn: '
         '${cols.length} cols → kept: "${firstCol.trim()}"');
     return '$before$selectKw${firstCol.trimRight()} $fromKw$after';
@@ -1147,13 +1154,14 @@ class SqlTranslator {
     result = result.replaceAll(RegExp(r'\bdbo\.', caseSensitive: false), '');
 
     // 0b. Crochets Access [FIELD_NAME] → nom brut  ex: [TOTAL_AGE_NIVEAU] → TOTAL_AGE_NIVEAU
-    result = result.replaceAllMapped(
-        RegExp(r'\[([^\]]+)\]'), (m) => m.group(1)!);
+    result =
+        result.replaceAllMapped(RegExp(r'\[([^\]]+)\]'), (m) => m.group(1)!);
 
     // 0c. TOP (N) PERCENT → supprimer (non supporté SQLite)
     //     Ex: SELECT TOP (100) PERCENT … → SELECT …
     result = result.replaceAll(
-        RegExp(r'\bTOP\s*\(\s*\d+\s*\)\s*PERCENT\s*', caseSensitive: false), '');
+        RegExp(r'\bTOP\s*\(\s*\d+\s*\)\s*PERCENT\s*', caseSensitive: false),
+        '');
     // TOP N PERCENT sans parenthèses
     result = result.replaceAll(
         RegExp(r'\bTOP\s+\d+\s+PERCENT\s*', caseSensitive: false), '');
@@ -1198,7 +1206,8 @@ class SqlTranslator {
     result = result.replaceAll(RegExp(r'\bAnd\b'), 'AND');
 
     // 6b. Not In → NOT IN (casse mixte Access)
-    result = result.replaceAll(RegExp(r'\bNot\s+In\b', caseSensitive: false), 'NOT IN');
+    result = result.replaceAll(
+        RegExp(r'\bNot\s+In\b', caseSensitive: false), 'NOT IN');
 
     // 7. DATEDIFF, DATEADD → non supporté SQLite, mais pas dans les règles de cohérence
     // 8. TOP N → LIMIT N  (Access TOP)
@@ -1244,22 +1253,24 @@ class SqlTranslator {
       final args = _parseArgs(result, openParen);
       if (args == null || args.length < 3) {
         // Structure invalide — ne pas traduire pour éviter corruption
-        SqlTranslator._log('[SqlTranslator] IIF: args invalides (${args?.length ?? 0}) — skip');
+        SqlTranslator._log(
+            '[SqlTranslator] IIF: args invalides (${args?.length ?? 0}) — skip');
         break;
       }
 
-      final cond     = args[0].trim();
-      final trueVal  = args[1].trim();
+      final cond = args[0].trim();
+      final trueVal = args[1].trim();
       final falseVal = args[2].trim();
 
       final closePos = _findClosingParen(result, openParen);
       if (closePos < 0) break;
 
       final replacement = 'CASE WHEN $cond THEN $trueVal ELSE $falseVal END';
-      SqlTranslator._log('[SqlTranslator] IIF→CASE: IIF($cond, $trueVal, $falseVal) → $replacement');
-      result = result.substring(0, m.start)
-               + replacement
-               + result.substring(closePos + 1);
+      SqlTranslator._log(
+          '[SqlTranslator] IIF→CASE: IIF($cond, $trueVal, $falseVal) → $replacement');
+      result = result.substring(0, m.start) +
+          replacement +
+          result.substring(closePos + 1);
     }
     return result;
   }
@@ -1294,7 +1305,7 @@ class SqlTranslator {
       String? elseClause;
       for (int i = 0; i + 1 < args.length; i += 2) {
         final cond = args[i].trim();
-        final val  = args[i + 1].trim();
+        final val = args[i + 1].trim();
         // 'True' (littéral Access) = clause DEFAULT
         if (RegExp(r'^True$', caseSensitive: false).hasMatch(cond)) {
           elseClause = val;
@@ -1306,10 +1317,11 @@ class SqlTranslator {
       buf.write(' END');
 
       final replacement = buf.toString();
-      SqlTranslator._log('[SqlTranslator] SWITCH→CASE: SWITCH(${args.join(', ')}) → $replacement');
-      result = result.substring(0, m.start)
-               + replacement
-               + result.substring(closePos + 1);
+      SqlTranslator._log(
+          '[SqlTranslator] SWITCH→CASE: SWITCH(${args.join(', ')}) → $replacement');
+      result = result.substring(0, m.start) +
+          replacement +
+          result.substring(closePos + 1);
     }
     return result;
   }
@@ -1324,22 +1336,34 @@ class SqlTranslator {
   //
   // Retourne null si la structure est malformée (pas de ')' fermant trouvé).
   static List<String>? _parseArgs(String sql, int openParen) {
-    final args    = <String>[];
-    final buf     = StringBuffer();
-    int   depth   = 0;
-    bool  inSQ    = false; // in single quote
-    bool  inDQ    = false; // in double quote
+    final args = <String>[];
+    final buf = StringBuffer();
+    int depth = 0;
+    bool inSQ = false; // in single quote
+    bool inDQ = false; // in double quote
 
     for (int i = openParen; i < sql.length; i++) {
       final c = sql[i];
 
-      if (c == "'" && !inDQ) { inSQ = !inSQ; buf.write(c); continue; }
-      if (c == '"' && !inSQ) { inDQ = !inDQ; buf.write(c); continue; }
-      if (inSQ || inDQ) { buf.write(c); continue; }
+      if (c == "'" && !inDQ) {
+        inSQ = !inSQ;
+        buf.write(c);
+        continue;
+      }
+      if (c == '"' && !inSQ) {
+        inDQ = !inDQ;
+        buf.write(c);
+        continue;
+      }
+      if (inSQ || inDQ) {
+        buf.write(c);
+        continue;
+      }
 
       if (c == '(') {
         depth++;
-        if (depth == 1) continue; // '(' ouvrante de niveau 0 : délimiteur, pas dans un arg
+        if (depth == 1)
+          continue; // '(' ouvrante de niveau 0 : délimiteur, pas dans un arg
         buf.write(c);
       } else if (c == ')') {
         depth--;
@@ -1360,16 +1384,26 @@ class SqlTranslator {
 
   // ─── SESSION 63 : Trouve l'index de la ')' fermante correspondant à openParen ─
   static int _findClosingParen(String sql, int openParen) {
-    int  depth = 0;
-    bool inSQ  = false;
-    bool inDQ  = false;
+    int depth = 0;
+    bool inSQ = false;
+    bool inDQ = false;
     for (int i = openParen; i < sql.length; i++) {
       final c = sql[i];
-      if (c == "'" && !inDQ) { inSQ = !inSQ; continue; }
-      if (c == '"' && !inSQ) { inDQ = !inDQ; continue; }
+      if (c == "'" && !inDQ) {
+        inSQ = !inSQ;
+        continue;
+      }
+      if (c == '"' && !inSQ) {
+        inDQ = !inDQ;
+        continue;
+      }
       if (inSQ || inDQ) continue;
-      if (c == '(') depth++;
-      else if (c == ')') { depth--; if (depth == 0) return i; }
+      if (c == '(')
+        depth++;
+      else if (c == ')') {
+        depth--;
+        if (depth == 0) return i;
+      }
     }
     return -1;
   }
@@ -1403,12 +1437,13 @@ class SqlTranslator {
           .toSet();
 
       // Vérifie si tous les identifiants sont des champs de contexte
-      final isContextOnly = identifiers
-          .every((id) => _contextFields.contains(id));
+      final isContextOnly =
+          identifiers.every((id) => _contextFields.contains(id));
 
       if (isContextOnly) {
         // HAVING ne filtre que sur l'établissement/année → redondant sur mobile
-        SqlTranslator._log('[SqlTranslator] stripping context-only HAVING: $havingBody');
+        SqlTranslator._log(
+            '[SqlTranslator] stripping context-only HAVING: $havingBody');
         return ''; // Supprime le HAVING entier
       } else {
         // HAVING contient une logique métier (SUM, COUNT, etc.) → on le garde
@@ -1458,7 +1493,7 @@ class SqlTranslator {
         }
       }
       if (firstCteEnd >= 0) {
-        ctePart  = sql.substring(0, firstCteEnd + 1);
+        ctePart = sql.substring(0, firstCteEnd + 1);
         mainPart = sql.substring(firstCteEnd + 1);
       }
     }
@@ -1487,11 +1522,13 @@ class SqlTranslator {
           .toSet();
 
       // Vérifie si tous les identifiants sont des champs de contexte
-      final isContextOnly = identifiers.every((id) => _contextFields.contains(id));
+      final isContextOnly =
+          identifiers.every((id) => _contextFields.contains(id));
 
       if (isContextOnly) {
         // WHERE ne filtre que sur l'établissement/année → redondant sur mobile
-        SqlTranslator._log('[SqlTranslator] stripping context-only WHERE: $whereBody');
+        SqlTranslator._log(
+            '[SqlTranslator] stripping context-only WHERE: $whereBody');
         return ''; // Supprime WHERE + body; le lookahead préserve \n) et GROUP BY
       } else {
         // WHERE contient une logique métier (champs de données) → on le garde
@@ -1530,15 +1567,15 @@ class SqlTranslator {
     if (selMatch == null) return false;
 
     // Supprimer les alias AS xxx puis tester chaque colonne
-    final selectPart = selMatch.group(1)!
+    final selectPart = selMatch
+        .group(1)!
         .replaceAll(RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '');
     final colParts = selectPart.split(',');
     for (final col in colParts) {
       final trimmed = col.trim();
       if (trimmed.isEmpty) continue;
       // Chaque colonne doit être une fonction d'agrégation
-      if (!RegExp(r'^(Sum|Count|Avg|Max|Min)\s*\(',
-              caseSensitive: false)
+      if (!RegExp(r'^(Sum|Count|Avg|Max|Min)\s*\(', caseSensitive: false)
           .hasMatch(trimmed)) {
         return false;
       }
@@ -1652,8 +1689,6 @@ class SqlTranslator {
     'DATEADD',
     'CONVERT',
     'LEN',
-    'LEFT',
-    'RIGHT',
     'UPPER',
     'LOWER',
     'TRIM',
@@ -1862,7 +1897,8 @@ class CoherenceEvaluator {
       final allKeys = {
         ...persistedData.keys,
         ...allEtabData.keys,
-      }.where((k) => !k.startsWith('CODE_')).toList()..sort();
+      }.where((k) => !k.startsWith('CODE_')).toList()
+        ..sort();
       logger.log('[CoherenceEval] collected_data ALL fields '
           '(idEtab=$idEtab, total=${allKeys.length}):');
       // Log par blocs de 30 pour lisibilité
@@ -1948,8 +1984,15 @@ class CoherenceEvaluator {
             'INSERT OR REPLACE INTO collected_data '
             '(id_camp, id_etab, id_qst, id_filter, field_name, field_value, is_sent, updated_at) '
             'VALUES (?, ?, ?, ?, ?, ?, 0, ?)',
-            [idCamp, idEtab, idQst ?? '', '', fieldName, rawValue,
-             DateTime.now().toIso8601String()],
+            [
+              idCamp,
+              idEtab,
+              idQst ?? '',
+              '',
+              fieldName,
+              rawValue,
+              DateTime.now().toIso8601String()
+            ],
           );
           injectedCount++;
         } catch (e) {
@@ -1957,13 +2000,15 @@ class CoherenceEvaluator {
               'field=$fieldName val=$rawValue: $e');
         }
       }
-      logger.log('[CoherenceEval] S59: $injectedCount champs injectés depuis formData');
+      logger.log(
+          '[CoherenceEval] S59: $injectedCount champs injectés depuis formData');
 
       // ── Étape 3 : boucle des règles (avec CTE qui voit formData) ─────────
       for (final rule in rules) {
         logger.log('--------------------------------------------------------');
-        logger.log('[CoherenceEval] rule=${rule.idRegle} lib="${rule.libRegle}" '
-            'critere="${rule.critere}"');
+        logger
+            .log('[CoherenceEval] rule=${rule.idRegle} lib="${rule.libRegle}" '
+                'critere="${rule.critere}"');
         try {
           final violated = await _evaluateRule(
             rule: rule,
@@ -1981,12 +2026,15 @@ class CoherenceEvaluator {
             violations.add(_buildViolation(rule, regexValues));
             logger.log('[CoherenceEval] rule=${rule.idRegle} *** VIOLATED ***');
           } else if (violated == false) {
-            logger.log('[CoherenceEval] rule=${rule.idRegle} OK (not violated)');
+            logger
+                .log('[CoherenceEval] rule=${rule.idRegle} OK (not violated)');
           } else {
-            logger.log('[CoherenceEval] rule=${rule.idRegle} SKIPPED (not evaluable)');
+            logger.log(
+                '[CoherenceEval] rule=${rule.idRegle} SKIPPED (not evaluable)');
           }
         } catch (e) {
-          logger.log('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
+          logger
+              .log('[CoherenceEval] error evaluating rule ${rule.idRegle}: $e');
         }
       }
     } finally {
@@ -1999,7 +2047,8 @@ class CoherenceEvaluator {
       try {
         await db.execute(';ROLLBACK TO SAVEPOINT coherence_eval');
         await db.execute(';RELEASE SAVEPOINT coherence_eval');
-        logger.log('[CoherenceEval] S60: SAVEPOINT coherence_eval rollback+release '
+        logger.log(
+            '[CoherenceEval] S60: SAVEPOINT coherence_eval rollback+release '
             '($injectedCount insertions temporaires supprimées)');
       } catch (e) {
         logger.log('[CoherenceEval] S60: ⚠️ erreur ROLLBACK SAVEPOINT: $e');
@@ -2093,7 +2142,8 @@ class CoherenceEvaluator {
     // globalement. Le champ statique _logger est désormais sauvegardé/restauré dans
     // un try/finally à l'intérieur de translate() — chaque appel translate() est
     // entièrement isolé. Plus d'interleaving de logs entre règles consécutives.
-    logger.log('[CoherenceEval] --- translating sql_regle rule=${rule.idRegle} ---');
+    logger.log(
+        '[CoherenceEval] --- translating sql_regle rule=${rule.idRegle} ---');
     final r1 = SqlTranslator.translate(
       serverSql: rule.sqlRegle,
       idCamp: idCamp,
@@ -2104,10 +2154,12 @@ class CoherenceEvaluator {
       logger: logger,
     );
     if (r1 == null) {
-      logger.log('[CoherenceEval] rule=${rule.idRegle} sql_regle not translatable → regex fallback');
+      logger.log(
+          '[CoherenceEval] rule=${rule.idRegle} sql_regle not translatable → regex fallback');
       return null; // non traduisible → fallback
     }
-    logger.log('[CoherenceEval] rule=${rule.idRegle} sql_regle (isScalar=${r1.isScalar}):\n${r1.sql}');
+    logger.log(
+        '[CoherenceEval] rule=${rule.idRegle} sql_regle (isScalar=${r1.isScalar}):\n${r1.sql}');
 
     // Traduire sql_assoc
     // FIX Bug 4: si sql_assoc n'est pas traduisible (ex: pas de table serveur
@@ -2121,7 +2173,8 @@ class CoherenceEvaluator {
     //     count1 (violations détectées) directement à 0 avec le critere.
     //     Cela couvre le cas fréquent critere='= 0' : la règle est violée si
     //     count1 > 0.
-    logger.log('[CoherenceEval] --- translating sql_assoc rule=${rule.idRegle} ---');
+    logger.log(
+        '[CoherenceEval] --- translating sql_assoc rule=${rule.idRegle} ---');
     final r2 = SqlTranslator.translate(
       serverSql: rule.sqlAssoc,
       idCamp: idCamp,
@@ -2132,13 +2185,17 @@ class CoherenceEvaluator {
       logger: logger,
     );
     if (r2 != null) {
-      logger.log('[CoherenceEval] rule=${rule.idRegle} sql_assoc (isScalar=${r2.isScalar}):\n${r2.sql}');
+      logger.log(
+          '[CoherenceEval] rule=${rule.idRegle} sql_assoc (isScalar=${r2.isScalar}):\n${r2.sql}');
     }
 
     // Exécuter sql_regle (toujours disponible à ce stade)
     // SESSION 49 : passer isScalar pour que _execCount lise la bonne colonne
     final count1 = await _execCount(
-      db, r1.sql, 'sql_regle', rule.idRegle,
+      db,
+      r1.sql,
+      'sql_regle',
+      rule.idRegle,
       isScalar: r1.isScalar,
       logger: logger,
     );
@@ -2148,7 +2205,10 @@ class CoherenceEvaluator {
     if (r2 != null) {
       // Les deux côtés sont traduisibles → évaluation complète
       final c2 = await _execCount(
-        db, r2.sql, 'sql_assoc', rule.idRegle,
+        db,
+        r2.sql,
+        'sql_assoc',
+        rule.idRegle,
         isScalar: r2.isScalar,
         logger: logger,
       );
@@ -2206,15 +2266,15 @@ class CoherenceEvaluator {
   /// FIX Session 48 : suppression du bloc diagnostic CTE. Le regex (.+?) non-greedy
   /// s'arrêtait au premier ')' rencontré dans le CTE (ex: END) dans MAX(CASE...END))
   /// → SQL tronqué → erreur SQLiteLog (1) near "SELECT": syntax error.
-  Future<double?> _execCount(
-      Database db, String sql, String label, int idRegle,
-      {bool isScalar = false,
-      CoherenceLogger? logger}) async {
+  Future<double?> _execCount(Database db, String sql, String label, int idRegle,
+      {bool isScalar = false, CoherenceLogger? logger}) async {
     try {
       final rows = await db.rawQuery(sql);
       if (rows.isEmpty) {
-        final msg = '[CoherenceEval] rawQuery $label rule=$idRegle → empty result';
-        debugPrint(msg); logger?.log(msg);
+        final msg =
+            '[CoherenceEval] rawQuery $label rule=$idRegle → empty result';
+        debugPrint(msg);
+        logger?.log(msg);
         return isScalar ? 0.0 : 0.0;
       }
       if (isScalar) {
@@ -2226,25 +2286,31 @@ class CoherenceEvaluator {
         // Pour sql_regle et sql_assoc à 1 colonne : values.last == values.first.
         // SQLite retourne les colonnes dans l'ordre du SELECT → deterministe.
         final firstRow = rows.first;
-        final rawVal = firstRow.values.last;  // S66 : .last (pas .first)
+        final rawVal = firstRow.values.last; // S66 : .last (pas .first)
         final val = rawVal == null
             ? 0.0
             : (rawVal is num
                 ? rawVal.toDouble()
                 : double.tryParse(rawVal.toString()) ?? 0.0);
-        final msg = '[CoherenceEval] rawQuery $label rule=$idRegle (SCALAR) → val=$val';
-        debugPrint(msg); logger?.log(msg);
+        final msg =
+            '[CoherenceEval] rawQuery $label rule=$idRegle (SCALAR) → val=$val';
+        debugPrint(msg);
+        logger?.log(msg);
         return val;
       } else {
         // MODE EXISTS : colonne cnt = COUNT(*)
         final count = Sqflite.firstIntValue(rows);
-        final msg = '[CoherenceEval] rawQuery $label rule=$idRegle (EXISTS) → count=$count';
-        debugPrint(msg); logger?.log(msg);
+        final msg =
+            '[CoherenceEval] rawQuery $label rule=$idRegle (EXISTS) → count=$count';
+        debugPrint(msg);
+        logger?.log(msg);
         return count?.toDouble();
       }
     } catch (e) {
-      final msg = '[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL:\n$sql';
-      debugPrint(msg); logger?.log(msg);
+      final msg =
+          '[CoherenceEval] rawQuery error $label rule=$idRegle: $e\nSQL:\n$sql';
+      debugPrint(msg);
+      logger?.log(msg);
       return null;
     }
   }
@@ -2399,7 +2465,7 @@ class CoherenceEvaluator {
       case '<>':
         return !(v1 != v2);
       default:
-      debugPrint('[CoherenceEval] unknown critère "$critere" — skipping');
+        debugPrint('[CoherenceEval] unknown critère "$critere" — skipping');
         return false;
     }
   }
