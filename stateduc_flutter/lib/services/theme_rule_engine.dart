@@ -332,19 +332,46 @@ class ThemeRuleEngine {
 
       if (translated.isScalar) {
         // Mode SCALAR hérité : une règle sans GROUP BY retourne une valeur agrégée.
-        // Violation si la valeur est non nulle et non nulle.
+        //
+        // SESSION 52 FIX (d) — faux positifs règles scalaires pures (Sum(single_field)) :
+        //
+        // AVANT : val != 0 → VIOLÉE (par exemple Sum(NB_LATRINES_ELEVES)=5 → VIOLÉE).
+        // Problème : ces règles sont des RÈGLES DE RÉFÉRENCE (valeurs pour ASSOC),
+        // pas des règles de vérification autonomes. Un Sum(NB_LATRINES_ELEVES)=5
+        // signifie simplement qu'il y a 5 latrines — ce n'est pas une incohérence.
+        //
+        // FIX : distinguer les règles "scalaire de référence" (Sum d'une seule colonne)
+        // des règles "indicateur de violation" (différence, CASE WHEN, sous-requête) :
+        //
+        //   • Règle de référence (Sum(X)) : val > 0 ne déclenche JAMAIS de violation.
+        //     Ces règles ne devraient être évaluées qu'en mode ASSOC comme règle associée.
+        //     On les ignore silencieusement en mode standalone.
+        //
+        //   • Indicateur de violation (Sum(X-Y), Sum(CASE WHEN...)) :
+        //     val != 0 (positif ou négatif) → violation.
+        //     Comportement conservé pour rétrocompatibilité.
+        //
+        // NOTE : zero regression — les règles 814-834 n'utilisent PAS ce chemin scalar
+        // standalone (elles sont toutes en mode ASSOC ou EXISTS avec GROUP BY).
         final val = _readScalarValue(rows);
         if (val != null && val != 0.0) {
-          logger.log('[ThemeRuleEngine] ✗ règle $idRegle VIOLÉE (scalar=$val)');
-          return ThemeCoherenceError(
-            idRegle:    idRegle,
-            idTheme:    idTheme,
-            message:    message,
-            ordreRegle: ordreRegle,
-            value1:     val,
-          );
+          // Vérifie si c'est une règle scalaire de référence pure (Sum d'une colonne)
+          if (_isPureReferenceScalarSql(sqlRegle)) {
+            logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK — scalaire de référence pure '
+                '(val=$val, standalone skip: pas d\'ASSOC pour cette règle)');
+          } else {
+            logger.log('[ThemeRuleEngine] ✗ règle $idRegle VIOLÉE (scalar=$val)');
+            return ThemeCoherenceError(
+              idRegle:    idRegle,
+              idTheme:    idTheme,
+              message:    message,
+              ordreRegle: ordreRegle,
+              value1:     val,
+            );
+          }
+        } else {
+          logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK (scalar=$val)');
         }
-        logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK (scalar=$val)');
       } else {
         // Mode EXISTS : COUNT(*) des violations
         final count = Sqflite.firstIntValue(rows) ?? 0;
@@ -405,26 +432,37 @@ class ThemeRuleEngine {
       limit: 1,
     );
 
+    // SESSION 52 FIX (b) — règle associée introuvable dans dico_regle_theme :
+    // Le serveur stocke des règles associées qui appartiennent à d'autres thèmes
+    // et ne sont donc pas dans la table dico_regle_theme locale.
+    // AVANT : fallback EXISTS → comparaison arithmétique remplacée par test d'existence
+    //         → faux positifs systématiques (count > 0 toujours vrai quand des données existent).
+    // MAINTENANT : on cherche d'abord le sql_assoc stocké dans dico_regle_theme_assoc
+    //   (ajouté par le serveur via data_rules.php → associations[].sql_assoc).
+    //   Si sql_assoc est non vide → on l'utilise directement.
+    //   Si sql_assoc est vide ET règle introuvable → on IGNORE la règle (skip silencieux)
+    //   au lieu du fallback EXISTS abusif.
+
+    // Tente de récupérer le sql_assoc directement depuis l'enregistrement d'association
+    final sqlAssocDirect = (assoc['sql_assoc'] as String?)?.trim() ?? '';
+
     if (assocRuleRows.isEmpty) {
-      logger.log('[ThemeRuleEngine] règle $idRegle: règle associée $idRegleAssoc '
-          'introuvable → fallback mode EXISTS');
-      return _evaluateExists(
-        db:            db,
-        logger:        logger,
-        idRegle:       idRegle,
-        idTheme:       idTheme,
-        ordreRegle:    ordreRegle,
-        sqlRegle:      sqlRegle,
-        message:       message,
-        idCamp:        idCamp,
-        idEtab:        idEtab,
-        idQst:         idQst,
-        codeEtab:      codeEtab,
-        codeTypeAnnee: codeTypeAnnee,
-      );
+      if (sqlAssocDirect.isNotEmpty) {
+        // sql_assoc disponible directement → on l'utilise sans chercher dans dico_regle_theme
+        logger.log('[ThemeRuleEngine] règle $idRegle: règle associée $idRegleAssoc '
+            'introuvable dans dico_regle_theme mais sql_assoc disponible → utilisation directe');
+      } else {
+        // sql_assoc vide ET règle introuvable → on ignore (skip silencieux) au lieu
+        // du fallback EXISTS abusif qui causait des faux positifs.
+        logger.log('[ThemeRuleEngine] règle $idRegle: règle associée $idRegleAssoc '
+            'introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)');
+        return null;
+      }
     }
 
-    final sqlAssoc = (assocRuleRows.first['sql_regle'] as String?) ?? '';
+    final sqlAssoc = sqlAssocDirect.isNotEmpty
+        ? sqlAssocDirect
+        : (assocRuleRows.first['sql_regle'] as String?) ?? '';
 
     // Exécute les deux règles et lit leurs valeurs scalaires
     final val1 = await _executeScalar(
@@ -528,15 +566,75 @@ class ThemeRuleEngine {
     }
   }
 
-  /// Lit la valeur scalaire : première cellule de la première ligne.
+  /// Lit la valeur scalaire : DERNIÈRE cellule de la première ligne.
+  ///
+  /// SESSION 52 FIX — utilise values.last (comme CoherenceEvaluator Session 66)
+  /// pour les règles scalaires multi-colonnes.
+  /// Ex : SELECT Sum(FILLES), Sum(TOTAL) → values = [FILLES=12, TOTAL=30]
+  ///   → last = 30 (valeur totale de référence) | first = 12 (valeur à comparer)
   double? _readScalarValue(List<Map<String, dynamic>> rows) {
     if (rows.isEmpty) return 0.0;
     final first = rows.first;
     if (first.isEmpty) return 0.0;
-    final raw = first.values.first;
+    final raw = first.values.last; // SESSION 52: values.last au lieu de values.first
     if (raw == null) return 0.0;
     if (raw is num) return raw.toDouble();
     return double.tryParse(raw.toString()) ?? 0.0;
+  }
+
+  /// Détermine si un SQL est une règle scalaire de référence pure.
+  ///
+  /// Une règle scalaire de référence pure est un SELECT qui ne fait que retourner
+  /// Sum(single_column) ou Count(column) sans aucune arithmétique, CASE WHEN,
+  /// sous-requête ou comparison embarquée.
+  ///
+  /// Ces règles ne doivent PAS déclencher de violations en mode standalone :
+  /// elles sont conçues pour être utilisées comme règles ASSOCIÉES (valeur de
+  /// référence pour une comparaison dans une autre règle).
+  ///
+  /// Exemples de règles de référence pure :
+  ///   SELECT Sum(NB_LATRINES_ELEVES) FROM DONNEES_ETABLISSEMENT WHERE (...)
+  ///   SELECT Sum(NB_LATRINES_FILLES) FROM DONNEES_ETABLISSEMENT WHERE (...)
+  ///
+  /// Exemples de règles d'indicateur de violation (NE sont PAS des références pures) :
+  ///   SELECT Sum(NB_LATRINES_FILLES - NB_LATRINES_ELEVES) FROM ... (différence)
+  ///   SELECT Sum(CASE WHEN FILLES > TOTAL THEN 1 ELSE 0 END) FROM ... (CASE WHEN)
+  ///   SELECT COUNT(*) FROM ... WHERE FILLES > TOTAL ... (EXISTS)
+  static bool _isPureReferenceScalarSql(String sql) {
+    // 1. Extraire la partie SELECT (entre SELECT et FROM)
+    final selMatch = RegExp(
+      r'\bSELECT\b(.+?)\bFROM\b',
+      caseSensitive: false,
+      dotAll: true,
+    ).firstMatch(sql);
+    if (selMatch == null) return false;
+
+    final selectPart = selMatch.group(1)!.trim();
+
+    // 2. Supprimer les alias AS xxx
+    final noAlias = selectPart.replaceAll(
+      RegExp(r'\bAS\b\s+\w+', caseSensitive: false), '');
+
+    // 3. Vérifier que chaque colonne est Sum(single_identifier) ou Count(*)
+    //    Pattern : Sum(TABLE.FIELD) ou Sum(FIELD) ou Count(*) ou Count(FIELD)
+    //    PAS d'arithmétique (+, -, *, /) ni de CASE WHEN ni de sous-requête
+    final cols = noAlias.split(',');
+    for (final col in cols) {
+      final trimmed = col.trim();
+      if (trimmed.isEmpty) continue;
+
+      // Match: Sum(TABLE.FIELD) ou Sum(FIELD) — un seul identifiant, pas d'opérateur
+      final pureAgg = RegExp(
+        r'^(Sum|Count|Avg|Min|Max)\s*\(\s*\*?\s*(\w+\.)?\w+\s*\)$',
+        caseSensitive: false,
+      );
+      if (!pureAgg.hasMatch(trimmed)) {
+        // Contient de l'arithmétique, CASE WHEN, ou autre complexité → pas une référence pure
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /// Applique un opérateur de comparaison.

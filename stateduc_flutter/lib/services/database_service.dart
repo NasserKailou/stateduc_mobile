@@ -33,6 +33,7 @@ import '../models/user.dart';
 ///   v2 : ajout colonne sort_order dans questions
 ///   v3 : ajout table coherence_rules (session 14 — contrôles offline)
 ///   v4 : ajout tables dico_regle_theme + dico_regle_theme_assoc (moteur générique)
+///   v5 : ajout colonne sql_assoc dans dico_regle_theme_assoc (Session 52 Fix b)
 ///
 /// TABLE CRITIQUE — coherence_rules :
 ///   Stocke les règles téléchargées depuis data_rules.php pour l'évaluation offline.
@@ -59,7 +60,7 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
@@ -87,6 +88,19 @@ class DatabaseService {
       // v4: dico_regle_theme + dico_regle_theme_assoc — moteur générique piloté par métadonnées
       await _createDicoRegleThemeTable(db);
       await _createDicoRegleThemeAssocTable(db);
+    }
+    if (oldVersion < 5) {
+      // v5 : SESSION 52 FIX (b) — ajout colonne sql_assoc dans dico_regle_theme_assoc.
+      // Le serveur (data_rules.php) retourne le SQL de la règle associée dans
+      // associations[].sql_assoc. On le stocke maintenant localement pour pouvoir
+      // évaluer la règle associée même si elle n'est pas dans dico_regle_theme.
+      try {
+        await db.execute(
+          'ALTER TABLE dico_regle_theme_assoc ADD COLUMN sql_assoc TEXT NOT NULL DEFAULT \'\'',
+        );
+      } catch (_) {
+        // Column may already exist if DB was recreated from v5 schema
+      }
     }
   }
 
@@ -321,7 +335,8 @@ class DatabaseService {
         id_regle_theme         INTEGER NOT NULL,
         id_regle_theme_assoc   INTEGER NOT NULL,
         critere                TEXT NOT NULL DEFAULT '>',
-        activer_ctrl           INTEGER NOT NULL DEFAULT 1
+        activer_ctrl           INTEGER NOT NULL DEFAULT 1,
+        sql_assoc              TEXT NOT NULL DEFAULT ''
       )
     ''');
     await db.execute('''
@@ -439,6 +454,11 @@ class DatabaseService {
             'id_regle_theme_assoc': a['id_regle_theme_assoc'],
             'critere':              a['critere'] ?? '>',
             'activer_ctrl':         a['activer_ctrl'] ?? 1,
+            // SESSION 52 FIX (b) — sql_assoc : SQL de la règle associée reçu
+            // depuis le serveur (data_rules.php → associations[].sql_assoc).
+            // Permet d'évaluer la comparaison ASSOC même quand la règle associée
+            // n'est pas dans dico_regle_theme (règles d'autres thèmes non téléchargés).
+            'sql_assoc':            a['sql_assoc'] ?? '',
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
