@@ -1,1330 +1,831 @@
-﻿2026-08-10T08:27:55.248988  [ThemeRuleEngine] === DÉBUT ÉVALUATION idTheme=950 22 règles ===
-2026-08-10T08:27:55.249034  [ThemeRuleEngine] idCamp=2 idEtab=22222 idQst=9502 codeEtab=0402012A01 codeTypeAnnee=21 formData=2 champs
-2026-08-10T08:27:55.255901  [ThemeRuleEngine] SAVEPOINT "theme_rule_eval" ouvert — 2/2 champs injectés
-2026-08-10T08:27:55.255957  
-[ThemeRuleEngine] --- Règle 810 (ordre=0) ---
-2026-08-10T08:27:55.256  [ThemeRuleEngine] SQL (début): SELECT ETABLISSEMENT.CODE_ETABLISSEMENT FROM ETABLISSEMENT INNER JOIN ELEVES_AGE_NIVEAU_SEXE ON ETABLISSEMENT.CODE_ETABLISSEMENT = ELEVES_AGE_NIVEAU_SEXE.CODE_ETABLISSEMENT WHERE (((ELEVES_AGE_NIVEAU_
-2026-08-10T08:27:55.258059  [ThemeRuleEngine] règle 810 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.260372  [ThemeRuleEngine] règle 810: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.260471  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.260652  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_NIVEAU, CODE_TYPE_STATUT_ORG}
-2026-08-10T08:27:55.260788  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01'))
-2026-08-10T08:27:55.260861  [SqlTranslator] translated SQL (isScalar=false):
+﻿2026-08-11T15:13:33.450671  [ThemeRuleEngine] === DÉBUT ÉVALUATION idTheme=10502 36 règles ===
+2026-08-11T15:13:33.450730  [ThemeRuleEngine] idCamp=2 idEtab=21739 idQst=10502 codeEtab=21739 codeTypeAnnee=21 formData=11 champs
+2026-08-11T15:13:33.569959  [ThemeRuleEngine] SAVEPOINT "theme_rule_eval" ouvert — 11/11 champs injectés
+2026-08-11T15:13:33.570095  
+[ThemeRuleEngine] --- Règle 711 (ordre=0) ---
+2026-08-11T15:13:33.570117  [ThemeRuleEngine] SQL (début): SELECT DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.ELECTRICITE)=0 Or (DONNEES_ETABLISSEMENT.ELECTRICITE) Is Null) AND ((DONNEES_ETABLISSEMENT.F
+2026-08-11T15:13:33.572958  [ThemeRuleEngine] règle 711 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.580620  [ThemeRuleEngine] règle 711: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.580868  
+[ThemeRuleEngine] --- Règle 712 (ordre=1) ---
+2026-08-11T15:13:33.580890  [ThemeRuleEngine] SQL (début): SELECT DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.LATRINES_DISPOSE)=0 Or (DONNEES_ETABLISSEMENT.LATRINES_DISPOSE) Is Null) AND ((DONNEES_ETABL
+2026-08-11T15:13:33.583614  [ThemeRuleEngine] règle 712 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.587273  [ThemeRuleEngine] règle 712: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.587463  
+[ThemeRuleEngine] --- Règle 713 (ordre=2) ---
+2026-08-11T15:13:33.587490  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (EAU_POTABLE = 0 OR
+             EAU_POTABLE IS NULL) AND (FONCT_ALIMENT_EAU = 1) OR
+             (EAU_POTABLE = 1) AND (FONCT_ALIMENT_
+2026-08-11T15:13:33.589378  [ThemeRuleEngine] règle 713 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.592466  [ThemeRuleEngine] règle 713: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.592560  
+[ThemeRuleEngine] --- Règle 714 (ordre=3) ---
+2026-08-11T15:13:33.592586  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (EXISTE_LAVAGE_MAINS = 0 OR
+             EXISTE_LAVAGE_MAINS IS NULL) AND (LAVAGE_MAINS_PROX_LATRINES = 1) OR
+             (EXISTE_LAVA
+2026-08-11T15:13:33.606906  [ThemeRuleEngine] règle 714 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.616180  [ThemeRuleEngine] règle 714: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.616255  
+[ThemeRuleEngine] --- Règle 715 (ordre=4) ---
+2026-08-11T15:13:33.616272  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (EXISTE_LAVAGE_MAINS = 0 OR
+             EXISTE_LAVAGE_MAINS IS NULL) AND (NB_INSTALL_LAVAGE_MAINS_T IS NOT NULL) OR
+             (EXIS
+2026-08-11T15:13:33.620032  [ThemeRuleEngine] règle 715 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.622721  [ThemeRuleEngine] règle 715: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.622826  
+[ThemeRuleEngine] --- Règle 716 (ordre=5) ---
+2026-08-11T15:13:33.622894  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRINES_ELEVES) AS SommeDeNB_LATRINES_ELEVES
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABLISSEMENT.COD
+2026-08-11T15:13:33.626235  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.627024  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_LATRINES_ELEVES}
+2026-08-11T15:13:33.627631  [SqlTranslator] stripping context-only WHERE:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+2026-08-11T15:13:33.627709  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.627745  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_STATUT_ORG_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_STATUT_ORG
-  FROM _cd
-),
-ETABLISSEMENT AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    MAX(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_0' THEN CAST(field_value AS REAL) END) AS CODE_TYPE_NIVEAU,
-    MAX(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_STATUT_ORG_0' THEN CAST(field_value AS REAL) END) AS CODE_TYPE_STATUT_ORG
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_ETABLISSEMENT FROM ETABLISSEMENT INNER JOIN ELEVES_AGE_NIVEAU_SEXE ON CODE_ETABLISSEMENT = CODE_ETABLISSEMENT WHERE (((CODE_TYPE_ANNEE)='21') AND ((CODE_TYPE_STATUT_ORG)=9) AND ((CODE_TYPE_NIVEAU) NOT IN (4,5,6,7,8,9))) GROUP BY CODE_ETABLISSEMENT 
-) _violations
-2026-08-10T08:27:55.295094  [ThemeRuleEngine] ⚠️ règle 810 rawQuery: DatabaseException(ambiguous column name: CODE_ETABLISSEMENT (code 1 SQLITE_ERROR): , while compiling: WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_STATUT_ORG_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_STATUT_ORG
-  FROM _cd
-),
-ETABLISSEMENT AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    MAX(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_0' THEN CAST(field_value AS REAL) END) AS CODE_TYPE_NIVEAU,
-    MAX(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_STATUT_ORG_0' THEN CAST(field_value AS REAL) END) AS CODE_TYPE_STATUT_ORG
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_ETABLISSEMENT FROM ETABLISSEMENT INNER JOIN ELEVES_AGE_NIVEAU_SEXE ON CODE_ETABLISSEMENT = CODE_ETABLISSEMENT WHERE (((CODE_TYPE_ANNEE)='21') AND ((CODE_TYPE_STATUT_ORG)=9) AND ((CODE_TYPE_NIVEAU) NOT IN (4,5,6,7,8,9))) GROUP BY CODE_ETABLISSEMENT 
-) _violations) sql 'WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_STATUT_ORG_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_STATUT_ORG
-  FROM _cd
-),
-ETABLISSEMENT AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    MAX(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_0' THEN CAST(field_value AS REAL) END) AS CODE_TYPE_NIVEAU,
-    MAX(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_STATUT_ORG_0' THEN CAST(field_value AS REAL) END) AS CODE_TYPE_STATUT_ORG
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_ETABLISSEMENT FROM ETABLISSEMENT INNER JOIN ELEVES_AGE_NIVEAU_SEXE ON CODE_ETABLISSEMENT = CODE_ETABLISSEMENT WHERE (((CODE_TYPE_ANNEE)='21') AND ((CODE_TYPE_STATUT_ORG)=9) AND ((CODE_TYPE_NIVEAU) NOT IN (4,5,6,7,8,9))) GROUP BY CODE_ETABLISSEMENT 
-) _violations' args [] — ignorée
-2026-08-10T08:27:55.295305  
-[ThemeRuleEngine] --- Règle 811 (ordre=0) ---
-2026-08-10T08:27:55.295329  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_NIVEAU, ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU, ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHER
-2026-08-10T08:27:55.297276  [ThemeRuleEngine] règle 811 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.298518  [ThemeRuleEngine] règle 811: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.298580  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.298701  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_NIVEAU, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, ISNULL}
-2026-08-10T08:27:55.298865  [SqlTranslator] SCALAR: building multi-column-safe wrapper
-2026-08-10T08:27:55.298891  [SqlTranslator] translated SQL (isScalar=true):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'ISNULL_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS ISNULL
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_LATRINES_ELEVES_0' THEN CAST(field_value AS REAL) END) AS NB_LATRINES_ELEVES
   FROM _cd
 )
 SELECT * FROM (
-SELECT CODE_TYPE_NIVEAU, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((COALESCE(FILLES_AGE_NIVEAU,0)-COALESCE(TOTAL_AGE_NIVEAU,0))>0) AND ((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
+SELECT Sum(NB_LATRINES_ELEVES) AS SommeDeNB_LATRINES_ELEVES
+FROM DONNEES_ETABLISSEMENT
+
 ) _scalar LIMIT 1
-2026-08-10T08:27:55.302331  [ThemeRuleEngine] ⚠️ règle 811 rawQuery: DatabaseException(near "ISNULL": syntax error (code 1 SQLITE_ERROR): , while compiling: WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'ISNULL_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS ISNULL
-  FROM _cd
-)
-SELECT * FROM (
-SELECT CODE_TYPE_NIVEAU, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((COALESCE(FILLES_AGE_NIVEAU,0)-COALESCE(TOTAL_AGE_NIVEAU,0))>0) AND ((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-) _scalar LIMIT 1) sql 'WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'ISNULL_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS ISNULL
-  FROM _cd
-)
-SELECT * FROM (
-SELECT CODE_TYPE_NIVEAU, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((COALESCE(FILLES_AGE_NIVEAU,0)-COALESCE(TOTAL_AGE_NIVEAU,0))>0) AND ((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-) _scalar LIMIT 1' args [] — ignorée
-2026-08-10T08:27:55.302453  
-[ThemeRuleEngine] --- Règle 812 (ordre=0) ---
-2026-08-10T08:27:55.302465  [ThemeRuleEngine] SQL (début): SELECT Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE GROUP BY ELEVES_AG
-2026-08-10T08:27:55.305264  [ThemeRuleEngine] règle 812 MODE ASSOC → règle associée=35 critere="="
-2026-08-10T08:27:55.307582  [ThemeRuleEngine] règle 812: règle associée 35 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.307682  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.307862  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU}
-2026-08-10T08:27:55.308019  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.308619  [SqlTranslator] Sum-scalar with context-only GROUP BY detected → GROUP BY stripped → SCALAR mode
-2026-08-10T08:27:55.308656  [SqlTranslator] SCALAR: building multi-column-safe wrapper
-2026-08-10T08:27:55.308926  [SqlTranslator] translated SQL (isScalar=true):
+2026-08-11T15:13:33.638450  [ThemeRuleEngine] ✓ règle 716 OK (scalar=0.0)
+2026-08-11T15:13:33.638541  
+[ThemeRuleEngine] --- Règle 717 (ordre=6) ---
+2026-08-11T15:13:33.638576  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRINES_FILLES) AS SommeDeNB_LATRINES_FILLES
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABLISSEMENT.COD
+2026-08-11T15:13:33.647981  [ThemeRuleEngine] règle 717 MODE ASSOC → règle associée=12 critere="<="
+2026-08-11T15:13:33.650568  [ThemeRuleEngine] règle 717: règle associée 12 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.650658  
+[ThemeRuleEngine] --- Règle 718 (ordre=7) ---
+2026-08-11T15:13:33.650679  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRINES_BON_ETAT) AS SommeDeNB_LATRINES_BON_ETAT
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABLISSEMENT
+2026-08-11T15:13:33.652232  [ThemeRuleEngine] règle 718 MODE ASSOC → règle associée=12 critere="<="
+2026-08-11T15:13:33.654348  [ThemeRuleEngine] règle 718: règle associée 12 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.654463  
+[ThemeRuleEngine] --- Règle 719 (ordre=8) ---
+2026-08-11T15:13:33.654481  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRINES_BON_ETAT_F) AS SommeDeNB_LATRINES_BON_ETAT_F
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABLISSE
+2026-08-11T15:13:33.657771  [ThemeRuleEngine] règle 719 MODE ASSOC → règle associée=13 critere="<="
+2026-08-11T15:13:33.667601  [ThemeRuleEngine] règle 719: règle associée 13 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.667668  
+[ThemeRuleEngine] --- Règle 720 (ordre=9) ---
+2026-08-11T15:13:33.667689  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRINES_TOTAL_HANDI) AS SommeDeNB_LATRINES_TOTAL_HANDI
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABLIS
+2026-08-11T15:13:33.671516  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.671689  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_LATRINES_TOTAL_HANDI}
+2026-08-11T15:13:33.671836  [SqlTranslator] stripping context-only WHERE:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+2026-08-11T15:13:33.671877  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.671899  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_LATRINES_TOTAL_HANDI_0' THEN CAST(field_value AS REAL) END) AS NB_LATRINES_TOTAL_HANDI
   FROM _cd
 )
 SELECT * FROM (
-SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE
+SELECT Sum(NB_LATRINES_TOTAL_HANDI) AS SommeDeNB_LATRINES_TOTAL_HANDI
+FROM DONNEES_ETABLISSEMENT
+
 ) _scalar LIMIT 1
-2026-08-10T08:27:55.331552  [ThemeRuleEngine] ✗ règle 812 VIOLÉE (scalar=12.0)
-2026-08-10T08:27:55.331618  
-[ThemeRuleEngine] --- Règle 814 (ordre=0) ---
-2026-08-10T08:27:55.331636  [ThemeRuleEngine] SQL (début): SELECT Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU, ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_NIVEAU FROM 
-2026-08-10T08:27:55.334830  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.335168  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.335475  [SqlTranslator] translated SQL (isScalar=false):
+2026-08-11T15:13:33.676181  [ThemeRuleEngine] ✓ règle 720 OK (scalar=0.0)
+2026-08-11T15:13:33.676263  
+[ThemeRuleEngine] --- Règle 721 (ordre=10) ---
+2026-08-11T15:13:33.676290  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRINES_FILLES_HANDI) AS SommeDeNB_LATRINES_FILLES_HANDI
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABL
+2026-08-11T15:13:33.685017  [ThemeRuleEngine] règle 721 MODE ASSOC → règle associée=16 critere="<="
+2026-08-11T15:13:33.686612  [ThemeRuleEngine] règle 721: règle associée 16 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.686662  
+[ThemeRuleEngine] --- Règle 722 (ordre=11) ---
+2026-08-11T15:13:33.686678  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRINES_BON_ETAT_HANDI) AS SommeDeNB_LATRINES_BON_ETAT_HANDI
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_E
+2026-08-11T15:13:33.690094  [ThemeRuleEngine] règle 722 MODE ASSOC → règle associée=16 critere="<="
+2026-08-11T15:13:33.695844  [ThemeRuleEngine] règle 722: règle associée 16 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.695907  
+[ThemeRuleEngine] --- Règle 723 (ordre=12) ---
+2026-08-11T15:13:33.695924  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LATRIN_BON_ETAT_HANDI_F) AS SommeDeNB_LATRIN_BON_ETAT_HANDI_F
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_E
+2026-08-11T15:13:33.698425  [ThemeRuleEngine] règle 723 MODE ASSOC → règle associée=18 critere="<="
+2026-08-11T15:13:33.701971  [ThemeRuleEngine] règle 723: règle associée 18 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.702081  
+[ThemeRuleEngine] --- Règle 724 (ordre=13) ---
+2026-08-11T15:13:33.702130  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (DISPOSE_LATRINES_HANDI = 0 OR
+             DISPOSE_LATRINES_HANDI IS NULL) AND (NB_LATRINES_TOTAL_HANDI IS NOT NULL) OR
+             (
+2026-08-11T15:13:33.721160  [ThemeRuleEngine] règle 724 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.728246  [ThemeRuleEngine] règle 724: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.728306  
+[ThemeRuleEngine] --- Règle 725 (ordre=14) ---
+2026-08-11T15:13:33.728323  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_INSTALL_LAVAGE_MAINS_T) AS SommeDeNB_INSTALL_LAVAGE_MAINS_T
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETA
+2026-08-11T15:13:33.730033  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.730292  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_INSTALL_LAVAGE_MAINS_T}
+2026-08-11T15:13:33.730515  [SqlTranslator] stripping context-only WHERE:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+2026-08-11T15:13:33.730571  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.730594  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE GROUP BY CODE_TYPE_NIVEAU, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE HAVING (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21')) ORDER BY CODE_TYPE_NIVEAU
-) _violations
-2026-08-10T08:27:55.426341  [ThemeRuleEngine] ✓ règle 814 OK (count=0)
-2026-08-10T08:27:55.426446  
-[ThemeRuleEngine] --- Règle 815 (ordre=0) ---
-2026-08-10T08:27:55.426471  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU, ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU, ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((ELEVES_AGE_NIVEAU_SEXE.CODE_ETABLISS
-2026-08-10T08:27:55.434741  [ThemeRuleEngine] règle 815 MODE ASSOC → règle associée=79 critere=">="
-2026-08-10T08:27:55.440256  [ThemeRuleEngine] règle 815: règle associée 79 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.440340  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.440551  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, TOTAL_AGE_NIVEAU, FILLES_AGE_NIVEAU, CODE_TYPE_AGE, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.440683  [SqlTranslator] SCALAR: building multi-column-safe wrapper
-2026-08-10T08:27:55.440711  [SqlTranslator] translated SQL (isScalar=true):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_INSTALL_LAVAGE_MAINS_T_0' THEN CAST(field_value AS REAL) END) AS NB_INSTALL_LAVAGE_MAINS_T
   FROM _cd
 )
 SELECT * FROM (
-SELECT TOTAL_AGE_NIVEAU, FILLES_AGE_NIVEAU, CODE_TYPE_AGE FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21') AND ((CODE_TYPE_NIVEAU)=4)) ORDER BY CODE_TYPE_AGE
+SELECT Sum(NB_INSTALL_LAVAGE_MAINS_T) AS SommeDeNB_INSTALL_LAVAGE_MAINS_T
+FROM DONNEES_ETABLISSEMENT
+
 ) _scalar LIMIT 1
-2026-08-10T08:27:55.455669  [ThemeRuleEngine] ✓ règle 815 OK (scalar=0.0)
-2026-08-10T08:27:55.455728  
-[ThemeRuleEngine] --- Règle 817 (ordre=0) ---
-2026-08-10T08:27:55.455745  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.460915  [ThemeRuleEngine] règle 817 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.518256  [ThemeRuleEngine] règle 817: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.518358  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.518515  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.518638  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.518711  [SqlTranslator] translated SQL (isScalar=false):
+2026-08-11T15:13:33.733273  [ThemeRuleEngine] ✓ règle 725 OK (scalar=0.0)
+2026-08-11T15:13:33.733422  
+[ThemeRuleEngine] --- Règle 726 (ordre=15) ---
+2026-08-11T15:13:33.733429  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_INSTALL_LAVAGE_MAINS_F) AS SommeDeNB_INSTALL_LAVAGE_MAINS_F
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETA
+2026-08-11T15:13:33.734683  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.734879  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_INSTALL_LAVAGE_MAINS_F}
+2026-08-11T15:13:33.735035  [SqlTranslator] stripping context-only WHERE:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+2026-08-11T15:13:33.735074  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.735103  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_INSTALL_LAVAGE_MAINS_F_0' THEN CAST(field_value AS REAL) END) AS NB_INSTALL_LAVAGE_MAINS_F
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=8) AND ((CODE_TYPE_NIVEAU)=5)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.546518  [ThemeRuleEngine] ✓ règle 817 OK (count=0)
-2026-08-10T08:27:55.546789  
-[ThemeRuleEngine] --- Règle 818 (ordre=0) ---
-2026-08-10T08:27:55.546811  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.554701  [ThemeRuleEngine] règle 818 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.559215  [ThemeRuleEngine] règle 818: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.559322  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.560716  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.560859  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.560924  [SqlTranslator] translated SQL (isScalar=false):
+SELECT * FROM (
+SELECT Sum(NB_INSTALL_LAVAGE_MAINS_F) AS SommeDeNB_INSTALL_LAVAGE_MAINS_F
+FROM DONNEES_ETABLISSEMENT
+
+) _scalar LIMIT 1
+2026-08-11T15:13:33.737392  [ThemeRuleEngine] ✓ règle 726 OK (scalar=0.0)
+2026-08-11T15:13:33.737447  
+[ThemeRuleEngine] --- Règle 727 (ordre=16) ---
+2026-08-11T15:13:33.737470  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LAVAGE_MAINS_FONCT_T) AS SommeDeNB_LAVAGE_MAINS_FONCT_T
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABLIS
+2026-08-11T15:13:33.738970  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.739162  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_LAVAGE_MAINS_FONCT_T}
+2026-08-11T15:13:33.739331  [SqlTranslator] stripping context-only WHERE:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+2026-08-11T15:13:33.739378  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.739481  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_LAVAGE_MAINS_FONCT_T_0' THEN CAST(field_value AS REAL) END) AS NB_LAVAGE_MAINS_FONCT_T
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=8 OR (CODE_TYPE_AGE)=5) AND ((CODE_TYPE_NIVEAU)=6)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.567543  [ThemeRuleEngine] ✓ règle 818 OK (count=0)
-2026-08-10T08:27:55.567589  
-[ThemeRuleEngine] --- Règle 819 (ordre=0) ---
-2026-08-10T08:27:55.567615  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.571287  [ThemeRuleEngine] règle 819 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.573355  [ThemeRuleEngine] règle 819: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.573424  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.573751  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.573908  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.574042  [SqlTranslator] translated SQL (isScalar=false):
+SELECT * FROM (
+SELECT Sum(NB_LAVAGE_MAINS_FONCT_T) AS SommeDeNB_LAVAGE_MAINS_FONCT_T
+FROM DONNEES_ETABLISSEMENT
+
+) _scalar LIMIT 1
+2026-08-11T15:13:33.745856  [ThemeRuleEngine] ✓ règle 727 OK (scalar=0.0)
+2026-08-11T15:13:33.745944  
+[ThemeRuleEngine] --- Règle 728 (ordre=17) ---
+2026-08-11T15:13:33.745961  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_LAVAGE_MAINS_FONCT_F) AS SommeDeNB_LAVAGE_MAINS_FONCT_F
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT)=21739) AND ((DONNEES_ETABLIS
+2026-08-11T15:13:33.748225  [ThemeRuleEngine] règle 728 MODE ASSOC → règle associée=23 critere="<="
+2026-08-11T15:13:33.750356  [ThemeRuleEngine] règle 728: règle associée 23 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.750403  
+[ThemeRuleEngine] --- Règle 729 (ordre=18) ---
+2026-08-11T15:13:33.750422  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (EXISTE_CPE = 0 OR
+             EXISTE_CPE IS NULL) AND (NB_REUNIONS_TENUES IS NOT NULL) OR
+             (EXISTE_CPE = 1) AND (NB_REUNI
+2026-08-11T15:13:33.752171  [ThemeRuleEngine] règle 729 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.754125  [ThemeRuleEngine] règle 729: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.754178  
+[ThemeRuleEngine] --- Règle 730 (ordre=19) ---
+2026-08-11T15:13:33.754193  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (NB_REUNIONS_ANNUELLES IS NOT NULL) AND (EXISTE_COMITE_GESTION = 0 OR
+             EXISTE_COMITE_GESTION IS NULL) OR
+             (NB_R
+2026-08-11T15:13:33.755874  [ThemeRuleEngine] règle 730 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.757631  [ThemeRuleEngine] règle 730: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.757680  
+[ThemeRuleEngine] --- Règle 731 (ordre=20) ---
+2026-08-11T15:13:33.757699  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (CG_FORMATION = 0 OR
+             CG_FORMATION IS NULL) AND (GESTION_ECOLE_CG = 1) OR
+             (CG_FORMATION = 1) AND (GESTION_ECOL
+2026-08-11T15:13:33.761779  [ThemeRuleEngine] règle 731 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.763704  [ThemeRuleEngine] règle 731: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.763764  
+[ThemeRuleEngine] --- Règle 732 (ordre=21) ---
+2026-08-11T15:13:33.763781  [ThemeRuleEngine] SQL (début): SELECT DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT
+FROM DONNEES_ETABLISSEMENT
+WHERE (((DONNEES_ETABLISSEMENT.HOME_ENSEIGNANT)=0 Or (DONNEES_ETABLISSEMENT.HOME_ENSEIGNANT) Is Null) AND ((DONNEES_ETABLIS
+2026-08-11T15:13:33.765410  [ThemeRuleEngine] règle 732 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.767082  [ThemeRuleEngine] règle 732: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.767142  
+[ThemeRuleEngine] --- Règle 734 (ordre=22) ---
+2026-08-11T15:13:33.767167  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (DISPOSE_BIBLIO = 0 OR
+             DISPOSE_BIBLIO IS NULL) AND (EXISTE_LOCAL_BIBLIO = 1) OR
+             (DISPOSE_BIBLIO = 1) AND (EXI
+2026-08-11T15:13:33.769989  [ThemeRuleEngine] règle 734 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.773527  [ThemeRuleEngine] règle 734: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.773610  
+[ThemeRuleEngine] --- Règle 735 (ordre=23) ---
+2026-08-11T15:13:33.773648  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (DETECTER_ENFANT_HANDI = 1) AND (CSPEC_DIAGNO_CASDOUTEUX = 1 OR
+             CSPEC_DIAGNO_CASDOUTEUX = 0) OR
+             (DETECTER_ENF
+2026-08-11T15:13:33.777934  [ThemeRuleEngine] règle 735 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.779838  [ThemeRuleEngine] règle 735: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.779898  
+[ThemeRuleEngine] --- Règle 736 (ordre=24) ---
+2026-08-11T15:13:33.779917  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (ECOLE_RESEAU_SCOL = 0 OR
+             ECOLE_RESEAU_SCOL IS NULL) AND (DISPOSE_LABORATOIRE_RESEAU_SCOL = 1 OR
+             DISPOSE_LABO
+2026-08-11T15:13:33.781845  [ThemeRuleEngine] règle 736 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.783715  [ThemeRuleEngine] règle 736: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.783787  
+[ThemeRuleEngine] --- Règle 737 (ordre=25) ---
+2026-08-11T15:13:33.783812  [ThemeRuleEngine] SQL (début): SELECT CODE_ETABLISSEMENT
+FROM   DONNEES_ETABLISSEMENT
+WHERE (DOMAINE_DELIMITE = 0 OR
+             DOMAINE_DELIMITE IS NULL) AND (SUPERFICIE_DOMAINE IS NOT NULL) OR
+             (DOMAINE_DELIMITE 
+2026-08-11T15:13:33.786658  [ThemeRuleEngine] règle 737 MODE ASSOC → règle associée=404 critere="="
+2026-08-11T15:13:33.788452  [ThemeRuleEngine] règle 737: règle associée 404 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.788507  
+[ThemeRuleEngine] --- Règle 738 (ordre=26) ---
+2026-08-11T15:13:33.788523  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ELEVES_F) AS SommeDeNB_ELEVES_F, Sum(DONNEES_ETABLISSEMENT.NB_ELEVES) AS SommeDeNB_ELEVES
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSE
+2026-08-11T15:13:33.790471  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.790692  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_ELEVES_F, NB_ELEVES}
+2026-08-11T15:13:33.790828  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+ORDER BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+2026-08-11T15:13:33.791118  [SqlTranslator] Sum-scalar with context-only GROUP BY detected → GROUP BY stripped → SCALAR mode
+2026-08-11T15:13:33.791203  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.791241  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ELEVES_F_0' THEN CAST(field_value AS REAL) END) AS NB_ELEVES_F,
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ELEVES_0' THEN CAST(field_value AS REAL) END) AS NB_ELEVES
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=8 OR (CODE_TYPE_AGE)=5 OR (CODE_TYPE_AGE)=6) AND ((CODE_TYPE_NIVEAU)=7)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.577047  [ThemeRuleEngine] ✓ règle 819 OK (count=0)
-2026-08-10T08:27:55.577109  
-[ThemeRuleEngine] --- Règle 820 (ordre=0) ---
-2026-08-10T08:27:55.577420  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.582179  [ThemeRuleEngine] règle 820 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.583909  [ThemeRuleEngine] règle 820: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.583984  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.584138  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.584288  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.584410  [SqlTranslator] translated SQL (isScalar=false):
+SELECT * FROM (
+SELECT Sum(NB_ELEVES_F) AS SommeDeNB_ELEVES_F, Sum(NB_ELEVES) AS SommeDeNB_ELEVES
+FROM DONNEES_ETABLISSEMENT
+) _scalar LIMIT 1
+2026-08-11T15:13:33.796917  [ThemeRuleEngine] ✓ règle 738 OK (scalar=0.0)
+2026-08-11T15:13:33.796992  
+[ThemeRuleEngine] --- Règle 748 (ordre=27) ---
+2026-08-11T15:13:33.797007  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ELEVES_F) AS SommeDeNB_ELEVES_F
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT, DONNEES_ETABLISSEMENT.CODE_TYPE_ANNEE
+HAVING (((DON
+2026-08-11T15:13:33.800559  [ThemeRuleEngine] règle 748 MODE ASSOC → règle associée=47 critere="<="
+2026-08-11T15:13:33.803133  [ThemeRuleEngine] règle 748: règle associée 47 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.803204  
+[ThemeRuleEngine] --- Règle 749 (ordre=28) ---
+2026-08-11T15:13:33.803225  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ELEVES) AS SommeDeNB_ELEVES
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT, DONNEES_ETABLISSEMENT.CODE_TYPE_ANNEE
+HAVING (((DONNEES
+2026-08-11T15:13:33.804850  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.805030  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_ELEVES}
+2026-08-11T15:13:33.805212  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+ORDER BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+2026-08-11T15:13:33.805282  [SqlTranslator] Sum-scalar with context-only GROUP BY detected → GROUP BY stripped → SCALAR mode
+2026-08-11T15:13:33.805307  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.805328  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ELEVES_0' THEN CAST(field_value AS REAL) END) AS NB_ELEVES
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=8 OR (CODE_TYPE_AGE)=5 OR (CODE_TYPE_AGE)=6 OR (CODE_TYPE_AGE)=9) AND ((CODE_TYPE_NIVEAU)=8)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.587492  [ThemeRuleEngine] ✓ règle 820 OK (count=0)
-2026-08-10T08:27:55.587525  
-[ThemeRuleEngine] --- Règle 821 (ordre=0) ---
-2026-08-10T08:27:55.587545  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.589421  [ThemeRuleEngine] règle 821 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.592256  [ThemeRuleEngine] règle 821: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.592326  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.592511  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.592653  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.592753  [SqlTranslator] translated SQL (isScalar=false):
+SELECT * FROM (
+SELECT Sum(NB_ELEVES) AS SommeDeNB_ELEVES
+FROM DONNEES_ETABLISSEMENT
+) _scalar LIMIT 1
+2026-08-11T15:13:33.809412  [ThemeRuleEngine] ✓ règle 749 OK (scalar=0.0)
+2026-08-11T15:13:33.809642  
+[ThemeRuleEngine] --- Règle 750 (ordre=29) ---
+2026-08-11T15:13:33.809660  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ENSEIGNANTS) AS SommeDeNB_ENSEIGNANTS
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT, DONNEES_ETABLISSEMENT.CODE_TYPE_ANNEE
+HAVING 
+2026-08-11T15:13:33.814254  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.814498  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_ENSEIGNANTS}
+2026-08-11T15:13:33.814632  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+ORDER BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+2026-08-11T15:13:33.814690  [SqlTranslator] Sum-scalar with context-only GROUP BY detected → GROUP BY stripped → SCALAR mode
+2026-08-11T15:13:33.814702  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.814736  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ENSEIGNANTS_0' THEN CAST(field_value AS REAL) END) AS NB_ENSEIGNANTS
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=8 OR (CODE_TYPE_AGE)=5 OR (CODE_TYPE_AGE)=6 OR (CODE_TYPE_AGE)=9 OR (CODE_TYPE_AGE)=10) AND ((CODE_TYPE_NIVEAU)=9)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.598738  [ThemeRuleEngine] ✓ règle 821 OK (count=0)
-2026-08-10T08:27:55.598794  
-[ThemeRuleEngine] --- Règle 822 (ordre=0) ---
-2026-08-10T08:27:55.598812  [ThemeRuleEngine] SQL (début): SELECT        CODE_TYPE_AGE, SUM(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, SUM(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM            dbo.ELEVES_AGE_NIVEAU_SEXE WHERE        (CODE_TYPE_AGE
-2026-08-10T08:27:55.601556  [ThemeRuleEngine] règle 822 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.603920  [ThemeRuleEngine] règle 822: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.604001  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.604133  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, CODE_TYPE_NIVEAU, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU}
-2026-08-10T08:27:55.604288  [SqlTranslator] stripping context-only HAVING:         (CODE_ETABLISSEMENT = '0402012A01' ) AND (CODE_TYPE_ANNEE = '21' )
-2026-08-10T08:27:55.604417  [SqlTranslator] translated SQL (isScalar=false):
+SELECT * FROM (
+SELECT Sum(NB_ENSEIGNANTS) AS SommeDeNB_ENSEIGNANTS
+FROM DONNEES_ETABLISSEMENT
+) _scalar LIMIT 1
+2026-08-11T15:13:33.817629  [ThemeRuleEngine] ✓ règle 750 OK (scalar=0.0)
+2026-08-11T15:13:33.817696  
+[ThemeRuleEngine] --- Règle 751 (ordre=30) ---
+2026-08-11T15:13:33.817713  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ENSEIGNANTS_F) AS SommeDeNB_ENSEIGNANTS_F
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT, DONNEES_ETABLISSEMENT.CODE_TYPE_ANNEE
+HAV
+2026-08-11T15:13:33.819558  [ThemeRuleEngine] règle 751 MODE ASSOC → règle associée=48 critere="<="
+2026-08-11T15:13:33.821503  [ThemeRuleEngine] règle 751: règle associée 48 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.821542  
+[ThemeRuleEngine] --- Règle 752 (ordre=31) ---
+2026-08-11T15:13:33.821557  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ENSEIGNANTS) AS SommeDeNB_ENSEIGNANTS, Sum(DONNEES_ETABLISSEMENT.NB_ENSEIGNANTS_F) AS SommeDeNB_ENSEIGNANTS_F
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISS
+2026-08-11T15:13:33.822732  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.822917  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_ENSEIGNANTS, NB_ENSEIGNANTS_F}
+2026-08-11T15:13:33.823049  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+2026-08-11T15:13:33.823109  [SqlTranslator] Sum-scalar with context-only GROUP BY detected → GROUP BY stripped → SCALAR mode
+2026-08-11T15:13:33.823137  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.823160  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ENSEIGNANTS_0' THEN CAST(field_value AS REAL) END) AS NB_ENSEIGNANTS,
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ENSEIGNANTS_F_0' THEN CAST(field_value AS REAL) END) AS NB_ENSEIGNANTS_F
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT        CODE_TYPE_AGE, SUM(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, SUM(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM            ELEVES_AGE_NIVEAU_SEXE WHERE        (CODE_TYPE_AGE = 8 OR CODE_TYPE_AGE = 5 OR CODE_TYPE_AGE = 6 OR CODE_TYPE_AGE = 9 OR CODE_TYPE_AGE = 10 OR CODE_TYPE_AGE = 11) AND (CODE_TYPE_NIVEAU = 10) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.606979  [ThemeRuleEngine] ✓ règle 822 OK (count=0)
-2026-08-10T08:27:55.607029  
-[ThemeRuleEngine] --- Règle 823 (ordre=0) ---
-2026-08-10T08:27:55.607045  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.608896  [ThemeRuleEngine] règle 823 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.614265  [ThemeRuleEngine] règle 823: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.614631  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.614856  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.615019  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.615129  [SqlTranslator] translated SQL (isScalar=false):
+SELECT * FROM (
+SELECT Sum(NB_ENSEIGNANTS) AS SommeDeNB_ENSEIGNANTS, Sum(NB_ENSEIGNANTS_F) AS SommeDeNB_ENSEIGNANTS_F
+FROM DONNEES_ETABLISSEMENT
+) _scalar LIMIT 1
+2026-08-11T15:13:33.828205  [ThemeRuleEngine] ✓ règle 752 OK (scalar=0.0)
+2026-08-11T15:13:33.828269  
+[ThemeRuleEngine] --- Règle 753 (ordre=32) ---
+2026-08-11T15:13:33.828284  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ENSEIGNANTS_BENEVOLES) AS SommeDeNB_ENSEIGNANTS_BENEVOLES
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT, DONNEES_ETABLISSEMENT.CODE
+2026-08-11T15:13:33.830551  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.830768  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_ENSEIGNANTS_BENEVOLES}
+2026-08-11T15:13:33.830937  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)=21739) AND ((CODE_TYPE_ANNEE)=21))
+ORDER BY CODE_ETABLISSEMENT, CODE_TYPE_ANNEE
+2026-08-11T15:13:33.831003  [SqlTranslator] Sum-scalar with context-only GROUP BY detected → GROUP BY stripped → SCALAR mode
+2026-08-11T15:13:33.831039  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.831060  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ENSEIGNANTS_BENEVOLES_0' THEN CAST(field_value AS REAL) END) AS NB_ENSEIGNANTS_BENEVOLES
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=8 OR (CODE_TYPE_AGE)=5 OR (CODE_TYPE_AGE)=6 OR (CODE_TYPE_AGE)=9 OR (CODE_TYPE_AGE)=10 OR (CODE_TYPE_AGE)=11 OR (CODE_TYPE_AGE)=12) AND ((CODE_TYPE_NIVEAU)=11)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.618548  [ThemeRuleEngine] ✓ règle 823 OK (count=0)
-2026-08-10T08:27:55.618603  
-[ThemeRuleEngine] --- Règle 824 (ordre=0) ---
-2026-08-10T08:27:55.618627  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.621106  [ThemeRuleEngine] règle 824 MODE ASSOC → règle associée=404 critere="="
-2026-08-10T08:27:55.623172  [ThemeRuleEngine] règle 824: règle associée 404 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.623258  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.623448  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.623607  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.623696  [SqlTranslator] translated SQL (isScalar=false):
+SELECT * FROM (
+SELECT Sum(NB_ENSEIGNANTS_BENEVOLES) AS SommeDeNB_ENSEIGNANTS_BENEVOLES
+FROM DONNEES_ETABLISSEMENT
+) _scalar LIMIT 1
+2026-08-11T15:13:33.833883  [ThemeRuleEngine] ✓ règle 753 OK (scalar=0.0)
+2026-08-11T15:13:33.833940  
+[ThemeRuleEngine] --- Règle 754 (ordre=33) ---
+2026-08-11T15:13:33.833956  [ThemeRuleEngine] SQL (début): SELECT Sum(DONNEES_ETABLISSEMENT.NB_ENSEIGNANTS_BENEVOLES_F) AS SommeDeNB_ENSEIGNANTS_BENEVOLES_F
+FROM DONNEES_ETABLISSEMENT
+GROUP BY DONNEES_ETABLISSEMENT.CODE_ETABLISSEMENT, DONNEES_ETABLISSEMENT.
+2026-08-11T15:13:33.835414  [ThemeRuleEngine] règle 754 MODE ASSOC → règle associée=51 critere="<="
+2026-08-11T15:13:33.837125  [ThemeRuleEngine] règle 754: règle associée 51 introuvable et sql_assoc vide → règle ignorée (pas de fallback EXISTS abusif)
+2026-08-11T15:13:33.837183  
+[ThemeRuleEngine] --- Règle 755 (ordre=34) ---
+2026-08-11T15:13:33.837207  [ThemeRuleEngine] SQL (début): SELECT        SUM(NB_ENSEIGNANTS_BENEVOLES) AS NB_ENSEIGNANTS_BENEVOLES, SUM(NB_ENSEIGNANTS_BENEVOLES_F) AS NB_ENSEIGNANTS_BENEVOLES_F
+FROM            dbo.DONNEES_ETABLISSEMENT
+WHERE        (CODE_ET
+2026-08-11T15:13:33.839790  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.839952  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_ENSEIGNANTS_BENEVOLES, NB_ENSEIGNANTS_BENEVOLES_F}
+2026-08-11T15:13:33.840110  [SqlTranslator] stripping context-only WHERE:         (CODE_ETABLISSEMENT = 21739 ) AND (CODE_TYPE_ANNEE = 21 )
+
+2026-08-11T15:13:33.840186  [SqlTranslator] translated SQL (isScalar=false):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ENSEIGNANTS_BENEVOLES_0' THEN CAST(field_value AS REAL) END) AS NB_ENSEIGNANTS_BENEVOLES,
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_ENSEIGNANTS_BENEVOLES_F_0' THEN CAST(field_value AS REAL) END) AS NB_ENSEIGNANTS_BENEVOLES_F
   FROM _cd
 )
 SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=8 OR (CODE_TYPE_AGE)=5 OR (CODE_TYPE_AGE)=6 OR (CODE_TYPE_AGE)=9 OR (CODE_TYPE_AGE)=10 OR (CODE_TYPE_AGE)=11 OR (CODE_TYPE_AGE)=12 OR (CODE_TYPE_AGE)=13) AND ((CODE_TYPE_NIVEAU)=12)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
+SELECT        SUM(NB_ENSEIGNANTS_BENEVOLES) AS NB_ENSEIGNANTS_BENEVOLES, SUM(NB_ENSEIGNANTS_BENEVOLES_F) AS NB_ENSEIGNANTS_BENEVOLES_F
+FROM            DONNEES_ETABLISSEMENT
+GROUP BY NB_ENSEIGNANTS_BENEVOLES, NB_ENSEIGNANTS_BENEVOLES_F
+HAVING        (NOT (NB_ENSEIGNANTS_BENEVOLES IS NULL)) AND (NOT (NB_ENSEIGNANTS_BENEVOLES_F IS NULL))
 ) _violations
-2026-08-10T08:27:55.626963  [ThemeRuleEngine] ✓ règle 824 OK (count=0)
-2026-08-10T08:27:55.626996  
-[ThemeRuleEngine] --- Règle 827 (ordre=0) ---
-2026-08-10T08:27:55.627150  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.632285  [ThemeRuleEngine] règle 827 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.633834  [ThemeRuleEngine] règle 827: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.633936  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.634150  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.634305  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.634407  [SqlTranslator] translated SQL (isScalar=false):
+2026-08-11T15:13:33.845569  [ThemeRuleEngine] ✓ règle 755 OK (count=0)
+2026-08-11T15:13:33.845652  
+[ThemeRuleEngine] --- Règle 764 (ordre=35) ---
+2026-08-11T15:13:33.845690  [ThemeRuleEngine] SQL (début): SELECT NB_MAITRES_VAC
+FROM   dbo.DONNEES_ETABLISSEMENT
+WHERE (CODE_ETABLISSEMENT = 21739) AND (CODE_TYPE_ANNEE = 21)
+2026-08-11T15:13:33.847886  [SqlTranslator] after param substitution: codeEtab=21739 codeTypeAnnee=21
+2026-08-11T15:13:33.848106  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, NB_MAITRES_VAC}
+2026-08-11T15:13:33.848236  [SqlTranslator] stripping context-only WHERE:  (CODE_ETABLISSEMENT = 21739) AND (CODE_TYPE_ANNEE = 21)
+2026-08-11T15:13:33.848273  [SqlTranslator] SCALAR: building multi-column-safe wrapper
+2026-08-11T15:13:33.848295  [SqlTranslator] translated SQL (isScalar=true):
 WITH _cd AS (
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst='10502'
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
       GROUP BY UPPER(field_name)
     )
   UNION ALL
   SELECT field_name, field_value
   FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
+  WHERE id_camp='2' AND id_etab='21739'
+    AND id_qst != '10502'
     AND UPPER(field_name) NOT IN (
       SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst='10502'
     )
     AND id IN (
       SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
+      WHERE id_camp='2' AND id_etab='21739'
+        AND id_qst != '10502'
       GROUP BY UPPER(field_name)
     )
 ),
-ELEVES_AGE_NIVEAU_SEXE AS (
+DONNEES_ETABLISSEMENT AS (
   SELECT
     MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
     MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
     MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
+    MAX(CASE WHEN UPPER(field_name) LIKE 'NB_MAITRES_VAC_0' THEN CAST(field_value AS REAL) END) AS NB_MAITRES_VAC
   FROM _cd
 )
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=14 OR (CODE_TYPE_AGE)=15 OR (CODE_TYPE_AGE)=16 OR (CODE_TYPE_AGE)=18 OR (CODE_TYPE_AGE)=19 OR (CODE_TYPE_AGE)=20 OR (CODE_TYPE_AGE)=21 OR (CODE_TYPE_AGE)=22 OR (CODE_TYPE_AGE)=23 OR (CODE_TYPE_AGE)=24 OR (CODE_TYPE_AGE)=25 OR (CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=4)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.636877  [ThemeRuleEngine] ✓ règle 827 OK (count=0)
-2026-08-10T08:27:55.637015  
-[ThemeRuleEngine] --- Règle 828 (ordre=0) ---
-2026-08-10T08:27:55.637034  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.638577  [ThemeRuleEngine] règle 828 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.640979  [ThemeRuleEngine] règle 828: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.641048  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.641262  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.641411  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.641521  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=16 OR (CODE_TYPE_AGE)=18 OR (CODE_TYPE_AGE)=19 OR (CODE_TYPE_AGE)=20 OR (CODE_TYPE_AGE)=21 OR (CODE_TYPE_AGE)=22 OR (CODE_TYPE_AGE)=23 OR (CODE_TYPE_AGE)=24 OR (CODE_TYPE_AGE)=25 OR (CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=5)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.644437  [ThemeRuleEngine] ✓ règle 828 OK (count=0)
-2026-08-10T08:27:55.644488  
-[ThemeRuleEngine] --- Règle 829 (ordre=0) ---
-2026-08-10T08:27:55.644503  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.649195  [ThemeRuleEngine] règle 829 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.651131  [ThemeRuleEngine] règle 829: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.651545  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.651860  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.652434  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.652544  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=18 OR (CODE_TYPE_AGE)=19 OR (CODE_TYPE_AGE)=20 OR (CODE_TYPE_AGE)=21 OR (CODE_TYPE_AGE)=22 OR (CODE_TYPE_AGE)=23 OR (CODE_TYPE_AGE)=24 OR (CODE_TYPE_AGE)=25 OR (CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=6)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.656064  [ThemeRuleEngine] ✓ règle 829 OK (count=0)
-2026-08-10T08:27:55.656121  
-[ThemeRuleEngine] --- Règle 830 (ordre=0) ---
-2026-08-10T08:27:55.656134  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.658145  [ThemeRuleEngine] règle 830 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.665919  [ThemeRuleEngine] règle 830: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.666011  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.666255  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.666401  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.666506  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=20 OR (CODE_TYPE_AGE)=21 OR (CODE_TYPE_AGE)=22 OR (CODE_TYPE_AGE)=23 OR (CODE_TYPE_AGE)=24 OR (CODE_TYPE_AGE)=25 OR (CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=7)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.670568  [ThemeRuleEngine] ✓ règle 830 OK (count=0)
-2026-08-10T08:27:55.670625  
-[ThemeRuleEngine] --- Règle 831 (ordre=0) ---
-2026-08-10T08:27:55.670641  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.673567  [ThemeRuleEngine] règle 831 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.674976  [ThemeRuleEngine] règle 831: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.675099  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.675391  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.675641  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.675772  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=21 OR (CODE_TYPE_AGE)=22 OR (CODE_TYPE_AGE)=23 OR (CODE_TYPE_AGE)=24 OR (CODE_TYPE_AGE)=25 OR (CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=8)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.681610  [ThemeRuleEngine] ✓ règle 831 OK (count=0)
-2026-08-10T08:27:55.681694  
-[ThemeRuleEngine] --- Règle 832 (ordre=0) ---
-2026-08-10T08:27:55.681717  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.683912  [ThemeRuleEngine] règle 832 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.686508  [ThemeRuleEngine] règle 832: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.686618  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.686905  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.687089  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.687175  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=23 OR (CODE_TYPE_AGE)=24 OR (CODE_TYPE_AGE)=25 OR (CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=9)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.689814  [ThemeRuleEngine] ✓ règle 832 OK (count=0)
-2026-08-10T08:27:55.689856  
-[ThemeRuleEngine] --- Règle 833 (ordre=0) ---
-2026-08-10T08:27:55.689872  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.691696  [ThemeRuleEngine] règle 833 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.693551  [ThemeRuleEngine] règle 833: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.693641  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.693806  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.693942  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.694022  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=24 OR (CODE_TYPE_AGE)=25 OR (CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=10)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.699770  [ThemeRuleEngine] ✓ règle 833 OK (count=0)
-2026-08-10T08:27:55.699832  
-[ThemeRuleEngine] --- Règle 834 (ordre=0) ---
-2026-08-10T08:27:55.699852  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_AGE, Sum(ELEVES_AGE_NIVEAU_SEXE.FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(ELEVES_AGE_NIVEAU_SEXE.TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELE
-2026-08-10T08:27:55.711201  [ThemeRuleEngine] règle 834 MODE ASSOC → règle associée=4 critere="="
-2026-08-10T08:27:55.722298  [ThemeRuleEngine] règle 834: règle associée 4 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.722421  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.723112  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_AGE, FILLES_AGE_NIVEAU, TOTAL_AGE_NIVEAU, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.723413  [SqlTranslator] stripping context-only HAVING:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21'))
-2026-08-10T08:27:55.723582  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_AGE_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_AGE,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'FILLES_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS FILLES_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'TOTAL_AGE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS TOTAL_AGE_NIVEAU,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_AGE, Sum(FILLES_AGE_NIVEAU) AS SommeDeFILLES_AGE_NIVEAU, Sum(TOTAL_AGE_NIVEAU) AS SommeDeTOTAL_AGE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((CODE_TYPE_AGE)=26 OR (CODE_TYPE_AGE)=27) AND ((CODE_TYPE_NIVEAU)=11)) GROUP BY CODE_TYPE_AGE, CODE_ETABLISSEMENT, CODE_TYPE_ANNEE 
-) _violations
-2026-08-10T08:27:55.726651  [ThemeRuleEngine] ✓ règle 834 OK (count=0)
-2026-08-10T08:27:55.726688  
-[ThemeRuleEngine] --- Règle 836 (ordre=0) ---
-2026-08-10T08:27:55.726763  [ThemeRuleEngine] SQL (début): SELECT ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE WHERE (((ELEVES_AGE_NIVEAU_SEXE.CODE_ETABLISSEMENT)=$CODE_ETABLISSEMENT) AND ((ELEVES_AGE_NIVEAU_SEXE.CODE_TYPE_ANNEE)=$CODE_
-2026-08-10T08:27:55.734603  [ThemeRuleEngine] règle 836 MODE ASSOC → règle associée=382 critere="="
-2026-08-10T08:27:55.736841  [ThemeRuleEngine] règle 836: règle associée 382 introuvable → fallback mode EXISTS
-2026-08-10T08:27:55.737039  [SqlTranslator] after param substitution: codeEtab=0402012A01 codeTypeAnnee=21
-2026-08-10T08:27:55.737199  [SqlTranslator] fields extracted for CTE: {CODE_ETABLISSEMENT, CODE_TYPE_ANNEE, CODE_ADMINISTRATIF, CODE_TYPE_NIVEAU}
-2026-08-10T08:27:55.737461  [SqlTranslator] stripping context-only WHERE:  (((CODE_ETABLISSEMENT)='0402012A01') AND ((CODE_TYPE_ANNEE)='21')) 
-2026-08-10T08:27:55.737541  [SqlTranslator] translated SQL (isScalar=false):
-WITH _cd AS (
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst='9502'
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-      GROUP BY UPPER(field_name)
-    )
-  UNION ALL
-  SELECT field_name, field_value
-  FROM collected_data
-  WHERE id_camp='2' AND id_etab='22222'
-    AND id_qst != '9502'
-    AND UPPER(field_name) NOT IN (
-      SELECT UPPER(field_name) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst='9502'
-    )
-    AND id IN (
-      SELECT MAX(id) FROM collected_data
-      WHERE id_camp='2' AND id_etab='22222'
-        AND id_qst != '9502'
-      GROUP BY UPPER(field_name)
-    )
-),
-ELEVES_AGE_NIVEAU_SEXE AS (
-  SELECT
-    MAX(CASE WHEN UPPER(field_name)='CODE_ETABLISSEMENT' THEN field_value END) AS CODE_ETABLISSEMENT,
-    MAX(CASE WHEN UPPER(field_name)='CODE_TYPE_ANNEE' THEN field_value END) AS CODE_TYPE_ANNEE,
-    MAX(CASE WHEN UPPER(field_name)='CODE_ADMINISTRATIF' THEN field_value END) AS CODE_ADMINISTRATIF,
-    SUM(CASE WHEN UPPER(field_name) LIKE 'CODE_TYPE_NIVEAU_%' THEN CAST(field_value AS REAL) ELSE 0 END) AS CODE_TYPE_NIVEAU
-  FROM _cd
-)
-SELECT COUNT(*) AS cnt FROM (
-SELECT CODE_TYPE_NIVEAU FROM ELEVES_AGE_NIVEAU_SEXE GROUP BY CODE_TYPE_NIVEAU
-) _violations
-2026-08-10T08:27:55.739991  [ThemeRuleEngine] ✗ règle 836 VIOLÉE (count=1)
-2026-08-10T08:27:55.740035  
-[ThemeRuleEngine] === FIN ÉVALUATION idTheme=950 2 violation(s) ===
+SELECT * FROM (
+SELECT NB_MAITRES_VAC
+FROM   DONNEES_ETABLISSEMENT
+
+) _scalar LIMIT 1
+2026-08-11T15:13:33.851881  [ThemeRuleEngine] ✓ règle 764 OK (scalar=0.0)
+2026-08-11T15:13:33.851926  
+[ThemeRuleEngine] === FIN ÉVALUATION idTheme=10502 0 violation(s) ===
