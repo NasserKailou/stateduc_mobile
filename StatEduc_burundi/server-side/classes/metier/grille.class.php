@@ -757,24 +757,24 @@ class grille {
 														}
 														$cptr_pass++;	
 													}
-												elseif ( (trim($rs->fields['TYPE_OBJET'])=='systeme') and  (trim($rs->fields['CHAMP_PERE'])==$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_FILTRE']) ){
-														// s'il s'agit du CODE_TYPE_PERIODE la valeur de la clé est préparée et rangée dans  val_cle[CODE_TYPE_PERIODE] 
+							elseif ( (trim($rs->fields['TYPE_OBJET'])=='systeme') and  (trim($rs->fields['CHAMP_PERE'])==$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_FILTRE']) ){
+								// s'il s'agit du CODE_TYPE_PERIODE la valeur de la clé est préparée et rangée dans  val_cle[CODE_TYPE_PERIODE] 
                                                         $val_cle[$rs->fields['CHAMP_PERE']] 	= $this->code_filtre;
-                                                        // SESSION 58 — FIX KOSAVE thèmes sans filtre (10502 DONNEES_ETABLISSEMENT, etc.)
-                                                        // ROOT CAUSE : quand code_filtre='' (thème sans filtre période, app mobile),
-                                                        // le SQL produit ".CHAMP_PERE=" (sans valeur) → syntaxe invalide → Execute()===false
-                                                        // → theme_data_MAJ_ok=false → KOSAVE.
-                                                        // FIX : ne construire la clause WHERE filtre QUE si code_filtre est non vide.
-                                                        // Sans clause filtre → matrice complète lue → comparer() correct → OKSAVE.
+                                                        // SESSION 59 FIX — KOSAVE thèmes sans filtre (10502/10602/10702) :
+                                                        // Quand code_filtre est vide (thème sans filtre période), ne pas
+                                                        // ajouter la clause WHERE CODE_TYPE_PERIODE= (SQL invalide → KOSAVE).
+                                                        // Deux causes : filterParam='null' reçu (PHP session B sans cookie) ou
+                                                        // filterParam='0' envoyé par le mobile (corrigé côté Flutter aussi).
                                                         if(trim($this->code_filtre) != '') {
-                                                            if(!preg_match('/.'.trim($rs->fields['CHAMP_PERE']).'/',$criteres)){
-                                                                if (($nb_table_liee==1)&& ($cptr_pass==0)){
-                                                                    $tab_criteres[$nomtableliee].=$nomtableliee.'.'.$rs->fields['CHAMP_PERE'].'='.$this->code_filtre;
-                                                                }else{
-                                                                    $tab_criteres[$nomtableliee].=' AND '.$nomtableliee.'.'.$rs->fields['CHAMP_PERE'].'='.$this->code_filtre;
-                                                                }		
-                                                            }
-                                                        }
+                                                        // Cette valeur est prise en compte dans les critéres de la requéte SQL_REQ de Selection des données de la TABLE MERE														
+                                                        if(!preg_match('/.'.trim($rs->fields['CHAMP_PERE']).'/',$criteres)){
+															if (($nb_table_liee==1)&& ($cptr_pass==0)){
+																$tab_criteres[$nomtableliee].=$nomtableliee.'.'.$rs->fields['CHAMP_PERE'].'='.$this->code_filtre;
+															}else{
+																$tab_criteres[$nomtableliee].=' AND '.$nomtableliee.'.'.$rs->fields['CHAMP_PERE'].'='.$this->code_filtre;
+															}		
+														}
+                                                        } // end SESSION 59 FIX — guard code_filtre non vide
 														$cptr_pass++;	
 													}
 													elseif ( (trim($rs->fields['TYPE_OBJET'])=='systeme') and  (trim($rs->fields['CHAMP_PERE'])==$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']) ){

@@ -371,6 +371,33 @@ class DataEntryProvider extends ChangeNotifier {
             }
             // ──────────────────────────────────────────────────────────────────
 
+            // ── SESSION 59 FIX — SYNC DICO_REGLE_THEME_ASSOC ─────────────────
+            // PROBLÈME RACINE COHÉRENCE OFFLINE :
+            //   ThemeRuleEngine._evaluateWithAssoc() lit dico_regle_theme_assoc
+            //   pour obtenir le sql_assoc de la règle associée (règles 404, 12,
+            //   13, 16, 18, 23, 47, 48, 51 — issues d'autres thèmes, absentes de
+            //   dico_regle_theme). Si dico_regle_theme_assoc est vide → toutes
+            //   les règles MODE ASSOC (24/36 pour theme 10502) sont ignorées.
+            //
+            // FIX : convertir chaque CoherenceRule en Map pour insertDicoRegleThemeAssoc.
+            //   fetchRules() a déjà extrait id_assoc, id_regle_assoc, sql_assoc,
+            //   critere depuis associations[] du serveur (data_rules.php ligne 305).
+            //   On les stocke ici dans dico_regle_theme_assoc (REPLACE — idempotent).
+            final assocRows = rules.map((r) => {
+              'id_assoc':             r.idAssoc,
+              'id_regle_theme':       r.idRegle,
+              'id_regle_theme_assoc': r.idRegleAssoc,
+              'critere':              r.critere.isNotEmpty ? r.critere : '>',
+              'activer_ctrl':         1,
+              'sql_assoc':            r.sqlAssoc,
+            }).toList();
+            if (assocRows.isNotEmpty) {
+              await _db.insertDicoRegleThemeAssoc(assocRows);
+              debugPrint('[DataEntry] synced ${assocRows.length} assoc rows '
+                  'into dico_regle_theme_assoc for qst=${q.idQst}');
+            }
+            // ──────────────────────────────────────────────────────────────────
+
             // ── Re-déclenche le contrôle offline si les règles viennent d'arriver
             // pour la question actuellement affichée.
             if (_selectedQuestion?.idQst == q.idQst &&
