@@ -614,10 +614,25 @@ class ApiService {
   //   → GET /user_camp.php/typ_reg_camp/{userId}/{id_camp}/{typeRegroups_csv}
   //   Response se_data: [ { id, nom }, ... ]
   // NOTE: uses currentUser.id (NOT .login); typeRegroups is CSV from campaign
+  //
+  // SESSION 55 FIX — guard typeRegroups vide :
+  //   Quand new_camp retourne typeregroups:'' (ID_TYPE_REGROUP=0 en DB),
+  //   l'URL construite serait .../typ_reg_camp/{userId}/{campId}/ (segment vide),
+  //   ce que Slim ne reconnaît pas → 404.
+  //   Le JS web (charge_camp.js) est robuste car ses appels AJAX sont parallèles ;
+  //   un 404 sur typ_reg_camp n'empêche pas les autres étapes (reg_camp, etabs…).
+  //   Flutter effectue les étapes en SÉQUENCE → un 404 fatal bloque tout le téléchargement.
+  //   Quand typeRegroups est vide, il n'y a aucun type à charger → retour [] immédiat.
   // ═══════════════════════════════════════════════════════════════════════════
 
   Future<List<RegroupType>> getRegroupTypes(
       String userId, String campId, String typeRegroups) async {
+    // SESSION 55 FIX: guard typeRegroups vide — évite un 404 Slim fatal
+    // (le serveur retourne typeregroups:'' quand ID_TYPE_REGROUP=0 pour cet agent)
+    if (typeRegroups.trim().isEmpty) {
+      debugPrint('[ApiService] getRegroupTypes: typeRegroups vide → skip (aucun type à charger)');
+      return [];
+    }
     final data =
         await _get('user_camp.php/typ_reg_camp/$userId/$campId/$typeRegroups');
     if (data is List) {

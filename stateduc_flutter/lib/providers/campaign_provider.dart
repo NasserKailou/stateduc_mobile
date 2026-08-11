@@ -374,10 +374,21 @@ class CampaignProvider extends ChangeNotifier {
       await _db.insertRegroups(campaign.idCamp, regroups);
 
       // Étape 2 — Types de regroupements (utilise userId + campaign.typeRegroups CSV)
+      // SESSION 55 FIX — non-fatal : quand typeRegroups est vide, getRegroupTypes()
+      // retourne [] sans appel réseau (guard dans api_service.dart).
+      // Double protection ici : si le serveur retourne un 404 inattendu pour toute
+      // autre raison, l'étape est loguée mais n'interrompt pas le téléchargement.
+      // Comportement équivalent au JS web (charge_camp.js appels AJAX parallèles).
       _setLoadStep(2, 'Chargement des types de regroupements…');
-      final regroupTypes = await _api.getRegroupTypes(
-          userId, campaign.idCamp, campaign.typeRegroups);
-      await _db.insertRegroupTypes(campaign.idCamp, regroupTypes);
+      try {
+        final regroupTypes = await _api.getRegroupTypes(
+            userId, campaign.idCamp, campaign.typeRegroups);
+        await _db.insertRegroupTypes(campaign.idCamp, regroupTypes);
+      } catch (e) {
+        // Non-fatal — typeRegroups peut être vide (ID_TYPE_REGROUP=0) ou le serveur
+        // peut retourner 404 pour d'autres raisons. Le chargement continue.
+        debugPrint('[CampaignProvider] étape 2 (typ_reg_camp) SKIPPED (non fatal) : $e');
+      }
 
       // Étape 3 — Statuts des établissements (sans paramètres)
       _setLoadStep(3, 'Chargement des statuts…');
