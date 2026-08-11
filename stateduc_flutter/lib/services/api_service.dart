@@ -1013,7 +1013,14 @@ class ApiService {
     bool isLastPage = true,
     String yearCode = '',
   }) async {
-    final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
+    // SESSION 59 FIX — KOSAVE thèmes 10502/10602/10702 :
+    // Avant : filterParam='0' pour les thèmes sans filtre (filter==null|empty).
+    // Problème : le serveur PHP reçoit '0' comme code_filtre → grille.class.php
+    //   construit WHERE CODE_TYPE_PERIODE=0 → SQL invalide → KOSAVE.
+    // Fix : utiliser 'null' (chaîne) comme fetchRules() ligne 1269 — le serveur
+    //   PHP détecte 'null' et fixe $_SESSION['filtre']='' → code_filtre='' →
+    //   guard PHP (grille.class.php) empêche la clause WHERE invalide.
+    final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
     // Build form body exactly like page_etab.js getPageDataToSend():
     //   • Radio keys are stored as "fieldName#optionId" = "1"|"0".
     //     Only checked radios (value == "1") are sent, transformed to
