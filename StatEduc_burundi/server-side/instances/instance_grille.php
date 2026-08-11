@@ -5,7 +5,7 @@ include_once $GLOBALS['SISED_PATH_LIB'] . 'lib.inc.php';
 include_once $GLOBALS['SISED_PATH_LIB'] . 'navigation.inc.php';
 include_once $GLOBALS['SISED_PATH_LIB'] . 'controle.inc.php';
 
-//si il y'a des données dans le post alors on met à jour et on genère le formulaire
+//si il y'a des donnï¿½es dans le post alors on met ï¿½ jour et on genï¿½re le formulaire
 if(count($_POST) == 0) {
 		// Modif Bass
 } elseif(!isset($GLOBALS['dont_submit'])) {
@@ -31,19 +31,19 @@ if(count($_POST) == 0) {
     // ici fonction VERIF du $_POST
     $curobj_grille->verif($_POST);    
     
-    // Demarrage de la Transaction pour contrôler le problème d'accès simultané sur le dernier enregistrement
+    // Demarrage de la Transaction pour contrï¿½ler le problï¿½me d'accï¿½s simultanï¿½ sur le dernier enregistrement
     $curobj_grille->conn->StartTrans();   // Start of trasaction
 
-    // Récuperation des données de la superglobale $_POST
+    // Rï¿½cuperation des donnï¿½es de la superglobale $_POST
     $curobj_grille->get_post_template($_POST);
-	// Comparaison des matrices de départ et d'arrivée'
+	// Comparaison des matrices de dï¿½part et d'arrivï¿½e'
 	$curobj_grille->comparer($curobj_grille->matrice_donnees,$curobj_grille->matrice_donnees_post, $curobj_grille->keys_template);
 
-    // maj de la base de données
+    // maj de la base de donnï¿½es
     
     $curobj_grille->maj_bdd();
     
-    // Vaidation de la Transaction après la Maj des données afin de libérer le processus
+    // Vaidation de la Transaction aprï¿½s la Maj des donnï¿½es afin de libï¿½rer le processus
     $curobj_grille->conn->CompleteTrans(); // Commit Transaction
        
     if($curobj_grille->new_etab == true){ 
@@ -64,11 +64,26 @@ if(count($_POST) == 0) {
 		
 }
     echo '<script language="javascript" src="'.$GLOBALS['SISED_URL_JSC'] . 'js.js"></script>' . "\n";
-    // paramètre d'échange
+    // paramï¿½tre d'ï¿½change
     $id_theme			=	$theme_manager->id;    
 	$code_etablissement = $_SESSION['code_etab'];
     $code_annee = $_SESSION['annee'];
-	$code_filtre = $_SESSION['filtre'];
+	// SESSION 59 FIX DÃ‰FINITIF â€” KOSAVE thÃ¨mes sans filtre (10502, 10602, 10702)
+	// ROOT CAUSE : questionnaire_ws.php utilise session_start(['read_and_close'=>true]),
+	// donc $_SESSION ne peut PAS Ãªtre modifiÃ©. La Session B (cURL data_saveâ†’questionnaire_ws)
+	// conserve la valeur stale de $_SESSION['filtre'] d'un appel prÃ©cÃ©dent (ex: '1').
+	// Instance_grille instancie grille avec code_filtre='1' â†’ WHERE CODE_TYPE_PERIODE=1
+	// sur thÃ¨me sans pÃ©riode â†’ matrice vide â†’ KOSAVE.
+	//
+	// FIX : quand $_GET['filtre'] est prÃ©sent dans l'URL (appel cURL mobile ou navigateur),
+	// l'utiliser directement. data_save.php passe &filtre=<valeur> seulement si filtre rÃ©el,
+	// sinon il ne passe PAS &filtre â†’ isset($_GET['filtre']) = false â†’ code_filtre = ''.
+	// Cela court-circuite complÃ¨tement la session stale.
+	if (isset($_GET['filtre'])) {
+	    $code_filtre = $_GET['filtre'];
+	} else {
+	    $code_filtre = $_SESSION['filtre'];
+	}
     $id_systeme	= $_SESSION['secteur'];
 
     if( $_GET['val'] == 'new_etab'){
@@ -86,7 +101,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
     // chargement des codes des nomenclatures des champs de type matrice
     $curobj_grille->set_code_nomenclature();
 
-    // Récupération des différents champs
+    // Rï¿½cupï¿½ration des diffï¿½rents champs
     // $curobj_grille->set_champs();
 
     // Configuration de la barre de navigation
@@ -124,12 +139,12 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 						}elseif(count($list_sql_tab) > 1){
 							if($tabs2[1] == 'ASC'){
 								if(!ereg(" AS ".$tabs3[1],$sql_tab) && !ereg(" AS ".$tabs3[1],$list_select_suite)){
-									if($tabs0[0] == 'int') $list_select_suite .= ", 4294967295 "." AS ".$tabs3[1]." ";//4294967295 est la valeur maxi d'un entier long non signé
+									if($tabs0[0] == 'int') $list_select_suite .= ", 4294967295 "." AS ".$tabs3[1]." ";//4294967295 est la valeur maxi d'un entier long non signï¿½
 									else $list_select_suite .= ", 'zzzzzzzzzz' "." AS ".$tabs3[1]." ";//zzzzzzzzzz etant une valeur tres tres grande d'une chaine de caracteres
 								}
 							}elseif($tabs2[1] == 'DESC'){
 								if(!ereg(" AS ".$tabs3[1],$sql_tab) && !ereg(" AS ".$tabs3[1],$list_select_suite)){
-									if($tabs0[0] == 'int') $list_select_suite .= ", 0 "." AS ".$tabs3[1]." ";//0 est la valeur mini d'un entier long non signé
+									if($tabs0[0] == 'int') $list_select_suite .= ", 0 "." AS ".$tabs3[1]." ";//0 est la valeur mini d'un entier long non signï¿½
 									else $list_select_suite .= ", 'aaaaaaaaaa' "." AS ".$tabs3[1]." ";//aaaaaaaaaa etant une valeur tres tres petite d'une chaine de caracteres
 								}
 							}
@@ -278,7 +293,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 		//print_r($curobj_grille->sql_data);
 	}
 	//Fin Ajout HEBIE TMIS
-	// récupération des données de la base de données
+	// rï¿½cupï¿½ration des donnï¿½es de la base de donnï¿½es
     //echo '<pre>';
 	//print_r($curobj_grille->sql_data);
 	$curobj_grille->get_donnees_bdd();
@@ -367,7 +382,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 			}
 		}
 		//Fin Ajout HEBIE TMIS
-		// récupération des données de la base de données
+		// rï¿½cupï¿½ration des donnï¿½es de la base de donnï¿½es
 		$curobj_grille->get_donnees_bdd();
 		//
 		foreach($curobj_grille->nomtableliee as $nomtableliee){

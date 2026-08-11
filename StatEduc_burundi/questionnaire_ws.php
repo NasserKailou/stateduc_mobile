@@ -17,7 +17,10 @@ if(count($_GET)>0) {
 		$i++;
 	}
 }//print_r($_POST);
-//On positionne la filtre, l'année et le secteur (si necessaire) choisis en session
+//On positionne la filtre, l'annï¿½e et le secteur (si necessaire) choisis en session
+// Note SESSION 59 : read_and_close (ligne 3) rend $_SESSION en lecture seule ici.
+// Toute Ã©criture dans $_SESSION est ignorÃ©e silencieusement.
+// Le fix KOSAVE est donc dans instance_grille.php (prÃ©fÃ¨re $_GET['filtre'] sur $_SESSION['filtre']).
 if(isset($_GET['filtre']) && $_GET['filtre']<>'') $_SESSION['filtre']=$_GET['filtre'];
 if(isset($_GET['annee']) && $_GET['annee']<>'') $_SESSION['annee']=$_GET['annee'];
 if(isset($_GET['secteur']) && $_GET['secteur']<>'') $_SESSION['secteur']=$_GET['secteur'];
@@ -177,7 +180,7 @@ function deactivate_ID($id){
 					xhr = new ActiveXObject("Microsoft.XMLHTTP");
 				}
 		}
-		else { // XMLHttpRequest non supporté par le navigateur 
+		else { // XMLHttpRequest non supportï¿½ par le navigateur 
 		   alert("<?php echo recherche_libelle_page('no_jajax');?>"); 
 		   xhr = false; 
 		} 
@@ -186,7 +189,7 @@ function deactivate_ID($id){
 	function run_imputation(cible, annee, check_action){
 		getXhr();
 		xhr.onreadystatechange = function(){
-			// On ne fait quelque chose que si on a tout reçu et que le serveur est ok
+			// On ne fait quelque chose que si on a tout reï¿½u et que le serveur est ok
 			if(xhr.readyState == 4 && xhr.status == 200){
 				run_imput_txt = xhr.responseText;
 				// On se sert de innerHTML pour rajouter les options a la liste
@@ -208,7 +211,7 @@ function deactivate_ID($id){
 	function run_traitement_grille(list_chps, type){
 		getXhr();
 		xhr.onreadystatechange = function(){
-			// On ne fait quelque chose que si on a tout reçu et que le serveur est ok
+			// On ne fait quelque chose que si on a tout reï¿½u et que le serveur est ok
 			if(xhr.readyState == 4 && xhr.status == 200){
 				run_sort_txt = xhr.responseText;
 				// On se sert de innerHTML pour rajouter les options a la liste
@@ -231,7 +234,7 @@ function deactivate_ID($id){
 		xhr.send(null);
 		//setTimeout("load_champs()",1000);	
 	}
-	//Desactiver des champs liés à un reponse
+	//Desactiver des champs liï¿½s ï¿½ un reponse
 	function desactiver_zone(){
 		var i,j,k,bool,nom_zone,liste_zones,tab_chp_pere,val_chp_pere
 		var args=desactiver_zone.arguments;
@@ -249,7 +252,7 @@ function deactivate_ID($id){
 		}
 		getXhr();
 		xhr.onreadystatechange = function(){
-			// On ne fait quelque chose que si on a tout reçu et que le serveur est ok
+			// On ne fait quelque chose que si on a tout reï¿½u et que le serveur est ok
 			if(xhr.readyState == 4 && xhr.status == 200){
 				var codes_chps = xhr.responseText;
 				//alert(codes_chps);
@@ -282,7 +285,7 @@ function deactivate_ID($id){
 		xhr.send(null);
 	}
 	
-	//Desactiver des themes liés à un reponse
+	//Desactiver des themes liï¿½s ï¿½ un reponse
 	function desactiver_theme(){	
 		var i,j,bool,obj,tab_chp_pere,val_chp_pere
 		var args=desactiver_theme.arguments;
@@ -301,7 +304,7 @@ function deactivate_ID($id){
 		}
 	  	getXhr();
 		xhr.onreadystatechange = function(){
-			// On ne fait quelque chose que si on a tout reçu et que le serveur est ok
+			// On ne fait quelque chose que si on a tout reï¿½u et que le serveur est ok
 			if(xhr.readyState == 4 && xhr.status == 200){
 				var xhr_txt = xhr.responseText;
 				// On se sert de innerHTML pour rajouter les options a la liste
@@ -328,7 +331,7 @@ function deactivate_ID($id){
 		}
 		getXhr();
 		xhr.onreadystatechange = function(){
-			// On ne fait quelque chose que si on a tout reçu et que le serveur est ok
+			// On ne fait quelque chose que si on a tout reï¿½u et que le serveur est ok
 			if(xhr.readyState == 4 && xhr.status == 200){
 				var valid_teach_txt = xhr.responseText;
 				// On se sert de innerHTML pour rajouter les options a la liste
@@ -338,7 +341,7 @@ function deactivate_ID($id){
 						var msg_alert = "<?php echo recherche_libelle_page('Teach_Exist'); ?> \""+trim(row_valid_teach[1])+"\" <?php echo recherche_libelle_page('Teach_Sect'); ?> \""+trim(row_valid_teach[2])+"\" <?php echo recherche_libelle_page('Teach_Year'); ?> \n<?php echo recherche_libelle_page('Teach_Capt_Confirm'); ?>";
 						if(alerter == true){
 							if(confirm(msg_alert)){
-								teacher_get_data(field_name,teach_number);//A revoir : faire en sorte que l'identifiant clé primaire soit pris en compte pr eviter la création d'un nouvel enregistrement en cas d'identifiant incremental
+								teacher_get_data(field_name,teach_number);//A revoir : faire en sorte que l'identifiant clï¿½ primaire soit pris en compte pr eviter la crï¿½ation d'un nouvel enregistrement en cas d'identifiant incremental
 							}
 						}else{
 							alert("<?php echo recherche_libelle_page('Teach_Exist'); ?> \""+trim(row_valid_teach[1])+"\" <?php echo recherche_libelle_page('Teach_Sect'); ?> \""+trim(row_valid_teach[2])+"\" <?php echo recherche_libelle_page('Teach_Year'); ?>");
@@ -357,7 +360,7 @@ function deactivate_ID($id){
 						}
 					}else if(row_valid_teach[0] == "not_exist_teacher_year"){
 						if(alerter == true){
-							teacher_get_data(field_name,teach_number);//A revoir : faire en sorte que l'identifiant clé primaire soit pris en compte pr eviter la création d'un nouvel enregistrement en cas d'identifiant incremental
+							teacher_get_data(field_name,teach_number);//A revoir : faire en sorte que l'identifiant clï¿½ primaire soit pris en compte pr eviter la crï¿½ation d'un nouvel enregistrement en cas d'identifiant incremental
 						}else{
 							var msg_alert = "<?php echo recherche_libelle_page('Teach_Exist2'); ?> \n<?php echo recherche_libelle_page('Teach_Capt_Confirm2'); ?>";
 							if(confirm(msg_alert)){
@@ -394,7 +397,7 @@ function deactivate_ID($id){
 	function teacher_get_data(field_name,teach_number){
 		getXhr();
 		xhr.onreadystatechange = function(){
-			// On ne fait quelque chose que si on a tout reçu et que le serveur est ok
+			// On ne fait quelque chose que si on a tout reï¿½u et que le serveur est ok
 			if(xhr.readyState == 4 && xhr.status == 200){
 				var valid_teach_txt = xhr.responseText;
 				// On se sert de innerHTML pour rajouter les options a la liste
@@ -928,9 +931,9 @@ if(isset($type_ent_stat) && $type_ent_stat <>""){
 
 <DIV id="contenu">
 <?php function new_infos_etab(){
-    //Cette fonction rafraichit les infos descriptives de l'établissement quand on vient de le créer
+    //Cette fonction rafraichit les infos descriptives de l'ï¿½tablissement quand on vient de le crï¿½er
     $conn = $GLOBALS['conn'];
-	//Recherche le code_regroupement à partir du code_etab : Modif Hebie
+	//Recherche le code_regroupement ï¿½ partir du code_etab : Modif Hebie
 	/*$requete = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' 
 				   FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'
 				   WHERE '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' ='. $_SESSION['code_etab'];
@@ -953,10 +956,10 @@ if(isset($type_ent_stat) && $type_ent_stat <>""){
                 FROM '.$GLOBALS['PARAM']['HIERARCHIE'].'
                 WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$_SESSION['chaine'];
     $niveau = $conn->GetOne($requete)-1;
-    //La classe arbre permet de recomposer la hiérarchie des regroupements
+    //La classe arbre permet de recomposer la hiï¿½rarchie des regroupements
     $arbre = new arbre($_SESSION['chaine']);
     $hierarchie = $arbre->getparentsid($niveau,$_SESSION['code_regroupement'],$_SESSION['chaine']);
-    //Mise en session de la string de la hiérarchie
+    //Mise en session de la string de la hiï¿½rarchie
     $_SESSION['hierarchie_regroup'] = '';
     foreach($hierarchie as $i=>$h) {
 	$_SESSION['hierarchie_regroup'] .= $h[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
@@ -970,7 +973,7 @@ if(isset($type_ent_stat) && $type_ent_stat <>""){
 	if(isset($_SESSION['list_themes_desact'])) unset($_SESSION['list_themes_desact']);
 }
 function extraire_valeur_matrice($texte){
-	// cette permet l'extraction de la valeur encodée dans le champ de type  matriciel 
+	// cette permet l'extraction de la valeur encodï¿½e dans le champ de type  matriciel 
 	$return = $texte;
 	if(preg_match('/_/',$texte)){
 			$val = explode('_',$texte);
@@ -979,12 +982,12 @@ function extraire_valeur_matrice($texte){
 	return ($return);
 }
 	// C'est un choix par introduction du code administratif
-	// Il faut donc contrôler l'existance de cet établissement
+	// Il faut donc contrï¿½ler l'existance de cet ï¿½tablissement
 	if ( isset($_GET['code_admin']) && $code_admin_not_found == true) {
 		print $_GET['code_admin'].' : '.recherche_libelle_page('CodAdmInex').'<BR>';
 	}
 
-    // Affichage des infos sur l'établissement en cours
+    // Affichage des infos sur l'ï¿½tablissement en cours
 
 	if(	(isset($_GET['code_etab']) && !isset($_GET['tmis'])) || (isset($_GET['ligne'])) || (isset($_GET['action']) && $_GET['action']=='add_new_teach')) {
 		if((isset($_GET['code_etab']) && !isset($_GET['tmis']))){
@@ -1035,7 +1038,7 @@ function extraire_valeur_matrice($texte){
 		if($_SESSION['code_etab']<>''){
 			$conn = $GLOBALS['conn'];
 			$GLOBALS['code_etab'] = $_SESSION['code_etab'];
-			//Recherche le code_regroupement à partir du code_etab : Modif Hebie
+			//Recherche le code_regroupement ï¿½ partir du code_etab : Modif Hebie
 			/*$requete = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' 
 						   FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'
 						   WHERE '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' ='. $_SESSION['code_etab'];
@@ -1058,7 +1061,7 @@ function extraire_valeur_matrice($texte){
 						FROM '.$GLOBALS['PARAM']['HIERARCHIE'].'
 						WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$_SESSION['chaine'];
 			$niveau = $conn->GetOne($requete)-1;
-			//La classe arbre permet de recomposer la hiérarchie des regroupements
+			//La classe arbre permet de recomposer la hiï¿½rarchie des regroupements
 			$arbre = new arbre($_SESSION['chaine']);
 			$hierarchie = $arbre->getparentsid($niveau,$_SESSION['code_regroupement'],$_SESSION['chaine']);
 			$_SESSION['hierarchie_regroup'] = '';
@@ -1380,13 +1383,13 @@ if(isset($GLOBALS['PARAM']['BTN_TRANSFERT_ENSEIGNANT']) && $GLOBALS['PARAM']['BT
 	echo '<br/><div style="text-align:left"><input style="text-align:center; font:bold;" type="button" name="" id="" value=" ... '.recherche_libelle_page('RechEns').' ... " onClick="OpenPopupRechEns(\'SERV\','.$_GET['theme'].');"/></div>'."\n";
 }
 //Fin bouton recherche enseignant			
-//Drapeau theme verrouillé
+//Drapeau theme verrouillï¿½
 if(isset($_SESSION['list_themes_desact']) && in_array($_GET['theme'],$_SESSION['list_themes_desact'])){
 	echo '<br/><div align="center" style="text-align:center; font:bold;"><span class="StyleVerrou" >'.recherche_libelle_page('infos_verrou').'</span></div>'."\n";
 }
 //echo "<pre>";
 //print_r($_SESSION['imput_all_tabms']);
-//Fin drapeau theme verrouillé
+//Fin drapeau theme verrouillï¿½
 //$theme_manager->set_theme_courant();
 //$theme_manager->set_classe();
 $requete  = "SELECT ACTION_THEME 
@@ -1430,7 +1433,7 @@ if(isset($_POST) && count($_POST)>0 && $GLOBALS['theme_data_MAJ_ok']== true){
 }
 //Fin gestion user link to data entry
 
-//Ajout HEBIE pr recuperer la requete associée a la liste des enseignants
+//Ajout HEBIE pr recuperer la requete associï¿½e a la liste des enseignants
 if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHERS_MANAGEMENT'] && in_array($_GET['theme'],$GLOBALS['PARAM']['TEACHERS_LIST_THEMES'])){
 	$_SESSION['teacher_sql_data'] = $curobj_grille->sql_data;
 	$_SESSION['nb_line'] = $curobj_grille->nb_lignes;
@@ -1463,7 +1466,7 @@ if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHER
 				//echo '<br>New_Etab='.$New_Etab;
 				if(isset($New_Etab)){
 						$plus_Get ='&code_etab='.$New_Etab;
-						//Afin de regénérer les infos decriptives de l'étab créé
+						//Afin de regï¿½nï¿½rer les infos decriptives de l'ï¿½tab crï¿½ï¿½
 						new_infos_etab();
 						print '<script type="text/Javascript">';
 						if(isset($_SESSION['type_ent_stat']) && (!isset($_POST['save_and_next']) || ($_POST['save_and_next']<>1)) && (!isset($_POST['save_and_prev']) || ($_POST['save_and_prev']<>1))){
@@ -1513,7 +1516,7 @@ if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHER
 						else
 							load_theme($theme_suivant);
 					}
-				}else{ // fin des thèmes
+				}else{ // fin des thï¿½mes
 					hide_ID('btn_save_and_next');
 					//if( $GLOBALS['theme_data_MAJ_ok']	== true ){
 					if( isset($_SESSION['next_etab'][$_SESSION['code_etab']]) ){ // si 
@@ -1530,13 +1533,13 @@ if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHER
 			print '    Set_Element(\'save_and_next\', \'form1\', 0);'."\n";
 			print '</script>'."\n";
 			
-			//Desactivation boutons save liés à une reponse sur un theme
+			//Desactivation boutons save liï¿½s ï¿½ une reponse sur un theme
 			if(isset($_SESSION['list_themes_desact']) && in_array($_GET['theme'],$_SESSION['list_themes_desact'])){
 				deactivate_ID('btn_save_and_prev');
 				deactivate_ID('btn_save_only');
 				deactivate_ID('btn_save_and_next');
 			}
-			//Fin Desactivation boutons save liés à une reponse sur un theme
+			//Fin Desactivation boutons save liï¿½s ï¿½ une reponse sur un theme
 		?>
 		</div>
 	<?php }elseif(isset($GLOBALS['PARAM']['TEACHER_DETAILS_THEMES']) && in_array($_GET['theme'],$GLOBALS['PARAM']['TEACHER_DETAILS_THEMES'])){?>
@@ -1554,7 +1557,7 @@ if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHER
 				//echo '<br>New_Teach='.$New_Teach;
 				if(isset($New_Teach)){
 						$plus_Get ='&id_teacher='.$New_Teach;
-						//Afin de regénérer les infos decriptives de l'étab créé
+						//Afin de regï¿½nï¿½rer les infos decriptives de l'ï¿½tab crï¿½ï¿½
 						//new_infos_ens();
 				}
 				if($teacher_precedant) {
@@ -1581,7 +1584,7 @@ if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHER
 		hide_ID('btn_save_and_prev');
 	}
 	
-	// Gestion Affichage Données Estimées
+	// Gestion Affichage Donnï¿½es Estimï¿½es
 	if( isset($_SESSION['imput_all_tabms'][$_SESSION['secteur']]) && count($_SESSION['imput_all_tabms'][$_SESSION['secteur']])  ) {
 		$curr_tabms = $_SESSION['curobj_instance']->nomtableliee;
 		if(!is_array($curr_tabms)){ $tmp = $curr_tabms ; $curr_tabms=array(); $curr_tabms[] = $tmp; }
@@ -1676,13 +1679,13 @@ if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHER
 		<?php
 		}
 		
-		//Drapeau données triées
+		//Drapeau donnï¿½es triï¿½es
 		if((isset($_GET['tmis']) && $_GET['tmis']=='teach_data') || (!isset($_GET['tmis']))){
 			if(in_array($_GET['theme'],$GLOBALS['PARAM']['TEACHERS_LIST_THEMES']) || in_array($_GET['theme'],$GLOBALS['PARAM']['TEACHER_DETAILS_THEMES'])){
 				if(isset($_SESSION['tab_get_sort']) && count($_SESSION['tab_get_sort'])){
 					echo '<div id="info_sort"><span class="StyleSortFiltData" style="width:100px">'.recherche_libelle_page('tamponsort').'</span></div>'."\n";
 				}
-				//Drapeau données filtrées
+				//Drapeau donnï¿½es filtrï¿½es
 				if(isset($_SESSION['tab_get_filter']) && count($_SESSION['tab_get_filter'])){
 					echo '<div id="info_filter"><span class="StyleSortFiltData" style="width:100px">'.recherche_libelle_page('tamponfilter').'</span></div>'."\n";
 				}
@@ -1723,7 +1726,7 @@ if(isset($GLOBALS['PARAM']['TEACHERS_MANAGEMENT']) && $GLOBALS['PARAM']['TEACHER
 						  <td nowrap="nowrap">&nbsp;<?php echo recherche_libelle_page('yeardata');?>
 						  <?php //$requete = 'SELECT * FROM '.$GLOBALS['PARAM']['TYPE_ANNEE'].' ORDER BY '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'];
 							//$list_ann = $GLOBALS['conn']->GetAll($requete); 
-							//echo'<pre> list année :<br>';
+							//echo'<pre> list annï¿½e :<br>';
 							//print_r($list_ann);
 							//die($ord_curr_ann);
 						   ?>

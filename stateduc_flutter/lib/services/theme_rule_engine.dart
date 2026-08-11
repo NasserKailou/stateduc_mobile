@@ -500,6 +500,18 @@ class ThemeRuleEngine {
       return null;
     }
 
+    // SESSION 59 FIX — Faux positifs quand données absentes de collected_data.
+    // SqlTranslator fait un pivot sur collected_data : si le champ n'existe pas
+    // pour ce thème, le pivot retourne NULL → COALESCE(NULL,0) = 0.
+    // Résultat : val1=0.0 ET val2=0.0 → opérateurs '<=' et '=' déclenchent
+    // une violation alors que les données n'ont tout simplement pas été collectées.
+    // Guard : si les DEUX valeurs sont zéro, les données sont absentes → pas de violation.
+    if (val1 == 0.0 && val2 == 0.0) {
+      logger.log('[ThemeRuleEngine] règle $idRegle ASSOC: val1=0 val2=0 '
+          '— données absentes de collected_data → règle ignorée (évite faux positif)');
+      return null;
+    }
+
     logger.log('[ThemeRuleEngine] règle $idRegle ASSOC: '
         '$val1 $critere $val2 ?');
 
