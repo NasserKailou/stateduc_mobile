@@ -394,8 +394,10 @@ class DataEntryProvider extends ChangeNotifier {
                 'for qst=${q.idQst} etab=$idEtab year=$yearCode '
                 '(normal if no rules configured in DB for this theme)');
           }
-        } catch (_) {
-          // Non fatal — pas de règles disponibles offline pour cette question
+        } catch (e, st) {
+          // SESSION 59 — LOG: non fatal mais loggé pour diagnostic cohérence offline
+          debugPrint('[DataEntry] _fetchAndStoreCoherenceRulesBackground '
+              'exception pour qst=${q.idQst}: $e\n$st');
         }
       }
     });
@@ -1093,7 +1095,18 @@ class DataEntryProvider extends ChangeNotifier {
       final idThemeFull = int.tryParse(idThemeStr) ?? 0;
       final idTheme     = _normalizeIdTheme(idThemeFull);
 
+      // SESSION 59 — LOG DIAGNOSTIC cohérence offline
+      debugPrint('[checkCoherenceOffline] idQst=$idThemeStr → idTheme=$idTheme '
+          'formData=${_formData.length} champs '
+          'camp=$_idCamp etab=$_idEtab filter=${_selectedFilter?.idFilter}');
+
       if (idTheme > 0) {
+        // SESSION 59 — diagnostic : combien de règles dans SQLite pour ce thème ?
+        final rulesInDb = await _db.getDicoReglesByTheme(idTheme);
+        debugPrint('[checkCoherenceOffline] dico_regle_theme: ${rulesInDb.length} '
+            'règles actives pour idTheme=$idTheme '
+            '(ids=${rulesInDb.map((r) => r['id_regle']).toList()})');
+
         _themeCoherenceErrors = await _themeEngine.evaluateTheme(
           idTheme:       idTheme,
           idCamp:        _idCamp!,
