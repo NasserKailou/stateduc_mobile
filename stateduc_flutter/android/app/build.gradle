@@ -1,0 +1,103 @@
+// app/build.gradle — AGP 8.11.1 + Flutter 3.35.x compatible
+// Plugins déclarés via settings.gradle (new plugin DSL), pas de buildscript block.
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
+if (flutterVersionCode == null) {
+    flutterVersionCode = "1"
+}
+
+def flutterVersionName = localProperties.getProperty("flutter.versionName")
+if (flutterVersionName == null) {
+    flutterVersionName = "1.0"
+}
+
+// ── Signature release ─────────────────────────────────────────────────────────
+// Lecture de android/key.properties (fichier confidentiel, non versionné dans Git).
+// Si key.properties est absent (ex: machine de CI sans la clé), le build release
+// retombe automatiquement sur la config debug — l'APK sera fonctionnel mais
+// affichera l'avertissement PlayProtect à l'installation.
+// Voir RELEASE_SIGNING.md pour la procédure complète.
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+def releaseSigningConfigured = keystorePropertiesFile.exists()
+if (releaseSigningConfigured) {
+    keystorePropertiesFile.withReader("UTF-8") { reader ->
+        keystoreProperties.load(reader)
+    }
+}
+
+android {
+    namespace "ark.android.stateduc"
+    compileSdk 34
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+
+    defaultConfig {
+        applicationId "ark.android.stateduc"
+        // flutter_secure_storage requiert minSdk 18+
+        // telephony requiert minSdk 21+
+        minSdkVersion flutter.minSdkVersion
+        targetSdk 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    // ── Configuration de signature ─────────────────────────────────────────────
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            release {
+                keyAlias     keystoreProperties["keyAlias"]
+                keyPassword  keystoreProperties["keyPassword"]
+                storeFile    file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // Utilise la clé release si key.properties est présent,
+            // sinon retombe sur debug (comportement précédent, non recommandé).
+            signingConfig releaseSigningConfigured
+                ? signingConfigs.release
+                : signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
+}

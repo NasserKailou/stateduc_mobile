@@ -1,0 +1,19 @@
+body {font-family:Verdana, Arial, Helvetica, sans-serif;font-size: 11px;margin-top: 0px;margin-left: 0px;margin-right: 0px;margin-bottom: 0px;padding-top: 0px;padding-left: 0px;padding-right: 0px;padding-bottom: 0px;background-color:#FFFFFF;}#login {	border: #9CB4CE; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;	margin-left:30%;	margin-right:30%;	color:#336699;	padding:0px;	margin-top:15px;}.envoyer {	border:0px;}.table-fond {background-image: url(../image/login_fond.jpg) ;}.table-login {	border: #9CB4CE; border-style: solid; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;	font-family:Verdana, Arial, Helvetica, sans-serif;	font-size: 11px;}.titre {		font-size: 16px;	font-family: Arial;	color:#003366;	font-weight:bold;	margin-top:35px;	margin-bottom:70px;}.pays {		font-size: 11px;	font-family: Arial;	color:#003366;	font-weight:bold;}a {	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;		color:#CC6600;#003366;	text-decoration:underline;	}a:hover {			color:#336699;	text-decoration:none;		}INPUT{  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px;padding: 2px; border: 1px #336699 inset; background-color: #FFFFFF;vertical-align:middle;	color:#336699;}p {		font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;		color:#336699;		}#gauche {
+position: absolute;
+left:10px;
+	/*height:63px;*/
+	margin-top:31px;
+}
+#centre {
+	position: absolute;
+	font-size: 11px;	font-family: Arial;
+	font-weight: bold;	color:#336699;
+	text-align: center;
+	margin-top:31px;
+	width: 100%;
+}
+#droite {
+position: absolute;
+margin-top:31px;
+right:10px;
+}

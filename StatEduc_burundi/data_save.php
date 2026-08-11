@@ -1,0 +1,534 @@
+<?php
+
+/**
+ * data_save.php
+ *
+ * Web Service REST - Persistance des donnees collectees par l'app mobile.
+ * Route : POST /data_save
+ * Enregistre les reponses du formulaire dans la base de donnees Access.
+ * Gere les validations, les doublons et les erreurs de contrainte.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 4-17
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
+require_once 'common_ws.php';
+
+require_once $GLOBALS['SISED_PATH_LIB'] . 'adodb_xml/class.ADODB_XML.php';
+require $GLOBALS['SISED_PATH_LIB'] . 'Curl/Curl.php';
+
+use \Curl\Curl;
+$curl = new Curl();
+$curl->setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36');
+$curl->setHeader('Accept', '*/*');
+$curl->setHeader('Accept-Encoding', 'gzip,deflate');
+$curl->setHeader('Accept-Language', 'fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4');
+$curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
+// Timeout pour l'appel interne vers questionnaire_ws.php
+// Sans timeout, le curl attend indefiniment si Apache est sature (self-curl deadlock)
+$curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15); // echec rapide si connexion impossible
+$curl->setOpt(CURLOPT_TIMEOUT, 120);        // max 120s - questionnaire_ws.php peut prendre >60s sur serveur charge
+// Session 46 : CURLOPT_SSL_VERIFYPEER=false supprime (faille securite).
+// Correction definitive SSL-51 : config_app.php force $_sised_local_scheme='http'
+// -> SISED_AURL_INTERNAL = http://127.0.0.1:PORT/ (jamais https:// vers 127.0.0.1)
+// Host header pour les appels curl internes (Session 44)
+// SISED_AURL_INTERNAL = http://127.0.0.1:PORT_LOCAL/stateduc/ (bypass Fortinet/NAT)
+// Le header Host = HTTP_HOST (ex: stateduc.ins.ne:9191) permet a Apache de router
+// vers le bon VirtualHost meme si l'URL utilise 127.0.0.1.
+// Fonctionne quel que soit le nom de domaine ou la topologie reseau.
+$curl->setHeader('Host', $GLOBALS['SISED_HOST_HEADER']);
+
+$app = new \Slim\Slim();
+
+$lib_status =  $GLOBALS['PARAM_WS']['LIB_STATUS'];
+$lib_message = $GLOBALS['PARAM_WS']['LIB_MESSAGE'];
+$lib_data = $GLOBALS['PARAM_WS']['LIB_DATA'];
+
+$status_ok = $GLOBALS['PARAM_WS']['STATUS_OK'];
+$status_ko = $GLOBALS['PARAM_WS']['STATUS_KO'];
+
+//$app->add(new \HttpAuth());
+
+$app->post('/receive_data/:user/:sector/:zipfilename', function ($user, $sector, $zipfilename) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $app) {
+
+	$sql = "SELECT CODE_USER FROM ADMIN_USERS WHERE NOM_USER='$user'";
+	$user_id = $GLOBALS['conn_dico']->GetOne($sql);   
+	
+	if (!$user_id || $user_id == '') {
+		sendError("User not found!"); 
+		return;
+	}
+	
+	$msg_ok = $GLOBALS['PARAM_WS']['OK'];
+	$msg_ko = $GLOBALS['PARAM_WS']['KO'];
+	$decodedData = $app->request->getBody(); 
+	$decodedData = substr($decodedData, strpos($decodedData, "PK"));    
+	$filename = $GLOBALS['SISED_PATH']."server-side/import_export/".$user."_".$zipfilename; 
+	file_put_contents($filename, $decodedData);
+	$listFiles = extract_zip($filename);
+	$adodbXML = new ADODB_XML("1.0", "ISO-8859-1");
+	save_xml_data($adodbXML, dirname($filename), $user, basename ($zipfilename,".zip"), $listFiles);
+	if(file_exists($filename)){
+		unlink($filename);
+	}
+	recursiveDelete($GLOBALS['SISED_PATH']."server-side/import_export/".$user."_".basename ($zipfilename,".zip"));
+	$result = array('ok_tables'=>$adodbXML->ok_tables,'ko_logs'=>$adodbXML->ko_logs);	
+	$posts = array('se_statut'=>200,'se_message'=>'ok','se_data'=>$result);	
+	echo json_encode($posts);
+});
+
+// Sauvegarde les donnees d'un theme
+$app->get('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:data', function ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $data) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
+	$msg_ok = $GLOBALS['PARAM_WS']['OK'];
+  $msg_ko = $GLOBALS['PARAM_WS']['KO'];
+	
+	
+	$period_query = "";
+	if ($id_filter != "null") {
+		$period_query = " AND ID_PERIODE=".$id_filter." "; 
+	}
+	
+	$id_year = $_SESSION['annee'];
+  $requete = "SELECT DISTINCT ID_CAMPAGNE
+				FROM DICO_FIXE_REGROUPEMENT DFR, ADMIN_USERS AU
+				WHERE AU.NOM_USER LIKE '".$user."' 
+            AND DFR.ID_USER=AU.CODE_USER 
+        		AND ID_ANNEE=".$id_year."      
+				".$period_query." 
+            AND ID_CAMPAGNE=".$id_camp.";";
+	$camps = $GLOBALS['conn_dico']->GetAll($requete); 
+  if (count($camps) == 0 || $camps[0] == '') {
+		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"The user '".$user."' can't access this Survey");
+		echo json_encode($rps);
+		return;
+	}
+  
+  $survey_curr_status = getSurveyStatus($id_camp, $id_year);
+  if ($survey_curr_status != 2) {
+     $rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"Cette campagne est ferm�e!");
+     echo json_encode($rps);
+     return;
+  }
+  
+  //return;
+  $curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
+  		if (strpos($instance->response, "ISOKSAVEINDATABASE") !== FALSE) {
+  			$statut_save = "OKSAVE";
+		} else {
+			$statut_save = "KOSAVE";
+		}
+		$rps = array($lib_status=>$status_ok, $lib_message=>$msg_ok, $lib_data=>$statut_save);
+		$string = date('Y/m/d H:i:s');
+		$string .= ";".$id_camp;
+		$string .= ";".$id_sector;
+		$string .= ";".$id_theme;
+		$string .= ";".$id_etab;
+		$string .= ";".$id_filter.";".$statut_save.";\n";
+		$myFile = "moblogs/".$user.".log";
+		renameLastFile("moblogs/".$user);
+		$fh = fopen($myFile, 'a');
+		@fwrite($fh, $string);
+		@fclose($fh);	
+		echo json_encode($rps);
+		//echo 'call to "' . $instance->url . '" was successful. response was' . "<br/>";
+		//echo $instance->response . "\n";
+	});
+	$curl->error(function($instance) use ($user, $data, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>$instance->error_code." : ".$instance->error_message);	
+		$string = date('Y/m/d H:i:s');
+		$string .= ";".$instance->error_code.":".$instance->error_message;
+		$string .= ";".$instance->url;
+		$string .= ";".$data."\n";
+		$myFile = "moblogs/".$user.".log";
+		renameLastFile("moblogs/".$user);
+		$fh = fopen($myFile, 'a');
+		@fwrite($fh, $string);
+		@fclose($fh);
+		echo json_encode($rps);
+		/*echo 'call to "' . $instance->url . '" was unsuccessful.' . "<br/>";
+		echo 'error code:' . $instance->error_code . "<br/>";
+		echo 'error message:' . $instance->error_message . "<br/>";*/
+	});
+	$curl->complete(function($instance) {
+		//echo 'call completed' . "<br/>";
+	});	
+	
+	$data_array = explode('&', $data);
+	
+	$data_to_send = array();
+  
+	foreach ($data_array as $row) {
+		$row_tab = explode('=', $row);
+    $data_to_send[$row_tab[0]] = str_replace("_slh_", "/", $row_tab[1]);
+	}
+
+	$urlBase = $GLOBALS['SISED_AURL_INTERNAL'].'questionnaire_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&annee='.$id_year.'&login='.$user.'&langue=fr';
+	if ($id_filter != null) {
+    $req = "SELECT count(".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_FILTRE'].")AS NB_ELT FROM ".$GLOBALS['PARAM']['TYPE_FILTRE']." WHERE ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_FILTRE']."=".$id_filter;
+		$nbFilt = $GLOBALS['conn']->GetRow($req); 
+    if ($nbFilt["NB_ELT"] == 0) {
+        $req = "INSERT INTO ".$GLOBALS['PARAM']['TYPE_FILTRE']." VALUES ($id_filter,'$id_filter',$id_filter)";
+        $ok = $GLOBALS['conn']->Execute($req);
+    }
+    $urlBase .= '&filtre='.$id_filter;
+	}
+	require_once $GLOBALS['SISED_PATH_CLS'] . 'metier/theme_manager.class.php';
+	$theme_manager = new theme_manager($id_camp);  
+	$theme_manager->charger_theme($id_camp, $id_sector);
+	$id_theme_ident = $theme_manager->recherche_theme_def();
+	if ($id_theme == $id_theme_ident) {  
+		$foundLoc1 = array_key_exists('LOC_REG_0', $data_to_send) && (strlen($data_to_send["LOC_REG_0"]) > 0);
+		
+		if (!$foundLoc1) {
+			$req = "SELECT ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['REGROUPEMENT']." AS LOC_ID 
+					FROM ".$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT']." 
+					WHERE ".$GLOBALS['PARAM']['CODE_ETABLISSEMENT']	."=".$id_etab." 
+					AND ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE']."_".$GLOBALS['PARAM']['REGROUPEMENT']." = 4;";
+			$locID = $GLOBALS['conn']->GetRow($req); 
+			$data_to_send["LOC_REG_0"] = $locID["LOC_ID"];
+		}
+	}
+	//print_r($data_to_send);
+	session_write_close(); // Libere le verrou de session avant l'appel curl interne
+	$curl->post($urlBase, $data_to_send);	
+	
+});
+
+// Sauvegarde les donnees d'un theme
+// Route etendue (app mobile) : inclut id_annee pour fonctionner sans session navigateur
+$app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:start/:id_annee', function ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
+	if (!isset($_SESSION['annee']) || $_SESSION['annee'] == '') { $_SESSION['annee'] = $id_annee; }
+	theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app);
+});
+
+// Route originale (navigateur web) : utilise $_SESSION['annee'] existante
+$app->post('/theme_save/:user/:id_camp/:id_sector/:id_theme/:id_etab/:id_filter/:start', function ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
+	$id_annee = isset($_SESSION['annee']) ? $_SESSION['annee'] : '';
+	theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app);
+});
+
+function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $start, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {
+	$msg_ok = $GLOBALS['PARAM_WS']['OK'];
+	$msg_ko = $GLOBALS['PARAM_WS']['KO'];
+  
+  $camp_list = array();
+  
+  $period_query = "";
+	if ($id_filter != "null") {
+		$period_query = " AND ID_PERIODE=".$id_filter." "; 
+	}
+	// Priorite : parametre URL (mobile) > session (navigateur web)
+	$id_year = ($id_annee != '' && $id_annee != '0') ? $id_annee : (isset($_SESSION['annee']) ? $_SESSION['annee'] : '');
+	// Fallback PARAM_DEFAUT : si annee absente (app non reconnectee, PIN-only unlock)
+	if ($id_year == '' || $id_year == '0') {
+		$_def = $GLOBALS['conn_dico']->GetOne('SELECT CODE_ANNEE FROM PARAM_DEFAUT');
+		if ($_def && (int)$_def > 0) { $id_year = $_def; $_SESSION['annee'] = $id_year; }
+	}
+
+	// --- Verification acces campagne ---
+	// Pour les requetes mobiles (id_annee fourni dans l'URL), on effectue d'abord
+	// la verification normale via DICO_FIXE_REGROUPEMENT. Si elle echoue
+	// (l'utilisateur mobile n'a pas forcement de ligne dans cette table),
+	// on tente un acces simplifie : verifier que l'utilisateur existe dans ADMIN_USERS.
+	$is_mobile_request = ($id_annee != '' && $id_annee != '0');
+	$access_ok = false;
+
+	$requete = "SELECT DISTINCT ID_CAMPAGNE
+				FROM DICO_FIXE_REGROUPEMENT DFR, ADMIN_USERS AU
+				WHERE AU.NOM_USER LIKE '".$user."' 
+            AND DFR.ID_USER=AU.CODE_USER 
+        		AND ID_ANNEE=".$id_year."      
+				".$period_query." 
+            AND ID_CAMPAGNE=".$id_camp.";";
+	$camps = $GLOBALS['conn_dico']->GetAll($requete);
+
+	if (count($camps) > 0 && $camps[0] != '') {
+		$access_ok = true;
+	}
+
+	// Fallback pour les utilisateurs mobiles : verifier existence utilisateur
+	if (!$access_ok && $is_mobile_request) {
+		$req_user = "SELECT CODE_USER FROM ADMIN_USERS WHERE NOM_USER LIKE '".$user."'";
+		$user_row = $GLOBALS['conn_dico']->GetRow($req_user);
+		if ($user_row && isset($user_row['CODE_USER']) && (int)$user_row['CODE_USER'] > 0) {
+			// Utilisateur valide - autoriser acces mobile (la campagne est deja telechargee)
+			$access_ok = true;
+		}
+	}
+
+  if (!$access_ok) {
+		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"L'utilisateur '".$user."' n'a pas acc�s � cette campagne");
+		echo json_encode($rps);
+		return;
+	}
+  
+	$data_to_send = $app->request->post();
+  
+  $survey_curr_status = getSurveyStatus($id_camp, $id_year);
+  $survey_curr_status = 2;
+	if ($survey_curr_status != 2) {
+		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"Cette campagne n'est pas ouverte!");
+		echo json_encode($rps);
+		return;
+	}
+	
+	//A REVOIR POUR LE CAS DES MULTIPLES CHAINES
+	require_once $GLOBALS['SISED_PATH_CLS'] . 'metier/theme_manager.class.php';
+	$theme_manager = new theme_manager($id_camp);  
+	$theme_manager->charger_theme($id_camp, $id_sector);
+	$id_theme_ident = $theme_manager->recherche_theme_def();
+	if ($id_theme == $id_theme_ident) {  
+		$foundLoc1 = array_key_exists('LOC_REG_0', $data_to_send) && (strlen($data_to_send["LOC_REG_0"]) > 0);
+		
+		if (!$foundLoc1) {
+			$req = "SELECT ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['REGROUPEMENT']." AS LOC_ID 
+					FROM ".$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT']." 
+					WHERE ".$GLOBALS['PARAM']['CODE_ETABLISSEMENT']	."=".$id_etab;
+			$locID = $GLOBALS['conn']->GetRow($req); 
+			$data_to_send["LOC_REG_0"] = $locID["LOC_ID"];
+		}
+	}
+  
+ //echo "<pre>"; print_r($data_to_send);   //return;
+	$curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
+  		//print_r($instance->response);
+		if (strpos($instance->response, "ISOKSAVEINDATABASE") !== FALSE) {
+  			$statut_save = "OKSAVE";
+		} else {
+			$statut_save = "KOSAVE";
+		}
+		$rps = array($lib_status=>$status_ok, $lib_message=>$msg_ok, $lib_data=>$statut_save);
+    	$date_time = date('Y/m/d H:i:s');
+		$string = $date_time;
+		$string .= ";".$id_camp;
+		$string .= ";".$id_sector;
+		$string .= ";".$id_theme;
+		$string .= ";".$id_etab;
+		$string .= ";".$id_filter.";".$statut_save.";\n";
+		$myFile = "moblogs/".$user.".log";
+		renameLastFile("moblogs/".$user);
+		$fh = fopen($myFile, 'a');
+		@fwrite($fh, $string);
+		@fclose($fh);	 
+    	saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut_save, $id_year);
+		echo json_encode($rps);
+		//echo 'call to "' . $instance->url . '" was successful. response was' . "<br/>";
+		//echo $instance->response . "\n";
+	});
+	$curl->error(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>$instance->error_code." : ".$instance->error_message);
+		$date_time_err = date('Y/m/d H:i:s');
+		$string = $date_time_err;
+		$string .= ";".$instance->error_code.":".$instance->error_message;
+		$string .= ";".$instance->url;
+		$string .= ";\n";
+		$myFile = "moblogs/".$user.".log";
+		renameLastFile("moblogs/".$user);
+		$fh = fopen($myFile, 'a');
+		@fwrite($fh, $string);
+		@fclose($fh);
+		saveLogInfo($user, $date_time_err, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, "KO", $id_year);
+		echo json_encode($rps);
+	});
+	$curl->complete(function($instance) {
+		//echo 'call completed' . "<br/>";
+	});	
+	
+	$data_array = $data_to_send;
+	
+	$data_to_send = array();
+	foreach ($data_array as $key => $value) {
+    	$data_to_send[$key] = str_replace("_slh_", "/", $value);
+	}
+	   
+	$urlBase = $GLOBALS['SISED_AURL_INTERNAL'].'questionnaire_ws.php?sector='.$id_sector.'&theme='.$id_theme.'&code_etab='.$id_etab.'&type_ent_stat='.$id_camp.'&annee='.$id_year.'&login='.$user.'&langue=fr';
+	
+  //echo $GLOBALS['SISED_SERVER']."rrrr".$_SESSION['annee']; return; 
+  
+  if ($start > 0) {
+    $urlBase .= '&debut='.$start;
+  } 
+  
+  if ($id_filter  != "null") {
+    $req = "SELECT count(".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_FILTRE'].")AS NB_ELT FROM ".$GLOBALS['PARAM']['TYPE_FILTRE']." WHERE ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_FILTRE']."=".$id_filter;
+		$nbFilt = $GLOBALS['conn']->GetRow($req); 
+    if ($nbFilt["NB_ELT"] == 0) {
+        $req = "INSERT INTO ".$GLOBALS['PARAM']['TYPE_FILTRE']." VALUES ($id_filter,'$id_filter',$id_filter)";
+        $ok = $GLOBALS['conn']->Execute($req);
+    }
+    $urlBase .= '&filtre='.$id_filter;
+	}
+  //echo "<pre>".$urlBase; print_r($data_to_send);   return;
+	session_write_close(); // Libere le verrou de session avant l'appel curl interne
+	$curl->post($urlBase, $data_to_send);	
+	
+}
+
+// Sauvegarde les donnees d'un theme
+$app->post('/theme_info_save', function () use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $app) {
+	$msg_ok = $GLOBALS['PARAM_WS']['OK'];
+	$data = $app->request->post();
+  
+  $req = "INSERT INTO THEME_INFO_SAVE VALUES (".$data['user'].",".$data['camp'].",".$data['sys'].",".$data['theme'].",
+          ".$data['year'].",".$data['ent_stat'].",".$data['filter'].",'".$data['lng']."','".$data['lat']."','".$data['dateh']."')";
+  $rps = array($lib_status=>$status_ok, $lib_message=>$msg_ok, $lib_data=>"");     
+  if ($GLOBALS['conn_dico']->Execute($req) === false) {
+    $req = "UPDATE THEME_INFO_SAVE SET LONGITUDE = '".$data['lng']."', LATITUDE = '".$data['lat']."', DATE_HEURE = '".$data['dateh']."' ".
+           "WHERE (ID_USER=".$data['user'].") AND (ID_CAMP=".$data['camp'].") AND (ID_SYSTEME=".$data['sys'].") AND (ID_THEME=".$data['theme'].") ".
+           "AND (ID_ANNEE=".$data['year'].") AND (ID_ENT_STAT=".$data['ent_stat'].") AND (ID_FILTRE=".$data['filter'].")";
+    if ($GLOBALS['conn_dico']->Execute($req) === false){
+			$rps = array($lib_status=>$status_ko, $lib_message=>"Error during trainings extraction", $lib_data=>""); 
+		} else {                                                         
+			$rps = array($lib_status=>$status_ok, $lib_message=>$msg_ok, $lib_data=>"");
+    }        
+  } 
+  
+  echo json_encode($rps);     
+});
+
+$app->get('/test/', function () use($app) {
+    // Endpoint de diagnostic - Session 44
+    // GET http://stateduc.ins.ne:9191/stateduc/data_save.php/test/
+    // Retourne les URLs internes, variables serveur et resultat du probe TCP
+    header('Content-Type: application/json; charset=utf-8');
+    $info = array(
+        'SISED_AURL'          => $GLOBALS['SISED_AURL'],
+        'SISED_AURL_INTERNAL' => $GLOBALS['SISED_AURL_INTERNAL'],
+        'SISED_HOST_HEADER'   => isset($GLOBALS['SISED_HOST_HEADER']) ? $GLOBALS['SISED_HOST_HEADER'] : 'N/A',
+        'HTTP_HOST'           => isset($_SERVER['HTTP_HOST'])   ? $_SERVER['HTTP_HOST']   : 'N/A',
+        'SERVER_ADDR'         => isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'N/A',
+        'SERVER_PORT'         => isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 'N/A',
+        'SERVER_NAME'         => isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'N/A',
+    );
+    // Test TCP vers SISED_AURL_INTERNAL (doit etre 127.0.0.1:port_local)
+    $p = parse_url($GLOBALS['SISED_AURL_INTERNAL']);
+    $test_ip   = isset($p['host']) ? $p['host'] : '127.0.0.1';
+    $test_port = isset($p['port']) ? (int)$p['port'] : 80;
+    $en = 0; $es = '';
+    $sock = @fsockopen($test_ip, $test_port, $en, $es, 3);
+    if ($sock !== false) { fclose($sock); $info['tcp_probe_internal'] = 'OK -> '.$GLOBALS['SISED_AURL_INTERNAL']; }
+    else { $info['tcp_probe_internal'] = 'FAIL: '.$en.' '.$es; }
+    echo json_encode($info, JSON_PRETTY_PRINT);
+});
+
+$app->post('/updateScore/:id', function($id) use($app) { 
+echo $id; 
+$allPostVars = $app->request->post();
+echo "<pre>"; print_r($allPostVars);
+
+});
+
+$app->run();
+ 
+function renameLastFile($filepath) {
+	$size = filesize($filepath.".log");
+	if ($size > 10485760) {
+		$i = 0;
+		while (file_exists($filepath."_".$i.".log")) {
+			$i++;
+		}
+		rename($filepath.".log", $filepath."_".$i.".log");		
+	}
+}
+
+function getSurveyStatus($idCamp, $idAnnee) {
+  
+  $req = "";
+  if ($GLOBALS['conn']->databaseType == 'mssqlnative' || $GLOBALS['conn']->databaseType == 'mssql') { 
+  	$req = "SELECT ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_RATTACHEMENT_STATUT']." AS status, CONVERT(datetime, ".$GLOBALS['PARAM']['DATE_DEBUT_STATUT'].", 103) AS date_start FROM ".$GLOBALS['PARAM']['RATTACHEMENT_STATUT']." ".
+          "WHERE ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_RATTACHEMENT']."=".$idCamp." ".
+          "AND ".$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE']."=".$idAnnee." ".
+          "ORDER BY date_start";
+  } else {
+  	$req = "SELECT ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_RATTACHEMENT_STATUT']." AS status, ".$GLOBALS['PARAM']['DATE_DEBUT_STATUT']." AS date_start FROM ".$GLOBALS['PARAM']['RATTACHEMENT_STATUT']." ".
+          "WHERE ".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_RATTACHEMENT']."=".$idCamp." ".
+          "AND ".$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE']."=".$idAnnee." ".
+          "ORDER BY FORMAT(".$GLOBALS['PARAM']['DATE_DEBUT_STATUT'].", 'dd/mm/yy')";
+  }
+  
+  $status_survey = $GLOBALS['conn']->GetAll($req); 
+  $status_survey = array_change_key_case_recursive($status_survey);	
+  $survey_curr_status = 0;
+  $now = date('d-m-Y');
+  $now = new DateTime($now);
+  $now = $now->format('Ymd');
+  //$result = "EEEE: ".$now;
+  foreach($status_survey as $status) {
+    $stat_date = $status['date_start'];
+    $stat_date = new DateTime($stat_date);
+    $stat_date = $stat_date->format('Ymd'); //$result .= "<br/>SSSS: ".$stat_date; 
+    if ($stat_date <= $now) {
+       $survey_curr_status = $status['status'];
+       break;
+    }
+  }
+  return $survey_curr_status;
+}
+
+function in_array_r($needle, $haystack, $strict = false) {
+    foreach ($haystack as $item) {
+        if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut, $id_annee = 0) {
+  $req = "INSERT INTO DATA_SAVING_LOGS (CODE_USER, LOG_DATE_TIME, ID_THEME_SYSTEME, CODE_ANNEE, CODE_PERIODE, CODE_CAMPAGNE".
+         ", CODE_SECTEUR, CODE_ECOLE, CODE_FILTRE, STATUT_OPERATION) VALUES ('".$user."','".$date_time."',".$id_theme.",".
+         $id_annee.",".$id_filter.",".$id_camp.",".$id_sector.",".$id_etab.",".$id_filter.",'".$statut."')";
+  return $GLOBALS['conn_dico']->Execute($req);        
+}
+
+/**
+* D�crompression du fichier compress� contenant les donn�es � importer
+* @access public
+* @param stirng fichier_zip chemin complet du fichier � d�compresser
+*/
+function extract_zip($fichier_zip) {
+	include_once($GLOBALS['SISED_PATH_LIB'].'pclzip.lib.php');
+	$zip = new PclZip($fichier_zip);
+	//echo $fichier_zip.'<br>';
+	//print_r( $zip->listContent());
+	$list_files = $zip->listContent();
+	if ($list_files == NULL || count($list_files) == 0) {
+			return NULL;
+	}
+	$xmlFiles = array();
+	foreach($list_files as $i => $file){
+		if( strpos($file['filename'], '.xml') !== FALSE){
+				$xmlFiles[] = $file;
+		}
+	}
+	if ($zip->extract(PCLZIP_OPT_PATH, dirname($fichier_zip).'\\'.basename ($fichier_zip,".zip")) == 0) {
+		return NULL;
+	}
+	return $xmlFiles;
+}
+
+function save_xml_data($adodbXML, $xmlFilesDir, $user, $baseName, $xmlFiles) {
+	$strRequete = "SELECT * FROM DICO_TABLE_ORDRE ORDER BY ORDRE";
+	$rsTables=$GLOBALS['conn_dico']->Execute($strRequete);
+	if ($rsTables->RecordCount()>0) {
+		while (!$rsTables->EOF) {
+			$currTable = $rsTables->fields['NOM_TABLE']; //echo "\n\nTABLE : ".$currTable."\n";
+			foreach($xmlFiles as $i => $file) { 
+				if( strpos($file['filename'], "/".$currTable.".xml") !== FALSE){ //echo "FILE : ".$file['filename']."\n";
+					$adodbXML->InsertIntoDB($GLOBALS['conn'], $xmlFilesDir.'/'.$user.'_'.$baseName."/".$file['filename'], $currTable);
+				}
+			}
+			$rsTables->MoveNext();
+		}
+	}
+}
+
+function sendError($message) {
+	$posts = array('se_statut'=>101,'se_message'=>$message,'se_data'=>NULL);	
+	echo json_encode($posts);
+}
+?>
