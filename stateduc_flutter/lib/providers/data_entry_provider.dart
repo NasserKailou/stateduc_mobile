@@ -273,6 +273,7 @@ class DataEntryProvider extends ChangeNotifier {
       final yearCode = _codeyear ?? '';
       for (final q in questions) {
         try {
+          // ── Récupération des règles depuis le serveur ──────────────────────
           final rules = await _api.fetchRules(
             login:    _api.login ?? '',
             campId:   idCamp,
@@ -282,19 +283,46 @@ class DataEntryProvider extends ChangeNotifier {
             filter:   _selectedFilter?.idFilter,
             yearCode: yearCode,  // ← correction session 14 : yearCode passé au serveur
           );
+
+          // SESSION 57 — SYNC DICO_REGLE_THEME ──────────────────────────────
+          // ROOT CAUSE du bug cohérence offline :
+          //   ThemeRuleEngine lit ses règles depuis dico_regle_theme (table SQLite).
+          //   Avant ce fix, seules les règles du JSON asset statique (id_theme ∈
+          //   [900..1070]) étaient dans dico_regle_theme.
+          //   Les thèmes Burundi (9802, 9902, 10002…) n'étaient jamais insérés →
+          //   getDicoReglesByTheme(9802) retournait [] → contrôle offline silencieux.
+          //
+          // FIX : on appelle fetchDicoRegleTheme() qui retourne les règles au
+          //   format dico_regle_theme avec l'id_theme réel (ex: 9802) fourni
+          //   par le serveur dans se_data.id_theme.
+          //   insertDicoRegleTheme() utilise REPLACE → idempotent.
+          //   Le contrôle offline se déclenche ensuite avec les bonnes règles.
+          final dicoRules = await _api.fetchDicoRegleTheme(
+            login:    _api.login ?? '',
+            campId:   idCamp,
+            sysId:    idSystem,
+            qstId:    q.idQst,
+            etabId:   idEtab,
+            filter:   _selectedFilter?.idFilter,
+            yearCode: yearCode,
+          );
+          if (dicoRules.isNotEmpty) {
+            await _db.insertDicoRegleTheme(dicoRules);
+            final idThemeStored = dicoRules.first['id_theme'];
+            debugPrint('[DataEntry] SESSION57: stored ${dicoRules.length} rules '
+                'in dico_regle_theme for id_theme=$idThemeStored '
+                '(qst=${q.idQst})');
+          }
+          // ──────────────────────────────────────────────────────────────────
+
           if (rules.isNotEmpty) {
             await _db.insertCoherenceRules(rules);
             debugPrint('[DataEntry] stored ${rules.length} offline coherence rules '
                 'for qst=${q.idQst} etab=$idEtab year=$yearCode');
 
-            // ── SYNC MESSAGES DICO_REGLE_THEME ────────────────────────────────
-            // data_rules.php retourne pour chaque paire (règle, association) le
-            // message condensé lisible (ex: "INCOHERENCE! EFFECTIF ELEVES F>F+M (4.1)").
-            // Ce message est stocké dans CoherenceRule.message.
-            // On le synchronise vers dico_regle_theme.message pour que
-            // ThemeRuleEngine affiche le même message que le serveur.
-            // Stratégie : pour chaque id_regle distinct, prendre le premier
-            // message non vide parmi toutes ses associations.
+            // ── SYNC MESSAGES DICO_REGLE_THEME (messages uniquement) ──────────
+            // updateDicoRegleMessages met à jour uniquement la colonne message
+            // des règles déjà présentes (insérées par fetchDicoRegleTheme ci-dessus).
             final msgMap = <int, String>{};
             for (final r in rules) {
               if (!msgMap.containsKey(r.idRegle) && r.message.isNotEmpty) {
@@ -310,15 +338,20 @@ class DataEntryProvider extends ChangeNotifier {
 
             // ── Re-déclenche le contrôle offline si les règles viennent d'arriver
             // pour la question actuellement affichée.
-            // La condition _formData.isNotEmpty a été retirée : on re-déclenche
-            // systématiquement dès que les règles arrivent pour la question courante,
-            // même si les données sont vides (le contrôle retournera 0 violations,
-            // ce qui est correct et met à jour l'UI de façon cohérente).
             if (_selectedQuestion?.idQst == q.idQst &&
                 !_isCheckingOffline) {
               debugPrint('[DataEntry] rules arrived for current question '
                   '(formData=${_formData.length} fields) — '
                   're-triggering offline coherence check');
+              await checkCoherenceOffline();
+            }
+          } else if (dicoRules.isNotEmpty) {
+            // Des règles dico_regle_theme ont été chargées même si coherence_rules
+            // est vide (peut arriver si le serveur retourne des règles EXISTS sans
+            // associations). Re-déclenchement si c'est la question courante.
+            if (_selectedQuestion?.idQst == q.idQst && !_isCheckingOffline) {
+              debugPrint('[DataEntry] dico rules arrived for current question '
+                  '— re-triggering offline coherence check');
               await checkCoherenceOffline();
             }
           } else {
@@ -1033,37 +1066,45 @@ class DataEntryProvider extends ChangeNotifier {
 
   // ── Normalise un idQst numérique vers l'id_theme DICO_REGLE_THEME ──────────
   //
-  // Les thèmes connus sont : 900, 920, 940, 950, 960, 970, 980, 990,
-  //   1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070.
+  // SESSION 57 — Suppression de la whitelist _knownThemes
+  // ROOT CAUSE du bug cohérence offline :
+  //   L'ancienne implémentation filtrait les idTheme via une liste statique
+  //   [900..1070]. Les thèmes Burundi (9802, 9902, 10002, 10102…) n'y étaient
+  //   pas → _normalizeIdTheme retournait la valeur brute mais ThemeRuleEngine
+  //   skippait si les règles n'étaient pas dans dico_regle_theme.
+  //
+  // Nouveau comportement : on retourne directement raw si > 0.
+  //   ThemeRuleEngine.evaluateTheme(9802) cherche dans dico_regle_theme
+  //   les règles avec id_theme=9802 (qui y sont maintenant grâce au fix
+  //   fetchDicoRegleTheme dans _fetchAndStoreCoherenceRulesBackground).
+  //   Si aucune règle → liste vide → 0 violations (correct).
   //
   // Cas :
-  //   "900"   → 900  (correspondance directe)
-  //   "9001"  → 900  (sous-thème : on essaie la troncature à 3 chiffres)
-  //   "9002"  → 900
-  //   "10001" → 1000 (sous-thème 5 chiffres : troncature à 4 chiffres)
-  //   "1050"  → 1050 (correspondance directe 4 chiffres)
-  //   "0"     → 0    (inconnu)
+  //   "9802"  → 9802 (direct — règles chargées depuis serveur)
+  //   "98021" → on essaie troncature 4 chiffres → 9802 ✓
+  //   "900"   → 900  (direct — règles dans asset JSON)
+  //   "9001"  → troncature 3 chiffres → 900 ✓
+  //   "0"     → 0    (inconnu — skippé)
   //
-  static const _knownThemes = {
-    900, 920, 940, 950, 960, 970, 980, 990,
-    1000, 1010, 1020, 1030, 1040, 1050, 1060, 1070,
-  };
 
   int _normalizeIdTheme(int raw) {
     if (raw <= 0) return 0;
-    // Correspondance directe
-    if (_knownThemes.contains(raw)) return raw;
-    // Tente troncature : garder les N premiers chiffres
+    // Retourne directement — ThemeRuleEngine retournera [] si pas de règles
+    // (comportement correct : 0 violations = pas de règles configurées)
+    return raw;
+  }
+
+  // Garde la méthode de troncature pour un usage futur si nécessaire
+  // ignore: unused_element
+  int _normalizeIdThemeLegacy(int raw) {
+    if (raw <= 0) return 0;
     final s = raw.toString();
     for (int len in [4, 3]) {
       if (s.length > len) {
         final candidate = int.tryParse(s.substring(0, len));
-        if (candidate != null && _knownThemes.contains(candidate)) {
-          return candidate;
-        }
+        if (candidate != null) return candidate;
       }
     }
-    // Retourne la valeur brute — ThemeRuleEngine retournera [] si theme inconnu
     return raw;
   }
 

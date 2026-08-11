@@ -1028,7 +1028,32 @@ class ApiService {
     bool isLastPage = true,
     String yearCode = '',
   }) async {
-    final filterParam = (filter == null || filter.isEmpty) ? '0' : filter;
+    // SESSION 57 FIX — KOSAVE définitif tous formulaires (themes filtres ex: 10502)
+    //
+    // ROOT CAUSE identifié :
+    //   Avant ce fix, Flutter envoyait filterParam='0' quand aucun filtre n'est
+    //   sélectionné (filter==null). data_save.php ligne 355 teste :
+    //     if ($id_filter != "null")
+    //   '0' != 'null' → VRAI → PHP exécutait le bloc filtre :
+    //     $urlBase .= '&filtre=0'
+    //   questionnaire_ws.php ligne 21 recevait filtre=0 → $_SESSION['filtre']='0'
+    //   instance_grille.php ligne 71 : $code_filtre = $_SESSION['filtre'] = '0'
+    //   grille.class.php constructeur ligne 443 : $this->code_filtre = '0'
+    //   get_dico() lignes 766/768 : ajoutait WHERE CODE_TYPE_PERIODE=0 aux requêtes SQL
+    //   → aucune donnée existante pour CODE_TYPE_PERIODE=0 → matrice vide
+    //   → comparer() : toutes lignes POST = action 'I' (INSERT)
+    //   → maj_bdd() : INSERT échoue (clé primaire déjà existante pour la vraie période)
+    //   → Execute()===false → theme_data_MAJ_ok=false → KOSAVE.
+    //
+    // FIX : envoyer 'null' (string) au lieu de '0' quand aucun filtre sélectionné.
+    //   data_save.php ligne 355 : 'null' != 'null' → FAUX → bloc filtre NON exécuté
+    //   → pas de &filtre=X dans l'URL cURL → $_SESSION['filtre'] inchangé
+    //   → code_filtre='' (défaut constructeur grille) → pas de clause WHERE filtre
+    //   → requêtes SQL lisent toutes les données → comparer correct → OKSAVE.
+    //
+    // Cohérence avec autres endpoints : fetchRules (ligne 1284) et checkCoherence
+    //   (ligne 1385) utilisent déjà 'null' — saveData doit être aligné.
+    final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
     // Build form body exactly like page_etab.js getPageDataToSend():
     //   • Radio keys are stored as "fieldName#optionId" = "1"|"0".
     //     Only checked radios (value == "1") are sent, transformed to
@@ -1106,6 +1131,10 @@ class ApiService {
       final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '';
       // SESSION 53 FIX: encoder le login pour éviter HTTP 400 sur les logins avec espaces
       final encodedLogin = Uri.encodeComponent(login);
+      // SESSION 57 — log du corps POST pour faciliter le diagnostic futur
+      debugPrint('[ApiService] saveData → qst=$qstId filter=$filterParam '
+          'body_fields=${bodyParts.length} '
+          'snippet=${body.length > 200 ? body.substring(0, 200) : body}');
       final response = await _dio.post(
         'data_save.php/theme_save/$encodedLogin/$campId/$sysId/$qstId/$etabId/$filterParam/0$anneeSegment',
         data: body,
@@ -1343,6 +1372,99 @@ class ApiService {
       return result;
     } on DioException catch (_) {
       return []; // Non-fatal — offline rules unavailable
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // SESSION 57 — SYNC DICO_REGLE_THEME depuis le serveur
+  // =============================================================================
+  // Même endpoint que fetchRules (data_rules.php/theme_rules/…) mais extrait
+  // les données au format dico_regle_theme (id_regle, id_theme, sql_regle, …)
+  // pour alimenter le moteur ThemeRuleEngine via SQLite local.
+  //
+  // Différence avec fetchRules :
+  //   - fetchRules → table coherence_rules (moteur paire CoherenceEvaluator)
+  //   - fetchDicoRegleTheme → table dico_regle_theme (moteur ThemeRuleEngine)
+  //
+  // Retourne une liste de Map conformes au schéma dico_regle_theme :
+  //   { id_regle, id_theme, sql_regle, ordre_regle, message, activer_ctrl }
+  // =============================================================================
+
+  Future<List<Map<String, dynamic>>> fetchDicoRegleTheme({
+    required String login,
+    required String campId,
+    required String sysId,
+    required String qstId,
+    required String etabId,
+    required String? filter,
+    String yearCode = '',
+  }) async {
+    final filterParam  = (filter == null || filter.isEmpty) ? 'null' : filter;
+    final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? yearCode : '0';
+    final encodedLogin = Uri.encodeComponent(login);
+    final path =
+        'data_rules.php/theme_rules/$encodedLogin/$campId/$sysId/$qstId/$etabId/$filterParam/$anneeSegment';
+    try {
+      final response = await _dio.get(
+        path,
+        options: Options(responseType: ResponseType.plain),
+      );
+      final rawBody = response.data?.toString().trim() ?? '';
+      if (rawBody.isEmpty) return [];
+
+      dynamic parsed;
+      try {
+        parsed = json.decode(rawBody);
+      } catch (_) {
+        return [];
+      }
+
+      if (parsed is! Map) return [];
+      if (parsed['se_status'] != 200) return [];
+
+      final seData = parsed['se_data'];
+      if (seData is! Map) return [];
+
+      // Récupère l'id_theme réel depuis la réponse serveur (ex: 9802 pour Burundi)
+      final idThemeRaw = seData['id_theme'];
+      final idTheme    = int.tryParse(idThemeRaw?.toString() ?? '0') ?? 0;
+      if (idTheme <= 0) return [];
+
+      final regles = seData['regles'];
+      if (regles is! List) return [];
+
+      final result = <Map<String, dynamic>>[];
+      int ordre = 0;
+      for (final regle in regles.whereType<Map>()) {
+        final idRegle  = int.tryParse(regle['id_regle']?.toString() ?? '0') ?? 0;
+        final sqlRegle = (regle['sql_regle'] ?? '').toString().trim();
+        final libRegle = (regle['lib_regle'] ?? '').toString();
+        if (idRegle <= 0 || sqlRegle.isEmpty) continue;
+
+        // Le message prioritaire vient de la première association
+        String message = '';
+        final assocs = regle['associations'];
+        if (assocs is List) {
+          for (final a in assocs.whereType<Map>()) {
+            final m = (a['message'] ?? '').toString();
+            if (m.isNotEmpty) { message = m; break; }
+          }
+        }
+        if (message.isEmpty) message = libRegle;
+
+        result.add({
+          'id_regle':    idRegle,
+          'id_theme':    idTheme,
+          'sql_regle':   sqlRegle,
+          'ordre_regle': ordre++,
+          'message':     message,
+          'activer_ctrl': 1,
+        });
+      }
+      return result;
+    } on DioException catch (_) {
+      return []; // Non-fatal — offline
     } catch (_) {
       return [];
     }
