@@ -1405,34 +1405,64 @@ class ApiService {
     final encodedLogin = Uri.encodeComponent(login);
     final path =
         'data_rules.php/theme_rules/$encodedLogin/$campId/$sysId/$qstId/$etabId/$filterParam/$anneeSegment';
+    // SESSION 59 — LOG DIAGNOSTIC cohérence offline
+    debugPrint('[fetchDicoRegleTheme] → GET $path');
     try {
       final response = await _dio.get(
         path,
         options: Options(responseType: ResponseType.plain),
       );
       final rawBody = response.data?.toString().trim() ?? '';
-      if (rawBody.isEmpty) return [];
+      // SESSION 59 — log réponse brute (150 chars max pour lisibilité)
+      debugPrint('[fetchDicoRegleTheme] ← HTTP ${response.statusCode} '
+          'body(150)=${rawBody.length > 150 ? rawBody.substring(0, 150) : rawBody}');
+      if (rawBody.isEmpty) {
+        debugPrint('[fetchDicoRegleTheme] rawBody vide → []');
+        return [];
+      }
 
       dynamic parsed;
       try {
         parsed = json.decode(rawBody);
-      } catch (_) {
+      } catch (e) {
+        debugPrint('[fetchDicoRegleTheme] JSON parse error: $e → []');
         return [];
       }
 
-      if (parsed is! Map) return [];
-      if (parsed['se_status'] != 200) return [];
+      if (parsed is! Map) {
+        debugPrint('[fetchDicoRegleTheme] parsed non Map → []');
+        return [];
+      }
+      if (parsed['se_status'] != 200) {
+        debugPrint('[fetchDicoRegleTheme] se_status=${parsed['se_status']} ≠ 200 → []');
+        return [];
+      }
 
       final seData = parsed['se_data'];
-      if (seData is! Map) return [];
+      if (seData is! Map) {
+        debugPrint('[fetchDicoRegleTheme] se_data non Map (type=${seData.runtimeType}) → []');
+        return [];
+      }
+
+      // SESSION 59 — log id_theme et nb_regles reçus du serveur
+      final idThemeRaw = seData['id_theme'];
+      final nbRegles   = seData['nb_regles'];
+      debugPrint('[fetchDicoRegleTheme] se_data: id_theme=$idThemeRaw nb_regles=$nbRegles');
 
       // Récupère l'id_theme réel depuis la réponse serveur (ex: 9802 pour Burundi)
-      final idThemeRaw = seData['id_theme'];
       final idTheme    = int.tryParse(idThemeRaw?.toString() ?? '0') ?? 0;
-      if (idTheme <= 0) return [];
+      if (idTheme <= 0) {
+        debugPrint('[fetchDicoRegleTheme] idTheme=$idTheme invalide → []');
+        return [];
+      }
 
       final regles = seData['regles'];
-      if (regles is! List) return [];
+      if (regles is! List) {
+        debugPrint('[fetchDicoRegleTheme] regles non List → []');
+        return [];
+      }
+      debugPrint('[fetchDicoRegleTheme] regles.length=${regles.length} '
+          'pour idTheme=$idTheme (qstId=$qstId)');
 
       final result = <Map<String, dynamic>>[];
       int ordre = 0;
@@ -1440,7 +1470,10 @@ class ApiService {
         final idRegle  = int.tryParse(regle['id_regle']?.toString() ?? '0') ?? 0;
         final sqlRegle = (regle['sql_regle'] ?? '').toString().trim();
         final libRegle = (regle['lib_regle'] ?? '').toString();
-        if (idRegle <= 0 || sqlRegle.isEmpty) continue;
+        if (idRegle <= 0 || sqlRegle.isEmpty) {
+          debugPrint('[fetchDicoRegleTheme] règle ignorée: idRegle=$idRegle sqlVide=${sqlRegle.isEmpty}');
+          continue;
+        }
 
         // Le message prioritaire vient de la première association
         String message = '';
@@ -1462,10 +1495,14 @@ class ApiService {
           'activer_ctrl': 1,
         });
       }
+      debugPrint('[fetchDicoRegleTheme] → ${result.length} règles insérables '
+          'pour idTheme=$idTheme (qstId=$qstId)');
       return result;
-    } on DioException catch (_) {
+    } on DioException catch (e) {
+      debugPrint('[fetchDicoRegleTheme] DioException: $e → [] (offline?)');
       return []; // Non-fatal — offline
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[fetchDicoRegleTheme] Exception: $e → []');
       return [];
     }
   }
