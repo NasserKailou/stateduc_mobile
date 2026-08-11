@@ -1340,6 +1340,92 @@ class ApiService {
     }
   }
 
+  // SESSION 57/59 — DICO_REGLE_THEME : règles par thème au format SQLite local
+  // =============================================================================
+  // Télécharge les règles du thème depuis data_rules.php et les retourne au
+  // format attendu par DatabaseService.insertDicoRegleTheme() :
+  //   { id_regle, id_theme, sql_regle, ordre_regle, message, activer_ctrl }
+  //
+  // Utilise le même endpoint que fetchRules() (data_rules.php/theme_rules/...)
+  // mais extrait id_theme depuis se_data.id_theme et construit des Maps
+  // dico_regle_theme plutôt que des CoherenceRule.
+  //
+  // Retourne [] si hors-ligne ou si le serveur ne retourne rien.
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<List<Map<String, dynamic>>> fetchDicoRegleTheme({
+    required String login,
+    required String campId,
+    required String sysId,
+    required String qstId,
+    required String etabId,
+    required String? filter,
+    String yearCode = '',
+  }) async {
+    final filterParam  = (filter == null || filter.isEmpty) ? 'null' : filter;
+    final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? yearCode : '0';
+    final encodedLogin = Uri.encodeComponent(login);
+    final path =
+        'data_rules.php/theme_rules/$encodedLogin/$campId/$sysId/$qstId/$etabId/$filterParam/$anneeSegment';
+    try {
+      final response = await _dio.get(
+        path,
+        options: Options(responseType: ResponseType.plain),
+      );
+      final rawBody = response.data?.toString().trim() ?? '';
+      if (rawBody.isEmpty) return [];
+
+      dynamic parsed;
+      try {
+        parsed = json.decode(rawBody);
+      } catch (_) {
+        return [];
+      }
+
+      if (parsed is! Map) return [];
+      if (parsed['se_status'] != 200) return [];
+
+      final seData = parsed['se_data'];
+      if (seData is! Map) return [];
+
+      // id_theme réel fourni par le serveur (ex: 9802 pour un thème Burundi)
+      final idTheme = int.tryParse(seData['id_theme']?.toString() ?? '0') ?? 0;
+
+      final regles = seData['regles'];
+      if (regles is! List) return [];
+
+      final result = <Map<String, dynamic>>[];
+      int ordre = 0;
+
+      for (final regle in regles.whereType<Map>()) {
+        final idRegle  = int.tryParse(regle['id_regle']?.toString() ?? '0') ?? 0;
+        final sqlRegle = (regle['sql_regle'] ?? '').toString();
+        // Récupère le message depuis la première association non vide
+        String message = '';
+        final assocs = regle['associations'];
+        if (assocs is List) {
+          for (final a in assocs.whereType<Map>()) {
+            final m = (a['message'] ?? '').toString();
+            if (m.isNotEmpty) { message = m; break; }
+          }
+        }
+        if (idRegle == 0 || sqlRegle.trim().isEmpty) continue;
+        result.add({
+          'id_regle':     idRegle,
+          'id_theme':     idTheme,
+          'sql_regle':    sqlRegle,
+          'ordre_regle':  ++ordre,
+          'message':      message,
+          'activer_ctrl': 1,
+        });
+      }
+      return result;
+    } on DioException catch (_) {
+      return []; // Non-fatal — offline
+    } catch (_) {
+      return [];
+    }
+  }
+
   // CONTRÔLE DE COHÉRENCE SERVEUR — APRÈS ENVOI DES DONNÉES
   // =============================================================================
   // Source serveur: data_controle.php → controle_theme_batch.class.php
