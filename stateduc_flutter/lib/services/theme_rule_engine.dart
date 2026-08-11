@@ -273,8 +273,14 @@ class ThemeRuleEngine {
       // Doit être exécuté même en cas d'exception pour ne pas laisser des
       // données temporaires dans collected_data.
       try {
-        await db.execute(';ROLLBACK TO SAVEPOINT $savepointName');
-        await db.execute(';RELEASE SAVEPOINT $savepointName');
+        // SESSION 58 — FIX : suppression des point-virgules initiaux invalides
+        // Bug original : ';ROLLBACK TO SAVEPOINT' était syntaxe SQLite invalide
+        // (le point-virgule initial cause une erreur SQLite, le ROLLBACK
+        //  n'était jamais exécuté → les données temporaires insertées dans
+        //  collected_data restaient en base → faux positifs possibles ou
+        //  entrées fantômes dans les résultats de règles EXISTS).
+        await db.execute('ROLLBACK TO SAVEPOINT $savepointName');
+        await db.execute('RELEASE SAVEPOINT $savepointName');
       } catch (e) {
         debugPrint('[ThemeRuleEngine] ⚠️ erreur ROLLBACK SAVEPOINT: $e');
       }

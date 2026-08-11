@@ -172,6 +172,41 @@ class DataEntryProvider extends ChangeNotifier {
   /// Mis à jour à chaque appel de updateField() sur un champ source.
   Set<String> get disabledFields => Set.unmodifiable(_disabledFields);
 
+  // SESSION 58 — FIX KOSAVE 10502 : filtre effectif côté serveur
+  //
+  // ROOT CAUSE : questionnaire_ws.php utilise un double-include :
+  //   1er include (GET) : crée le grille avec code_filtre=$_SESSION['filtre']
+  //   2ème include (POST) : exécute comparer()+maj_bdd() sur le grille sauvé
+  // Si $_SESSION['filtre'] a une valeur résiduelle d'un thème précédent
+  // (ex: '21' d'un thème avec filtre) ET que le thème courant a une zone
+  // TYPE_OBJET='systeme' + CHAMP_PERE='CODE_TYPE_FILTRE', alors get_dico()
+  // génère WHERE CODE_TYPE_PERIODE=21 (valeur résiduelle) → aucune donnée
+  // existante trouvée → toutes les lignes POST = action 'I' (INSERT) →
+  // INSERT échoue (PK déjà existante) → Execute()===false → KOSAVE.
+  //
+  // FIX : si la campagne a des périodes disponibles (_filterPeriods non vide)
+  // ET que l'utilisateur n'a pas sélectionné de filtre (_selectedFilter==null),
+  // on utilise _filterPeriods.first comme filtre côté serveur UNIQUEMENT
+  // (envoi du paramètre &filtre=X à questionnaire_ws.php pour forcer
+  //  $_SESSION['filtre'] à une valeur valide et connue).
+  //
+  // Ce getter est utilisé dans sendToServer() et _autoReloadFromServerBackground()
+  // à la place de _selectedFilter?.idFilter.
+  //
+  // IMPORTANT : les opérations SQLite (saveCollectedData, getCollectedData,
+  // markCollectedDataSent) continuent d'utiliser _selectedFilter?.idFilter
+  // (null pour hasFilter==false) pour ne pas fragmenter les données locales
+  // par période quand le formulaire ne l'exige pas.
+  String? get _effectiveServerFilter {
+    if (_selectedFilter != null) return _selectedFilter!.idFilter;
+    if (_filterPeriods.isNotEmpty) {
+      // Utilise la première période disponible comme filtre par défaut
+      // pour éviter que PHP utilise une valeur résiduelle de $_SESSION['filtre']
+      return _filterPeriods.first.idFilter;
+    }
+    return null;
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // INITIALISATION — configure le contexte pour un établissement + système donnés
   //
@@ -492,7 +527,10 @@ class DataEntryProvider extends ChangeNotifier {
     final idCamp    = _idCamp;
     final idEtab    = _idEtab;
     final idSystem  = _idSystem;
-    final idFilter  = _selectedFilter?.idFilter;
+    // SESSION 58 — FIX KOSAVE : utilise le filtre effectif serveur
+    // (voir _effectiveServerFilter) pour le rechargement depuis le serveur.
+    // SQLite utilise toujours _selectedFilter?.idFilter (null si hasFilter==false).
+    final idFilter  = _effectiveServerFilter;
     // Capture l'état des données locales au moment de l'appel.
     // forceOverwrite = true pour le formulaire d'identification : les données
     // serveur remplacent toujours les données locales (le serveur est source de vérité).
@@ -922,13 +960,20 @@ class DataEntryProvider extends ChangeNotifier {
     try {
       // saveData() utilise _withRetry() en interne — le retry est transparent ici.
       // _sendAttempt sera mis à jour via le callback onRetry si le retry se déclenche.
+      // SESSION 58 — FIX KOSAVE 10502 : utilise _effectiveServerFilter
+      // au lieu de _selectedFilter?.idFilter pour éviter que PHP utilise
+      // une valeur résiduelle de $_SESSION['filtre'] (voir getter doc).
+      final serverFilter = _effectiveServerFilter;
+      debugPrint('[DataEntry] sendToServer: selectedFilter=${_selectedFilter?.idFilter} '
+          'effectiveServerFilter=$serverFilter '
+          '(filterPeriods=${_filterPeriods.length})');
       final ok = await _api.saveData(
         login:            user.login,         // ← utilise login, pas idUser !
         campId:           _idCamp!,
         sysId:            _idSystem!,
         qstId:            _selectedQuestion!.idQst,
         etabId:           _idEtab!,
-        filter:           _selectedFilter?.idFilter,
+        filter:           serverFilter,       // SESSION 58: filtre effectif serveur
         formData:         _formData,
         etabRegroupId:    _idRegroupEtab,     // pour LOC_REG_0 (première question)
         isFirstQuestion:  _isFirstQuestion,
@@ -964,7 +1009,7 @@ class DataEntryProvider extends ChangeNotifier {
             sysId:    _idSystem!,
             qstId:    _selectedQuestion!.idQst,
             etabId:   _idEtab!,
-            filter:   _selectedFilter?.idFilter,
+            filter:   serverFilter,   // SESSION 58: filtre effectif serveur
             yearCode: user.codeyear,
           );
         } catch (_) {
