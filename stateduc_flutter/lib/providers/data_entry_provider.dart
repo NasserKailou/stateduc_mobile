@@ -711,6 +711,18 @@ class DataEntryProvider extends ChangeNotifier {
           '_formData=${_formData.length} _isCheckingOffline=$_isCheckingOffline');
       if (!_isCheckingOffline) {
         checkCoherenceOffline();
+      } else {
+        // SESSION 58 — FIX cohérence offline auto-trigger
+        // Si un check est déjà en cours, on replanifie pour s'assurer que la
+        // dernière valeur saisie sera bien évaluée après la fin du check courant.
+        // Sans ce replanification, une saisie rapide pendant un check en cours
+        // est silencieusement ignorée → cohérence jamais réévaluée après.
+        debugPrint('[DataEntry] debounce: check en cours → replanification 800ms');
+        _coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
+          debugPrint('[DataEntry] debounce replanifié fired: '
+              '_isCheckingOffline=$_isCheckingOffline');
+          if (!_isCheckingOffline) checkCoherenceOffline();
+        });
       }
     });
   }

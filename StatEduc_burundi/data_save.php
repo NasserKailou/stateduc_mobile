@@ -360,7 +360,24 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
         $ok = $GLOBALS['conn']->Execute($req);
     }
     $urlBase .= '&filtre='.$id_filter;
-	}
+	} else {
+    // SESSION 58 — FIX KOSAVE thèmes sans filtre (10502, 10602, 10702)
+    //
+    // ROOT CAUSE : instance_grille.php ligne 71 lit $_SESSION['filtre'] directement.
+    // Si une session navigateur précédente avait filtre='1' (ou autre valeur),
+    // cette valeur stale persiste dans la session PHP car :
+    //   1. questionnaire_ws.php ligne 21 ne remet filtre en session QUE si
+    //      $_GET['filtre'] est présent ET non vide.
+    //   2. La session_write_close() ci-dessous ne purge pas la valeur stale.
+    // Résultat : grille instanciée avec code_filtre='1' → get_dico() ajoute
+    // WHERE CODE_TYPE_PERIODE=1 → matrice vide → comparer() → toutes lignes='I'
+    // → INSERT échoue sur clé primaire → Execute()===false → KOSAVE.
+    //
+    // FIX : remettre $_SESSION['filtre'] à '' explicitement avant session_write_close()
+    // Ainsi questionnaire_ws.php lit filtre='' → constructeur grille code_filtre=''
+    // → get_dico() n'ajoute PAS de clause WHERE filtre → lecture complète → OKSAVE.
+    $_SESSION['filtre'] = '';
+  }
   //echo "<pre>".$urlBase; print_r($data_to_send);   return;
 	session_write_close(); // Libere le verrou de session avant l'appel curl interne
 	$curl->post($urlBase, $data_to_send);	
