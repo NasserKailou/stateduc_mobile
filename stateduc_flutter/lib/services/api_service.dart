@@ -1399,14 +1399,26 @@ class ApiService {
       for (final regle in regles.whereType<Map>()) {
         final idRegle  = int.tryParse(regle['id_regle']?.toString() ?? '0') ?? 0;
         final sqlRegle = (regle['sql_regle'] ?? '').toString();
-        // Récupère le message depuis la première association non vide
+        // SESSION 61 FIX — message d'incohérence :
+        // Priorité 1 : message de la première association (DICO_REGLE_THEME_ASSOC)
+        //   → le message métier "INCOHERENCE ENTRE X ET Y" vient de l'assoc
+        // Priorité 2 : lib_regle du serveur (DICO_TRADUCTION / DICO_REGLE_THEME)
+        //   → libellé de la règle principale (ex: "INCOHERENCE ENTRE EXISTENCE ET FONCT ELECTRICITE")
+        // Avant ce fix : lib_regle ignoré → rules sans assoc (ex: 639, 580) avaient
+        //   message='' → UI affichait "Règle 639 — incohérence" (fallback générique)
         String message = '';
+        // Priorité 1 : association message
         final assocs = regle['associations'];
         if (assocs is List) {
           for (final a in assocs.whereType<Map>()) {
             final m = (a['message'] ?? '').toString();
             if (m.isNotEmpty) { message = m; break; }
           }
+        }
+        // Priorité 2 : lib_regle (libellé de la règle principale — retourné par data_rules.php)
+        if (message.isEmpty) {
+          final libRegle = (regle['lib_regle'] ?? '').toString();
+          if (libRegle.isNotEmpty) message = libRegle;
         }
         if (idRegle == 0 || sqlRegle.trim().isEmpty) continue;
         result.add({

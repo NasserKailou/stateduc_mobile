@@ -294,7 +294,6 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
   
  //echo "<pre>"; print_r($data_to_send);   //return;
 	$curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
-  		//print_r($instance->response);
 		if (strpos($instance->response, "ISOKSAVEINDATABASE") !== FALSE) {
   			$statut_save = "OKSAVE";
 		} else {
@@ -308,6 +307,15 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 		$string .= ";".$id_theme;
 		$string .= ";".$id_etab;
 		$string .= ";".$id_filter.";".$statut_save.";\n";
+		// SESSION 61 — DIAGNOSTIC KOSAVE
+		// Log les 600 premiers chars de la réponse questionnaire_ws.php quand KOSAVE.
+		// Permet d'identifier : erreur PHP bootstrap, SQL failure, HTML inattendu, etc.
+		// DÉPLOYER ce fichier sur le serveur puis lire moblogs/kailou.log après un test.
+		// À retirer après résolution confirmée.
+		if ($statut_save === "KOSAVE") {
+			$resp_diag = substr(preg_replace('/\s+/', ' ', $instance->response), 0, 600);
+			$string .= "DIAG[" . $resp_diag . "]\n";
+		}
 		$myFile = "moblogs/".$user.".log";
 		renameLastFile("moblogs/".$user);
 		$fh = fopen($myFile, 'a');
