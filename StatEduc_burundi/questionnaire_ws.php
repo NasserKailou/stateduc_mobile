@@ -1,6 +1,21 @@
 <?php
-// session 34 : read_and_close pour eviter deadlock XAMPP curl interne data_save.php -> questionnaire_ws.php
-@session_start(['read_and_close' => true]);
+// SESSION 61 FIX DEFINITIF -- anti-deadlock reel
+// ROOT CAUSE IDENTIFIEE (log kailou.log, ligne DIAG) :
+//   Avant (session 34) : @session_start(['read_and_close' => true]) ligne 3
+//   -> session ouverte en lecture seule et immediatement fermee.
+//   Toutes les ecritures $_SESSION du bootstrap (login, code_user, secteur,
+//   type_ent_stat...) etaient perdues (en memoire seulement, non persistees).
+//   Puis require 'common.php' -> common.php:94 session_start() SANS read_and_close
+//   et SANS guard session_status() -> essaie d'acquerir un verrou exclusif
+//   -> BLOQUE INDEFINIMENT -> timeout 120s -> erreur cURL 28 -> KOSAVE sur TOUS les formulaires.
+//
+// FIX : ouvrir la session normalement (mode ecriture) pour que les ecritures
+//   bootstrap (lignes ci-dessous) soient persistees sur disque, puis appeler
+//   session_write_close() juste AVANT require 'common.php'.
+//   common.php:94 session_start() s'executera sans conflit de verrou.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 set_time_limit(0);
 ////Recuperation des varibles globales dans $_GET
 ini_set("memory_limit", "64M");
@@ -83,6 +98,11 @@ $GLOBALS['ne_pas_verifier_session'] = true;
 if(isset($_GET['type_ent_stat']) && $_GET['type_ent_stat']<>'') {
     $_SESSION['type_ent_stat'] = $_GET['type_ent_stat'];
 }
+// SESSION 61 : persiste toutes les ecritures bootstrap (login, code_user, secteur,
+// type_ent_stat...) sur disque et libere le verrou de session.
+// Sans ceci, common.php:94 session_start() bloquait indefiniment (deadlock)
+// -> timeout 120s -> erreur 28 -> KOSAVE generalise sur tous les formulaires.
+session_write_close();
 require_once 'common.php';
 // Recharger avec APPARTENANCE = campagne (type_ent_stat) pour isoler les themes mobiles
 $_appart_mob = (isset($_GET['type_ent_stat']) && $_GET['type_ent_stat']<>'') ? $_GET['type_ent_stat'] : '';
