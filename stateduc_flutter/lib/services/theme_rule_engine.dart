@@ -381,16 +381,40 @@ class ThemeRuleEngine {
         // Mode EXISTS : COUNT(*) des violations
         final count = Sqflite.firstIntValue(rows) ?? 0;
         if (count > 0) {
-          logger.log('[ThemeRuleEngine] ✗ règle $idRegle VIOLÉE (count=$count)');
-          return ThemeCoherenceError(
-            idRegle:    idRegle,
-            idTheme:    idTheme,
-            message:    message,
-            ordreRegle: ordreRegle,
-            value1:     count.toDouble(),
-          );
+          // SESSION 61 FIX — faux positifs EXISTS mode (règles 639, 580, etc.)
+          //
+          // ANALYSE ROOT CAUSE :
+          //   Certaines règles (ex: 639 msg="2*NB DE SALLES DE CLASSE",
+          //   580 msg="ETAB_NIV") ont un GROUP BY non-contexte (CODE_TYPE_NIVEAU)
+          //   → translateur choisit MODE EXISTS → COUNT(*) = nb niveaux > 0
+          //   → fausse violation "Règle 639 — incohérence" affichée dans l'UI.
+          //
+          //   Ces règles sont des VALEURS DE RÉFÉRENCE (pas des règles de violation).
+          //   Leur rôle réel : être utilisées comme val2 dans les ASSOC d'autres règles.
+          //   En standalone (sans ASSOC), COUNT(*) > 0 = "le thème existe" → PAS une erreur.
+          //
+          //   CONVENTION BURUNDI : toutes les vraies règles de violation portent
+          //   le mot "INCOHERENCE" dans leur libellé (lib_regle/message).
+          //   Les règles de référence n'ont PAS "INCOHERENCE" → on les ignore.
+          //
+          // FIX : si EXISTS count > 0 MAIS message sans "INCOHERENCE" → valeur de
+          //   référence → ignorer silencieusement (même logique que SCALAR mode).
+          if (!message.toUpperCase().contains('INCOHERENCE')) {
+            logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK — EXISTS valeur de '
+                'référence ignorée (count=$count, message sans INCOHERENCE)');
+          } else {
+            logger.log('[ThemeRuleEngine] ✗ règle $idRegle VIOLÉE (count=$count)');
+            return ThemeCoherenceError(
+              idRegle:    idRegle,
+              idTheme:    idTheme,
+              message:    message,
+              ordreRegle: ordreRegle,
+              value1:     count.toDouble(),
+            );
+          }
+        } else {
+          logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK (count=0)');
         }
-        logger.log('[ThemeRuleEngine] ✓ règle $idRegle OK (count=0)');
       }
     } catch (e) {
       logger.log('[ThemeRuleEngine] ⚠️ règle $idRegle rawQuery: $e — ignorée');
