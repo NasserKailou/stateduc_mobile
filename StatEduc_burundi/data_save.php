@@ -307,28 +307,38 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 		$string .= ";".$id_theme;
 		$string .= ";".$id_etab;
 		$string .= ";".$id_filter.";".$statut_save.";\n";
-		// SESSION 62 — DIAGNOSTIC KOSAVE ÉTENDU
-		// Capture 4000 chars + extrait l'erreur SQL spécifique (après le header HTML).
-		// Le header HTML de questionnaire_ws.php fait ~550 chars — l'erreur SQL est après.
-		// DIAG1 = 4000 premiers chars (inclut tout le HTML + l'erreur SQL)
-		// SQLERR = extrait ciblé autour du premier "error" dans la réponse
+		// SESSION 62b — DIAGNOSTIC KOSAVE CIBLÉ (toute la réponse scannée)
+		// La réponse de questionnaire_ws.php fait >>4000 chars (HTML complet).
+		// On ne peut pas la tronquer → on cherche directement les tokens dans toute la réponse.
 		if ($statut_save === "KOSAVE") {
-			$resp_flat = preg_replace('/\s+/', ' ', $instance->response);
-			// Bloc 1 : les 4000 premiers chars (contient HTML + erreur SQL après le header)
-			$resp_diag = substr($resp_flat, 0, 4000);
-			$string .= "DIAG1[" . $resp_diag . "]\n";
-			// Bloc 2 : extrait ciblé autour du mot "error" (SQL error text de maj_bdd)
-			$err_pos = stripos($resp_flat, 'error');
-			if ($err_pos !== false) {
-				$err_start = max(0, $err_pos - 30);
-				$sql_err = substr($resp_flat, $err_start, 600);
-				$string .= "SQLERR[" . $sql_err . "]\n";
+			$resp_full = $instance->response;
+			$resp_flat = preg_replace('/\s+/', ' ', $resp_full);
+
+			// MAJOK : cherche MAJ_OK=true|false dans TOUTE la réponse
+			$majok_pos = strpos($resp_flat, 'MAJ_OK=');
+			if ($majok_pos !== false) {
+				$string .= "MAJOK[" . substr($resp_flat, $majok_pos, 30) . "]\n";
+			} else {
+				$string .= "MAJOK[ABSENT — MAJ_OK non trouvé dans la réponse]\n";
 			}
-			// Bloc 3 : MAJ_OK status injecté par questionnaire_ws.php
-			if (strpos($instance->response, 'MAJ_OK=false') !== false) {
-				$string .= "MAJOK[false — theme_data_MAJ_ok=false confirmé]\n";
-			} elseif (strpos($instance->response, 'MAJ_OK=true') !== false) {
-				$string .= "MAJOK[true — KOSAVE cause autre (POST vide?)]\n";
+
+			// SQLERR : cherche "error inserting", "error deleting", "error updating" (maj_bdd)
+			// Ces patterns sont spécifiques à grille.class.php — pas dans le JS HTML
+			$sql_patterns = array('error inserting', 'error deleting', 'error updating');
+			$sql_found = false;
+			foreach ($sql_patterns as $pat) {
+				$pat_pos = stripos($resp_flat, $pat);
+				if ($pat_pos !== false) {
+					$sql_found = true;
+					$sql_ctx = substr($resp_flat, max(0, $pat_pos - 20), 800);
+					$string .= "SQLERR[" . $sql_ctx . "]\n";
+					break;
+				}
+			}
+			if (!$sql_found) {
+				$string .= "SQLERR[ABSENT — aucun error insert/delete/update dans la réponse]\n";
+				// DIAG_TAIL : 400 derniers chars (zone où apparaissent MAJ_OK et les erreurs)
+				$string .= "DIAG_TAIL[" . substr($resp_flat, -400) . "]\n";
 			}
 		}
 		$myFile = "moblogs/".$user.".log";
