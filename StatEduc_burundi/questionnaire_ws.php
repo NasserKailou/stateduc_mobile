@@ -1432,6 +1432,12 @@ if(file_exists($curfile) and $nom_theme != '') {
     print $curfile.' Inexistant!<BR>';
 }
 
+// SESSION 62 — DIAGNOSTIC : émet MAJ_OK=true/false pour data_save.php DIAG
+// Ceci permet de distinguer : (a) erreur SQL maj_bdd → MAJ_OK=false
+//                             (b) POST vide ou curobj_instance absent → pas de save du tout
+if(isset($_POST) && count($_POST)>0) {
+    echo ($GLOBALS['theme_data_MAJ_ok'] ? "MAJ_OK=true" : "MAJ_OK=false");
+}
 //Gestion data entry by user
 if(isset($_POST) && count($_POST)>0 && $GLOBALS['theme_data_MAJ_ok']== true){
 	echo "ISOKSAVEINDATABASE";

@@ -307,14 +307,29 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 		$string .= ";".$id_theme;
 		$string .= ";".$id_etab;
 		$string .= ";".$id_filter.";".$statut_save.";\n";
-		// SESSION 61 — DIAGNOSTIC KOSAVE
-		// Log les 600 premiers chars de la réponse questionnaire_ws.php quand KOSAVE.
-		// Permet d'identifier : erreur PHP bootstrap, SQL failure, HTML inattendu, etc.
-		// DÉPLOYER ce fichier sur le serveur puis lire moblogs/kailou.log après un test.
-		// À retirer après résolution confirmée.
+		// SESSION 62 — DIAGNOSTIC KOSAVE ÉTENDU
+		// Capture 4000 chars + extrait l'erreur SQL spécifique (après le header HTML).
+		// Le header HTML de questionnaire_ws.php fait ~550 chars — l'erreur SQL est après.
+		// DIAG1 = 4000 premiers chars (inclut tout le HTML + l'erreur SQL)
+		// SQLERR = extrait ciblé autour du premier "error" dans la réponse
 		if ($statut_save === "KOSAVE") {
-			$resp_diag = substr(preg_replace('/\s+/', ' ', $instance->response), 0, 600);
-			$string .= "DIAG[" . $resp_diag . "]\n";
+			$resp_flat = preg_replace('/\s+/', ' ', $instance->response);
+			// Bloc 1 : les 4000 premiers chars (contient HTML + erreur SQL après le header)
+			$resp_diag = substr($resp_flat, 0, 4000);
+			$string .= "DIAG1[" . $resp_diag . "]\n";
+			// Bloc 2 : extrait ciblé autour du mot "error" (SQL error text de maj_bdd)
+			$err_pos = stripos($resp_flat, 'error');
+			if ($err_pos !== false) {
+				$err_start = max(0, $err_pos - 30);
+				$sql_err = substr($resp_flat, $err_start, 600);
+				$string .= "SQLERR[" . $sql_err . "]\n";
+			}
+			// Bloc 3 : MAJ_OK status injecté par questionnaire_ws.php
+			if (strpos($instance->response, 'MAJ_OK=false') !== false) {
+				$string .= "MAJOK[false — theme_data_MAJ_ok=false confirmé]\n";
+			} elseif (strpos($instance->response, 'MAJ_OK=true') !== false) {
+				$string .= "MAJOK[true — KOSAVE cause autre (POST vide?)]\n";
+			}
 		}
 		$myFile = "moblogs/".$user.".log";
 		renameLastFile("moblogs/".$user);
