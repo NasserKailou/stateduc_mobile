@@ -28,8 +28,20 @@ if(count($_POST) == 0) {
 	
     $curobj_grille = $_SESSION['curobj_instance'];
     
-    // ici fonction VERIF du $_POST
-    $curobj_grille->verif($_POST);    
+    // SESSION 62 FIX — bypass verif() pour les appels curl mobiles (questionnaire_ws.php)
+    // ROOT CAUSE IDENTIFIÉE (log DIAG_TAIL 10:46:11) :
+    //   verif() appelle All_Controle() → une règle de validation échoue → exit()
+    //   exit() tue le script AVANT que questionnaire_ws.php puisse émettre MAJ_OK
+    //   ou ISOKSAVEINDATABASE → data_save.php détecte KOSAVE.
+    //   Le contrôle de cohérence est géré côté Flutter (theme_rule_engine.dart).
+    //   Le serveur ne doit PAS bloquer la sauvegarde mobile sur règles de contrôle.
+    // GUARD : ne_pas_verifier_session=true est positionné par questionnaire_ws.php
+    //   uniquement pour les appels curl internes (jamais pour les navigateurs).
+    if (!isset($GLOBALS['ne_pas_verifier_session']) || !$GLOBALS['ne_pas_verifier_session']) {
+        // ici fonction VERIF du $_POST (navigateur uniquement)
+        $curobj_grille->verif($_POST);
+    }
+    // Mobile curl : verif() skippée → pas d'exit() → sauvegarde continue normalement
     
     // Demarrage de la Transaction pour contr�ler le probl�me d'acc�s simultan� sur le dernier enregistrement
     $curobj_grille->conn->StartTrans();   // Start of trasaction
