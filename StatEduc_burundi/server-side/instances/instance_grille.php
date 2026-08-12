@@ -68,20 +68,30 @@ if(count($_POST) == 0) {
     $id_theme			=	$theme_manager->id;    
 	$code_etablissement = $_SESSION['code_etab'];
     $code_annee = $_SESSION['annee'];
-	// SESSION 59 FIX DÉFINITIF — KOSAVE thèmes sans filtre (10502, 10602, 10702)
-	// ROOT CAUSE : questionnaire_ws.php utilise session_start(['read_and_close'=>true]),
-	// donc $_SESSION ne peut PAS être modifié. La Session B (cURL data_save→questionnaire_ws)
-	// conserve la valeur stale de $_SESSION['filtre'] d'un appel précédent (ex: '1').
-	// Instance_grille instancie grille avec code_filtre='1' → WHERE CODE_TYPE_PERIODE=1
-	// sur thème sans période → matrice vide → KOSAVE.
+	// SESSION 59+60 FIX DÉFINITIF — KOSAVE thèmes sans filtre (10502, 10602, 10702)
 	//
-	// FIX : quand $_GET['filtre'] est présent dans l'URL (appel cURL mobile ou navigateur),
-	// l'utiliser directement. data_save.php passe &filtre=<valeur> seulement si filtre réel,
-	// sinon il ne passe PAS &filtre → isset($_GET['filtre']) = false → code_filtre = ''.
-	// Cela court-circuite complètement la session stale.
+	// ROOT CAUSE COMPLÈTE (sessions 58–60) :
+	//   questionnaire_ws.php → session_start(['read_and_close'=>true]) → Session B
+	//   (cURL interne data_save→questionnaire_ws) est READ-ONLY : toute écriture
+	//   dans $_SESSION est ignorée silencieusement.
+	//   Session B conserve $_SESSION['filtre'] stale d'un appel précédent (ex: '1').
+	//
+	// SESSION 59 FIX (partiel) :
+	//   Lire $_GET['filtre'] directement si présent dans l'URL cURL.
+	//   PROBLÈME RÉSIDUEL : data_save.php n'ajoutait PAS &filtre= (vide) quand
+	//   id_filter=="null" → isset($_GET['filtre']) = false → fallback stale → KOSAVE.
+	//
+	// SESSION 60 FIX (complet) :
+	//   data_save.php ajoute maintenant TOUJOURS &filtre= dans l'URL cURL :
+	//     - filtre réel → &filtre=<id> (ex: &filtre=1)
+	//     - sans filtre → &filtre= (chaîne vide)
+	//   Ainsi isset($_GET['filtre']) = TRUE dans TOUS les cas.
+	//   Pour &filtre= (vide) : $_GET['filtre']='' → code_filtre='' → pas de clause WHERE filtre → OKSAVE.
+	//   Pour &filtre=1       : $_GET['filtre']='1' → code_filtre='1' → WHERE CODE_TYPE_PERIODE=1 → OK.
 	if (isset($_GET['filtre'])) {
 	    $code_filtre = $_GET['filtre'];
 	} else {
+	    // Fallback sécurité (appel direct navigateur sans paramètre filtre)
 	    $code_filtre = $_SESSION['filtre'];
 	}
     $id_systeme	= $_SESSION['secteur'];
