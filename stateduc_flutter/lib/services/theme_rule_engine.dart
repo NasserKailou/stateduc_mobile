@@ -495,8 +495,51 @@ class ThemeRuleEngine {
     );
 
     if (val1 == null || val2 == null) {
+      // SESSION 60 FIX — Faux négatifs quand SQL associé non traduisible (val2=null)
+      //                   mais SQL principal a détecté des violations (val1 > 0).
+      //
+      // ANALYSE ROOT CAUSE :
+      //   Le SQL de la règle associée (ex: règle 404) utilise des tables serveur
+      //   NON présentes dans _knownServerTables → SqlTranslator retourne null → val2=null.
+      //   L'ancienne logique skipait TOUTE la règle quand val2=null → faux négatif.
+      //
+      //   Ces règles ASSOC avec critere="=" ont la sémantique suivante :
+      //     val1 = COUNT des établissements en infraction (SQL principal translateable)
+      //     val2 = COUNT total des établissements (SQL associé, non translateable)
+      //     Violation si val1 == val2 (TOUS les établissements en infraction).
+      //
+      //   Mais pour un seul établissement (mobile offline), si val1 > 0, cela signifie
+      //   que CET établissement est en infraction. La comparaison val1 == val2 n'a pas
+      //   de sens sans val2, MAIS val1 > 0 suffit à déclarer la violation car :
+      //     - val1 est le COUNT des établissements violant la règle parmi ce contexte
+      //     - En mode offline mono-établissement, val1 > 0 ↔ cet établissement viole
+      //
+      // RÈGLE DE DÉCISION SESSION 60 :
+      //   val2 = null (non traduisible) ET val1 > 0 → violation EXISTS basée sur val1
+      //   val2 = null (non traduisible) ET val1 = 0 → pas de violation (règle OK)
+      //   val1 = null (principal non traduisible) → règle ignorée (ne peut pas évaluer)
+      //
+      // COUVERTURE :
+      //   - Règles 533-537 (NB_CLASSES_VAC, DISPOSE_BIBLIO, DETECTER_ENFANT_HANDI,
+      //     ECOLE_RESEAU_SCOL, DOMAINE_DELIMITE) : val1=1.0 val2=null → VIOLATION
+      //   - Électricité, latrines, eau (thème 10502) : même pattern → VIOLATION
+      //   - val1=0.0 val2=null (règles 535, 536) → pas de violation → OK
+      if (val1 != null && val1 > 0) {
+        logger.log('[ThemeRuleEngine] règle $idRegle ASSOC: val1=$val1 val2=null '
+            '— SQL associé non traduisible MAIS val1>0 : violation EXISTS détectée '
+            '(Session 60: mono-établissement offline → val1>0 suffit)');
+        return ThemeCoherenceError(
+          idRegle:    idRegle,
+          idTheme:    idTheme,
+          message:    message,
+          ordreRegle: ordreRegle,
+          value1:     val1,
+          value2:     null,
+          critere:    critere,
+        );
+      }
       logger.log('[ThemeRuleEngine] règle $idRegle ASSOC: val1=$val1 val2=$val2 '
-          '— non évaluable');
+          '— non évaluable (val1=null ou val1=0 avec val2=null → OK)');
       return null;
     }
 

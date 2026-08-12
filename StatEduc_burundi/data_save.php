@@ -361,22 +361,32 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
     }
     $urlBase .= '&filtre='.$id_filter;
 	} else {
-    // SESSION 58 — FIX KOSAVE thèmes sans filtre (10502, 10602, 10702)
+    // SESSION 60 FIX DÉFINITIF — KOSAVE thèmes sans filtre (10502, 10602, 10702)
     //
-    // ROOT CAUSE : instance_grille.php ligne 71 lit $_SESSION['filtre'] directement.
-    // Si une session navigateur précédente avait filtre='1' (ou autre valeur),
-    // cette valeur stale persiste dans la session PHP car :
-    //   1. questionnaire_ws.php ligne 21 ne remet filtre en session QUE si
-    //      $_GET['filtre'] est présent ET non vide.
-    //   2. La session_write_close() ci-dessous ne purge pas la valeur stale.
-    // Résultat : grille instanciée avec code_filtre='1' → get_dico() ajoute
-    // WHERE CODE_TYPE_PERIODE=1 → matrice vide → comparer() → toutes lignes='I'
-    // → INSERT échoue sur clé primaire → Execute()===false → KOSAVE.
+    // ANALYSE ROOT CAUSE COMPLÈTE (sessions 58–60) :
     //
-    // FIX : remettre $_SESSION['filtre'] à '' explicitement avant session_write_close()
-    // Ainsi questionnaire_ws.php lit filtre='' → constructeur grille code_filtre=''
-    // → get_dico() n'ajoute PAS de clause WHERE filtre → lecture complète → OKSAVE.
-    $_SESSION['filtre'] = '';
+    //   questionnaire_ws.php utilise session_start(['read_and_close'=>true]) → Session B
+    //   (créée par cURL data_save→questionnaire_ws) est en LECTURE SEULE.
+    //   Toute écriture dans $_SESSION (ex: $_SESSION['filtre']='') est ignorée.
+    //
+    //   La Session 59 a ajouté dans instance_grille.php :
+    //     if (isset($_GET['filtre'])) $code_filtre = $_GET['filtre'];
+    //     else                        $code_filtre = $_SESSION['filtre'];
+    //
+    //   Mais quand id_filter=="null", data_save.php N'AJOUTAIT PAS &filtre= à l'URL.
+    //   Résultat : isset($_GET['filtre']) = false → fallback sur $_SESSION['filtre']
+    //   stale de Session B (ex: '1') → WHERE CODE_TYPE_PERIODE=1 → matrice vide → KOSAVE.
+    //
+    // FIX SESSION 60 : ajouter EXPLICITEMENT &filtre= (chaîne vide) à l'URL cURL
+    // quand il n'y a pas de filtre. Ainsi dans instance_grille.php :
+    //   isset($_GET['filtre']) = TRUE et $_GET['filtre'] = '' → code_filtre = ''
+    //   → get_dico() n'ajoute PAS de clause WHERE filtre → lecture complète → OKSAVE.
+    //
+    // GARANTIE : ce &filtre= (vide) est inoffensif pour questionnaire_ws.php car
+    //   ligne 21 : if(isset($_GET['filtre']) && $_GET['filtre']<>'') $_SESSION['filtre']=...
+    //   la condition $_GET['filtre']<>'' est fausse → $_SESSION['filtre'] NON modifié.
+    //   Instance_grille lit $code_filtre='' → grille sans filtre → OKSAVE.
+    $urlBase .= '&filtre=';
   }
   //echo "<pre>".$urlBase; print_r($data_to_send);   return;
 	session_write_close(); // Libere le verrou de session avant l'appel curl interne
