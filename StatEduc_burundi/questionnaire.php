@@ -1260,6 +1260,47 @@ if(!isset($_GET['tmis'])){
 	if(isset($GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB']) && isset($GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB'][$_SESSION['secteur']]) && $GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB'][$_SESSION['secteur']] <> ''){
 	 	$style_infos_etab = ' style="'.$GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB'][$_SESSION['secteur']].'"';
 	}
+	// ── FIX SESSION : si code_etab est en session mais hierarchie_regroup/infos_etab vides
+    // (session fraîche, rechargement page sans code_etab dans GET), on repopule depuis DB.
+    if( isset($_SESSION['code_etab']) && $_SESSION['code_etab'] <> ''
+        && trim($_SESSION['hierarchie_regroup'] ?? '') === ''
+        && trim($_SESSION['infos_etab'] ?? '') === ''
+        && !isset($_GET['tmis'])
+    ){
+        $_log_sess_fix = date('Y-m-d H:i:s').';questionnaire.php;INFO_REPOP_SESSION'
+            .';code_etab='.($_SESSION['code_etab']).';theme='.($_GET['theme']??'?')."\n";
+        @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_sess_fix, FILE_APPEND);
+        // Repopuler hierarchie_regroup et infos_etab depuis le code_etab en session
+        $conn = $GLOBALS['conn'];
+        $GLOBALS['code_etab'] = $_SESSION['code_etab'];
+        // Requête hiérarchie identique à celle du bloc code_etab (ligne ~1182)
+        $requete_rp = 'SELECT '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'
+                    FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].', '.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['HIERARCHIE'].','.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' 
+                    WHERE '.$GLOBALS['PARAM']['REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'
+                    AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'
+                    AND  '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'='.$GLOBALS['PARAM']['REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'
+                    AND  '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].'='.$_SESSION['code_etab'].'
+                    AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.$_SESSION['chaine'].'
+                    AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].'=1
+                    AND  '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].'='.$_SESSION['secteur'];
+        $_SESSION['code_regroupement'] = $conn->GetOne($requete_rp);
+        // Nombre de niveaux de la chaîne
+        $requete_niv_rp = 'SELECT COUNT(*) FROM '.$GLOBALS['PARAM']['HIERARCHIE'].'
+                            WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$_SESSION['chaine'];
+        $niveau_rp = $conn->GetOne($requete_niv_rp) - 1;
+        $arbre_rp = new arbre($_SESSION['chaine']);
+        $hierarchie_rp = $arbre_rp->getparentsid($niveau_rp, $_SESSION['code_regroupement'], $_SESSION['chaine']);
+        $_SESSION['hierarchie_regroup'] = '';
+        if(is_array($hierarchie_rp)) foreach($hierarchie_rp as $i_rp => $h_rp) {
+            $_SESSION['hierarchie_regroup'] .= $h_rp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+            if($i_rp < (count($hierarchie_rp)-1)) {
+                $_SESSION['hierarchie_regroup'] .= '<b> / </b>';
+            }
+        }
+        $_SESSION['hierarchie_regroup'] .= '<br>';
+        $_SESSION['infos_etab'] = get_infos_etab();
+    }
+    // ── FIN FIX SESSION
 	if( (trim($_SESSION['hierarchie_regroup']) <> '') or (trim($_SESSION['infos_etab']) <> '') ){ 
 		$_SESSION['theme_manager'] = $theme_manager;
 		if(!isset($_SESSION['infos_data_entry']) && isset($GLOBALS['PARAM']['DATA_ENTRY_BY_USER']) && $GLOBALS['PARAM']['DATA_ENTRY_BY_USER']){
@@ -1550,48 +1591,91 @@ if(isset($_SESSION['list_themes_desact']) && in_array($_GET['theme'],$_SESSION['
 //Fin drapeau theme verrouill�
 //$theme_manager->set_theme_courant();
 //$theme_manager->set_classe();
-// === GUARD : éviter la requête avec ID vide (theme_manager->id NULL) ===
-// On log toujours ; mais on n'interrompt que si aucun theme GET disponible.
+// === RÉSOLUTION ID_THEME INTERNE ===
+// VOCABULAIRE CRITIQUE (ne pas confondre) :
+//   $_GET['theme']        = ID_THEME_SYSTEME  (ex: 9002, 1102) — identifiant menu/URL visible
+//   theme_manager->id     = ID de DICO_THEME  (ex: 90, 11)    — identifiant interne du dictionnaire
+//   theme_manager->list[] contient {'ID_THEME_SYSTEME'=>9002, 'ID'=>90, ...}
+//
+// theme_manager->id est NULL quand :
+//   1. charger_theme($appart) n'a trouvé aucun thème avec ce critère APPARTENANCE
+//   2. set_theme_courant() ne trouve pas ID_THEME_SYSTEME dans la liste chargée
+//
+// STRATÉGIE de résolution (3 niveaux) :
+//   Niveau 1 : theme_manager->id déjà résolu (cas nominal)
+//   Niveau 2 : set_id_from_id_thm_sys() dans la liste déjà chargée (ignore APPARTENANCE)
+//   Niveau 3 : requête SQL directe sur DICO_THEME_SYSTEME (sans filtre APPARTENANCE)
+
 $_qr_theme_id = $theme_manager->id ?? null;
+
 if (empty($_qr_theme_id)) {
-    $_log_null = date('Y-m-d H:i:s').';questionnaire.php;WARN_NULL_THEME_ID'
-        .';theme_get='.($_GET['theme']??'?')
-        .';type_ent_stat='.($_GET['type_ent_stat']??$_SESSION['type_ent_stat']??'?')
-        .';secteur='.($_SESSION['secteur']??'?')
-        .';theme_list_count='.(isset($theme_manager->list) ? count($theme_manager->list) : '?')
-        ."\n";
-    @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_null, FILE_APPEND);
-    error_log('[DIAG_S28] '.$_log_null);
-    // Si aucun theme GET → impossible de continuer
-    if (empty($_GET['theme'])) {
-        echo '<script type="text/Javascript">if(typeof $.unblockUI==="function") $.unblockUI();</script>';
-        require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
-        exit();
+    // --- Niveau 2 : chercher dans la liste déjà chargée, sans filtre APPARTENANCE ---
+    if (!empty($_GET['theme']) && isset($theme_manager->list) && is_array($theme_manager->list)) {
+        foreach ($theme_manager->list as $_thm_row) {
+            if (isset($_thm_row['ID_THEME_SYSTEME']) && $_thm_row['ID_THEME_SYSTEME'] == $_GET['theme']
+                && isset($_thm_row['ID']) && !empty($_thm_row['ID'])) {
+                $_qr_theme_id = (int)$_thm_row['ID'];
+                break;
+            }
+        }
     }
-    // Sinon : essayer de résoudre theme_manager->id depuis l'ID brut GET
-    // (cas : APPARTENANCE ne correspond pas → essai sans filtre)
-    $requete_fallback = "SELECT D_T.ID FROM DICO_THEME D_T
-                         JOIN DICO_THEME_SYSTEME D_T_S ON D_T_S.ID = D_T.ID
-                         WHERE D_T_S.ID_THEME_SYSTEME = ".intval($_GET['theme']).";";
-    $row_fb = $GLOBALS['conn_dico']->GetRow($requete_fallback);
-    if (!empty($row_fb['ID'])) {
-        $_qr_theme_id = (int)$row_fb['ID'];
-        $_log_fallback = date('Y-m-d H:i:s').';questionnaire.php;INFO_THEME_FALLBACK_RESOLVED'
-            .';theme_get='.($_GET['theme']??'?').';resolved_id='.$_qr_theme_id."\n";
-        @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_fallback, FILE_APPEND);
-    } else {
-        // Réellement introuvable — interrompre proprement
-        echo '<script type="text/Javascript">if(typeof $.unblockUI==="function") $.unblockUI();</script>';
-        echo '<div style="padding:20px;color:#c00;font-family:Arial">';
-        echo '<b>Thème '.htmlspecialchars($_GET['theme']).' introuvable dans le dictionnaire (type_ent_stat=';
-        echo htmlspecialchars($_GET['type_ent_stat']??$_SESSION['type_ent_stat']??'?').')</b><br>';
+
+    // --- Niveau 3 : si toujours vide, recharger sans filtre APPARTENANCE depuis la DB ---
+    if (empty($_qr_theme_id) && !empty($_GET['theme'])) {
+        // ATTENTION : ID_THEME_SYSTEME ≠ ID dans DICO_THEME
+        // ID_THEME_SYSTEME est la valeur de $_GET['theme'] (ex: 9002)
+        // ID est la clé interne de DICO_THEME (ex: 90) → c'est ce dont on a besoin
+        $requete_fallback = "SELECT D_T_S.ID
+                             FROM DICO_THEME_SYSTEME D_T_S
+                             WHERE D_T_S.ID_THEME_SYSTEME = ".intval($_GET['theme'])."
+                             AND D_T_S.ID_SYSTEME = ".(int)($_SESSION['secteur'] ?? 0)."
+                             LIMIT 1";
+        $row_fb = $GLOBALS['conn_dico']->GetRow($requete_fallback);
+        if (!empty($row_fb['ID'])) {
+            $_qr_theme_id = (int)$row_fb['ID'];
+            $_log_fallback = date('Y-m-d H:i:s').';questionnaire.php;INFO_THEME_L3_RESOLVED'
+                .';theme_sys='.($_GET['theme']??'?').';id_interne='.$_qr_theme_id
+                .';secteur='.($_SESSION['secteur']??'?')."\n";
+            @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_fallback, FILE_APPEND);
+            error_log('[DIAG_THEME] '.$_log_fallback);
+        }
+    }
+
+    // --- Toujours NULL : log diagnostique ---
+    if (empty($_qr_theme_id)) {
+        $_log_null = date('Y-m-d H:i:s').';questionnaire.php;ERR_THEME_INTROUVABLE'
+            .';theme_sys='.($_GET['theme']??'?')
+            .';type_ent_stat='.($_GET['type_ent_stat']??$_SESSION['type_ent_stat']??'?')
+            .';secteur='.($_SESSION['secteur']??'?')
+            .';list_count='.(isset($theme_manager->list) ? count($theme_manager->list) : '?')
+            ."\n";
+        @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_null, FILE_APPEND);
+        error_log('[DIAG_THEME] '.$_log_null);
+        // Sans theme GET → impossible de continuer
+        if (empty($_GET['theme'])) {
+            echo '<script type="text/Javascript">if(typeof jQuery!=="undefined"&&typeof jQuery.unblockUI==="function")jQuery.unblockUI();</script>';
+            require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
+            exit();
+        }
+        // Avec theme GET mais non trouvé en DB → afficher message clair
+        echo '<script type="text/Javascript">if(typeof jQuery!=="undefined"&&typeof jQuery.unblockUI==="function")jQuery.unblockUI();</script>';
+        echo '<div style="padding:20px;color:#c00;font-family:Arial;font-size:13px">';
+        echo '<b>Thème '.htmlspecialchars($_GET['theme']).' introuvable dans le dictionnaire.</b><br>';
+        echo '(secteur='.htmlspecialchars($_SESSION['secteur']??'?').' / type_ent_stat='.htmlspecialchars($_GET['type_ent_stat']??$_SESSION['type_ent_stat']??'?').')<br><br>';
         echo '<a href="saisie_donnees.php?val=choix_etablissement">&#8592; Retour à la liste des établissements</a>';
         echo '</div>';
         require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
         exit();
     }
+} else {
+    // Niveau 1 nominal — log pour traçabilité
+    $_log_ok = date('Y-m-d H:i:s').';questionnaire.php;INFO_THEME_OK'
+        .';theme_sys='.($_GET['theme']??'?').';id_interne='.$_qr_theme_id
+        .';secteur='.($_SESSION['secteur']??'?')."\n";
+    @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_ok, FILE_APPEND);
 }
-// Exposer $_qr_theme_id globalement pour instance_grille.php (qui sera inclus via require_once $curfile)
+
+// Exposer $_qr_theme_id globalement pour instance_grille.php (inclus via require_once $curfile)
 $GLOBALS['_qr_theme_id_resolved'] = $_qr_theme_id;
 
 $requete  = "SELECT ACTION_THEME 
