@@ -1,6 +1,6 @@
 # CONTEXT.md — StatEduc_burundi
 > Fichier de référence pour toute nouvelle session IA sur ce projet.
-> Mis à jour : 2026-08-15 | Branche active : `ak_app_ident`
+> Mis à jour : 2026-08-15 (session 2) | Branche active : `ak_app_ident`
 
 ---
 
@@ -105,6 +105,18 @@ StatEduc_burundi/
 
 ## 5. Fichiers CRITIQUES — règles d'intervention
 
+### CONCEPT ABSOLUMENT CRITIQUE : `ID_THEME_SYSTEME` ≠ `ID` (DICO_THEME)
+> **Ne jamais confondre ces deux identifiants — c'était la source de TOUS les problèmes de formulaire.**
+
+| Variable | Valeur exemple | Signification |
+|----------|---------------|---------------|
+| `$_GET['theme']` | `9002` | **ID_THEME_SYSTEME** — identifiant visible dans les menus/URL |
+| `theme_manager->id` | `90` | **ID interne de DICO_THEME** — identifiant du dictionnaire |
+| `DICO_THEME_SYSTEME.ID_THEME_SYSTEME` | `9002` | clé de menu (=`$_GET['theme']`) |
+| `DICO_THEME_SYSTEME.ID` | `90` | FK vers DICO_THEME.ID (= `theme_manager->id`) |
+
+**Règle :** `get_dico()`, `grille->__construct()` et `SELECT ACTION_THEME FROM DICO_THEME WHERE ID=?` prennent tous l'**ID interne** (ex: 90), jamais l'`ID_THEME_SYSTEME` (ex: 9002).
+
 ### `questionnaire.php` ⚠️
 **Ne jamais modifier sans comprendre :**
 - **Gate ligne ~1263 :** `if((trim($_SESSION['hierarchie_regroup']) <> '') or (trim($_SESSION['infos_etab']) <> ''))`
@@ -112,13 +124,25 @@ StatEduc_burundi/
   → **Le `require_once $curfile` (instance_grille.php) est HORS de ce gate** (ligne ~1622) — la grille est toujours instanciée.
 - **Bloc GET code_etab (~lignes 1126-1221) :** Peuple `$_SESSION['hierarchie_regroup']` et `$_SESSION['infos_etab']`.
   → N'est exécuté QUE si `$_GET['code_etab']` est présent dans l'URL.
-- **Fix session repopulation (ajouté cette session) :** Bloc inséré AVANT le gate :
+- **Fix session repopulation :** Bloc inséré AVANT le gate :
   → Si `$_SESSION['code_etab']` est en session mais `hierarchie_regroup`/`infos_etab` sont vides (reload sans GET code_etab),
     recharge les vars depuis la DB avant d'évaluer le gate.
+- **Résolution `$_qr_theme_id` (ID interne) — 3 niveaux :**
+  1. `theme_manager->id` (cas nominal, APPARTENANCE correspond)
+  2. Parcours de `$theme_manager->list[]` sans filtre APPARTENANCE
+  3. `SELECT D_T_S.ID FROM DICO_THEME_SYSTEME WHERE ID_THEME_SYSTEME=$_GET['theme'] AND ID_SYSTEME=$secteur`
+     ⚠️ **`D_T_S.ID` est l'ID interne** — ne pas confondre avec `D_T_S.ID_THEME_SYSTEME`
+
+### `server-side/classes/metier/grille.class.php` → `get_dico()` ⚠️
+- La requête FRAME filtre sur `B.APPARTENANCE = type_ent_stat`.
+- **Fix (session 2) :** Si FRAME = NULL avec filtre APPARTENANCE → passe 2 sans filtre APPARTENANCE.
+- Les zones (`DICO_ZONE`) sont filtrées sur `ID_SYSTEME` et `ACTIVER=1` — pas de filtre APPARTENANCE.
+- Constructeur `grille` signature : `__construct($code_etablissement, $code_annee, $id_theme_INTERNE, $id_systeme, $code_filtre="")`
 
 ### `server-side/instances/instance_grille.php` ⚠️
-- Utilise `$GLOBALS['_qr_theme_id_resolved']` en fallback pour `$id_theme` si `$theme_manager->id === null`.
-- Retourne immédiatement si `$id_theme` est vide (garde anti-crash).
+- Utilise `$GLOBALS['_qr_theme_id_resolved']` (ID interne) en priorité, fallback sur `$theme_manager->id`.
+- Guard : retourne si `$id_theme` vide (message clair).
+- **Guard (session 2) :** retourne si `$curobj_grille->template` vide après instanciation (FRAME non trouvé).
 - Constructeur `grille` signature : `__construct($code_etablissement, $code_annee, $id_theme, $id_systeme, $code_filtre="")`
 
 ### `api/fie/etabs_fie_ws.php` ⚠️
@@ -222,22 +246,29 @@ feat(api-fie): ajout pagination et filtre province dans etabs_fie_ws
 
 ## 10. État d'avancement au 2026-08-15
 
-### ✅ Résolus (sessions précédentes + session courante)
+### ✅ Résolus (toutes sessions)
 
 | Problème | Commit | Statut |
 |----------|--------|--------|
-| `etabs_fie_ws.php` retournait 500 (bootstrap ADOdb manquant) | `a4bca2e` | ✅ Résolu |
-| Spinner infini sur questionnaire.php | `b2c2836` | ✅ Résolu |
-| `theme_manager->id` null → crash instance_grille | `b2c2836` | ✅ Résolu |
-| Signature `syncFromApi()` incorrecte dans AdminController | `df8ed09` | ✅ Résolu |
-| URL endpoint incorrecte dans StatEducApiClient | `df8ed09` | ✅ Résolu |
-| **Formulaire ne s'affiche pas** (gate session vide au reload) | `df2e55a` | ✅ Résolu (à vérifier XAMPP) |
-| **Sync "API StatEduc inaccessible"** (startSyncLog avant ping, URL hardcodée) | `df2e55a` | ✅ Résolu (à vérifier XAMPP) |
-| **province/commune/zone = null** (JOIN TYPE_CHAINE_REGROUPEMENT manquant) | `df2e55a` | ✅ Résolu (à vérifier XAMPP) |
+| `etabs_fie_ws.php` retournait 500 (bootstrap ADOdb manquant) | `a4bca2e` | ✅ |
+| Spinner infini sur questionnaire.php | `b2c2836` | ✅ |
+| `theme_manager->id` null → crash instance_grille | `b2c2836` | ✅ |
+| Signature `syncFromApi()` incorrecte dans AdminController | `df8ed09` | ✅ |
+| URL endpoint incorrecte dans StatEducApiClient | `df8ed09` | ✅ |
+| Gate session vide au reload (repopulation session) | `df2e55a` | ✅ |
+| Sync "API StatEduc inaccessible" (startSyncLog bloquant, URL hardcodée) | `df2e55a` | ✅ |
+| province/commune/zone = null (JOIN TYPE_CHAINE_REGROUPEMENT manquant) | `df2e55a` | ✅ |
+| CONTEXT.md créés pour les deux projets | `0aeeb54` | ✅ |
+| **FORMULAIRE ABSENT** : fallback SQL `ID_THEME_SYSTEME ≠ ID` corrigé (3 niveaux) | `14e640a` | ✅ (à tester XAMPP) |
+| **FRAME NULL** : passe 2 sans APPARTENANCE dans `get_dico()` | `14e640a` | ✅ (à tester XAMPP) |
+| Guard template vide dans `instance_grille.php` | `14e640a` | ✅ |
 
 ### ⏳ En attente de vérification (nécessite XAMPP)
 
-- `questionnaire.php?theme=1102&type_ent_stat=1` → formulaire doit s'afficher sans `code_etab` en GET
+- `questionnaire.php?theme=9002&code_etab=21422&type_ent_stat=2` → formulaire doit s'afficher
+- `questionnaire.php?theme=1102&type_ent_stat=1` → idem sans `code_etab` en GET
+- Si formulaire toujours absent : lire `moblogs/diag_questionnaire.log` et `moblogs/diag_grille.log`
+  (chercher `INFO_THEME_L3_RESOLVED`, `FRAME_FALLBACK2`, `ERR_TEMPLATE_VIDE`)
 - Sync depuis app_fie → doit afficher l'erreur réelle au lieu de "API inaccessible"
 - `etabs_fie_ws.php?page=1&per_page=1` → JSON doit avoir `province`/`commune`/`zone` non-null
 
