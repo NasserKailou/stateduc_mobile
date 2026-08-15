@@ -351,21 +351,27 @@ function fie_etabs_load_localisation_batch(array $codes_etab, $conn): array
     $in_list = implode(',', array_map('intval', $codes_etab));
 
     try {
-        // Même jointure que établissement.php val=liste_etablissement :
+        // Jointure identique à celle de questionnaire.php pour la hiérarchie :
         //   ETABLISSEMENT_REGROUPEMENT ER
-        //   JOIN REGROUPEMENT R       ON R.CODE_REGROUPEMENT      = ER.CODE_REGROUPEMENT
-        //   JOIN TYPE_REGROUPEMENT TR ON TR.CODE_TYPE_REGROUPEMENT = R.CODE_TYPE_REGROUPEMENT
-        //   JOIN HIERARCHIE H         ON H.CODE_TYPE_REGROUPEMENT  = TR.CODE_TYPE_REGROUPEMENT
+        //   JOIN REGROUPEMENT R            ON R.CODE_REGROUPEMENT            = ER.CODE_REGROUPEMENT
+        //   JOIN TYPE_REGROUPEMENT TR      ON TR.CODE_TYPE_REGROUPEMENT       = R.CODE_TYPE_REGROUPEMENT
+        //   JOIN HIERARCHIE H              ON H.CODE_TYPE_REGROUPEMENT        = TR.CODE_TYPE_REGROUPEMENT
+        //   JOIN TYPE_CHAINE_REGROUPEMENT TCR ON TCR.CODE_TYPE_CHAINE_REGROUPEMENT = H.CODE_TYPE_CHAINE_REGROUPEMENT
+        //
+        // On récupère tous les niveaux de tous les établissements de la page en un seul SELECT.
+        // DISTINCT sur (CODE_ETABLISSEMENT, NIVEAU_HIERARCHIE, CODE_REGROUPEMENT) pour éviter doublons
+        // si un même regroupement appartient à plusieurs chaînes.
         $sql = "
-            SELECT
+            SELECT DISTINCT
                 ER.CODE_ETABLISSEMENT,
                 R.CODE_REGROUPEMENT,
                 R.LIBELLE_REGROUPEMENT,
                 H.NIVEAU_HIERARCHIE
             FROM ETABLISSEMENT_REGROUPEMENT ER
-            JOIN REGROUPEMENT      R  ON R.CODE_REGROUPEMENT       = ER.CODE_REGROUPEMENT
-            JOIN TYPE_REGROUPEMENT TR ON TR.CODE_TYPE_REGROUPEMENT  = R.CODE_TYPE_REGROUPEMENT
-            JOIN HIERARCHIE        H  ON H.CODE_TYPE_REGROUPEMENT   = TR.CODE_TYPE_REGROUPEMENT
+            JOIN REGROUPEMENT              R   ON R.CODE_REGROUPEMENT              = ER.CODE_REGROUPEMENT
+            JOIN TYPE_REGROUPEMENT         TR  ON TR.CODE_TYPE_REGROUPEMENT        = R.CODE_TYPE_REGROUPEMENT
+            JOIN HIERARCHIE                H   ON H.CODE_TYPE_REGROUPEMENT         = TR.CODE_TYPE_REGROUPEMENT
+            JOIN TYPE_CHAINE_REGROUPEMENT  TCR ON TCR.CODE_TYPE_CHAINE_REGROUPEMENT = H.CODE_TYPE_CHAINE_REGROUPEMENT
             WHERE ER.CODE_ETABLISSEMENT IN ($in_list)
             ORDER BY ER.CODE_ETABLISSEMENT ASC, H.NIVEAU_HIERARCHIE DESC
         ";
@@ -374,13 +380,14 @@ function fie_etabs_load_localisation_batch(array $codes_etab, $conn): array
         if (!is_array($rows)) return [];
 
         foreach ($rows as $row) {
-            $code = (int)$row['CODE_ETABLISSEMENT'];
-            $niv  = (int)$row['NIVEAU_HIERARCHIE'];
-            // Garder uniquement le premier enregistrement par niveau (si plusieurs chaines)
+            $code = (int)($row['CODE_ETABLISSEMENT'] ?? 0);
+            $niv  = (int)($row['NIVEAU_HIERARCHIE'] ?? 0);
+            if ($code === 0 || $niv === 0) continue;
+            // Garder uniquement le premier enregistrement par niveau (priorité : premier retourné)
             if (!isset($result[$code][$niv])) {
                 $result[$code][$niv] = [
-                    'code'    => (int)$row['CODE_REGROUPEMENT'],
-                    'libelle' => trim((string)$row['LIBELLE_REGROUPEMENT']),
+                    'code'    => (int)($row['CODE_REGROUPEMENT'] ?? 0),
+                    'libelle' => trim((string)($row['LIBELLE_REGROUPEMENT'] ?? '')),
                 ];
             }
         }
@@ -443,6 +450,19 @@ foreach ((array)$rows as $row) {
 
 $loc_batch    = fie_etabs_load_localisation_batch($codes_page, $GLOBALS['conn']);
 $niv_chaine   = fie_etabs_get_niveaux_chaine($GLOBALS['conn']);
+
+// ── Diagnostic localisation (premier établissement de la page) ────────────
+if (!empty($codes_page)) {
+    $first_code = $codes_page[0];
+    $_loc_diag = '[FIE_ETABS_LOC] page='.$page
+        .';per_page='.$per_page
+        .';codes_count='.count($codes_page)
+        .';first_code='.$first_code
+        .';niv_chaine='.json_encode($niv_chaine)
+        .';niveaux_etab='.json_encode($loc_batch[$first_code] ?? [])
+        .';loc_built='.json_encode(fie_etabs_build_loc_struct($loc_batch[$first_code] ?? [], $niv_chaine));
+    error_log($_loc_diag);
+}
 
 // ── Construction de la réponse ────────────────────────────────────────────────
 $etablissements = [];

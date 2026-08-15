@@ -1260,6 +1260,47 @@ if(!isset($_GET['tmis'])){
 	if(isset($GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB']) && isset($GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB'][$_SESSION['secteur']]) && $GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB'][$_SESSION['secteur']] <> ''){
 	 	$style_infos_etab = ' style="'.$GLOBALS['PARAM']['SECTEUR_STYLE_INFOS_ETAB'][$_SESSION['secteur']].'"';
 	}
+	// ── FIX SESSION : si code_etab est en session mais hierarchie_regroup/infos_etab vides
+    // (session fraîche, rechargement page sans code_etab dans GET), on repopule depuis DB.
+    if( isset($_SESSION['code_etab']) && $_SESSION['code_etab'] <> ''
+        && trim($_SESSION['hierarchie_regroup'] ?? '') === ''
+        && trim($_SESSION['infos_etab'] ?? '') === ''
+        && !isset($_GET['tmis'])
+    ){
+        $_log_sess_fix = date('Y-m-d H:i:s').';questionnaire.php;INFO_REPOP_SESSION'
+            .';code_etab='.($_SESSION['code_etab']).';theme='.($_GET['theme']??'?')."\n";
+        @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_sess_fix, FILE_APPEND);
+        // Repopuler hierarchie_regroup et infos_etab depuis le code_etab en session
+        $conn = $GLOBALS['conn'];
+        $GLOBALS['code_etab'] = $_SESSION['code_etab'];
+        // Requête hiérarchie identique à celle du bloc code_etab (ligne ~1182)
+        $requete_rp = 'SELECT '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'
+                    FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].', '.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['HIERARCHIE'].','.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' 
+                    WHERE '.$GLOBALS['PARAM']['REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'
+                    AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'
+                    AND  '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'='.$GLOBALS['PARAM']['REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'
+                    AND  '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].'='.$_SESSION['code_etab'].'
+                    AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.$_SESSION['chaine'].'
+                    AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].'=1
+                    AND  '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].'='.$_SESSION['secteur'];
+        $_SESSION['code_regroupement'] = $conn->GetOne($requete_rp);
+        // Nombre de niveaux de la chaîne
+        $requete_niv_rp = 'SELECT COUNT(*) FROM '.$GLOBALS['PARAM']['HIERARCHIE'].'
+                            WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$_SESSION['chaine'];
+        $niveau_rp = $conn->GetOne($requete_niv_rp) - 1;
+        $arbre_rp = new arbre($_SESSION['chaine']);
+        $hierarchie_rp = $arbre_rp->getparentsid($niveau_rp, $_SESSION['code_regroupement'], $_SESSION['chaine']);
+        $_SESSION['hierarchie_regroup'] = '';
+        if(is_array($hierarchie_rp)) foreach($hierarchie_rp as $i_rp => $h_rp) {
+            $_SESSION['hierarchie_regroup'] .= $h_rp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+            if($i_rp < (count($hierarchie_rp)-1)) {
+                $_SESSION['hierarchie_regroup'] .= '<b> / </b>';
+            }
+        }
+        $_SESSION['hierarchie_regroup'] .= '<br>';
+        $_SESSION['infos_etab'] = get_infos_etab();
+    }
+    // ── FIN FIX SESSION
 	if( (trim($_SESSION['hierarchie_regroup']) <> '') or (trim($_SESSION['infos_etab']) <> '') ){ 
 		$_SESSION['theme_manager'] = $theme_manager;
 		if(!isset($_SESSION['infos_data_entry']) && isset($GLOBALS['PARAM']['DATA_ENTRY_BY_USER']) && $GLOBALS['PARAM']['DATA_ENTRY_BY_USER']){
