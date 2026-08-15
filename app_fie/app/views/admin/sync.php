@@ -57,10 +57,10 @@ require BASE_PATH . '/app/views/layouts/header.php';
                     <i class="fa-solid fa-circle-check text-success me-1"></i>Dernière sync réussie
                 </div>
                 <?php if ($lastSuccess): ?>
-                <div class="fw-bold"><?= date('d/m/Y à H:i', strtotime($lastSuccess['created_at'])) ?></div>
+                <div class="fw-bold"><?= date('d/m/Y à H:i', strtotime($lastSuccess['started_at'])) ?></div>
                 <div class="small text-muted">
-                    Insérés : <?= (int)($lastSuccess['nb_inserted'] ?? 0) ?> |
-                    Mis à jour : <?= (int)($lastSuccess['nb_updated'] ?? 0) ?>
+                    Insérés : <?= (int)($lastSuccess['inserted'] ?? 0) ?> |
+                    Mis à jour : <?= (int)($lastSuccess['updated'] ?? 0) ?>
                 </div>
                 <?php else: ?>
                 <div class="text-muted">Aucune synchronisation réussie</div>
@@ -125,30 +125,38 @@ require BASE_PATH . '/app/views/layouts/header.php';
                 <?php foreach ($logs as $log): ?>
                 <tr>
                     <td class="ps-3 text-nowrap small">
-                        <?= date('d/m/Y H:i', strtotime($log['created_at'])) ?>
+                        <?= date('d/m/Y H:i', strtotime($log['started_at'])) ?>
                     </td>
                     <td>
-                        <span class="badge bg-<?= ($log['source'] ?? '') === 'api' ? 'primary' : 'success' ?>">
-                            <i class="fa-solid fa-<?= ($log['source'] ?? '') === 'api' ? 'cloud' : 'file-excel' ?> me-1"></i>
-                            <?= SecurityHelper::e($log['source'] ?? '—') ?>
+                        <span class="badge bg-<?= ($log['source_type'] ?? '') === 'api_stateduc' ? 'primary' : 'success' ?>">
+                            <i class="fa-solid fa-<?= ($log['source_type'] ?? '') === 'api_stateduc' ? 'cloud' : 'file-excel' ?> me-1"></i>
+                            <?= SecurityHelper::e($log['source_type'] ?? '—') ?>
                         </span>
                     </td>
                     <td class="text-center">
-                        <?php if (($log['statut'] ?? '') === 'succes'): ?>
+                        <?php if (($log['status'] ?? '') === 'success'): ?>
                         <span class="badge bg-success">
                             <i class="fa-solid fa-check me-1"></i>Succès
                         </span>
-                        <?php elseif (($log['statut'] ?? '') === 'echec'): ?>
+                        <?php elseif (($log['status'] ?? '') === 'error'): ?>
                         <span class="badge bg-danger">
-                            <i class="fa-solid fa-xmark me-1"></i>Échec
+                            <i class="fa-solid fa-xmark me-1"></i>Erreur
+                        </span>
+                        <?php elseif (($log['status'] ?? '') === 'partial'): ?>
+                        <span class="badge bg-warning text-dark">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i>Partiel
+                        </span>
+                        <?php elseif (($log['status'] ?? '') === 'running'): ?>
+                        <span class="badge bg-info text-dark">
+                            <i class="fa-solid fa-spinner fa-spin me-1"></i>En cours
                         </span>
                         <?php else: ?>
-                        <span class="badge bg-secondary"><?= SecurityHelper::e($log['statut'] ?? '—') ?></span>
+                        <span class="badge bg-secondary"><?= SecurityHelper::e($log['status'] ?? '—') ?></span>
                         <?php endif; ?>
                     </td>
-                    <td class="text-center"><?= (int)($log['nb_inserted'] ?? 0) ?></td>
-                    <td class="text-center"><?= (int)($log['nb_updated'] ?? 0) ?></td>
-                    <td class="pe-3 small text-muted"><?= SecurityHelper::e($log['message'] ?? '') ?></td>
+                    <td class="text-center"><?= (int)($log['inserted'] ?? 0) ?></td>
+                    <td class="text-center"><?= (int)($log['updated'] ?? 0) ?></td>
+                    <td class="pe-3 small text-muted"><?= SecurityHelper::e($log['details'] ?? '') ?></td>
                 </tr>
                 <?php endforeach; ?>
                 <?php endif; ?>

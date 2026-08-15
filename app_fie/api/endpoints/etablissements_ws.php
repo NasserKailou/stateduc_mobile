@@ -59,7 +59,7 @@ $params = [$actif];
 if (!empty($_GET['province'])) { $where .= ' AND province = ?';  $params[] = $_GET['province']; }
 if (!empty($_GET['secteur']))  { $where .= ' AND code_type_secteur_ens = ?'; $params[] = (int)$_GET['secteur']; }
 if (!empty($_GET['updated_since'])) {
-    $where  .= ' AND modifie_le >= ?';
+    $where  .= ' AND stateduc_updated_at >= ?';
     $params[] = $_GET['updated_since'];
 }
 
@@ -68,7 +68,8 @@ $total = (int)Database::fetchScalar("SELECT COUNT(*) FROM etablissements_miroir 
 $rows  = Database::fetchAll(
     "SELECT code_etablissement, nom_etablissement, province, commune,
             zone_admin, colline, code_type_secteur_ens, code_type_milieu,
-            chaine_localisation, code_ecole_pays, actif, modifie_le
+            chaine_localisation, code_ecole_pays, actif,
+            synced_at, stateduc_updated_at
      FROM etablissements_miroir
      WHERE $where
      ORDER BY nom_etablissement

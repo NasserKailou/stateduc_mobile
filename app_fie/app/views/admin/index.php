@@ -95,14 +95,14 @@ require BASE_PATH . '/app/views/layouts/header.php';
 
 <!-- ── Info synchronisation ──────────────────────────────────────────────── -->
 <?php if ($lastSync): ?>
-<div class="alert alert-<?= ($lastSync['statut'] ?? '') === 'succes' ? 'success' : 'warning' ?> d-flex align-items-center gap-2 mb-4">
-    <i class="fa-solid fa-<?= ($lastSync['statut'] ?? '') === 'succes' ? 'circle-check' : 'triangle-exclamation' ?>"></i>
+<div class="alert alert-<?= ($lastSync['status'] ?? '') === 'success' ? 'success' : (($lastSync['status'] ?? '') === 'error' ? 'danger' : 'warning') ?> d-flex align-items-center gap-2 mb-4">
+    <i class="fa-solid fa-<?= ($lastSync['status'] ?? '') === 'success' ? 'circle-check' : 'triangle-exclamation' ?>"></i>
     <span>
         Dernière synchronisation :
-        <strong><?= SecurityHelper::e(date('d/m/Y à H:i', strtotime($lastSync['created_at']))) ?></strong>
-        — Statut : <strong><?= SecurityHelper::e($lastSync['statut'] ?? 'inconnu') ?></strong>
-        <?php if (isset($lastSync['message'])): ?>
-        — <?= SecurityHelper::e($lastSync['message']) ?>
+        <strong><?= SecurityHelper::e(date('d/m/Y à H:i', strtotime($lastSync['started_at']))) ?></strong>
+        — Statut : <strong><?= SecurityHelper::e($lastSync['status'] ?? 'inconnu') ?></strong>
+        <?php if (!empty($lastSync['details'])): ?>
+        — <?= SecurityHelper::e($lastSync['details']) ?>
         <?php endif; ?>
     </span>
 </div>

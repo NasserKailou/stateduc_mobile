@@ -47,7 +47,7 @@ class AdminController
                 "SELECT COUNT(*) FROM eleves"
             ),
             'inscriptions'   => (int)Database::fetchScalar(
-                "SELECT COUNT(*) FROM inscriptions WHERE statut = 'actif'"
+                "SELECT COUNT(*) FROM inscriptions WHERE statut = 'inscrit'"
             ),
             'doublons'       => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM eleves WHERE doublon_suspect = 1"
@@ -55,7 +55,7 @@ class AdminController
         ];
 
         $lastSync = Database::fetchOne(
-            "SELECT * FROM sync_log ORDER BY created_at DESC LIMIT 1"
+            "SELECT * FROM sync_log ORDER BY started_at DESC LIMIT 1"
         );
 
         $pendingAggregats = (int)Database::fetchScalar(
@@ -72,11 +72,11 @@ class AdminController
     public function syncStatus(): void
     {
         $logs = Database::fetchAll(
-            "SELECT * FROM sync_log ORDER BY created_at DESC LIMIT 20"
+            "SELECT * FROM sync_log ORDER BY started_at DESC LIMIT 20"
         );
 
         $lastSuccess = Database::fetchOne(
-            "SELECT * FROM sync_log WHERE statut = 'succes' ORDER BY created_at DESC LIMIT 1"
+            "SELECT * FROM sync_log WHERE status = 'success' ORDER BY started_at DESC LIMIT 1"
         );
 
         $etablissementsCount = (int)Database::fetchScalar(

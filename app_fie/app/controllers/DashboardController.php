@@ -31,7 +31,7 @@ class DashboardController
         $kpis = [
             'total_eleves'     => (int)Database::fetchScalar("SELECT COUNT(*) FROM eleves"),
             'inscriptions_an'  => (int)Database::fetchScalar(
-                "SELECT COUNT(*) FROM inscriptions WHERE statut = 'actif'"
+                "SELECT COUNT(*) FROM inscriptions WHERE statut = 'inscrit'"
             ),
             'etablissements'   => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM etablissements_miroir WHERE actif = 1"
@@ -44,7 +44,7 @@ class DashboardController
         // Répartition par secteur d'enseignement
         $bySecteur = Database::fetchAll(
             "SELECT i.code_type_secteur_ens, COUNT(*) as nb
-             FROM inscriptions i WHERE i.statut = 'actif'
+             FROM inscriptions i WHERE i.statut = 'inscrit'
              GROUP BY i.code_type_secteur_ens ORDER BY nb DESC"
         );
 
@@ -52,7 +52,7 @@ class DashboardController
         $bySexe = Database::fetchAll(
             "SELECT e.sexe, COUNT(*) as nb FROM inscriptions i
              JOIN eleves e ON e.id = i.eleve_id
-             WHERE i.statut = 'actif' GROUP BY e.sexe"
+             WHERE i.statut = 'inscrit' GROUP BY e.sexe"
         );
 
         // Répartition par province (top 10)
@@ -61,7 +61,7 @@ class DashboardController
              FROM inscriptions i
              JOIN eleves e ON e.id = i.eleve_id
              JOIN etablissements_miroir em ON em.code_etablissement = i.code_etablissement
-             WHERE i.statut = 'actif'
+             WHERE i.statut = 'inscrit'
              GROUP BY em.province ORDER BY nb DESC LIMIT 10"
         );
 
