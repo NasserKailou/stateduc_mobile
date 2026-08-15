@@ -1,23 +1,24 @@
 -- =============================================================================
 -- FIE — Seed utilisateurs de test (Phase 3)
 -- 5 profils couvrant toute la hiérarchie RBAC
--- Mots de passe hachés avec bcrypt cost 12 (password_hash PHP)
+-- Hashes bcrypt cost 12 RÉELS générés avec bcrypt (Python/PHP compatibles)
+-- ($2b$ Python == $2y$ PHP pour password_verify())
 --
 -- ┌─────────────────────┬──────────────────────┬────────────────────────┐
 -- │ Login               │ Mot de passe (clair) │ Rôle                   │
 -- ├─────────────────────┼──────────────────────┼────────────────────────┤
 -- │ admin.fie           │ AdminFIE2026!        │ super_admin            │
--- │ admin.bujumbura     │ ProvinceFIE2026!     │ admin_provincial       │
--- │ gest.lycee.mwm      │ GestEtab2026!        │ gestionnaire_etab      │
--- │ enseignant.dupont   │ Enseignant2026!      │ enseignant             │
--- │ consultant.mineduc  │ Consultant2026!      │ consultant             │
+-- │ admin.bujumbura     │ BujumburaFIE!        │ admin_provincial       │
+-- │ gest.lycee.mwm      │ LyceeFIE2026!        │ gestionnaire_etab      │
+-- │ enseignant.dupont   │ EnseignFIE26!        │ enseignant             │
+-- │ consultant.mineduc  │ ConsultFIE26!        │ consultant             │
 -- └─────────────────────┴──────────────────────┴────────────────────────┘
 --
--- IMPORTANT : Ces hashes sont valides pour PHP password_hash() bcrypt cost 12.
--- Pour regénérer :
---   php -r "echo password_hash('VotreMotDePasse', PASSWORD_BCRYPT, ['cost'=>12]);"
---
--- Les hashes ci-dessous ont été pré-calculés avec bcrypt cost 12.
+-- Hashes générés avec bcrypt cost 12 (compatibles password_verify() PHP 8).
+-- Pour vérifier en PHP :
+--   var_dump(password_verify('AdminFIE2026!', '$2b$12$VGP/y4X1XA6FxFEFzbEvfu...'));
+-- Pour regénérer en PHP :
+--   php -r "echo password_hash('NouveauMotDePasse', PASSWORD_BCRYPT, ['cost'=>12]);"
 -- =============================================================================
 
 -- Désactiver vérifications FK temporairement
@@ -33,16 +34,17 @@ DELETE FROM fie_users WHERE login IN (
 );
 
 -- =============================================================================
--- 1. SUPER ADMIN — Administrateur national
+-- 1. SUPER ADMIN — Administrateur national FIE
 --    Accès : TOTAL — toutes provinces, toutes fonctions
 --    Mot de passe : AdminFIE2026!
+--    Hash bcrypt cost 12 (réel) :
 -- =============================================================================
 INSERT INTO fie_users (
     login, password_hash, nom, prenoms, role,
     province_code, actif, created_at
 ) VALUES (
     'admin.fie',
-    '$2y$12$TqKXK8vbHxaXGzBk.4vOsOl/VXFwkqXvD1k5Y.QnGlFAeJZQKUXGy',
+    '$2b$12$VGP/y4X1XA6FxFEFzbEvfuUiw2uHtJLGK/2LSIvmjAjfkacXYbApS',
     'NDAYISHIMIYE',
     'Adolphe',
     'super_admin',
@@ -52,16 +54,17 @@ INSERT INTO fie_users (
 );
 
 -- =============================================================================
--- 2. ADMIN PROVINCIAL — Administrateur de la province de Bujumbura Mairie
---    Accès : Province Bujumbura Mairie uniquement
---    Mot de passe : ProvinceFIE2026!
+-- 2. ADMIN PROVINCIAL — Administrateur province Bujumbura Mairie
+--    Accès : Province BJM uniquement — inscription, recherche, modif, audit
+--    Mot de passe : BujumburaFIE!
+--    Hash bcrypt cost 12 (réel) :
 -- =============================================================================
 INSERT INTO fie_users (
     login, password_hash, nom, prenoms, role,
     province_code, actif, created_at
 ) VALUES (
     'admin.bujumbura',
-    '$2y$12$8m6bVz9yR1ZP.Xk3AeF1XOjvWqHp7NGd8kR0nPJiVQ5sWe.0/Bpem',
+    '$2b$12$jQxo5BIHbYMNL7FYDAm9Fu8M1N3w427Ca.bfvIfJ2VwrFZeS5w26y',
     'HAKIZIMANA',
     'Pierre-Claver',
     'admin_provincial',
@@ -71,16 +74,17 @@ INSERT INTO fie_users (
 );
 
 -- =============================================================================
--- 3. GESTIONNAIRE D'ÉTABLISSEMENT — Responsable du Lycée Municipal de Muramvya
---    Accès : Son établissement uniquement
---    Mot de passe : GestEtab2026!
+-- 3. GESTIONNAIRE D'ÉTABLISSEMENT — Lycée Municipal de Muramvya
+--    Accès : Inscription, recherche, modification — son établissement
+--    Mot de passe : LyceeFIE2026!
+--    Hash bcrypt cost 12 (réel) :
 -- =============================================================================
 INSERT INTO fie_users (
     login, password_hash, nom, prenoms, role,
     province_code, actif, created_at
 ) VALUES (
     'gest.lycee.mwm',
-    '$2y$12$Kp2qLYiZJYX7N9RpFZ.CAOiKjUn6Cs7ND1V8a8LZKvvFcwdFXG8Me',
+    '$2b$12$GlDgu0HMuRigM3LHecWoRe8Z7qQUEtUjMskFeN7YdcTo1wKRmLjt2',
     'NZEYIMANA',
     'Jeanne',
     'gestionnaire_etab',
@@ -90,16 +94,17 @@ INSERT INTO fie_users (
 );
 
 -- =============================================================================
--- 4. ENSEIGNANT — Agent de saisie des inscriptions
---    Accès : Saisie et consultation — pas d'administration
---    Mot de passe : Enseignant2026!
+-- 4. ENSEIGNANT — Agent de saisie des inscriptions, province Gitega
+--    Accès : Inscription + recherche uniquement — pas d'administration
+--    Mot de passe : EnseignFIE26!
+--    Hash bcrypt cost 12 (réel) :
 -- =============================================================================
 INSERT INTO fie_users (
     login, password_hash, nom, prenoms, role,
     province_code, actif, created_at
 ) VALUES (
     'enseignant.dupont',
-    '$2y$12$dNSjXpO5qVr8Lzm4MhFcCe2kQhHwYgZ6nQfT3uJ5VpJHdM8bKXXiq',
+    '$2b$12$kxKTMJRglg2dFGl/d6HV.OTbpkQj9KuDvQDYY.KOjqdCKvWWqYz5a',
     'NIYONGABO',
     'Jean-Paul',
     'enseignant',
@@ -109,16 +114,17 @@ INSERT INTO fie_users (
 );
 
 -- =============================================================================
--- 5. CONSULTANT — Accès lecture seule (rapports, tableaux de bord)
---    Accès : Consultation uniquement, aucune modification
---    Mot de passe : Consultant2026!
+-- 5. CONSULTANT MENERS — Accès lecture seule (rapports, tableaux de bord)
+--    Accès : Recherche + consultation uniquement, aucune modification
+--    Mot de passe : ConsultFIE26!
+--    Hash bcrypt cost 12 (réel) :
 -- =============================================================================
 INSERT INTO fie_users (
     login, password_hash, nom, prenoms, role,
     province_code, actif, created_at
 ) VALUES (
     'consultant.mineduc',
-    '$2y$12$xHv7bFR2s8TzWq0YOLc3QeJi5gNmKdP1sAeGh9vUIQ4pLyM0kXBiC',
+    '$2b$12$0HTU.8VlCdpmrGRtzRPmDO0rSLEPIRkCQbjsZ9VdLkgLQHi..YKYG',
     'KABURA',
     'Marie-Louise',
     'consultant',
@@ -131,7 +137,7 @@ INSERT INTO fie_users (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =============================================================================
--- Vérification
+-- Vérification post-import
 -- =============================================================================
 SELECT id, login, nom, prenoms, role, province_code, actif
 FROM fie_users
@@ -154,9 +160,8 @@ ORDER BY id;
 -- api_client          |     ❌      |     ❌    |  ❌   |  ❌  |  ❌   |  ❌
 -- =============================================================================
 --
--- NOTE SUR LES HASHES :
--- Ces hashes bcrypt sont des valeurs de démonstration.
--- En production, regénérez OBLIGATOIREMENT avec :
---   php -r "echo password_hash('NouveauMotDePasse', PASSWORD_BCRYPT, ['cost'=>12]);"
--- et remplacez les valeurs ci-dessus avant déploiement.
+-- NOTE COMPATIBILITÉ :
+-- PHP password_verify() accepte indifféremment $2b$ (Python/OpenBSD) et $2y$ (PHP).
+-- Les hashes ci-dessus sont donc 100% compatibles avec AuthController.php.
+-- Référence : https://www.php.net/manual/fr/function.password-verify.php
 -- =============================================================================
