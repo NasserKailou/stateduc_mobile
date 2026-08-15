@@ -10,6 +10,7 @@ class StatEducApiClient
     private string $baseUrl;
     private string $token;
     private int    $timeout;
+    public  string $lastError = '';  // Dernière erreur pour diagnostic
 
     public function __construct(
         string $baseUrl  = STATEDUC_API_BASE_URL,
@@ -36,7 +37,9 @@ class StatEducApiClient
             'per_page' => STATEDUC_SYNC_PAGE_SIZE,
         ];
         $queryParams = array_merge($defaultParams, $params);
-        $url = $this->baseUrl . '/app_fie/api/stateduc/etabs_fie_ws.php?' . http_build_query($queryParams);
+        // L'endpoint réel est dans StatEduc_burundi/api/fie/etabs_fie_ws.php
+        // (et non dans app_fie/api/stateduc/ qui est le proxy local)
+        $url = $this->baseUrl . '/StatEduc_burundi/api/fie/etabs_fie_ws.php?' . http_build_query($queryParams);
 
         $ch = curl_init($url);
         curl_setopt_array($ch, [
@@ -96,8 +99,10 @@ class StatEducApiClient
     {
         try {
             $data = $this->getEtablissements(['per_page' => 1, 'page' => 1]);
+            $this->lastError = '';
             return $data !== null;
         } catch (Throwable $e) {
+            $this->lastError = $e->getMessage();
             return false;
         }
     }

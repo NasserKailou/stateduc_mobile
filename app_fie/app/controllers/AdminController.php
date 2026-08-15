@@ -105,10 +105,11 @@ class AdminController
         $perPage  = (int)($_POST['per_page'] ?? 100);
         $province = $_POST['province'] ?? null;
 
-        $sync   = new SyncService();
-        $params = [];
-        if ($province)               $params['province']    = $province;
-        if ($mode === 'incremental') $params['incremental'] = true;
+        $sync = new SyncService();
+
+        // Paramètres individuels pour syncFromApi (signature correcte)
+        $updatedSince = ($mode === 'incremental') ? date('Y-m-d', strtotime('-30 days')) : null;
+        $secteur      = null;  // pas de filtre secteur depuis l'UI pour l'instant
 
         $this->log->info("Lancement synchronisation manuelle", [
             'user'     => $_SESSION['fie_user']['username'] ?? 'unknown',
@@ -116,13 +117,24 @@ class AdminController
             'province' => $province,
         ]);
 
-        $result = $sync->syncFromApi($params, $perPage);
+        try {
+            $result  = $sync->syncFromApi(
+                $updatedSince,
+                $secteur,
+                $province ?: null,
+                $_SESSION['fie_user']['username'] ?? 'admin-ui'
+            );
+            $ok      = true;
+            $message = "Synchronisation terminée : {$result['inserted']} insérés, {$result['updated']} mis à jour.";
+        } catch (Throwable $e) {
+            $ok      = false;
+            $message = "Synchronisation échouée : " . $e->getMessage();
+            $result  = ['inserted' => 0, 'updated' => 0, 'errors' => 1, 'total' => 0];
+        }
 
         SecurityHelper::jsonResponse([
-            'ok'      => $result['ok'],
-            'message' => $result['ok']
-                ? "Synchronisation terminée : {$result['inserted']} insérés, {$result['updated']} mis à jour."
-                : "Synchronisation échouée : " . ($result['error'] ?? 'erreur inconnue'),
+            'ok'      => $ok,
+            'message' => $message,
             'data'    => $result,
         ]);
     }
