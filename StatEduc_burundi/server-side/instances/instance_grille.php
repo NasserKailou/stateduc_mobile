@@ -81,16 +81,35 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 	// Instanciation de la classe
 	// === GUARD theme id vide ===
 	if (empty($id_theme)) {
-		// Log pour diagnostic
 		$_diag_ig = date('Y-m-d H:i:s').';instance_grille.php;ERR_ID_THEME_VIDE'
-		    .';theme_get='.($_GET['theme']??'?').';type_ent_stat='.($_SESSION['type_ent_stat']??'?')."\n";
+		    .';theme_sys='.($_GET['theme']??'?').';type_ent_stat='.($_SESSION['type_ent_stat']??'?')."\n";
 		@file_put_contents(dirname(dirname(dirname(__FILE__))).'/moblogs/diag_questionnaire.log', $_diag_ig, FILE_APPEND);
-		echo '<p style="color:red;padding:10px">Erreur : th\u00e8me non d\u00e9fini (id_theme vide).</p>';
-		echo '<script type="text/Javascript">if(typeof $.unblockUI==="function") $.unblockUI();</script>';
+		echo '<p style="color:red;padding:10px">Erreur : thème non défini (id_theme vide). Vérifier moblogs/diag_questionnaire.log</p>';
+		echo '<script type="text/Javascript">if(typeof jQuery!=="undefined"&&typeof jQuery.unblockUI==="function")jQuery.unblockUI();</script>';
 		return;
 	}
 	// === FIN GUARD ===
+	// --- Trace diagnostic avant instanciation ---
+	$_diag_ig_ok = date('Y-m-d H:i:s').';instance_grille.php;INSTANCIATION'
+	    .';theme_sys='.($_GET['theme']??'?').';id_theme_interne='.$id_theme
+	    .';code_etab='.($code_etablissement??'NULL').';secteur='.$id_systeme."\n";
+	@file_put_contents(dirname(dirname(dirname(__FILE__))).'/moblogs/diag_questionnaire.log', $_diag_ig_ok, FILE_APPEND);
     $curobj_grille		=	new grille($code_etablissement,$code_annee,$id_theme,$id_systeme,$code_filtre);
+	// --- Guard template vide (FRAME non trouvé dans DICO_THEME_SYSTEME) ---
+	if (empty($curobj_grille->template)) {
+		$_diag_ig_tpl = date('Y-m-d H:i:s').';instance_grille.php;ERR_TEMPLATE_VIDE'
+		    .';theme_sys='.($_GET['theme']??'?').';id_theme='.$id_theme.';secteur='.$id_systeme
+		    .';type_ent_stat='.($_SESSION['type_ent_stat']??'?')."\n";
+		@file_put_contents(dirname(dirname(dirname(__FILE__))).'/moblogs/diag_questionnaire.log', $_diag_ig_tpl, FILE_APPEND);
+		error_log('[DIAG_GRILLE] '.$_diag_ig_tpl);
+		echo '<div style="padding:15px;color:#c00;font-family:Arial;font-size:13px">';
+		echo '<b>Formulaire introuvable pour le thème '.(int)($_GET['theme']??0).'</b><br>';
+		echo '(id_interne='.$id_theme.' / secteur='.$id_systeme.' / type_ent_stat='.($_SESSION['type_ent_stat']??'?').')<br>';
+		echo 'Vérifier que DICO_THEME_SYSTEME contient une entrée FRAME non nulle pour ID='.$id_theme.' et ID_SYSTEME='.$id_systeme.'<br>';
+		echo '</div>';
+		echo '<script type="text/Javascript">if(typeof jQuery!=="undefined"&&typeof jQuery.unblockUI==="function")jQuery.unblockUI();</script>';
+		return;
+	}
 	//echo "<pre>";
 	//print_r($curobj_grille);
 	if(isset($_SESSION['tab_html_export']))	$curobj_grille->nb_lignes = $_SESSION['nbre_total_enr'];
