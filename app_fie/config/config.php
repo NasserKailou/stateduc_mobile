@@ -41,12 +41,27 @@ define('DB_PASS',    getenv('FIE_DB_PASS')    ?: '');       // XAMPP default (em
 define('DB_CHARSET', 'utf8mb4');
 
 // ─── API StatEduc (source de vérité des établissements) ─────────────────────
-// PRIORITÉ : fie_settings (DB) > variable d'env > constante ci-dessous.
-// La valeur ci-dessous n'est utilisée que si fie_settings est vide ET
-// que la variable d'env STATEDUC_API_URL n'est pas définie.
-// En développement local XAMPP : stateduc_burundi tourne sur le même serveur.
-define('STATEDUC_API_BASE_URL',  getenv('STATEDUC_API_URL')   ?: 'http://localhost:8085/stateduc_burundi');
-define('STATEDUC_API_TOKEN',     getenv('STATEDUC_API_TOKEN') ?: '');  // vide = accès ouvert en dev
+// En production : définir la variable d'env STATEDUC_API_URL=http://stateduc.ins.bi/
+// En développement XAMPP : l'API tourne sur le même serveur que cette app.
+// L'endpoint réel est : <base>/StatEduc_burundi/api/fie/etabs_fie_ws.php
+//
+// AUTO-DETECT : si STATEDUC_API_URL n'est pas défini, on construit l'URL depuis
+// le serveur courant (même hôte + même port que cette requête HTTP).
+// Cela garantit que cURL peut joindre l'API StatEduc même en dev XAMPP multi-port.
+if (!defined('STATEDUC_API_BASE_URL')) {
+    $__stateduc_url = getenv('STATEDUC_API_URL') ?: '';
+    if ($__stateduc_url === '') {
+        // Construire depuis le serveur courant
+        $__proto  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $__host   = $_SERVER['HTTP_HOST'] ?? 'localhost';  // inclut le port si non-standard
+        $__stateduc_url = $__proto . '://' . $__host;
+    }
+    define('STATEDUC_API_BASE_URL', rtrim($__stateduc_url, '/'));
+    unset($__stateduc_url, $__proto, $__host);
+}
+// Token : sans token.php côté StatEduc_burundi, l'API est ouverte → token ignoré.
+// Si token.php existe dans StatEduc_burundi/api/fie/, mettre ici le même token.
+define('STATEDUC_API_TOKEN',     getenv('STATEDUC_API_TOKEN') ?: '');
 define('STATEDUC_API_TIMEOUT',   30);
 define('STATEDUC_SYNC_PAGE_SIZE', 500);
 

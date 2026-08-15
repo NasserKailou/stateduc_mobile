@@ -1,6 +1,6 @@
 <?php
 	 require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
-	  // PHP 8: éviter le Warning 'already defined' — constante déjà définie dans common.php
+	  // PHP 8: avoid 'already defined' warning - constant already set in common.php
 	  if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
 	  $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 

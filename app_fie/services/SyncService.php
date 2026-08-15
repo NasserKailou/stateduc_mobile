@@ -43,14 +43,22 @@ class SyncService
         ?string $province     = null,
         ?string $triggeredBy  = 'system'
     ): array {
-        $this->syncLogId = $this->startSyncLog('api_stateduc', $triggeredBy);
         $summary = ['inserted' => 0, 'updated' => 0, 'errors' => 0, 'total' => 0, 'pages_done' => 0];
         $errorDetails = [];
 
+        // Démarrage du log (non bloquant : si la table sync_log est absente, on continue)
         try {
-            // Test de connectivité
+            $this->syncLogId = $this->startSyncLog('api_stateduc', $triggeredBy);
+        } catch (Throwable $eLog) {
+            $this->logger->warning("sync_log indisponible (table absente ?) : " . $eLog->getMessage());
+            $this->syncLogId = 0;
+        }
+
+        try {
+            // Test de connectivité — ping() capte l'erreur dans lastError
             if (!$this->apiClient->ping()) {
-                throw new RuntimeException('API StatEduc inaccessible');
+                $pingErr = $this->apiClient->lastError ?: 'connexion refusée ou timeout';
+                throw new RuntimeException('API StatEduc inaccessible : ' . $pingErr);
             }
 
             $page = 1;
@@ -392,23 +400,33 @@ with open($escJson, 'w', encoding='utf-8') as f:
 
     private function updateSyncLog(int $id, array $summary): void
     {
-        Database::query(
-            "UPDATE sync_log SET inserted=?, updated=?, errors=?, last_page=? WHERE id=?",
-            [$summary['inserted'], $summary['updated'], $summary['errors'],
-             $summary['pages_done'] ?? null, $id]
-        );
+        if ($id <= 0) return;
+        try {
+            Database::query(
+                "UPDATE sync_log SET inserted=?, updated=?, errors=?, last_page=? WHERE id=?",
+                [$summary['inserted'], $summary['updated'], $summary['errors'],
+                 $summary['pages_done'] ?? null, $id]
+            );
+        } catch (Throwable $e) {
+            $this->logger->warning("updateSyncLog échoué : " . $e->getMessage());
+        }
     }
 
     private function finishSyncLog(int $id, string $status, array $summary, array $errors): void
     {
-        $det = empty($errors) ? null : json_encode(array_slice($errors, 0, 100), JSON_UNESCAPED_UNICODE);
-        Database::query(
-            "UPDATE sync_log
-             SET status=?, ended_at=NOW(), total_records=?, inserted=?, updated=?, errors=?, details=?
-             WHERE id=?",
-            [$status, $summary['total'], $summary['inserted'], $summary['updated'],
-             $summary['errors'], $det, $id]
-        );
+        if ($id <= 0) return;
+        try {
+            $det = empty($errors) ? null : json_encode(array_slice($errors, 0, 100), JSON_UNESCAPED_UNICODE);
+            Database::query(
+                "UPDATE sync_log
+                 SET status=?, ended_at=NOW(), total_records=?, inserted=?, updated=?, errors=?, details=?
+                 WHERE id=?",
+                [$status, $summary['total'], $summary['inserted'], $summary['updated'],
+                 $summary['errors'], $det, $id]
+            );
+        } catch (Throwable $e) {
+            $this->logger->warning("finishSyncLog échoué : " . $e->getMessage());
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════════════

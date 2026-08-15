@@ -141,8 +141,7 @@ function recherche_libelle($code_libelle){
 			if( (isset($GLOBALS['PARAM']['LOG_BY_SCHOOL_USER']) and trim($GLOBALS['PARAM']['LOG_BY_SCHOOL_USER']) <> '') && (isset($GLOBALS['PARAM']['LOG_BY_SCHOOL_PASS']) and trim($GLOBALS['PARAM']['LOG_BY_SCHOOL_PASS']) <> '') ){
 				require_once $GLOBALS['SISED_PATH_LIB'] . 'connexion.inc.php';
 				require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
-				// PHP 8: éviter le Warning 'already defined' — constante déjà définie dans common.php
-				if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
+				if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER); // PHP 8: guard
 			
 				$requete        = ' SELECT '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].', '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT'].'
 									WHERE '.$GLOBALS['PARAM']['LOG_BY_SCHOOL_USER'].'=\''.$login.'\' AND '.$GLOBALS['PARAM']['LOG_BY_SCHOOL_PASS'].'=\''.$password.'\'';
@@ -353,8 +352,7 @@ function recherche_libelle($code_libelle){
 	function set_tab_session($cas, $langue){
 			
 			require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
-			// PHP 8: éviter le Warning 'already defined' — constante déjà définie dans common.php
-			if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
+			if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER); // PHP 8: guard
 			require_once $GLOBALS['SISED_PATH_LIB'] . 'connexion.inc.php';
 			$db                 = $GLOBALS['conn'];
 			switch($cas){
