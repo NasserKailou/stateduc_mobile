@@ -1,159 +1,151 @@
-<?php
-/**
- * FIE — Vue : Formulaire de connexion
- * Rendu par AuthController::loginForm()
- * Variables : $error (string|null), $username (string)
- */
-use App\Services\SecurityHelper;
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title ?? 'Connexion — FIE', ENT_QUOTES, 'UTF-8') ?></title>
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/fie.css">
     <meta name="robots" content="noindex, nofollow">
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W=="
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Charte FIE -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/fie.css">
+    <link rel="icon" href="<?= BASE_URL ?>/public/img/favicon.png" type="image/png">
 </head>
 <body>
 
-<div class="fie-auth-page">
-    <div class="fie-auth-card">
+<div class="fie-login-page">
+  <div class="fie-login-card">
 
-        <!-- Logo -->
-        <div class="fie-auth-logo">
-            <div class="fie-auth-flag" aria-hidden="true">
-                <span class="fie-auth-flag__red"></span>
-                <span class="fie-auth-flag__white"></span>
-                <span class="fie-auth-flag__green"></span>
-            </div>
-            <div class="fie-auth-logo__title">FIE</div>
-            <p class="fie-auth-logo__subtitle">
-                Fichier Informatisé des Élèves<br>
-                <small>SIGE Burundi — MENERS</small>
-            </p>
+    <!-- Logo / En-tête -->
+    <div class="text-center mb-4">
+      <div class="fie-auth-flag" aria-hidden="true">
+        <span class="fie-auth-flag__red"></span>
+        <span class="fie-auth-flag__white"></span>
+        <span class="fie-auth-flag__green"></span>
+      </div>
+      <div class="fie-login-logo-title">FIE</div>
+      <p class="fie-login-logo-sub mt-1 mb-0">
+        Fichier Informatisé des Élèves<br>
+        <small class="text-muted">SIGE Burundi — MENERS</small>
+      </p>
+    </div>
+
+    <h1 class="h5 text-center fw-semibold mb-4" style="color:#343a40">
+      <i class="fa-solid fa-right-to-bracket me-2" style="color:var(--fie-red)"></i>Connexion
+    </h1>
+
+    <!-- Message de déconnexion -->
+    <?php if (isset($_GET['deconnecte'])): ?>
+    <div class="alert alert-info d-flex align-items-center gap-2 py-2 small" role="alert">
+      <i class="fa-solid fa-circle-info flex-shrink-0"></i>
+      <span>Vous avez été déconnecté(e) avec succès.</span>
+    </div>
+    <?php endif; ?>
+
+    <!-- Message d'erreur -->
+    <?php if (!empty($error)): ?>
+    <div class="alert alert-danger d-flex align-items-start gap-2 py-2 small" role="alert">
+      <i class="fa-solid fa-circle-exclamation flex-shrink-0 mt-1"></i>
+      <span><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></span>
+    </div>
+    <?php endif; ?>
+
+    <!-- Formulaire de connexion -->
+    <form method="post" action="<?= BASE_URL ?>/connexion" novalidate>
+      <?= SecurityHelper::csrfField() ?>
+
+      <?php if (!empty($_GET['redirect'])): ?>
+      <input type="hidden" name="redirect"
+             value="<?= htmlspecialchars($_GET['redirect'], ENT_QUOTES, 'UTF-8') ?>">
+      <?php endif; ?>
+
+      <!-- Identifiant -->
+      <div class="mb-3">
+        <label for="username" class="form-label fw-medium">
+          <i class="fa-solid fa-user me-1 text-muted"></i>Identifiant
+          <span class="text-danger">*</span>
+        </label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-control<?= !empty($error) ? ' is-invalid' : '' ?>"
+          value="<?= htmlspecialchars($username ?? '', ENT_QUOTES, 'UTF-8') ?>"
+          autocomplete="username"
+          autofocus
+          required
+          placeholder="Votre identifiant FIE"
+          aria-required="true"
+        >
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="mb-4">
+        <label for="password" class="form-label fw-medium">
+          <i class="fa-solid fa-lock me-1 text-muted"></i>Mot de passe
+          <span class="text-danger">*</span>
+        </label>
+        <div class="input-group">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control<?= !empty($error) ? ' is-invalid' : '' ?>"
+            autocomplete="current-password"
+            required
+            placeholder="••••••••"
+            aria-required="true"
+          >
+          <button class="btn btn-outline-secondary" type="button" id="togglePwd"
+                  aria-label="Afficher/masquer le mot de passe" tabindex="-1">
+            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+          </button>
         </div>
+      </div>
 
-        <h1 class="fie-auth-title">Connexion</h1>
+      <!-- Soumettre -->
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg fw-semibold">
+          <i class="fa-solid fa-right-to-bracket me-2"></i>Se connecter
+        </button>
+      </div>
+    </form>
 
-        <!-- Message de déconnexion -->
-        <?php if (isset($_GET['deconnecte'])): ?>
-            <div class="fie-alert fie-alert--info" data-autohide="4000" role="alert">
-                <svg class="fie-alert__icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
-                             10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                </svg>
-                <div class="fie-alert__body">Vous avez été déconnecté(e).</div>
-            </div>
-        <?php endif; ?>
+    <!-- Mention légale -->
+    <p class="mt-4 mb-0 text-center small text-muted" style="line-height:1.5">
+      <i class="fa-solid fa-shield-halved me-1"></i>
+      Accès réservé aux agents autorisés.<br>
+      Conforme à la loi n°1/03-2026 sur la protection des données.
+    </p>
 
-        <!-- Erreur de connexion -->
-        <?php if ($error): ?>
-            <div class="fie-alert fie-alert--error" role="alert">
-                <svg class="fie-alert__icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48
-                             10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                </svg>
-                <div class="fie-alert__body">
-                    <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
-                </div>
-            </div>
-        <?php endif; ?>
+  </div><!-- /.fie-login-card -->
+</div><!-- /.fie-login-page -->
 
-        <!-- Formulaire -->
-        <form method="post" action="<?= BASE_URL ?>/connexion" class="fie-form" novalidate>
-            <?= SecurityHelper::csrfField() ?>
-
-            <?php if (!empty($_GET['redirect'])): ?>
-                <input type="hidden" name="redirect"
-                       value="<?= htmlspecialchars($_GET['redirect'], ENT_QUOTES, 'UTF-8') ?>">
-            <?php endif; ?>
-
-            <!-- Identifiant -->
-            <div class="fie-form-group">
-                <label for="username" class="fie-label fie-label--required">
-                    Identifiant
-                </label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    class="fie-input"
-                    value="<?= htmlspecialchars($username ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                    autocomplete="username"
-                    autofocus
-                    required
-                    placeholder="Votre identifiant FIE"
-                    aria-required="true"
-                >
-            </div>
-
-            <!-- Mot de passe -->
-            <div class="fie-form-group">
-                <label for="password" class="fie-label fie-label--required">
-                    Mot de passe
-                </label>
-                <div style="position:relative">
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="fie-input"
-                        autocomplete="current-password"
-                        required
-                        placeholder="••••••••"
-                        aria-required="true"
-                        style="padding-right: 2.8rem"
-                    >
-                    <!-- Bouton afficher/masquer mot de passe -->
-                    <button
-                        type="button"
-                        id="togglePwd"
-                        aria-label="Afficher/masquer le mot de passe"
-                        style="position:absolute;right:10px;top:50%;transform:translateY(-50%);
-                               background:none;border:none;cursor:pointer;color:var(--fie-gray-500);
-                               padding:4px;"
-                    >
-                        <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11
-                                     11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5
-                                     5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3
-                                     3-1.34 3-3-1.34-3-3-3z"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Soumettre -->
-            <button type="submit" class="fie-btn fie-btn--primary fie-btn--lg"
-                    style="width:100%;margin-top:var(--fie-space-2)">
-                Se connecter
-            </button>
-        </form>
-
-        <!-- Mention légale -->
-        <p style="margin-top:var(--fie-space-6);font-size:var(--fie-font-size-xs);
-                  color:var(--fie-gray-500);text-align:center;line-height:1.6">
-            Accès réservé aux agents autorisés.<br>
-            Conforme à la loi n°1/03-2026 sur la protection des données.
-        </p>
-
-    </div><!-- /.fie-auth-card -->
-</div><!-- /.fie-auth-page -->
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmU1EspL3xfC8wMw1ECNEkOsEHGU"
+        crossorigin="anonymous"></script>
 <script>
 (function() {
     var btn = document.getElementById('togglePwd');
     var pwd = document.getElementById('password');
+    var ico = document.getElementById('eyeIcon');
     if (!btn || !pwd) return;
     btn.addEventListener('click', function() {
-        var visible = pwd.type === 'text';
-        pwd.type = visible ? 'password' : 'text';
-        btn.setAttribute('aria-label',
-            visible ? 'Afficher le mot de passe' : 'Masquer le mot de passe');
+        var show = pwd.type === 'password';
+        pwd.type = show ? 'text' : 'password';
+        ico.className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+        btn.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
     });
 }());
 </script>
-
 </body>
 </html>

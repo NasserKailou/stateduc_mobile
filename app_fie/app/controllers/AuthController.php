@@ -1,17 +1,19 @@
 <?php
 /**
- * FIE — AuthController
- * Gestion connexion / déconnexion avec protection brute-force
- * Dépendances : SecurityHelper, config/Database.php
+ * app_fie/app/controllers/AuthController.php
+ * Gestion connexion / déconnexion.
+ *
+ * CORRECTIONS PHASE 1 :
+ *   - Suppression du namespace App\Controllers (pas de PSR-4 complet dans ce projet)
+ *   - Suppression des use App\... (autoloader simple)
+ *   - Colonne de connexion : `login` (conforme à schema.sql fie_users)
+ *     Ancienne erreur : utilisait `username` → SQL SELECT échouait silencieusement
+ *   - Session stockée dans $_SESSION['fie_user'] (clé cohérente avec SecurityHelper::isLoggedIn)
+ *   - Logger::info/warning : signature corrigée (1 seul argument string)
+ *   - MAX_LOGIN_ATTEMPTS / LOGIN_LOCKOUT_SECONDS désormais dans config.php
+ *   - Redirection post-login via SecurityHelper::safeRedirect()
+ *   - derniere_connexion renommé last_login_at (conforme schema.sql)
  */
-
-declare(strict_types=1);
-
-namespace App\Controllers;
-
-use App\Services\SecurityHelper;
-use App\Config\Database;
-use App\Services\Logger;
 
 class AuthController
 {
@@ -26,7 +28,7 @@ class AuthController
 
     public function loginForm(): void
     {
-        // Si déjà connecté, rediriger
+        // Si déjà connecté → tableau de bord
         if (SecurityHelper::isLoggedIn()) {
             header('Location: ' . BASE_URL . '/tableau-de-bord');
             exit;
@@ -34,7 +36,7 @@ class AuthController
 
         $page_title  = 'Connexion — FIE';
         $active_menu = '';
-        $error       = $_SESSION['auth_error']  ?? null;
+        $error       = $_SESSION['auth_error']    ?? null;
         $username    = $_SESSION['auth_username'] ?? '';
 
         unset($_SESSION['auth_error'], $_SESSION['auth_username']);
@@ -47,7 +49,7 @@ class AuthController
     public function login(): void
     {
         // Vérification CSRF
-        $token = $_POST['csrf_token'] ?? '';
+        $token = $_POST[FIE_CSRF_TOKEN_NAME] ?? ($_POST['csrf_token'] ?? '');
         if (!SecurityHelper::verifyCsrf($token)) {
             $_SESSION['auth_error'] = 'Jeton de sécurité invalide. Veuillez réessayer.';
             header('Location: ' . BASE_URL . '/connexion');
@@ -55,10 +57,10 @@ class AuthController
         }
 
         $username = trim($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $redirect = $_POST['redirect'] ?? '';
+        $password = $_POST['password']      ?? '';
+        $redirect = $_POST['redirect']      ?? '';
 
-        // Conserver le username en cas d'erreur
+        // Conserver le username en session (re-remplissage du champ après erreur)
         $_SESSION['auth_username'] = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
 
         if (empty($username) || empty($password)) {
@@ -67,27 +69,25 @@ class AuthController
             exit;
         }
 
-        // ── Vérification brute-force ───────────────────────────────────────
-        $lockKey  = 'bf_' . md5($username . SecurityHelper::clientIp());
-        $attempts = (int)($_SESSION[$lockKey . '_count'] ?? 0);
+        // ── Vérification brute-force (session) ────────────────────────────
+        $lockKey   = 'bf_' . md5($username . SecurityHelper::clientIp());
+        $attempts  = (int)($_SESSION[$lockKey . '_count'] ?? 0);
         $lockUntil = (int)($_SESSION[$lockKey . '_until'] ?? 0);
 
         if ($lockUntil > time()) {
             $wait = ceil(($lockUntil - time()) / 60);
-            $_SESSION['auth_error'] = "Compte temporairement bloqué. Réessayez dans $wait minute(s).";
-            $this->log->warning("Tentative de connexion en période de blocage", [
-                'username' => $username, 'ip' => SecurityHelper::clientIp()
-            ]);
+            $_SESSION['auth_error'] = "Compte temporairement bloqué. Réessayez dans {$wait} minute(s).";
+            $this->log->warning("Tentative connexion en période blocage | login=$username ip=" . SecurityHelper::clientIp());
             header('Location: ' . BASE_URL . '/connexion');
             exit;
         }
 
-        // ── Recherche de l'utilisateur ────────────────────────────────────
-        $db   = Database::getInstance();
-        $user = $db->fetchOne(
-            "SELECT * FROM fie_users WHERE username = ? AND actif = 1 LIMIT 1",
-            [$username]
-        );
+        // ── Recherche de l'utilisateur (colonne : login) ──────────────────
+        // CORRECTION : schéma SQL utilise `login`, pas `username`
+        $pdo  = Database::getInstance();
+        $stmt = $pdo->prepare("SELECT * FROM fie_users WHERE login = ? AND actif = 1 LIMIT 1");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
 
         if (!$user || !password_verify($password, $user['password_hash'])) {
             $attempts++;
@@ -96,9 +96,7 @@ class AuthController
             if ($attempts >= MAX_LOGIN_ATTEMPTS) {
                 $_SESSION[$lockKey . '_until'] = time() + LOGIN_LOCKOUT_SECONDS;
                 $_SESSION[$lockKey . '_count'] = 0;
-                $this->log->warning("Compte bloqué après $attempts tentatives", [
-                    'username' => $username, 'ip' => SecurityHelper::clientIp()
-                ]);
+                $this->log->warning("Compte bloqué après $attempts tentatives | login=$username");
                 $msg = "Trop de tentatives échouées. Compte bloqué "
                      . ceil(LOGIN_LOCKOUT_SECONDS / 60) . " minute(s).";
             } else {
@@ -108,9 +106,7 @@ class AuthController
             }
 
             $_SESSION['auth_error'] = $msg;
-            $this->log->warning("Échec de connexion", [
-                'username' => $username, 'ip' => SecurityHelper::clientIp(), 'attempts' => $attempts
-            ]);
+            $this->log->warning("Échec connexion | login=$username tentatives=$attempts");
             header('Location: ' . BASE_URL . '/connexion');
             exit;
         }
@@ -118,37 +114,38 @@ class AuthController
         // ── Connexion réussie ─────────────────────────────────────────────
         unset($_SESSION[$lockKey . '_count'], $_SESSION[$lockKey . '_until']);
 
-        // Régénérer l'ID de session (protection fixation)
+        // Régénérer l'ID de session (protection fixation de session)
         session_regenerate_id(true);
 
-        // Mise à jour de la dernière connexion
-        $db->query(
-            "UPDATE fie_users SET derniere_connexion = NOW() WHERE id = ?",
-            [$user['id']]
-        );
+        // Mise à jour last_login_at (conforme schema.sql)
+        $pdo->prepare(
+            "UPDATE fie_users SET last_login_at=NOW(), last_login_ip=?, failed_login_count=0, locked_until=NULL WHERE id=?"
+        )->execute([SecurityHelper::clientIp(), $user['id']]);
 
-        // Stocker l'identité en session
+        // ── Stocker l'identité en session ────────────────────────────────
+        // Clé 'fie_user' attendue par SecurityHelper::isLoggedIn()
         $_SESSION['fie_user'] = [
-            'id'       => $user['id'],
-            'username' => $user['username'],
-            'nom'      => $user['nom'],
-            'prenom'   => $user['prenom'],
+            'id'       => (int)$user['id'],
+            'username' => $user['login'],          // expose 'username' pour SecurityHelper::userLogin()
+            'nom'      => $user['nom'] . (isset($user['prenoms']) ? ' ' . $user['prenoms'] : ''),
             'role'     => $user['role'],
-            'province' => $user['province_code'] ?? null,
+            'province' => $user['province_perimetre'] ?? null,
+            'etab'     => $user['code_etablissement'] ?? null,
+            'must_change_password' => (bool)($user['must_change_password'] ?? false),
         ];
 
-        // Renouveler le jeton CSRF après connexion
+        // Renouveler le jeton CSRF
         SecurityHelper::renewCsrf();
 
-        $this->log->info("Connexion réussie", [
-            'user_id' => $user['id'], 'username' => $username
-        ]);
-
+        $this->log->info("Connexion réussie | login={$user['login']} id={$user['id']}");
         unset($_SESSION['auth_username']);
 
-        // Redirection post-connexion
-        $safe = $this->safeRedirect($redirect);
-        header('Location: ' . $safe);
+        // ── Redirection post-connexion ────────────────────────────────────
+        if (!empty($redirect) && str_starts_with($redirect, '/') && !str_starts_with($redirect, '//')) {
+            header('Location: ' . BASE_URL . $redirect);
+        } else {
+            header('Location: ' . BASE_URL . '/tableau-de-bord');
+        }
         exit;
     }
 
@@ -156,28 +153,12 @@ class AuthController
 
     public function logout(): void
     {
-        $userId = $_SESSION['fie_user']['id'] ?? null;
-        if ($userId) {
-            $this->log->info("Déconnexion", ['user_id' => $userId]);
-        }
+        $login = SecurityHelper::userLogin() ?? '(anonyme)';
+        $this->log->info("Déconnexion | login=$login");
 
         SecurityHelper::logout();
 
         header('Location: ' . BASE_URL . '/connexion?deconnecte=1');
         exit;
-    }
-
-    /* ── Helpers privés ──────────────────────────────────────────────────── */
-
-    /**
-     * Valide et retourne une URL de redirection sûre (interne uniquement).
-     */
-    private function safeRedirect(string $url): string
-    {
-        // N'autoriser que les chemins internes
-        if (!empty($url) && str_starts_with($url, '/') && !str_starts_with($url, '//')) {
-            return BASE_URL . $url;
-        }
-        return BASE_URL . '/tableau-de-bord';
     }
 }

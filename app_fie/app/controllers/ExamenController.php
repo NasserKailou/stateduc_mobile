@@ -1,13 +1,16 @@
 <?php
 /**
- * FIE — ExamenController (squelette)
- * Gère les résultats d'examens et de concours liés aux IUE.
- * À développer en phase 3.
+ * FIE — ExamenController
+ * Gère les résultats d'examens et concours liés aux IUE.
+ * CORRECTION Phase 1 :
+ *   - Suppression namespace App\Controllers et use App\Services\SecurityHelper
+ *   - Flash messages normalisés : $_SESSION['fie_flash_*']
+ *   - detail() : id lu via $_GET (pas de paramètre de signature)
  */
-declare(strict_types=1);
-namespace App\Controllers;
 
-use App\Services\SecurityHelper;
+declare(strict_types=1);
+
+require_once FIE_SVC_PATH . 'SecurityHelper.php';
 
 class ExamenController
 {
@@ -32,15 +35,17 @@ class ExamenController
 
     public function processNew(): void
     {
-        // TODO: Implémenter en phase 3
-        $_SESSION['flash_info'] = 'Module en cours de développement.';
+        // TODO : Implémenter la logique métier d'examen
+        $_SESSION['fie_flash_info'] = 'Module en cours de développement.';
         header('Location: ' . BASE_URL . '/examen');
         exit;
     }
 
     public function detail(): void
     {
-        $page_title  = 'Résultats d\'examen — FIE';
+        // CORRECTION : pas de paramètre dans la signature — id lu via $_GET
+        $id          = (int)($_GET['id'] ?? 0);
+        $page_title  = "Résultats d'examen — FIE";
         $active_menu = 'examen';
         require BASE_PATH . '/app/views/examen/detail.php';
     }

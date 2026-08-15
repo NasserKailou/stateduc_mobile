@@ -1,13 +1,16 @@
 <?php
 /**
- * FIE — MouvementController (squelette)
+ * FIE — MouvementController
  * Gère les transferts et radiations d'élèves.
- * À développer en phase 2.
+ * CORRECTION Phase 1 :
+ *   - Suppression namespace App\Controllers et use App\Services\SecurityHelper
+ *   - Flash messages normalisés : $_SESSION['fie_flash_*']
+ *   - detail() : id lu depuis $_GET (Router n'injecte pas de paramètre)
  */
-declare(strict_types=1);
-namespace App\Controllers;
 
-use App\Services\SecurityHelper;
+declare(strict_types=1);
+
+require_once FIE_SVC_PATH . 'SecurityHelper.php';
 
 class MouvementController
 {
@@ -18,7 +21,7 @@ class MouvementController
 
     public function index(): void
     {
-        $page_title  = 'Mouvements d\'élèves — FIE';
+        $page_title  = "Mouvements d'élèves — FIE";
         $active_menu = 'mouvement';
         require BASE_PATH . '/app/views/mouvement/index.php';
     }
@@ -32,15 +35,16 @@ class MouvementController
 
     public function processNew(): void
     {
-        // TODO: Implémenter en phase 2
-        $_SESSION['flash_info'] = 'Module en cours de développement.';
+        // TODO : Implémenter la logique métier de mouvement
+        $_SESSION['fie_flash_info'] = 'Module en cours de développement.';
         header('Location: ' . BASE_URL . '/mouvement');
         exit;
     }
 
     public function detail(): void
     {
-        $id = $_GET['id'] ?? null;
+        // CORRECTION : pas de paramètre dans la signature — id lu via $_GET
+        $id          = (int)($_GET['id'] ?? 0);
         $page_title  = 'Détail mouvement — FIE';
         $active_menu = 'mouvement';
         require BASE_PATH . '/app/views/mouvement/detail.php';

@@ -1,8 +1,14 @@
-<!DOCTYPE html>
+<?php
+/**
+ * FIE — Vue : Fiche imprimable (print.php)
+ * CORRECTION Phase 2 : standalone (pas de layouts), optimisée A4 impression
+ * Aucun require FIE_VIEWS_PATH — utilise BASE_PATH
+ */
+?><!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Fiche d'inscription — <?= SecurityHelper::e($eleve['iue']) ?></title>
+<title>Fiche d'inscription — <?= SecurityHelper::e($eleve['iue'] ?? '') ?></title>
 <style>
   /* Fiche imprimable — optimisée pour A4 */
   @page { size: A4; margin: 1.5cm; }

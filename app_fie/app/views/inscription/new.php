@@ -1,552 +1,616 @@
 <?php
 /**
- * Vue : Formulaire de nouvelle inscription
+ * FIE — Vue : Formulaire de nouvelle inscription / émission d'IUE
+ * Bootstrap 5 + Font Awesome — Charte Burundi
+ * CORRECTION Phase 2 : refonte Bootstrap complète
  * Variables injectées par InscriptionController::newForm() :
  *   $anneeActive, $secteurs, $niveaux, $sections, $provinces, $csrf, $lastSync
  */
-$title = 'Nouvelle Inscription';
-require FIE_VIEWS_PATH . 'layouts/header.php';
-$old    = $_SESSION['fie_form_old']     ?? [];
-$ferr   = $_SESSION['fie_field_errors'] ?? [];
-$flash  = $_SESSION['fie_flash_error']  ?? null;
-unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors'], $_SESSION['fie_flash_error']);
+$page_title  = "Nouvelle Inscription — FIE";
+$active_menu = 'inscription';
+require BASE_PATH . '/app/views/layouts/header.php';
+
+$old  = $_SESSION['fie_form_old']     ?? [];
+$ferr = $_SESSION['fie_field_errors'] ?? [];
+unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
 ?>
 
-<div class="fie-page-header">
-  <h1><i class="fi-icon">✏</i> Nouvelle Inscription — Émission d'IUE</h1>
-  <div class="fie-breadcrumb">Accueil &rsaquo; Inscriptions &rsaquo; Nouvelle inscription</div>
+<!-- ── Fil d'Ariane ────────────────────────────────────────────────────── -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/inscription">Inscriptions</a></li>
+        <li class="breadcrumb-item active">Nouvelle inscription</li>
+    </ol>
+</nav>
+
+<!-- ── Titre ───────────────────────────────────────────────────────────── -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h4 fw-bold mb-0">
+            <i class="fa-solid fa-user-plus me-2" style="color:var(--fie-red)"></i>
+            Nouvelle Inscription — Émission d'IUE
+        </h1>
+        <p class="text-muted mb-0 small">
+            Année scolaire :
+            <strong><?= SecurityHelper::e($anneeActive['libelle'] ?? 'N/A') ?></strong>
+        </p>
+    </div>
 </div>
 
+<!-- ── Alerte sync ─────────────────────────────────────────────────────── -->
 <?php if ($lastSync): ?>
-<div class="fie-notice info">
-  <strong>Référentiel établissements :</strong> dernière synchronisation depuis StatEduc le
-  <?= SecurityHelper::e(date('d/m/Y H:i', strtotime($lastSync))) ?>.
+<div class="alert alert-success border-0 small d-flex align-items-center gap-2 mb-3">
+    <i class="fa-solid fa-circle-check"></i>
+    <span>
+        Référentiel établissements synchronisé depuis StatEduc le
+        <strong><?= SecurityHelper::e(date('d/m/Y H:i', strtotime($lastSync))) ?></strong>.
+    </span>
 </div>
 <?php else: ?>
-<div class="fie-notice warning">
-  <strong>Attention :</strong> Le référentiel établissements n'a pas encore été synchronisé.
-  <a href="<?= FIE_BASE_URL ?>admin/sync">Synchroniser maintenant</a>
+<div class="alert alert-warning small d-flex align-items-center gap-2 mb-3">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>
+        Le référentiel établissements n'a pas encore été synchronisé.
+        <a href="<?= BASE_URL ?>/admin/sync" class="alert-link">Synchroniser maintenant</a>
+    </span>
 </div>
 <?php endif; ?>
 
-<?php if ($flash): ?>
-<div class="fie-notice error" id="fie-flash-error">
-  <?= SecurityHelper::e($flash) ?>
-  <?php if (!empty($ferr)): ?>
-  <ul class="fie-error-list">
-    <?php foreach ($ferr as $f => $msg): ?>
-    <li><?= SecurityHelper::e($msg) ?></li>
-    <?php endforeach; ?>
-  </ul>
-  <?php endif; ?>
-</div>
-<?php endif; ?>
-
-<!-- Bandeau doublon AJAX -->
-<div id="fie-doublon-alert" class="fie-notice warning" style="display:none">
-  <strong>⚠ Doublon potentiel détecté !</strong>
-  <span id="fie-doublon-msg"></span>
-  <ul id="fie-doublon-list"></ul>
-  <label>
-    <input type="checkbox" id="fie-confirm-no-doublon">
-    Je confirme que cet élève n'est pas déjà enregistré et souhaite continuer.
-  </label>
+<!-- ── Bandeau doublon AJAX (caché par défaut) ─────────────────────────── -->
+<div id="fie-doublon-alert" class="alert alert-warning d-none" role="alert">
+    <h6 class="alert-heading">
+        <i class="fa-solid fa-triangle-exclamation me-1"></i>
+        Doublon potentiel détecté !
+    </h6>
+    <p id="fie-doublon-msg" class="mb-2"></p>
+    <ul id="fie-doublon-list" class="mb-2"></ul>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="fie-confirm-no-doublon">
+        <label class="form-check-label" for="fie-confirm-no-doublon">
+            Je confirme que cet élève n'est pas déjà enregistré et souhaite continuer.
+        </label>
+    </div>
 </div>
 
-<form method="POST" action="<?= FIE_BASE_URL ?>inscription/new"
-      id="fie-insc-form" enctype="multipart/form-data" novalidate>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FORMULAIRE PRINCIPAL
+     ═══════════════════════════════════════════════════════════════════════ -->
+<form method="POST" action="<?= BASE_URL ?>/inscription/nouveau"
+      id="fie-insc-form" novalidate>
 
-  <?= SecurityHelper::csrfField() ?>
-  <input type="hidden" name="code_type_annee"
-         value="<?= (int)($anneeActive['code_type_annee'] ?? 0) ?>">
+    <?= SecurityHelper::csrfField() ?>
+    <input type="hidden" name="code_type_annee"
+           value="<?= (int)($anneeActive['code_type_annee'] ?? 0) ?>">
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- SECTION 1 : ÉTAT CIVIL                                                -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <fieldset class="fie-fieldset">
-    <legend>1. État civil de l'élève</legend>
-    <div class="fie-form-grid">
-
-      <div class="fie-field <?= isset($ferr['nom']) ? 'fie-field--error' : '' ?>">
-        <label for="nom">Nom de famille <span class="fie-required">*</span></label>
-        <input type="text" id="nom" name="nom" required maxlength="100"
-               value="<?= SecurityHelper::e($old['nom'] ?? '') ?>"
-               placeholder="ex : NIYONZIMA"
-               class="fie-input <?= isset($ferr['nom']) ? 'fie-input--error' : '' ?>">
-        <?php if (isset($ferr['nom'])): ?>
-        <span class="fie-field-error"><?= SecurityHelper::e($ferr['nom']) ?></span>
-        <?php endif; ?>
-      </div>
-
-      <div class="fie-field <?= isset($ferr['prenoms']) ? 'fie-field--error' : '' ?>">
-        <label for="prenoms">Prénom(s) <span class="fie-required">*</span></label>
-        <input type="text" id="prenoms" name="prenoms" required maxlength="150"
-               value="<?= SecurityHelper::e($old['prenoms'] ?? '') ?>"
-               placeholder="ex : Jean-Pierre">
-        <?php if (isset($ferr['prenoms'])): ?>
-        <span class="fie-field-error"><?= SecurityHelper::e($ferr['prenoms']) ?></span>
-        <?php endif; ?>
-      </div>
-
-      <div class="fie-field <?= isset($ferr['sexe']) ? 'fie-field--error' : '' ?>">
-        <label>Sexe <span class="fie-required">*</span></label>
-        <div class="fie-radio-group">
-          <label><input type="radio" name="sexe" value="M"
-            <?= (($old['sexe'] ?? '') === 'M') ? 'checked' : '' ?>> Masculin</label>
-          <label><input type="radio" name="sexe" value="F"
-            <?= (($old['sexe'] ?? '') === 'F') ? 'checked' : '' ?>> Féminin</label>
+    <!-- ══ SECTION 1 : ÉTAT CIVIL ══════════════════════════════════════════ -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header fw-semibold"
+             style="background:var(--fie-red);color:#fff">
+            <i class="fa-solid fa-person me-2"></i>1. État civil de l'élève
         </div>
-        <?php if (isset($ferr['sexe'])): ?>
-        <span class="fie-field-error"><?= SecurityHelper::e($ferr['sexe']) ?></span>
-        <?php endif; ?>
-      </div>
+        <div class="card-body">
+            <div class="row g-3">
 
-      <div class="fie-field <?= isset($ferr['date_naissance']) ? 'fie-field--error' : '' ?>">
-        <label for="date_naissance">Date de naissance <span class="fie-required">*</span></label>
-        <input type="date" id="date_naissance" name="date_naissance" required
-               max="<?= date('Y-m-d') ?>"
-               value="<?= SecurityHelper::e($old['date_naissance'] ?? '') ?>">
-        <?php if (isset($ferr['date_naissance'])): ?>
-        <span class="fie-field-error"><?= SecurityHelper::e($ferr['date_naissance']) ?></span>
-        <?php endif; ?>
-      </div>
+                <!-- Nom -->
+                <div class="col-md-6">
+                    <label for="nom" class="form-label fw-semibold">
+                        Nom de famille <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" id="nom" name="nom" required maxlength="100"
+                           class="form-control <?= isset($ferr['nom']) ? 'is-invalid' : '' ?>"
+                           value="<?= SecurityHelper::e($old['nom'] ?? '') ?>"
+                           placeholder="ex : NIYONZIMA">
+                    <?php if (isset($ferr['nom'])): ?>
+                    <div class="invalid-feedback"><?= SecurityHelper::e($ferr['nom']) ?></div>
+                    <?php endif; ?>
+                </div>
 
-      <div class="fie-field">
-        <label for="lieu_naissance">Lieu de naissance</label>
-        <input type="text" id="lieu_naissance" name="lieu_naissance" maxlength="150"
-               value="<?= SecurityHelper::e($old['lieu_naissance'] ?? '') ?>"
-               placeholder="ex : Gitega">
-      </div>
+                <!-- Prénoms -->
+                <div class="col-md-6">
+                    <label for="prenoms" class="form-label fw-semibold">
+                        Prénom(s) <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" id="prenoms" name="prenoms" required maxlength="150"
+                           class="form-control <?= isset($ferr['prenoms']) ? 'is-invalid' : '' ?>"
+                           value="<?= SecurityHelper::e($old['prenoms'] ?? '') ?>"
+                           placeholder="ex : Jean-Pierre">
+                    <?php if (isset($ferr['prenoms'])): ?>
+                    <div class="invalid-feedback"><?= SecurityHelper::e($ferr['prenoms']) ?></div>
+                    <?php endif; ?>
+                </div>
 
-      <div class="fie-field">
-        <label for="province_naissance">Province de naissance</label>
-        <select id="province_naissance" name="province_naissance">
-          <option value="">-- Sélectionner --</option>
-          <?php foreach ($provinces as $p): ?>
-          <option value="<?= SecurityHelper::e($p['province']) ?>"
-            <?= (($old['province_naissance'] ?? '') === $p['province']) ? 'selected' : '' ?>>
-            <?= SecurityHelper::e($p['province']) ?>
-          </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+                <!-- Sexe -->
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">
+                        Sexe <span class="text-danger">*</span>
+                    </label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sexe" id="sexeM" value="M"
+                                   <?= (($old['sexe'] ?? '') === 'M') ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="sexeM">
+                                <i class="fa-solid fa-mars text-primary me-1"></i>Masculin
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sexe" id="sexeF" value="F"
+                                   <?= (($old['sexe'] ?? '') === 'F') ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="sexeF">
+                                <i class="fa-solid fa-venus text-danger me-1"></i>Féminin
+                            </label>
+                        </div>
+                    </div>
+                    <?php if (isset($ferr['sexe'])): ?>
+                    <div class="text-danger small mt-1"><?= SecurityHelper::e($ferr['sexe']) ?></div>
+                    <?php endif; ?>
+                </div>
 
-      <div class="fie-field">
-        <label for="nationalite">Nationalité</label>
-        <input type="text" id="nationalite" name="nationalite" maxlength="3"
-               value="<?= SecurityHelper::e($old['nationalite'] ?? 'BDI') ?>"
-               placeholder="BDI">
-        <span class="fie-hint">Code ISO 3 lettres (ex : BDI = Burundais)</span>
-      </div>
+                <!-- Date de naissance -->
+                <div class="col-md-4">
+                    <label for="date_naissance" class="form-label fw-semibold">
+                        Date de naissance <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" id="date_naissance" name="date_naissance" required
+                           class="form-control <?= isset($ferr['date_naissance']) ? 'is-invalid' : '' ?>"
+                           max="<?= date('Y-m-d') ?>"
+                           value="<?= SecurityHelper::e($old['date_naissance'] ?? '') ?>">
+                    <?php if (isset($ferr['date_naissance'])): ?>
+                    <div class="invalid-feedback"><?= SecurityHelper::e($ferr['date_naissance']) ?></div>
+                    <?php endif; ?>
+                </div>
 
-    </div><!-- .fie-form-grid -->
+                <!-- Lieu de naissance -->
+                <div class="col-md-4">
+                    <label for="lieu_naissance" class="form-label fw-semibold">Lieu de naissance</label>
+                    <input type="text" id="lieu_naissance" name="lieu_naissance" maxlength="150"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['lieu_naissance'] ?? '') ?>"
+                           placeholder="ex : Gitega">
+                </div>
 
-    <!-- Bouton vérification doublon (AJAX) -->
-    <div class="fie-doublon-check-bar">
-      <button type="button" id="btn-check-doublon" class="fie-btn fie-btn--secondary">
-        🔍 Vérifier les doublons
-      </button>
-      <span id="fie-doublon-status" class="fie-hint"></span>
-    </div>
-  </fieldset>
+                <!-- Province de naissance -->
+                <div class="col-md-4">
+                    <label for="province_naissance" class="form-label fw-semibold">Province de naissance</label>
+                    <select id="province_naissance" name="province_naissance" class="form-select">
+                        <option value="">— Sélectionner —</option>
+                        <?php foreach ($provinces as $p): ?>
+                        <option value="<?= SecurityHelper::e($p['province']) ?>"
+                            <?= (($old['province_naissance'] ?? '') === $p['province']) ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e($p['province']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- SECTION 2 : ACTE DE NAISSANCE                                         -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <fieldset class="fie-fieldset fie-fieldset--collapsible">
-    <legend>2. Acte de naissance <small>(facultatif)</small></legend>
-    <div class="fie-form-grid">
-      <div class="fie-field">
-        <label for="numero_acte_naissance">N° acte de naissance</label>
-        <input type="text" id="numero_acte_naissance" name="numero_acte_naissance" maxlength="50"
-               value="<?= SecurityHelper::e($old['numero_acte_naissance'] ?? '') ?>">
-      </div>
-      <div class="fie-field">
-        <label for="date_acte_naissance">Date de l'acte</label>
-        <input type="date" id="date_acte_naissance" name="date_acte_naissance"
-               value="<?= SecurityHelper::e($old['date_acte_naissance'] ?? '') ?>">
-      </div>
-      <div class="fie-field">
-        <label for="commune_acte">Commune de l'acte</label>
-        <input type="text" id="commune_acte" name="commune_acte" maxlength="100"
-               value="<?= SecurityHelper::e($old['commune_acte'] ?? '') ?>">
-      </div>
-    </div>
-  </fieldset>
+                <!-- Nationalité -->
+                <div class="col-md-4">
+                    <label for="nationalite" class="form-label fw-semibold">Nationalité</label>
+                    <input type="text" id="nationalite" name="nationalite" maxlength="3"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['nationalite'] ?? 'BDI') ?>"
+                           placeholder="BDI">
+                    <div class="form-text">Code ISO 3 lettres (BDI = Burundais)</div>
+                </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- SECTION 3 : TUTEUR / PARENT                                           -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <fieldset class="fie-fieldset fie-fieldset--collapsible">
-    <legend>3. Tuteur / Parent</legend>
-    <div class="fie-form-grid">
-      <div class="fie-field">
-        <label for="nom_pere">Nom du père</label>
-        <input type="text" id="nom_pere" name="nom_pere" maxlength="150"
-               value="<?= SecurityHelper::e($old['nom_pere'] ?? '') ?>">
-      </div>
-      <div class="fie-field">
-        <label for="nom_mere">Nom de la mère</label>
-        <input type="text" id="nom_mere" name="nom_mere" maxlength="150"
-               value="<?= SecurityHelper::e($old['nom_mere'] ?? '') ?>">
-      </div>
-      <div class="fie-field">
-        <label for="nom_tuteur">Tuteur légal</label>
-        <input type="text" id="nom_tuteur" name="nom_tuteur" maxlength="150"
-               value="<?= SecurityHelper::e($old['nom_tuteur'] ?? '') ?>">
-      </div>
-      <div class="fie-field">
-        <label for="telephone_tuteur">Téléphone tuteur</label>
-        <input type="tel" id="telephone_tuteur" name="telephone_tuteur" maxlength="30"
-               value="<?= SecurityHelper::e($old['telephone_tuteur'] ?? '') ?>"
-               placeholder="+257 XX XXX XXX">
-      </div>
-    </div>
-  </fieldset>
+            </div><!-- .row -->
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- SECTION 4 : ÉTABLISSEMENT & NIVEAU (Sélects dépendants AJAX)         -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <fieldset class="fie-fieldset">
-    <legend>4. Scolarisation — Année <?= SecurityHelper::e($anneeActive['libelle'] ?? '') ?></legend>
-
-    <!-- Sous-secteur -->
-    <div class="fie-field <?= isset($ferr['code_type_secteur_ens']) ? 'fie-field--error' : '' ?>">
-      <label for="code_type_secteur_ens">Sous-secteur <span class="fie-required">*</span></label>
-      <select id="code_type_secteur_ens" name="code_type_secteur_ens" required>
-        <option value="">-- Sélectionner --</option>
-        <?php foreach ($secteurs as $s): ?>
-        <option value="<?= (int)$s['code_type_secteur_ens'] ?>"
-          <?= ((int)($old['code_type_secteur_ens'] ?? 0) === (int)$s['code_type_secteur_ens']) ? 'selected' : '' ?>>
-          <?= SecurityHelper::e($s['libelle']) ?>
-        </option>
-        <?php endforeach; ?>
-      </select>
-      <?php if (isset($ferr['code_type_secteur_ens'])): ?>
-      <span class="fie-field-error"><?= SecurityHelper::e($ferr['code_type_secteur_ens']) ?></span>
-      <?php endif; ?>
+            <!-- Bouton vérification doublon -->
+            <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+                <button type="button" id="btn-check-doublon" class="btn btn-outline-warning btn-sm">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>Vérifier les doublons
+                </button>
+                <span id="fie-doublon-status" class="small text-muted"></span>
+            </div>
+        </div>
     </div>
 
-    <!-- Niveau -->
-    <div class="fie-field <?= isset($ferr['code_type_niveau']) ? 'fie-field--error' : '' ?>">
-      <label for="code_type_niveau">Niveau <span class="fie-required">*</span></label>
-      <select id="code_type_niveau" name="code_type_niveau" required>
-        <option value="">-- Sélectionner d'abord le sous-secteur --</option>
-        <?php foreach ($niveaux as $niv): ?>
-        <option value="<?= (int)$niv['code_type_niveau'] ?>"
-                data-secteur="<?= (int)$niv['code_secteur'] ?>"
-          <?= ((int)($old['code_type_niveau'] ?? 0) === (int)$niv['code_type_niveau']) ? 'selected' : '' ?>>
-          <?= SecurityHelper::e($niv['libelle']) ?>
-        </option>
-        <?php endforeach; ?>
-      </select>
+    <!-- ══ SECTION 2 : ACTE DE NAISSANCE ══════════════════════════════════ -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header fw-semibold bg-light">
+            <i class="fa-solid fa-file-contract me-2 text-secondary"></i>
+            2. Acte de naissance
+            <span class="badge bg-secondary ms-2 fw-normal">facultatif</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="numero_acte_naissance" class="form-label">N° acte de naissance</label>
+                    <input type="text" id="numero_acte_naissance" name="numero_acte_naissance"
+                           maxlength="50" class="form-control"
+                           value="<?= SecurityHelper::e($old['numero_acte_naissance'] ?? '') ?>">
+                </div>
+                <div class="col-md-4">
+                    <label for="date_acte_naissance" class="form-label">Date de l'acte</label>
+                    <input type="date" id="date_acte_naissance" name="date_acte_naissance"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['date_acte_naissance'] ?? '') ?>">
+                </div>
+                <div class="col-md-4">
+                    <label for="commune_acte" class="form-label">Commune de l'acte</label>
+                    <input type="text" id="commune_acte" name="commune_acte" maxlength="100"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['commune_acte'] ?? '') ?>">
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Section -->
-    <div class="fie-field">
-      <label for="code_type_section">Section</label>
-      <select id="code_type_section" name="code_type_section">
-        <?php foreach ($sections as $sec): ?>
-        <option value="<?= (int)$sec['code_type_section'] ?>"
-          <?= ((int)($old['code_type_section'] ?? 1) === (int)$sec['code_type_section']) ? 'selected' : '' ?>>
-          <?= SecurityHelper::e($sec['libelle']) ?>
-        </option>
-        <?php endforeach; ?>
-      </select>
+    <!-- ══ SECTION 3 : TUTEUR / PARENT ════════════════════════════════════ -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header fw-semibold bg-light">
+            <i class="fa-solid fa-people-roof me-2 text-secondary"></i>3. Tuteur / Parent
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="nom_pere" class="form-label">Nom du père</label>
+                    <input type="text" id="nom_pere" name="nom_pere" maxlength="150"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['nom_pere'] ?? '') ?>">
+                </div>
+                <div class="col-md-6">
+                    <label for="nom_mere" class="form-label">Nom de la mère</label>
+                    <input type="text" id="nom_mere" name="nom_mere" maxlength="150"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['nom_mere'] ?? '') ?>">
+                </div>
+                <div class="col-md-6">
+                    <label for="nom_tuteur" class="form-label">Tuteur légal</label>
+                    <input type="text" id="nom_tuteur" name="nom_tuteur" maxlength="150"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['nom_tuteur'] ?? '') ?>">
+                </div>
+                <div class="col-md-6">
+                    <label for="telephone_tuteur" class="form-label">Téléphone tuteur</label>
+                    <input type="tel" id="telephone_tuteur" name="telephone_tuteur" maxlength="30"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['telephone_tuteur'] ?? '') ?>"
+                           placeholder="+257 XX XXX XXX">
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Classe -->
-    <div class="fie-field">
-      <label for="numero_classe">N° de classe</label>
-      <input type="text" id="numero_classe" name="numero_classe" maxlength="20"
-             value="<?= SecurityHelper::e($old['numero_classe'] ?? '') ?>"
-             placeholder="ex: 2AF-B">
+    <!-- ══ SECTION 4 : SCOLARISATION + ÉTABLISSEMENT ══════════════════════ -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header fw-semibold" style="background:var(--fie-green);color:#fff">
+            <i class="fa-solid fa-school me-2"></i>
+            4. Scolarisation — Année <?= SecurityHelper::e($anneeActive['libelle'] ?? '') ?>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+
+                <!-- Sous-secteur -->
+                <div class="col-md-4">
+                    <label for="code_type_secteur_ens" class="form-label fw-semibold">
+                        Sous-secteur <span class="text-danger">*</span>
+                    </label>
+                    <select id="code_type_secteur_ens" name="code_type_secteur_ens" required
+                            class="form-select <?= isset($ferr['code_type_secteur_ens']) ? 'is-invalid' : '' ?>">
+                        <option value="">— Sélectionner —</option>
+                        <?php foreach ($secteurs as $s): ?>
+                        <option value="<?= (int)$s['code_type_secteur_ens'] ?>"
+                            <?= ((int)($old['code_type_secteur_ens'] ?? 0) === (int)$s['code_type_secteur_ens']) ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e($s['libelle']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (isset($ferr['code_type_secteur_ens'])): ?>
+                    <div class="invalid-feedback"><?= SecurityHelper::e($ferr['code_type_secteur_ens']) ?></div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Niveau -->
+                <div class="col-md-4">
+                    <label for="code_type_niveau" class="form-label fw-semibold">
+                        Niveau <span class="text-danger">*</span>
+                    </label>
+                    <select id="code_type_niveau" name="code_type_niveau" required
+                            class="form-select <?= isset($ferr['code_type_niveau']) ? 'is-invalid' : '' ?>">
+                        <option value="">— Sélectionner le sous-secteur d'abord —</option>
+                        <?php foreach ($niveaux as $niv): ?>
+                        <option value="<?= (int)$niv['code_type_niveau'] ?>"
+                                data-secteur="<?= (int)$niv['code_secteur'] ?>"
+                            <?= ((int)($old['code_type_niveau'] ?? 0) === (int)$niv['code_type_niveau']) ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e($niv['libelle']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Section -->
+                <div class="col-md-2">
+                    <label for="code_type_section" class="form-label fw-semibold">Section</label>
+                    <select id="code_type_section" name="code_type_section" class="form-select">
+                        <?php foreach ($sections as $sec): ?>
+                        <option value="<?= (int)$sec['code_type_section'] ?>"
+                            <?= ((int)($old['code_type_section'] ?? 1) === (int)$sec['code_type_section']) ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e($sec['libelle']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Classe -->
+                <div class="col-md-2">
+                    <label for="numero_classe" class="form-label fw-semibold">Classe</label>
+                    <input type="text" id="numero_classe" name="numero_classe" maxlength="20"
+                           class="form-control"
+                           value="<?= SecurityHelper::e($old['numero_classe'] ?? '') ?>"
+                           placeholder="ex: 2AF-B">
+                </div>
+
+            </div><!-- row secteur/niveau -->
+
+            <!-- Sélects dépendants géographiques -->
+            <hr class="my-3">
+            <p class="fw-semibold small mb-2">
+                <i class="fa-solid fa-location-dot me-1" style="color:var(--fie-red)"></i>
+                Localisation de l'établissement
+                <span class="text-danger">*</span>
+            </p>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="province" class="form-label">Province</label>
+                    <select id="province" name="_province" required class="form-select">
+                        <option value="">— Province —</option>
+                        <?php foreach ($provinces as $p): ?>
+                        <option value="<?= SecurityHelper::e($p['province']) ?>"
+                            <?= (($old['_province'] ?? '') === $p['province']) ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e($p['province']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="commune" class="form-label">Commune</label>
+                    <select id="commune" name="_commune" required class="form-select" disabled>
+                        <option value="">— Commune —</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="zone" class="form-label">Zone</label>
+                    <select id="zone" name="_zone" class="form-select" disabled>
+                        <option value="">— Zone —</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="colline" class="form-label">Colline</label>
+                    <select id="colline" name="_colline" class="form-select" disabled>
+                        <option value="">— Colline —</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Établissement -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-8">
+                    <label for="code_etablissement" class="form-label fw-semibold">
+                        Établissement <span class="text-danger">*</span>
+                    </label>
+                    <select id="code_etablissement" name="code_etablissement" required
+                            class="form-select <?= isset($ferr['code_etablissement']) ? 'is-invalid' : '' ?>"
+                            disabled>
+                        <option value="">— Sélectionner la localisation d'abord —</option>
+                    </select>
+                    <div class="form-text">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>
+                        Alimenté depuis le référentiel StatEduc synchronisé.
+                    </div>
+                    <?php if (isset($ferr['code_etablissement'])): ?>
+                    <div class="invalid-feedback"><?= SecurityHelper::e($ferr['code_etablissement']) ?></div>
+                    <?php endif; ?>
+                </div>
+                <div class="col-md-4">
+                    <label for="date_inscription" class="form-label fw-semibold">
+                        Date d'inscription <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" id="date_inscription" name="date_inscription" required
+                           class="form-control <?= isset($ferr['date_inscription']) ? 'is-invalid' : '' ?>"
+                           value="<?= SecurityHelper::e($old['date_inscription'] ?? date('Y-m-d')) ?>">
+                    <?php if (isset($ferr['date_inscription'])): ?>
+                    <div class="invalid-feedback"><?= SecurityHelper::e($ferr['date_inscription']) ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Sélects dépendants Province → Commune → Zone → Colline → Établissement -->
-    <div class="fie-loc-grid">
-      <div class="fie-field">
-        <label for="province">Province <span class="fie-required">*</span></label>
-        <select id="province" name="_province" required>
-          <option value="">-- Province --</option>
-          <?php foreach ($provinces as $p): ?>
-          <option value="<?= SecurityHelper::e($p['province']) ?>"
-            <?= (($old['_province'] ?? '') === $p['province']) ? 'selected' : '' ?>>
-            <?= SecurityHelper::e($p['province']) ?>
-          </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-
-      <div class="fie-field">
-        <label for="commune">Commune <span class="fie-required">*</span></label>
-        <select id="commune" name="_commune" required disabled>
-          <option value="">-- Commune --</option>
-        </select>
-      </div>
-
-      <div class="fie-field">
-        <label for="zone">Zone</label>
-        <select id="zone" name="_zone" disabled>
-          <option value="">-- Zone --</option>
-        </select>
-      </div>
-
-      <div class="fie-field">
-        <label for="colline">Colline</label>
-        <select id="colline" name="_colline" disabled>
-          <option value="">-- Colline --</option>
-        </select>
-      </div>
-    </div><!-- .fie-loc-grid -->
-
-    <div class="fie-field <?= isset($ferr['code_etablissement']) ? 'fie-field--error' : '' ?>">
-      <label for="code_etablissement">Établissement <span class="fie-required">*</span></label>
-      <select id="code_etablissement" name="code_etablissement" required disabled>
-        <option value="">-- Sélectionner la localisation d'abord --</option>
-      </select>
-      <span class="fie-hint">
-        Alimenté depuis le référentiel StatEduc synchronisé.
-      </span>
-      <?php if (isset($ferr['code_etablissement'])): ?>
-      <span class="fie-field-error"><?= SecurityHelper::e($ferr['code_etablissement']) ?></span>
-      <?php endif; ?>
+    <!-- ══ BOUTONS DE SOUMISSION ════════════════════════════════════════════ -->
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <button type="submit" id="btn-submit-insc" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-id-card me-2"></i>Inscrire et générer l'IUE
+        </button>
+        <a href="<?= BASE_URL ?>/inscription/recherche" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-magnifying-glass me-1"></i>Rechercher un élève existant
+        </a>
+        <a href="<?= BASE_URL ?>/tableau-de-bord" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-xmark me-1"></i>Annuler
+        </a>
     </div>
-
-    <!-- Date d'inscription -->
-    <div class="fie-field <?= isset($ferr['date_inscription']) ? 'fie-field--error' : '' ?>">
-      <label for="date_inscription">Date d'inscription <span class="fie-required">*</span></label>
-      <input type="date" id="date_inscription" name="date_inscription"
-             value="<?= SecurityHelper::e($old['date_inscription'] ?? date('Y-m-d')) ?>"
-             required>
-    </div>
-
-  </fieldset>
-
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- BOUTONS                                                                -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <div class="fie-form-actions">
-    <button type="submit" id="btn-submit-insc" class="fie-btn fie-btn--primary fie-btn--large">
-      ✅ Inscrire et générer l'IUE
-    </button>
-    <a href="<?= FIE_BASE_URL ?>inscription/search" class="fie-btn fie-btn--ghost">
-      🔍 Rechercher un élève existant
-    </a>
-    <a href="<?= FIE_BASE_URL ?>" class="fie-btn fie-btn--ghost">Annuler</a>
-  </div>
 
 </form>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT : cascades AJAX + doublon
+     ═══════════════════════════════════════════════════════════════════════ -->
 <script>
-/* ═══════════════════════════════════════════════════════════════════════════
-   JAVASCRIPT DU FORMULAIRE D'INSCRIPTION
-   • Sélects dépendants Province → Commune → Zone → Colline → Établissement
-   • Filtre dynamique des niveaux par sous-secteur
-   • Vérification de doublon AJAX
-   ═══════════════════════════════════════════════════════════════════════════ */
-(function() {
+(function () {
   'use strict';
 
-  const BASE = '<?= FIE_BASE_URL ?>';
+  const BASE = '<?= BASE_URL ?>/';
 
-  // ── Utilitaire AJAX POST ──────────────────────────────────────────────────
+  /* ── Utilitaires AJAX ──────────────────────────────────────────────────── */
+  function getJSON(url, cb) {
+    fetch(url).then(r => r.json()).then(cb).catch(e => console.error('AJAX GET:', e));
+  }
   function postJSON(url, data, cb) {
     const fd = new FormData();
-    for (const [k, v] of Object.entries(data)) fd.append(k, v);
-    fetch(url, {method:'POST', body: fd})
-      .then(r => r.json())
-      .then(cb)
-      .catch(e => console.error('AJAX error:', e));
+    Object.entries(data).forEach(([k, v]) => fd.append(k, v));
+    fetch(url, {method: 'POST', body: fd})
+      .then(r => r.json()).then(cb).catch(e => console.error('AJAX POST:', e));
   }
 
-  function setSelectOptions(sel, items, valKey, textKey, placeholder) {
+  /* ── Peupler un <select> ───────────────────────────────────────────────── */
+  function fillSelect(sel, items, placeholder) {
     sel.innerHTML = '<option value="">' + placeholder + '</option>';
-    items.forEach(function(item) {
-      const opt = document.createElement('option');
-      opt.value       = item[valKey] !== undefined ? item[valKey] : item;
-      opt.textContent = item[textKey] !== undefined ? item[textKey] : item;
-      sel.appendChild(opt);
+    (items || []).forEach(function(item) {
+      const o = document.createElement('option');
+      o.value       = item.code;
+      o.textContent = item.libelle;
+      sel.appendChild(o);
     });
-    sel.disabled = items.length === 0;
+    sel.disabled = !items || items.length === 0;
   }
 
-  // ── Sélects dépendants ────────────────────────────────────────────────────
-  const selProvince   = document.getElementById('province');
-  const selCommune    = document.getElementById('commune');
-  const selZone       = document.getElementById('zone');
-  const selColline    = document.getElementById('colline');
-  const selEtab       = document.getElementById('code_etablissement');
-  const selSecteur    = document.getElementById('code_type_secteur_ens');
+  /* ── Références DOM ────────────────────────────────────────────────────── */
+  const selProvince  = document.getElementById('province');
+  const selCommune   = document.getElementById('commune');
+  const selZone      = document.getElementById('zone');
+  const selColline   = document.getElementById('colline');
+  const selEtab      = document.getElementById('code_etablissement');
+  const selSecteur   = document.getElementById('code_type_secteur_ens');
+  const selNiveau    = document.getElementById('code_type_niveau');
 
-  selProvince.addEventListener('change', function() {
-    selCommune.disabled = true;
-    selZone.disabled    = true;
-    selColline.disabled = true;
-    selEtab.disabled    = true;
-    selCommune.innerHTML = '<option value="">Chargement...</option>';
+  /* ── Cascade Province → Commune ────────────────────────────────────────── */
+  selProvince.addEventListener('change', function () {
+    [selCommune, selZone, selColline, selEtab].forEach(s => { s.disabled = true; s.innerHTML = '<option value="">...</option>'; });
     if (!this.value) return;
-    postJSON(BASE + 'inscription/ajax/communes', {province: this.value}, function(resp) {
-      setSelectOptions(selCommune, resp.communes || [], null, null, '-- Commune --');
-      selCommune.disabled = false;
+    getJSON(BASE + 'inscription/ajax/communes?province=' + encodeURIComponent(this.value), function(d) {
+      fillSelect(selCommune, d.items, '— Commune —');
     });
   });
 
-  selCommune.addEventListener('change', function() {
-    selZone.disabled    = true;
-    selColline.disabled = true;
-    selEtab.disabled    = true;
+  /* ── Commune → Zone ─────────────────────────────────────────────────────── */
+  selCommune.addEventListener('change', function () {
+    [selZone, selColline, selEtab].forEach(s => { s.disabled = true; s.innerHTML = '<option value="">...</option>'; });
     if (!this.value) return;
-    postJSON(BASE + 'inscription/ajax/zones',
-      {province: selProvince.value, commune: this.value}, function(resp) {
-      const zones = resp.zones || [];
-      if (zones.length > 0) {
-        setSelectOptions(selZone, zones, null, null, '-- Zone --');
-        selZone.disabled = false;
-      } else {
-        // Pas de zones → charger directement les collines
-        postJSON(BASE + 'inscription/ajax/collines',
-          {province: selProvince.value, commune: selCommune.value, zone: ''}, function(r) {
-          setSelectOptions(selColline, r.collines || [], null, null, '-- Colline --');
-          selColline.disabled = (r.collines || []).length === 0;
-        });
-      }
+    getJSON(BASE + 'inscription/ajax/zones?province=' + encodeURIComponent(selProvince.value)
+            + '&commune=' + encodeURIComponent(this.value), function(d) {
+      fillSelect(selZone, d.items, '— Zone —');
+      if (!d.items || d.items.length === 0) loadCollines();
     });
   });
 
-  selZone.addEventListener('change', function() {
-    selColline.disabled = true;
-    selEtab.disabled    = true;
-    postJSON(BASE + 'inscription/ajax/collines',
-      {province: selProvince.value, commune: selCommune.value, zone: this.value}, function(resp) {
-      setSelectOptions(selColline, resp.collines || [], null, null, '-- Colline --');
-      selColline.disabled = (resp.collines || []).length === 0;
-    });
+  /* ── Zone → Colline ─────────────────────────────────────────────────────── */
+  selZone.addEventListener('change', function () {
+    [selColline, selEtab].forEach(s => { s.disabled = true; s.innerHTML = '<option value="">...</option>'; });
+    loadCollines();
   });
 
-  function loadEtablissements() {
-    const province = selProvince.value;
-    const commune  = selCommune.value;
-    if (!province || !commune) return;
+  function loadCollines() {
+    getJSON(BASE + 'inscription/ajax/collines?province=' + encodeURIComponent(selProvince.value)
+            + '&commune=' + encodeURIComponent(selCommune.value)
+            + '&zone=' + encodeURIComponent(selZone.value), function(d) {
+      fillSelect(selColline, d.items, '— Colline —');
+    });
+  }
+
+  /* ── Colline → Établissement ─────────────────────────────────────────────── */
+  selColline.addEventListener('change', loadEtabs);
+  selZone.addEventListener('change', function() { if (!selColline.value) loadEtabs(); });
+  selSecteur.addEventListener('change', function() {
+    filterNiveaux(this.value);
+    if (selCommune.value) loadEtabs();
+  });
+
+  function loadEtabs() {
     selEtab.disabled = true;
     selEtab.innerHTML = '<option value="">Chargement...</option>';
-    postJSON(BASE + 'inscription/ajax/etablissements', {
-      province: province,
-      commune:  commune,
-      zone:     selZone.value,
-      colline:  selColline.value,
-      secteur:  selSecteur.value,
-    }, function(resp) {
-      const etabs = resp.etablissements || [];
-      selEtab.innerHTML = '<option value="">-- Établissement --</option>';
-      etabs.forEach(function(e) {
-        const opt = document.createElement('option');
-        opt.value       = e.code_etablissement;
-        opt.textContent = e.nom_etablissement;
-        selEtab.appendChild(opt);
+    getJSON(BASE + 'inscription/ajax/etablissements?province=' + encodeURIComponent(selProvince.value)
+            + '&commune=' + encodeURIComponent(selCommune.value)
+            + '&zone=' + encodeURIComponent(selZone.value)
+            + '&colline=' + encodeURIComponent(selColline.value)
+            + '&secteur=' + encodeURIComponent(selSecteur.value), function(d) {
+      selEtab.innerHTML = '<option value="">— Établissement —</option>';
+      (d.items || []).forEach(function(e) {
+        const o = document.createElement('option');
+        o.value       = e.code;
+        o.textContent = e.libelle;
+        selEtab.appendChild(o);
       });
-      selEtab.disabled = etabs.length === 0;
+      selEtab.disabled = !d.items || d.items.length === 0;
     });
   }
 
-  selColline.addEventListener('change', loadEtablissements);
-  selZone.addEventListener('change', function() {
-    if (!selColline.value) loadEtablissements();
-  });
-  selSecteur.addEventListener('change', function() {
-    // Re-filtrer les niveaux
-    filterNiveaux(this.value);
-    // Recharger les établissements si localisation déjà sélectionnée
-    if (selCommune.value) loadEtablissements();
-  });
-
-  // ── Filtre dynamique des niveaux par sous-secteur ─────────────────────────
+  /* ── Filtre niveaux par sous-secteur ─────────────────────────────────────── */
   function filterNiveaux(secteurCode) {
-    const sel = document.getElementById('code_type_niveau');
-    const opts = sel.querySelectorAll('option[data-secteur]');
-    let firstVisible = null;
-    opts.forEach(function(opt) {
+    Array.from(selNiveau.options).forEach(function(opt) {
+      if (!opt.dataset.secteur) return;
       const match = !secteurCode || opt.dataset.secteur === secteurCode;
-      opt.hidden = !match;
-      opt.disabled = !match;
-      if (match && !firstVisible) firstVisible = opt;
+      opt.hidden = opt.disabled = !match;
     });
-    sel.value = '';
+    selNiveau.value = '';
   }
-  // Init au chargement si secteur déjà sélectionné (retour formulaire)
   if (selSecteur.value) filterNiveaux(selSecteur.value);
 
-  // ── Vérification doublon AJAX ─────────────────────────────────────────────
-  const btnDoublon    = document.getElementById('btn-check-doublon');
-  const alertDoublon  = document.getElementById('fie-doublon-alert');
-  const listDoublon   = document.getElementById('fie-doublon-list');
-  const msgDoublon    = document.getElementById('fie-doublon-msg');
-  const statusDoublon = document.getElementById('fie-doublon-status');
-  const confirmCheck  = document.getElementById('fie-confirm-no-doublon');
-  const btnSubmit     = document.getElementById('btn-submit-insc');
+  /* ── Vérification doublon ────────────────────────────────────────────────── */
+  const btnDoublon   = document.getElementById('btn-check-doublon');
+  const alertDoublon = document.getElementById('fie-doublon-alert');
+  const listDoublon  = document.getElementById('fie-doublon-list');
+  const msgDoublon   = document.getElementById('fie-doublon-msg');
+  const statusMsg    = document.getElementById('fie-doublon-status');
+  const confirmChk   = document.getElementById('fie-confirm-no-doublon');
+  const btnSubmit    = document.getElementById('btn-submit-insc');
 
-  function checkDoublon() {
+  btnDoublon.addEventListener('click', function() {
     const nom = document.getElementById('nom').value.trim();
     const prn = document.getElementById('prenoms').value.trim();
     const ddn = document.getElementById('date_naissance').value;
-    const lieu = document.getElementById('lieu_naissance').value.trim();
     if (!nom || !prn || !ddn) {
-      alert('Veuillez renseigner le nom, les prénoms et la date de naissance avant de vérifier les doublons.');
+      alert('Renseignez le nom, les prénoms et la date de naissance avant de vérifier.');
       return;
     }
-    statusDoublon.textContent = 'Vérification en cours…';
+    statusMsg.textContent = 'Vérification en cours…';
     btnDoublon.disabled = true;
-    postJSON(BASE + 'inscription/ajax/check_doublon',
-      {nom: nom, prenoms: prn, date_naissance: ddn, lieu_naissance: lieu},
+    const csrf = document.querySelector('input[name="csrf_token"]').value;
+    postJSON(BASE + 'inscription/ajax/doublon',
+      {nom, prenoms: prn, date_naissance: ddn, csrf_token: csrf},
       function(resp) {
         btnDoublon.disabled = false;
-        statusDoublon.textContent = '';
         if (resp.count > 0) {
-          msgDoublon.textContent = resp.count + ' élève(s) potentiellement similaire(s) trouvé(s) :';
+          msgDoublon.textContent = resp.count + ' élève(s) similaire(s) trouvé(s) :';
           listDoublon.innerHTML  = '';
-          resp.doublons.forEach(function(d) {
+          (resp.doublons || []).forEach(function(d) {
             const li = document.createElement('li');
-            li.innerHTML = '<strong>' + d.iue + '</strong> — '
-              + d.nom + ' ' + d.prenoms + ' — né(e) le ' + d.date_naissance
-              + (d.lieu_naissance ? ' à ' + d.lieu_naissance : '')
-              + ' <a href="' + BASE + 'inscription/detail/' + encodeURIComponent(d.iue)
-              + '" target="_blank">Voir la fiche</a>';
+            li.innerHTML = '<strong>' + d.iue + '</strong> — ' + d.nom + ' ' + d.prenoms
+              + ' — né(e) le ' + d.date_naissance
+              + ' <a href="' + BASE + 'inscription/' + encodeURIComponent(d.iue) + '" target="_blank">Voir la fiche</a>';
             listDoublon.appendChild(li);
           });
-          alertDoublon.style.display = '';
-          btnSubmit.disabled = true; // Forcer confirmation
+          alertDoublon.classList.remove('d-none');
+          btnSubmit.disabled = true;
+          statusMsg.textContent = '';
         } else {
-          alertDoublon.style.display = 'none';
-          statusDoublon.textContent  = '✅ Aucun doublon détecté.';
-          statusDoublon.style.color  = 'green';
+          alertDoublon.classList.add('d-none');
+          statusMsg.innerHTML = '<span class="text-success"><i class="fa-solid fa-check me-1"></i>Aucun doublon détecté.</span>';
           btnSubmit.disabled = false;
         }
-      });
-  }
+      }
+    );
+  });
 
-  btnDoublon.addEventListener('click', checkDoublon);
-
-  confirmCheck.addEventListener('change', function() {
+  confirmChk.addEventListener('change', function() {
     btnSubmit.disabled = !this.checked;
   });
 
-  // ── Validation avant soumission ───────────────────────────────────────────
+  /* ── Validation avant soumission ──────────────────────────────────────────── */
   document.getElementById('fie-insc-form').addEventListener('submit', function(e) {
-    // Vérifier doublon non confirmé
-    if (alertDoublon.style.display !== 'none' && !confirmCheck.checked) {
+    if (!alertDoublon.classList.contains('d-none') && !confirmChk.checked) {
       e.preventDefault();
-      alert('Veuillez confirmer qu\'il ne s\'agit pas d\'un doublon avant de soumettre.');
+      alert("Veuillez confirmer qu'il ne s'agit pas d'un doublon avant de soumettre.");
       return;
     }
-    // Vérifier établissement
     if (!selEtab.value) {
       e.preventDefault();
-      alert('Veuillez sélectionner un établissement.');
+      alert("Veuillez sélectionner un établissement.");
       selEtab.focus();
     }
   });
 
-})();
+}());
 </script>
 
-<?php require FIE_VIEWS_PATH . 'layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>

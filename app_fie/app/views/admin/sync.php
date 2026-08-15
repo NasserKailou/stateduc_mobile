@@ -1,143 +1,204 @@
 <?php
 /**
- * FIE — Vue : Statut synchronisation API StatEduc
+ * FIE — Vue : Synchronisation StatEduc
+ * Bootstrap 5 + Font Awesome — Charte Burundi
+ * CORRECTION Phase 2 : redesign BS5 + suppression use App\...
  */
-use App\Services\SecurityHelper;
-require __DIR__ . '/../layouts/header.php';
+$page_title  = $page_title  ?? 'Synchronisation — Administration FIE';
+$active_menu = $active_menu ?? 'admin';
+require BASE_PATH . '/app/views/layouts/header.php';
 ?>
-<nav aria-label="Fil d'Ariane" class="fie-breadcrumb">
-    <ol>
-        <li><a href="<?= BASE_URL ?>/">Accueil</a></li>
-        <li><a href="<?= BASE_URL ?>/admin">Administration</a></li>
-        <li aria-current="page">Synchronisation</li>
+
+<!-- ── Fil d'Ariane ─────────────────────────────────────────────────────── -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/admin">Administration</a></li>
+        <li class="breadcrumb-item active">Synchronisation</li>
     </ol>
 </nav>
 
-<div class="fie-page-header">
-    <h1 class="fie-page-title">Synchronisation des établissements</h1>
+<!-- ── Titre ───────────────────────────────────────────────────────────── -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="h4 fw-bold mb-0">
+        <i class="fa-solid fa-arrows-rotate me-2" style="color:var(--fie-red)"></i>
+        Synchronisation des établissements
+    </h1>
 </div>
 
-<!-- Stats locales -->
-<div class="fie-stats-grid">
-    <div class="fie-stat-card">
-        <div class="fie-stat-card__label">Total dans la base locale</div>
-        <div class="fie-stat-card__value"><?= number_format($etablissementsCount) ?></div>
-    </div>
-    <?php foreach ($bySource as $src): ?>
-    <div class="fie-stat-card <?= $src['source'] === 'api_stateduc' ? 'fie-stat-card--green' : '' ?>">
-        <div class="fie-stat-card__label"><?= SecurityHelper::e($src['source']) ?></div>
-        <div class="fie-stat-card__value"><?= number_format($src['nb']) ?></div>
-    </div>
-    <?php endforeach; ?>
-</div>
+<!-- ── Résumé ────────────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
 
-<!-- Déclencheur manuel -->
-<div class="fie-card">
-    <h2 class="fie-card__title">Lancer une synchronisation</h2>
-    <form id="syncForm" class="fie-form">
-        <?= SecurityHelper::csrfField() ?>
-        <div class="fie-form-grid">
-            <div class="fie-form-group">
-                <label for="sync_mode" class="fie-label">Mode</label>
-                <select id="sync_mode" name="mode" class="fie-select">
-                    <option value="full">Complète (toutes les pages)</option>
-                    <option value="incremental">Incrémentale (modifiés depuis dernière synchro)</option>
-                </select>
-            </div>
-            <div class="fie-form-group">
-                <label for="sync_per_page" class="fie-label">Taille des pages</label>
-                <select id="sync_per_page" name="per_page" class="fie-select">
-                    <option value="50">50</option>
-                    <option value="100" selected>100</option>
-                    <option value="200">200</option>
-                </select>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small mb-1">
+                    <i class="fa-solid fa-school me-1"></i>Total établissements (miroir)
+                </div>
+                <div class="h3 fw-bold"><?= number_format($etablissementsCount ?? 0) ?></div>
+                <?php if (!empty($bySource)): ?>
+                <div class="mt-2">
+                    <?php foreach ($bySource as $src): ?>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span><?= SecurityHelper::e($src['source']) ?></span>
+                        <span class="fw-semibold"><?= number_format($src['nb']) ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
-        <div class="fie-btn-group">
-            <button type="submit" class="fie-btn fie-btn--primary" id="syncBtn">
-                Lancer la synchronisation
-            </button>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small mb-1">
+                    <i class="fa-solid fa-circle-check text-success me-1"></i>Dernière sync réussie
+                </div>
+                <?php if ($lastSuccess): ?>
+                <div class="fw-bold"><?= date('d/m/Y à H:i', strtotime($lastSuccess['created_at'])) ?></div>
+                <div class="small text-muted">
+                    Insérés : <?= (int)($lastSuccess['nb_inserted'] ?? 0) ?> |
+                    Mis à jour : <?= (int)($lastSuccess['nb_updated'] ?? 0) ?>
+                </div>
+                <?php else: ?>
+                <div class="text-muted">Aucune synchronisation réussie</div>
+                <?php endif; ?>
+            </div>
         </div>
-    </form>
-    <div id="syncResult" class="fie-alert" style="display:none;margin-top:var(--fie-space-4)"></div>
+    </div>
+
+    <div class="col-sm-12 col-lg-4">
+        <!-- Bouton lancer synchronisation -->
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <div class="text-muted small mb-2">
+                    <i class="fa-solid fa-play-circle me-1"></i>Lancer une synchronisation
+                </div>
+                <div class="d-flex gap-2">
+                    <button id="btn-sync-full" class="btn btn-primary btn-sm"
+                            onclick="lancerSync('full')">
+                        <i class="fa-solid fa-arrows-rotate me-1"></i>Complète
+                    </button>
+                    <button id="btn-sync-incr" class="btn btn-outline-secondary btn-sm"
+                            onclick="lancerSync('incremental')">
+                        <i class="fa-solid fa-rotate-right me-1"></i>Incrémentale
+                    </button>
+                </div>
+                <div id="sync-status" class="small text-muted mt-2 d-none">
+                    <i class="fa-solid fa-spinner fa-spin me-1"></i>Synchronisation en cours…
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- Journal des synchronisations -->
-<div class="fie-card">
-    <h2 class="fie-card__title">Journal des synchronisations (20 dernières)</h2>
-    <?php if (empty($logs)): ?>
-        <p class="fie-text--muted">Aucune synchronisation enregistrée.</p>
-    <?php else: ?>
-    <div class="fie-table-wrapper">
-        <table class="fie-table">
-            <thead>
+<!-- ── Journal des synchronisations ──────────────────────────────────────── -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom fw-semibold">
+        <i class="fa-solid fa-list me-2" style="color:var(--fie-red)"></i>
+        Journal des synchronisations (20 dernières)
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Date</th>
+                        <th>Source</th>
+                        <th class="text-center">Statut</th>
+                        <th class="text-center">Insérés</th>
+                        <th class="text-center">Mis à jour</th>
+                        <th class="pe-3">Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if (empty($logs)): ?>
                 <tr>
-                    <th class="fie-table__th">Date</th>
-                    <th class="fie-table__th">Statut</th>
-                    <th class="fie-table__th">Insérés</th>
-                    <th class="fie-table__th">Mis à jour</th>
-                    <th class="fie-table__th">Erreurs</th>
-                    <th class="fie-table__th">Durée</th>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        <i class="fa-solid fa-circle-info me-1"></i>Aucun journal disponible.
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($logs as $log): ?>
-                <tr class="fie-table__row">
-                    <td class="fie-table__td"><?= date('d/m/Y H:i', strtotime($log['created_at'])) ?></td>
-                    <td class="fie-table__td">
-                        <span class="fie-badge fie-badge--<?= $log['statut'] === 'succes' ? 'success' : 'error' ?>">
-                            <?= SecurityHelper::e($log['statut']) ?>
+                <?php else: ?>
+                <?php foreach ($logs as $log): ?>
+                <tr>
+                    <td class="ps-3 text-nowrap small">
+                        <?= date('d/m/Y H:i', strtotime($log['created_at'])) ?>
+                    </td>
+                    <td>
+                        <span class="badge bg-<?= ($log['source'] ?? '') === 'api' ? 'primary' : 'success' ?>">
+                            <i class="fa-solid fa-<?= ($log['source'] ?? '') === 'api' ? 'cloud' : 'file-excel' ?> me-1"></i>
+                            <?= SecurityHelper::e($log['source'] ?? '—') ?>
                         </span>
                     </td>
-                    <td class="fie-table__td"><?= (int)($log['nb_inseres'] ?? 0) ?></td>
-                    <td class="fie-table__td"><?= (int)($log['nb_mis_a_jour'] ?? 0) ?></td>
-                    <td class="fie-table__td">
-                        <?php if ($log['message_erreur']): ?>
-                            <span class="fie-text--sm" style="color:var(--fie-red)" title="<?= SecurityHelper::e($log['message_erreur']) ?>">
-                                <?= SecurityHelper::e(substr($log['message_erreur'], 0, 60)) ?>…
-                            </span>
+                    <td class="text-center">
+                        <?php if (($log['statut'] ?? '') === 'succes'): ?>
+                        <span class="badge bg-success">
+                            <i class="fa-solid fa-check me-1"></i>Succès
+                        </span>
+                        <?php elseif (($log['statut'] ?? '') === 'echec'): ?>
+                        <span class="badge bg-danger">
+                            <i class="fa-solid fa-xmark me-1"></i>Échec
+                        </span>
                         <?php else: ?>
-                            <span class="fie-text--muted">—</span>
+                        <span class="badge bg-secondary"><?= SecurityHelper::e($log['statut'] ?? '—') ?></span>
                         <?php endif; ?>
                     </td>
-                    <td class="fie-table__td fie-text--sm fie-text--muted">
-                        <?= isset($log['duree_secondes']) ? $log['duree_secondes'] . 's' : '—' ?>
-                    </td>
+                    <td class="text-center"><?= (int)($log['nb_inserted'] ?? 0) ?></td>
+                    <td class="text-center"><?= (int)($log['nb_updated'] ?? 0) ?></td>
+                    <td class="pe-3 small text-muted"><?= SecurityHelper::e($log['message'] ?? '') ?></td>
                 </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+                <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <?php endif; ?>
 </div>
 
+<!-- Lien import Excel -->
+<div class="mt-3">
+    <a href="<?= BASE_URL ?>/admin/import-excel" class="btn btn-outline-success btn-sm">
+        <i class="fa-solid fa-file-excel me-1"></i>Importer depuis Excel (fallback hors-ligne)
+    </a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT : lancer synchronisation via AJAX
+     ═══════════════════════════════════════════════════════════════════════ -->
 <script>
-document.getElementById('syncForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const btn    = document.getElementById('syncBtn');
-    const result = document.getElementById('syncResult');
+function lancerSync(mode) {
+    const csrf = '<?= SecurityHelper::getCsrfToken() ?>';
+    const btn  = document.getElementById('btn-sync-' + (mode === 'full' ? 'full' : 'incr'));
+    const status = document.getElementById('sync-status');
+
     btn.disabled = true;
-    btn.textContent = 'Synchronisation en cours…';
-    result.style.display = 'none';
+    status.classList.remove('d-none');
 
-    const fd = new FormData(this);
-    const body = {};
-    fd.forEach(function(v,k){ body[k] = v; });
+    const fd = new FormData();
+    fd.append('csrf_token', csrf);
+    fd.append('mode', mode);
 
-    try {
-        const data = await postJSON('<?= BASE_URL ?>/admin/sync/lancer', body);
-        result.className = 'fie-alert fie-alert--' + (data.ok ? 'success' : 'error');
-        result.textContent = data.message;
-        result.style.display = 'flex';
-        if (data.ok) setTimeout(function(){ location.reload(); }, 2000);
-    } catch(err) {
-        result.className = 'fie-alert fie-alert--error';
-        result.textContent = 'Erreur de communication : ' + err.message;
-        result.style.display = 'flex';
-    } finally {
+    fetch('<?= BASE_URL ?>/admin/sync/lancer', {method: 'POST', body: fd})
+      .then(r => r.json())
+      .then(function(d) {
         btn.disabled = false;
-        btn.textContent = 'Lancer la synchronisation';
-    }
-});
+        status.classList.add('d-none');
+        if (d.ok) {
+            alert('✅ ' + d.message);
+            location.reload();
+        } else {
+            alert('❌ ' + (d.message || d.error || 'Erreur inconnue'));
+        }
+      })
+      .catch(function(e) {
+        btn.disabled = false;
+        status.classList.add('d-none');
+        alert('❌ Erreur réseau : ' + e.message);
+      });
+}
 </script>
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
+
+<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>

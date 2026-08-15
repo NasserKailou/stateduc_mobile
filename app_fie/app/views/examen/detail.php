@@ -1,5 +1,7 @@
-<?php require __DIR__ . '/../layouts/header.php'; ?>
-<div class="fie-page-header"><h1 class="fie-page-title">Résultats d'examen</h1></div>
-<div class="fie-alert fie-alert--info"><div class="fie-alert__body">Module en développement (Phase 3).</div></div>
-<a href="<?= BASE_URL ?>/examen" class="fie-btn fie-btn--ghost">Retour</a>
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
+<?php
+$page_title = "Résultats d'examen — FIE"; $active_menu = 'examen';
+require BASE_PATH . '/app/views/layouts/header.php';
+?>
+<h1 class="h4 fw-bold mb-4"><i class="fa-solid fa-pen-to-square me-2" style="color:var(--fie-red)"></i>Résultats d'examen</h1>
+<div class="alert alert-info"><i class="fa-solid fa-circle-info me-2"></i>Module en cours de développement.</div>
+<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>

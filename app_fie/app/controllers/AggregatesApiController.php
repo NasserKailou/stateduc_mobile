@@ -1,15 +1,13 @@
 <?php
 /**
  * FIE — AggregatesApiController
- * Route interne /api/agregats (dispatche vers api/endpoints/aggregates_ws.php
- * en réutilisant la même logique via redirection interne).
- *
- * Note : pour les appels StatEduc en production, utiliser directement
- * l'endpoint brut api/endpoints/aggregates_ws.php (sans le router FIE)
- * pour éviter le surcoût du bootstrap complet.
+ * Route interne /api/agregats — délègue à api/endpoints/aggregates_ws.php.
+ * CORRECTION Phase 1 :
+ *   - Suppression namespace App\Controllers
+ *   - BASE_PATH utilisé pour le require (défini dans public/index.php)
  */
+
 declare(strict_types=1);
-namespace App\Controllers;
 
 class AggregatesApiController
 {

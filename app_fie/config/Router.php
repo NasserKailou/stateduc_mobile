@@ -1,22 +1,20 @@
 <?php
 /**
- * FIE — Routeur HTTP simple
- * Dispatche les requêtes vers les bons contrôleurs/méthodes.
+ * app_fie/config/Router.php
+ * Routeur HTTP — dispatche les requêtes vers les contrôleurs.
  *
- * Syntaxe de déclaration :
- *   $router->get('/path', 'ControllerClass', 'method')
- *   $router->post('/path', 'ControllerClass', 'method')
- *   $router->any('/path', 'ControllerClass', 'method')
- *
- * Paramètres nommés : /inscription/:iue  → disponibles dans $_GET['iue']
- * Les contrôleurs sont chargés via l'autoloader PSR-4 défini dans config.php
+ * CORRECTIONS PHASE 1 :
+ *   - Suppression du namespace App\Config (incompatible avec l'autoloader simple — pas de PSR-4 complet)
+ *   - Suppression du use App\Services\SecurityHelper (idem)
+ *   - callController() : charge le fichier contrôleur via BASE_PATH/FIE_CTRL_PATH
+ *     et instancie la classe sans namespace (cohérent avec l'autoloader)
+ *   - Ajout de la route GET /inscription (index) manquante
+ *   - Ajout route GET /inscription/:iue/imprimer → printFiche (paramètre $iue passé via $_GET)
+ *   - AJAX routes : uniformisation GET/POST selon usage réel (communes/zones/collines = GET)
+ *   - Route /deconnexion → déplacée avant les routes protégées
  */
 
 declare(strict_types=1);
-
-namespace App\Config;
-
-use App\Services\SecurityHelper;
 
 class Router
 {
@@ -68,59 +66,59 @@ class Router
     private function registerRoutes(): void
     {
         // ── Site public ──────────────────────────────────────────────────────
-        $this->get('/',               'PublicController', 'home');
-        $this->get('/aide',           'PublicController', 'aide');
-        $this->get('/contact',        'PublicController', 'contact');
-        $this->get('/confidentialite','PublicController', 'confidentialite');
-        $this->get('/mentions-legales','PublicController','mentions');
+        $this->get('/',                'PublicController', 'home');
+        $this->get('/aide',            'PublicController', 'aide');
+        $this->get('/contact',         'PublicController', 'contact');
+        $this->get('/confidentialite', 'PublicController', 'confidentialite');
+        $this->get('/mentions-legales','PublicController', 'mentions');
 
         // ── Authentification ─────────────────────────────────────────────────
-        $this->get('/connexion',      'AuthController', 'loginForm');
-        $this->post('/connexion',     'AuthController', 'login');
-        $this->any('/deconnexion',    'AuthController', 'logout');
-
-        // ── Inscriptions ─────────────────────────────────────────────────────
-        $this->get('/inscription',              'InscriptionController', 'index');
-        $this->get('/inscription/nouveau',       'InscriptionController', 'newForm');
-        $this->post('/inscription/nouveau',      'InscriptionController', 'processNew');
-        $this->get('/inscription/recherche',     'InscriptionController', 'search');
-        $this->get('/inscription/:iue',          'InscriptionController', 'detail');
-        $this->get('/inscription/:iue/imprimer', 'InscriptionController', 'printFiche');
-
-        // AJAX
-        $this->post('/inscription/ajax/doublon',        'InscriptionController', 'ajaxCheckDoublon');
-        $this->get('/inscription/ajax/communes',        'InscriptionController', 'ajaxSelectDependent');
-        $this->get('/inscription/ajax/zones',           'InscriptionController', 'ajaxSelectDependent');
-        $this->get('/inscription/ajax/collines',        'InscriptionController', 'ajaxSelectDependent');
-        $this->get('/inscription/ajax/etablissements',  'InscriptionController', 'ajaxSelectDependent');
-
-        // ── Mouvements (squelette) ───────────────────────────────────────────
-        $this->get('/mouvement',           'MouvementController', 'index');
-        $this->get('/mouvement/nouveau',   'MouvementController', 'newForm');
-        $this->post('/mouvement/nouveau',  'MouvementController', 'processNew');
-        $this->get('/mouvement/:id',       'MouvementController', 'detail');
-
-        // ── Examens (squelette) ──────────────────────────────────────────────
-        $this->get('/examen',              'ExamenController', 'index');
-        $this->get('/examen/nouveau',      'ExamenController', 'newForm');
-        $this->post('/examen/nouveau',     'ExamenController', 'processNew');
-        $this->get('/examen/:id',          'ExamenController', 'detail');
+        $this->get('/connexion',  'AuthController', 'loginForm');
+        $this->post('/connexion', 'AuthController', 'login');
+        $this->any('/deconnexion','AuthController', 'logout');
 
         // ── Tableau de bord ──────────────────────────────────────────────────
-        $this->get('/tableau-de-bord',     'DashboardController', 'index');
-        $this->get('/dashboard',           'DashboardController', 'index');
+        $this->get('/tableau-de-bord', 'DashboardController', 'index');
+        $this->get('/dashboard',       'DashboardController', 'index');
+
+        // ── Inscriptions ─────────────────────────────────────────────────────
+        $this->get('/inscription',               'InscriptionController', 'index');
+        $this->get('/inscription/recherche',      'InscriptionController', 'search');
+        $this->get('/inscription/nouveau',        'InscriptionController', 'newForm');
+        $this->post('/inscription/nouveau',       'InscriptionController', 'processNew');
+        // CORRECTION : routes AJAX d'abord (avant :iue sinon capturées par le param)
+        $this->post('/inscription/ajax/doublon',         'InscriptionController', 'ajaxCheckDoublon');
+        $this->get('/inscription/ajax/communes',         'InscriptionController', 'ajaxCommunes');
+        $this->get('/inscription/ajax/zones',            'InscriptionController', 'ajaxZones');
+        $this->get('/inscription/ajax/collines',         'InscriptionController', 'ajaxCollines');
+        $this->get('/inscription/ajax/etablissements',   'InscriptionController', 'ajaxEtablissements');
+        // Routes paramétrées en dernier
+        $this->get('/inscription/:iue/imprimer', 'InscriptionController', 'printFiche');
+        $this->get('/inscription/:iue',           'InscriptionController', 'detail');
+
+        // ── Mouvements (squelette) ───────────────────────────────────────────
+        $this->get('/mouvement',            'MouvementController', 'index');
+        $this->get('/mouvement/nouveau',    'MouvementController', 'newForm');
+        $this->post('/mouvement/nouveau',   'MouvementController', 'processNew');
+        $this->get('/mouvement/:id',        'MouvementController', 'detail');
+
+        // ── Examens (squelette) ──────────────────────────────────────────────
+        $this->get('/examen',               'ExamenController', 'index');
+        $this->get('/examen/nouveau',       'ExamenController', 'newForm');
+        $this->post('/examen/nouveau',      'ExamenController', 'processNew');
+        $this->get('/examen/:id',           'ExamenController', 'detail');
 
         // ── Administration ───────────────────────────────────────────────────
-        $this->get('/admin',               'AdminController', 'index');
-        $this->get('/admin/sync',          'AdminController', 'syncStatus');
-        $this->post('/admin/sync/lancer',  'AdminController', 'triggerSync');
-        $this->get('/admin/import-excel',  'AdminController', 'importExcelForm');
-        $this->post('/admin/import-excel', 'AdminController', 'processExcelImport');
-        $this->get('/admin/users',         'AdminController', 'users');
-        $this->get('/admin/audit',         'AdminController', 'auditLog');
+        $this->get('/admin',                'AdminController', 'index');
+        $this->get('/admin/sync',           'AdminController', 'syncStatus');
+        $this->post('/admin/sync/lancer',   'AdminController', 'triggerSync');
+        $this->get('/admin/import-excel',   'AdminController', 'importExcelForm');
+        $this->post('/admin/import-excel',  'AdminController', 'processExcelImport');
+        $this->get('/admin/users',          'AdminController', 'users');
+        $this->get('/admin/audit',          'AdminController', 'auditLog');
 
         // ── API interne (agrégats) ───────────────────────────────────────────
-        $this->get('/api/agregats',        'AggregatesApiController', 'index');
+        $this->get('/api/agregats',  'AggregatesApiController', 'index');
     }
 
     /* ── Dispatch ─────────────────────────────────────────────────────────── */
@@ -139,7 +137,7 @@ class Router
             // Injecter les paramètres nommés dans $_GET
             foreach ($matches as $key => $val) {
                 if (is_string($key)) {
-                    $_GET[$key] = $val;
+                    $_GET[$key] = urldecode($val);
                 }
             }
 
@@ -153,8 +151,7 @@ class Router
 
     private function callController(string $controllerName, string $action): void
     {
-        // Chemin complet du fichier contrôleur
-        $file = BASE_PATH . '/app/controllers/' . $controllerName . '.php';
+        $file = FIE_CTRL_PATH . $controllerName . '.php';
 
         if (!file_exists($file)) {
             $this->error500("Contrôleur introuvable : $controllerName");
@@ -163,16 +160,16 @@ class Router
 
         require_once $file;
 
-        $fqcn = 'App\\Controllers\\' . $controllerName;
-        if (!class_exists($fqcn)) {
-            $this->error500("Classe introuvable : $fqcn");
+        // Les contrôleurs sont des classes simples (pas de namespace)
+        if (!class_exists($controllerName)) {
+            $this->error500("Classe introuvable : $controllerName");
             return;
         }
 
-        $controller = new $fqcn();
+        $controller = new $controllerName();
 
         if (!method_exists($controller, $action)) {
-            $this->error500("Méthode $action introuvable dans $fqcn");
+            $this->error500("Méthode $action introuvable dans $controllerName");
             return;
         }
 
@@ -186,19 +183,27 @@ class Router
         http_response_code(404);
         $page_title  = 'Page introuvable (404)';
         $active_menu = '';
-        require BASE_PATH . '/app/views/errors/404.php';
+        if (file_exists(FIE_VIEWS_PATH . 'errors/404.php')) {
+            require FIE_VIEWS_PATH . 'errors/404.php';
+        } else {
+            echo '<h1>404 — Page introuvable</h1><p>' . htmlspecialchars($uri, ENT_QUOTES, 'UTF-8') . '</p>';
+        }
     }
 
     private function error500(string $message): void
     {
         http_response_code(500);
         if (defined('FIE_DEBUG') && FIE_DEBUG) {
-            echo '<pre style="padding:2rem;font-family:monospace;color:red">'
+            echo '<pre style="padding:2rem;font-family:monospace;color:red;background:#fff;">'
                . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</pre>';
         } else {
             $page_title  = 'Erreur serveur (500)';
             $active_menu = '';
-            require BASE_PATH . '/app/views/errors/500.php';
+            if (file_exists(FIE_VIEWS_PATH . 'errors/500.php')) {
+                require FIE_VIEWS_PATH . 'errors/500.php';
+            } else {
+                echo '<h1>500 — Erreur serveur</h1>';
+            }
         }
     }
 }

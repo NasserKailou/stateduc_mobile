@@ -1,86 +1,80 @@
-# FIE — Feuille de route de déploiement
+# FIE — Guide de déploiement XAMPP (Phase 4)
 
-## Prérequis serveur
-- PHP ≥ 8.1 (PDO, mbstring, curl, fileinfo, json)
-- MySQL ≥ 8.0
-- Apache 2.4+ ou Nginx avec mod_rewrite / try_files
-- Accès réseau vers le serveur StatEduc (SQL Server)
+## Prérequis
+- XAMPP ≥ 8.1 (PHP 8.1+, Apache 2.4, MySQL/MariaDB 10.4+)
+- Module Apache : `mod_rewrite` activé
+- Extension PHP : `pdo_mysql`, `mbstring`, `fileinfo`, `openssl`
 
-## 1. Installation initiale
+## Étapes
 
-```bash
-# 1. Cloner le dépôt et se positionner sur la branche ak_fie
-git clone <repo> && git checkout ak_fie
-
-# 2. Créer la base de données MySQL
-mysql -u root -p -e "CREATE DATABASE fie_burundi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p fie_burundi < app_fie/db/schema.sql
-
-# 3. Copier et configurer les variables d'environnement
-cp app_fie/config/config.php.dist app_fie/config/config.php
-# Éditer DB_HOST, DB_NAME, DB_USER, DB_PASS, STATEDUC_API_TOKEN, FIE_AGREGATS_API_TOKEN
-
-# 4. Configurer le vhost Apache (DocumentRoot → app_fie/public/)
-# Activer mod_rewrite et AllowOverride All
-
-# 5. Créer le fichier .htaccess dans app_fie/public/
+### 1. Placement des fichiers
 ```
+C:\xampp\htdocs\app_fie\   (Windows)
+/opt/lampp/htdocs/app_fie/ (Linux)
+```
+Le point d'entrée est **`app_fie/public/index.php`**.
 
-## 2. Fichier .htaccess (app_fie/public/)
-
+### 2. Configuration Apache (VirtualHost recommandé)
+Ajouter dans `httpd-vhosts.conf` :
 ```apache
-Options -Indexes
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [L]
-
-# Sécurité
-Header always set X-Frame-Options "SAMEORIGIN"
-Header always set X-Content-Type-Options "nosniff"
+<VirtualHost *:80>
+    ServerName fie.local
+    DocumentRoot "C:/xampp/htdocs/app_fie/public"
+    <Directory "C:/xampp/htdocs/app_fie/public">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
 ```
+Ajouter `127.0.0.1 fie.local` dans `C:\Windows\System32\drivers\etc\hosts`.
 
-## 3. Synchronisation des établissements
+**Ou sans VirtualHost** (accès direct) :
+- URL : `http://localhost/app_fie/public/`
+- S'assurer que `AllowOverride All` est activé pour `htdocs`.
 
-```bash
-# Copier l'endpoint API côté StatEduc
-cp app_fie/api/stateduc/etabs_fie_ws.php StatEduc_burundi/etabs_fie_ws.php
-# Configurer le token dans StatEduc_burundi/config_fie_api.php (non versionné)
-
-# Premier import depuis l'API via l'interface admin
-# → /admin/sync → Lancer (mode Complète)
-
-# Ou fallback Excel si API indisponible
-# → /admin/import-excel → uploader infos_etab_bu.xlsx
-```
-
-## 4. Création du premier administrateur
-
+### 3. Base de données (phpMyAdmin)
 ```sql
-INSERT INTO fie_users (username, password_hash, nom, prenom, role, actif)
-VALUES ('admin', '$2y$12$...', 'Administrateur', 'FIE', 'admin', 1);
--- Générer le hash avec : php -r "echo password_hash('motdepasse', PASSWORD_BCRYPT, ['cost'=>12]);"
+CREATE DATABASE fie_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'fie_user'@'localhost' IDENTIFIED BY 'MotDePasseSecurise!';
+GRANT ALL PRIVILEGES ON fie_db.* TO 'fie_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+Puis importer dans l'ordre :
+1. `app_fie/db/schema.sql` — schéma complet
+2. `app_fie/db/seed_users.sql` — utilisateurs de test
+
+### 4. Configuration `config/config.php`
+```php
+define('DB_HOST',     'localhost');
+define('DB_NAME',     'fie_db');
+define('DB_USER',     'fie_user');    // ou 'root' pour dev local
+define('DB_PASS',     'MotDePasseSecurise!'); // vide pour root XAMPP par défaut
+define('FIE_DEBUG',   true);          // false en production
 ```
 
-## 5. Jalons de déploiement
+### 5. Dossier cache (permissions)
+```bash
+mkdir app_fie/cache
+chmod 750 app_fie/cache   # Linux/Mac
+```
+Sur Windows : clic droit → Propriétés → Sécurité → Écriture pour `IUSR`.
 
-| Phase | Livrable | Délai estimé |
-|-------|----------|-------------|
-| P0 | Infrastructure + schéma BD + admin | Sem. 1–2 |
-| P1 | Module inscription complet + IUE | Sem. 3–6 |
-| P2 | Module mouvement (transferts) | Sem. 7–10 |
-| P3 | Module examens (BEPC/BAC) | Sem. 11–16 |
-| P4 | Synchronisation agrégats → StatEduc | Sem. 17–20 |
-| P5 | Tableaux de bord avancés | Sem. 21–24 |
+### 6. Vérification post-déploiement
+| Test | URL | Résultat attendu |
+|------|-----|-----------------|
+| Page d'accueil publique | `http://fie.local/` | Hero FIE, navbar rouge |
+| Connexion admin | `http://fie.local/connexion` | Formulaire Bootstrap |
+| Login | `admin.fie` / `AdminFIE2026!` | Tableau de bord |
+| Recherche élève | `http://fie.local/inscription/recherche` | Formulaire de recherche |
+| Admin | `http://fie.local/admin` | Page administration |
 
-## 6. Note MySQL ↔ SQL Server
+### 7. Comptes de test (voir `db/seed_users.sql`)
+| Login | Mot de passe | Rôle |
+|-------|-------------|------|
+| `admin.fie` | `AdminFIE2026!` | Super Admin |
+| `admin.bujumbura` | `ProvinceFIE2026!` | Admin provincial |
+| `gest.lycee.mwm` | `GestEtab2026!` | Gestionnaire étab. |
+| `enseignant.dupont` | `Enseignant2026!` | Enseignant |
+| `consultant.mineduc` | `Consultant2026!` | Consultant (lecture) |
 
-**Options d'intégration :**
-
-1. **API REST (recommandé)** — FIE expose `aggregates_ws.php`, StatEduc consomme via CURL ou SSIS. Pas de dépendance driver ODBC côté FIE.
-
-2. **ODBC/PDO SQLSRV** — PHP connecte directement SQL Server via `pdo_sqlsrv` (driver Microsoft). Requiert installation du driver sur le serveur FIE.
-
-3. **Fichiers CSV/intermédiaires** — Export MySQL → CSV → Import SSIS SQL Server. Solution de dernier recours, non temps-réel.
-
-**Recommandation :** Option 1 (API REST) pour la synchronisation agrégats, Option 1 inverse (StatEduc API → FIE) pour les établissements. Zéro couplage technique direct entre les deux SGBD.
+**IMPORTANT** : Changer tous les mots de passe avant mise en production.

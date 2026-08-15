@@ -2,17 +2,19 @@
 /**
  * FIE — AdminController
  * Tableau d'administration : synchronisation API/Excel, gestion utilisateurs, journal d'audit.
- * Toutes les méthodes exigent le rôle 'admin'.
+ * CORRECTION Phase 1 :
+ *   - Suppression namespace App\Controllers et tous les use App\...
+ *   - requireRole() appelé avec rôles valides du schéma
+ *   - Colonne `login` et `last_login_at` conformes au schéma SQL
+ *   - Flash messages normalisés : $_SESSION['fie_flash_*']
  */
 
 declare(strict_types=1);
 
-namespace App\Controllers;
-
-use App\Services\SecurityHelper;
-use App\Services\SyncService;
-use App\Services\Logger;
-use App\Config\Database;
+require_once FIE_SVC_PATH . 'SecurityHelper.php';
+require_once FIE_SVC_PATH . 'Logger.php';
+require_once FIE_SVC_PATH . 'SyncService.php';
+require_once FIE_CFG_PATH . 'Database.php';
 
 class AdminController
 {
@@ -20,7 +22,8 @@ class AdminController
 
     public function __construct()
     {
-        SecurityHelper::requireRole('admin');
+        // Rôles autorisés : super_admin ou admin_central
+        SecurityHelper::requireRole(['super_admin', 'admin_central']);
         $this->log = new Logger('admin');
     }
 
@@ -49,7 +52,7 @@ class AdminController
             "SELECT * FROM sync_log ORDER BY created_at DESC LIMIT 1"
         );
 
-        $pendingAggregats = $db->fetchScalar(
+        $pendingAggregats = (int)$db->fetchScalar(
             "SELECT COUNT(*) FROM agregats_eleves_age_niveau_sexe WHERE synced_to_stateduc = 0"
         );
 
@@ -89,19 +92,18 @@ class AdminController
 
     public function triggerSync(): void
     {
-        // CSRF
         if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
             $this->jsonError('Jeton CSRF invalide', 403);
             return;
         }
 
-        $mode      = $_POST['mode']      ?? 'full';       // 'full' ou 'incremental'
-        $perPage   = (int)($_POST['per_page'] ?? 100);
-        $province  = $_POST['province']  ?? null;
+        $mode     = $_POST['mode']     ?? 'full';
+        $perPage  = (int)($_POST['per_page'] ?? 100);
+        $province = $_POST['province'] ?? null;
 
-        $sync    = new SyncService();
-        $params  = [];
-        if ($province)          $params['province'] = $province;
+        $sync   = new SyncService();
+        $params = [];
+        if ($province)               $params['province']    = $province;
         if ($mode === 'incremental') $params['incremental'] = true;
 
         $this->log->info("Lancement synchronisation manuelle", [
@@ -135,31 +137,35 @@ class AdminController
     public function processExcelImport(): void
     {
         if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
-            $_SESSION['flash_error'] = 'Jeton CSRF invalide.';
+            $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
             header('Location: ' . BASE_URL . '/admin/import-excel');
             exit;
         }
 
         if (empty($_FILES['excel_file']['tmp_name'])) {
-            $_SESSION['flash_error'] = 'Aucun fichier sélectionné.';
+            $_SESSION['fie_flash_error'] = 'Aucun fichier sélectionné.';
             header('Location: ' . BASE_URL . '/admin/import-excel');
             exit;
         }
 
-        $tmpFile = $_FILES['excel_file']['tmp_name'];
+        $tmpFile  = $_FILES['excel_file']['tmp_name'];
         $origName = $_FILES['excel_file']['name'];
-        $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+        $ext      = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
 
         if (!in_array($ext, ['xlsx', 'xls'], true)) {
-            $_SESSION['flash_error'] = 'Format de fichier non supporté. Utilisez .xlsx ou .xls';
+            $_SESSION['fie_flash_error'] = 'Format non supporté. Utilisez .xlsx ou .xls';
             header('Location: ' . BASE_URL . '/admin/import-excel');
             exit;
         }
 
-        // Déplacer dans le dossier cache
-        $destFile = BASE_PATH . '/cache/' . 'import_' . date('YmdHis') . '.' . $ext;
+        $cacheDir = BASE_PATH . '/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0750, true);
+        }
+
+        $destFile = $cacheDir . '/import_' . date('YmdHis') . '.' . $ext;
         if (!move_uploaded_file($tmpFile, $destFile)) {
-            $_SESSION['flash_error'] = 'Erreur lors de l\'enregistrement du fichier.';
+            $_SESSION['fie_flash_error'] = "Erreur lors de l'enregistrement du fichier.";
             header('Location: ' . BASE_URL . '/admin/import-excel');
             exit;
         }
@@ -172,18 +178,17 @@ class AdminController
         $sync   = new SyncService();
         $result = $sync->importFromExcel($destFile);
 
-        // Supprimer le fichier temporaire
         @unlink($destFile);
 
         if ($result['ok']) {
-            $_SESSION['flash_success'] = sprintf(
+            $_SESSION['fie_flash_success'] = sprintf(
                 'Import terminé : %d insérés, %d mis à jour, %d ignorés.',
                 $result['inserted'] ?? 0,
                 $result['updated']  ?? 0,
                 $result['skipped']  ?? 0
             );
         } else {
-            $_SESSION['flash_error'] = 'Erreur lors de l\'import : ' . ($result['error'] ?? 'inconnue');
+            $_SESSION['fie_flash_error'] = "Erreur lors de l'import : " . ($result['error'] ?? 'inconnue');
         }
 
         header('Location: ' . BASE_URL . '/admin/sync');
@@ -194,11 +199,12 @@ class AdminController
 
     public function users(): void
     {
-        $db    = Database::getInstance();
+        $db = Database::getInstance();
+        // CORRECTION : colonnes conformes au schéma (login, not username; last_login_at, not derniere_connexion)
         $users = $db->fetchAll(
-            "SELECT id, username, nom, prenom, role, province_code,
-                    actif, derniere_connexion, created_at
-             FROM fie_users ORDER BY nom, prenom"
+            "SELECT id, login, nom, prenoms, role, province_code,
+                    actif, last_login_at, created_at
+             FROM fie_users ORDER BY nom, prenoms"
         );
 
         $page_title  = 'Utilisateurs — Administration FIE';
@@ -216,11 +222,12 @@ class AdminController
         $perPage = 50;
         $offset  = ($page - 1) * $perPage;
 
-        $total   = (int)$db->fetchScalar("SELECT COUNT(*) FROM audit_log");
-        $pages   = max(1, (int)ceil($total / $perPage));
+        $total = (int)$db->fetchScalar("SELECT COUNT(*) FROM audit_log");
+        $pages = max(1, (int)ceil($total / $perPage));
 
+        // CORRECTION : colonne `login` pas `username` dans la jointure
         $logs = $db->fetchAll(
-            "SELECT al.*, fu.username
+            "SELECT al.*, fu.login AS username
              FROM audit_log al
              LEFT JOIN fie_users fu ON al.user_id = fu.id
              ORDER BY al.created_at DESC
@@ -228,7 +235,7 @@ class AdminController
             [$perPage, $offset]
         );
 
-        $page_title  = 'Journal d\'audit — Administration FIE';
+        $page_title  = "Journal d'audit — Administration FIE";
         $active_menu = 'admin';
         require BASE_PATH . '/app/views/admin/audit.php';
     }

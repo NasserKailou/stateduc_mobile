@@ -1,86 +1,169 @@
 <?php
 /**
  * FIE — Vue : Tableau d'administration
+ * Bootstrap 5 + Font Awesome — Charte Burundi
+ * CORRECTION Phase 2 : suppression use App\Services\SecurityHelper + redesign BS5
  */
-use App\Services\SecurityHelper;
 $page_title  = $page_title  ?? 'Administration — FIE';
 $active_menu = $active_menu ?? 'admin';
-require __DIR__ . '/../layouts/header.php';
+require BASE_PATH . '/app/views/layouts/header.php';
 ?>
-<nav aria-label="Fil d'Ariane" class="fie-breadcrumb">
-    <ol><li><a href="<?= BASE_URL ?>/">Accueil</a></li><li aria-current="page">Administration</li></ol>
+
+<!-- ── Fil d'Ariane ─────────────────────────────────────────────────────── -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/">Accueil</a></li>
+        <li class="breadcrumb-item active">Administration</li>
+    </ol>
 </nav>
 
-<div class="fie-page-header">
-    <h1 class="fie-page-title">Administration FIE</h1>
+<!-- ── Titre ───────────────────────────────────────────────────────────── -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="h4 fw-bold mb-0">
+        <i class="fa-solid fa-gears me-2" style="color:var(--fie-red)"></i>Administration FIE
+    </h1>
 </div>
 
-<!-- Stats -->
-<div class="fie-stats-grid">
-    <div class="fie-stat-card">
-        <div class="fie-stat-card__label">Établissements (miroir)</div>
-        <div class="fie-stat-card__value"><?= number_format($stats['etablissements']) ?></div>
-        <div class="fie-stat-card__sub">base locale synchronisée</div>
+<!-- ── KPI Cards ──────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3" style="background:#f0f4ff;min-width:52px;height:52px;display:flex;align-items:center;justify-content:center">
+                    <i class="fa-solid fa-school fa-lg" style="color:#0d6efd"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Établissements (miroir)</div>
+                    <div class="h4 fw-bold mb-0"><?= number_format($stats['etablissements']) ?></div>
+                    <div class="text-muted small">base locale synchronisée</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="fie-stat-card fie-stat-card--green">
-        <div class="fie-stat-card__label">Élèves enregistrés</div>
-        <div class="fie-stat-card__value"><?= number_format($stats['eleves']) ?></div>
-        <div class="fie-stat-card__sub">avec IUE unique</div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3" style="background:#f0fff4;min-width:52px;height:52px;display:flex;align-items:center;justify-content:center">
+                    <i class="fa-solid fa-users fa-lg" style="color:var(--fie-green)"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Élèves enregistrés</div>
+                    <div class="h4 fw-bold mb-0"><?= number_format($stats['eleves']) ?></div>
+                    <div class="text-muted small">avec IUE unique</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="fie-stat-card fie-stat-card--blue">
-        <div class="fie-stat-card__label">Inscriptions actives</div>
-        <div class="fie-stat-card__value"><?= number_format($stats['inscriptions']) ?></div>
-        <div class="fie-stat-card__sub">année en cours</div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3" style="background:#fff5f5;min-width:52px;height:52px;display:flex;align-items:center;justify-content:center">
+                    <i class="fa-solid fa-file-lines fa-lg" style="color:var(--fie-red)"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Inscriptions actives</div>
+                    <div class="h4 fw-bold mb-0"><?= number_format($stats['inscriptions']) ?></div>
+                    <div class="text-muted small">année en cours</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <?php if ($stats['doublons'] > 0): ?>
-    <div class="fie-stat-card fie-stat-card--warn">
-        <div class="fie-stat-card__label">Doublons suspects</div>
-        <div class="fie-stat-card__value"><?= number_format($stats['doublons']) ?></div>
-        <div class="fie-stat-card__sub"><a href="<?= BASE_URL ?>/inscription/recherche?doublons_only=1">Voir</a></div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 <?= $stats['doublons'] > 0 ? 'border-warning' : '' ?>">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3" style="background:#fffbf0;min-width:52px;height:52px;display:flex;align-items:center;justify-content:center">
+                    <i class="fa-solid fa-copy fa-lg" style="color:<?= $stats['doublons'] > 0 ? '#fd7e14' : '#adb5bd' ?>"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Doublons suspects</div>
+                    <div class="h4 fw-bold mb-0" style="color:<?= $stats['doublons'] > 0 ? '#fd7e14' : 'inherit' ?>">
+                        <?= number_format($stats['doublons']) ?>
+                    </div>
+                    <?php if ($stats['doublons'] > 0): ?>
+                    <a href="<?= BASE_URL ?>/inscription/recherche?doublons_only=1" class="small text-warning">Voir les doublons</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
-    <?php endif; ?>
+
 </div>
 
-<!-- Actions rapides -->
-<div class="fie-card">
-    <h2 class="fie-card__title">Actions rapides</h2>
-    <div class="fie-btn-group">
-        <a href="<?= BASE_URL ?>/admin/sync" class="fie-btn fie-btn--secondary">
-            État de la synchronisation
-        </a>
-        <a href="<?= BASE_URL ?>/admin/import-excel" class="fie-btn fie-btn--secondary">
-            Import Excel établissements
-        </a>
-        <a href="<?= BASE_URL ?>/admin/users" class="fie-btn fie-btn--secondary">
-            Gestion des utilisateurs
-        </a>
-        <a href="<?= BASE_URL ?>/admin/audit" class="fie-btn fie-btn--ghost">
-            Journal d'audit
-        </a>
-    </div>
-</div>
-
-<!-- Dernière synchro -->
+<!-- ── Info synchronisation ──────────────────────────────────────────────── -->
 <?php if ($lastSync): ?>
-<div class="fie-card">
-    <h2 class="fie-card__title">Dernière synchronisation</h2>
-    <dl class="fie-dl">
-        <dt>Date</dt>
-        <dd><?= SecurityHelper::e(date('d/m/Y H:i', strtotime($lastSync['created_at']))) ?></dd>
-        <dt>Statut</dt>
-        <dd>
-            <span class="fie-badge fie-badge--<?= $lastSync['statut'] === 'succes' ? 'success' : 'error' ?>">
-                <?= SecurityHelper::e($lastSync['statut']) ?>
-            </span>
-        </dd>
-        <dt>Insérés</dt><dd><?= (int)($lastSync['nb_inseres'] ?? 0) ?></dd>
-        <dt>Mis à jour</dt><dd><?= (int)($lastSync['nb_mis_a_jour'] ?? 0) ?></dd>
-        <?php if ($lastSync['message_erreur']): ?>
-        <dt>Erreur</dt>
-        <dd style="color:var(--fie-red)"><?= SecurityHelper::e($lastSync['message_erreur']) ?></dd>
+<div class="alert alert-<?= ($lastSync['statut'] ?? '') === 'succes' ? 'success' : 'warning' ?> d-flex align-items-center gap-2 mb-4">
+    <i class="fa-solid fa-<?= ($lastSync['statut'] ?? '') === 'succes' ? 'circle-check' : 'triangle-exclamation' ?>"></i>
+    <span>
+        Dernière synchronisation :
+        <strong><?= SecurityHelper::e(date('d/m/Y à H:i', strtotime($lastSync['created_at']))) ?></strong>
+        — Statut : <strong><?= SecurityHelper::e($lastSync['statut'] ?? 'inconnu') ?></strong>
+        <?php if (isset($lastSync['message'])): ?>
+        — <?= SecurityHelper::e($lastSync['message']) ?>
         <?php endif; ?>
-    </dl>
+    </span>
 </div>
 <?php endif; ?>
 
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
+<?php if ($pendingAggregats > 0): ?>
+<div class="alert alert-warning d-flex align-items-center gap-2 mb-4">
+    <i class="fa-solid fa-clock-rotate-left"></i>
+    <span>
+        <strong><?= number_format($pendingAggregats) ?></strong> agrégat(s) en attente de synchronisation vers StatEduc.
+    </span>
+</div>
+<?php endif; ?>
+
+<!-- ── Navigation admin ───────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6 col-lg-3">
+        <a href="<?= BASE_URL ?>/admin/sync"
+           class="card border-0 shadow-sm text-decoration-none text-dark h-100">
+            <div class="card-body text-center py-4">
+                <i class="fa-solid fa-arrows-rotate fa-2x mb-3" style="color:var(--fie-green)"></i>
+                <div class="fw-semibold">Synchronisation</div>
+                <div class="text-muted small">API StatEduc &amp; Import Excel</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <a href="<?= BASE_URL ?>/admin/users"
+           class="card border-0 shadow-sm text-decoration-none text-dark h-100">
+            <div class="card-body text-center py-4">
+                <i class="fa-solid fa-users-gear fa-2x mb-3" style="color:#0d6efd"></i>
+                <div class="fw-semibold">Utilisateurs</div>
+                <div class="text-muted small">Gestion des comptes &amp; rôles</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <a href="<?= BASE_URL ?>/admin/audit"
+           class="card border-0 shadow-sm text-decoration-none text-dark h-100">
+            <div class="card-body text-center py-4">
+                <i class="fa-solid fa-list-check fa-2x mb-3" style="color:#6f42c1"></i>
+                <div class="fw-semibold">Journal d'audit</div>
+                <div class="text-muted small">Traçabilité complète des actions</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <a href="<?= BASE_URL ?>/admin/import-excel"
+           class="card border-0 shadow-sm text-decoration-none text-dark h-100">
+            <div class="card-body text-center py-4">
+                <i class="fa-solid fa-file-excel fa-2x mb-3" style="color:#20c997"></i>
+                <div class="fw-semibold">Import Excel</div>
+                <div class="text-muted small">Fichier infos_etab_bu.xlsx</div>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>

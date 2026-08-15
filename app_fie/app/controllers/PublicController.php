@@ -2,9 +2,13 @@
 /**
  * FIE — PublicController
  * Site public accessible sans authentification.
+ * CORRECTION Phase 1 :
+ *   - Suppression namespace App\Controllers
+ *   - Pas de require de SecurityHelper (non nécessaire ici — pages publiques)
+ *   - BASE_PATH utilisé pour les require (défini dans index.php)
  */
+
 declare(strict_types=1);
-namespace App\Controllers;
 
 class PublicController
 {
