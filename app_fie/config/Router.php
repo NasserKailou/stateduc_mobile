@@ -117,8 +117,13 @@ class Router
         $this->get('/admin/users',          'AdminController', 'users');
         $this->get('/admin/audit',          'AdminController', 'auditLog');
 
+        // ── Administration — Paramétrage StatEduc ────────────────────────────
+        $this->get('/admin/parametres',  'ParametresController', 'index');
+        $this->post('/admin/parametres', 'ParametresController', 'save');
+
         // ── API interne (agrégats) ───────────────────────────────────────────
-        $this->get('/api/agregats',  'AggregatesApiController', 'index');
+        $this->get('/api/agregats',         'AggregatesApiController',   'index');
+        $this->get('/api/etablissements',   'EtablissementsApiController', 'index');
     }
 
     /* ── Dispatch ─────────────────────────────────────────────────────────── */

@@ -136,7 +136,7 @@
         
 		$nom_theme = $_POST['ASSOCIATE_OLAP_FILE'];
 		$nom_fichier="";
-		if(eregi("(\.cub)",$nom_theme))
+		if(preg_match("/(\.cub)/i", $nom_theme))
 			$nom_fichier=$nom_theme;			
 		else
 		$nom_fichier=$nom_theme.'.cub'	;		

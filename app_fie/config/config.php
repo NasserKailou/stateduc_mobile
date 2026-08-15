@@ -138,7 +138,10 @@ spl_autoload_register(function (string $className): void {
         'PublicController'      => FIE_CTRL_PATH . 'PublicController.php',
         'MouvementController'   => FIE_CTRL_PATH . 'MouvementController.php',
         'ExamenController'      => FIE_CTRL_PATH . 'ExamenController.php',
-        'AggregatesApiController' => FIE_CTRL_PATH . 'AggregatesApiController.php',
+        'AggregatesApiController'   => FIE_CTRL_PATH . 'AggregatesApiController.php',
+        'ParametresController'      => FIE_CTRL_PATH . 'ParametresController.php',
+        'EtablissementsApiController' => FIE_CTRL_PATH . 'EtablissementsApiController.php',
+        'StatEducClient'            => FIE_SERVICES_PATH . 'StatEducClient.php',
     ];
 
     if (isset($map[$bare]) && file_exists($map[$bare])) {
