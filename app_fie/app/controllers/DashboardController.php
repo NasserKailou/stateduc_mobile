@@ -9,8 +9,8 @@
 
 declare(strict_types=1);
 
-require_once FIE_SVC_PATH . 'SecurityHelper.php';
-require_once FIE_CFG_PATH . 'Database.php';
+require_once FIE_SERVICES_PATH . 'SecurityHelper.php';
+require_once FIE_CONFIG_PATH   . 'Database.php';
 
 class DashboardController
 {

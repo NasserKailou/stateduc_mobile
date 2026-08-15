@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-require_once FIE_SVC_PATH . 'SecurityHelper.php';
+require_once FIE_SERVICES_PATH . 'SecurityHelper.php';
 
 class ExamenController
 {

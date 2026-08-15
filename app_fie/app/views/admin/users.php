@@ -89,7 +89,7 @@ $roleLabels = [
                         </span>
                     </td>
                     <td class="small text-muted">
-                        <?= SecurityHelper::e($u['province_code'] ?? '—') ?>
+                        <?= SecurityHelper::e($u['province_perimetre'] ?? '—') ?>
                     </td>
                     <td class="text-center">
                         <?php if ($u['actif']): ?>

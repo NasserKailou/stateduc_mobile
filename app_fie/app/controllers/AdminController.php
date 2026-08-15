@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-require_once FIE_SVC_PATH . 'SecurityHelper.php';
-require_once FIE_SVC_PATH . 'Logger.php';
-require_once FIE_SVC_PATH . 'SyncService.php';
-require_once FIE_CFG_PATH . 'Database.php';
+require_once FIE_SERVICES_PATH . 'SecurityHelper.php';
+require_once FIE_SERVICES_PATH . 'Logger.php';
+require_once FIE_SERVICES_PATH . 'SyncService.php';
+require_once FIE_CONFIG_PATH   . 'Database.php';
 
 class AdminController
 {
@@ -202,7 +202,7 @@ class AdminController
         $db = Database::getInstance();
         // CORRECTION : colonnes conformes au schéma (login, not username; last_login_at, not derniere_connexion)
         $users = $db->fetchAll(
-            "SELECT id, login, nom, prenoms, role, province_code,
+            "SELECT id, login, nom, prenoms, role, province_perimetre,
                     actif, last_login_at, created_at
              FROM fie_users ORDER BY nom, prenoms"
         );
