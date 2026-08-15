@@ -29,8 +29,9 @@
     --bs-link-color:    #CE1126;
     --bs-link-hover-color: #a50d1e;
 
-    /* Typographie */
-    --fie-font-sans:    'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+    /* Typographie — Poppins pour titres, Open Sans pour corps */
+    --fie-font-title:   'Poppins', 'Segoe UI', system-ui, Arial, sans-serif;
+    --fie-font-sans:    'Open Sans', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
     --fie-font-mono:    'Courier New', Courier, monospace;
 }
 
@@ -38,6 +39,7 @@
    2. BASE
    ═══════════════════════════════════════════════════════════════ */
 body { font-family: var(--fie-font-sans); background-color: #f8f9fa; }
+h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title); }
 .fie-body { display: flex; flex-direction: column; min-height: 100vh; }
 
 /* ═══════════════════════════════════════════════════════════════

@@ -1,0 +1,57 @@
+# =============================================================================
+# app_fie/.htaccess — Point d'entrée racine
+# XAMPP / Apache 2.4 — Port 8085
+#
+# PROBLÈME RÉSOLU :
+#   http://localhost:8085/app_fie       → affiche le site public FIE
+#   http://localhost:8085/app_fie/...   → routes propres (connexion, inscription…)
+#
+# FONCTIONNEMENT :
+#   Toutes les requêtes vers app_fie/ sont réécrites de manière transparente
+#   vers app_fie/public/ sans exposer l'arborescence interne (config/, db/, app/…).
+#
+# PRÉ-REQUIS XAMPP :
+#   1. Dans httpd.conf, s'assurer que mod_rewrite est activé :
+#        LoadModule rewrite_module modules/mod_rewrite.so   ← décommenter si nécessaire
+#   2. Pour le répertoire app_fie dans httpd.conf ou httpd-vhosts.conf :
+#        <Directory "C:/xampp/htdocs/app_fie">
+#            AllowOverride All
+#            Require all granted
+#        </Directory>
+#   3. Redémarrer Apache depuis le panneau de contrôle XAMPP.
+# =============================================================================
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Base du sous-répertoire (adapter si app_fie n'est pas à la racine htdocs)
+    RewriteBase /app_fie/
+
+    # ── 1. Laisser passer les ressources physiques de public/ (CSS, JS, images)
+    #        Ex: /app_fie/css/fie.css → /app_fie/public/css/fie.css (géré par public/.htaccess)
+    RewriteCond %{REQUEST_URI} ^/app_fie/public/ [NC]
+    RewriteRule ^ - [L]
+
+    # ── 2. Laisser passer les fichiers/dossiers qui existent réellement sous app_fie/
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # ── 3. Tout le reste → redirection interne transparente vers public/index.php
+    #        /app_fie          → public/index.php (route /)
+    #        /app_fie/connexion → public/index.php (route /connexion)
+    #        /app_fie/inscription/nouveau → public/index.php
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
+</IfModule>
+
+# Sécurité : interdire l'accès direct aux fichiers sensibles
+<FilesMatch "\.(sql|log|env|ini|sh|lock|json|md|bak)$">
+    Require all denied
+</FilesMatch>
+
+# Interdire l'accès direct aux dossiers internes (config, db, services, app)
+<IfModule mod_rewrite.c>
+    RewriteRule ^(config|db|services|app|api/stateduc)(/|$) - [F,L]
+</IfModule>
