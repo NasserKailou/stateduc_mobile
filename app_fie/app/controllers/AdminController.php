@@ -96,35 +96,53 @@ class AdminController
 
     public function triggerSync(): void
     {
+        // Garantir que la réponse est toujours JSON même en cas d'exception PHP
+        header('Content-Type: application/json; charset=utf-8');
+
         if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
             $this->jsonError('Jeton CSRF invalide', 403);
             return;
         }
 
         $mode     = $_POST['mode']     ?? 'full';
-        $perPage  = (int)($_POST['per_page'] ?? 100);
         $province = $_POST['province'] ?? null;
 
-        $sync   = new SyncService();
-        $params = [];
-        if ($province)               $params['province']    = $province;
-        if ($mode === 'incremental') $params['incremental'] = true;
-
         $this->log->info("Lancement synchronisation manuelle", [
-            'user'     => $_SESSION['fie_user']['username'] ?? 'unknown',
+            'user'     => $_SESSION['fie_user']['login'] ?? 'unknown',
             'mode'     => $mode,
             'province' => $province,
         ]);
 
-        $result = $sync->syncFromApi($params, $perPage);
+        try {
+            $sync = new SyncService();
 
-        SecurityHelper::jsonResponse([
-            'ok'      => $result['ok'],
-            'message' => $result['ok']
-                ? "Synchronisation terminée : {$result['inserted']} insérés, {$result['updated']} mis à jour."
-                : "Synchronisation échouée : " . ($result['error'] ?? 'erreur inconnue'),
-            'data'    => $result,
-        ]);
+            // syncFromApi(?string $updatedSince, ?int $secteur, ?string $province, ?string $triggeredBy)
+            $updatedSince = ($mode === 'incremental') ? date('Y-m-d', strtotime('-7 days')) : null;
+            $user         = $_SESSION['fie_user']['login'] ?? 'admin';
+
+            $result = $sync->syncFromApi(
+                updatedSince: $updatedSince,
+                province:     $province ?: null,
+                triggeredBy:  $user
+            );
+
+            SecurityHelper::jsonResponse([
+                'ok'      => true,
+                'message' => "Synchronisation terminée : {$result['inserted']} insérés, {$result['updated']} mis à jour, {$result['errors']} erreurs.",
+                'data'    => $result,
+            ]);
+
+        } catch (Throwable $e) {
+            $this->log->error("triggerSync échoué : " . $e->getMessage());
+            // Réponse JSON propre — jamais de HTML
+            http_response_code(200); // 200 pour que fetch() .then(r=>r.json()) fonctionne
+            echo json_encode([
+                'ok'    => false,
+                'error' => $e->getMessage(),
+                'message' => 'Synchronisation échouée : ' . $e->getMessage(),
+            ]);
+            exit;
+        }
     }
 
     /* ── GET /admin/import-excel ─────────────────────────────────────────── */

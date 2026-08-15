@@ -41,8 +41,12 @@ define('DB_PASS',    getenv('FIE_DB_PASS')    ?: '');       // XAMPP default (em
 define('DB_CHARSET', 'utf8mb4');
 
 // ─── API StatEduc (source de vérité des établissements) ─────────────────────
-define('STATEDUC_API_BASE_URL',  getenv('STATEDUC_API_URL')   ?: 'http://stateduc.ins.bi/');
-define('STATEDUC_API_TOKEN',     getenv('STATEDUC_API_TOKEN') ?: 'CHANGE_ME_IN_ENV');
+// PRIORITÉ : fie_settings (DB) > variable d'env > constante ci-dessous.
+// La valeur ci-dessous n'est utilisée que si fie_settings est vide ET
+// que la variable d'env STATEDUC_API_URL n'est pas définie.
+// En développement local XAMPP : stateduc_burundi tourne sur le même serveur.
+define('STATEDUC_API_BASE_URL',  getenv('STATEDUC_API_URL')   ?: 'http://localhost:8085/stateduc_burundi');
+define('STATEDUC_API_TOKEN',     getenv('STATEDUC_API_TOKEN') ?: '');  // vide = accès ouvert en dev
 define('STATEDUC_API_TIMEOUT',   30);
 define('STATEDUC_SYNC_PAGE_SIZE', 500);
 

@@ -190,7 +190,18 @@ function lancerSync(mode) {
     fd.append('mode', mode);
 
     fetch('<?= BASE_URL ?>/admin/sync/lancer', {method: 'POST', body: fd})
-      .then(r => r.json())
+      .then(function(r) {
+        // Lire le texte brut pour détecter si la réponse n'est pas du JSON
+        return r.text().then(function(text) {
+            try {
+                return JSON.parse(text);
+            } catch(e) {
+                // La réponse n'est pas du JSON — afficher un aperçu pour diagnostiquer
+                var preview = text.replace(/<[^>]+>/g, '').substring(0, 400).trim();
+                throw new Error('Réponse non-JSON reçue du serveur.\n\nDébut de la réponse :\n' + preview);
+            }
+        });
+      })
       .then(function(d) {
         btn.disabled = false;
         status.classList.add('d-none');
@@ -198,13 +209,14 @@ function lancerSync(mode) {
             alert('✅ ' + d.message);
             location.reload();
         } else {
-            alert('❌ ' + (d.message || d.error || 'Erreur inconnue'));
+            var msg = d.message || d.error || 'Erreur inconnue';
+            alert('❌ ' + msg);
         }
       })
       .catch(function(e) {
         btn.disabled = false;
         status.classList.add('d-none');
-        alert('❌ Erreur réseau : ' + e.message);
+        alert('❌ ' + e.message);
       });
 }
 </script>
