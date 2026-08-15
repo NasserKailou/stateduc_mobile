@@ -7,6 +7,14 @@
  *   - requireRole() appelé avec rôles valides du schéma
  *   - Colonne `login` et `last_login_at` conformes au schéma SQL
  *   - Flash messages normalisés : $_SESSION['fie_flash_*']
+ * CORRECTION Phase 2 :
+ *   - Database::getInstance() retourne un objet PDO brut (pas de wrapper).
+ *   - fetchScalar / fetchAll / fetchOne sont des méthodes STATIQUES de la
+ *     classe Database, pas des méthodes d'instance PDO.
+ *   - Suppression de tous les $db = Database::getInstance() dans les
+ *     méthodes index(), syncStatus(), users() et auditLog().
+ *   - Remplacement de $db->fetchScalar/fetchAll/fetchOne(...)
+ *     par Database::fetchScalar/fetchAll/fetchOne(...) partout.
  */
 
 declare(strict_types=1);
@@ -31,28 +39,26 @@ class AdminController
 
     public function index(): void
     {
-        $db = Database::getInstance();
-
         $stats = [
-            'etablissements' => (int)$db->fetchScalar(
+            'etablissements' => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM etablissements_miroir WHERE actif = 1"
             ),
-            'eleves'         => (int)$db->fetchScalar(
+            'eleves'         => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM eleves"
             ),
-            'inscriptions'   => (int)$db->fetchScalar(
+            'inscriptions'   => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM inscriptions WHERE statut = 'actif'"
             ),
-            'doublons'       => (int)$db->fetchScalar(
+            'doublons'       => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM eleves WHERE doublon_suspect = 1"
             ),
         ];
 
-        $lastSync = $db->fetchOne(
+        $lastSync = Database::fetchOne(
             "SELECT * FROM sync_log ORDER BY created_at DESC LIMIT 1"
         );
 
-        $pendingAggregats = (int)$db->fetchScalar(
+        $pendingAggregats = (int)Database::fetchScalar(
             "SELECT COUNT(*) FROM agregats_eleves_age_niveau_sexe WHERE synced_to_stateduc = 0"
         );
 
@@ -65,21 +71,19 @@ class AdminController
 
     public function syncStatus(): void
     {
-        $db = Database::getInstance();
-
-        $logs = $db->fetchAll(
+        $logs = Database::fetchAll(
             "SELECT * FROM sync_log ORDER BY created_at DESC LIMIT 20"
         );
 
-        $lastSuccess = $db->fetchOne(
+        $lastSuccess = Database::fetchOne(
             "SELECT * FROM sync_log WHERE statut = 'succes' ORDER BY created_at DESC LIMIT 1"
         );
 
-        $etablissementsCount = (int)$db->fetchScalar(
+        $etablissementsCount = (int)Database::fetchScalar(
             "SELECT COUNT(*) FROM etablissements_miroir"
         );
 
-        $bySource = $db->fetchAll(
+        $bySource = Database::fetchAll(
             "SELECT source, COUNT(*) as nb FROM etablissements_miroir GROUP BY source"
         );
 
@@ -199,9 +203,8 @@ class AdminController
 
     public function users(): void
     {
-        $db = Database::getInstance();
         // CORRECTION : colonnes conformes au schéma (login, not username; last_login_at, not derniere_connexion)
-        $users = $db->fetchAll(
+        $users = Database::fetchAll(
             "SELECT id, login, nom, prenoms, role, province_perimetre,
                     actif, last_login_at, created_at
              FROM fie_users ORDER BY nom, prenoms"
@@ -216,17 +219,15 @@ class AdminController
 
     public function auditLog(): void
     {
-        $db = Database::getInstance();
-
         $page    = max(1, (int)($_GET['page'] ?? 1));
         $perPage = 50;
         $offset  = ($page - 1) * $perPage;
 
-        $total = (int)$db->fetchScalar("SELECT COUNT(*) FROM audit_log");
+        $total = (int)Database::fetchScalar("SELECT COUNT(*) FROM audit_log");
         $pages = max(1, (int)ceil($total / $perPage));
 
         // CORRECTION : colonne `login` pas `username` dans la jointure
-        $logs = $db->fetchAll(
+        $logs = Database::fetchAll(
             "SELECT al.*, fu.login AS username
              FROM audit_log al
              LEFT JOIN fie_users fu ON al.user_id = fu.id

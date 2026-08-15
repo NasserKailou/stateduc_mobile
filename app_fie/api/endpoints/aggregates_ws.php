@@ -47,6 +47,14 @@
  *   POST /api/agregats/mark-synced
  *   Body JSON : { "token":"...", "ids": [1,2,3] }
  * pour que le FIE mette à jour synced_to_stateduc = 1.
+ *
+ * CORRECTION Phase 2 :
+ *   - Suppression des use App\Config\Database et use App\Services\Logger
+ *     (pas de namespaces dans ce projet — PHP MVC sans framework)
+ *   - Database::getInstance() retourne un PDO brut ; fetchScalar/fetchAll/query
+ *     sont des méthodes STATIQUES de la classe Database.
+ *   - Remplacement de $db->fetchScalar/fetchAll/query par Database::fetchScalar/fetchAll/query
+ *   - Suppression des $db = Database::getInstance() dans les blocs GET et POST.
  */
 
 declare(strict_types=1);
@@ -66,8 +74,8 @@ set_error_handler(function (int $errno, string $errstr) {
 });
 
 require BASE_PATH . '/config/config.php';
-use App\Config\Database;
-use App\Services\Logger;
+require_once FIE_CONFIG_PATH   . 'Database.php';
+require_once FIE_SERVICES_PATH . 'Logger.php';
 
 $log = new Logger('api_agregats');
 
@@ -124,12 +132,12 @@ $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 // ══════════════════════════════════════════════════════════════════════════════
 if ($method === 'GET') {
 
-    $codeAnnee  = isset($_GET['code_annee'])  ? (int)$_GET['code_annee']  : null;
-    $codeEtab   = isset($_GET['code_etab'])   ? (int)$_GET['code_etab']   : null;
+    $codeAnnee   = isset($_GET['code_annee'])  ? (int)$_GET['code_annee']  : null;
+    $codeEtab    = isset($_GET['code_etab'])   ? (int)$_GET['code_etab']   : null;
     $pendingOnly = !empty($_GET['pending_only']);
-    $page       = max(1, (int)($_GET['page']     ?? 1));
-    $perPage    = min(1000, max(1, (int)($_GET['per_page'] ?? 500)));
-    $offset     = ($page - 1) * $perPage;
+    $page        = max(1, (int)($_GET['page']     ?? 1));
+    $perPage     = min(1000, max(1, (int)($_GET['per_page'] ?? 500)));
+    $offset      = ($page - 1) * $perPage;
 
     // Au moins un filtre obligatoire (sinon table entière)
     if ($codeAnnee === null && $codeEtab === null) {
@@ -154,15 +162,13 @@ if ($method === 'GET') {
 
     $whereClause = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
-    $db = Database::getInstance();
-
-    $total = (int)$db->fetchScalar(
+    $total = (int)Database::fetchScalar(
         "SELECT COUNT(*)
          FROM agregats_eleves_age_niveau_sexe a $whereClause",
         $params
     );
 
-    $rows = $db->fetchAll(
+    $rows = Database::fetchAll(
         "SELECT
             a.id,
             a.code_etablissement,
@@ -251,15 +257,16 @@ if ($method === 'POST') {
         inputError("Trop d'IDs (max 5000 par appel)");
     }
 
-    $db          = Database::getInstance();
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-    $affected = $db->query(
+    // Database::query() retourne un PDOStatement ; rowCount() donne les lignes affectées
+    $stmt = Database::query(
         "UPDATE agregats_eleves_age_niveau_sexe
          SET synced_to_stateduc = 1, synced_at = NOW()
          WHERE id IN ($placeholders) AND synced_to_stateduc = 0",
         $ids
     );
+    $affected = $stmt->rowCount();
 
     $log->info("POST /api/agregats/mark-synced", [
         'ids_count' => count($ids),

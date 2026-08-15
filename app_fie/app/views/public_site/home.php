@@ -629,7 +629,7 @@
         position: absolute; inset: 0;
         background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='40' cy='40' r='30'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3Ccircle cx='40' cy='40' r='10'/%3E%3C/g%3E%3C/svg%3E");
     }
-    .about-visual-inner { position: relative; z-index: 1; text-align: center; }
+    .about-visual-inner { position: relative; z-index: 1; text-align: center; padding: 2rem; }
 
     .milestone {
         display: flex; align-items: flex-start; gap: 1rem;
@@ -703,7 +703,18 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 3rem;
         position: relative; overflow: hidden;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
+    .news-thumb img {
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform .5s ease;
+    }
+    .news-card:hover .news-thumb img { transform: scale(1.05); }
     .news-thumb::after {
         content: '';
         position: absolute; inset: 0;
@@ -1443,7 +1454,17 @@
 
             <!-- VISUEL GAUCHE -->
             <div class="col-lg-5" data-aos="fade-right" data-aos-duration="700">
-                <div class="about-visual">
+                <div class="about-visual" style="padding:0;overflow:hidden;">
+                    <!-- Photo réelle école Burundi -->
+                    <div style="position:relative;overflow:hidden;border-radius:var(--bi-radius-lg) var(--bi-radius-lg) 0 0;">
+                        <img src="https://sspark.genspark.ai/cfimages?u1=ziz%2BUR%2Bf9ElrUjugiPTIUoEl4zlECubNCaYLWMnRb5sNQwNzoXUEB%2B3AuIitpgPV9oEoRI2vdxyG9CinScxvqH6xO7eME34wZ42wTG01nZO%2BHpaqM0n4GC9zs%2FoXun6ei4nIbOIxO8RvUzbY1LkObs5QP24v9pnfEiHDLRu307AqTWCpyBZaWbUGeftY3iIa2%2B%2BgK8Yfc5CdjbDj9DXdSw%3D%3D&u2=EFStBu5SGDE4H4u3&width=2560"
+                             alt="Apprentissage fondé sur le jeu au Burundi — Right To Play"
+                             style="width:100%;height:220px;object-fit:cover;object-position:center;display:block;">
+                        <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.45), transparent);"></div>
+                        <div style="position:absolute;bottom:.75rem;left:1rem;color:#fff;font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:600;">
+                            <i class="fa-solid fa-camera me-1" style="opacity:.7;"></i>Burundi — Right To Play
+                        </div>
+                    </div>
                     <div class="about-visual-inner">
                         <!-- Écu drapeau stylisé -->
                         <div style="width:90px;height:90px;background:rgba(255,255,255,.15);
@@ -1643,7 +1664,13 @@
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
                 <div class="news-card card border-0">
                     <div class="news-thumb" style="background:linear-gradient(135deg,#ffeef0 0%,#ffc8d0 100%);">
-                        <i class="fa-solid fa-rocket" style="color:var(--bi-red);position:relative;z-index:1;"></i>
+                        <img src="https://sspark.genspark.ai/cfimages?u1=bIQsqcvxMgBpZ9pbIbuou06u0LSjSxlxkkuPPUjAJP3Qwh9AMR0tckWFh1egjvmeqV7ckikQJ5xRohvCVCvGJehI9sdQFy%2FiATHLzZPriofCqyfBTKXvKVnpEMDKn5Y%3D&u2=cy0ndCkVn7PS4jVG&width=2560"
+                             alt="Élèves du Burundi en classe" loading="lazy">
+                        <span style="position:absolute;bottom:.75rem;right:.75rem;z-index:2;
+                                     background:var(--bi-red);color:#fff;border-radius:6px;
+                                     padding:.2rem .6rem;font-size:.68rem;font-weight:700;font-family:'Poppins',sans-serif;">
+                            <i class="fa-solid fa-rocket me-1"></i>Déploiement
+                        </span>
                     </div>
                     <div class="card-body p-4">
                         <span class="news-category text-danger">Déploiement</span>
@@ -1670,7 +1697,13 @@
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="news-card card border-0">
                     <div class="news-thumb" style="background:linear-gradient(135deg,#eaf9ed 0%,#b8f0c8 100%);">
-                        <i class="fa-solid fa-rotate" style="color:var(--bi-green);position:relative;z-index:1;"></i>
+                        <img src="https://sspark.genspark.ai/cfimages?u1=%2BOwcmeusI7YmeMqFIxZMlJGnOzuVc4sviqPzFsBjWODRExfbWDI%2FOpiol4NOTovfhuX5M4e%2FCfIOySPgP2K7M2F4Dy7XdaxwH1x7BXHUmD2FeJBU3Yb%2BuaGIpKixwY6%2Fyk%2FXV6HN6weA&u2=dTxigUFkOTz6JYzm&width=2560"
+                             alt="Outils numériques pour l'éducation en Afrique" loading="lazy">
+                        <span style="position:absolute;bottom:.75rem;right:.75rem;z-index:2;
+                                     background:var(--bi-green);color:#fff;border-radius:6px;
+                                     padding:.2rem .6rem;font-size:.68rem;font-weight:700;font-family:'Poppins',sans-serif;">
+                            <i class="fa-solid fa-rotate me-1"></i>Interopérabilité
+                        </span>
                     </div>
                     <div class="card-body p-4">
                         <span class="news-category" style="color:var(--bi-green);">Interopérabilité</span>
@@ -1697,7 +1730,13 @@
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="news-card card border-0">
                     <div class="news-thumb" style="background:linear-gradient(135deg,#e8f0fe 0%,#c0d4fc 100%);">
-                        <i class="fa-solid fa-chart-line" style="color:#1a73e8;position:relative;z-index:1;"></i>
+                        <img src="https://sspark.genspark.ai/cfimages?u1=wNNjty7UhhKGJoXlZdd11oq0j5mmLjkD4FNNvpZ9rYZRgb%2BfXf8HxfjhJW5SXKxUtlsDi%2BRkkb%2FrrkGV3Nbm3H9twiKdciwMCb66uOKmeJi5Fe0756x7wv2snA%3D%3D&u2=G19d1W2GwRPBatNA&width=2560"
+                             alt="Éducation numérique en Afrique" loading="lazy">
+                        <span style="position:absolute;bottom:.75rem;right:.75rem;z-index:2;
+                                     background:#1a73e8;color:#fff;border-radius:6px;
+                                     padding:.2rem .6rem;font-size:.68rem;font-weight:700;font-family:'Poppins',sans-serif;">
+                            <i class="fa-solid fa-chart-line me-1"></i>Statistiques
+                        </span>
                     </div>
                     <div class="card-body p-4">
                         <span class="news-category text-primary">Statistiques</span>

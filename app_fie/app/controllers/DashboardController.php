@@ -5,6 +5,12 @@
  * CORRECTION Phase 1 :
  *   - Suppression namespace App\Controllers et use App\...
  *   - requireLogin() utilise la bonne implémentation de SecurityHelper
+ * CORRECTION Phase 2 :
+ *   - Database::getInstance() retourne un objet PDO brut (pas de wrapper).
+ *   - fetchScalar / fetchAll / fetchOne sont des méthodes STATIQUES de la
+ *     classe Database, pas des méthodes d'instance PDO.
+ *   - Suppression de $db = Database::getInstance() ; utilisation de la
+ *     syntaxe statique Database::fetchScalar(...) partout.
  */
 
 declare(strict_types=1);
@@ -21,38 +27,36 @@ class DashboardController
 
     public function index(): void
     {
-        $db = Database::getInstance();
-
         // KPIs rapides
         $kpis = [
-            'total_eleves'     => (int)$db->fetchScalar("SELECT COUNT(*) FROM eleves"),
-            'inscriptions_an'  => (int)$db->fetchScalar(
+            'total_eleves'     => (int)Database::fetchScalar("SELECT COUNT(*) FROM eleves"),
+            'inscriptions_an'  => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM inscriptions WHERE statut = 'actif'"
             ),
-            'etablissements'   => (int)$db->fetchScalar(
+            'etablissements'   => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM etablissements_miroir WHERE actif = 1"
             ),
-            'agregats_pending' => (int)$db->fetchScalar(
+            'agregats_pending' => (int)Database::fetchScalar(
                 "SELECT COUNT(*) FROM agregats_eleves_age_niveau_sexe WHERE synced_to_stateduc = 0"
             ),
         ];
 
         // Répartition par secteur d'enseignement
-        $bySecteur = $db->fetchAll(
+        $bySecteur = Database::fetchAll(
             "SELECT i.code_type_secteur_ens, COUNT(*) as nb
              FROM inscriptions i WHERE i.statut = 'actif'
              GROUP BY i.code_type_secteur_ens ORDER BY nb DESC"
         );
 
         // Répartition par sexe
-        $bySexe = $db->fetchAll(
+        $bySexe = Database::fetchAll(
             "SELECT e.sexe, COUNT(*) as nb FROM inscriptions i
              JOIN eleves e ON e.id = i.eleve_id
              WHERE i.statut = 'actif' GROUP BY e.sexe"
         );
 
         // Répartition par province (top 10)
-        $byProvince = $db->fetchAll(
+        $byProvince = Database::fetchAll(
             "SELECT em.province, COUNT(DISTINCT e.id) as nb
              FROM inscriptions i
              JOIN eleves e ON e.id = i.eleve_id
