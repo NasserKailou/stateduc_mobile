@@ -1551,21 +1551,52 @@ if(isset($_SESSION['list_themes_desact']) && in_array($_GET['theme'],$_SESSION['
 //$theme_manager->set_theme_courant();
 //$theme_manager->set_classe();
 // === GUARD : éviter la requête avec ID vide (theme_manager->id NULL) ===
-if (empty($theme_manager->id)) {
+// On log toujours ; mais on n'interrompt que si aucun theme GET disponible.
+$_qr_theme_id = $theme_manager->id ?? null;
+if (empty($_qr_theme_id)) {
     $_log_null = date('Y-m-d H:i:s').';questionnaire.php;WARN_NULL_THEME_ID'
         .';theme_get='.($_GET['theme']??'?')
         .';type_ent_stat='.($_GET['type_ent_stat']??$_SESSION['type_ent_stat']??'?')
         .';secteur='.($_SESSION['secteur']??'?')
+        .';theme_list_count='.(isset($theme_manager->list) ? count($theme_manager->list) : '?')
         ."\n";
     @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_null, FILE_APPEND);
     error_log('[DIAG_S28] '.$_log_null);
-    echo '<script type="text/Javascript">$.unblockUI(); alert("Thème introuvable pour ce type établissement. Veuillez relancer depuis la liste des établissements.");</script>';
-    require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
-    exit();
+    // Si aucun theme GET → impossible de continuer
+    if (empty($_GET['theme'])) {
+        echo '<script type="text/Javascript">if(typeof $.unblockUI==="function") $.unblockUI();</script>';
+        require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
+        exit();
+    }
+    // Sinon : essayer de résoudre theme_manager->id depuis l'ID brut GET
+    // (cas : APPARTENANCE ne correspond pas → essai sans filtre)
+    $requete_fallback = "SELECT D_T.ID FROM DICO_THEME D_T
+                         JOIN DICO_THEME_SYSTEME D_T_S ON D_T_S.ID = D_T.ID
+                         WHERE D_T_S.ID_THEME_SYSTEME = ".intval($_GET['theme']).";";
+    $row_fb = $GLOBALS['conn_dico']->GetRow($requete_fallback);
+    if (!empty($row_fb['ID'])) {
+        $_qr_theme_id = (int)$row_fb['ID'];
+        $_log_fallback = date('Y-m-d H:i:s').';questionnaire.php;INFO_THEME_FALLBACK_RESOLVED'
+            .';theme_get='.($_GET['theme']??'?').';resolved_id='.$_qr_theme_id."\n";
+        @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_fallback, FILE_APPEND);
+    } else {
+        // Réellement introuvable — interrompre proprement
+        echo '<script type="text/Javascript">if(typeof $.unblockUI==="function") $.unblockUI();</script>';
+        echo '<div style="padding:20px;color:#c00;font-family:Arial">';
+        echo '<b>Thème '.htmlspecialchars($_GET['theme']).' introuvable dans le dictionnaire (type_ent_stat=';
+        echo htmlspecialchars($_GET['type_ent_stat']??$_SESSION['type_ent_stat']??'?').')</b><br>';
+        echo '<a href="saisie_donnees.php?val=choix_etablissement">&#8592; Retour à la liste des établissements</a>';
+        echo '</div>';
+        require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
+        exit();
+    }
 }
+// Exposer $_qr_theme_id globalement pour instance_grille.php (qui sera inclus via require_once $curfile)
+$GLOBALS['_qr_theme_id_resolved'] = $_qr_theme_id;
+
 $requete  = "SELECT ACTION_THEME 
 			 FROM DICO_THEME 
-			 WHERE ID =".$theme_manager->id.";";
+			 WHERE ID =".intval($_qr_theme_id).";";
 /*echo $requete."<pre>";
 print_r($_SESSION['curobj_instance']);*/
 $result_etab = $GLOBALS['conn_dico']->GetRow($requete);

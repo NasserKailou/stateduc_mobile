@@ -319,12 +319,21 @@ function fie_etabs_get_niveaux_chaine($conn): array
         $sql = 'SELECT MIN(NIVEAU_HIERARCHIE) AS niv_min, MAX(NIVEAU_HIERARCHIE) AS niv_max
                 FROM HIERARCHIE';
         $row = $conn->GetRow($sql);
+        // ADOdb avec ADODB_ASSOC_CASE_UPPER → clés en majuscules : NIV_MIN, NIV_MAX
+        // Fallback case-insensitive au cas où le driver retourne autrement
+        $niv_min_val = $row['NIV_MIN'] ?? $row['niv_min'] ?? null;
+        $niv_max_val = $row['NIV_MAX'] ?? $row['niv_max'] ?? null;
         $niveaux = [
-            'min' => isset($row['NIV_MIN']) ? (int)$row['NIV_MIN'] : 1,
-            'max' => isset($row['NIV_MAX']) ? (int)$row['NIV_MAX'] : 4,
+            'min' => ($niv_min_val !== null) ? (int)$niv_min_val : 1,
+            'max' => ($niv_max_val !== null) ? (int)$niv_max_val : 4,
         ];
+        // Sécurité : max doit être >= min et >= 1
+        if ($niveaux['max'] < $niveaux['min'] || $niveaux['max'] < 1) {
+            $niveaux = ['min' => 1, 'max' => 4];
+        }
     } catch (Throwable $e) {
         $niveaux = ['min' => 1, 'max' => 4];
+        error_log('[FIE_ETABS_WS] fie_etabs_get_niveaux_chaine error: ' . $e->getMessage());
     }
     return $niveaux;
 }
@@ -377,6 +386,7 @@ function fie_etabs_load_localisation_batch(array $codes_etab, $conn): array
         }
     } catch (Throwable $e) {
         // Non fatal — localisation vide pour tous
+        error_log('[FIE_ETABS_WS] fie_etabs_load_localisation_batch error: ' . $e->getMessage());
     }
 
     return $result;
@@ -390,6 +400,8 @@ function fie_etabs_load_localisation_batch(array $codes_etab, $conn): array
 function fie_etabs_build_loc_struct(array $niveaux_etab, array $niveaux_chaine): array
 {
     $niv_max = $niveaux_chaine['max'];
+    $niv_min = $niveaux_chaine['min'];
+
     // Labels génériques selon position relative par rapport au niveau max
     $labels = ['province', 'commune', 'zone', 'colline'];
 
@@ -398,10 +410,21 @@ function fie_etabs_build_loc_struct(array $niveaux_etab, array $niveaux_chaine):
         'code_province' => null, 'code_commune' => null, 'code_zone' => null, 'code_colline' => null,
     ];
 
+    if (empty($niveaux_etab)) return $loc;
+
+    // Récupérer les niveaux effectivement présents pour cet établissement
+    $niveaux_presents = array_keys($niveaux_etab);
+    $niv_etab_max = max($niveaux_presents); // plus haut niveau de CET établissement
+
+    // Si l'établissement a un niveau max différent de la chaîne globale
+    // (sous-chaîne locale ou données partielles), on adapte la référence
+    // Priorité : utiliser $niv_max global pour le mapping, mais avec protection
+    $ref_max = max($niv_max, $niv_etab_max);
+
     // Itérer du niveau le plus haut (province) vers le plus bas (colline)
     foreach ($labels as $i => $label) {
-        $niv = $niv_max - $i;
-        if ($niv < 1) break;
+        $niv = $ref_max - $i;
+        if ($niv < $niv_min) break;
         if (isset($niveaux_etab[$niv])) {
             $loc[$label]            = $niveaux_etab[$niv]['libelle'];
             $loc['code_' . $label]  = $niveaux_etab[$niv]['code'];

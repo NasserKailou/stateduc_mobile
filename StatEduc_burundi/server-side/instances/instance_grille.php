@@ -65,7 +65,9 @@ if(count($_POST) == 0) {
 }
     echo '<script language="javascript" src="'.$GLOBALS['SISED_URL_JSC'] . 'js.js"></script>' . "\n";
     // param�tre d'�change
-    $id_theme			=	$theme_manager->id;    
+    // Utiliser $_qr_theme_id si disponible (fallback r\u00e9solu dans questionnaire.php quand theme_manager->id = NULL)
+    $id_theme = isset($GLOBALS['_qr_theme_id_resolved']) ? $GLOBALS['_qr_theme_id_resolved']
+              : ($theme_manager->id ?? null);
 	$code_etablissement = $_SESSION['code_etab'];
     $code_annee = $_SESSION['annee'];
 	$code_filtre = $_SESSION['filtre'];
@@ -79,7 +81,12 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 	// Instanciation de la classe
 	// === GUARD theme id vide ===
 	if (empty($id_theme)) {
-		echo '<script type="text/Javascript">$.unblockUI(); alert("Erreur: thème non défini (id_theme vide). Relancer depuis la liste des établissements.");</script>';
+		// Log pour diagnostic
+		$_diag_ig = date('Y-m-d H:i:s').';instance_grille.php;ERR_ID_THEME_VIDE'
+		    .';theme_get='.($_GET['theme']??'?').';type_ent_stat='.($_SESSION['type_ent_stat']??'?')."\n";
+		@file_put_contents(dirname(dirname(dirname(__FILE__))).'/moblogs/diag_questionnaire.log', $_diag_ig, FILE_APPEND);
+		echo '<p style="color:red;padding:10px">Erreur : th\u00e8me non d\u00e9fini (id_theme vide).</p>';
+		echo '<script type="text/Javascript">if(typeof $.unblockUI==="function") $.unblockUI();</script>';
 		return;
 	}
 	// === FIN GUARD ===
