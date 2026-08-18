@@ -148,9 +148,10 @@ class StatEducClient
         ];
         $query = array_merge($defaults, $params);
 
+        // L'endpoint est sur le serveur StatEduc_burundi, pas sur app_fie lui-même
         $result = $this->doRequest(
             'GET',
-            '/app_fie/api/stateduc/etabs_fie_ws.php',
+            '/api/fie/etabs_fie_ws.php',
             $query
         );
 

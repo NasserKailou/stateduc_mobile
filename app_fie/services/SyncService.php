@@ -43,6 +43,10 @@ class SyncService
         ?string $province     = null,
         ?string $triggeredBy  = 'system'
     ): array {
+        // Évite le "Maximum execution time exceeded" sur les synchros longues
+        set_time_limit(300); // 5 min max pour la synchro complète
+        ini_set('memory_limit', '256M');
+
         $this->syncLogId = $this->startSyncLog('api_stateduc', $triggeredBy);
         $summary = ['inserted' => 0, 'updated' => 0, 'errors' => 0, 'total' => 0, 'pages_done' => 0];
         $errorDetails = [];

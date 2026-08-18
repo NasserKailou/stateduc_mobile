@@ -7,9 +7,9 @@
  */
 declare(strict_types=1);
 
-require_once FIE_SVC_PATH . 'SecurityHelper.php';
-require_once FIE_SVC_PATH . 'StatEducClient.php';
-require_once FIE_CFG_PATH . 'Database.php';
+// Les classes sont chargées par l'autoloader de config.php (spl_autoload_register)
+// FIE_SVC_PATH et FIE_CFG_PATH n'existent pas — les vraies constantes sont
+// FIE_SERVICES_PATH et FIE_CONFIG_PATH, mais l'autoloader suffit ici.
 
 class ParametresController
 {
