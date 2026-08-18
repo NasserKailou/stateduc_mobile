@@ -193,19 +193,34 @@ class AdminController
         ]);
 
         $sync   = new SyncService();
-        $result = $sync->importFromExcel($destFile);
+        try {
+            $result = $sync->importFromExcel($destFile);
+        } catch (\Throwable $importEx) {
+            @unlink($destFile);
+            $_SESSION['fie_flash_error'] = "Erreur lors de l'import : " . $importEx->getMessage();
+            header('Location: ' . BASE_URL . '/admin/sync');
+            exit;
+        }
 
         @unlink($destFile);
 
-        if ($result['ok']) {
+        // importFromExcel() retourne ['inserted','skipped','errors','total']
+        // Mode INSERT-ONLY : les lignes déjà en base sont ignorées (skipped).
+        if (($result['errors'] ?? 0) === 0) {
             $_SESSION['fie_flash_success'] = sprintf(
-                'Import terminé : %d insérés, %d mis à jour, %d ignorés.',
+                'Import terminé : %d nouveaux établissements insérés, %d déjà présents ignorés (sur %d lignes).',
                 $result['inserted'] ?? 0,
-                $result['updated']  ?? 0,
-                $result['skipped']  ?? 0
+                $result['skipped']  ?? 0,
+                $result['total']    ?? 0
             );
         } else {
-            $_SESSION['fie_flash_error'] = "Erreur lors de l'import : " . ($result['error'] ?? 'inconnue');
+            $_SESSION['fie_flash_error'] = sprintf(
+                'Import terminé avec %d erreur(s) : %d insérés, %d ignorés (sur %d lignes).',
+                $result['errors']   ?? 0,
+                $result['inserted'] ?? 0,
+                $result['skipped']  ?? 0,
+                $result['total']    ?? 0
+            );
         }
 
         header('Location: ' . BASE_URL . '/admin/sync');

@@ -77,26 +77,40 @@ class Database
 
     /**
      * Démarre une transaction.
+     * Idempotent : ne fait rien si une transaction est déjà active.
      */
     public static function beginTransaction(): void
     {
-        self::getInstance()->beginTransaction();
+        $pdo = self::getInstance();
+        if (!$pdo->inTransaction()) {
+            $pdo->beginTransaction();
+        }
     }
 
     /**
      * Valide une transaction.
+     * Silencieux si aucune transaction active (évite l'erreur PDO
+     * "There is no active transaction" quand LOCK TABLES a implicitement
+     * committé la transaction en cours — ex: IueGenerator::nextSequence()).
      */
     public static function commit(): void
     {
-        self::getInstance()->commit();
+        $pdo = self::getInstance();
+        if ($pdo->inTransaction()) {
+            $pdo->commit();
+        }
     }
 
     /**
      * Annule une transaction.
+     * Silencieux si aucune transaction active (même raison que commit()).
      */
     public static function rollback(): void
     {
-        self::getInstance()->rollBack();
+        $pdo = self::getInstance();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
     }
 
     /**

@@ -216,12 +216,18 @@ class SyncService
      *               CODE_TYPE_STATUT_ORG, STATUT, NOM_ETAB,
      *               CODE_ETABLISSEMENT, CODE_TYPE_MILIEU, MILIEU
      *
-     * Idempotent : si un CODE_ETABLISSEMENT existe déjà (source=api_stateduc),
-     * l'Excel ne l'écrase PAS (la source API est prioritaire).
+     * MODE INSERT-ONLY (session10) :
+     *   Lors d'une nouvelle importation, seuls les établissements ABSENTS de la
+     *   base sont insérés. Toute ligne dont le CODE_ETABLISSEMENT existe déjà
+     *   (quelle que soit la source : api_stateduc, excel_import, manuel) est
+     *   ignorée — on ne met jamais à jour les données existantes par Excel.
      *
-     * @param string $xlsxPath  Chemin absolu vers FICHIER_ETAB.xlsx
+     *   Raison : éviter d'écraser des corrections manuelles ou des données API
+     *   à chaque ré-importation du fichier brut.
+     *
+     * @param string $xlsxPath   Chemin absolu vers FICHIER_ETAB.xlsx
      * @param string $triggeredBy
-     * @return array  Résumé
+     * @return array  Résumé ['inserted', 'skipped', 'errors', 'total']
      */
     public function importFromExcel(string $xlsxPath, string $triggeredBy = 'import'): array
     {
@@ -230,7 +236,7 @@ class SyncService
         }
 
         $this->syncLogId = $this->startSyncLog('excel_import', $triggeredBy);
-        $summary = ['inserted' => 0, 'updated' => 0, 'errors' => 0, 'total' => 0];
+        $summary = ['inserted' => 0, 'skipped' => 0, 'errors' => 0, 'total' => 0];
         $errorDetails = [];
 
         // Priorité : PhpSpreadsheet (si disponible) → lecteur natif ZipArchive
@@ -243,24 +249,37 @@ class SyncService
 
         $summary['total'] = count($rows);
 
+        // ── Pré-charger tous les codes existants en mémoire ───────────────────
+        // Un seul SELECT au lieu d'un SELECT par ligne → 100× plus rapide
+        // pour 11 497 lignes sur XAMPP/Windows.
+        $existingCodes = [];
+        $existingRows  = Database::fetchAll(
+            "SELECT code_etablissement FROM etablissements_miroir"
+        );
+        foreach ($existingRows as $r) {
+            $existingCodes[(int)$r['code_etablissement']] = true;
+        }
+        $this->logger->info("Import Excel : {$summary['total']} lignes xlsx, "
+            . count($existingCodes) . " codes déjà présents en base.");
+
         Database::beginTransaction();
         try {
             foreach ($rows as $row) {
                 $code = (int)($row['CODE_ETABLISSEMENT'] ?? 0);
                 if ($code <= 0) continue;
 
+                // ── INSERT-ONLY : ignorer toute ligne déjà en base ────────────
+                if (isset($existingCodes[$code])) {
+                    $summary['skipped']++;
+                    continue;
+                }
+
                 $etab = $this->normalizeExcelRow($row);
 
                 try {
-                    $existing = Database::fetchOne(
-                        "SELECT source FROM etablissements_miroir WHERE code_etablissement = ?",
-                        [$code]
-                    );
-                    if ($existing && $existing['source'] === 'api_stateduc') {
-                        continue; // API a priorité sur Excel
-                    }
-                    $result = $this->upsertEtablissement($etab, 'excel_import');
-                    $summary[$result]++;
+                    $this->insertEtablissement($etab, 'excel_import');
+                    $existingCodes[$code] = true; // marquer comme inséré
+                    $summary['inserted']++;
                 } catch (Throwable $e) {
                     $summary['errors']++;
                     $errorDetails[] = ['code' => $code, 'err' => $e->getMessage()];
@@ -275,7 +294,7 @@ class SyncService
 
         $this->finishSyncLog($this->syncLogId, 'success', $summary, $errorDetails);
         $this->logger->info("Import Excel ATLAS_COLLINE terminé : {$summary['total']} lignes, "
-            . "+{$summary['inserted']} insérés, {$summary['updated']} MàJ");
+            . "+{$summary['inserted']} insérés, {$summary['skipped']} ignorés (déjà présents)");
         return $summary;
     }
 
@@ -404,6 +423,98 @@ class SyncService
         }
 
         return $wasUpdated ? 'updated' : 'inserted';
+    }
+
+    /**
+     * INSERT-ONLY dans etablissements_miroir (session10 — mode importation).
+     *
+     * Insère un établissement sans ON DUPLICATE KEY UPDATE.
+     * Peuple aussi ref_province / ref_commune / ref_colline.
+     * Lance une exception si le code existe déjà (la couche appelante filtre
+     * en amont via le cache $existingCodes, donc ça ne devrait pas arriver).
+     */
+    private function insertEtablissement(array $etab, string $source): void
+    {
+        $code = (int)($etab['code_etablissement'] ?? 0);
+        if ($code <= 0) throw new \InvalidArgumentException("code_etablissement invalide");
+
+        $province   = $this->cleanStr($etab['province']         ?? null);
+        $commune    = $this->cleanStr($etab['commune']          ?? null);
+        $colline    = $this->cleanStr($etab['colline']          ?? null);
+        $secteurEns = $this->cleanStr($etab['secteur_ens']      ?? null);
+        $statutOrg  = $this->cleanStr($etab['statut_org']       ?? null);
+        $milieu     = $this->cleanStr($etab['milieu']           ?? null);
+        $nom        = $this->cleanStr($etab['nom_etablissement'] ?? '') ?? '';
+
+        $cp   = isset($etab['code_province'])         ? (int)$etab['code_province']         : null;
+        $cc   = isset($etab['code_commune'])           ? (int)$etab['code_commune']           : null;
+        $ccl  = isset($etab['code_colline'])           ? (int)$etab['code_colline']           : null;
+        $csec = isset($etab['code_type_secteur_ens']) ? (int)$etab['code_type_secteur_ens'] : null;
+        $cstat= isset($etab['code_type_statut_org'])  ? (int)$etab['code_type_statut_org']  : null;
+        $cmil = isset($etab['code_type_milieu'])      ? (int)$etab['code_type_milieu']      : null;
+
+        $chaine = $etab['chaine_localisation']
+            ?? implode(' / ', array_filter([$province, $commune, $colline, $nom]));
+
+        $pdo = Database::getInstance();
+
+        $pdo->prepare("
+            INSERT INTO etablissements_miroir (
+                code_etablissement, nom_etablissement,
+                province, commune, colline, chaine_localisation,
+                code_province, code_commune, code_colline,
+                code_type_milieu, code_type_statut_org, code_type_secteur_ens,
+                secteur_ens, statut_org, milieu,
+                source, synced_at, actif
+            ) VALUES (
+                :code, :nom,
+                :province, :commune, :colline, :chaine,
+                :cp, :cc, :ccl,
+                :cmil, :cstat, :csec,
+                :secteur_ens, :statut_org, :milieu,
+                :source, NOW(), 1
+            )
+        ")->execute([
+            ':code'        => $code,
+            ':nom'         => $nom,
+            ':province'    => $province,
+            ':commune'     => $commune,
+            ':colline'     => $colline,
+            ':chaine'      => $this->cleanStr($chaine),
+            ':cp'          => $cp,
+            ':cc'          => $cc,
+            ':ccl'         => $ccl,
+            ':cmil'        => $cmil,
+            ':cstat'       => $cstat,
+            ':csec'        => $csec,
+            ':secteur_ens' => $secteurEns,
+            ':statut_org'  => $statutOrg,
+            ':milieu'      => $milieu,
+            ':source'      => $source,
+        ]);
+
+        // Alimenter ref_province / ref_commune / ref_colline
+        if ($cp && $province) {
+            $pdo->prepare("
+                INSERT INTO ref_province (code_province, libelle)
+                VALUES (:cp, :lib)
+                ON DUPLICATE KEY UPDATE libelle = VALUES(libelle)
+            ")->execute([':cp' => $cp, ':lib' => $province]);
+        }
+        if ($cc && $cp && $commune) {
+            $pdo->prepare("
+                INSERT INTO ref_commune (code_commune, code_province, libelle)
+                VALUES (:cc, :cp, :lib)
+                ON DUPLICATE KEY UPDATE libelle = VALUES(libelle), code_province = VALUES(code_province)
+            ")->execute([':cc' => $cc, ':cp' => $cp, ':lib' => $commune]);
+        }
+        if ($ccl && $cc && $cp && $colline) {
+            $pdo->prepare("
+                INSERT INTO ref_colline (code_colline, code_commune, code_province, libelle)
+                VALUES (:ccl, :cc, :cp, :lib)
+                ON DUPLICATE KEY UPDATE libelle = VALUES(libelle)
+            ")->execute([':ccl' => $ccl, ':cc' => $cc, ':cp' => $cp, ':lib' => $colline]);
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════════════

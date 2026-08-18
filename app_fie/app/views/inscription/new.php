@@ -423,10 +423,19 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
   function getJSON(url, cb, errCb) {
     fetch(url).then(r => r.json()).then(cb).catch(e => { console.error('GET', url, e); if(errCb) errCb(e); });
   }
-  function postJSON(url, data, cb) {
+  function postJSON(url, data, cb, errCb) {
     const fd = new FormData();
     Object.entries(data).forEach(([k,v]) => fd.append(k, v));
-    fetch(url, {method:'POST', body:fd}).then(r => r.json()).then(cb).catch(e => console.error('POST', url, e));
+    fetch(url, {method:'POST', body:fd})
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + r.statusText);
+        return r.json();
+      })
+      .then(cb)
+      .catch(function(e) {
+        console.error('POST', url, e);
+        if (errCb) errCb(e);
+      });
   }
   function fillSelect(sel, items, placeholder, codeKey='code', libKey='libelle') {
     sel.innerHTML = '<option value="">' + placeholder + '</option>';
@@ -554,7 +563,7 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     btnSyncAnnees.addEventListener('click', function(e) {
       e.preventDefault();
       btnSyncAnnees.textContent = 'Synchronisation…';
-      postJSON(BASE + 'inscription/ajax/sync-annees', {csrf_token: CSRF}, function(d) {
+      postJSON(BASE + 'inscription/ajax/sync-annees', {'<?= FIE_CSRF_TOKEN_NAME ?>': CSRF}, function(d) {
         btnSyncAnnees.innerHTML = '<i class="fa-solid fa-rotate me-1"></i>Actualiser depuis StatEduc';
         if (d.success) {
           alert(d.message + '\nRechargez la page pour voir les années mises à jour.');
@@ -592,7 +601,7 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     btnDoublon.disabled = true;
 
     postJSON(BASE + 'inscription/ajax/doublon',
-      {nom, prenoms: prn, date_naissance: ddn, csrf_token: CSRF},
+      {nom, prenoms: prn, date_naissance: ddn, '<?= FIE_CSRF_TOKEN_NAME ?>': CSRF},
       function(resp) {
         btnDoublon.disabled = false;
         if (resp.found && resp.count > 0) {
@@ -637,6 +646,15 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
           btnSubmit.disabled = false;
           statusMsg.innerHTML = '<span class="text-success"><i class="fa-solid fa-check me-1"></i>Aucun doublon détecté.</span>';
         }
+      },
+      // ── Gestionnaire d'erreur réseau / HTTP ───────────────────────────────
+      function(err) {
+        btnDoublon.disabled = false;
+        modalBody.innerHTML = '<div class="alert alert-danger"><i class="fa-solid fa-circle-xmark me-2"></i>'
+          + '<strong>Erreur de communication</strong><br>'
+          + '<small class="text-muted">' + (err ? err.message : 'Réponse inattendue du serveur') + '</small>'
+          + '<br><span class="small">Vérifiez la console navigateur (F12) pour plus de détails.</span></div>';
+        modalFoot.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>';
       }
     );
   });
