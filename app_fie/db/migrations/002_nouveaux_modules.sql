@@ -16,13 +16,13 @@ SET foreign_key_checks = 0;
 -- ============================================================================
 -- 1. MISE À JOUR TABLE users — nouveaux rôles et champs
 -- ============================================================================
-ALTER TABLE users
+ALTER TABLE fie_users
     MODIFY COLUMN role ENUM(
         'super_admin','admin_central',
         'directeur_ecole','enseignant','bibliothecaire'
     ) NOT NULL DEFAULT 'enseignant';
 
-ALTER TABLE users
+ALTER TABLE fie_users
     ADD COLUMN IF NOT EXISTS ecole_code VARCHAR(20) NULL COMMENT 'Code établissement (directeur/enseignant)',
     ADD COLUMN IF NOT EXISTS classe_id INT UNSIGNED NULL COMMENT 'ID classe de l\'enseignant',
     ADD COLUMN IF NOT EXISTS nom_complet VARCHAR(255) NULL COMMENT 'Nom et prénom de l\'utilisateur';
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS classes (
 
     INDEX idx_ecole_annee (ecole_code, annee_scolaire),
     INDEX idx_enseignant  (enseignant_id),
-    FOREIGN KEY (enseignant_id) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (enseignant_id) REFERENCES fie_users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Classes d\'un établissement par année scolaire';
 
 -- ============================================================================
@@ -78,8 +78,8 @@ CREATE TABLE IF NOT EXISTS suivi_pedagogique (
     UNIQUE KEY uk_eleve_classe_annee (eleve_iue, classe_id, annee_scolaire),
     INDEX idx_ecole_annee (ecole_code, annee_scolaire),
     INDEX idx_decision    (decision),
-    FOREIGN KEY (cree_par) REFERENCES users(id),
-    FOREIGN KEY (valide_par) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (cree_par) REFERENCES fie_users(id),
+    FOREIGN KEY (valide_par) REFERENCES fie_users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Suivi pédagogique fin d\'année par élève';
 
 -- ============================================================================
@@ -119,8 +119,8 @@ CREATE TABLE IF NOT EXISTS transferts_scolaires (
     INDEX idx_dest       (ecole_dest_code),
     INDEX idx_statut     (statut),
     INDEX idx_annee      (annee_scolaire),
-    FOREIGN KEY (demande_par) REFERENCES users(id),
-    FOREIGN KEY (traite_par)  REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (demande_par) REFERENCES fie_users(id),
+    FOREIGN KEY (traite_par)  REFERENCES fie_users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Demandes de transfert scolaire en cours d\'année';
 
 -- ============================================================================
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS historique_eleve (
     INDEX idx_type        (type_action),
     INDEX idx_ecole       (ecole_code),
     INDEX idx_cree_le     (cree_le),
-    FOREIGN KEY (effectue_par) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (effectue_par) REFERENCES fie_users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Historique complet de toutes les actions sur un élève';
 
 -- ============================================================================
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS bibliotheque_documents (
     INDEX idx_public     (public, statut),
     INDEX idx_annee      (annee_publication),
     FOREIGN KEY (thematique_id) REFERENCES bibliotheque_thematiques(id),
-    FOREIGN KEY (publie_par)    REFERENCES users(id)
+    FOREIGN KEY (publie_par)    REFERENCES fie_users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Documents de la bibliothèque FIE';
 
 -- ============================================================================
