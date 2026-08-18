@@ -1625,7 +1625,8 @@ if (empty($_qr_theme_id)) {
         // ATTENTION : ID_THEME_SYSTEME ≠ ID dans DICO_THEME
         // ID_THEME_SYSTEME est la valeur de $_GET['theme'] (ex: 9002)
         // ID est la clé interne de DICO_THEME (ex: 90) → c'est ce dont on a besoin
-        $requete_fallback = "SELECT D_T_S.ID
+        // Passe 3a : avec filtre ID_SYSTEME
+        $requete_fallback = "SELECT D_T_S.ID, D_T_S.ID_SYSTEME
                              FROM DICO_THEME_SYSTEME D_T_S
                              WHERE D_T_S.ID_THEME_SYSTEME = ".intval($_GET['theme'])."
                              AND D_T_S.ID_SYSTEME = ".(int)($_SESSION['secteur'] ?? 0)."
@@ -1633,11 +1634,27 @@ if (empty($_qr_theme_id)) {
         $row_fb = $GLOBALS['conn_dico']->GetRow($requete_fallback);
         if (!empty($row_fb['ID'])) {
             $_qr_theme_id = (int)$row_fb['ID'];
-            $_log_fallback = date('Y-m-d H:i:s').';questionnaire.php;INFO_THEME_L3_RESOLVED'
+            $_log_fallback = date('Y-m-d H:i:s').';questionnaire.php;INFO_THEME_L3a_RESOLVED'
                 .';theme_sys='.($_GET['theme']??'?').';id_interne='.$_qr_theme_id
                 .';secteur='.($_SESSION['secteur']??'?')."\n";
             @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_fallback, FILE_APPEND);
             error_log('[DIAG_THEME] '.$_log_fallback);
+        } else {
+            // Passe 3b : sans filtre ID_SYSTEME (thème cross-secteur ex: 9002 accessible depuis type_ent_stat=1)
+            $requete_fallback_nosys = "SELECT D_T_S.ID, D_T_S.ID_SYSTEME
+                                       FROM DICO_THEME_SYSTEME D_T_S
+                                       WHERE D_T_S.ID_THEME_SYSTEME = ".intval($_GET['theme'])."
+                                       LIMIT 1";
+            $row_fb2 = $GLOBALS['conn_dico']->GetRow($requete_fallback_nosys);
+            if (!empty($row_fb2['ID'])) {
+                $_qr_theme_id = (int)$row_fb2['ID'];
+                $_log_fallback2 = date('Y-m-d H:i:s').';questionnaire.php;INFO_THEME_L3b_RESOLVED'
+                    .';theme_sys='.($_GET['theme']??'?').';id_interne='.$_qr_theme_id
+                    .';id_systeme_reel='.($row_fb2['ID_SYSTEME']??'?')
+                    .';secteur_sess='.($_SESSION['secteur']??'?')."\n";
+                @file_put_contents(dirname(__FILE__).'/moblogs/diag_questionnaire.log', $_log_fallback2, FILE_APPEND);
+                error_log('[DIAG_THEME] '.$_log_fallback2);
+            }
         }
     }
 

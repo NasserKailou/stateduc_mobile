@@ -1,33 +1,39 @@
 /*
  * FIE — Fichier Informatisé des Élèves
  * Feuille de style de marque (complément à Bootstrap 5)
- * Charte chromatique du Burundi : #CE1126 (rouge), #FFFFFF (blanc), #1EB53A (vert)
+ * Charte chromatique FIE : #007bff / #17a2b8 (bleu ciel), #FFFFFF (blanc), #1EB53A (vert)
  *
- * PHASE 2 — Refonte Bootstrap 5
+ * PHASE 3 — Refonte charte graphique : rouge → bleu ciel
  * Ce fichier ne remplace PAS Bootstrap — il surcharge et complète.
  * Toutes les classes Bootstrap sont utilisables dans les vues.
  */
 
 /* ═══════════════════════════════════════════════════════════════
-   1. VARIABLES CSS — Charte Burundi
+   1. VARIABLES CSS — Charte FIE Bleu Ciel
    ═══════════════════════════════════════════════════════════════ */
 :root {
-    /* Couleurs institutionnelles */
-    --fie-red:          #CE1126;
-    --fie-red-dark:     #a50d1e;
-    --fie-red-light:    #f8d7da;
+    /* Couleurs primaires FIE (bleu ciel) */
+    --fie-red:          #007bff;   /* renommé mais gardé pour compat compat */
+    --fie-red-dark:     #0056b3;
+    --fie-red-light:    #cce5ff;
+    --fie-primary:      #007bff;
+    --fie-primary-dark: #0056b3;
+    --fie-primary-light:#cce5ff;
+    --fie-accent:       #17a2b8;
+    --fie-accent-dark:  #117a8b;
+    --fie-accent-light: #d1ecf1;
     --fie-green:        #1EB53A;
     --fie-green-dark:   #178a2b;
     --fie-green-light:  #d1f0d8;
     --fie-white:        #FFFFFF;
 
     /* Surcharge Bootstrap pour cohérence */
-    --bs-primary:       #CE1126;
-    --bs-primary-rgb:   206,17,38;
+    --bs-primary:       #007bff;
+    --bs-primary-rgb:   0,123,255;
     --bs-success:       #1EB53A;
     --bs-success-rgb:   30,181,58;
-    --bs-link-color:    #CE1126;
-    --bs-link-hover-color: #a50d1e;
+    --bs-link-color:    #007bff;
+    --bs-link-hover-color: #0056b3;
 
     /* Typographie — Poppins pour titres, Open Sans pour corps */
     --fie-font-title:   'Poppins', 'Segoe UI', system-ui, Arial, sans-serif;
@@ -46,7 +52,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
    3. NAVBAR
    ═══════════════════════════════════════════════════════════════ */
 .fie-navbar {
-    background-color: var(--fie-red) !important;
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 100%) !important;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 }
@@ -99,11 +105,11 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 }
 .fie-btn-login {
     background: #fff;
-    color: var(--fie-red);
+    color: var(--fie-primary);
     border: none;
     font-size: 0.85rem;
 }
-.fie-btn-login:hover { background: #f0f0f0; color: var(--fie-red-dark); }
+.fie-btn-login:hover { background: #f0f0f0; color: var(--fie-primary-dark); }
 
 /* Burger icon */
 .navbar-toggler:focus { box-shadow: none; }
@@ -128,7 +134,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 .fie-footer {
     background: #2d3748;
     color: #a0aec0;
-    border-top: 3px solid var(--fie-red);
+    border-top: 3px solid var(--fie-primary);
 }
 .fie-footer__brand { color: #fff; font-size: 1rem; }
 .fie-footer__sub   { color: #cbd5e0; }
@@ -146,20 +152,20 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
    6. SURCHARGE BOUTONS BOOTSTRAP (charte Burundi)
    ═══════════════════════════════════════════════════════════════ */
 .btn-primary {
-    --bs-btn-bg:            var(--fie-red);
-    --bs-btn-border-color:  var(--fie-red);
-    --bs-btn-hover-bg:      var(--fie-red-dark);
-    --bs-btn-hover-border-color: var(--fie-red-dark);
-    --bs-btn-active-bg:     #8c0019;
-    --bs-btn-focus-shadow-rgb: 206,17,38;
+    --bs-btn-bg:            var(--fie-primary);
+    --bs-btn-border-color:  var(--fie-primary);
+    --bs-btn-hover-bg:      var(--fie-primary-dark);
+    --bs-btn-hover-border-color: var(--fie-primary-dark);
+    --bs-btn-active-bg:     #003d80;
+    --bs-btn-focus-shadow-rgb: 0,123,255;
 }
 .btn-outline-primary {
-    --bs-btn-color:         var(--fie-red);
-    --bs-btn-border-color:  var(--fie-red);
-    --bs-btn-hover-bg:      var(--fie-red);
-    --bs-btn-hover-border-color: var(--fie-red);
-    --bs-btn-active-bg:     var(--fie-red-dark);
-    --bs-btn-focus-shadow-rgb: 206,17,38;
+    --bs-btn-color:         var(--fie-primary);
+    --bs-btn-border-color:  var(--fie-primary);
+    --bs-btn-hover-bg:      var(--fie-primary);
+    --bs-btn-hover-border-color: var(--fie-primary);
+    --bs-btn-active-bg:     var(--fie-primary-dark);
+    --bs-btn-focus-shadow-rgb: 0,123,255;
 }
 .btn-success {
     --bs-btn-bg:            var(--fie-green);
@@ -172,7 +178,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
    7. CARTES PERSONNALISÉES
    ═══════════════════════════════════════════════════════════════ */
 .fie-card-header {
-    background: linear-gradient(135deg, var(--fie-red) 0%, var(--fie-red-dark) 100%);
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 100%);
     color: #fff;
     border-radius: 0.5rem 0.5rem 0 0 !important;
 }
@@ -180,7 +186,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 
 /* Stats dashboard */
 .fie-stat-card {
-    border-top: 3px solid var(--fie-red);
+    border-top: 3px solid var(--fie-primary);
     transition: box-shadow .15s, transform .15s;
 }
 .fie-stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
@@ -194,7 +200,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 }
 .fie-stat-icon { width: 44px; height: 44px; border-radius: 10px;
     display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
-.fie-stat-icon--red   { background: var(--fie-red-light);  color: var(--fie-red); }
+.fie-stat-icon--red   { background: var(--fie-primary-light); color: var(--fie-primary); }
 .fie-stat-icon--green { background: var(--fie-green-light); color: var(--fie-green-dark); }
 .fie-stat-icon--blue  { background: #dbeafe; color: #1d4ed8; }
 .fie-stat-icon--warn  { background: #fef3c7; color: #92400e; }
@@ -203,12 +209,12 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
    8. FORMULAIRES SPÉCIALISÉS
    ═══════════════════════════════════════════════════════════════ */
 .form-control:focus, .form-select:focus {
-    border-color: var(--fie-red);
-    box-shadow: 0 0 0 0.2rem rgba(206,17,38,.15);
+    border-color: var(--fie-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15);
 }
 .fie-fieldset-title {
     font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .08em; color: var(--fie-red);
+    letter-spacing: .08em; color: var(--fie-primary);
 }
 
 /* ─── Badge IUE ─── */
@@ -232,7 +238,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 
 /* ─── Carte IUE élève ─── */
 .fie-iue-hero {
-    background: linear-gradient(135deg, var(--fie-red) 0%, var(--fie-red-dark) 100%);
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 100%);
     color: #fff;
     border-radius: 0.75rem;
     padding: 1.5rem;
@@ -262,10 +268,10 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 .table thead th {
     font-size: 0.72rem; text-transform: uppercase;
     letter-spacing: .06em; font-weight: 700;
-    border-bottom: 2px solid var(--fie-red);
+    border-bottom: 2px solid var(--fie-primary);
     background: #f8f9fa;
 }
-.table-hover tbody tr:hover { background: #fff5f5; }
+.table-hover tbody tr:hover { background: #f0f4ff; }
 .fie-table-iue { font-family: var(--fie-font-mono); font-size: 0.85rem; }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -273,7 +279,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
    ═══════════════════════════════════════════════════════════════ */
 .fie-login-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--fie-red) 0%, var(--fie-red-dark) 55%, #7a000f 100%);
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 55%, #003d80 100%);
     display: flex; align-items: center; justify-content: center;
 }
 .fie-login-card {
@@ -285,7 +291,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
     box-shadow: 0 20px 60px rgba(0,0,0,.3);
 }
 .fie-login-logo-title {
-    font-size: 2.5rem; font-weight: 900; color: var(--fie-red);
+    font-size: 2.5rem; font-weight: 900; color: var(--fie-primary);
     letter-spacing: .06em; line-height: 1;
 }
 .fie-login-logo-sub { font-size: 0.85rem; color: #6c757d; }
@@ -322,13 +328,13 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
     font-size: 1.1rem; opacity: .9; margin-bottom: 2rem; line-height: 1.6;
 }
 .fie-hero__btn {
-    background: #fff; color: var(--fie-red); font-weight: 700;
+    background: #fff; color: var(--fie-primary); font-weight: 700;
     padding: 0.75rem 2rem; border-radius: 50px; text-decoration: none;
     font-size: 1rem; transition: box-shadow .15s, transform .15s;
     box-shadow: 0 4px 12px rgba(0,0,0,.2);
     display: inline-block;
 }
-.fie-hero__btn:hover { box-shadow: 0 8px 24px rgba(0,0,0,.3); transform: translateY(-2px); color: var(--fie-red-dark); }
+.fie-hero__btn:hover { box-shadow: 0 8px 24px rgba(0,0,0,.3); transform: translateY(-2px); color: var(--fie-primary-dark); }
 .fie-hero__btn-outline {
     border: 2px solid rgba(255,255,255,.7); color: #fff; font-weight: 600;
     padding: 0.75rem 2rem; border-radius: 50px; text-decoration: none;
@@ -343,13 +349,13 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
     background: var(--fie-red-light); border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.4rem; margin: 0 auto 1rem;
-    color: var(--fie-red);
+    color: var(--fie-primary);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    12. BREADCRUMB BURUNDI
    ═══════════════════════════════════════════════════════════════ */
-.fie-breadcrumb .breadcrumb-item a { color: var(--fie-red); }
+.fie-breadcrumb .breadcrumb-item a { color: var(--fie-primary); }
 .fie-breadcrumb .breadcrumb-item.active { color: #6c757d; }
 .fie-breadcrumb .breadcrumb-item + .breadcrumb-item::before { color: #adb5bd; }
 
@@ -370,7 +376,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 .fie-spinner-overlay--visible { display: flex; }
 
 /* Erreur de champ */
-.fie-field-error { font-size: 0.8rem; color: var(--fie-red); }
+.fie-field-error { font-size: 0.8rem; color: var(--fie-primary); }
 
 /* Sélect dépendant en chargement */
 .fie-select-loading { opacity: .6; pointer-events: none; }
@@ -401,3 +407,141 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
     .fie-login-card { padding: 1.5rem; }
     .fie-hero { padding: 3rem 1rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   16. KPI CARDS — Dashboard & Site public
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Cartes KPI avec icônes FontAwesome */
+.fie-kpi-card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 12px rgba(0,123,255,.08);
+    transition: transform .18s, box-shadow .18s;
+    overflow: hidden;
+}
+.fie-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,123,255,.16);
+}
+.fie-kpi-card .fie-kpi-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.fie-kpi-card .fie-kpi-value {
+    font-size: 2rem; font-weight: 800;
+    line-height: 1.1; font-family: var(--fie-font-title);
+}
+.fie-kpi-card .fie-kpi-label {
+    font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .07em;
+    color: #6c757d;
+}
+.fie-kpi-card .fie-kpi-sub {
+    font-size: 0.8rem; color: #8a9ab0;
+}
+
+/* Variantes couleurs KPI */
+.fie-kpi--blue   .fie-kpi-icon { background:#dbeafe; color:#1d4ed8; }
+.fie-kpi--sky    .fie-kpi-icon { background:#d1ecf1; color:#117a8b; }
+.fie-kpi--green  .fie-kpi-icon { background:#d1f0d8; color:#178a2b; }
+.fie-kpi--orange .fie-kpi-icon { background:#fef3c7; color:#92400e; }
+.fie-kpi--purple .fie-kpi-icon { background:#ede9fe; color:#6d28d9; }
+.fie-kpi--pink   .fie-kpi-icon { background:#fce7f3; color:#9d174d; }
+.fie-kpi--teal   .fie-kpi-icon { background:#ccfbf1; color:#0f766e; }
+.fie-kpi--indigo .fie-kpi-icon { background:#e0e7ff; color:#3730a3; }
+
+.fie-kpi--blue   .fie-kpi-value { color:#1d4ed8; }
+.fie-kpi--sky    .fie-kpi-value { color:#117a8b; }
+.fie-kpi--green  .fie-kpi-value { color:#178a2b; }
+.fie-kpi--orange .fie-kpi-value { color:#92400e; }
+.fie-kpi--purple .fie-kpi-value { color:#6d28d9; }
+.fie-kpi--pink   .fie-kpi-value { color:#9d174d; }
+.fie-kpi--teal   .fie-kpi-value { color:#0f766e; }
+.fie-kpi--indigo .fie-kpi-value { color:#3730a3; }
+
+/* Bordure colorée top des cartes KPI */
+.fie-kpi--blue   { border-top: 4px solid #1d4ed8 !important; }
+.fie-kpi--sky    { border-top: 4px solid #17a2b8 !important; }
+.fie-kpi--green  { border-top: 4px solid var(--fie-green) !important; }
+.fie-kpi--orange { border-top: 4px solid #fd7e14 !important; }
+.fie-kpi--purple { border-top: 4px solid #6d28d9 !important; }
+.fie-kpi--pink   { border-top: 4px solid #e83e8c !important; }
+.fie-kpi--teal   { border-top: 4px solid #0f766e !important; }
+.fie-kpi--indigo { border-top: 4px solid #3730a3 !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   17. BIBLIOTHÈQUE PUBLIQUE
+   ═══════════════════════════════════════════════════════════════ */
+.fie-library-card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    transition: transform .15s, box-shadow .15s;
+}
+.fie-library-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,123,255,.14);
+}
+.fie-library-card .fie-lib-type-badge {
+    font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    padding: 3px 8px; border-radius: 20px;
+}
+.fie-library-card .fie-lib-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   18. SUIVI PÉDAGOGIQUE
+   ═══════════════════════════════════════════════════════════════ */
+.fie-suivi-table .badge-promotion {
+    background: #d1f0d8; color: #178a2b;
+    font-size: 0.7rem; padding: 3px 8px; border-radius: 20px;
+}
+.fie-suivi-table .badge-redoublement {
+    background: #fef3c7; color: #92400e;
+    font-size: 0.7rem; padding: 3px 8px; border-radius: 20px;
+}
+.fie-suivi-table .badge-transfert {
+    background: #d1ecf1; color: #117a8b;
+    font-size: 0.7rem; padding: 3px 8px; border-radius: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   19. HISTORIQUE ÉLÈVE
+   ═══════════════════════════════════════════════════════════════ */
+.fie-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+.fie-timeline::before {
+    content: '';
+    position: absolute; left: 0.75rem; top: 0; bottom: 0;
+    width: 2px; background: #dee2e6;
+}
+.fie-timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+.fie-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.45rem; top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--fie-primary);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--fie-primary-light);
+}
+.fie-timeline-item--inscription::before { background: var(--fie-green); box-shadow: 0 0 0 2px var(--fie-green-light); }
+.fie-timeline-item--transfert::before   { background: #17a2b8; box-shadow: 0 0 0 2px #d1ecf1; }
+.fie-timeline-item--promotion::before   { background: #6d28d9; box-shadow: 0 0 0 2px #ede9fe; }
+.fie-timeline-item--redoublement::before { background: #fd7e14; box-shadow: 0 0 0 2px #fef3c7; }
+.fie-timeline-item--examen::before      { background: #e83e8c; box-shadow: 0 0 0 2px #fce7f3; }

@@ -143,7 +143,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 						$tabs3 = explode('-',$tabs2[0]);
 						if(preg_match('/ '.$tabs1[0].' /', $sql_tab)){
 							if($tabs1[0] <> $tab){
-								if((strpos($sql_tab, str_replace(\'-\',\'.\',$tabs2[0])." AS ".$tabs3[1]) === false) && (strpos($list_select_suite, str_replace(\'-\',\'.\',$tabs2[0])." AS ".$tabs3[1]) === false)){
+								if((strpos($sql_tab, str_replace('-','.',$tabs2[0])." AS ".$tabs3[1]) === false) && (strpos($list_select_suite, str_replace('-','.',$tabs2[0])." AS ".$tabs3[1]) === false)){
 									$list_select_suite .= ", ".str_replace('-','.',$tabs2[0])." AS ".$tabs3[1]." ";
 								}
 								if($i==0) $list_ord .= " ORDER BY ".$tabs3[1].' '.$tabs2[1];
@@ -199,11 +199,11 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 							$tabs2 = explode('-',$tabs1[1]);//table = $tabs2[0] et champ = $tabs2[1]
 						}elseif(preg_match('/ '.$tabs2[0].' /', $sql_tab)){
 							if($tabs2[0] <> $tab){
-								if((strpos($sql_tab, str_replace(\'-\',\'.\',$tabs1[1])." AS ".$tabs2[1]) === false) && (strpos($list_select_suite, str_replace(\'-\',\'.\',$tabs1[1])." AS ".$tabs2[1]) === false)){
+								if((strpos($sql_tab, str_replace('-','.',$tabs1[1])." AS ".$tabs2[1]) === false) && (strpos($list_select_suite, str_replace('-','.',$tabs1[1])." AS ".$tabs2[1]) === false)){
 									$list_select_suite .= ", ".str_replace('-','.',$tabs1[1])." AS ".$tabs2[1]." ";
 								}
 								if($tabs0[0]=='equalint' || $tabs0[0]=='equaltext' || $tabs0[0]=='different' || $tabs0[0]=='superior' || $tabs0[0]=='inferior'){
-									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].'\''.$tabs0[1].'\' AND ';
+									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]]."'".$tabs0[1]."' AND ";
 									else $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].$tabs0[1].' AND ';
 									
 								}elseif($tabs0[0]=='contain' || $tabs0[0]=='notcontain' || $tabs0[0]=='start' || $tabs0[0]=='end'){
@@ -218,7 +218,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 								}
 							}else{
 								if($tabs0[0]=='equalint' || $tabs0[0]=='equaltext' || $tabs0[0]=='different' || $tabs0[0]=='superior' || $tabs0[0]=='inferior')
-									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].'\''.$tabs0[1].'\' AND ';
+									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]]."'".$tabs0[1]."' AND ";
 									else $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].$tabs0[1].' AND ';
 								elseif($tabs0[0]=='contain' || $tabs0[0]=='notcontain' || $tabs0[0]=='start' || $tabs0[0]=='end'){
 									$list_crit .= str_replace('-','.',$tabs1[1]).str_replace('#',$tabs0[1],$operators[$tabs0[0]]).' AND ';
