@@ -1,6 +1,6 @@
 <?php
 $page_title = "Examens — FIE"; $active_menu = 'examen';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 ?>
 <nav aria-label="breadcrumb" class="mb-3"><ol class="breadcrumb">
 <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/">Accueil</a></li>
@@ -16,4 +16,4 @@ require BASE_PATH . '/app/views/layouts/header.php';
 <p class="text-muted">La gestion des résultats d'examens nationaux liés aux IUE sera disponible dans la prochaine version.</p>
 <a href="<?= BASE_URL ?>/tableau-de-bord" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-gauge me-1"></i>Retour au tableau de bord</a>
 </div></div>
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

@@ -5,7 +5,7 @@
  */
 $page_title  = $page_title  ?? 'Suivi classe — FIE';
 $active_menu = $active_menu ?? 'suivi';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 $classe   = $classe   ?? [];
 $eleves   = $eleves   ?? [];
@@ -276,4 +276,4 @@ $csrf     = SecurityHelper::csrfToken();
 })();
 </script>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

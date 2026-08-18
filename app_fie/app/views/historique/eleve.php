@@ -5,7 +5,7 @@
  */
 $page_title  = $page_title  ?? 'Historique élève — FIE';
 $active_menu = $active_menu ?? 'recherche';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 $eleve      = $eleve      ?? [];
 $byAnnee    = $byAnnee    ?? [];
@@ -246,4 +246,4 @@ document.querySelectorAll('#filter-menu .dropdown-item').forEach(item => {
 });
 </script>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

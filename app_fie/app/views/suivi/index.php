@@ -5,7 +5,7 @@
  */
 $page_title  = $page_title  ?? 'Suivi pédagogique — FIE';
 $active_menu = $active_menu ?? 'suivi';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 $role        = SecurityHelper::userRole();
 $classes     = $classes     ?? [];
@@ -182,4 +182,4 @@ $anneeCour   = $anneeCour   ?? date('Y') . '-' . (date('Y') + 1);
 </div>
 <?php endif; ?>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

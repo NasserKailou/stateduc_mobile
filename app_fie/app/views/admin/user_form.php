@@ -10,7 +10,7 @@ $admin_breadcrumb = [
     ['label' => 'Utilisateurs', 'url' => BASE_URL . '/admin/users'],
     ['label' => $editMode ? 'Modifier' : 'Nouvel utilisateur', 'url' => ''],
 ];
-require BASE_PATH . '/app/views/layouts/admin_layout.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 $csrf    = SecurityHelper::csrfToken();
 $errors  = $errors ?? [];
@@ -299,4 +299,4 @@ document.querySelectorAll('input[name="role"]').forEach(r =>
 updatePerimetre();
 </script>
 
-<?php require BASE_PATH . '/app/views/layouts/admin_footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

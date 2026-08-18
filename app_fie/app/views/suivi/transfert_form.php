@@ -4,7 +4,7 @@
  */
 $page_title  = $page_title  ?? 'Nouveau transfert — FIE';
 $active_menu = $active_menu ?? 'suivi';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 $csrf        = SecurityHelper::csrfToken();
 $errors      = $errors ?? [];
@@ -200,4 +200,4 @@ document.getElementById('btn-verify-iue')?.addEventListener('click', async funct
 });
 </script>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

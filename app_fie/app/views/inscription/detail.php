@@ -10,7 +10,7 @@
  */
 $page_title  = 'Fiche Élève — ' . SecurityHelper::e($eleve['iue'] ?? '');
 $active_menu = 'inscription';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 ?>
 
 <!-- ── Fil d'Ariane ─────────────────────────────────────────────────────── -->
@@ -249,4 +249,4 @@ require BASE_PATH . '/app/views/layouts/header.php';
     <?php endif; ?>
 </div>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

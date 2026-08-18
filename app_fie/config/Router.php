@@ -122,16 +122,20 @@ class Router
         $this->post('/admin/parametres', 'ParametresController', 'save');
 
         // ── Bibliothèque (public — accessible sans connexion) ────────────────
-        // IMPORTANT : routes statiques AVANT la route paramétrée /:id/telecharger
+        // IMPORTANT : routes statiques AVANT les routes paramétrées
         $this->get('/bibliotheque',                        'BibliothequeController', 'index');
-        $this->get('/bibliotheque/:id/telecharger',        'BibliothequeController', 'telecharger');
 
         // ── Bibliothèque — Administration (bibliothecaire / admin) ───────────
+        // Ces routes doivent être enregistrées AVANT /bibliotheque/:id/telecharger
+        // sinon "admin" serait capturé comme :id
         $this->get('/bibliotheque/admin',                  'BibliothequeController', 'adminIndex');
         $this->get('/bibliotheque/admin/nouveau',          'BibliothequeController', 'adminNewForm');
         $this->post('/bibliotheque/admin/publier',         'BibliothequeController', 'adminPublish');
         $this->post('/bibliotheque/admin/:id/statut/:statut', 'BibliothequeController', 'adminSetStatut');
         $this->post('/bibliotheque/admin/:id/supprimer',   'BibliothequeController', 'adminDelete');
+
+        // Route paramétrée en DERNIER (après toutes les statiques /bibliotheque/...)
+        $this->get('/bibliotheque/:id/telecharger',        'BibliothequeController', 'telecharger');
 
         // ── Suivi pédagogique ────────────────────────────────────────────────
         $this->get('/suivi',                               'SuiviPedagogiqueController', 'index');
@@ -179,7 +183,17 @@ class Router
                 }
             }
 
-            $this->callController($route['controller'], $route['action']);
+                try {
+                $this->callController($route['controller'], $route['action']);
+            } catch (Throwable $e) {
+                // Log de l'exception en mode debug
+                if (defined('FIE_DEBUG') && FIE_DEBUG) {
+                    $this->error500($e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                } else {
+                    error_log('[FIE] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                    $this->error500('Une erreur interne est survenue. Veuillez réessayer.');
+                }
+            }
             return;
         }
 

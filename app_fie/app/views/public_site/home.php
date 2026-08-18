@@ -4,7 +4,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Stack         : Bootstrap 5.3.3 + Font Awesome 6.5.2 + AOS 2.3.4
  * Polices       : Poppins (700–900 titres) + Open Sans (400–600 corps) via Google Fonts
- * Charte        : Rouge #CE1126 · Vert #1EB53A · Blanc #FFFFFF (Burundi)
+ * Charte        : Bleu Royal #1a56db · Cyan #0891b2 · Blanc #FFFFFF · Vert #059669
  * Animations    : AOS scroll + compteurs easeOutExpo + navbar scroll-shadow
  *                 + hover cards elevation + scroll-indicator + typed text
  * Accessibilité : prefers-reduced-motion respecté (CSS + JS)
@@ -18,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Le Fichier Informatisé des Élèves (FIE) attribue un Identifiant Unique (IUE) à chaque apprenant du système éducatif burundais. Géré par la DGESS / MENERS — SIGE Burundi.">
     <meta name="keywords" content="FIE, Burundi, éducation, SIGE, IUE, DGESS, MENERS, élèves, immatriculation">
-    <meta name="theme-color" content="#CE1126">
+    <meta name="theme-color" content="#1a56db">
     <meta property="og:title" content="FIE Burundi — Fichier Informatisé des Élèves">
     <meta property="og:description" content="Système national d'immatriculation des élèves du Burundi — DGESS / MENERS.">
     <meta property="og:type" content="website">
@@ -47,20 +47,45 @@
 
     <style>
     /* ══════════════════════════════════════════════════════════════════════════
-       TOKENS & FONDATION
+       TOKENS & FONDATION — Charte FIE Bleu Royal v3.0
+       Palette complémentaire :
+         Bleu Royal #1a56db  → Primaire institutionnel, confiance, technologie
+         Bleu Foncé #0f2749  → Backgrounds sombres, gradients profonds
+         Cyan #0891b2        → Secondaire, frais, numérique
+         Émeraude #059669    → Succès, vert données positives
+         Ambre #d97706       → Stats chaudes, KPIs clés
+         Violet #7c3aed      → Accent CTA, mouvements, transferts
        ══════════════════════════════════════════════════════════════════════════ */
     :root {
-        --bi-red:        #CE1126;
-        --bi-red-d:      #a50d1e;
-        --bi-red-l:      #ffeef0;
-        --bi-red-m:      #f5c6cc;
+        /* ── Bleu primaire FIE ── */
+        --bi-red:        #1a56db;   /* Renommé pour compatibilité — c'est le bleu primaire */
+        --bi-red-d:      #1343a8;
+        --bi-red-l:      #eff6ff;
+        --bi-red-m:      #bfdbfe;
+
+        /* ── Palette étendue ── */
+        --bi-blue:       #1a56db;
+        --bi-blue-d:     #1343a8;
+        --bi-blue-l:     #eff6ff;
+        --bi-navy:       #0f2749;
+        --bi-cyan:       #0891b2;
+        --bi-cyan-l:     #e0f2fe;
+        --bi-emerald:    #059669;
+        --bi-emerald-l:  #d1fae5;
+        --bi-amber:      #d97706;
+        --bi-amber-l:    #fef3c7;
+        --bi-violet:     #7c3aed;
+        --bi-violet-l:   #ede9fe;
+
+        /* ── Garder le vert Burundi pour les éléments de drapeau ── */
         --bi-green:      #1EB53A;
         --bi-green-d:    #178a2b;
         --bi-green-l:    #eaf9ed;
+
         --bi-white:      #FFFFFF;
         --bi-dark:       #0d1b2a;
-        --bi-dark-2:     #1a2e45;
-        --bi-text:       #2c3e50;
+        --bi-dark-2:     #0f2749;
+        --bi-text:       #1e293b;
         --bi-muted:      #64748b;
         --bi-border:     #e2e8f0;
         --bi-bg-light:   #f8fafc;
@@ -88,9 +113,12 @@
     .poppins { font-family: 'Poppins', system-ui, sans-serif; }
 
     /* ── UTILITAIRES ────────────────────────────────────────────────────────── */
-    .text-bi-red   { color: var(--bi-red) !important; }
+    .text-bi-blue  { color: var(--bi-blue) !important; }
+    .text-bi-cyan  { color: var(--bi-cyan) !important; }
     .text-bi-green { color: var(--bi-green) !important; }
-    .bg-bi-red     { background-color: var(--bi-red) !important; }
+    .text-bi-amber { color: var(--bi-amber) !important; }
+    .bg-bi-blue    { background-color: var(--bi-blue) !important; }
+    .bg-bi-cyan    { background-color: var(--bi-cyan) !important; }
     .bg-bi-green   { background-color: var(--bi-green) !important; }
 
     .section-eyebrow {
@@ -176,7 +204,7 @@
     }
 
     #mainNav.scrolled {
-        box-shadow: 0 4px 20px rgba(206,17,38,.35);
+        box-shadow: 0 4px 20px rgba(26,86,219,.35);
         padding-top: .5rem;
         padding-bottom: .5rem;
     }
@@ -239,10 +267,11 @@
     .hero-section {
         min-height: calc(100vh - 112px); /* minus topbar + navbar + flagstrip */
         background: linear-gradient(145deg,
-            #7a0015 0%,
-            var(--bi-red) 35%,
-            #b5102a 65%,
-            #6e0010 100%);
+            #0c1f3f 0%,
+            #0f2749 20%,
+            #1343a8 50%,
+            #1a56db 75%,
+            #0891b2 100%);
         display: flex; align-items: center;
         position: relative; overflow: hidden;
         padding: 4rem 0 7rem;
@@ -253,9 +282,10 @@
         content: '';
         position: absolute; inset: 0; pointer-events: none;
         background-image:
-            radial-gradient(ellipse at 15% 85%, rgba(255,255,255,.06) 0%, transparent 55%),
-            radial-gradient(ellipse at 85% 15%, rgba(30,181,58,.12) 0%, transparent 50%),
-            url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpolygon points='0,0 20,0 0,20'/%3E%3Cpolygon points='80,0 100,0 100,20'/%3E%3Cpolygon points='0,80 0,100 20,100'/%3E%3Cpolygon points='100,80 100,100 80,100'/%3E%3Cpolygon points='40,40 60,40 50,57'/%3E%3C/g%3E%3C/svg%3E");
+            radial-gradient(ellipse at 15% 85%, rgba(8,145,178,.18) 0%, transparent 55%),
+            radial-gradient(ellipse at 85% 15%, rgba(124,58,237,.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.04) 0%, transparent 70%),
+            url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Ccircle cx='80' cy='20' r='8'/%3E%3Ccircle cx='20' cy='80' r='8'/%3E%3Ccircle cx='80' cy='80' r='8'/%3E%3Ccircle cx='50' cy='50' r='12'/%3E%3C/g%3E%3C/svg%3E");
     }
 
     /* Vague blanche en bas */
@@ -475,10 +505,10 @@
         box-shadow: var(--bi-shadow-lg);
         border-color: transparent;
     }
-    .stat-card--red::before   { background: var(--bi-red); }
-    .stat-card--green::before { background: var(--bi-green); }
-    .stat-card--blue::before  { background: #1a73e8; }
-    .stat-card--gold::before  { background: #f0a500; }
+    .stat-card--red::before   { background: var(--bi-blue); }
+    .stat-card--green::before { background: var(--bi-cyan); }
+    .stat-card--blue::before  { background: var(--bi-emerald); }
+    .stat-card--gold::before  { background: var(--bi-amber); }
 
     .stat-icon {
         width: 72px; height: 72px; border-radius: 18px;
@@ -487,20 +517,20 @@
         transition: transform var(--bi-transition);
     }
     .stat-card:hover .stat-icon { transform: scale(1.12) rotate(-5deg); }
-    .stat-card--red   .stat-icon { background: var(--bi-red-l);  color: var(--bi-red); }
-    .stat-card--green .stat-icon { background: var(--bi-green-l); color: var(--bi-green-d); }
-    .stat-card--blue  .stat-icon { background: #e8f0fe; color: #1a73e8; }
-    .stat-card--gold  .stat-icon { background: #fff8e1; color: #d97706; }
+    .stat-card--red   .stat-icon { background: var(--bi-blue-l);    color: var(--bi-blue); }
+    .stat-card--green .stat-icon { background: var(--bi-cyan-l);    color: var(--bi-cyan); }
+    .stat-card--blue  .stat-icon { background: var(--bi-emerald-l); color: var(--bi-emerald); }
+    .stat-card--gold  .stat-icon { background: var(--bi-amber-l);   color: var(--bi-amber); }
 
     .stat-number {
         font-family: 'Poppins', sans-serif;
         font-size: 2.75rem; font-weight: 900;
         line-height: 1; margin-bottom: .3rem;
     }
-    .stat-card--red   .stat-number { color: var(--bi-red); }
-    .stat-card--green .stat-number { color: var(--bi-green-d); }
-    .stat-card--blue  .stat-number { color: #1a73e8; }
-    .stat-card--gold  .stat-number { color: #d97706; }
+    .stat-card--red   .stat-number { color: var(--bi-blue); }
+    .stat-card--green .stat-number { color: var(--bi-cyan); }
+    .stat-card--blue  .stat-number { color: var(--bi-emerald); }
+    .stat-card--gold  .stat-number { color: var(--bi-amber); }
     .stat-sublabel {
         font-size: .78rem; color: var(--bi-muted); font-weight: 500;
         line-height: 1.4;
@@ -593,10 +623,10 @@
         cursor: default;
     }
     .how-step-num:hover { transform: scale(1.08); box-shadow: var(--bi-shadow-md); }
-    .how-step-num--red   { background: var(--bi-red);   color: #fff; }
-    .how-step-num--green { background: var(--bi-green); color: #fff; }
-    .how-step-num--blue  { background: #1a73e8; color: #fff; }
-    .how-step-num--gold  { background: #f0a500; color: #fff; }
+    .how-step-num--red   { background: var(--bi-blue);    color: #fff; }
+    .how-step-num--green { background: var(--bi-emerald); color: #fff; }
+    .how-step-num--blue  { background: var(--bi-cyan);    color: #fff; }
+    .how-step-num--gold  { background: var(--bi-amber);   color: #fff; }
 
     .how-step h6 {
         font-family: 'Poppins', sans-serif;
@@ -617,7 +647,7 @@
 
     .about-visual {
         border-radius: var(--bi-radius-lg);
-        background: linear-gradient(145deg, var(--bi-red-d) 0%, var(--bi-red) 60%, #c5102a 100%);
+        background: linear-gradient(145deg, #0f2749 0%, var(--bi-blue-d) 40%, var(--bi-blue) 75%, var(--bi-cyan) 100%);
         min-height: 400px;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
@@ -673,9 +703,9 @@
         white-space: nowrap;
     }
     .province-chip:hover {
-        background: var(--bi-red-l);
+        background: var(--bi-blue-l);
         border-color: var(--bi-red-m);
-        color: var(--bi-red);
+        color: var(--bi-blue);
     }
     .province-chip i { font-size: .75rem; }
 
@@ -804,7 +834,7 @@
        CTA — SECTION FINALE (vert Burundi)
        ══════════════════════════════════════════════════════════════════════════ */
     .cta-section {
-        background: linear-gradient(135deg, var(--bi-green-d) 0%, var(--bi-green) 60%, #28d44e 100%);
+        background: linear-gradient(135deg, #0f2749 0%, var(--bi-blue-d) 40%, var(--bi-blue) 70%, var(--bi-cyan) 100%);
         padding: 6rem 0;
         position: relative; overflow: hidden;
     }
@@ -824,7 +854,7 @@
 
     .btn-cta-white {
         display: inline-flex; align-items: center; gap: .5rem;
-        background: #fff; color: var(--bi-green-d);
+        background: #fff; color: var(--bi-blue-d);
         font-family: 'Poppins', sans-serif;
         font-weight: 700; font-size: 1rem;
         padding: .85rem 2.5rem;
@@ -836,7 +866,7 @@
     .btn-cta-white:hover {
         transform: translateY(-3px);
         box-shadow: 0 12px 32px rgba(0,0,0,.35);
-        color: var(--bi-green-d);
+        color: var(--bi-blue-d);
     }
 
     .btn-cta-outline {
@@ -904,7 +934,7 @@
         transition: background var(--bi-transition), color var(--bi-transition), transform var(--bi-transition);
     }
     .footer-social a:hover {
-        background: var(--bi-red);
+        background: var(--bi-blue);
         color: #fff;
         transform: translateY(-2px);
     }
@@ -926,7 +956,7 @@
         border: none; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
         font-size: 1rem; z-index: 999;
-        box-shadow: 0 4px 16px rgba(206,17,38,.4);
+        box-shadow: 0 4px 16px rgba(26,86,219,.4);
         opacity: 0; transform: translateY(20px) scale(.8);
         transition: opacity .3s, transform .3s;
         pointer-events: none;
@@ -1022,7 +1052,7 @@
                 <li class="nav-item"><a class="nav-link" href="#fonctionnalites">Services</a></li>
                 <li class="nav-item"><a class="nav-link" href="#comment">Comment ça marche</a></li>
                 <li class="nav-item"><a class="nav-link" href="#mission">Mission</a></li>
-                <li class="nav-item"><a class="nav-link" href="#actualites">Actualités</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/bibliotheque"><i class="fa-solid fa-book-open me-1"></i>Bibliothèque</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/aide">Aide</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/contact">Contact</a></li>
             </ul>
@@ -1194,7 +1224,7 @@
                 Sync StatEduc temps réel
             </div>
             <div class="trust-item d-none d-lg-flex">
-                <i class="fa-solid fa-users-gear" style="color:var(--bi-red);"></i>
+                <i class="fa-solid fa-users-gear" style="color:var(--bi-blue);"></i>
                 RBAC 7 rôles
             </div>
             <div class="trust-item d-none d-lg-flex">
@@ -1216,7 +1246,7 @@
 <section class="stats-section" id="chiffres" aria-labelledby="stats-title">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="section-eyebrow text-bi-red">Chiffres clés</span>
+            <span class="section-eyebrow text-bi-blue">Chiffres clés</span>
             <div class="tri-divider d-block mx-auto my-2"></div>
             <h2 class="section-title" id="stats-title">Le FIE en quelques chiffres</h2>
             <p class="section-lead mx-auto mt-2">
@@ -1292,13 +1322,13 @@
             <!-- 1 -->
             <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
                 <div class="feat-card">
-                    <div class="feat-icon" style="background:#ffeef0;color:var(--bi-red);">
+                    <div class="feat-icon" style="background:var(--bi-blue-l);color:var(--bi-blue);">
                         <i class="fa-solid fa-id-card"></i>
                     </div>
                     <h5>Immatriculation IUE</h5>
                     <p>Attribution automatique d'un Identifiant Unique Élève certifié ISO 7064 MOD 97-10
                        à chaque inscription. Détection des doublons en temps réel.</p>
-                    <a href="<?= BASE_URL ?>/aide" class="feat-link" style="color:var(--bi-red);">
+                    <a href="<?= BASE_URL ?>/aide" class="feat-link" style="color:var(--bi-blue);">
                         En savoir plus <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
@@ -1384,7 +1414,7 @@
 <section class="how-section" id="comment" aria-labelledby="how-title">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="section-eyebrow text-bi-red">Processus</span>
+            <span class="section-eyebrow text-bi-blue">Processus</span>
             <div class="tri-divider d-block mx-auto my-2"></div>
             <h2 class="section-title" id="how-title">Comment fonctionne l'immatriculation ?</h2>
             <p class="section-lead mx-auto mt-2">
@@ -1432,7 +1462,7 @@
         <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="200">
             <a href="<?= BASE_URL ?>/connexion"
                class="btn text-white fw-bold px-5 py-3 rounded-pill"
-               style="background:var(--bi-red);font-family:'Poppins',sans-serif;">
+               style="background:var(--bi-blue);font-family:'Poppins',sans-serif;">
                 <i class="fa-solid fa-right-to-bracket me-2"></i>Commencer l'immatriculation
             </a>
             <a href="<?= BASE_URL ?>/aide"
@@ -1482,7 +1512,7 @@
 
                         <!-- Barre tricolore -->
                         <div class="d-flex justify-content-center gap-2 mb-4">
-                            <div style="width:44px;height:7px;background:#CE1126;border-radius:4px;"></div>
+                            <div style="width:44px;height:7px;background:#1a56db;border-radius:4px;"></div>
                             <div style="width:44px;height:7px;background:#fff;border-radius:4px;"></div>
                             <div style="width:44px;height:7px;background:#1EB53A;border-radius:4px;"></div>
                         </div>
@@ -1507,7 +1537,7 @@
 
             <!-- CONTENU DROIT -->
             <div class="col-lg-7" data-aos="fade-left" data-aos-duration="700">
-                <span class="section-eyebrow text-bi-red">Notre mission</span>
+                <span class="section-eyebrow text-bi-blue">Notre mission</span>
                 <div class="tri-divider d-block my-2"></div>
                 <h2 class="section-title mt-2 mb-3" id="about-title">
                     Un système d'information éducatif<br>au service de chaque enfant
@@ -1522,7 +1552,7 @@
                 <!-- Milestones -->
                 <div class="mb-4">
                     <div class="milestone">
-                        <div class="milestone-icon" style="background:var(--bi-red-l);color:var(--bi-red);">
+                        <div class="milestone-icon" style="background:var(--bi-red-l);color:var(--bi-blue);">
                             <i class="fa-solid fa-bullseye"></i>
                         </div>
                         <div>
@@ -1565,7 +1595,7 @@
 
                 <a href="<?= BASE_URL ?>/connexion"
                    class="btn text-white fw-semibold px-4 py-2 rounded-pill"
-                   style="background:var(--bi-red);font-family:'Poppins',sans-serif;">
+                   style="background:var(--bi-blue);font-family:'Poppins',sans-serif;">
                     <i class="fa-solid fa-arrow-right me-2"></i>Accéder au portail FIE
                 </a>
                 <a href="<?= BASE_URL ?>/aide"
@@ -1604,7 +1634,7 @@
                     </div>
                     <div class="vr d-none d-sm-block" style="height:40px;"></div>
                     <div class="text-center">
-                        <div class="fw-bold" style="font-size:2rem;font-family:'Poppins',sans-serif;color:var(--bi-red);">119</div>
+                        <div class="fw-bold" style="font-size:2rem;font-family:'Poppins',sans-serif;color:var(--bi-blue);">119</div>
                         <div class="text-muted small">Communes</div>
                     </div>
                     <div class="vr d-none d-sm-block" style="height:40px;"></div>
@@ -1667,13 +1697,13 @@
                         <img src="https://sspark.genspark.ai/cfimages?u1=bIQsqcvxMgBpZ9pbIbuou06u0LSjSxlxkkuPPUjAJP3Qwh9AMR0tckWFh1egjvmeqV7ckikQJ5xRohvCVCvGJehI9sdQFy%2FiATHLzZPriofCqyfBTKXvKVnpEMDKn5Y%3D&u2=cy0ndCkVn7PS4jVG&width=2560"
                              alt="Élèves du Burundi en classe" loading="lazy">
                         <span style="position:absolute;bottom:.75rem;right:.75rem;z-index:2;
-                                     background:var(--bi-red);color:#fff;border-radius:6px;
+                                     background:var(--bi-blue);color:#fff;border-radius:6px;
                                      padding:.2rem .6rem;font-size:.68rem;font-weight:700;font-family:'Poppins',sans-serif;">
                             <i class="fa-solid fa-rocket me-1"></i>Déploiement
                         </span>
                     </div>
                     <div class="card-body p-4">
-                        <span class="news-category text-danger">Déploiement</span>
+                        <span class="news-category text-primary">Déploiement</span>
                         <h5 class="card-title mt-2">
                             Lancement FIE v1.0 — Immatriculation IUE opérationnelle
                         </h5>
@@ -1685,7 +1715,7 @@
                             <span class="news-date">
                                 <i class="fa-regular fa-calendar"></i>Janvier 2026
                             </span>
-                            <a href="<?= BASE_URL ?>/aide" class="news-read-more text-danger">
+                            <a href="<?= BASE_URL ?>/aide" class="news-read-more text-primary">
                                 Lire <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </div>
@@ -1733,7 +1763,7 @@
                         <img src="https://sspark.genspark.ai/cfimages?u1=wNNjty7UhhKGJoXlZdd11oq0j5mmLjkD4FNNvpZ9rYZRgb%2BfXf8HxfjhJW5SXKxUtlsDi%2BRkkb%2FrrkGV3Nbm3H9twiKdciwMCb66uOKmeJi5Fe0756x7wv2snA%3D%3D&u2=G19d1W2GwRPBatNA&width=2560"
                              alt="Éducation numérique en Afrique" loading="lazy">
                         <span style="position:absolute;bottom:.75rem;right:.75rem;z-index:2;
-                                     background:#1a73e8;color:#fff;border-radius:6px;
+                                     background:var(--bi-cyan);color:#fff;border-radius:6px;
                                      padding:.2rem .6rem;font-size:.68rem;font-weight:700;font-family:'Poppins',sans-serif;">
                             <i class="fa-solid fa-chart-line me-1"></i>Statistiques
                         </span>
@@ -1769,7 +1799,7 @@
 <section class="partners-section" id="partenaires" aria-label="Partenaires institutionnels">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="section-eyebrow text-bi-red">Partenaires</span>
+            <span class="section-eyebrow text-bi-blue">Partenaires</span>
             <div class="tri-divider d-block mx-auto my-2"></div>
             <h2 class="section-title mt-2 mb-2">Nos partenaires institutionnels</h2>
             <p class="text-muted" style="font-size:.95rem;">
@@ -1863,7 +1893,7 @@
             <!-- Colonne 1 : Branding -->
             <div class="col-lg-4 col-md-12">
                 <div class="footer-brand">
-                    <i class="fa-solid fa-graduation-cap me-2" style="color:var(--bi-red);"></i>FIE Burundi
+                    <i class="fa-solid fa-graduation-cap me-2" style="color:var(--bi-blue);"></i>FIE Burundi
                 </div>
                 <p class="footer-tagline">Fichier Informatisé des Élèves · SIGE</p>
                 <p class="small mb-3" style="color:rgba(255,255,255,.5);line-height:1.7;">
@@ -1873,7 +1903,7 @@
                 </p>
                 <!-- Tricolore mini -->
                 <div style="width:64px;height:4px;border-radius:2px;margin-bottom:1rem;
-                            background:linear-gradient(to right,#CE1126 33%,#fff 33%,#fff 66%,#1EB53A 66%);"></div>
+                            background:linear-gradient(to right,#1a56db 33%,#fff 33%,#fff 66%,#1EB53A 66%);"></div>
                 <div class="footer-social">
                     <a href="#" aria-label="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
                     <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>

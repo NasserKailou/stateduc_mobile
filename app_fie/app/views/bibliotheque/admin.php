@@ -4,7 +4,7 @@
  */
 $page_title  = $page_title  ?? 'Gestion bibliothèque — FIE';
 $active_menu = $active_menu ?? 'bibliotheque_admin';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -113,4 +113,4 @@ require BASE_PATH . '/app/views/layouts/header.php';
     </a>
 </div>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

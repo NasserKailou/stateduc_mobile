@@ -8,7 +8,7 @@
  */
 $page_title  = "Nouvelle Inscription — FIE";
 $active_menu = 'inscription';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 $old  = $_SESSION['fie_form_old']     ?? [];
 $ferr = $_SESSION['fie_field_errors'] ?? [];
@@ -613,4 +613,4 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
 }());
 </script>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

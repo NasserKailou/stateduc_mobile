@@ -3,9 +3,10 @@
  * FIE — Vue : Bibliothèque publique
  * Accessible à tous — Bootstrap 5 + FontAwesome
  */
-$page_title  = $page_title  ?? 'Bibliothèque — FIE';
-$active_menu = $active_menu ?? 'bibliotheque';
-require BASE_PATH . '/app/views/layouts/header.php';
+$page_title     = $page_title  ?? 'Bibliothèque — FIE';
+$active_menu    = $active_menu ?? 'bibliotheque';
+$app_breadcrumb = [['label' => 'Bibliothèque', 'url' => '']];
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 ?>
 
 <!-- ── En-tête ──────────────────────────────────────────────────────────── -->
@@ -171,4 +172,4 @@ require BASE_PATH . '/app/views/layouts/header.php';
 </div>
 <?php endif; ?>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

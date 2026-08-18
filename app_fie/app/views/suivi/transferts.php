@@ -4,7 +4,7 @@
  */
 $page_title  = $page_title  ?? 'Transferts scolaires — FIE';
 $active_menu = $active_menu ?? 'suivi';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 $transferts  = $transferts  ?? [];
 $role        = SecurityHelper::userRole();
@@ -156,4 +156,4 @@ $statutLabels = [
 </div>
 <?php endif; ?>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>
