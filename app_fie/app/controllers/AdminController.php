@@ -259,7 +259,205 @@ class AdminController
         require BASE_PATH . '/app/views/admin/audit.php';
     }
 
+    /* ── GET /admin/users/nouveau ───────────────────────────────────────── */
+
+    public function userNewForm(): void
+    {
+        $ecoles = Database::fetchAll(
+            "SELECT code_etablissement, nom_etablissement
+             FROM etablissements_miroir WHERE actif = 1
+             ORDER BY nom_etablissement LIMIT 500"
+        );
+        $classes = Database::fetchAll(
+            "SELECT id, nom_classe, code_etablissement, annee_scolaire
+             FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
+        );
+        $errors  = [];
+        $old     = [];
+        $page_title  = 'Nouvel utilisateur — Admin FIE';
+        $active_menu = 'admin';
+        require BASE_PATH . '/app/views/admin/user_form.php';
+    }
+
+    /* ── POST /admin/users/nouveau ──────────────────────────────────────── */
+
+    public function userCreate(): void
+    {
+        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+            $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
+            header('Location: ' . BASE_URL . '/admin/users/nouveau');
+            exit;
+        }
+
+        $errors = $this->validateUserForm($_POST);
+        if (!empty($errors)) {
+            $ecoles = Database::fetchAll(
+                "SELECT code_etablissement, nom_etablissement
+                 FROM etablissements_miroir WHERE actif = 1 ORDER BY nom_etablissement LIMIT 500"
+            );
+            $classes = Database::fetchAll(
+                "SELECT id, nom_classe, code_etablissement, annee_scolaire
+                 FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
+            );
+            $old     = $_POST;
+            $page_title  = 'Nouvel utilisateur — Admin FIE';
+            $active_menu = 'admin';
+            require BASE_PATH . '/app/views/admin/user_form.php';
+            return;
+        }
+
+        $hash = password_hash($_POST['mot_de_passe'], PASSWORD_BCRYPT);
+        Database::query(
+            "INSERT INTO fie_users
+               (login, password_hash, nom, prenoms, role, ecole_code, classe_id,
+                nom_complet, province_perimetre, actif, created_at)
+             VALUES (?,?,?,?,?,?,?,?,?,1,NOW())",
+            [
+                trim($_POST['login']),
+                $hash,
+                trim($_POST['nom']),
+                trim($_POST['prenoms'] ?? ''),
+                $_POST['role'],
+                $_POST['ecole_code']  ?: null,
+                ($_POST['classe_id'] ?? '') ?: null,
+                trim($_POST['nom_complet'] ?? ($_POST['prenoms'] . ' ' . $_POST['nom'])),
+                $_POST['province_perimetre'] ?: null,
+            ]
+        );
+
+        $this->log->info("Utilisateur créé", ['login' => $_POST['login'], 'role' => $_POST['role']]);
+        $_SESSION['fie_flash_success'] = 'Utilisateur ' . htmlspecialchars($_POST['login'], ENT_QUOTES) . ' créé.';
+        header('Location: ' . BASE_URL . '/admin/users');
+        exit;
+    }
+
+    /* ── GET /admin/users/:id/editer ───────────────────────────────────── */
+
+    public function userEditForm(): void
+    {
+        $id   = (int)($_GET['id'] ?? 0);
+        $user = Database::fetchOne("SELECT * FROM fie_users WHERE id = ?", [$id]);
+        if (!$user) {
+            $_SESSION['fie_flash_error'] = 'Utilisateur introuvable.';
+            header('Location: ' . BASE_URL . '/admin/users');
+            exit;
+        }
+        $ecoles = Database::fetchAll(
+            "SELECT code_etablissement, nom_etablissement
+             FROM etablissements_miroir WHERE actif = 1 ORDER BY nom_etablissement LIMIT 500"
+        );
+        $classes = Database::fetchAll(
+            "SELECT id, nom_classe, code_etablissement, annee_scolaire
+             FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
+        );
+        $errors  = [];
+        $old     = $user; // pré-remplissage
+        $editMode = true;
+        $page_title  = 'Modifier utilisateur — Admin FIE';
+        $active_menu = 'admin';
+        require BASE_PATH . '/app/views/admin/user_form.php';
+    }
+
+    /* ── POST /admin/users/:id/editer ──────────────────────────────────── */
+
+    public function userUpdate(): void
+    {
+        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+            $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
+            header('Location: ' . BASE_URL . '/admin/users');
+            exit;
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        $errors = $this->validateUserForm($_POST, $id);
+        if (!empty($errors)) {
+            $ecoles = Database::fetchAll(
+                "SELECT code_etablissement, nom_etablissement
+                 FROM etablissements_miroir WHERE actif = 1 ORDER BY nom_etablissement LIMIT 500"
+            );
+            $classes = Database::fetchAll(
+                "SELECT id, nom_classe, code_etablissement, annee_scolaire
+                 FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
+            );
+            $old = $_POST; $old['id'] = $id;
+            $editMode = true;
+            $page_title = 'Modifier utilisateur — Admin FIE';
+            $active_menu = 'admin';
+            require BASE_PATH . '/app/views/admin/user_form.php';
+            return;
+        }
+
+        $params = [
+            trim($_POST['nom']),
+            trim($_POST['prenoms'] ?? ''),
+            $_POST['role'],
+            $_POST['ecole_code']  ?: null,
+            ($_POST['classe_id'] ?? '') ?: null,
+            trim($_POST['nom_complet'] ?? ($_POST['prenoms'] . ' ' . $_POST['nom'])),
+            $_POST['province_perimetre'] ?: null,
+            (int)($_POST['actif'] ?? 1),
+        ];
+        $sql = "UPDATE fie_users SET nom=?,prenoms=?,role=?,ecole_code=?,classe_id=?,
+                nom_complet=?,province_perimetre=?,actif=?";
+        if (!empty($_POST['mot_de_passe'])) {
+            $sql     .= ',password_hash=?';
+            $params[] = password_hash($_POST['mot_de_passe'], PASSWORD_BCRYPT);
+        }
+        $sql     .= ' WHERE id=?';
+        $params[] = $id;
+        Database::query($sql, $params);
+
+        $this->log->info("Utilisateur modifié", ['id' => $id]);
+        $_SESSION['fie_flash_success'] = 'Utilisateur mis à jour.';
+        header('Location: ' . BASE_URL . '/admin/users');
+        exit;
+    }
+
+    /* ── POST /admin/users/:id/supprimer ───────────────────────────────── */
+
+    public function userDelete(): void
+    {
+        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+            $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
+            header('Location: ' . BASE_URL . '/admin/users');
+            exit;
+        }
+        $id = (int)($_GET['id'] ?? 0);
+        // Soft-delete : désactiver plutôt que supprimer
+        Database::query("UPDATE fie_users SET actif=0 WHERE id=?", [$id]);
+        $this->log->info("Utilisateur désactivé", ['id' => $id]);
+        $_SESSION['fie_flash_success'] = 'Utilisateur désactivé.';
+        header('Location: ' . BASE_URL . '/admin/users');
+        exit;
+    }
+
     /* ── Helpers ─────────────────────────────────────────────────────────── */
+
+    /** Valide le formulaire utilisateur. Retourne tableau d'erreurs (vide = OK). */
+    private function validateUserForm(array $data, int $excludeId = 0): array
+    {
+        $errors = [];
+        if (empty(trim($data['login'] ?? '')))      $errors['login'] = 'Le login est requis.';
+        if (empty(trim($data['nom']   ?? '')))       $errors['nom']   = 'Le nom est requis.';
+        if ($excludeId === 0 && empty($data['mot_de_passe'] ?? ''))
+            $errors['mot_de_passe'] = 'Le mot de passe est requis pour un nouvel utilisateur.';
+        if (!empty($data['mot_de_passe']) && strlen($data['mot_de_passe']) < 8)
+            $errors['mot_de_passe'] = 'Le mot de passe doit faire au moins 8 caractères.';
+
+        $rolesValides = ['super_admin','admin_central','directeur_ecole','enseignant','bibliothecaire'];
+        if (!in_array($data['role'] ?? '', $rolesValides, true))
+            $errors['role'] = 'Rôle invalide.';
+
+        // Unicité du login
+        if (empty($errors['login'])) {
+            $existing = Database::fetchOne(
+                "SELECT id FROM fie_users WHERE login = ? AND id != ?",
+                [trim($data['login']), $excludeId]
+            );
+            if ($existing) $errors['login'] = 'Ce login est déjà utilisé.';
+        }
+        return $errors;
+    }
 
     private function jsonError(string $message, int $code = 400): void
     {

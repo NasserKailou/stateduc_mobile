@@ -121,6 +121,39 @@ class Router
         $this->get('/admin/parametres',  'ParametresController', 'index');
         $this->post('/admin/parametres', 'ParametresController', 'save');
 
+        // ── Bibliothèque (public — accessible sans connexion) ────────────────
+        // IMPORTANT : routes statiques AVANT la route paramétrée /:id/telecharger
+        $this->get('/bibliotheque',                        'BibliothequeController', 'index');
+        $this->get('/bibliotheque/:id/telecharger',        'BibliothequeController', 'telecharger');
+
+        // ── Bibliothèque — Administration (bibliothecaire / admin) ───────────
+        $this->get('/bibliotheque/admin',                  'BibliothequeController', 'adminIndex');
+        $this->get('/bibliotheque/admin/nouveau',          'BibliothequeController', 'adminNewForm');
+        $this->post('/bibliotheque/admin/publier',         'BibliothequeController', 'adminPublish');
+        $this->post('/bibliotheque/admin/:id/statut/:statut', 'BibliothequeController', 'adminSetStatut');
+        $this->post('/bibliotheque/admin/:id/supprimer',   'BibliothequeController', 'adminDelete');
+
+        // ── Suivi pédagogique ────────────────────────────────────────────────
+        $this->get('/suivi',                               'SuiviPedagogiqueController', 'index');
+        $this->get('/suivi/classe/:id',                    'SuiviPedagogiqueController', 'classeDetail');
+        $this->post('/suivi/decision',                     'SuiviPedagogiqueController', 'saveDecision');
+
+        // ── Transferts scolaires ─────────────────────────────────────────────
+        $this->get('/suivi/transferts',                    'SuiviPedagogiqueController', 'transfertsList');
+        $this->get('/suivi/transfert/nouveau',             'SuiviPedagogiqueController', 'transfertForm');
+        $this->post('/suivi/transfert/demander',           'SuiviPedagogiqueController', 'transfertSubmit');
+        $this->post('/suivi/transfert/:id/traiter',        'SuiviPedagogiqueController', 'transfertTraiter');
+
+        // ── Historique élève ─────────────────────────────────────────────────
+        $this->get('/eleve/:iue/historique',               'HistoriqueController', 'eleve');
+
+        // ── Gestion utilisateurs (admin) ─────────────────────────────────────
+        $this->get('/admin/users/nouveau',                 'AdminController', 'userNewForm');
+        $this->post('/admin/users/nouveau',                'AdminController', 'userCreate');
+        $this->get('/admin/users/:id/editer',              'AdminController', 'userEditForm');
+        $this->post('/admin/users/:id/editer',             'AdminController', 'userUpdate');
+        $this->post('/admin/users/:id/supprimer',          'AdminController', 'userDelete');
+
         // ── API interne (agrégats) ───────────────────────────────────────────
         $this->get('/api/agregats',         'AggregatesApiController',   'index');
         $this->get('/api/etablissements',   'EtablissementsApiController', 'index');

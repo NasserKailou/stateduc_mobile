@@ -1,6 +1,6 @@
 # CONTEXT.md — StatEduc_burundi
 > Fichier de référence pour toute nouvelle session IA sur ce projet.
-> Mis à jour : 2026-08-15 (session 2) | Branche active : `ak_app_ident`
+> Mis à jour : 2026-08-18 (session 3) | Branche active : `ak_app_ident`
 
 ---
 
@@ -268,9 +268,23 @@ feat(api-fie): ajout pagination et filtre province dans etabs_fie_ws
 - `questionnaire.php?theme=9002&code_etab=21422&type_ent_stat=2` → formulaire doit s'afficher
 - `questionnaire.php?theme=1102&type_ent_stat=1` → idem sans `code_etab` en GET
 - Si formulaire toujours absent : lire `moblogs/diag_questionnaire.log` et `moblogs/diag_grille.log`
-  (chercher `INFO_THEME_L3_RESOLVED`, `FRAME_FALLBACK2`, `ERR_TEMPLATE_VIDE`)
+  (chercher `INFO_THEME_L3a_RESOLVED`, `INFO_THEME_L3b_RESOLVED`, `FRAME_FALLBACK2`, `ERR_TEMPLATE_VIDE`)
 - Sync depuis app_fie → doit afficher l'erreur réelle au lieu de "API inaccessible"
 - `etabs_fie_ws.php?page=1&per_page=1` → JSON doit avoir `province`/`commune`/`zone` non-null
+
+### ✅ Résolus (session 3 — 2026-08-18)
+
+| Problème | Commit | Statut |
+|----------|--------|--------|
+| **E_PARSE `instance_grille.php` ligne 146** — backslash-apostrophes `\'` | `9d03fa5` | ✅ (à valider XAMPP) |
+| **ERR_THEME_INTROUVABLE thème 9002 / type_ent_stat=1** — Passe 3b ajoutée (sans filtre ID_SYSTEME) | `9d03fa5` | ✅ (à valider XAMPP) |
+
+**Note log session 3** : Le `diag_questionnaire.log` du 18/08/2026 confirme que l'E_PARSE
+persistait sur XAMPP (le fichier corrigé n'était pas encore synchronisé). Les corrections
+sont pushées sur `ak_app_ident` — effectuer `git pull origin ak_app_ident` sur XAMPP.
+
+Après pull, rechercher dans le log : `INFO_THEME_L3b_RESOLVED` pour confirmer que le thème 9002
+est résolu via la Passe 3b.
 
 ### 🔲 Non démarré / Hors périmètre actuel
 
