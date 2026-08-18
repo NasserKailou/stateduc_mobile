@@ -233,10 +233,12 @@ class SyncService
         $summary = ['inserted' => 0, 'updated' => 0, 'errors' => 0, 'total' => 0];
         $errorDetails = [];
 
+        // Priorité : PhpSpreadsheet (si disponible) → lecteur natif ZipArchive
+        // (plus de dépendance python3/openpyxl — fonctionne sur Windows/XAMPP)
         if (class_exists('\\PhpOffice\\PhpSpreadsheet\\IOFactory')) {
             $rows = $this->readExcelWithSpreadsheet($xlsxPath);
         } else {
-            $rows = $this->readExcelPythonFallback($xlsxPath);
+            $rows = $this->readExcelNative($xlsxPath);
         }
 
         $summary['total'] = count($rows);
@@ -429,34 +431,228 @@ class SyncService
     }
 
     /**
-     * Fallback Python pour lire le fichier Excel (openpyxl).
+     * Lecteur natif PHP pour les fichiers .xlsx (format OOXML).
+     *
+     * Un fichier .xlsx est une archive ZIP contenant :
+     *   xl/sharedStrings.xml  — index de toutes les chaînes partagées
+     *   xl/worksheets/sheet1.xml — données de la première feuille
+     *
+     * Fonctionne sans openpyxl, sans python3, sans PhpSpreadsheet.
+     * Compatible Windows/Linux/Mac — ZipArchive et SimpleXML sont
+     * inclus dans PHP en standard depuis PHP 5.2.
+     *
+     * @param  string $path  Chemin absolu vers le fichier .xlsx
+     * @return array         Tableau de lignes associatives [NOM_COLONNE => valeur]
+     * @throws RuntimeException si le fichier ne peut pas être ouvert/parsé
      */
-    private function readExcelPythonFallback(string $path): array
+    private function readExcelNative(string $path): array
     {
-        $jsonPath = tempnam(sys_get_temp_dir(), 'fie_etab_') . '.json';
-        $escaped  = escapeshellarg($path);
-        $escJson  = escapeshellarg($jsonPath);
-        $cmd = "python3 -c \"
-import openpyxl, json, sys
-wb = openpyxl.load_workbook($escaped, read_only=True, data_only=True)
-ws = wb.active
-rows = list(ws.iter_rows(values_only=True))
-headers = [str(h) if h is not None else '' for h in rows[0]]
-result = []
-for row in rows[1:]:
-    if all(v is None for v in row): continue
-    d = {headers[i]: (str(row[i]) if row[i] is not None else None) for i in range(min(len(headers),len(row)))}
-    result.append(d)
-with open($escJson, 'w', encoding='utf-8') as f:
-    json.dump(result, f, ensure_ascii=False)
-\" 2>&1";
-        exec($cmd, $output, $rc);
-        if ($rc !== 0 || !file_exists($jsonPath)) {
-            throw new RuntimeException("Lecture Excel Python échouée : " . implode("\n", $output));
+        // ── 1. Ouvrir l'archive ZIP ───────────────────────────────────────────
+        $zip = new \ZipArchive();
+        $res = $zip->open($path);
+        if ($res !== true) {
+            throw new \RuntimeException(
+                "Impossible d'ouvrir le fichier xlsx (ZipArchive code $res) : $path"
+            );
         }
-        $rows = json_decode(file_get_contents($jsonPath), true) ?? [];
-        @unlink($jsonPath);
-        return $rows;
+
+        // ── 2. Lire sharedStrings.xml ─────────────────────────────────────────
+        // Les cellules de type "s" (string) référencent cet index (0-based).
+        $sharedStrings = [];
+        $ssRaw = $zip->getFromName('xl/sharedStrings.xml');
+        if ($ssRaw !== false && $ssRaw !== '') {
+            // Désactiver les erreurs XML internes, on gérera manuellement
+            $prevXmlErrors = libxml_use_internal_errors(true);
+            $ss = simplexml_load_string($ssRaw);
+            libxml_use_internal_errors($prevXmlErrors);
+            if ($ss !== false) {
+                foreach ($ss->si as $si) {
+                    // Chaque <si> peut contenir soit <t> soit plusieurs <r><t>
+                    // (rich text). On concatène tous les <t> enfants.
+                    $text = '';
+                    if (isset($si->t)) {
+                        $text = (string)$si->t;
+                    } else {
+                        // Rich text : <r><t>...</t></r>
+                        foreach ($si->r as $r) {
+                            if (isset($r->t)) {
+                                $text .= (string)$r->t;
+                            }
+                        }
+                    }
+                    $sharedStrings[] = $text;
+                }
+            }
+        }
+
+        // ── 3. Trouver le nom réel de la première feuille ─────────────────────
+        // workbook.xml liste les feuilles, sheet1.xml n'est pas toujours le
+        // bon nom (certains exports placent la feuille dans sheetN.xml).
+        $sheetFile = 'xl/worksheets/sheet1.xml'; // défaut
+        $wbRaw = $zip->getFromName('xl/workbook.xml');
+        if ($wbRaw !== false) {
+            $prevXmlErrors = libxml_use_internal_errors(true);
+            $wb = simplexml_load_string($wbRaw);
+            libxml_use_internal_errors($prevXmlErrors);
+            if ($wb !== false) {
+                // Récupérer le rId de la première feuille dans workbook.xml
+                $sheets = $wb->sheets->sheet ?? [];
+                $firstRId = '';
+                if (isset($sheets[0])) {
+                    $rels = $sheets[0]->attributes('r', true);
+                    if ($rels && isset($rels['id'])) {
+                        $firstRId = (string)$rels['id'];
+                    }
+                }
+                // Résoudre le rId via workbook.xml.rels
+                if ($firstRId !== '') {
+                    $relsRaw = $zip->getFromName('xl/_rels/workbook.xml.rels');
+                    if ($relsRaw !== false) {
+                        $prevXmlErrors = libxml_use_internal_errors(true);
+                        $relsXml = simplexml_load_string($relsRaw);
+                        libxml_use_internal_errors($prevXmlErrors);
+                        if ($relsXml !== false) {
+                            foreach ($relsXml->Relationship as $rel) {
+                                if ((string)$rel['Id'] === $firstRId) {
+                                    $target = (string)$rel['Target'];
+                                    // Target peut être "worksheets/sheet1.xml" ou absolu
+                                    if (strpos($target, '/') === 0) {
+                                        $sheetFile = ltrim($target, '/');
+                                    } else {
+                                        $sheetFile = 'xl/' . $target;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── 4. Lire la feuille ────────────────────────────────────────────────
+        $sheetRaw = $zip->getFromName($sheetFile);
+        $zip->close();
+
+        if ($sheetRaw === false || $sheetRaw === '') {
+            throw new \RuntimeException(
+                "Feuille introuvable dans le xlsx ($sheetFile) — archive corrompue ?"
+            );
+        }
+
+        $prevXmlErrors = libxml_use_internal_errors(true);
+        $sheet = simplexml_load_string($sheetRaw);
+        libxml_use_internal_errors($prevXmlErrors);
+        if ($sheet === false) {
+            throw new \RuntimeException("Impossible de parser la feuille XML du xlsx.");
+        }
+
+        // ── 5. Parser les lignes/cellules ─────────────────────────────────────
+        // Namespaces OOXML — on cherche <sheetData><row><c r="A1" t="s"><v>
+        $ns = $sheet->getNamespaces(true);
+        // Certains xlsx n'ont pas de namespace, d'autres ont 'xmlns' comme default
+        $sheetData = $sheet->sheetData ?? $sheet->children(array_values($ns)[0] ?? '')->sheetData ?? null;
+        if ($sheetData === null) {
+            // Essai sans namespace
+            $sheetData = $sheet->sheetData;
+        }
+
+        $rawRows = [];
+        $sourceRows = ($sheetData !== null) ? $sheetData->row : $sheet->xpath('//row');
+        if ($sourceRows === null || count($sourceRows) === 0) {
+            // Tentative xpath générique
+            $sourceRows = $sheet->xpath('//*[local-name()="row"]') ?: [];
+        }
+
+        foreach ($sourceRows as $rowEl) {
+            // Extraire l'index de ligne (attribut r)
+            $rowIdx = (int)($rowEl['r'] ?? 0);
+
+            $cells = [];
+            $cellEls = $rowEl->c ?? $rowEl->xpath('*[local-name()="c"]') ?? [];
+            foreach ($cellEls as $c) {
+                // Référence de cellule ex: "A1", "B2"
+                $ref  = (string)($c['r'] ?? '');
+                $type = (string)($c['t'] ?? ''); // s=sharedString, n=number, b=bool, str=formula
+                $v    = isset($c->v) ? (string)$c->v : null;
+
+                // Valeur réelle
+                if ($v !== null) {
+                    if ($type === 's') {
+                        // Index dans sharedStrings
+                        $v = $sharedStrings[(int)$v] ?? '';
+                    } elseif ($type === 'b') {
+                        $v = ($v === '1') ? 'TRUE' : 'FALSE';
+                    } elseif ($type === 'str' || $type === 'inlineStr') {
+                        // Formule ou inline string — garder la valeur calculée
+                        if (isset($c->is->t)) {
+                            $v = (string)$c->is->t;
+                        }
+                        // sinon $v contient déjà la valeur calculée
+                    }
+                    // Type numérique ou vide : $v reste tel quel
+                }
+
+                // Extraire l'indice de colonne depuis la référence "A1" → col 0
+                $colLetter = preg_replace('/[0-9]/', '', $ref);
+                $colIdx = self::colLetterToIndex($colLetter);
+                $cells[$colIdx] = $v;
+            }
+
+            if (!empty($cells)) {
+                $rawRows[$rowIdx] = $cells;
+            }
+        }
+
+        if (empty($rawRows)) {
+            return [];
+        }
+
+        // ── 6. Construire le tableau associatif ───────────────────────────────
+        ksort($rawRows); // s'assurer que les lignes sont dans l'ordre
+        $rowIndices = array_keys($rawRows);
+        $firstIdx   = $rowIndices[0];
+
+        // Ligne 1 = entêtes
+        $headerRow = $rawRows[$firstIdx];
+        ksort($headerRow);
+        $headers = [];
+        foreach ($headerRow as $ci => $val) {
+            $headers[$ci] = ($val !== null && $val !== '') ? strtoupper(trim((string)$val)) : "COL_$ci";
+        }
+
+        // Lignes suivantes = données
+        $result = [];
+        foreach ($rowIndices as $ri) {
+            if ($ri === $firstIdx) continue;
+            $cellMap = $rawRows[$ri];
+            // Vérifier si la ligne est vide
+            $nonNull = array_filter($cellMap, fn($v) => $v !== null && $v !== '');
+            if (empty($nonNull)) continue;
+
+            $assoc = [];
+            foreach ($headers as $ci => $hdr) {
+                $assoc[$hdr] = $cellMap[$ci] ?? null;
+            }
+            $result[] = $assoc;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Convertit une lettre de colonne Excel (A, B, …, Z, AA, …) en indice 0-based.
+     * Ex: A→0, B→1, Z→25, AA→26
+     */
+    private static function colLetterToIndex(string $col): int
+    {
+        $col = strtoupper($col);
+        $idx = 0;
+        $len = strlen($col);
+        for ($i = 0; $i < $len; $i++) {
+            $idx = $idx * 26 + (ord($col[$i]) - ord('A') + 1);
+        }
+        return $idx - 1; // 0-based
     }
 
     /**

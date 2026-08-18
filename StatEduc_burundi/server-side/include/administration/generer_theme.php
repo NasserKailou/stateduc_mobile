@@ -2,6 +2,17 @@
 set_time_limit(0);
 ini_set("memory_limit", "256M");
 
+// ── Streaming immédiat : le navigateur voit chaque itération en temps réel ──
+// ignore_user_abort(true) empêche PHP de s'arrêter si le navigateur se déconnecte.
+// ob_implicit_flush(true) + while_ob_end_flush() vident tous les tampons existants
+// afin que echo/print arrive au navigateur sans attendre la fin du script.
+ignore_user_abort(true);
+@ini_set('zlib.output_compression', '0');
+@ini_set('output_buffering', '0');
+// Vider tous les niveaux de tampon déjà ouverts (Apache/FastCGI peuvent en avoir)
+while (ob_get_level() > 0) { @ob_end_flush(); }
+ob_implicit_flush(true);
+
 require_once $GLOBALS['SISED_PATH_CLS'] . 'affichage/frame.class.php';
 if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) require_once $GLOBALS['SISED_PATH_CLS'] . 'affichage/frame_mobile.class.php';
 
@@ -169,41 +180,45 @@ echo '<br><span style="color:#555;">⚙ Lancement génération (' . count($id_th
      . count($id_systemes) . ' systèmes × ' . count($langues) . ' langue(s))...</span><br>';
 echo '</div>';
 
-// ── 8. Génération avec output buffering ────────────────────────────────────────
-// frame::generer_frame() affiche <H1>, <H2>, <H3> pour suivi en temps réel
-// ET affiche "Attention! Dico" quand le switch ne reconnaît pas le LIBELLE.
-// Grâce au filtre sur types_frame_valides (étape 4), ce cas ne devrait plus arriver.
-ob_start();
+// ── 8. Génération en streaming (SANS ob_start/ob_get_clean) ───────────────────
+//
+// EXPLICATION DU BUG Session 8 :
+//   ob_start() capturait TOUTE la sortie de frame::generer_frame() (1456 itérations
+//   × <H1>/<H2>/<H3>) sans rien envoyer au navigateur → browser timeout/spinner.
+//
+// CORRECTION :
+//   - ob_start/ob_get_clean supprimés pour la génération principale.
+//   - @ob_flush(); @flush(); après la construction → le navigateur reçoit le
+//     résumé immédiatement après la fin du constructeur.
+//   - ignore_user_abort(true) + ob_implicit_flush(true) en tête de script
+//     garantissent que chaque echo/print part tout de suite au navigateur.
+//
 $generation_ok = true;
+$nb_attention  = 0;
+
 try {
+    // Le constructeur appelle generer_frame() en interne.
+    // Chaque itération émet <H1>/<H2>/<H3> — visibles en temps réel grâce
+    // à ob_implicit_flush(true) défini en tête de fichier.
     $form = new frame($id_themes, $langues, $id_systemes, '', '');
 } catch (Throwable $ex) {
     $generation_ok = false;
     echo '<p style="color:#c00;font-weight:bold;">✖ Exception : ' . htmlspecialchars($ex->getMessage()) . '</p>';
 }
-$output_frame = ob_get_clean();
 
-$nb_attention = substr_count($output_frame, 'Attention! Dico');
-
-// Afficher la sortie de génération (contient les <H1>/<H2>/<H3> de suivi)
-echo $output_frame;
-
-if ($nb_attention > 0) {
-    echo '<div style="font-family:monospace;font-size:12px;color:#c00;margin:4px 0;">';
-    echo '⚠ ' . $nb_attention . ' cas "Attention! Dico" résiduels — les LIBELLE suivants ne sont pas dans le switch :<br>';
-    echo implode(', ', array_map('htmlspecialchars', $types_frame_valides));
-    echo '</div>';
-}
+// Forcer l'envoi du tampon vers le navigateur
+@ob_flush();
+@flush();
 
 // ── 9. Mobile ─────────────────────────────────────────────────────────────────
 if ($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) {
-    ob_start();
     try {
         $form_mobile = new frame_mobile($id_themes, $langues, $id_systemes, '', '');
     } catch (Throwable $ex) {
         echo '<p style="color:#c00;">✖ frame_mobile : ' . htmlspecialchars($ex->getMessage()) . '</p>';
     }
-    echo ob_get_clean();
+    @ob_flush();
+    @flush();
 }
 
 // ── 10. Restauration langue + bilan ───────────────────────────────────────────
@@ -211,17 +226,17 @@ $_SESSION['langue'] = $_langue_session_original;
 unset($_langue_session_original);
 
 echo '<div style="font-family:monospace;font-size:13px;margin:8px 0;">';
-if ($generation_ok && $nb_attention === 0) {
+if ($generation_ok) {
     echo '<p style="color:green;font-weight:bold;">✔ Génération terminée avec succès ('
          . count($id_themes) . ' thèmes, ' . count($id_systemes) . ' systèmes, '
          . count($langues) . ' langue(s)).</p>';
     if ($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) {
         echo '<p style="color:green;">✔ Génération mobile terminée.</p>';
     }
-} elseif ($nb_attention > 0) {
-    echo '<p style="color:#e67e00;font-weight:bold;">⚠ Génération partielle : ' . $nb_attention . ' thèmes ignorés (LIBELLE non reconnu).</p>';
 } else {
-    echo '<p style="color:#c00;font-weight:bold;">⚠ Génération terminée avec erreurs.</p>';
+    echo '<p style="color:#c00;font-weight:bold;">⚠ Génération terminée avec erreurs (voir ci-dessus).</p>';
 }
 echo '</div>';
+@ob_flush();
+@flush();
 ?>
