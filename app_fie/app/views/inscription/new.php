@@ -421,7 +421,13 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
 
   /* ── Utilitaires ──────────────────────────────────────────────────────────── */
   function getJSON(url, cb, errCb) {
-    fetch(url).then(r => r.json()).then(cb).catch(e => { console.error('GET', url, e); if(errCb) errCb(e); });
+    fetch(url)
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + r.statusText);
+        return r.json();
+      })
+      .then(cb)
+      .catch(function(e) { console.error('GET', url, e); if (errCb) errCb(e); });
   }
   function postJSON(url, data, cb, errCb) {
     const fd = new FormData();
@@ -563,15 +569,21 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     btnSyncAnnees.addEventListener('click', function(e) {
       e.preventDefault();
       btnSyncAnnees.textContent = 'Synchronisation…';
-      postJSON(BASE + 'inscription/ajax/sync-annees', {'<?= FIE_CSRF_TOKEN_NAME ?>': CSRF}, function(d) {
-        btnSyncAnnees.innerHTML = '<i class="fa-solid fa-rotate me-1"></i>Actualiser depuis StatEduc';
-        if (d.success) {
-          alert(d.message + '\nRechargez la page pour voir les années mises à jour.');
-          window.location.reload();
-        } else {
-          alert('Erreur : ' + (d.message || 'Sync échouée'));
+      postJSON(BASE + 'inscription/ajax/sync-annees', {'<?= FIE_CSRF_TOKEN_NAME ?>': CSRF},
+        function(d) {
+          btnSyncAnnees.innerHTML = '<i class="fa-solid fa-rotate me-1"></i>Actualiser depuis StatEduc';
+          if (d.success) {
+            alert(d.message + '\nRechargez la page pour voir les années mises à jour.');
+            window.location.reload();
+          } else {
+            alert('Erreur : ' + (d.message || 'Sync échouée'));
+          }
+        },
+        function(err) {
+          btnSyncAnnees.innerHTML = '<i class="fa-solid fa-rotate me-1"></i>Actualiser depuis StatEduc';
+          alert('Erreur réseau lors de la synchronisation : ' + (err ? err.message : 'Réponse inattendue'));
         }
-      });
+      );
     });
   }
 
