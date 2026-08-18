@@ -32,7 +32,7 @@
 
 <!-- ═══════════════════════════════════════════════════
      BARRE DE NAVIGATION PRINCIPALE
-     Couleur primaire : #CE1126 (rouge Burundi)
+     Couleur primaire : #007bff (bleu FIE)
      ═══════════════════════════════════════════════════ -->
 <nav class="navbar navbar-expand-lg fie-navbar shadow-sm" role="navigation" aria-label="Navigation principale">
   <div class="container-xl">
@@ -85,6 +85,23 @@
           <a class="nav-link fie-nav-link <?= ($active_menu ?? '') === 'examen' ? 'active' : '' ?>"
              href="<?= BASE_URL ?>/examen">
             <i class="fa-solid fa-file-pen me-1"></i> Examens
+          </a>
+        </li>
+
+        <?php if (in_array(SecurityHelper::userRole(), ['super_admin','admin_central','directeur_ecole','enseignant'], true)): ?>
+        <li class="nav-item">
+          <a class="nav-link fie-nav-link <?= in_array($active_menu ?? '', ['suivi','suivi_classe','transferts'], true) ? 'active' : '' ?>"
+             href="<?= BASE_URL ?>/suivi">
+            <i class="fa-solid fa-chalkboard-teacher me-1"></i> Suivi
+          </a>
+        </li>
+        <?php endif; ?>
+
+        <!-- Bibliothèque : visible par tous (connectés ou non) -->
+        <li class="nav-item">
+          <a class="nav-link fie-nav-link <?= in_array($active_menu ?? '', ['bibliotheque','bibliotheque_admin'], true) ? 'active' : '' ?>"
+             href="<?= BASE_URL ?>/bibliotheque">
+            <i class="fa-solid fa-book-open me-1"></i> Bibliothèque
           </a>
         </li>
 

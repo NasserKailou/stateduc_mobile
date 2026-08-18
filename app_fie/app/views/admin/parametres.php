@@ -7,7 +7,7 @@ $page_title  = $page_title  ?? 'Paramétrage StatEduc — FIE';
 $active_menu = $active_menu ?? 'admin';
 $settings    = $settings    ?? [];
 $testResult  = $testResult  ?? null;
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 $h = fn(string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 ?>
 
@@ -239,4 +239,4 @@ document.getElementById('btnTest')?.addEventListener('click', function() {
 });
 </script>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

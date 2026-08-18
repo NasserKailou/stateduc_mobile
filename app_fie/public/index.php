@@ -43,14 +43,16 @@ if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
     header('X-XSS-Protection: 1; mode=block');
     header('Referrer-Policy: strict-origin-when-cross-origin');
-    // CDN Bootstrap + Font Awesome autorisés dans la CSP
+    // CDN Bootstrap + Font Awesome + AdminLTE autorisés dans la CSP
     header(
         "Content-Security-Policy: default-src 'self'; "
-        . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+        . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; "
         . "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-        . "img-src 'self' data: https:; "
-        . "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.gstatic.com; "
-        . "connect-src 'self';"
+        . "img-src 'self' data: https: blob:; "
+        . "font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.gstatic.com data:; "
+        . "connect-src 'self' https:; "
+        . "media-src 'self'; "
+        . "frame-src 'none';"
     );
 }
 

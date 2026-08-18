@@ -27,18 +27,25 @@ class BibliothequeController
         $thematique  = (int)($_GET['thematique'] ?? 0);
         $niveau      = trim($_GET['niveau'] ?? '');
 
-        // Charger les thématiques
-        $thematiques = Database::fetchAll(
-            "SELECT * FROM bibliotheque_thematiques WHERE actif = 1 ORDER BY ordre ASC, libelle ASC"
-        ) ?: [];
+        // Charger les thématiques — graceful fallback si tables manquantes
+        try {
+            $thematiques = Database::fetchAll(
+                "SELECT * FROM bibliotheque_thematiques WHERE actif = 1 ORDER BY ordre ASC, libelle ASC"
+            ) ?: [];
+        } catch (Throwable $e) {
+            error_log('[FIE/Bibliotheque] Tables manquantes — exécutez 002_nouveaux_modules.sql: ' . $e->getMessage());
+            $thematiques = [];
+        }
 
         // Requête documents publics et publiés
-        $params = ['publie'];
-        $where  = "d.statut = ? AND d.public = 1";
+        $params    = ['publie'];
+        $where     = "d.statut = ? AND d.public = 1";
+        $documents = [];
 
         if ($search !== '') {
-            $where   .= " AND MATCH(d.titre, d.description) AGAINST(? IN BOOLEAN MODE)";
-            $params[] = $search . '*';
+            $where   .= " AND (d.titre LIKE ? OR d.description LIKE ?)";
+            $params[] = '%' . $search . '%';
+            $params[] = '%' . $search . '%';
         }
         if ($thematique > 0) {
             $where   .= " AND d.thematique_id = ?";
@@ -49,15 +56,20 @@ class BibliothequeController
             $params[] = '%' . $niveau . '%';
         }
 
-        $documents = Database::fetchAll(
-            "SELECT d.*, t.libelle AS thematique_libelle, t.icone_fa, t.couleur
-             FROM bibliotheque_documents d
-             JOIN bibliotheque_thematiques t ON t.id = d.thematique_id
-             WHERE {$where}
-             ORDER BY d.publie_le DESC
-             LIMIT 60",
-            $params
-        ) ?: [];
+        try {
+            $documents = Database::fetchAll(
+                "SELECT d.*, t.libelle AS thematique_libelle, t.icone_fa, t.couleur
+                 FROM bibliotheque_documents d
+                 JOIN bibliotheque_thematiques t ON t.id = d.thematique_id
+                 WHERE {$where}
+                 ORDER BY d.publie_le DESC
+                 LIMIT 60",
+                $params
+            ) ?: [];
+        } catch (Throwable $e) {
+            error_log('[FIE/Bibliotheque] Erreur requête documents: ' . $e->getMessage());
+            $documents = [];
+        }
 
         $page_title  = 'Bibliothèque — FIE';
         $active_menu = 'bibliotheque';
@@ -67,12 +79,13 @@ class BibliothequeController
     /**
      * GET /bibliotheque/:id/telecharger — Téléchargement avec compteur
      */
-    public function telecharger(int $id): void
+    public function telecharger(): void
     {
-        $doc = Database::fetchOne(
+        $id  = (int)($_GET['id'] ?? 0);
+        $doc = $id > 0 ? Database::fetchOne(
             "SELECT * FROM bibliotheque_documents WHERE id = ? AND statut = 'publie' AND public = 1",
             [$id]
-        );
+        ) : null;
 
         if (!$doc) {
             http_response_code(404);
@@ -118,19 +131,28 @@ class BibliothequeController
     {
         $this->requireAdminRole();
 
-        $documents = Database::fetchAll(
-            "SELECT d.*, t.libelle AS thematique_libelle, t.icone_fa, t.couleur,
-                    u.login AS publie_par_login
-             FROM bibliotheque_documents d
-             JOIN bibliotheque_thematiques t ON t.id = d.thematique_id
-             LEFT JOIN users u ON u.id = d.publie_par
-             ORDER BY d.cree_le DESC
-             LIMIT 100"
-        ) ?: [];
+        try {
+            $documents = Database::fetchAll(
+                "SELECT d.*, t.libelle AS thematique_libelle, t.icone_fa, t.couleur,
+                        u.login AS publie_par_login
+                 FROM bibliotheque_documents d
+                 JOIN bibliotheque_thematiques t ON t.id = d.thematique_id
+                 LEFT JOIN fie_users u ON u.id = d.publie_par
+                 ORDER BY d.cree_le DESC
+                 LIMIT 100"
+            ) ?: [];
+        } catch (Throwable $e) {
+            error_log('[FIE/Bibliotheque] adminIndex: ' . $e->getMessage());
+            $documents = [];
+        }
 
-        $thematiques = Database::fetchAll(
-            "SELECT * FROM bibliotheque_thematiques WHERE actif = 1 ORDER BY ordre ASC"
-        ) ?: [];
+        try {
+            $thematiques = Database::fetchAll(
+                "SELECT * FROM bibliotheque_thematiques WHERE actif = 1 ORDER BY ordre ASC"
+            ) ?: [];
+        } catch (Throwable $e) {
+            $thematiques = [];
+        }
 
         $page_title  = 'Gestion bibliothèque — FIE';
         $active_menu = 'bibliotheque_admin';
@@ -260,9 +282,11 @@ class BibliothequeController
     /**
      * GET /bibliotheque/admin/:id/statut/:statut — Changer le statut d'un document
      */
-    public function adminSetStatut(int $id, string $statut): void
+    public function adminSetStatut(): void
     {
         $this->requireAdminRole();
+        $id     = (int)($_GET['id'] ?? 0);
+        $statut = trim($_GET['statut'] ?? '');
 
         $validStatuts = ['brouillon', 'publie', 'archive'];
         if (!in_array($statut, $validStatuts)) {
@@ -284,11 +308,12 @@ class BibliothequeController
     /**
      * GET /bibliotheque/admin/:id/supprimer — Suppression document
      */
-    public function adminDelete(int $id): void
+    public function adminDelete(): void
     {
         $this->requireAdminRole();
+        $id  = (int)($_GET['id'] ?? 0);
 
-        $doc = Database::fetchOne("SELECT * FROM bibliotheque_documents WHERE id = ?", [$id]);
+        $doc = $id > 0 ? Database::fetchOne("SELECT * FROM bibliotheque_documents WHERE id = ?", [$id]) : null;
         if ($doc) {
             // Supprimer fichier physique
             $filePath = BASE_PATH . '/' . $doc['chemin_fichier'];

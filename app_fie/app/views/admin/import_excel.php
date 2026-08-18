@@ -5,7 +5,7 @@
  */
 $page_title  = $page_title  ?? 'Import Excel — Administration FIE';
 $active_menu = $active_menu ?? 'admin';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 ?>
 
 <!-- ── Fil d'Ariane ─────────────────────────────────────────────────────── -->
@@ -167,4 +167,4 @@ document.getElementById('excelForm').addEventListener('submit', function() {
 });
 </script>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

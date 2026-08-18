@@ -1,0 +1,207 @@
+/**
+ * fie_admin.css — Surcharges AdminLTE pour la charte FIE Burundi
+ * Couleur primaire : #007bff (bleu FIE) au lieu du bleu AdminLTE par défaut
+ */
+
+/* ── Variables AdminLTE redéfinies ──────────────────────────────────────── */
+:root {
+  --lte-sidebar-bg-color:        #1e2a38;
+  --lte-sidebar-hover-bg-color:  rgba(255,255,255,.08);
+  --lte-sidebar-active-bg-color: var(--fie-primary);
+  --lte-sidebar-color:           rgba(255,255,255,.75);
+  --lte-sidebar-hover-color:     #fff;
+  --lte-sidebar-active-color:    #fff;
+  --lte-link-color:              var(--fie-primary);
+  --lte-link-hover-color:        var(--fie-primary-dark);
+  --bs-primary:                  var(--fie-primary);
+  --bs-primary-rgb:              0, 123, 255;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────────── */
+.app-sidebar {
+  background: var(--lte-sidebar-bg-color) !important;
+}
+
+.app-sidebar .nav-link {
+  color: rgba(255,255,255,.7) !important;
+  border-radius: 6px;
+  margin: 2px 8px;
+  transition: background .15s, color .15s;
+}
+
+.app-sidebar .nav-link:hover,
+.app-sidebar .nav-link.active {
+  background: rgba(0, 123, 255, .25) !important;
+  color: #fff !important;
+}
+
+.app-sidebar .nav-link.active {
+  background: var(--fie-primary) !important;
+}
+
+.app-sidebar .nav-icon {
+  color: inherit !important;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.sidebar-brand {
+  background: rgba(0,0,0,.2);
+}
+
+/* ── Topbar ─────────────────────────────────────────────────────────────── */
+.app-header {
+  background: var(--fie-primary) !important;
+  border-bottom: 0 !important;
+}
+
+.app-header .navbar-brand {
+  color: #fff !important;
+}
+
+/* ── Contenu ────────────────────────────────────────────────────────────── */
+.app-main {
+  background: #f4f6f9;
+}
+
+.app-content-header {
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+  padding: .5rem 0;
+}
+
+/* ── Cards ──────────────────────────────────────────────────────────────── */
+.card {
+  box-shadow: 0 .125rem .375rem rgba(0,0,0,.08) !important;
+}
+
+/* ── Bouton primaire ────────────────────────────────────────────────────── */
+.btn-primary {
+  background-color: var(--fie-primary) !important;
+  border-color:     var(--fie-primary) !important;
+}
+.btn-primary:hover {
+  background-color: var(--fie-primary-dark) !important;
+  border-color:     var(--fie-primary-dark) !important;
+}
+
+/* ── Badges rôles ───────────────────────────────────────────────────────── */
+.badge-role-super_admin    { background: #dc3545; }
+.badge-role-admin_central  { background: var(--fie-primary); }
+.badge-role-directeur_ecole{ background: var(--fie-accent); }
+.badge-role-enseignant     { background: #198754; }
+.badge-role-bibliothecaire { background: #6f42c1; }
+
+/* ── Sidebar FIE (app_layout.php) ──────────────────────────────────────── */
+.fie-sidebar {
+  background: #1a2636 !important;
+}
+
+.fie-sidebar .nav-header {
+  color: rgba(255,255,255,.35) !important;
+  font-size: .65rem !important;
+  letter-spacing: .1em !important;
+  padding: .8rem 1rem .3rem !important;
+  text-transform: uppercase;
+}
+
+.fie-sidebar .nav-link {
+  color: rgba(255,255,255,.7) !important;
+  border-radius: 6px;
+  margin: 1px 6px;
+  padding: .42rem .75rem;
+  transition: background .15s ease, color .15s ease;
+  font-size: .875rem;
+}
+
+.fie-sidebar .nav-link:hover {
+  background: rgba(0, 123, 255, .18) !important;
+  color: #fff !important;
+}
+
+.fie-sidebar .nav-link.active {
+  background: var(--fie-primary) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.fie-sidebar .nav-treeview .nav-link {
+  padding-left: 1rem;
+  font-size: .83rem;
+  color: rgba(255,255,255,.6) !important;
+}
+
+.fie-sidebar .nav-treeview .nav-link:hover,
+.fie-sidebar .nav-treeview .nav-link.active {
+  color: #fff !important;
+}
+
+.fie-sidebar .nav-arrow {
+  transition: transform .2s;
+  font-size: .65rem !important;
+}
+
+.fie-sidebar .nav-item.menu-open > .nav-link .nav-arrow {
+  transform: rotate(90deg);
+}
+
+/* ── Topbar FIE ─────────────────────────────────────────────────────────── */
+.fie-app-topbar {
+  background: var(--fie-primary) !important;
+  border-bottom: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+
+/* ── Contenu principal ──────────────────────────────────────────────────── */
+.app-main {
+  background: #f4f6f9 !important;
+  min-height: 100vh;
+}
+
+/* ── KPI cards dans app_layout ──────────────────────────────────────────── */
+.kpi-card {
+  border: none;
+  border-radius: .75rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.kpi-icon-box {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.35rem; flex-shrink: 0;
+}
+.kpi-value {
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 700; font-size: 1.9rem; line-height: 1;
+}
+.kpi-label {
+  font-size: .78rem; color: #8896a7; margin-top: .15rem;
+}
+
+/* ── Tables app_layout ──────────────────────────────────────────────────── */
+.fie-table th {
+  background: #f8fafc;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: #64748b;
+  border-bottom: 2px solid #e2e8f0;
+}
+.fie-table td {
+  font-size: .875rem;
+  vertical-align: middle;
+  border-color: #f1f5f9;
+}
+.fie-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ── Sidebar étroite (collapsed) ────────────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .fie-sidebar .nav-header { display: none; }
+}

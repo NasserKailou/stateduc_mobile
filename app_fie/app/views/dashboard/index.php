@@ -4,9 +4,10 @@
  * Bootstrap 5 + Font Awesome — Charte Bleu Ciel FIE
  * PHASE 3 : Refonte charte graphique + nouvelles KPI cards avec icônes FA
  */
-$page_title  = $page_title  ?? 'Tableau de bord — FIE';
-$active_menu = $active_menu ?? 'dashboard';
-require BASE_PATH . '/app/views/layouts/header.php';
+$page_title      = $page_title  ?? 'Tableau de bord — FIE';
+$active_menu     = $active_menu ?? 'dashboard';
+$app_breadcrumb  = [['label' => 'Tableau de bord', 'url' => '']];
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 // Labels secteurs d'enseignement
 $secteurLabels = [
@@ -346,4 +347,4 @@ $pctCouverture = ($totalEtabs > 0) ? min(100, round($totalInscrits / max($totalE
     </div>
 </div>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

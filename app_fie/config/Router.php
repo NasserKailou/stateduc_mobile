@@ -121,6 +121,43 @@ class Router
         $this->get('/admin/parametres',  'ParametresController', 'index');
         $this->post('/admin/parametres', 'ParametresController', 'save');
 
+        // ── Bibliothèque (public — accessible sans connexion) ────────────────
+        // IMPORTANT : routes statiques AVANT les routes paramétrées
+        $this->get('/bibliotheque',                        'BibliothequeController', 'index');
+
+        // ── Bibliothèque — Administration (bibliothecaire / admin) ───────────
+        // Ces routes doivent être enregistrées AVANT /bibliotheque/:id/telecharger
+        // sinon "admin" serait capturé comme :id
+        $this->get('/bibliotheque/admin',                  'BibliothequeController', 'adminIndex');
+        $this->get('/bibliotheque/admin/nouveau',          'BibliothequeController', 'adminNewForm');
+        $this->post('/bibliotheque/admin/publier',         'BibliothequeController', 'adminPublish');
+        $this->post('/bibliotheque/admin/:id/statut/:statut', 'BibliothequeController', 'adminSetStatut');
+        $this->post('/bibliotheque/admin/:id/supprimer',   'BibliothequeController', 'adminDelete');
+
+        // Route paramétrée en DERNIER (après toutes les statiques /bibliotheque/...)
+        $this->get('/bibliotheque/:id/telecharger',        'BibliothequeController', 'telecharger');
+
+        // ── Suivi pédagogique ────────────────────────────────────────────────
+        $this->get('/suivi',                               'SuiviPedagogiqueController', 'index');
+        $this->get('/suivi/classe/:id',                    'SuiviPedagogiqueController', 'classeDetail');
+        $this->post('/suivi/decision',                     'SuiviPedagogiqueController', 'saveDecision');
+
+        // ── Transferts scolaires ─────────────────────────────────────────────
+        $this->get('/suivi/transferts',                    'SuiviPedagogiqueController', 'transfertsList');
+        $this->get('/suivi/transfert/nouveau',             'SuiviPedagogiqueController', 'transfertForm');
+        $this->post('/suivi/transfert/demander',           'SuiviPedagogiqueController', 'transfertSubmit');
+        $this->post('/suivi/transfert/:id/traiter',        'SuiviPedagogiqueController', 'transfertTraiter');
+
+        // ── Historique élève ─────────────────────────────────────────────────
+        $this->get('/eleve/:iue/historique',               'HistoriqueController', 'eleve');
+
+        // ── Gestion utilisateurs (admin) ─────────────────────────────────────
+        $this->get('/admin/users/nouveau',                 'AdminController', 'userNewForm');
+        $this->post('/admin/users/nouveau',                'AdminController', 'userCreate');
+        $this->get('/admin/users/:id/editer',              'AdminController', 'userEditForm');
+        $this->post('/admin/users/:id/editer',             'AdminController', 'userUpdate');
+        $this->post('/admin/users/:id/supprimer',          'AdminController', 'userDelete');
+
         // ── API interne (agrégats) ───────────────────────────────────────────
         $this->get('/api/agregats',         'AggregatesApiController',   'index');
         $this->get('/api/etablissements',   'EtablissementsApiController', 'index');
@@ -146,7 +183,17 @@ class Router
                 }
             }
 
-            $this->callController($route['controller'], $route['action']);
+                try {
+                $this->callController($route['controller'], $route['action']);
+            } catch (Throwable $e) {
+                // Log de l'exception en mode debug
+                if (defined('FIE_DEBUG') && FIE_DEBUG) {
+                    $this->error500($e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                } else {
+                    error_log('[FIE] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                    $this->error500('Une erreur interne est survenue. Veuillez réessayer.');
+                }
+            }
             return;
         }
 

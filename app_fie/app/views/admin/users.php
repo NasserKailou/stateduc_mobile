@@ -6,7 +6,7 @@
  */
 $page_title  = $page_title  ?? 'Utilisateurs — Administration FIE';
 $active_menu = $active_menu ?? 'admin';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 
 // Libellés des rôles
 $roleLabels = [
@@ -127,4 +127,4 @@ $roleLabels = [
     Les mots de passe sont stockés hashés avec bcrypt (cost 12).
 </div>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

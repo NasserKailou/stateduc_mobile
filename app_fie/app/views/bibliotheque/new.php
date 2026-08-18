@@ -4,7 +4,7 @@
  */
 $page_title  = $page_title  ?? 'Publier un document — Bibliothèque FIE';
 $active_menu = $active_menu ?? 'bibliotheque_admin';
-require BASE_PATH . '/app/views/layouts/header.php';
+require BASE_PATH . '/app/views/layouts/app_layout.php';
 ?>
 
 <nav aria-label="breadcrumb" class="mb-3">
@@ -142,4 +142,4 @@ require BASE_PATH . '/app/views/layouts/header.php';
     </div>
 </div>
 
-<?php require BASE_PATH . '/app/views/layouts/footer.php'; ?>
+<?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>
