@@ -2,13 +2,20 @@
 /**
  * app_fie/services/SyncService.php
  * ══════════════════════════════════════════════════════════════════════════════
- * Service de synchronisation des établissements.
+ * Service de synchronisation des établissements et années scolaires.
  *
  * Sources :
- *   1. API StatEduc (source de vérité) — mode NORMAL
- *   2. Fichier Excel infos_etab_bu.xlsx — mode DÉGRADÉ / BOOTSTRAP
+ *   1. API StatEduc — vue ATLAS_COLLINE (source de vérité) — mode NORMAL
+ *   2. Fichier Excel FICHIER_ETAB.xlsx (14 colonnes ATLAS_COLLINE) — mode DÉGRADÉ
+ *
+ * Structure ATLAS_COLLINE / Excel (14 colonnes) :
+ *   CODE_PROVINCE, PROVINCE, CODE_COMMUNE, COMMUNE, CODE_COLLINE, COLLINE,
+ *   CODE_TYPE_SECTEUR_ENS, SECTEUR_ENS, CODE_TYPE_STATUT_ORG, STATUT,
+ *   NOM_ETAB, CODE_ETABLISSEMENT, CODE_TYPE_MILIEU, MILIEU
  *
  * Dans les deux cas, l'upsert est idempotent par CODE_ETABLISSEMENT.
+ * Chaque upsert peuple aussi ref_province, ref_commune, ref_colline pour
+ * les cascades déconnectées (sans accès StatEduc).
  * ══════════════════════════════════════════════════════════════════════════════
  */
 
@@ -25,26 +32,26 @@ class SyncService
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // SYNC DEPUIS L'API STATEDUC
+    // SYNC ÉTABLISSEMENTS DEPUIS L'API STATEDUC (ATLAS_COLLINE)
     // ══════════════════════════════════════════════════════════════════════════
 
     /**
      * Synchronisation complète ou incrémentale depuis l'API StatEduc.
+     * L'API utilise la vue ATLAS_COLLINE → toutes les 14 colonnes FICHIER_ETAB.
      *
-     * @param string|null $updatedSince  Date ISO 'YYYY-MM-DD' pour mode incrémental
-     * @param int|null    $secteur       Filtrer par CODE_TYPE_SECTEUR_ENS
-     * @param string|null $province      Filtrer par province
-     * @param string|null $triggeredBy   Identité du déclencheur (login ou 'cron')
-     * @return array  Résumé : ['inserted'=>N, 'updated'=>N, 'errors'=>N, 'total'=>N]
+     * @param int|null    $secteur      Filtrer par CODE_TYPE_SECTEUR_ENS
+     * @param int|null    $codeProvince Filtrer par CODE_PROVINCE (entier)
+     * @param string|null $triggeredBy  Identité du déclencheur
+     * @return array  ['inserted'=>N, 'updated'=>N, 'errors'=>N, 'total'=>N]
      */
     public function syncFromApi(
         ?string $updatedSince = null,
         ?int    $secteur      = null,
-        ?string $province     = null,
-        ?string $triggeredBy  = 'system'
+        ?string $province     = null,   // conservé pour rétrocompat (ignoré si codeProvince fourni)
+        ?string $triggeredBy  = 'system',
+        ?int    $codeProvince = null
     ): array {
-        // Évite le "Maximum execution time exceeded" sur les synchros longues
-        set_time_limit(300); // 5 min max pour la synchro complète
+        set_time_limit(300);
         ini_set('memory_limit', '256M');
 
         $this->syncLogId = $this->startSyncLog('api_stateduc', $triggeredBy);
@@ -52,22 +59,20 @@ class SyncService
         $errorDetails = [];
 
         try {
-            // Test de connectivité
             if (!$this->apiClient->ping()) {
-                throw new RuntimeException('API StatEduc inaccessible');
+                throw new RuntimeException('API StatEduc inaccessible (ping failed)');
             }
 
             $page = 1;
             do {
                 $params = ['page' => $page, 'per_page' => STATEDUC_SYNC_PAGE_SIZE];
-                if ($updatedSince) $params['updated_since'] = $updatedSince;
                 if ($secteur)      $params['secteur']       = $secteur;
-                if ($province)     $params['province']      = $province;
+                if ($codeProvince) $params['code_province'] = $codeProvince;
 
                 $data = $this->apiClient->getEtablissements($params);
                 if (!$data) break;
 
-                $totalPages = (int)($data['pages'] ?? 1);
+                $totalPages     = (int)($data['pages'] ?? 1);
                 $summary['total'] = (int)($data['total'] ?? 0);
 
                 foreach ($data['etablissements'] as $etab) {
@@ -91,7 +96,7 @@ class SyncService
             } while ($page <= $totalPages);
 
             $this->finishSyncLog($this->syncLogId, 'success', $summary, $errorDetails);
-            $this->logger->info("Sync API terminée : {$summary['total']} etabs, "
+            $this->logger->info("Sync API ATLAS_COLLINE terminée : {$summary['total']} etabs, "
                 . "+{$summary['inserted']} insérés, ~{$summary['updated']} MàJ, "
                 . "{$summary['errors']} erreurs");
 
@@ -105,15 +110,101 @@ class SyncService
     }
 
     // ══════════════════════════════════════════════════════════════════════════
+    // SYNC ANNÉES SCOLAIRES DEPUIS TYPE_ANNEE STATEDUC
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Synchronise ref_type_annee depuis StatEduc TYPE_ANNEE.
+     * La dernière année (ordre max) est marquée actif=1, les autres actif=0.
+     *
+     * @param string|null $triggeredBy
+     * @return array  ['total' => N, 'upserted' => N, 'errors' => N]
+     */
+    public function syncTypeAnnee(?string $triggeredBy = 'system'): array
+    {
+        $summary = ['total' => 0, 'upserted' => 0, 'errors' => 0];
+
+        try {
+            $data = $this->apiClient->getTypeAnnees();
+            if (!$data || empty($data['annees'])) {
+                throw new RuntimeException('Aucune année scolaire retournée par l\'API StatEduc.');
+            }
+
+            $annees = $data['annees'];
+            $summary['total'] = count($annees);
+
+            // Déterminer l'ordre max (= année courante)
+            $ordreMax = 0;
+            foreach ($annees as $a) {
+                if ((int)$a['ordre'] > $ordreMax) $ordreMax = (int)$a['ordre'];
+            }
+
+            $pdo = Database::getInstance();
+
+            foreach ($annees as $annee) {
+                $code   = (int)($annee['code_type_annee'] ?? 0);
+                $libelle = trim($annee['libelle'] ?? '');
+                $ordre  = (int)($annee['ordre'] ?? 0);
+                if ($code <= 0 || $libelle === '') continue;
+
+                $actif = ($ordre === $ordreMax) ? 1 : 0;
+
+                $stmt = $pdo->prepare("
+                    INSERT INTO ref_type_annee (code_type_annee, libelle, ordre, actif, synced_at)
+                    VALUES (:code, :libelle, :ordre, :actif, NOW())
+                    ON DUPLICATE KEY UPDATE
+                        libelle   = VALUES(libelle),
+                        ordre     = VALUES(ordre),
+                        actif     = VALUES(actif),
+                        synced_at = NOW()
+                ");
+                $stmt->execute([
+                    ':code'    => $code,
+                    ':libelle' => $libelle,
+                    ':ordre'   => $ordre,
+                    ':actif'   => $actif,
+                ]);
+                $summary['upserted']++;
+            }
+
+            // Log dans sync_type_annee_log
+            Database::query(
+                "INSERT INTO sync_type_annee_log (triggered_by, status, total, details, synced_at)
+                 VALUES (?, 'success', ?, NULL, NOW())",
+                [$triggeredBy, $summary['upserted']]
+            );
+
+            $this->logger->info("Sync TYPE_ANNEE terminée : {$summary['upserted']} années upsertées.");
+
+        } catch (Throwable $e) {
+            Database::query(
+                "INSERT INTO sync_type_annee_log (triggered_by, status, total, details, synced_at)
+                 VALUES (?, 'error', 0, ?, NOW())",
+                [$triggeredBy, $e->getMessage()]
+            );
+            $summary['errors']++;
+            $this->logger->error("Sync TYPE_ANNEE échouée : " . $e->getMessage());
+            throw $e;
+        }
+
+        return $summary;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
     // IMPORT EXCEL (mode dégradé / bootstrap)
     // ══════════════════════════════════════════════════════════════════════════
 
     /**
-     * Importe les établissements depuis le fichier Excel infos_etab_bu.xlsx.
+     * Importe les établissements depuis FICHIER_ETAB.xlsx (format ATLAS_COLLINE).
+     * 14 colonnes : CODE_PROVINCE, PROVINCE, CODE_COMMUNE, COMMUNE,
+     *               CODE_COLLINE, COLLINE, CODE_TYPE_SECTEUR_ENS, SECTEUR_ENS,
+     *               CODE_TYPE_STATUT_ORG, STATUT, NOM_ETAB,
+     *               CODE_ETABLISSEMENT, CODE_TYPE_MILIEU, MILIEU
+     *
      * Idempotent : si un CODE_ETABLISSEMENT existe déjà (source=api_stateduc),
      * l'Excel ne l'écrase PAS (la source API est prioritaire).
      *
-     * @param string $xlsxPath  Chemin absolu vers infos_etab_bu.xlsx
+     * @param string $xlsxPath  Chemin absolu vers FICHIER_ETAB.xlsx
      * @param string $triggeredBy
      * @return array  Résumé
      */
@@ -127,11 +218,9 @@ class SyncService
         $summary = ['inserted' => 0, 'updated' => 0, 'errors' => 0, 'total' => 0];
         $errorDetails = [];
 
-        // Utilise PhpSpreadsheet si disponible, sinon tente la lecture native
         if (class_exists('\\PhpOffice\\PhpSpreadsheet\\IOFactory')) {
             $rows = $this->readExcelWithSpreadsheet($xlsxPath);
         } else {
-            // Fallback : lecture par script Python en CLI
             $rows = $this->readExcelPythonFallback($xlsxPath);
         }
 
@@ -143,18 +232,15 @@ class SyncService
                 $code = (int)($row['CODE_ETABLISSEMENT'] ?? 0);
                 if ($code <= 0) continue;
 
-                // Construire le tableau normalisé
                 $etab = $this->normalizeExcelRow($row);
 
                 try {
-                    // Si déjà en base avec source=api_stateduc → ne pas écraser
                     $existing = Database::fetchOne(
                         "SELECT source FROM etablissements_miroir WHERE code_etablissement = ?",
                         [$code]
                     );
                     if ($existing && $existing['source'] === 'api_stateduc') {
-                        // API a priorité sur Excel
-                        continue;
+                        continue; // API a priorité sur Excel
                     }
                     $result = $this->upsertEtablissement($etab, 'excel_import');
                     $summary[$result]++;
@@ -171,17 +257,18 @@ class SyncService
         }
 
         $this->finishSyncLog($this->syncLogId, 'success', $summary, $errorDetails);
-        $this->logger->info("Import Excel terminé : {$summary['total']} lignes, "
+        $this->logger->info("Import Excel ATLAS_COLLINE terminé : {$summary['total']} lignes, "
             . "+{$summary['inserted']} insérés, {$summary['updated']} MàJ");
         return $summary;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // UPSERT IDEMPOTENT
+    // UPSERT IDEMPOTENT (établissements_miroir + ref_province/commune/colline)
     // ══════════════════════════════════════════════════════════════════════════
 
     /**
      * INSERT OR UPDATE un établissement dans etablissements_miroir.
+     * Met aussi à jour ref_province, ref_commune, ref_colline si codes présents.
      * Retourne 'inserted' ou 'updated'.
      */
     private function upsertEtablissement(array $etab, string $source): string
@@ -189,120 +276,127 @@ class SyncService
         $code = (int)($etab['code_etablissement'] ?? 0);
         if ($code <= 0) throw new InvalidArgumentException("code_etablissement invalide");
 
-        // Extraire localisation (API → structure imbriquée ; Excel → à plat)
-        $province = null; $commune = null; $zone = null; $colline = null;
-        $cp = null; $cc = null; $cz = null; $ccl = null;
-        if (isset($etab['localisation'])) {
-            $loc     = $etab['localisation'];
-            $province = $loc['province']['libelle'] ?? null;
-            $commune  = $loc['commune']['libelle']  ?? null;
-            $zone     = $loc['zone']['libelle']     ?? null;
-            $colline  = $loc['colline']['libelle']  ?? null;
-            $cp       = $loc['province']['code']    ?? null;
-            $cc       = $loc['commune']['code']     ?? null;
-            $cz       = $loc['zone']['code']        ?? null;
-            $ccl      = $loc['colline']['code']     ?? null;
-        } else {
-            $province = $etab['province']   ?? null;
-            $commune  = $etab['commune']    ?? null;
-            $zone     = $etab['zone_admin'] ?? null;
-            $colline  = $etab['colline']    ?? null;
-        }
-        $chaine = $etab['chaine_localisation'] ?? implode(' / ', array_filter([$province, $commune, $zone, $colline]));
-        $typo   = $etab['typologie'] ?? [];
+        // ── Extraction des champs ATLAS_COLLINE (réponse API ou Excel normalisé)
+        // L'API retourne un objet plat (pas de sous-objet localisation depuis v2)
+        $province  = $this->cleanStr($etab['province']         ?? null);
+        $commune   = $this->cleanStr($etab['commune']          ?? null);
+        $colline   = $this->cleanStr($etab['colline']          ?? null);
+        $secteurEns= $this->cleanStr($etab['secteur_ens']      ?? null);
+        $statutOrg = $this->cleanStr($etab['statut_org']       ?? null);
+        $milieu    = $this->cleanStr($etab['milieu']           ?? null);
 
+        $cp  = isset($etab['code_province']) ? (int)$etab['code_province'] : null;
+        $cc  = isset($etab['code_commune'])  ? (int)$etab['code_commune']  : null;
+        $ccl = isset($etab['code_colline'])  ? (int)$etab['code_colline']  : null;
+
+        $csec  = isset($etab['code_type_secteur_ens']) ? (int)$etab['code_type_secteur_ens'] : null;
+        $cstat = isset($etab['code_type_statut_org'])  ? (int)$etab['code_type_statut_org']  : null;
+        $cmil  = isset($etab['code_type_milieu'])      ? (int)$etab['code_type_milieu']      : null;
+
+        // Chaîne de localisation : Province / Commune / Colline / Nom
+        $nom    = $this->cleanStr($etab['nom_etablissement'] ?? '') ?? '';
+        $chaine = $etab['chaine_localisation']
+            ?? implode(' / ', array_filter([$province, $commune, $colline, $nom]));
+
+        // ── Upsert dans etablissements_miroir ─────────────────────────────────
         $sql = "
             INSERT INTO etablissements_miroir (
                 code_etablissement, nom_etablissement,
-                province, commune, zone_admin, colline, chaine_localisation,
-                code_province, code_commune, code_zone, code_colline,
+                province, commune, colline, chaine_localisation,
+                code_province, code_commune, code_colline,
                 code_type_milieu, code_type_statut_org, code_type_secteur_ens,
-                code_type_fonction, code_type_etablissement, code_type_etat_fonct,
-                code_ecole_pays, code_etablissement_parent,
-                telephone, adresse_electronique, responsable_ecole, annee_creation,
-                source, synced_at, stateduc_updated_at, actif
+                secteur_ens, statut_org, milieu,
+                source, synced_at, actif
             ) VALUES (
                 :code, :nom,
-                :province, :commune, :zone, :colline, :chaine,
-                :cp, :cc, :cz, :ccl,
-                :milieu, :statut, :secteur, :fonction, :type_etab, :etat_fonct,
-                :code_ecole, :parent,
-                :tel, :email, :resp, :annee,
-                :source, NOW(), :stateduc_updated_at, 1
+                :province, :commune, :colline, :chaine,
+                :cp, :cc, :ccl,
+                :cmil, :cstat, :csec,
+                :secteur_ens, :statut_org, :milieu,
+                :source, NOW(), 1
             )
             ON DUPLICATE KEY UPDATE
-                nom_etablissement       = IF(:source2 = 'api_stateduc' OR source != 'api_stateduc', VALUES(nom_etablissement), nom_etablissement),
-                province                = IF(:source3 = 'api_stateduc' OR source != 'api_stateduc', VALUES(province), province),
-                commune                 = IF(:source4 = 'api_stateduc' OR source != 'api_stateduc', VALUES(commune), commune),
-                zone_admin              = VALUES(zone_admin),
-                colline                 = VALUES(colline),
-                chaine_localisation     = VALUES(chaine_localisation),
-                code_province           = COALESCE(VALUES(code_province), code_province),
-                code_commune            = COALESCE(VALUES(code_commune), code_commune),
-                code_zone               = COALESCE(VALUES(code_zone), code_zone),
-                code_colline            = COALESCE(VALUES(code_colline), code_colline),
-                code_type_milieu        = COALESCE(VALUES(code_type_milieu), code_type_milieu),
-                code_type_statut_org    = COALESCE(VALUES(code_type_statut_org), code_type_statut_org),
-                code_type_secteur_ens   = COALESCE(VALUES(code_type_secteur_ens), code_type_secteur_ens),
-                code_type_etat_fonct    = VALUES(code_type_etat_fonct),
-                code_ecole_pays         = COALESCE(VALUES(code_ecole_pays), code_ecole_pays),
-                responsable_ecole       = COALESCE(VALUES(responsable_ecole), responsable_ecole),
-                synced_at               = NOW(),
-                source                  = IF(:source5 = 'api_stateduc', 'api_stateduc', source),
-                stateduc_updated_at     = IF(:source6 = 'api_stateduc', VALUES(stateduc_updated_at), stateduc_updated_at),
-                actif                   = 1
+                nom_etablissement = IF(:source2 = 'api_stateduc' OR source != 'api_stateduc', VALUES(nom_etablissement), nom_etablissement),
+                province          = IF(:source3 = 'api_stateduc' OR source != 'api_stateduc', VALUES(province), province),
+                commune           = IF(:source4 = 'api_stateduc' OR source != 'api_stateduc', VALUES(commune), commune),
+                colline           = VALUES(colline),
+                chaine_localisation = VALUES(chaine_localisation),
+                code_province     = COALESCE(VALUES(code_province), code_province),
+                code_commune      = COALESCE(VALUES(code_commune),  code_commune),
+                code_colline      = COALESCE(VALUES(code_colline),  code_colline),
+                code_type_milieu  = COALESCE(VALUES(code_type_milieu), code_type_milieu),
+                code_type_statut_org  = COALESCE(VALUES(code_type_statut_org), code_type_statut_org),
+                code_type_secteur_ens = COALESCE(VALUES(code_type_secteur_ens), code_type_secteur_ens),
+                secteur_ens       = COALESCE(VALUES(secteur_ens), secteur_ens),
+                statut_org        = COALESCE(VALUES(statut_org),  statut_org),
+                milieu            = COALESCE(VALUES(milieu),      milieu),
+                synced_at         = NOW(),
+                source            = IF(:source5 = 'api_stateduc', 'api_stateduc', source),
+                actif             = 1
         ";
 
         $pdo  = Database::getInstance();
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':code'                => $code,
-            ':nom'                 => $this->cleanStr($etab['nom_etablissement'] ?? ''),
-            ':province'            => $this->cleanStr($province),
-            ':commune'             => $this->cleanStr($commune),
-            ':zone'                => $this->cleanStr($zone),
-            ':colline'             => $this->cleanStr($colline),
-            ':chaine'              => $this->cleanStr($chaine),
-            ':cp'                  => $cp  ? (int)$cp  : null,
-            ':cc'                  => $cc  ? (int)$cc  : null,
-            ':cz'                  => $cz  ? (int)$cz  : null,
-            ':ccl'                 => $ccl ? (int)$ccl : null,
-            ':milieu'              => $typo['code_type_milieu']        ?? ($etab['code_type_milieu'] ?? null),
-            ':statut'              => $typo['code_type_statut_org']    ?? ($etab['code_type_statut_org'] ?? null),
-            ':secteur'             => $typo['code_type_secteur_ens']   ?? ($etab['code_type_secteur_ens'] ?? null),
-            ':fonction'            => $typo['code_type_fonction']      ?? ($etab['code_type_fonction'] ?? null),
-            ':type_etab'           => $typo['code_type_etablissement'] ?? ($etab['code_type_etablissement'] ?? null),
-            ':etat_fonct'          => $typo['code_type_etat_fonct']    ?? ($etab['code_type_etat_fonct'] ?? null),
-            ':code_ecole'          => $etab['code_ecole_pays']         ?? null,
-            ':parent'              => $etab['code_etablissement_parent'] ?? null,
-            ':tel'                 => $etab['telephone']               ?? null,
-            ':email'               => $etab['adresse_electronique']    ?? null,
-            ':resp'                => $this->cleanStr($etab['responsable_ecole'] ?? null),
-            ':annee'               => $etab['annee_creation']          ?? null,
-            ':source'              => $source,
-            ':stateduc_updated_at' => null, // sera complété si API fournit une date
-            ':source2'             => $source,
-            ':source3'             => $source,
-            ':source4'             => $source,
-            ':source5'             => $source,
-            ':source6'             => $source,
+            ':code'        => $code,
+            ':nom'         => $nom,
+            ':province'    => $province,
+            ':commune'     => $commune,
+            ':colline'     => $colline,
+            ':chaine'      => $this->cleanStr($chaine),
+            ':cp'          => $cp,
+            ':cc'          => $cc,
+            ':ccl'         => $ccl,
+            ':cmil'        => $cmil,
+            ':cstat'       => $cstat,
+            ':csec'        => $csec,
+            ':secteur_ens' => $secteurEns,
+            ':statut_org'  => $statutOrg,
+            ':milieu'      => $milieu,
+            ':source'      => $source,
+            ':source2'     => $source,
+            ':source3'     => $source,
+            ':source4'     => $source,
+            ':source5'     => $source,
         ]);
 
-        // rowCount() > 1 = UPDATE (MySQL INSERT...ON DUPLICATE KEY UPDATE renvoie 2 pour update)
-        return $stmt->rowCount() > 1 ? 'updated' : 'inserted';
+        $wasUpdated = $stmt->rowCount() > 1;
+
+        // ── Alimentation ref_province / ref_commune / ref_colline ─────────────
+        // On upsert les libellés géographiques pour les cascades déconnectées.
+        if ($cp && $province) {
+            $pdo->prepare("
+                INSERT INTO ref_province (code_province, libelle)
+                VALUES (:cp, :lib)
+                ON DUPLICATE KEY UPDATE libelle = VALUES(libelle)
+            ")->execute([':cp' => $cp, ':lib' => $province]);
+        }
+        if ($cc && $cp && $commune) {
+            $pdo->prepare("
+                INSERT INTO ref_commune (code_commune, code_province, libelle)
+                VALUES (:cc, :cp, :lib)
+                ON DUPLICATE KEY UPDATE libelle = VALUES(libelle), code_province = VALUES(code_province)
+            ")->execute([':cc' => $cc, ':cp' => $cp, ':lib' => $commune]);
+        }
+        if ($ccl && $cc && $cp && $colline) {
+            $pdo->prepare("
+                INSERT INTO ref_colline (code_colline, code_commune, code_province, libelle)
+                VALUES (:ccl, :cc, :cp, :lib)
+                ON DUPLICATE KEY UPDATE libelle = VALUES(libelle)
+            ")->execute([':ccl' => $ccl, ':cc' => $cc, ':cp' => $cp, ':lib' => $colline]);
+        }
+
+        return $wasUpdated ? 'updated' : 'inserted';
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    // LECTURE EXCEL
+    // LECTURE EXCEL (format ATLAS_COLLINE / FICHIER_ETAB.xlsx)
     // ══════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Lit le fichier Excel via PhpSpreadsheet.
-     */
     private function readExcelWithSpreadsheet(string $path): array
     {
         $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($path);
-        $reader->setLoadSheetsOnly(['etab']);
+        // FICHIER_ETAB.xlsx n'a qu'une feuille (Feuil1 ou active)
         $spreadsheet = $reader->load($path);
         $ws = $spreadsheet->getActiveSheet();
         $rows = [];
@@ -320,7 +414,7 @@ class SyncService
     }
 
     /**
-     * Fallback Python pour lire l'Excel (openpyxl).
+     * Fallback Python pour lire le fichier Excel (openpyxl).
      */
     private function readExcelPythonFallback(string $path): array
     {
@@ -330,7 +424,7 @@ class SyncService
         $cmd = "python3 -c \"
 import openpyxl, json, sys
 wb = openpyxl.load_workbook($escaped, read_only=True, data_only=True)
-ws = wb['etab'] if 'etab' in wb.sheetnames else wb.active
+ws = wb.active
 rows = list(ws.iter_rows(values_only=True))
 headers = [str(h) if h is not None else '' for h in rows[0]]
 result = []
@@ -351,32 +445,39 @@ with open($escJson, 'w', encoding='utf-8') as f:
     }
 
     /**
-     * Normalise une ligne Excel au format attendu par upsertEtablissement.
+     * Normalise une ligne Excel (ATLAS_COLLINE, 14 colonnes) au format interne.
+     * Colonnes Excel :
+     *   CODE_PROVINCE, PROVINCE, CODE_COMMUNE, COMMUNE, CODE_COLLINE, COLLINE,
+     *   CODE_TYPE_SECTEUR_ENS, SECTEUR_ENS, CODE_TYPE_STATUT_ORG, STATUT,
+     *   NOM_ETAB, CODE_ETABLISSEMENT, CODE_TYPE_MILIEU, MILIEU
      */
     private function normalizeExcelRow(array $row): array
     {
-        $null_str = fn($v) => ($v === null || $v === 'NULL' || $v === 'None' || $v === '') ? null : (string)$v;
-        $null_int = fn($v) => ($v === null || $v === 'NULL' || $v === 'None' || $v === '' || $v === '0') ? null : (int)$v;
+        $str = fn($v) => ($v === null || $v === 'NULL' || $v === 'None' || trim((string)$v) === '') ? null : trim((string)$v);
+        $int = fn($v) => ($v === null || $v === 'NULL' || $v === 'None' || $v === '' || $v === '0') ? null : (int)$v;
 
         return [
-            'code_etablissement'        => (int)($row['CODE_ETABLISSEMENT'] ?? 0),
-            'nom_etablissement'         => $null_str($row['NOM_ETABLISSEMENT'] ?? null) ?? '',
-            'province'                  => $null_str($row['PROVINCE']          ?? null),
-            'commune'                   => $null_str($row['COMMUNE']           ?? null),
-            'zone_admin'                => $null_str($row['ZONE']              ?? null),
-            'colline'                   => $null_str($row['COLLINE']           ?? null),
-            'code_type_milieu'          => $null_int($row['CODE_TYPE_MILIEU']        ?? null),
-            'code_type_statut_org'      => $null_int($row['CODE_TYPE_STATUT_ORG']    ?? null),
-            'code_type_secteur_ens'     => $null_int($row['CODE_TYPE_SECTEUR_ENS']   ?? null),
-            'code_type_fonction'        => $null_int($row['CODE_TYPE_FONCTION']      ?? null),
-            'code_type_etablissement'   => $null_int($row['CODE_TYPE_ETABLISSEMENT'] ?? null),
-            'code_type_etat_fonct'      => $null_int($row['CODE_TYPE_ETAT_FONCT']    ?? null),
-            'code_ecole_pays'           => $null_str($row['CODE_ECOLE_PAYS']   ?? null),
-            'code_etablissement_parent' => $null_int($row['CODE_ETABLISSEMENT_PARENT'] ?? null),
-            'telephone'                 => $null_str($row['TELEPHONE']         ?? null),
-            'adresse_electronique'      => $null_str($row['ADRESSE_ELECTRONIQUE'] ?? null),
-            'responsable_ecole'         => $null_str($row['RESPONSABLE_ECOLE'] ?? null),
-            'annee_creation'            => $null_int($row['ANNEE_CREATION']    ?? null),
+            // Clé primaire
+            'code_etablissement'   => (int)($row['CODE_ETABLISSEMENT'] ?? 0),
+            'nom_etablissement'    => $str($row['NOM_ETAB'] ?? ($row['NOM_ETABLISSEMENT'] ?? null)) ?? '',
+
+            // Codes géographiques entiers (ATLAS_COLLINE)
+            'code_province'        => $int($row['CODE_PROVINCE']  ?? null),
+            'code_commune'         => $int($row['CODE_COMMUNE']   ?? null),
+            'code_colline'         => $int($row['CODE_COLLINE']   ?? null),
+
+            // Libellés géographiques
+            'province'             => $str($row['PROVINCE']  ?? null),
+            'commune'              => $str($row['COMMUNE']   ?? null),
+            'colline'              => $str($row['COLLINE']   ?? null),
+
+            // Codes et libellés pédagogiques/administratifs
+            'code_type_secteur_ens' => $int($row['CODE_TYPE_SECTEUR_ENS'] ?? null),
+            'secteur_ens'           => $str($row['SECTEUR_ENS'] ?? null),
+            'code_type_statut_org'  => $int($row['CODE_TYPE_STATUT_ORG']  ?? null),
+            'statut_org'            => $str($row['STATUT'] ?? ($row['STATUT_ORG'] ?? null)),
+            'code_type_milieu'      => $int($row['CODE_TYPE_MILIEU']       ?? null),
+            'milieu'                => $str($row['MILIEU'] ?? null),
         ];
     }
 

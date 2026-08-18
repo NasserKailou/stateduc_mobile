@@ -98,6 +98,51 @@ class StatEducApiClient
     }
 
     /**
+     * Récupère les années scolaires depuis TYPE_ANNEE StatEduc.
+     *
+     * @return array|null  ['total' => N, 'annees' => [['code_type_annee', 'libelle', 'ordre'], ...]]
+     */
+    public function getTypeAnnees(): ?array
+    {
+        $url = $this->baseUrl . '/StatEduc_burundi/api/fie/type_annee_ws.php';
+
+        $effectiveTimeout = max(10, min($this->timeout, 60));
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => $effectiveTimeout,
+            CURLOPT_CONNECTTIMEOUT => 8,
+            CURLOPT_HTTPHEADER     => [
+                'Authorization: Bearer ' . $this->token,
+                'Accept: application/json',
+                'User-Agent: FIE-App/1.0',
+            ],
+            CURLOPT_SSL_VERIFYPEER => !FIE_DEBUG,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS      => 3,
+        ]);
+
+        $response  = curl_exec($ch);
+        $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            throw new RuntimeException("StatEduc API (type_annee) cURL error: $curlError");
+        }
+        if ($httpCode !== 200) {
+            throw new RuntimeException("StatEduc API (type_annee): HTTP $httpCode");
+        }
+
+        $decoded = json_decode($response, true);
+        if (!is_array($decoded) || ($decoded['se_status'] ?? 0) !== 200) {
+            throw new RuntimeException("StatEduc API (type_annee): réponse invalide");
+        }
+
+        return $decoded['se_data'] ?? null;
+    }
+
+    /**
      * Vérifie la connectivité avec le serveur StatEduc via un endpoint LÉGER
      * (api/ping.php) qui répond sans bootstrap ADOdb / SQL Server.
      *

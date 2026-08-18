@@ -2,16 +2,18 @@
 /**
  * StatEduc_burundi/api/fie/etabs_fie_ws.php
  * ══════════════════════════════════════════════════════════════════════════════
- * ENDPOINT StatEduc → FIE : Référentiel Établissements
+ * ENDPOINT StatEduc → FIE : Référentiel Établissements via ATLAS_COLLINE
  * ══════════════════════════════════════════════════════════════════════════════
  *
  * Appelé par app_fie/api/stateduc/StatEducApiClient.php lors d'une sync.
- * Ce fichier est dans StatEduc_burundi/api/fie/ et utilise la connexion
- * SQL Server de StatEduc via $GLOBALS['conn'] (ADODB) — même bootstrap que
- * saisie_donnees.php?val=choix_etablissement.
+ * Utilise la VUE SQL Server ATLAS_COLLINE qui contient directement les 14
+ * colonnes du fichier FICHIER_ETAB.xlsx :
+ *   CODE_PROVINCE, PROVINCE, CODE_COMMUNE, COMMUNE, CODE_COLLINE, COLLINE,
+ *   CODE_TYPE_SECTEUR_ENS, SECTEUR_ENS, CODE_TYPE_STATUT_ORG, STATUT,
+ *   NOM_ETAB, CODE_ETABLISSEMENT, CODE_TYPE_MILIEU, MILIEU
  *
  * URL d'accès (exemple XAMPP) :
- *   http://localhost:8085/stateduc_burundi/api/fie/etabs_fie_ws.php
+ *   http://localhost:8085/StatEduc_burundi/api/fie/etabs_fie_ws.php
  *
  * Authentification :
  *   Header  : Authorization: Bearer <STATEDUC_FIE_TOKEN>
@@ -22,17 +24,22 @@
  *   "se_status": 200,
  *   "se_message": "ok",
  *   "se_data": {
- *     "page": 1, "per_page": 500, "total": 11982, "pages": 24,
- *     "etablissements": [ {...}, ... ]
+ *     "page": 1, "per_page": 500, "total": 11498, "pages": 23,
+ *     "etablissements": [ {
+ *       "code_etablissement": 10011,
+ *       "nom_etablissement":  "GIHOSHA (E.P GIHOSHA)",
+ *       "code_province": 117,  "province": "BUJUMBURA Mairie",
+ *       "code_commune":  11716,"commune":  "NTAHANGWA",
+ *       "code_colline":  1170501, "colline": "Gihosha",
+ *       "code_type_secteur_ens": 1, "secteur_ens": "Préscolaire",
+ *       "code_type_statut_org":  3, "statut_org": "école maternelle publique",
+ *       "code_type_milieu":      1, "milieu": "urbain"
+ *     }, ... ]
  *   }
  * }
  *
- * Localisation : même chaîne que saisie_donnees.php?val=choix_etablissement —
- *   ETABLISSEMENT_REGROUPEMENT → REGROUPEMENT → TYPE_REGROUPEMENT → HIERARCHIE
- *   La table HIERARCHIE contient NIVEAU_HIERARCHIE : 1=bas (colline), N=haut (province).
- *
- * @author   Projet FIE / SIGE Burundi
- * @version  1.2.0  — fix bootstrap : connexion.inc.php au lieu de connexion.php
+ * @author   Projet FIE / SIGE Burundi — Session 6 ATLAS_COLLINE rewrite
+ * @version  2.0.0 — ATLAS_COLLINE view (simplifié, toutes les 14 colonnes directes)
  */
 
 // ── Désactiver tout affichage d'erreurs — répondre TOUJOURS en JSON ───────────
@@ -43,13 +50,12 @@ ini_set('log_errors', '1');
 // Bufferiser la sortie — capturer tout warning PHP avant les headers
 ob_start();
 
-// ── Helpers de réponse (définis avant tout require pour éviter les fatals) ───
+// ── Helpers de réponse ────────────────────────────────────────────────────────
 
 function fie_etabs_send_error(int $code, string $message): void
 {
     $buffered = ob_get_clean();
     if ($buffered) $message .= ' | PHP output: ' . substr(strip_tags($buffered), 0, 300);
-    // On vide et repart proprement
     while (ob_get_level() > 0) ob_end_clean();
     http_response_code($code);
     header('Content-Type: application/json; charset=utf-8');
@@ -76,18 +82,14 @@ function fie_etabs_send_ok($data): void
 }
 
 // ── Bootstrap StatEduc ────────────────────────────────────────────────────────
-// Ce fichier est dans api/fie/ → StatEduc_burundi/ est 2 niveaux plus haut.
-// On reproduit EXACTEMENT la séquence de common.php (sans la partie session/UI)
-// qui est la même que saisie_donnees.php?val=choix_etablissement.
-$stateduc_root = dirname(__DIR__, 2); // = .../stateduc_burundi/
+$stateduc_root = dirname(__DIR__, 2); // = .../StatEduc_burundi/
 
 try {
-    require_once $stateduc_root . '/config_app.php';   // $GLOBALS['SISED_PATH'], SISED_PATH_CLS, etc.
-    require_once $stateduc_root . '/params.php';        // $GLOBALS['PARAM'][...]
-    require_once $stateduc_root . '/params_sys.php';    // $GLOBALS['PARAM_SYS'][...]
+    require_once $stateduc_root . '/config_app.php';
+    require_once $stateduc_root . '/params.php';
+    require_once $stateduc_root . '/params_sys.php';
     require_once $stateduc_root . '/constants.php';
 
-    // ADOdb + constante ADODB_ASSOC_CASE (même ordre que common.php lignes 8-9)
     require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
     if (!defined('ADODB_ASSOC_CASE')) {
         define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
@@ -95,35 +97,24 @@ try {
     $GLOBALS['ADODB_FETCH_MODE'] = ADODB_FETCH_ASSOC;
 
 } catch (Throwable $e) {
-    fie_etabs_send_error(500, 'Erreur bootstrap StatEduc (config/params) : ' . $e->getMessage());
+    fie_etabs_send_error(500, 'Erreur bootstrap StatEduc : ' . $e->getMessage());
 }
 
-// ── Connexion DB via connexion.class.php — même logique que connexion.inc.php ─
-// On n'utilise PAS connexion.inc.php directement car il appelle connexion::init()
-// qui fait header('Location: no_conn.php')+exit() en cas d'échec — ce qui casserait
-// notre réponse JSON. On reproduit uniquement la partie connexion ADOdb.
-//
-// Équivalent de :
-//   require_once connexion.inc.php  →  new connexion() → $connexion->init(false)
-//   puis : $GLOBALS['conn'] est peuplé si $connexion->ok === true
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Connexion DB (SQL Server via ADOdb) ───────────────────────────────────────
 try {
     require_once $GLOBALS['SISED_PATH_CLS'] . 'connexion.class.php';
 
-    // Lire les sources de connexion depuis connexion.php (le fichier credentials)
     $connexion_obj = new connexion();
     $curcnx = $connexion_obj->sources[0] ?? null;
 
     if (empty($curcnx)) {
-        fie_etabs_send_error(500, 'Aucune source de connexion trouvée dans connexion.php.');
+        fie_etabs_send_error(500, 'Aucune source de connexion trouvée.');
     }
 
-    // Déterminer le type ADOdb (mssql→mssqlnative, mysql→mysqli)
     $conn_type = $curcnx['type'];
     if ($conn_type === 'mssql')  $conn_type = 'mssqlnative';
     if ($conn_type === 'mysql')  $conn_type = 'mysqli';
 
-    // Créer et ouvrir la connexion ADOdb
     $conn = ADONewConnection($conn_type);
 
     if ($curcnx['type'] === 'access') {
@@ -142,12 +133,11 @@ try {
 
     if (!$connected || !$conn->IsConnected()) {
         fie_etabs_send_error(500,
-            'Connexion base de données StatEduc impossible (serveur=' . $curcnx['serveur'] .
+            'Connexion StatEduc impossible (serveur=' . $curcnx['serveur'] .
             ', base=' . $curcnx['base'] . ').'
         );
     }
 
-    // Charset UTF-8 pour SQL Server
     if ($curcnx['type'] === 'mssql') {
         $conn->setConnectionParameter('CharacterSet', 'UTF-8');
     } elseif ($curcnx['type'] === 'mysql') {
@@ -160,24 +150,19 @@ try {
     fie_etabs_send_error(500, 'Erreur connexion DB StatEduc : ' . $e->getMessage());
 }
 
-// Sécurité : vérification finale
 if (empty($GLOBALS['conn'])) {
-    fie_etabs_send_error(500, 'Connexion base de données StatEduc non disponible.');
+    fie_etabs_send_error(500, 'Connexion DB non disponible.');
 }
 
 // ── Lecture du token ──────────────────────────────────────────────────────────
 $expected_token = '';
-
-// 1) Fichier token.php (recommandé)
 $token_file = __DIR__ . '/token.php';
 if (file_exists($token_file)) {
     $expected_token = (string)(require $token_file);
 }
-// 2) Variable d'environnement
 if ($expected_token === '') {
     $expected_token = (string)(getenv('STATEDUC_FIE_TOKEN') ?: '');
 }
-// 3) Sans token configuré → accès ouvert en dev local
 $auth_required = ($expected_token !== '');
 
 // ── Vérification Bearer token ─────────────────────────────────────────────────
@@ -198,54 +183,27 @@ if ($auth_required) {
 }
 
 // ── Paramètres de requête ─────────────────────────────────────────────────────
-$page        = max(1, (int)($_GET['page']     ?? 1));
-$per_page    = min(1000, max(1, (int)($_GET['per_page'] ?? 500)));
-$province_f  = isset($_GET['province'])      ? trim($_GET['province'])      : null;
-$secteur_f   = isset($_GET['secteur'])       ? (int)$_GET['secteur']        : null;
-$updated_f   = isset($_GET['updated_since']) ? trim($_GET['updated_since']) : null;
-$actif_f     = isset($_GET['actif'])         ? (int)$_GET['actif']          : null;
-$code_etab_f = isset($_GET['code_etablissement']) ? (int)$_GET['code_etablissement'] : null;
-$offset      = ($page - 1) * $per_page;
+$page         = max(1, (int)($_GET['page']     ?? 1));
+$per_page     = min(1000, max(1, (int)($_GET['per_page'] ?? 500)));
+$secteur_f    = isset($_GET['secteur'])            ? (int)$_GET['secteur']            : null;
+$province_f   = isset($_GET['code_province'])      ? (int)$_GET['code_province']      : null;
+$code_etab_f  = isset($_GET['code_etablissement']) ? (int)$_GET['code_etablissement'] : null;
+$offset       = ($page - 1) * $per_page;
 
-// ── Construction WHERE ────────────────────────────────────────────────────────
-// Les noms de tables/champs suivent les PARAM définis dans params.php :
-//   ETABLISSEMENT.CODE_ETABLISSEMENT, NOM_ETABLISSEMENT,
-//   CODE_TYPE_SECTEUR_ENS (TYPE_SYSTEME_ENSEIGNEMENT = 'TYPE_SECTEUR_ENS')
+// ── Construction WHERE pour ATLAS_COLLINE ─────────────────────────────────────
+// La vue ATLAS_COLLINE expose directement les 14 colonnes FICHIER_ETAB.xlsx
+// Filtres disponibles : CODE_TYPE_SECTEUR_ENS, CODE_PROVINCE, CODE_ETABLISSEMENT
 // ─────────────────────────────────────────────────────────────────────────────
 $where_parts = ['1=1'];
 
-if ($province_f !== null) {
-    // Filtrer par province = regroupement de plus haut niveau dans la chaîne
-    // Même logique que la clause WHERE de etablissement.php :
-    //   E_R.CODE_REGROUPEMENT IN (regroupements de la province demandée)
-    $prov_esc = addslashes($province_f);
-    $where_parts[] = "E.CODE_ETABLISSEMENT IN (
-        SELECT ER2.CODE_ETABLISSEMENT
-        FROM ETABLISSEMENT_REGROUPEMENT ER2
-        JOIN REGROUPEMENT      R2  ON R2.CODE_REGROUPEMENT      = ER2.CODE_REGROUPEMENT
-        JOIN TYPE_REGROUPEMENT TR2 ON TR2.CODE_TYPE_REGROUPEMENT = R2.CODE_TYPE_REGROUPEMENT
-        JOIN HIERARCHIE        H2  ON H2.CODE_TYPE_REGROUPEMENT  = TR2.CODE_TYPE_REGROUPEMENT
-        WHERE H2.NIVEAU_HIERARCHIE = (
-            SELECT MAX(H3.NIVEAU_HIERARCHIE)
-            FROM HIERARCHIE H3
-        )
-          AND UPPER(R2.LIBELLE_REGROUPEMENT) LIKE UPPER('%$prov_esc%')
-    )";
-}
 if ($secteur_f !== null) {
-    $where_parts[] = 'E.CODE_TYPE_SECTEUR_ENS = ' . (int)$secteur_f;
+    $where_parts[] = 'CODE_TYPE_SECTEUR_ENS = ' . (int)$secteur_f;
 }
-if ($actif_f !== null) {
-    $where_parts[] = $actif_f
-        ? 'E.CODE_TYPE_ETAT_FONCT = 1'
-        : '(E.CODE_TYPE_ETAT_FONCT IS NULL OR E.CODE_TYPE_ETAT_FONCT != 1)';
-}
-if ($updated_f && preg_match('/^\d{4}-\d{2}-\d{2}/', $updated_f)) {
-    $date_esc = addslashes($updated_f);
-    $where_parts[] = "E.ANNEE_CREATION >= YEAR('$date_esc')";
+if ($province_f !== null) {
+    $where_parts[] = 'CODE_PROVINCE = ' . (int)$province_f;
 }
 if ($code_etab_f !== null) {
-    $where_parts[] = 'E.CODE_ETABLISSEMENT = ' . (int)$code_etab_f;
+    $where_parts[] = 'CODE_ETABLISSEMENT = ' . (int)$code_etab_f;
     $per_page = 1;
     $offset   = 0;
 }
@@ -254,33 +212,35 @@ $where_sql = implode(' AND ', $where_parts);
 
 // ── COUNT total ───────────────────────────────────────────────────────────────
 try {
-    $count_sql = "SELECT COUNT(*) AS TOTAL FROM ETABLISSEMENT E WHERE $where_sql";
+    $count_sql = "SELECT COUNT(*) AS TOTAL FROM ATLAS_COLLINE WHERE $where_sql";
     $total     = (int)($GLOBALS['conn']->GetOne($count_sql) ?? 0);
 } catch (Throwable $e) {
-    fie_etabs_send_error(500, 'Erreur COUNT établissements : ' . $e->getMessage());
+    fie_etabs_send_error(500, 'Erreur COUNT ATLAS_COLLINE : ' . $e->getMessage());
 }
 $pages = ($per_page > 0) ? (int)ceil($total / $per_page) : 0;
 
-// ── Liste paginée (SQL Server 2012+ : OFFSET / FETCH NEXT) ───────────────────
+// ── Requête paginée ATLAS_COLLINE (toutes les 14 colonnes directement) ────────
+// Plus besoin de jointures HIERARCHIE/REGROUPEMENT — la vue les encapsule.
+// ─────────────────────────────────────────────────────────────────────────────
 $list_sql = "
     SELECT
-        E.CODE_ETABLISSEMENT,
-        E.NOM_ETABLISSEMENT,
-        E.CODE_TYPE_MILIEU,
-        E.CODE_TYPE_STATUT_ORG,
-        E.CODE_TYPE_SECTEUR_ENS,
-        E.CODE_TYPE_FONCTION,
-        E.CODE_TYPE_ETABLISSEMENT,
-        E.CODE_TYPE_ETAT_FONCT,
-        E.CODE_ECOLE_PAYS,
-        E.CODE_ETABLISSEMENT_PARENT,
-        E.TELEPHONE,
-        E.ADRESSE_ELECTRONIQUE,
-        E.RESPONSABLE_ECOLE,
-        E.ANNEE_CREATION
-    FROM ETABLISSEMENT E
+        CODE_PROVINCE,
+        PROVINCE,
+        CODE_COMMUNE,
+        COMMUNE,
+        CODE_COLLINE,
+        COLLINE,
+        CODE_TYPE_SECTEUR_ENS,
+        SECTEUR_ENS,
+        CODE_TYPE_STATUT_ORG,
+        STATUT,
+        NOM_ETAB,
+        CODE_ETABLISSEMENT,
+        CODE_TYPE_MILIEU,
+        MILIEU
+    FROM ATLAS_COLLINE
     WHERE $where_sql
-    ORDER BY E.NOM_ETABLISSEMENT ASC, E.CODE_ETABLISSEMENT ASC
+    ORDER BY NOM_ETAB ASC, CODE_ETABLISSEMENT ASC
     OFFSET $offset ROWS
     FETCH NEXT $per_page ROWS ONLY
 ";
@@ -288,180 +248,23 @@ $list_sql = "
 try {
     $rows = $GLOBALS['conn']->GetAll($list_sql);
     if ($rows === false) {
-        fie_etabs_send_error(500, 'Erreur lecture établissements (GetAll returned false).');
+        fie_etabs_send_error(500, 'Erreur lecture ATLAS_COLLINE (GetAll returned false).');
     }
 } catch (Throwable $e) {
-    fie_etabs_send_error(500, 'Erreur lecture établissements : ' . $e->getMessage());
+    fie_etabs_send_error(500, 'Erreur lecture ATLAS_COLLINE : ' . $e->getMessage());
 }
 
-// ── Préchargement de la chaîne de localisation (même logique que établissement.php) ──
-//
-// Même jointure que dans etablissement.php (val=liste_etablissement) :
-//   ETABLISSEMENT_REGROUPEMENT (ER) → REGROUPEMENT (R) → TYPE_REGROUPEMENT (TR) → HIERARCHIE (H)
-// La table HIERARCHIE contient NIVEAU_HIERARCHIE :
-//   niveau le PLUS HAUT = province, niveau le PLUS BAS (1) = colline/sous-commune.
-// Le nombre de niveaux dépend de la chaîne de localisation du pays (ex. Burundi : 4 niveaux).
-//
-// On charge la localisation en une seule requête pour tous les établissements de la page
-// (évite N requêtes individuelles).
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Charge les niveaux max/min de la chaîne de localisation.
- * Retourne ['max' => N, 'min' => 1] (ex. Burundi : max=4 → Province)
- */
-function fie_etabs_get_niveaux_chaine($conn): array
+// ── Utilitaire : nettoyage UTF-8 (SQL Server mssqlnative peut varier) ─────────
+function fie_atlas_clean_str(?string $v): ?string
 {
-    static $niveaux = null;
-    if ($niveaux !== null) return $niveaux;
-
-    try {
-        $sql = 'SELECT MIN(NIVEAU_HIERARCHIE) AS niv_min, MAX(NIVEAU_HIERARCHIE) AS niv_max
-                FROM HIERARCHIE';
-        $row = $conn->GetRow($sql);
-        // ADOdb avec ADODB_ASSOC_CASE_UPPER → clés en majuscules : NIV_MIN, NIV_MAX
-        // Fallback case-insensitive au cas où le driver retourne autrement
-        $niv_min_val = $row['NIV_MIN'] ?? $row['niv_min'] ?? null;
-        $niv_max_val = $row['NIV_MAX'] ?? $row['niv_max'] ?? null;
-        $niveaux = [
-            'min' => ($niv_min_val !== null) ? (int)$niv_min_val : 1,
-            'max' => ($niv_max_val !== null) ? (int)$niv_max_val : 4,
-        ];
-        // Sécurité : max doit être >= min et >= 1
-        if ($niveaux['max'] < $niveaux['min'] || $niveaux['max'] < 1) {
-            $niveaux = ['min' => 1, 'max' => 4];
-        }
-    } catch (Throwable $e) {
-        $niveaux = ['min' => 1, 'max' => 4];
-        error_log('[FIE_ETABS_WS] fie_etabs_get_niveaux_chaine error: ' . $e->getMessage());
+    if ($v === null) return null;
+    $v = trim($v);
+    if ($v === '') return null;
+    // Détecter et convertir si nécessaire
+    if (mb_detect_encoding($v, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true) !== 'UTF-8') {
+        $v = mb_convert_encoding($v, 'UTF-8', 'ISO-8859-1');
     }
-    return $niveaux;
-}
-
-/**
- * Charge la localisation complète de plusieurs établissements en une seule requête.
- * Retourne un tableau indexé par CODE_ETABLISSEMENT :
- *   [CODE_ETABLISSEMENT => [niv_max => [...], niv_max-1 => [...], ..., niv_min => [...]]]
- */
-function fie_etabs_load_localisation_batch(array $codes_etab, $conn): array
-{
-    if (empty($codes_etab)) return [];
-
-    $result = [];
-    $in_list = implode(',', array_map('intval', $codes_etab));
-
-    try {
-        // Jointure identique à celle de questionnaire.php pour la hiérarchie :
-        //   ETABLISSEMENT_REGROUPEMENT ER
-        //   JOIN REGROUPEMENT R            ON R.CODE_REGROUPEMENT            = ER.CODE_REGROUPEMENT
-        //   JOIN TYPE_REGROUPEMENT TR      ON TR.CODE_TYPE_REGROUPEMENT       = R.CODE_TYPE_REGROUPEMENT
-        //   JOIN HIERARCHIE H              ON H.CODE_TYPE_REGROUPEMENT        = TR.CODE_TYPE_REGROUPEMENT
-        //   JOIN TYPE_CHAINE_REGROUPEMENT TCR ON TCR.CODE_TYPE_CHAINE_REGROUPEMENT = H.CODE_TYPE_CHAINE_REGROUPEMENT
-        //
-        // On récupère tous les niveaux de tous les établissements de la page en un seul SELECT.
-        // DISTINCT sur (CODE_ETABLISSEMENT, NIVEAU_HIERARCHIE, CODE_REGROUPEMENT) pour éviter doublons
-        // si un même regroupement appartient à plusieurs chaînes.
-        $sql = "
-            SELECT DISTINCT
-                ER.CODE_ETABLISSEMENT,
-                R.CODE_REGROUPEMENT,
-                R.LIBELLE_REGROUPEMENT,
-                H.NIVEAU_HIERARCHIE
-            FROM ETABLISSEMENT_REGROUPEMENT ER
-            JOIN REGROUPEMENT              R   ON R.CODE_REGROUPEMENT              = ER.CODE_REGROUPEMENT
-            JOIN TYPE_REGROUPEMENT         TR  ON TR.CODE_TYPE_REGROUPEMENT        = R.CODE_TYPE_REGROUPEMENT
-            JOIN HIERARCHIE                H   ON H.CODE_TYPE_REGROUPEMENT         = TR.CODE_TYPE_REGROUPEMENT
-            JOIN TYPE_CHAINE_REGROUPEMENT  TCR ON TCR.CODE_TYPE_CHAINE_REGROUPEMENT = H.CODE_TYPE_CHAINE_REGROUPEMENT
-            WHERE ER.CODE_ETABLISSEMENT IN ($in_list)
-            ORDER BY ER.CODE_ETABLISSEMENT ASC, H.NIVEAU_HIERARCHIE DESC
-        ";
-        $rows = $conn->GetAll($sql);
-
-        if (!is_array($rows)) return [];
-
-        foreach ($rows as $row) {
-            $code = (int)($row['CODE_ETABLISSEMENT'] ?? 0);
-            $niv  = (int)($row['NIVEAU_HIERARCHIE'] ?? 0);
-            if ($code === 0 || $niv === 0) continue;
-            // Garder uniquement le premier enregistrement par niveau (priorité : premier retourné)
-            if (!isset($result[$code][$niv])) {
-                $result[$code][$niv] = [
-                    'code'    => (int)($row['CODE_REGROUPEMENT'] ?? 0),
-                    'libelle' => trim((string)($row['LIBELLE_REGROUPEMENT'] ?? '')),
-                ];
-            }
-        }
-    } catch (Throwable $e) {
-        // Non fatal — localisation vide pour tous
-        error_log('[FIE_ETABS_WS] fie_etabs_load_localisation_batch error: ' . $e->getMessage());
-    }
-
-    return $result;
-}
-
-/**
- * Construit le tableau de localisation structuré à partir des niveaux.
- * Mappe niveau max → province, max-1 → commune, max-2 → zone, max-3 → colline (ou sous-entités).
- * Compatible avec tous les pays (Burundi = 4 niveaux, autres = 3 niveaux, etc.)
- */
-function fie_etabs_build_loc_struct(array $niveaux_etab, array $niveaux_chaine): array
-{
-    $niv_max = $niveaux_chaine['max'];
-    $niv_min = $niveaux_chaine['min'];
-
-    // Labels génériques selon position relative par rapport au niveau max
-    $labels = ['province', 'commune', 'zone', 'colline'];
-
-    $loc = [
-        'province' => null, 'commune' => null, 'zone' => null, 'colline' => null,
-        'code_province' => null, 'code_commune' => null, 'code_zone' => null, 'code_colline' => null,
-    ];
-
-    if (empty($niveaux_etab)) return $loc;
-
-    // Récupérer les niveaux effectivement présents pour cet établissement
-    $niveaux_presents = array_keys($niveaux_etab);
-    $niv_etab_max = max($niveaux_presents); // plus haut niveau de CET établissement
-
-    // Si l'établissement a un niveau max différent de la chaîne globale
-    // (sous-chaîne locale ou données partielles), on adapte la référence
-    // Priorité : utiliser $niv_max global pour le mapping, mais avec protection
-    $ref_max = max($niv_max, $niv_etab_max);
-
-    // Itérer du niveau le plus haut (province) vers le plus bas (colline)
-    foreach ($labels as $i => $label) {
-        $niv = $ref_max - $i;
-        if ($niv < $niv_min) break;
-        if (isset($niveaux_etab[$niv])) {
-            $loc[$label]            = $niveaux_etab[$niv]['libelle'];
-            $loc['code_' . $label]  = $niveaux_etab[$niv]['code'];
-        }
-    }
-
-    return $loc;
-}
-
-// ── Chargement batch de la localisation pour tous les établissements de la page
-$codes_page = [];
-foreach ((array)$rows as $row) {
-    $c = (int)($row['CODE_ETABLISSEMENT'] ?? 0);
-    if ($c > 0) $codes_page[] = $c;
-}
-
-$loc_batch    = fie_etabs_load_localisation_batch($codes_page, $GLOBALS['conn']);
-$niv_chaine   = fie_etabs_get_niveaux_chaine($GLOBALS['conn']);
-
-// ── Diagnostic localisation (premier établissement de la page) ────────────
-if (!empty($codes_page)) {
-    $first_code = $codes_page[0];
-    $_loc_diag = '[FIE_ETABS_LOC] page='.$page
-        .';per_page='.$per_page
-        .';codes_count='.count($codes_page)
-        .';first_code='.$first_code
-        .';niv_chaine='.json_encode($niv_chaine)
-        .';niveaux_etab='.json_encode($loc_batch[$first_code] ?? [])
-        .';loc_built='.json_encode(fie_etabs_build_loc_struct($loc_batch[$first_code] ?? [], $niv_chaine));
-    error_log($_loc_diag);
+    return $v;
 }
 
 // ── Construction de la réponse ────────────────────────────────────────────────
@@ -471,50 +274,48 @@ foreach ((array)$rows as $row) {
     $code = (int)($row['CODE_ETABLISSEMENT'] ?? 0);
     if ($code === 0) continue;
 
-    // Localisation depuis le batch (même structure que établissement.php)
-    $niveaux_etab = $loc_batch[$code] ?? [];
-    $loc = fie_etabs_build_loc_struct($niveaux_etab, $niv_chaine);
+    $nom      = fie_atlas_clean_str($row['NOM_ETAB']    ?? null) ?? '';
+    $province = fie_atlas_clean_str($row['PROVINCE']    ?? null);
+    $commune  = fie_atlas_clean_str($row['COMMUNE']     ?? null);
+    $colline  = fie_atlas_clean_str($row['COLLINE']     ?? null);
+    $secteur  = fie_atlas_clean_str($row['SECTEUR_ENS'] ?? null);
+    $statut   = fie_atlas_clean_str($row['STATUT']      ?? null);
+    $milieu   = fie_atlas_clean_str($row['MILIEU']      ?? null);
 
-    // Encodage UTF-8 (SQL Server mssqlnative peut retourner UTF-16/Latin-1)
-    $nom = trim((string)($row['NOM_ETABLISSEMENT'] ?? ''));
-    $nom = mb_detect_encoding($nom, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true) !== 'UTF-8'
-        ? mb_convert_encoding($nom, 'UTF-8', 'ISO-8859-1')
-        : $nom;
+    $cp   = isset($row['CODE_PROVINCE'])         ? (int)$row['CODE_PROVINCE']         : null;
+    $cc   = isset($row['CODE_COMMUNE'])          ? (int)$row['CODE_COMMUNE']          : null;
+    $ccl  = isset($row['CODE_COLLINE'])          ? (int)$row['CODE_COLLINE']          : null;
+    $csec = isset($row['CODE_TYPE_SECTEUR_ENS']) ? (int)$row['CODE_TYPE_SECTEUR_ENS'] : null;
+    $csta = isset($row['CODE_TYPE_STATUT_ORG'])  ? (int)$row['CODE_TYPE_STATUT_ORG']  : null;
+    $cmil = isset($row['CODE_TYPE_MILIEU'])      ? (int)$row['CODE_TYPE_MILIEU']      : null;
 
-    // Chaîne localisation complète : Province / Commune / Zone / Colline / Nom école
-    $chaine_parts = array_filter([
-        $loc['province'], $loc['commune'], $loc['zone'], $loc['colline'], $nom
-    ]);
+    // Chaîne localisation complète : Province / Commune / Colline / Nom école
+    $chaine_parts = array_filter([$province, $commune, $colline, $nom]);
     $chaine_localisation = implode(' / ', $chaine_parts);
 
     $etablissements[] = [
-        'code_etablissement'        => $code,
-        'nom_etablissement'         => $nom,
-        'localisation'              => [
-            'province' => ['code' => $loc['code_province'], 'libelle' => $loc['province']],
-            'commune'  => ['code' => $loc['code_commune'],  'libelle' => $loc['commune']],
-            'zone'     => ['code' => $loc['code_zone'],     'libelle' => $loc['zone']],
-            'colline'  => ['code' => $loc['code_colline'],  'libelle' => $loc['colline']],
-        ],
-        'chaine_localisation'       => $chaine_localisation,
-        'typologie'                 => [
-            'code_type_milieu'        => isset($row['CODE_TYPE_MILIEU'])        ? (int)$row['CODE_TYPE_MILIEU']        : null,
-            'code_type_statut_org'    => isset($row['CODE_TYPE_STATUT_ORG'])    ? (int)$row['CODE_TYPE_STATUT_ORG']    : null,
-            'code_type_secteur_ens'   => isset($row['CODE_TYPE_SECTEUR_ENS'])   ? (int)$row['CODE_TYPE_SECTEUR_ENS']   : null,
-            'code_type_fonction'      => isset($row['CODE_TYPE_FONCTION'])      ? (int)$row['CODE_TYPE_FONCTION']      : null,
-            'code_type_etablissement' => isset($row['CODE_TYPE_ETABLISSEMENT']) ? (int)$row['CODE_TYPE_ETABLISSEMENT'] : null,
-            'code_type_etat_fonct'    => isset($row['CODE_TYPE_ETAT_FONCT'])    ? (int)$row['CODE_TYPE_ETAT_FONCT']    : null,
-        ],
-        'code_ecole_pays'           => $row['CODE_ECOLE_PAYS'] ?? null,
-        'code_etablissement_parent' => isset($row['CODE_ETABLISSEMENT_PARENT']) ? (int)$row['CODE_ETABLISSEMENT_PARENT'] : null,
-        'telephone'                 => $row['TELEPHONE']             ?? null,
-        'adresse_electronique'      => $row['ADRESSE_ELECTRONIQUE']  ?? null,
-        'responsable_ecole'         => isset($row['RESPONSABLE_ECOLE'])
-            ? (mb_detect_encoding((string)$row['RESPONSABLE_ECOLE'], ['UTF-8', 'ISO-8859-1'], true) !== 'UTF-8'
-                ? mb_convert_encoding((string)$row['RESPONSABLE_ECOLE'], 'UTF-8', 'ISO-8859-1')
-                : (string)$row['RESPONSABLE_ECOLE'])
-            : null,
-        'annee_creation'            => isset($row['ANNEE_CREATION']) ? (int)$row['ANNEE_CREATION'] : null,
+        // Clé primaire
+        'code_etablissement'      => $code,
+        'nom_etablissement'       => $nom,
+
+        // Localisation géographique (codes + libellés ATLAS_COLLINE)
+        'code_province'           => $cp,
+        'province'                => $province,
+        'code_commune'            => $cc,
+        'commune'                 => $commune,
+        'code_colline'            => $ccl,
+        'colline'                 => $colline,
+
+        // Caractéristiques pédagogiques/administratives
+        'code_type_secteur_ens'   => $csec,
+        'secteur_ens'             => $secteur,
+        'code_type_statut_org'    => $csta,
+        'statut_org'              => $statut,
+        'code_type_milieu'        => $cmil,
+        'milieu'                  => $milieu,
+
+        // Chaîne pratique pour affichage
+        'chaine_localisation'     => $chaine_localisation,
     ];
 }
 

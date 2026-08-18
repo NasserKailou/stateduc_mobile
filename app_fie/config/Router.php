@@ -88,6 +88,13 @@ class Router
         $this->post('/inscription/nouveau',       'InscriptionController', 'processNew');
         // CORRECTION : routes AJAX d'abord (avant :iue sinon capturées par le param)
         $this->post('/inscription/ajax/doublon',         'InscriptionController', 'ajaxCheckDoublon');
+        // Cascades code-based ATLAS_COLLINE (nouvelles — session 6)
+        $this->get('/inscription/ajax/communes-code',    'InscriptionController', 'ajaxCommunesCode');
+        $this->get('/inscription/ajax/collines-code',    'InscriptionController', 'ajaxCollinesCode');
+        $this->get('/inscription/ajax/etabs-code',       'InscriptionController', 'ajaxEtabsCode');
+        $this->get('/inscription/ajax/etab-detail',      'InscriptionController', 'ajaxEtabDetail');
+        $this->post('/inscription/ajax/sync-annees',     'InscriptionController', 'ajaxSyncTypeAnnee');
+        // Cascades texte legacy
         $this->get('/inscription/ajax/communes',         'InscriptionController', 'ajaxCommunes');
         $this->get('/inscription/ajax/zones',            'InscriptionController', 'ajaxZones');
         $this->get('/inscription/ajax/collines',         'InscriptionController', 'ajaxCollines');
