@@ -31,7 +31,7 @@ class EleveModel
                 :pere, :mere, :tuteur, :tel_tuteur, :adr_tuteur,
                 :photo, 'actif',
                 :doublon, :doublon_ref,
-                :created_by, :created_by
+                :created_by, :updated_by
             )",
             [
                 ':iue'          => $iue,
@@ -53,7 +53,8 @@ class EleveModel
                 ':photo'        => $data['photo_path']           ?? null,
                 ':doublon'      => 0,
                 ':doublon_ref'  => null,
-                ':created_by'   => $data['created_by']           ?? null,
+                ':created_by'   => $data['created_by'] ?? null,
+                ':updated_by'   => $data['created_by'] ?? null,
             ]
         );
 

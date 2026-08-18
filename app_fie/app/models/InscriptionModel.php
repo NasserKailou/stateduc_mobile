@@ -29,7 +29,7 @@ class InscriptionModel
                 :classe, :date_insc, :date_debut,
                 'inscrit', :etab_prec, :annee_prec,
                 :motif, :frais, :bourse, :matricule,
-                :by, :by
+                :created_by, :updated_by
             )",
             [
                 ':eleve'      => $eleveId,
@@ -47,7 +47,8 @@ class InscriptionModel
                 ':frais'      => $data['frais_inscription']   ?? null,
                 ':bourse'     => $data['bourse']              ?? 0,
                 ':matricule'  => $data['matricule_etab']      ?? null,
-                ':by'         => $data['created_by']          ?? null,
+                ':created_by' => $data['created_by']          ?? null,
+                ':updated_by' => $data['created_by']          ?? null,
             ]
         );
         $id = (int)Database::lastInsertId();
