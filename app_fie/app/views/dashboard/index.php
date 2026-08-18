@@ -1,9 +1,8 @@
 <?php
 /**
  * FIE — Vue : Tableau de bord analytique
- * Bootstrap 5 + Font Awesome — Charte Burundi
- * CORRECTION Phase 2 : suppression use App\Services\SecurityHelper (pas de namespace)
- *                       redesign complet Bootstrap 5
+ * Bootstrap 5 + Font Awesome — Charte Bleu Ciel FIE
+ * PHASE 3 : Refonte charte graphique + nouvelles KPI cards avec icônes FA
  */
 $page_title  = $page_title  ?? 'Tableau de bord — FIE';
 $active_menu = $active_menu ?? 'dashboard';
@@ -19,21 +18,36 @@ $secteurLabels = [
     6 => 'Alphabétisation',
     7 => 'Supérieur',
 ];
+
+// Statistiques complémentaires (calculées ou issues du contrôleur)
+$totalEleves        = $kpis['total_eleves']     ?? 0;
+$totalInscrits      = $kpis['inscriptions_an']  ?? 0;
+$totalEtabs         = $kpis['etablissements']   ?? 0;
+$totalDoublons      = $kpis['doublons']         ?? 0;
+$totalFilles        = 0; $totalGarcons = 0;
+if (!empty($bySexe)) {
+    foreach ($bySexe as $row) {
+        if ($row['sexe'] === 'F') $totalFilles   = (int)$row['nb'];
+        else                      $totalGarcons  = (int)$row['nb'];
+    }
+}
+$pctFilles = ($totalEleves > 0) ? round($totalFilles / $totalEleves * 100, 1) : 0;
+$pctCouverture = ($totalEtabs > 0) ? min(100, round($totalInscrits / max($totalEtabs, 1) * 100, 1)) : 0;
 ?>
 
 <!-- ── En-tête de page ─────────────────────────────────────────────────── -->
 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-2">
     <div>
         <h1 class="h4 fw-bold mb-0">
-            <i class="fa-solid fa-gauge-high me-2" style="color:var(--fie-red)"></i>Tableau de bord
+            <i class="fa-solid fa-gauge-high me-2" style="color:var(--fie-primary)"></i>Tableau de bord
         </h1>
         <p class="text-muted mb-0 small">
             Bienvenue,
             <strong><?= SecurityHelper::e($_SESSION['fie_user']['nom'] ?? '') ?></strong>
-            — <span class="badge" style="background:var(--fie-red)"><?= SecurityHelper::e($_SESSION['fie_user']['role'] ?? '') ?></span>
+            — <span class="badge" style="background:var(--fie-primary)"><?= SecurityHelper::e($_SESSION['fie_user']['role'] ?? '') ?></span>
         </p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
         <a href="<?= BASE_URL ?>/inscription/nouveau" class="btn btn-sm btn-primary">
             <i class="fa-solid fa-plus me-1"></i>Nouvelle inscription
         </a>
@@ -43,72 +57,76 @@ $secteurLabels = [
     </div>
 </div>
 
-<!-- ── KPI Cards ──────────────────────────────────────────────────────── -->
-<div class="row g-3 mb-4">
+<!-- ══════════════════════════════════════════════════════════════════════
+     KPI CARDS — Ligne 1 : Indicateurs principaux FIE
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-3">
 
+    <!-- Carte Élève Numérique FIE -->
     <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card fie-kpi-card fie-kpi--blue h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center"
-                     style="background:#fff5f5;min-width:54px;height:54px">
-                    <i class="fa-solid fa-users fa-lg" style="color:var(--fie-red)"></i>
+                <div class="fie-kpi-icon fie-kpi--blue">
+                    <i class="fa-solid fa-id-card"></i>
                 </div>
-                <div>
-                    <div class="text-muted small mb-1">Élèves enregistrés</div>
-                    <div class="h4 fw-bold mb-0"><?= number_format($kpis['total_eleves']) ?></div>
-                    <div class="text-muted small">avec IUE unique</div>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Carte Élève Numérique FIE</div>
+                    <div class="fie-kpi-value fie-kpi--blue"><?= number_format($totalEleves) ?></div>
+                    <div class="fie-kpi-sub">IUE uniques émis</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Élèves immatriculés -->
     <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card fie-kpi-card fie-kpi--sky h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center"
-                     style="background:#f0fff4;min-width:54px;height:54px">
-                    <i class="fa-solid fa-file-lines fa-lg" style="color:var(--fie-green)"></i>
+                <div class="fie-kpi-icon fie-kpi--sky">
+                    <i class="fa-solid fa-users"></i>
                 </div>
-                <div>
-                    <div class="text-muted small mb-1">Inscriptions actives</div>
-                    <div class="h4 fw-bold mb-0"><?= number_format($kpis['inscriptions_an']) ?></div>
-                    <div class="text-muted small">statut actif</div>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Élèves immatriculés</div>
+                    <div class="fie-kpi-value fie-kpi--sky"><?= number_format($totalInscrits) ?></div>
+                    <div class="fie-kpi-sub">Inscrits actifs (année en cours)</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Établissements couverts -->
     <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card fie-kpi-card fie-kpi--green h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center"
-                     style="background:#f0f4ff;min-width:54px;height:54px">
-                    <i class="fa-solid fa-school fa-lg" style="color:#0d6efd"></i>
+                <div class="fie-kpi-icon fie-kpi--green">
+                    <i class="fa-solid fa-school"></i>
                 </div>
-                <div>
-                    <div class="text-muted small mb-1">Établissements</div>
-                    <div class="h4 fw-bold mb-0"><?= number_format($kpis['etablissements']) ?></div>
-                    <div class="text-muted small">miroir StatEduc</div>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Établissements couverts</div>
+                    <div class="fie-kpi-value fie-kpi--green"><?= number_format($totalEtabs) ?></div>
+                    <div class="fie-kpi-sub">Miroir StatEduc synchronisé</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Unicité garantie -->
     <div class="col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100 <?= $kpis['agregats_pending'] > 0 ? 'border-warning' : '' ?>">
+        <div class="card fie-kpi-card fie-kpi--teal h-100 <?= $totalDoublons > 0 ? 'border-warning' : '' ?>">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="rounded-3 p-3 d-flex align-items-center justify-content-center"
-                     style="background:#fffbf0;min-width:54px;height:54px">
-                    <i class="fa-solid fa-clock-rotate-left fa-lg"
-                       style="color:<?= $kpis['agregats_pending'] > 0 ? '#fd7e14' : '#adb5bd' ?>"></i>
+                <div class="fie-kpi-icon fie-kpi--teal">
+                    <i class="fa-solid fa-shield-check"></i>
                 </div>
-                <div>
-                    <div class="text-muted small mb-1">Agrégats à synchroniser</div>
-                    <div class="h4 fw-bold mb-0"
-                         style="color:<?= $kpis['agregats_pending'] > 0 ? '#fd7e14' : 'inherit' ?>">
-                        <?= number_format($kpis['agregats_pending']) ?>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Unicité garantie</div>
+                    <div class="fie-kpi-value fie-kpi--teal">
+                        <?= $totalDoublons > 0 ? '<span style="color:#fd7e14">'.number_format($totalDoublons).'</span>' : '<span>0</span>' ?>
                     </div>
-                    <div class="text-muted small">vers StatEduc</div>
+                    <div class="fie-kpi-sub">
+                        <?= $totalDoublons > 0
+                            ? '<a href="'.BASE_URL.'/inscription/recherche?doublon=1" class="text-warning fw-semibold">Doublons suspects à vérifier</a>'
+                            : 'Aucun doublon détecté ✓' ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -116,14 +134,85 @@ $secteurLabels = [
 
 </div>
 
-<!-- ── Ligne 2 : Répartition secteur + Parité sexe ────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════
+     KPI CARDS — Ligne 2 : Couverture & Parité
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="row g-3 mb-4">
+
+    <!-- Couverture nationale -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card fie-kpi-card fie-kpi--indigo h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="fie-kpi-icon fie-kpi--indigo">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </div>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Couverture nationale</div>
+                    <div class="fie-kpi-value fie-kpi--indigo"><?= $pctCouverture ?>%</div>
+                    <div class="fie-kpi-sub">Taux d'immatriculation estimé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parité filles -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card fie-kpi-card fie-kpi--pink h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="fie-kpi-icon fie-kpi--pink">
+                    <i class="fa-solid fa-venus"></i>
+                </div>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Parité — Filles</div>
+                    <div class="fie-kpi-value fie-kpi--pink"><?= $pctFilles ?>%</div>
+                    <div class="fie-kpi-sub"><?= number_format($totalFilles) ?> filles enregistrées</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agrégats à synchroniser -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card fie-kpi-card fie-kpi--orange h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="fie-kpi-icon fie-kpi--orange">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Agrégats en attente</div>
+                    <div class="fie-kpi-value fie-kpi--orange"><?= number_format($kpis['agregats_pending'] ?? 0) ?></div>
+                    <div class="fie-kpi-sub">À synchroniser vers StatEduc</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unicité à l'échelle nationale -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card fie-kpi-card fie-kpi--purple h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="fie-kpi-icon fie-kpi--purple">
+                    <i class="fa-solid fa-fingerprint"></i>
+                </div>
+                <div class="flex-fill">
+                    <div class="fie-kpi-label">Unicité nationale</div>
+                    <div class="fie-kpi-value fie-kpi--purple"><?= number_format($totalEleves) ?></div>
+                    <div class="fie-kpi-sub">IUE uniques à l'échelle nationale</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Ligne 3 : Répartition secteur + Parité sexe ────────────────────── -->
 <div class="row g-4 mb-4">
 
     <!-- Répartition par secteur -->
     <div class="col-lg-7">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-bottom fw-semibold">
-                <i class="fa-solid fa-chart-bar me-2" style="color:var(--fie-red)"></i>
+                <i class="fa-solid fa-chart-bar me-2" style="color:var(--fie-primary)"></i>
                 Inscriptions par secteur d'enseignement
             </div>
             <div class="card-body">
@@ -134,9 +223,13 @@ $secteurLabels = [
                 <?php else: ?>
                 <?php
                 $totalIns = array_sum(array_column($bySecteur, 'nb'));
+                $sectorColors = ['#1d4ed8','#17a2b8','#178a2b','#fd7e14','#6d28d9','#e83e8c','#0f766e'];
+                $ci = 0;
                 foreach ($bySecteur as $row):
                     $pct = $totalIns > 0 ? round($row['nb'] / $totalIns * 100, 1) : 0;
                     $label = $secteurLabels[(int)$row['code_type_secteur_ens']] ?? 'Code '.$row['code_type_secteur_ens'];
+                    $color = $sectorColors[$ci % count($sectorColors)];
+                    $ci++;
                 ?>
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
@@ -147,7 +240,7 @@ $secteurLabels = [
                     </div>
                     <div class="progress" style="height:8px;border-radius:4px">
                         <div class="progress-bar" role="progressbar"
-                             style="width:<?= $pct ?>%;background:var(--fie-red)"
+                             style="width:<?= $pct ?>%;background:<?= $color ?>"
                              aria-valuenow="<?= $pct ?>" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
@@ -175,14 +268,15 @@ $secteurLabels = [
                 foreach ($bySexe as $row):
                     $pct    = $totalSexe > 0 ? round($row['nb'] / $totalSexe * 100, 1) : 0;
                     $isF    = $row['sexe'] === 'F';
-                    $color  = $isF ? '#e83e8c' : '#0d6efd';
+                    $color  = $isF ? '#e83e8c' : '#1d4ed8';
                     $label  = $isF ? 'Filles' : 'Garçons';
                     $icon   = $isF ? 'fa-venus' : 'fa-mars';
+                    $bg     = $isF ? '#fce7f3' : '#dbeafe';
                 ?>
                 <div class="mb-4">
                     <div class="d-flex align-items-center gap-3 mb-2">
                         <div class="rounded-circle d-flex align-items-center justify-content-center"
-                             style="width:40px;height:40px;background:<?= $isF ? '#fff0f7' : '#f0f4ff' ?>">
+                             style="width:40px;height:40px;background:<?= $bg ?>">
                             <i class="fa-solid <?= $icon ?>" style="color:<?= $color ?>"></i>
                         </div>
                         <div>
@@ -210,7 +304,7 @@ $secteurLabels = [
 <!-- ── Actions rapides ────────────────────────────────────────────────── -->
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white border-bottom fw-semibold">
-        <i class="fa-solid fa-bolt me-2" style="color:var(--fie-red)"></i>
+        <i class="fa-solid fa-bolt me-2" style="color:var(--fie-primary)"></i>
         Actions rapides
     </div>
     <div class="card-body">
@@ -219,9 +313,9 @@ $secteurLabels = [
                 <a href="<?= BASE_URL ?>/inscription/nouveau"
                    class="d-flex flex-column align-items-center gap-2 p-3 rounded-3 text-center
                           text-decoration-none border"
-                   style="border-color:var(--fie-red)!important;background:#fff5f5">
-                    <i class="fa-solid fa-user-plus fa-lg" style="color:var(--fie-red)"></i>
-                    <span class="small fw-semibold" style="color:var(--fie-red)">Inscrire un élève</span>
+                   style="border-color:var(--fie-primary)!important;background:#f0f4ff">
+                    <i class="fa-solid fa-user-plus fa-lg" style="color:var(--fie-primary)"></i>
+                    <span class="small fw-semibold" style="color:var(--fie-primary)">Inscrire un élève</span>
                 </a>
             </div>
             <div class="col-6 col-md-3">
@@ -236,26 +330,17 @@ $secteurLabels = [
                 <a href="<?= BASE_URL ?>/mouvement"
                    class="d-flex flex-column align-items-center gap-2 p-3 rounded-3 text-center
                           text-decoration-none border bg-light">
-                    <i class="fa-solid fa-arrow-right-arrow-left fa-lg" style="color:#6f42c1"></i>
-                    <span class="small fw-semibold" style="color:#6f42c1">Mouvements</span>
+                    <i class="fa-solid fa-arrow-right-arrow-left fa-lg" style="color:#17a2b8"></i>
+                    <span class="small fw-semibold" style="color:#17a2b8">Mouvements</span>
                 </a>
             </div>
             <div class="col-6 col-md-3">
-                <?php if (in_array($_SESSION['fie_user']['role'] ?? '', ['super_admin','admin_central'], true)): ?>
-                <a href="<?= BASE_URL ?>/admin"
+                <a href="<?= BASE_URL ?>/bibliotheque"
                    class="d-flex flex-column align-items-center gap-2 p-3 rounded-3 text-center
                           text-decoration-none border bg-light">
-                    <i class="fa-solid fa-gears fa-lg" style="color:#0d6efd"></i>
-                    <span class="small fw-semibold" style="color:#0d6efd">Administration</span>
+                    <i class="fa-solid fa-book-open fa-lg" style="color:#6d28d9"></i>
+                    <span class="small fw-semibold" style="color:#6d28d9">Bibliothèque</span>
                 </a>
-                <?php else: ?>
-                <a href="<?= BASE_URL ?>/examen"
-                   class="d-flex flex-column align-items-center gap-2 p-3 rounded-3 text-center
-                          text-decoration-none border bg-light">
-                    <i class="fa-solid fa-pen-to-square fa-lg" style="color:#20c997"></i>
-                    <span class="small fw-semibold" style="color:#20c997">Examens</span>
-                </a>
-                <?php endif; ?>
             </div>
         </div>
     </div>
