@@ -1,6 +1,6 @@
 # CONTEXT.md — app_fie
 > Fichier de référence pour toute nouvelle session IA sur ce projet.
-> **Mis à jour : 2026-08-18 (session 11)** | Branche active : `ak_app_ident`
+> **Mis à jour : 2026-08-18 (session 12)** | Branche active : `ak_app_ident`
 > PR active : https://github.com/NasserKailou/stateduc_mobile/pull/4
 
 ---
@@ -352,7 +352,8 @@ const CSRF = document.querySelector('input[name="<?= FIE_CSRF_TOKEN_NAME ?>"]')?
 
 | Piège | Cause | Guard |
 |-------|-------|-------|
-| `"There is no active transaction"` | `LOCK TABLES` dans `nextSequence()` commit implicite | `inTransaction()` dans Database.php ✅ |
+| `SQLSTATE[HY093]: Invalid parameter number` inscription | Placeholder PDO nommé réutilisé deux fois dans un même INSERT (`:created_by, :created_by`) | Renommé en `:created_by, :updated_by` dans EleveModel + InscriptionModel ✅ session 12 |
+| `"There is no active transaction"` | `LOCK TABLES` dans `nextSequence()` commit implicite | `inTransaction()` dans Database.php ✅ session 10 |
 | Cascades AJAX silencieuses | `getJSON` sans `r.ok` check | Ajouté session 11 ✅ |
 | Bouton sync bloqué "Synchronisation…" | `postJSON` sans `errCb` | Ajouté session 11 ✅ |
 | `r.json()` SyntaxError sur HTML | Pas de `r.ok` avant `.json()` | Ajouté sessions 10+11 ✅ |
@@ -360,7 +361,7 @@ const CSRF = document.querySelector('input[name="<?= FIE_CSRF_TOKEN_NAME ?>"]')?
 | CSRF invalide côté JS | `'csrf_token'` au lieu de `'_csrf_token'` | Corrigé session 10 ✅ |
 | Doublon check bouton muet | `errCb` absent dans `postJSON` | Corrigé session 10 ✅ |
 | Python3 absent sur XAMPP | `readExcelPythonFallback()` | Remplacé par `readExcelNative()` session 9 ✅ |
-| `array_keys(null)` TypeError | `MetaColumnNames()` retourne null (StatEduc conn) | Guard `if(!is_array())` dans frame*.class.php ✅ |
+| `array_keys(null)` TypeError | `MetaColumnNames()` retourne null (StatEduc conn) | Guard `if(!is_array())` dans frame*.class.php ✅ session 10 |
 
 ---
 
@@ -431,6 +432,11 @@ gh pr comment 4 --body "..."
 | `getJSON` sans `r.ok` — cascades silencieuses | `new.php` | `if (!r.ok) throw` avant `r.json()` |
 | `sync-annees` bouton bloqué sur erreur | `new.php` | 4e arg `errCb` + reset bouton + alert |
 
+### Session 12 — 1 bug corrigé (commit `ff58722`)
+| Bug | Fichier | Fix |
+|-----|---------|-----|
+| `SQLSTATE[HY093]: Invalid parameter number` — inscription bloquée | `EleveModel.php` + `InscriptionModel.php` | Placeholder `:created_by` utilisé deux fois dans VALUES → renommé `:created_by`/`:updated_by` |
+
 ---
 
 ## 15. Checklist état actuel (après session 11)
@@ -449,6 +455,7 @@ gh pr comment 4 --body "..."
 - [x] `frame.class.php` + `frame_mobile.class.php` — guard `MetaColumnNames()` null (fix session 10)
 - [x] `Database.php` — `inTransaction()` guard (fix session 10)
 - [x] JS `getJSON` + `postJSON` — `r.ok` guard + `errCb` (fix sessions 10+11)
+- [x] `EleveModel::create()` + `InscriptionModel::create()` — placeholders PDO uniques (fix session 12)
 
 ### ⏳ En attente de test manuel (nécessite XAMPP)
 - [ ] Exécuter migrations 003 + 005 sur `fie_burundi`
