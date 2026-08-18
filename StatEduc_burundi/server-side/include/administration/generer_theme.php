@@ -48,47 +48,28 @@ foreach ($all_systemes as $systeme){
 $form           =	new frame( $id_themes, $langues, $id_systemes, '', '' );
 if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) $form_mobile    =	new frame_mobile( $id_themes, $langues, $id_systemes, '', '' );
 
-// Pour chaque langue 
-
-
+// ── Génération de tous les thèmes ────────────────────────────────────────────
+// CORRECTION PHP8 : le bloc d'appel était commenté dans /* */ — restauré.
+// La classe frame() reçoit tous les id_themes/langues/id_systemes dans son
+// constructeur et generer_frame() boucle en interne sur les trois dimensions.
+// Un seul appel suffit — pas besoin de boucle foreach externe.
 //------------------------------------------
 
+try {
+	$form->generer_frame();
+	echo '<p style="color:green;font-weight:bold;margin:10px 0;">&#10003; Génération des frames terminée avec succès.</p>';
+} catch (Exception $e) {
+	echo '<p style="color:red;">Erreur lors de la génération : '.htmlspecialchars($e->getMessage()).'</p>';
+}
 
-/*
-// Traitement du theme ENV SOCIO ECO (type formulaire)
-$form->set_id_theme(20);
-$form->generer_frame();
-
-// Traitement du theme LOCAUX (type grille)
-$form->set_id_theme(40);
-$form->generer_frame();
-
-// Traitement du theme 2
-//$form->set_id_theme(180);
-//$form->generer_frame();
-
-// Traitement theme 3 (Matrice 2D)
-$form->set_id_theme(50);
-$form->generer_frame();
-
-
-// Traitement theme 4 (Matrice 1 dimension /1 ou plusieurs lignes)
-$form->set_id_theme(10);
-$form->generer_frame();
-
-// Traitement theme 4 (Matrice 1 dimension / 2 colonnes)
-$form->set_id_theme(70);
-$form->generer_frame();
-
-// Users
-$form->set_id_theme(2000);
-$form->generer_frame();
-// Bailleurs / Systeme
-$form->set_id_theme(3000);
-$form->generer_frame();
-
-
-*/
+if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG'] && isset($form_mobile)) {
+	try {
+		$form_mobile->generer_frame();
+		echo '<p style="color:green;">&#10003; Génération mobile terminée.</p>';
+	} catch (Exception $e) {
+		echo '<p style="color:orange;">[Mobile] Erreur : '.htmlspecialchars($e->getMessage()).'</p>';
+	}
+}
 
 //------------------------------------------
 
