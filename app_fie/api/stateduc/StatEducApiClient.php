@@ -98,17 +98,41 @@ class StatEducApiClient
     }
 
     /**
-     * Vérifie la connectivité avec l'API.
+     * Vérifie la connectivité avec le serveur StatEduc via un endpoint LÉGER
+     * (api/ping.php) qui répond sans bootstrap ADOdb / SQL Server.
+     *
+     * Pourquoi ne PAS utiliser getEtablissements() ici ?
+     *   → getEtablissements() déclenche la connexion SQL Server + ADOdb qui
+     *     peut prendre 5–30 s → timeout systématique à 30 s au niveau cURL.
+     *   → api/ping.php répond immédiatement (< 100 ms), sans aucune DB.
+     *
+     * @return bool  true si le serveur StatEduc est joignable
      */
     public function ping(): bool
     {
-        try {
-            $data = $this->getEtablissements(['per_page' => 1, 'page' => 1]);
-            $this->lastError = '';
-            return $data !== null;
-        } catch (Throwable $e) {
-            $this->lastError = $e->getMessage();
-            return false;
-        }
+        $url = $this->baseUrl . '/api/ping.php';
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,   // 10 s max — ce ping doit être rapide
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS      => 3,
+        ]);
+
+        $response  = curl_exec($ch);
+        $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError || $httpCode === 0) return false;
+        if ($httpCode !== 200) return false;
+
+        // Vérifier que la réponse JSON contient bien status=ok
+        $decoded = @json_decode((string)$response, true);
+        return is_array($decoded) && ($decoded['status'] ?? '') === 'ok';
     }
 }

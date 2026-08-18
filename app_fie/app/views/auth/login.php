@@ -10,12 +10,12 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-          crossorigin="anonymous">
+         crossorigin="anonymous">
     <!-- Font Awesome -->
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W=="
-          crossorigin="anonymous" referrerpolicy="no-referrer">
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          
+         crossorigin="anonymous" referrerpolicy="no-referrer">
     <!-- Charte FIE -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/fie.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/img/favicon.png" type="image/png">
@@ -132,7 +132,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmU1EspL3xfC8wMw1ECNEkOsEHGU"
-        crossorigin="anonymous"></script>
+       crossorigin="anonymous"></script>
 <script>
 (function() {
     var btn = document.getElementById('togglePwd');

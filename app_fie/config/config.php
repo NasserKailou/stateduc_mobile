@@ -62,7 +62,8 @@ if (!defined('STATEDUC_API_BASE_URL')) {
 // Token : sans token.php côté StatEduc_burundi, l'API est ouverte → token ignoré.
 // Si token.php existe dans StatEduc_burundi/api/fie/, mettre ici le même token.
 define('STATEDUC_API_TOKEN',     getenv('STATEDUC_API_TOKEN') ?: '');
-define('STATEDUC_API_TIMEOUT',   30);
+// FIX SESSION 5 : timeout augmenté 30→90 s — ADOdb+SQL Server bootstrap peut prendre 30-60 s
+define('STATEDUC_API_TIMEOUT',   90);
 define('STATEDUC_SYNC_PAGE_SIZE', 500);
 
 // ─── Chemins absolus ────────────────────────────────────────────────────────
