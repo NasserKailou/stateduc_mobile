@@ -115,7 +115,9 @@ class SyncService
 
     /**
      * Synchronise ref_type_annee depuis StatEduc TYPE_ANNEE.
-     * La dernière année (ordre max) est marquée actif=1, les autres actif=0.
+     * La dernière année (code_type_annee = année_debut max) est marquée actif=1.
+     * Schéma réel ref_type_annee : (code_type_annee, libelle, annee_debut, annee_fin, actif)
+     * PAS de colonne 'ordre' — tri par code_type_annee DESC.
      *
      * @param string|null $triggeredBy
      * @return array  ['total' => N, 'upserted' => N, 'errors' => N]
@@ -133,55 +135,68 @@ class SyncService
             $annees = $data['annees'];
             $summary['total'] = count($annees);
 
-            // Déterminer l'ordre max (= année courante)
-            $ordreMax = 0;
+            // Déterminer le code_type_annee max (= année la plus récente)
+            $codeMax = 0;
             foreach ($annees as $a) {
-                if ((int)$a['ordre'] > $ordreMax) $ordreMax = (int)$a['ordre'];
+                $c = (int)($a['code_type_annee'] ?? 0);
+                if ($c > $codeMax) $codeMax = $c;
             }
 
             $pdo = Database::getInstance();
 
             foreach ($annees as $annee) {
-                $code   = (int)($annee['code_type_annee'] ?? 0);
+                $code    = (int)($annee['code_type_annee'] ?? 0);
                 $libelle = trim($annee['libelle'] ?? '');
-                $ordre  = (int)($annee['ordre'] ?? 0);
                 if ($code <= 0 || $libelle === '') continue;
 
-                $actif = ($ordre === $ordreMax) ? 1 : 0;
+                // Extraire annee_debut / annee_fin depuis le libellé (ex: "2025-2026")
+                $anneeParts = explode('-', $libelle);
+                $anneeDebut = isset($anneeParts[0]) ? (int)trim($anneeParts[0]) : $code;
+                $anneeFinV  = isset($anneeParts[1]) ? (int)trim($anneeParts[1]) : $code + 1;
+
+                $actif = ($code === $codeMax) ? 1 : 0;
 
                 $stmt = $pdo->prepare("
-                    INSERT INTO ref_type_annee (code_type_annee, libelle, ordre, actif, synced_at)
-                    VALUES (:code, :libelle, :ordre, :actif, NOW())
+                    INSERT INTO ref_type_annee (code_type_annee, libelle, annee_debut, annee_fin, actif)
+                    VALUES (:code, :libelle, :debut, :fin, :actif)
                     ON DUPLICATE KEY UPDATE
-                        libelle   = VALUES(libelle),
-                        ordre     = VALUES(ordre),
-                        actif     = VALUES(actif),
-                        synced_at = NOW()
+                        libelle     = VALUES(libelle),
+                        annee_debut = VALUES(annee_debut),
+                        annee_fin   = VALUES(annee_fin),
+                        actif       = VALUES(actif)
                 ");
                 $stmt->execute([
                     ':code'    => $code,
                     ':libelle' => $libelle,
-                    ':ordre'   => $ordre,
+                    ':debut'   => $anneeDebut,
+                    ':fin'     => $anneeFinV,
                     ':actif'   => $actif,
                 ]);
                 $summary['upserted']++;
             }
 
-            // Log dans sync_type_annee_log
-            Database::query(
-                "INSERT INTO sync_type_annee_log (triggered_by, status, total, details, synced_at)
-                 VALUES (?, 'success', ?, NULL, NOW())",
-                [$triggeredBy, $summary['upserted']]
-            );
+            // Log dans sync_type_annee_log (table optionnelle — ignore si absente)
+            try {
+                Database::query(
+                    "INSERT INTO sync_type_annee_log (triggered_by, status, total, details, synced_at)
+                     VALUES (?, 'success', ?, NULL, NOW())",
+                    [$triggeredBy, $summary['upserted']]
+                );
+            } catch (Throwable $logEx) {
+                // Table sync_type_annee_log absente — non bloquant
+                $this->logger->warning('sync_type_annee_log absent : ' . $logEx->getMessage());
+            }
 
             $this->logger->info("Sync TYPE_ANNEE terminée : {$summary['upserted']} années upsertées.");
 
         } catch (Throwable $e) {
-            Database::query(
-                "INSERT INTO sync_type_annee_log (triggered_by, status, total, details, synced_at)
-                 VALUES (?, 'error', 0, ?, NOW())",
-                [$triggeredBy, $e->getMessage()]
-            );
+            try {
+                Database::query(
+                    "INSERT INTO sync_type_annee_log (triggered_by, status, total, details, synced_at)
+                     VALUES (?, 'error', 0, ?, NOW())",
+                    [$triggeredBy, $e->getMessage()]
+                );
+            } catch (Throwable $logEx2) { /* Table absente — non bloquant */ }
             $summary['errors']++;
             $this->logger->error("Sync TYPE_ANNEE échouée : " . $e->getMessage());
             throw $e;

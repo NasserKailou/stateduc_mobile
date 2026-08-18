@@ -63,7 +63,7 @@ class AdminController
         );
 
         $page_title  = 'Administration — FIE';
-        $active_menu = 'admin';
+        $active_menu = 'admin_home';
         require BASE_PATH . '/app/views/admin/index.php';
     }
 
@@ -88,7 +88,7 @@ class AdminController
         );
 
         $page_title  = 'Synchronisation — Administration FIE';
-        $active_menu = 'admin';
+        $active_menu = 'admin_sync';
         require BASE_PATH . '/app/views/admin/sync.php';
     }
 
@@ -144,7 +144,7 @@ class AdminController
     public function importExcelForm(): void
     {
         $page_title  = 'Import Excel — Administration FIE';
-        $active_menu = 'admin';
+        $active_menu = 'admin_import';
         require BASE_PATH . '/app/views/admin/import_excel.php';
     }
 
@@ -152,7 +152,8 @@ class AdminController
 
     public function processExcelImport(): void
     {
-        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+        // FIE_CSRF_TOKEN_NAME = '_csrf_token' — utiliser la constante, pas le nom brut
+        if (!SecurityHelper::verifyCsrf($_POST[FIE_CSRF_TOKEN_NAME] ?? '')) {
             $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
             header('Location: ' . BASE_URL . '/admin/import-excel');
             exit;
@@ -223,7 +224,7 @@ class AdminController
         );
 
         $page_title  = 'Utilisateurs — Administration FIE';
-        $active_menu = 'admin';
+        $active_menu = 'admin_users';
         require BASE_PATH . '/app/views/admin/users.php';
     }
 
@@ -249,7 +250,7 @@ class AdminController
         );
 
         $page_title  = "Journal d'audit — Administration FIE";
-        $active_menu = 'admin';
+        $active_menu = 'admin_audit';
         require BASE_PATH . '/app/views/admin/audit.php';
     }
 
@@ -269,7 +270,7 @@ class AdminController
         $errors  = [];
         $old     = [];
         $page_title  = 'Nouvel utilisateur — Admin FIE';
-        $active_menu = 'admin';
+        $active_menu = 'admin_user_form';
         require BASE_PATH . '/app/views/admin/user_form.php';
     }
 
@@ -295,7 +296,7 @@ class AdminController
             );
             $old     = $_POST;
             $page_title  = 'Nouvel utilisateur — Admin FIE';
-            $active_menu = 'admin';
+            $active_menu = 'admin_user_form';
             require BASE_PATH . '/app/views/admin/user_form.php';
             return;
         }
@@ -348,7 +349,7 @@ class AdminController
         $old     = $user; // pré-remplissage
         $editMode = true;
         $page_title  = 'Modifier utilisateur — Admin FIE';
-        $active_menu = 'admin';
+        $active_menu = 'admin_users';
         require BASE_PATH . '/app/views/admin/user_form.php';
     }
 
@@ -376,7 +377,7 @@ class AdminController
             $old = $_POST; $old['id'] = $id;
             $editMode = true;
             $page_title = 'Modifier utilisateur — Admin FIE';
-            $active_menu = 'admin';
+            $active_menu = 'admin_users';
             require BASE_PATH . '/app/views/admin/user_form.php';
             return;
         }

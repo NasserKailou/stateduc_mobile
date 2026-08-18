@@ -46,14 +46,14 @@ class InscriptionController
     {
         SecurityHelper::requireLogin();
 
-        // Toutes les années scolaires (pas seulement actif=1 — l'utilisateur
-        // doit pouvoir choisir parmi toutes les années disponibles)
+        // Toutes les années scolaires — ORDER BY code_type_annee DESC
+        // (ref_type_annee n'a PAS de colonne 'ordre' dans le schéma réel)
         $annees = Database::fetchAll(
             "SELECT code_type_annee, libelle, actif
              FROM ref_type_annee
-             ORDER BY ordre DESC"
+             ORDER BY code_type_annee DESC"
         );
-        // Année active par défaut (actif=1 = ordre le plus haut)
+        // Année active par défaut (actif=1)
         $anneeActive = null;
         foreach ($annees as $a) {
             if ($a['actif']) { $anneeActive = $a; break; }
