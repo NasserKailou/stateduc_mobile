@@ -41,11 +41,15 @@ class StatEducApiClient
         // (et non dans app_fie/api/stateduc/ qui est le proxy local)
         $url = $this->baseUrl . '/StatEduc_burundi/api/fie/etabs_fie_ws.php?' . http_build_query($queryParams);
 
+        // Garantir un timeout PHP cohérent avec cURL (évite max_execution_time 600s)
+        $effectiveTimeout = max(10, min($this->timeout, 60));
+        set_time_limit($effectiveTimeout + 15);
+
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => $this->timeout,
-            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT        => $effectiveTimeout,
+            CURLOPT_CONNECTTIMEOUT => 8,
             CURLOPT_HTTPHEADER     => [
                 'Authorization: Bearer ' . $this->token,
                 'Accept: application/json',
@@ -53,6 +57,7 @@ class StatEducApiClient
             ],
             CURLOPT_SSL_VERIFYPEER => !FIE_DEBUG, // Vérifier SSL en production
             CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS      => 3,
         ]);
 
         $response  = curl_exec($ch);
