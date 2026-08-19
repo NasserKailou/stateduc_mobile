@@ -494,6 +494,12 @@ class AdminController
     /** Génère le modèle XLSX avec listes déroulantes (PhpSpreadsheet requis) */
     private function downloadElevesTemplateXlsx(): void
     {
+        // Supprimer les notices Deprecated de la vieille version PhpSpreadsheet
+        // (ReturnTypeWillChange PHP8) — elles pollueraient le flux binaire XLSX
+        $prevErrorLevel = error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+        // Capturer tout output parasite (notices d'autres libs) avant les headers
+        ob_start();
+
         // Namespace résolu via autoloader : \PhpOffice\PhpSpreadsheet
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet       = $spreadsheet->getActiveSheet();
@@ -536,16 +542,22 @@ class AdminController
         }
 
         // ── 2. Ligne d'exemple ────────────────────────────────────────────
+        // Récupérer l'année active pour l'exemple
+        $anneeActive = Database::fetchOne(
+            "SELECT code_type_annee FROM ref_type_annee WHERE actif=1 ORDER BY code_type_annee DESC LIMIT 1"
+        );
+        $codeAnneeEx = $anneeActive['code_type_annee'] ?? date('Y');
+
         $exemple = [
-            'A' => 'NIYONZIMA',      'B' => 'Jean-Pierre',
-            'C' => 'M',               'D' => '2010-05-14',
-            'E' => 'Gitega',          'F' => 'Gitega',
-            'G' => 'BDI',             'H' => 'NIYONZIMA Gérard',
-            'I' => 'HAKIZIMANA Cécile','J' => '',
-            'K' => '+257 79 123 456', 'L' => '21422',
-            'M' => '1',               'N' => '1',
-            'O' => '2',               'P' => '1',
-            'Q' => 'CP1-A',           'R' => date('Y-m-d'),
+            'A' => 'NIYONZIMA',        'B' => 'Jean-Pierre',
+            'C' => 'M',                 'D' => '2010-05-14',
+            'E' => 'Gitega',            'F' => 'Gitega',
+            'G' => 'BDI',               'H' => 'NIYONZIMA Gérard',
+            'I' => 'HAKIZIMANA Cécile', 'J' => '',
+            'K' => '+257 79 123 456',   'L' => '21422',
+            'M' => (string)$codeAnneeEx,'N' => '2',
+            'O' => '4',                 'P' => '1',
+            'Q' => '1AF-A',             'R' => date('Y-m-d'),
         ];
         foreach ($exemple as $col => $val) {
             $sheet->setCellValue($col . '2', $val);
@@ -573,16 +585,25 @@ class AdminController
         // On crée les labels concaténés pour la validation directe
         $sexeLabels = '"Masculin,Féminin"';
 
-        // 3b. Nationalités
-        $nationalites = Database::fetchAll(
-            "SELECT code_type_nationalite, libelle FROM ref_type_nationalite ORDER BY libelle LIMIT 200"
-        ) ?: [];
+        // 3b. Nationalités — codes ISO 3166-1 alpha-3 (pas de table ref_type_nationalite)
+        // Liste des principaux pays africains + monde pour le contexte Burundi
+        $nationalites = [
+            ['BDI','Burundais(e)'],['COD','Congolais(e) RDC'],['RWA','Rwandais(e)'],
+            ['TZA','Tanzanien(ne)'],['UGA','Ougandais(e)'],['KEN','Kényan(e)'],
+            ['ETH','Éthiopien(ne)'],['BEL','Belge'],['FRA','Français(e)'],
+            ['USA','Américain(e)'],['GBR','Britannique'],['DEU','Allemand(e)'],
+            ['CHN','Chinois(e)'],['IND','Indien(ne)'],['ZAF','Sud-Africain(e)'],
+            ['MOZ','Mozambicain(e)'],['ZMB','Zambien(ne)'],['MWI','Malawien(ne)'],
+            ['CAF','Centrafricain(e)'],['CMR','Camerounais(e)'],['SSD','Sud-Soudanais(e)'],
+            ['AUT','Autrichien(ne)'],['ITA','Italien(ne)'],['NLD','Néerlandais(e)'],
+            ['XXX','Autre / Inconnu'],
+        ];
         $refSheet->setCellValue('C1', 'code_nat');
         $refSheet->setCellValue('D1', 'libelle_nat');
         $rowIdx = 2;
         foreach ($nationalites as $n) {
-            $refSheet->setCellValue('C' . $rowIdx, $n['code_type_nationalite']);
-            $refSheet->setCellValue('D' . $rowIdx, $n['libelle']);
+            $refSheet->setCellValue('C' . $rowIdx, $n[0]);
+            $refSheet->setCellValue('D' . $rowIdx, $n[1]);
             $rowIdx++;
         }
         $natLastRow = max(2, $rowIdx - 1);
@@ -601,9 +622,9 @@ class AdminController
         }
         $anneeLastRow = max(2, $rowIdx - 1);
 
-        // 3d. Secteurs enseignement
+        // 3d. Secteurs enseignement (table réelle : ref_secteur_ens, pas ref_type_secteur_ens)
         $secteurs = Database::fetchAll(
-            "SELECT code_type_secteur_ens, libelle FROM ref_type_secteur_ens ORDER BY libelle LIMIT 50"
+            "SELECT code_type_secteur_ens, libelle FROM ref_secteur_ens ORDER BY ordre, libelle LIMIT 50"
         ) ?: [];
         $refSheet->setCellValue('G1', 'code_secteur');
         $refSheet->setCellValue('H1', 'libelle_secteur');
@@ -762,7 +783,10 @@ class AdminController
         $mainSheet->freezePane('A2');
         $mainSheet->getRowDimension(1)->setRowHeight(20);
 
-        // ── 7. Téléchargement ─────────────────────────────────────────────
+        // ── 7. Téléchargement : vider output parasite PUIS envoyer headers ──
+        // Vider tout output parasite capturé avant d'envoyer les headers XLSX
+        ob_end_clean();
+
         $filename = 'modele_import_eleves_' . date('Y-m-d') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -772,6 +796,9 @@ class AdminController
 
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
+
+        // Restaurer le niveau d'erreur PHP
+        error_reporting($prevErrorLevel);
         exit;
     }
 

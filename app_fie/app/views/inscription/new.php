@@ -110,16 +110,24 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
                            placeholder="ex : Gitega">
                 </div>
                 <div class="col-md-4">
-                    <label for="province_naissance" class="form-label fw-semibold">Province de naissance</label>
-                    <select id="province_naissance" name="province_naissance" class="form-select">
-                        <option value="">— Sélectionner —</option>
-                        <?php foreach ($provinces as $p): ?>
-                        <option value="<?= SecurityHelper::e($p['libelle'] ?? $p['province'] ?? '') ?>"
-                            <?= (($old['province_naissance'] ?? '') === ($p['libelle'] ?? $p['province'] ?? '')) ? 'selected' : '' ?>>
-                            <?= SecurityHelper::e($p['libelle'] ?? $p['province'] ?? '') ?>
-                        </option>
+                    <label for="province_naissance" class="form-label fw-semibold">Province / Région de naissance</label>
+                    <!-- Champ texte libre avec suggestions (datalist) pour permettre
+                         les naissances hors Burundi (autre pays, autre région) -->
+                    <input type="text" id="province_naissance" name="province_naissance"
+                           list="list_provinces_naiss"
+                           class="form-control"
+                           maxlength="150"
+                           value="<?= SecurityHelper::e($old['province_naissance'] ?? '') ?>"
+                           placeholder="ex : Gitega, Bujumbura, Kigali, Paris...">
+                    <datalist id="list_provinces_naiss">
+                        <?php foreach ($provinces as $p):
+                            $prov = $p['libelle'] ?? $p['province'] ?? ''; ?>
+                        <option value="<?= SecurityHelper::e($prov) ?>">
                         <?php endforeach; ?>
-                    </select>
+                    </datalist>
+                    <div class="form-text text-muted" style="font-size:.78rem;">
+                        Saisissez ou sélectionnez — peut être hors Burundi
+                    </div>
                 </div>
 
                 <!-- ── Nationalité (depuis ref_type_nationalite) ── -->

@@ -47,73 +47,81 @@ foreach ($all_systemes as $systeme){
 	$id_systemes[]	=	$systeme[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT']];
 }
 
-// ── FIX S17 : Synchroniser $_SESSION['langue'] avec la valeur réelle de DICO_TYPE_THEME ──
-// frame::generer_frame() (ligne 10543) filtre DICO_TYPE_THEME par CODE_LANGUE = $_SESSION['langue'].
-// Si la table ne contient que 'fr' mais que $_SESSION['langue'] = 'eng' (lu depuis DICO_LANGUE),
-// aucune ligne n'est retournée → $type_frame vide → switch default → "Attention! Dico" → pas de fichier.
-// Solution : interroger DICO_TYPE_THEME pour connaître le CODE_LANGUE effectivement présent.
-$_lang_dico_row = $GLOBALS['conn_dico']->GetRow(
-    "SELECT DISTINCT CODE_LANGUE FROM DICO_TYPE_THEME LIMIT 1"
+// ── FIX S17b : Synchroniser $_SESSION['langue'] avec DICO_TYPE_THEME ──────────────────────────
+// frame::generer_frame() ligne 10543 filtre DICO_TYPE_THEME par CODE_LANGUE = $_SESSION['langue'].
+// La table DICO_TYPE_THEME peut avoir des langues différentes de DICO_LANGUE.
+// On découvre toutes les langues présentes dans DICO_TYPE_THEME et on force $langues en conséquence.
+
+// Étape 1 : Toutes les langues disponibles dans DICO_TYPE_THEME
+$_langs_in_dico_type = $GLOBALS['conn_dico']->GetAll(
+    "SELECT DISTINCT CODE_LANGUE FROM DICO_TYPE_THEME ORDER BY CODE_LANGUE"
 );
-if (!empty($_lang_dico_row) && !empty($_lang_dico_row['CODE_LANGUE'])) {
-    // Utiliser la langue trouvée dans le dictionnaire de thèmes
-    $_SESSION['langue'] = $_lang_dico_row['CODE_LANGUE'];
-    // Synchroniser aussi le tableau $langues pour que frame boucle sur la bonne langue
-    if (!in_array($_lang_dico_row['CODE_LANGUE'], $langues)) {
-        // Ajouter la langue réelle si elle n'est pas dans la liste DICO_LANGUE
-        array_unshift($langues, $_lang_dico_row['CODE_LANGUE']);
+
+if (!empty($_langs_in_dico_type) && is_array($_langs_in_dico_type)) {
+    // Reconstruire $langues en ne gardant QUE les langues réellement présentes dans DICO_TYPE_THEME
+    $langues_in_dtt = array_column($_langs_in_dico_type, 'CODE_LANGUE');
+
+    // Si $langues (de DICO_LANGUE) a une intersection avec $langues_in_dtt → utiliser l'intersection
+    $intersection = array_intersect($langues, $langues_in_dtt);
+    if (!empty($intersection)) {
+        // Il y a des langues communes → garder seulement celles-là
+        $langues = array_values($intersection);
+    } else {
+        // Pas d'intersection → forcer avec ce qui existe dans DICO_TYPE_THEME
+        $langues = $langues_in_dtt;
     }
-} elseif (!isset($_SESSION['langue']) || $_SESSION['langue'] === '') {
-    // Fallback : première langue de DICO_LANGUE ou 'fr'
-    $_SESSION['langue'] = !empty($langues) ? $langues[0] : 'fr';
+    // Synchroniser la session avec la première langue valide
+    $_SESSION['langue'] = $langues[0];
+
+    // DEBUG : afficher les langues trouvées (à retirer une fois stabilisé)
+    echo '<p style="color:#1a56db;font-size:.85rem;">🔍 FIX gentheme — DICO_TYPE_THEME CODE_LANGUE : <strong>'
+         . htmlspecialchars(implode(', ', $langues_in_dtt))
+         . '</strong> | Langue active session : <strong>'
+         . htmlspecialchars($_SESSION['langue'])
+         . '</strong></p>';
+    flush();
+    unset($langues_in_dtt, $intersection);
+} else {
+    // DICO_TYPE_THEME vide ou inaccessible → fallback
+    if (!isset($_SESSION['langue']) || $_SESSION['langue'] === '') {
+        $_SESSION['langue'] = !empty($langues) ? $langues[0] : 'fr';
+    }
+    echo '<p style="color:#CE1126;">⚠️ DICO_TYPE_THEME : aucune langue trouvée. Utilisation de : '
+         . htmlspecialchars($_SESSION['langue']) . '</p>';
+    flush();
 }
-unset($_lang_dico_row);
+unset($_langs_in_dico_type);
 
-$form           =	new frame( $id_themes, $langues, $id_systemes, '', '' );
-if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) $form_mobile    =	new frame_mobile( $id_themes, $langues, $id_systemes, '', '' );
+// Étape 2 : Vérification que DICO_TYPE_THEME contient bien des libellés reconnus
+// (Formulaire, Grille, Matrice, etc.) pour la langue sélectionnée
+$_check_types = $GLOBALS['conn_dico']->GetAll(
+    "SELECT DISTINCT LIBELLE FROM DICO_TYPE_THEME WHERE CODE_LANGUE='" . $_SESSION['langue'] . "' ORDER BY LIBELLE"
+);
+if (!empty($_check_types) && is_array($_check_types)) {
+    $_libelles = array_column($_check_types, 'LIBELLE');
+    echo '<p style="color:#1a56db;font-size:.85rem;">🔍 Types de frames disponibles : <strong>'
+         . htmlspecialchars(implode(', ', $_libelles)) . '</strong></p>';
+    flush();
+    unset($_libelles);
+} else {
+    echo '<p style="color:#CE1126;">⚠️ DICO_TYPE_THEME : aucun libellé pour CODE_LANGUE=\''
+         . htmlspecialchars($_SESSION['langue']) . '\'</p>';
+    flush();
+}
+unset($_check_types);
 
-// Pour chaque langue 
-
+// Étape 3 : Instanciation frame — le constructeur appelle generer_frame() automatiquement
+// (voir frame.class.php ligne 97 : $this->generer_frame($code_annee, $code_etablissement))
+// Pas besoin d'appeler generer_frame() manuellement ensuite.
+$form = new frame( $id_themes, $langues, $id_systemes, '', '' );
+if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) {
+    $form_mobile = new frame_mobile( $id_themes, $langues, $id_systemes, '', '' );
+}
 
 //------------------------------------------
-
-
-/*
-// Traitement du theme ENV SOCIO ECO (type formulaire)
-$form->set_id_theme(20);
-$form->generer_frame();
-
-// Traitement du theme LOCAUX (type grille)
-$form->set_id_theme(40);
-$form->generer_frame();
-
-// Traitement du theme 2
-//$form->set_id_theme(180);
-//$form->generer_frame();
-
-// Traitement theme 3 (Matrice 2D)
-$form->set_id_theme(50);
-$form->generer_frame();
-
-
-// Traitement theme 4 (Matrice 1 dimension /1 ou plusieurs lignes)
-$form->set_id_theme(10);
-$form->generer_frame();
-
-// Traitement theme 4 (Matrice 1 dimension / 2 colonnes)
-$form->set_id_theme(70);
-$form->generer_frame();
-
-// Users
-$form->set_id_theme(2000);
-$form->generer_frame();
-// Bailleurs / Systeme
-$form->set_id_theme(3000);
-$form->generer_frame();
-
-
-*/
-
+// NOTE : Le bloc set_id_theme/generer_frame() ci-dessous était
+// une ancienne méthode thème par thème, maintenant inutile car
+// le constructeur frame() appelle generer_frame() pour TOUS les thèmes.
 //------------------------------------------
 
 ?>
