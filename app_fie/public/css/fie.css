@@ -1,24 +1,24 @@
 /*
  * FIE — Fichier Informatisé des Élèves
  * Feuille de style de marque (complément à Bootstrap 5)
- * Charte chromatique FIE : #007bff / #17a2b8 (bleu ciel), #FFFFFF (blanc), #1EB53A (vert)
+ * Charte chromatique FIE : Rouge #CE1126 · Blanc #FFFFFF · Vert #1EB53A (drapeau Burundi)
  *
- * PHASE 3 — Refonte charte graphique : rouge → bleu ciel
+ * PHASE 4 — Correction charte graphique : rouge Burundi réel (#CE1126)
  * Ce fichier ne remplace PAS Bootstrap — il surcharge et complète.
  * Toutes les classes Bootstrap sont utilisables dans les vues.
  */
 
 /* ═══════════════════════════════════════════════════════════════
-   1. VARIABLES CSS — Charte FIE Bleu Ciel
+   1. VARIABLES CSS — Charte FIE Rouge Burundi
    ═══════════════════════════════════════════════════════════════ */
 :root {
-    /* Couleurs primaires FIE (bleu ciel) */
-    --fie-red:          #007bff;   /* renommé mais gardé pour compat compat */
-    --fie-red-dark:     #0056b3;
-    --fie-red-light:    #cce5ff;
-    --fie-primary:      #007bff;
-    --fie-primary-dark: #0056b3;
-    --fie-primary-light:#cce5ff;
+    /* Couleurs primaires FIE — Drapeau Burundi : Rouge · Blanc · Vert */
+    --fie-red:          #CE1126;   /* Rouge Burundi officiel */
+    --fie-red-dark:     #a00e1b;
+    --fie-red-light:    #fce8ea;
+    --fie-primary:      #CE1126;
+    --fie-primary-dark: #a00e1b;
+    --fie-primary-light:#fce8ea;
     --fie-accent:       #17a2b8;
     --fie-accent-dark:  #117a8b;
     --fie-accent-light: #d1ecf1;
@@ -28,12 +28,12 @@
     --fie-white:        #FFFFFF;
 
     /* Surcharge Bootstrap pour cohérence */
-    --bs-primary:       #007bff;
-    --bs-primary-rgb:   0,123,255;
+    --bs-primary:       #CE1126;
+    --bs-primary-rgb:   206,17,38;
     --bs-success:       #1EB53A;
     --bs-success-rgb:   30,181,58;
-    --bs-link-color:    #007bff;
-    --bs-link-hover-color: #0056b3;
+    --bs-link-color:    #CE1126;
+    --bs-link-hover-color: #a00e1b;
 
     /* Typographie — Poppins pour titres, Open Sans pour corps */
     --fie-font-title:   'Poppins', 'Segoe UI', system-ui, Arial, sans-serif;
@@ -156,8 +156,8 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
     --bs-btn-border-color:  var(--fie-primary);
     --bs-btn-hover-bg:      var(--fie-primary-dark);
     --bs-btn-hover-border-color: var(--fie-primary-dark);
-    --bs-btn-active-bg:     #003d80;
-    --bs-btn-focus-shadow-rgb: 0,123,255;
+    --bs-btn-active-bg:     #7a0a13;
+    --bs-btn-focus-shadow-rgb: 206,17,38;
 }
 .btn-outline-primary {
     --bs-btn-color:         var(--fie-primary);
@@ -165,7 +165,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
     --bs-btn-hover-bg:      var(--fie-primary);
     --bs-btn-hover-border-color: var(--fie-primary);
     --bs-btn-active-bg:     var(--fie-primary-dark);
-    --bs-btn-focus-shadow-rgb: 0,123,255;
+    --bs-btn-focus-shadow-rgb: 206,17,38;
 }
 .btn-success {
     --bs-btn-bg:            var(--fie-green);
@@ -210,7 +210,7 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
    ═══════════════════════════════════════════════════════════════ */
 .form-control:focus, .form-select:focus {
     border-color: var(--fie-primary);
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.15);
+    box-shadow: 0 0 0 0.2rem rgba(206,17,38,.15);
 }
 .fie-fieldset-title {
     font-size: 0.78rem; font-weight: 700; text-transform: uppercase;

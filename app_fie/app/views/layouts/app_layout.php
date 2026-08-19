@@ -63,7 +63,9 @@ $_am       = $active_menu ?? '';
       </ul>
 
       <a href="<?= BASE_URL ?>/tableau-de-bord" class="navbar-brand ms-2 fw-bold text-white text-decoration-none d-flex align-items-center gap-2">
-        <span style="font-size:1.4rem;" aria-hidden="true">🇧🇮</span>
+        <img src="<?= BASE_URL ?>/public/images/armoiries_burundi.gif"
+             alt="Armoiries du Burundi"
+             style="height:28px;width:auto;" aria-hidden="true">
         <span class="d-none d-sm-inline" style="font-family:'Source Sans 3',sans-serif;font-weight:700;font-size:1.15rem;">FIE</span>
         <span class="d-none d-md-inline opacity-75 fw-normal" style="font-size:.85rem;">| Burundi · SIGE</span>
       </a>
@@ -135,9 +137,11 @@ $_am       = $active_menu ?? '';
     <!-- En-tête sidebar -->
     <div class="sidebar-brand px-3 py-3 d-flex align-items-center gap-2"
          style="border-bottom:1px solid rgba(255,255,255,.08);min-height:56px;">
-      <div style="width:36px;height:36px;background:var(--fie-primary);border-radius:10px;
-                  display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <i class="fa-solid fa-graduation-cap text-white" style="font-size:.9rem;"></i>
+      <div style="width:36px;height:36px;border-radius:10px;overflow:hidden;flex-shrink:0;
+                  display:flex;align-items:center;justify-content:center;background:#fff;">
+        <img src="<?= BASE_URL ?>/public/images/armoiries_burundi.gif"
+             alt="Armoiries du Burundi"
+             style="width:34px;height:auto;display:block;">
       </div>
       <div>
         <div class="text-white fw-bold" style="font-size:.9rem;line-height:1.2;">FIE Burundi</div>

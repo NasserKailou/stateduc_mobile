@@ -81,23 +81,60 @@ class DashboardController
              WHERE i.statut = 'inscrit' GROUP BY e.sexe ORDER BY e.sexe"
         ), []) ?: [];
 
-        // ── Répartition par province (top 10) ─────────────────────────────────
+        // ── Répartition par province (top 18) ─────────────────────────────────
         $byProvince = $safe(fn() => Database::fetchAll(
             "SELECT em.province, COUNT(DISTINCT e.id) as nb
              FROM inscriptions i
              JOIN eleves e ON e.id = i.eleve_id
              JOIN etablissements_miroir em ON em.code_etablissement = i.code_etablissement
-             WHERE i.statut = 'inscrit'
-             GROUP BY em.province ORDER BY nb DESC LIMIT 10"
+             WHERE i.statut = 'inscrit' AND em.province IS NOT NULL AND em.province <> ''
+             GROUP BY em.province ORDER BY nb DESC LIMIT 18"
         ), []) ?: [];
 
-        // ── Dernières inscriptions (10 dernières) ─────────────────────────────
+        // ── Dernières inscriptions (15 dernières) ─────────────────────────────
         $lastInscrits = $safe(fn() => Database::fetchAll(
-            "SELECT e.nom, e.prenom, e.iue, i.code_etablissement, i.created_at
+            "SELECT e.nom, e.prenoms, e.iue, e.sexe, i.code_etablissement,
+                    em.nom_etablissement, em.province, i.created_at
              FROM inscriptions i
              JOIN eleves e ON e.id = i.eleve_id
+             LEFT JOIN etablissements_miroir em ON em.code_etablissement = i.code_etablissement
              WHERE i.statut = 'inscrit'
-             ORDER BY i.created_at DESC LIMIT 10"
+             ORDER BY i.created_at DESC LIMIT 15"
+        ), []) ?: [];
+
+        // ── Évolution des inscriptions par mois (12 derniers mois) ────────────
+        $byMois = $safe(fn() => Database::fetchAll(
+            "SELECT DATE_FORMAT(created_at, '%Y-%m') AS mois,
+                    COUNT(*) AS nb
+             FROM inscriptions
+             WHERE statut = 'inscrit'
+               AND created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+             GROUP BY mois ORDER BY mois ASC"
+        ), []) ?: [];
+
+        // ── Répartition par niveau d'enseignement ─────────────────────────────
+        $byNiveau = $safe(fn() => Database::fetchAll(
+            "SELECT i.code_type_niveau, COUNT(*) as nb
+             FROM inscriptions i
+             WHERE i.statut = 'inscrit' AND i.code_type_niveau IS NOT NULL
+             GROUP BY i.code_type_niveau ORDER BY nb DESC LIMIT 12"
+        ), []) ?: [];
+
+        // ── Répartition par nationalité ────────────────────────────────────────
+        $byNationalite = $safe(fn() => Database::fetchAll(
+            "SELECT COALESCE(e.nationalite, 'Non renseignée') as nationalite, COUNT(*) as nb
+             FROM eleves e
+             GROUP BY e.nationalite ORDER BY nb DESC LIMIT 8"
+        ), []) ?: [];
+
+        // ── Top 10 établissements ──────────────────────────────────────────────
+        $topEtabs = $safe(fn() => Database::fetchAll(
+            "SELECT em.nom_etablissement, em.province, COUNT(DISTINCT e.id) as nb
+             FROM inscriptions i
+             JOIN eleves e ON e.id = i.eleve_id
+             JOIN etablissements_miroir em ON em.code_etablissement = i.code_etablissement
+             WHERE i.statut = 'inscrit'
+             GROUP BY i.code_etablissement ORDER BY nb DESC LIMIT 10"
         ), []) ?: [];
 
         $page_title     = 'Tableau de bord — FIE';

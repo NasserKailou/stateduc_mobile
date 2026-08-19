@@ -18,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Le Fichier Informatisé des Élèves (FIE) attribue un Identifiant Unique (IUE) à chaque apprenant du système éducatif burundais. Géré par la DGESS / MENERS — SIGE Burundi.">
     <meta name="keywords" content="FIE, Burundi, éducation, SIGE, IUE, DGESS, MENERS, élèves, immatriculation">
-    <meta name="theme-color" content="#1a56db">
+    <meta name="theme-color" content="#CE1126">
     <meta property="og:title" content="FIE Burundi — Fichier Informatisé des Élèves">
     <meta property="og:description" content="Système national d'immatriculation des élèves du Burundi — DGESS / MENERS.">
     <meta property="og:type" content="website">
@@ -56,13 +56,13 @@
          Violet #7c3aed      → Accent CTA, mouvements, transferts
        ══════════════════════════════════════════════════════════════════════════ */
     :root {
-        /* ── Bleu primaire FIE ── */
-        --bi-red:        #1a56db;   /* Renommé pour compatibilité — c'est le bleu primaire */
-        --bi-red-d:      #1343a8;
-        --bi-red-l:      #eff6ff;
-        --bi-red-m:      #bfdbfe;
+        /* ── Rouge Burundi (drapeau : Rouge · Blanc · Vert) ── */
+        --bi-red:        #CE1126;   /* Rouge Burundi officiel */
+        --bi-red-d:      #a00e1b;
+        --bi-red-l:      #fce8ea;
+        --bi-red-m:      #f5a8b0;
 
-        /* ── Palette étendue ── */
+        /* ── Palette étendue (bleu institutionnel conservé séparément) ── */
         --bi-blue:       #1a56db;
         --bi-blue-d:     #1343a8;
         --bi-blue-l:     #eff6ff;
@@ -203,7 +203,7 @@
     }
 
     #mainNav.scrolled {
-        box-shadow: 0 4px 20px rgba(26,86,219,.35);
+        box-shadow: 0 4px 20px rgba(206,17,38,.35);
         padding-top: .5rem;
         padding-bottom: .5rem;
     }

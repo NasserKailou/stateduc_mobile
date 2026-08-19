@@ -255,19 +255,133 @@ class InscriptionController
     public function search(): void
     {
         SecurityHelper::requireLogin();
+
+        $role     = SecurityHelper::userRole() ?? '';
+        $isAdmin  = in_array($role, ['super_admin', 'admin_central'], true);
+        $isDir    = $role === 'directeur_ecole';
+        $isEnseig = $role === 'enseignant';
+
+        // ── Critères de recherche ──────────────────────────────────────────
         $criteria = [
-            'nom'            => SecurityHelper::sanitizeStr($_GET['nom']            ?? ''),
-            'prenoms'        => SecurityHelper::sanitizeStr($_GET['prenoms']        ?? ''),
-            'date_naissance' => $_GET['date_naissance'] ?? '',
-            'iue'            => SecurityHelper::sanitizeStr($_GET['iue']            ?? ''),
-            'sexe'           => in_array($_GET['sexe'] ?? '', ['M','F']) ? $_GET['sexe'] : '',
+            'q'          => SecurityHelper::sanitizeStr($_GET['q']          ?? ''),
+            'nom'        => SecurityHelper::sanitizeStr($_GET['nom']        ?? ''),
+            'iue'        => SecurityHelper::sanitizeStr($_GET['iue']        ?? ''),
+            'province'   => SecurityHelper::sanitizeStr($_GET['province']   ?? ''),
+            'commune'    => SecurityHelper::sanitizeStr($_GET['commune']    ?? ''),
+            'colline'    => SecurityHelper::sanitizeStr($_GET['colline']    ?? ''),
+            'ecole'      => SecurityHelper::sanitizeStr($_GET['ecole']      ?? ''),
+            'sexe'       => in_array($_GET['sexe'] ?? '', ['M','F','']) ? ($_GET['sexe'] ?? '') : '',
+            'annee'      => (int)($_GET['annee'] ?? 0),
         ];
+
         $page    = max(1, (int)($_GET['page'] ?? 1));
-        $results = null;
-        if (array_filter($criteria)) {
-            $results = EleveModel::search(array_filter($criteria), $page);
+        $perPage = 25;
+
+        // ── Restriction par rôle ───────────────────────────────────────────
+        // Directeur/Enseignant ne voient que leur établissement
+        $codeEtabRestrict = null;
+        if ($isDir || $isEnseig) {
+            $codeEtabRestrict = $_SESSION['fie_user']['code_etablissement'] ?? null;
         }
-        $page_title  = 'Recherche élève — FIE';
+
+        // ── Requête élèves ────────────────────────────────────────────────
+        $safe = static function (callable $fn, mixed $default = null): mixed {
+            try { return $fn(); } catch (\Throwable $e) { return $default; }
+        };
+
+        // Construction SQL dynamique
+        $join    = "LEFT JOIN inscriptions i ON i.eleve_id = e.id AND i.statut='inscrit'
+                    LEFT JOIN etablissements_miroir em ON em.code_etablissement = i.code_etablissement";
+        $where   = ['1=1'];
+        $params  = [];
+
+        // ── Filtre q (nom/prénom/IUE)
+        if (!empty($criteria['q'])) {
+            $q = '%' . $criteria['q'] . '%';
+            $where[] = "(e.nom LIKE ? OR e.prenoms LIKE ? OR e.iue LIKE ?)";
+            $params  = array_merge($params, [$q, $q, $q]);
+        }
+        if (!empty($criteria['nom'])) {
+            $where[] = "e.nom LIKE ?";
+            $params[] = '%' . $criteria['nom'] . '%';
+        }
+        if (!empty($criteria['iue'])) {
+            $where[] = "e.iue LIKE ?";
+            $params[] = '%' . $criteria['iue'] . '%';
+        }
+        if (!empty($criteria['province'])) {
+            $where[] = "em.province = ?";
+            $params[] = $criteria['province'];
+        }
+        if (!empty($criteria['commune'])) {
+            $where[] = "(em.commune = ? OR i.code_commune = ?)";
+            $params[] = $criteria['commune'];
+            $params[] = $criteria['commune'];
+        }
+        if (!empty($criteria['colline'])) {
+            $where[] = "(em.colline = ? OR i.code_colline LIKE ?)";
+            $params[] = $criteria['colline'];
+            $params[] = '%' . $criteria['colline'] . '%';
+        }
+        if (!empty($criteria['ecole'])) {
+            $where[] = "(em.nom_etablissement LIKE ? OR i.code_etablissement = ?)";
+            $params[] = '%' . $criteria['ecole'] . '%';
+            $params[] = $criteria['ecole'];
+        }
+        if (!empty($criteria['sexe'])) {
+            $where[] = "e.sexe = ?";
+            $params[] = $criteria['sexe'];
+        }
+        if (!empty($criteria['annee'])) {
+            $where[] = "i.code_type_annee = ?";
+            $params[] = $criteria['annee'];
+        }
+        if ($codeEtabRestrict) {
+            $where[] = "i.code_etablissement = ?";
+            $params[] = $codeEtabRestrict;
+        }
+
+        $whereSql = implode(' AND ', $where);
+        $offset   = ($page - 1) * $perPage;
+
+        $total = (int)$safe(fn() => Database::fetchScalar(
+            "SELECT COUNT(DISTINCT e.id) FROM eleves e $join WHERE $whereSql", $params
+        ), 0);
+        $pages = max(1, (int)ceil($total / $perPage));
+        if ($page > $pages) $page = $pages;
+        $offset = ($page - 1) * $perPage;
+
+        $results = $safe(fn() => Database::fetchAll(
+            "SELECT DISTINCT e.id, e.iue, e.nom, e.prenoms, e.sexe, e.date_naissance,
+                    e.statut, e.doublon_suspect,
+                    em.nom_etablissement AS dernier_etablissement,
+                    em.province, em.commune,
+                    i.code_type_annee AS derniere_annee
+             FROM eleves e $join
+             WHERE $whereSql
+             ORDER BY e.nom, e.prenoms
+             LIMIT $perPage OFFSET $offset",
+            $params
+        ), []) ?: [];
+
+        // ── Listes pour les filtres ───────────────────────────────────────
+        $provinces = $safe(fn() => Database::fetchAll(
+            "SELECT DISTINCT province FROM etablissements_miroir WHERE province IS NOT NULL AND province<>'' ORDER BY province"
+        ), []) ?: [];
+
+        $annees = $safe(fn() => Database::fetchAll(
+            "SELECT code_type_annee, libelle FROM ref_type_annee ORDER BY code_type_annee DESC"
+        ), []) ?: [];
+
+        $communes = [];
+        if (!empty($criteria['province'])) {
+            $communes = $safe(fn() => Database::fetchAll(
+                "SELECT DISTINCT commune FROM etablissements_miroir WHERE province=? AND commune IS NOT NULL AND commune<>'' ORDER BY commune",
+                [$criteria['province']]
+            ), []) ?: [];
+        }
+
+        $page_title  = 'Liste des élèves inscrits — FIE';
         $active_menu = 'recherche';
         $csrf        = SecurityHelper::getCsrfToken();
         require FIE_VIEWS_PATH . 'inscription/search.php';

@@ -347,4 +347,301 @@ $pctCouverture = ($totalEtabs > 0) ? min(100, round($totalInscrits / max($totalE
     </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════════
+     SECTION ANALYTIQUE AVANCÉE
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── Évolution mensuelle des inscriptions ──────────────────────────── -->
+<?php if (!empty($byMois)): ?>
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom fw-semibold">
+                <i class="fa-solid fa-chart-line me-2" style="color:var(--fie-primary)"></i>
+                Évolution des inscriptions — 12 derniers mois
+            </div>
+            <div class="card-body">
+                <canvas id="chartMois" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- ── Répartition province + Top établissements ─────────────────────── -->
+<div class="row g-4 mb-4">
+
+    <!-- Donut / bar par province -->
+    <?php if (!empty($byProvince)): ?>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom fw-semibold">
+                <i class="fa-solid fa-map-location-dot me-2" style="color:var(--fie-primary)"></i>
+                Élèves par province (Top <?= count($byProvince) ?>)
+            </div>
+            <div class="card-body" style="max-height:360px;overflow-y:auto;">
+                <?php
+                $totalProv = array_sum(array_column($byProvince, 'nb'));
+                $provColors = ['#CE1126','#1EB53A','#1d4ed8','#17a2b8','#fd7e14','#6d28d9',
+                               '#e83e8c','#0f766e','#92400e','#b45309','#374151','#0891b2',
+                               '#7c3aed','#dc2626','#16a34a','#2563eb','#d97706','#0e7490'];
+                $ci = 0;
+                foreach ($byProvince as $row):
+                    $pct = $totalProv > 0 ? round($row['nb'] / $totalProv * 100, 1) : 0;
+                    $color = $provColors[$ci % count($provColors)]; $ci++;
+                ?>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-semibold"><?= SecurityHelper::e($row['province']) ?></span>
+                        <span class="small text-muted"><?= number_format($row['nb']) ?> — <strong><?= $pct ?>%</strong></span>
+                    </div>
+                    <div class="progress" style="height:7px;border-radius:4px">
+                        <div class="progress-bar" role="progressbar"
+                             style="width:<?= $pct ?>%;background:<?= $color ?>"
+                             aria-valuenow="<?= $pct ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Top 10 établissements -->
+    <?php if (!empty($topEtabs)): ?>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom fw-semibold">
+                <i class="fa-solid fa-school me-2" style="color:var(--fie-green)"></i>
+                Top 10 établissements
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="font-size:.82rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3" style="width:30px">#</th>
+                                <th>Établissement</th>
+                                <th>Province</th>
+                                <th class="text-end pe-3">Élèves</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($topEtabs as $rank => $etab): ?>
+                        <tr>
+                            <td class="ps-3 text-muted fw-semibold"><?= $rank + 1 ?></td>
+                            <td><?= SecurityHelper::e($etab['nom_etablissement'] ?? '—') ?></td>
+                            <td class="text-muted small"><?= SecurityHelper::e($etab['province'] ?? '—') ?></td>
+                            <td class="text-end pe-3 fw-semibold" style="color:var(--fie-primary)"><?= number_format($etab['nb']) ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+</div>
+
+<!-- ── Nationalités + Niveaux d'enseignement ─────────────────────────── -->
+<div class="row g-4 mb-4">
+
+    <!-- Nationalités -->
+    <?php if (!empty($byNationalite)): ?>
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom fw-semibold">
+                <i class="fa-solid fa-globe me-2" style="color:#17a2b8"></i>
+                Répartition par nationalité
+            </div>
+            <div class="card-body">
+                <canvas id="chartNationalite" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Niveaux d'enseignement -->
+    <?php if (!empty($byNiveau)): ?>
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom fw-semibold">
+                <i class="fa-solid fa-graduation-cap me-2" style="color:#6d28d9"></i>
+                Inscriptions par niveau d'enseignement
+            </div>
+            <div class="card-body">
+                <?php
+                $totalNiv = array_sum(array_column($byNiveau, 'nb'));
+                $nivColors = ['#CE1126','#1EB53A','#1d4ed8','#17a2b8','#fd7e14','#6d28d9',
+                              '#e83e8c','#0f766e','#92400e','#b45309','#374151','#0891b2'];
+                $ci = 0;
+                foreach ($byNiveau as $row):
+                    $pct = $totalNiv > 0 ? round($row['nb'] / $totalNiv * 100, 1) : 0;
+                    $color = $nivColors[$ci % count($nivColors)]; $ci++;
+                ?>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-semibold">Niveau <?= SecurityHelper::e($row['code_type_niveau']) ?></span>
+                        <span class="small text-muted"><?= number_format($row['nb']) ?> — <strong><?= $pct ?>%</strong></span>
+                    </div>
+                    <div class="progress" style="height:8px;border-radius:4px">
+                        <div class="progress-bar" style="width:<?= $pct ?>%;background:<?= $color ?>"></div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+</div>
+
+<!-- ── Dernières inscriptions ────────────────────────────────────────── -->
+<?php if (!empty($lastInscrits)): ?>
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom fw-semibold d-flex align-items-center justify-content-between">
+        <span>
+            <i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--fie-primary)"></i>
+            Dernières inscriptions enregistrées
+        </span>
+        <a href="<?= BASE_URL ?>/inscription/recherche" class="btn btn-sm btn-outline-primary">
+            <i class="fa-solid fa-list me-1"></i>Voir toutes
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle" style="font-size:.85rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">IUE</th>
+                        <th>Nom</th>
+                        <th>Prénom(s)</th>
+                        <th class="text-center">Sexe</th>
+                        <th>Établissement</th>
+                        <th>Province</th>
+                        <th>Date inscription</th>
+                        <th class="pe-3 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($lastInscrits as $ins): ?>
+                <tr>
+                    <td class="ps-3">
+                        <code class="fie-iue-badge small"><?= SecurityHelper::e($ins['iue']) ?></code>
+                    </td>
+                    <td class="fw-semibold"><?= SecurityHelper::e($ins['nom']) ?></td>
+                    <td><?= SecurityHelper::e($ins['prenoms'] ?? '') ?></td>
+                    <td class="text-center">
+                        <?php if (($ins['sexe'] ?? '') === 'F'): ?>
+                        <span class="badge" style="background:#e83e8c">F</span>
+                        <?php else: ?>
+                        <span class="badge bg-primary">M</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="small"><?= SecurityHelper::e($ins['nom_etablissement'] ?? '—') ?></td>
+                    <td class="small text-muted"><?= SecurityHelper::e($ins['province'] ?? '—') ?></td>
+                    <td class="text-nowrap small text-muted">
+                        <?= !empty($ins['created_at']) ? date('d/m/Y', strtotime($ins['created_at'])) : '—' ?>
+                    </td>
+                    <td class="pe-3 text-center">
+                        <a href="<?= BASE_URL ?>/inscription/<?= urlencode($ins['iue']) ?>"
+                           class="btn btn-sm btn-outline-primary" title="Voir fiche">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Chart.js CDN + data -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    Chart.defaults.font.family = "'Open Sans', system-ui, sans-serif";
+    Chart.defaults.font.size   = 12;
+    Chart.defaults.color       = '#6c757d';
+
+    // ── Graphique évolution mensuelle ────────────────────────────────
+    <?php if (!empty($byMois)): ?>
+    (function() {
+        var labels  = <?= json_encode(array_column($byMois, 'mois')) ?>;
+        var data    = <?= json_encode(array_map('intval', array_column($byMois, 'nb'))) ?>;
+        // Format labels: "2024-08" → "Août 24"
+        var moisFr  = ['','Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+        var fmtLabels = labels.map(function(m) {
+            var p = m.split('-'); return moisFr[parseInt(p[1])] + ' ' + p[0].slice(2);
+        });
+        var ctx = document.getElementById('chartMois');
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: fmtLabels,
+                datasets: [{
+                    label: 'Inscriptions',
+                    data: data,
+                    borderColor: '#CE1126',
+                    backgroundColor: 'rgba(206,17,38,0.08)',
+                    pointBackgroundColor: '#CE1126',
+                    pointRadius: 4,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: function(c) { return ' ' + c.parsed.y + ' inscription' + (c.parsed.y > 1 ? 's' : ''); } } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }());
+    <?php endif; ?>
+
+    // ── Graphique nationalités (doughnut) ────────────────────────────
+    <?php if (!empty($byNationalite)): ?>
+    (function() {
+        var labels = <?= json_encode(array_column($byNationalite, 'nationalite')) ?>;
+        var data   = <?= json_encode(array_map('intval', array_column($byNationalite, 'nb'))) ?>;
+        var colors = ['#CE1126','#1EB53A','#1d4ed8','#17a2b8','#fd7e14','#6d28d9','#e83e8c','#374151'];
+        var ctx = document.getElementById('chartNationalite');
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{ data: data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 10, font: { size: 11 } } },
+                    tooltip: { callbacks: {
+                        label: function(c) {
+                            var total = c.dataset.data.reduce(function(a,b){return a+b;},0);
+                            var pct = total > 0 ? Math.round(c.parsed / total * 1000) / 10 : 0;
+                            return ' ' + c.label + ': ' + c.parsed + ' (' + pct + '%)';
+                        }
+                    }}
+                }
+            }
+        });
+    }());
+    <?php endif; ?>
+}());
+</script>
+
 <?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>
+

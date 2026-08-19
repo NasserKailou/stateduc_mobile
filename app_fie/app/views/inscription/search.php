@@ -1,11 +1,12 @@
 <?php
 /**
- * FIE — Vue : Recherche d'élèves
- * Bootstrap 5 + Font Awesome — Charte Burundi
- * CORRECTION Phase 2 : suppression use App\Services\SecurityHelper + redesign BS5
+ * FIE — Vue : Liste complète des élèves inscrits + Recherche avancée
+ * Bootstrap 5 + Font Awesome — Charte Burundi Rouge/Blanc/Vert
+ * Filtres : nom/IUE, école, colline, commune, province, sexe, année
+ * Visiblité : admin = tout, directeur/enseignant = leur établissement
  */
-$page_title  = "Recherche d'élèves — FIE";
-$active_menu = 'inscription';
+$page_title  = $page_title  ?? "Liste des élèves — FIE";
+$active_menu = 'recherche';
 require BASE_PATH . '/app/views/layouts/app_layout.php';
 ?>
 
@@ -14,176 +15,217 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/">Accueil</a></li>
         <li class="breadcrumb-item">Inscriptions</li>
-        <li class="breadcrumb-item active">Recherche</li>
+        <li class="breadcrumb-item active">Liste &amp; Recherche</li>
     </ol>
 </nav>
 
 <!-- ── Titre ───────────────────────────────────────────────────────────── -->
-<div class="d-flex align-items-center justify-content-between mb-4">
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
     <div>
         <h1 class="h4 fw-bold mb-0">
-            <i class="fa-solid fa-magnifying-glass me-2" style="color:var(--fie-red)"></i>
-            Recherche d'élèves
+            <i class="fa-solid fa-users me-2" style="color:var(--fie-primary)"></i>
+            Élèves inscrits
         </h1>
-        <?php if (($total ?? 0) > 0): ?>
         <p class="text-muted mb-0 small">
-            <strong><?= $total ?></strong> résultat<?= $total > 1 ? 's' : '' ?>
-            <?php if (!empty($query)): ?>
-            pour <em>«&nbsp;<?= SecurityHelper::e($query) ?>&nbsp;»</em>
+            <?php if ($total > 0): ?>
+            <strong><?= number_format($total) ?></strong> élève<?= $total > 1 ? 's' : '' ?> trouvé<?= $total > 1 ? 's' : '' ?>
+            <?php if (!empty(array_filter($criteria))): ?>
+            — filtrés sur <?= count(array_filter($criteria)) ?> critère<?= count(array_filter($criteria)) > 1 ? 's' : '' ?>
+            <?php endif; ?>
+            <?php elseif (isset($total) && $total === 0): ?>
+            Aucun élève ne correspond aux critères.
+            <?php else: ?>
+            Utilisez les filtres ci-dessous pour rechercher.
             <?php endif; ?>
         </p>
+    </div>
+    <div class="d-flex gap-2">
+        <?php if (SecurityHelper::isLoggedIn()): ?>
+        <a href="<?= BASE_URL ?>/inscription/nouveau" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-plus me-1"></i>Nouvelle inscription
+        </a>
+        <?php endif; ?>
+        <?php if (!empty($results)): ?>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()" type="button">
+            <i class="fa-solid fa-print me-1"></i>Imprimer liste
+        </button>
         <?php endif; ?>
     </div>
-    <?php if (SecurityHelper::isLoggedIn()): ?>
-    <a href="<?= BASE_URL ?>/inscription/nouveau" class="btn btn-primary btn-sm">
-        <i class="fa-solid fa-plus me-1"></i>Nouvelle inscription
-    </a>
-    <?php endif; ?>
 </div>
 
-<!-- ── Formulaire de recherche ─────────────────────────────────────────── -->
+<!-- ── Formulaire de recherche + filtres ────────────────────────────────── -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
+    <div class="card-header bg-white fw-semibold" style="border-bottom:2px solid var(--fie-primary);">
+        <i class="fa-solid fa-filter me-2" style="color:var(--fie-primary)"></i>
+        Filtres de recherche
+        <?php if (!empty(array_filter($criteria))): ?>
+        <span class="badge ms-2" style="background:var(--fie-primary)">
+            <?= count(array_filter($criteria)) ?> actif<?= count(array_filter($criteria))>1?'s':'' ?>
+        </span>
+        <?php endif; ?>
+    </div>
+    <div class="card-body pb-2">
         <form method="get" action="<?= BASE_URL ?>/inscription/recherche" id="searchForm">
 
-            <!-- Barre principale -->
-            <div class="input-group mb-3">
-                <span class="input-group-text bg-white">
-                    <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                </span>
-                <input type="search" name="q" id="q" class="form-control border-start-0"
-                       placeholder="Nom, prénom, IUE ou date de naissance…"
-                       value="<?= SecurityHelper::e($query ?? '') ?>"
-                       autocomplete="off" autofocus
-                       aria-label="Terme de recherche">
-                <button type="submit" class="btn btn-primary px-4">
-                    <i class="fa-solid fa-search me-1"></i>Rechercher
-                </button>
-            </div>
-
-            <!-- Filtres avancés repliables -->
-            <div class="accordion" id="accordionFiltres">
-                <div class="accordion-item border-0 bg-light rounded-3">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed bg-light rounded-3 py-2 small fw-semibold"
-                                type="button"
-                                data-bs-toggle="collapse" data-bs-target="#filtresBody">
-                            <i class="fa-solid fa-sliders me-2"></i>Filtres avancés
-                            <?php if (!empty(array_filter($criteria ?? []))): ?>
-                            <span class="badge bg-warning text-dark ms-2">actifs</span>
-                            <?php endif; ?>
-                        </button>
-                    </h2>
-                    <div id="filtresBody"
-                         class="accordion-collapse collapse <?= !empty(array_filter($criteria ?? [])) ? 'show' : '' ?>">
-                        <div class="accordion-body pt-2">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <label for="f_province" class="form-label small fw-semibold">Province</label>
-                                    <select id="f_province" name="province" class="form-select form-select-sm">
-                                        <option value="">— Toutes —</option>
-                                        <?php foreach ($provinces ?? [] as $prov): ?>
-                                        <option value="<?= SecurityHelper::e($prov['province']) ?>"
-                                            <?= (($criteria['province'] ?? '') === $prov['province']) ? 'selected' : '' ?>>
-                                            <?= SecurityHelper::e($prov['province']) ?>
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="f_secteur" class="form-label small fw-semibold">Secteur</label>
-                                    <select id="f_secteur" name="secteur" class="form-select form-select-sm">
-                                        <option value="">— Tous —</option>
-                                        <?php foreach ($secteurs ?? [] as $code => $libelle): ?>
-                                        <option value="<?= (int)$code ?>"
-                                            <?= (isset($criteria['secteur']) && (int)$criteria['secteur'] === (int)$code) ? 'selected' : '' ?>>
-                                            <?= SecurityHelper::e($libelle) ?>
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="f_annee" class="form-label small fw-semibold">Année scolaire</label>
-                                    <select id="f_annee" name="annee" class="form-select form-select-sm">
-                                        <option value="">— Toutes —</option>
-                                        <?php foreach ($annees ?? [] as $code => $libelle): ?>
-                                        <option value="<?= (int)$code ?>"
-                                            <?= (isset($criteria['annee']) && (int)$criteria['annee'] === (int)$code) ? 'selected' : '' ?>>
-                                            <?= SecurityHelper::e($libelle) ?>
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="doublons_only" value="1" id="doublonsOnly"
-                                               <?= !empty($criteria['doublons_only']) ? 'checked' : '' ?>>
-                                        <label class="form-check-label small" for="doublonsOnly">
-                                            Doublons suspects seulement
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2 mt-3">
-                                <button type="submit" class="btn btn-sm btn-secondary">
-                                    <i class="fa-solid fa-filter me-1"></i>Appliquer
-                                </button>
-                                <a href="<?= BASE_URL ?>/inscription/recherche" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
-                                </a>
-                            </div>
-                        </div>
+            <!-- Ligne 1 : Recherche textuelle -->
+            <div class="row g-2 mb-2">
+                <div class="col-md-5">
+                    <label class="form-label small fw-semibold mb-1">Nom / Prénom(s) / IUE</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fa-solid fa-magnifying-glass" style="color:var(--fie-primary)"></i>
+                        </span>
+                        <input type="search" name="q" id="q" class="form-control border-start-0"
+                               placeholder="Nom, prénom ou identifiant IUE…"
+                               value="<?= SecurityHelper::e($criteria['q'] ?? '') ?>"
+                               autocomplete="off" aria-label="Recherche rapide">
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">IUE exact</label>
+                    <input type="text" name="iue" class="form-control"
+                           placeholder="ex: BI-2024-0001"
+                           value="<?= SecurityHelper::e($criteria['iue'] ?? '') ?>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold mb-1">Sexe</label>
+                    <select name="sexe" class="form-select">
+                        <option value="">— Tous —</option>
+                        <option value="M" <?= ($criteria['sexe'] ?? '') === 'M' ? 'selected' : '' ?>>Masculin</option>
+                        <option value="F" <?= ($criteria['sexe'] ?? '') === 'F' ? 'selected' : '' ?>>Féminin</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold mb-1">Année scolaire</label>
+                    <select name="annee" class="form-select">
+                        <option value="">— Toutes —</option>
+                        <?php foreach ($annees ?? [] as $a): ?>
+                        <option value="<?= (int)$a['code_type_annee'] ?>"
+                            <?= ($criteria['annee'] ?? 0) == $a['code_type_annee'] ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e($a['libelle']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Ligne 2 : Filtres géographiques / établissement -->
+            <div class="row g-2 mb-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">
+                        <i class="fa-solid fa-map-marker-alt me-1" style="color:var(--fie-primary)"></i>Province
+                    </label>
+                    <select id="f_province" name="province" class="form-select form-select-sm">
+                        <option value="">— Toutes provinces —</option>
+                        <?php foreach ($provinces ?? [] as $prov): ?>
+                        <option value="<?= SecurityHelper::e($prov['province']) ?>"
+                            <?= ($criteria['province'] ?? '') === $prov['province'] ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e($prov['province']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">
+                        <i class="fa-solid fa-city me-1" style="color:var(--fie-primary)"></i>Commune
+                    </label>
+                    <input type="text" name="commune" class="form-control form-control-sm"
+                           placeholder="Nom commune…"
+                           value="<?= SecurityHelper::e($criteria['commune'] ?? '') ?>">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">
+                        <i class="fa-solid fa-hill-rockslide me-1" style="color:var(--fie-primary)"></i>Colline / Quartier
+                    </label>
+                    <input type="text" name="colline" class="form-control form-control-sm"
+                           placeholder="Nom colline…"
+                           value="<?= SecurityHelper::e($criteria['colline'] ?? '') ?>">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">
+                        <i class="fa-solid fa-school me-1" style="color:var(--fie-primary)"></i>École / Établissement
+                    </label>
+                    <input type="text" name="ecole" class="form-control form-control-sm"
+                           placeholder="Nom ou code école…"
+                           value="<?= SecurityHelper::e($criteria['ecole'] ?? '') ?>">
+                </div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn btn-sm btn-primary px-4">
+                    <i class="fa-solid fa-search me-1"></i>Rechercher
+                </button>
+                <a href="<?= BASE_URL ?>/inscription/recherche" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-rotate-left me-1"></i>Réinitialiser
+                </a>
+                <?php if (!empty($results)): ?>
+                <span class="ms-auto text-muted small align-self-center">
+                    Page <?= $page ?? 1 ?> / <?= $pages ?? 1 ?>
+                    — <?= number_format($total ?? 0) ?> résultat<?= ($total ?? 0) > 1 ? 's' : '' ?>
+                </span>
+                <?php endif; ?>
             </div>
 
         </form>
     </div>
 </div>
 
-<!-- ── Résultats ────────────────────────────────────────────────────────── -->
-<?php if (empty($query) && empty(array_filter($criteria ?? []))): ?>
-
-<div class="card border-0 shadow-sm">
-    <div class="card-body text-center py-5 text-muted">
-        <i class="fa-solid fa-magnifying-glass fa-3x mb-3 d-block" style="opacity:.3"></i>
-        <p class="mb-0">Saisissez un nom, prénom, IUE ou date de naissance pour rechercher un élève.</p>
-    </div>
-</div>
-
-<?php elseif (empty($results)): ?>
+<!-- ── Résultats ─────────────────────────────────────────────────────────── -->
+<?php if (empty($results) && isset($total) && $total === 0): ?>
 
 <div class="card border-0 shadow-sm">
     <div class="card-body text-center py-5">
         <i class="fa-solid fa-circle-exclamation fa-3x mb-3 d-block text-warning" style="opacity:.5"></i>
-        <p class="text-muted mb-3">Aucun élève ne correspond à votre recherche.</p>
+        <p class="text-muted mb-3">Aucun élève ne correspond aux critères de recherche.</p>
         <?php if (SecurityHelper::isLoggedIn()): ?>
-        <a href="<?= BASE_URL ?>/inscription/nouveau?nom=<?= urlencode($query ?? '') ?>"
-           class="btn btn-primary btn-sm">
+        <a href="<?= BASE_URL ?>/inscription/nouveau" class="btn btn-primary btn-sm">
             <i class="fa-solid fa-plus me-1"></i>Inscrire un nouvel élève
         </a>
         <?php endif; ?>
     </div>
 </div>
 
+<?php elseif (empty($results) && !isset($total)): ?>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5 text-muted">
+        <i class="fa-solid fa-magnifying-glass fa-3x mb-3 d-block" style="opacity:.3"></i>
+        <p class="mb-0">Saisissez des critères et cliquez sur <strong>Rechercher</strong>, ou laissez les filtres vides pour afficher tous les élèves.</p>
+    </div>
+</div>
+
 <?php else: ?>
 
-<!-- Tableau de résultats -->
+<!-- Tableau des élèves -->
 <div class="card border-0 shadow-sm">
+    <!-- En-tête avec compteur + export -->
+    <div class="card-header bg-white d-flex align-items-center justify-content-between py-2"
+         style="border-bottom:2px solid var(--fie-primary);">
+        <span class="fw-semibold small">
+            <i class="fa-solid fa-table me-1" style="color:var(--fie-primary)"></i>
+            <?= number_format($total ?? count($results)) ?> élève<?= ($total ?? count($results)) > 1 ? 's' : '' ?>
+        </span>
+        <div class="d-flex gap-2">
+            <a href="<?= BASE_URL ?>/inscription/nouveau" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-plus me-1"></i><span class="d-none d-md-inline">Inscrire</span>
+            </a>
+        </div>
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
+            <table class="table table-hover mb-0 align-middle" style="font-size:.875rem;">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">IUE</th>
+                        <th class="ps-3" style="width:130px">IUE</th>
                         <th>Nom</th>
                         <th>Prénom(s)</th>
+                        <th class="text-center" style="width:70px">Sexe</th>
                         <th>Naissance</th>
-                        <th class="text-center">Sexe</th>
-                        <th>Dernier établissement</th>
-                        <th class="text-center">Statut</th>
-                        <th class="text-center pe-3">Actions</th>
+                        <th>Province</th>
+                        <th>Établissement</th>
+                        <th class="text-center" style="width:80px">Statut</th>
+                        <th class="text-center pe-3" style="width:100px">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -194,7 +236,7 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
                         <td class="ps-3">
                             <code class="fie-iue-badge small"><?= SecurityHelper::e($eleve['iue']) ?></code>
                             <?php if (!empty($eleve['doublon_suspect'])): ?>
-                            <span class="badge bg-warning text-dark ms-1 small">
+                            <br><span class="badge bg-warning text-dark mt-1" style="font-size:.6rem;">
                                 <i class="fa-solid fa-triangle-exclamation me-1"></i>doublon
                             </span>
                             <?php endif; ?>
@@ -204,7 +246,18 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
                         <td class="fw-semibold"><?= SecurityHelper::e($eleve['nom']) ?></td>
 
                         <!-- Prénom -->
-                        <td><?= SecurityHelper::e($eleve['prenom'] ?? $eleve['prenoms'] ?? '') ?></td>
+                        <td><?= SecurityHelper::e($eleve['prenoms'] ?? $eleve['prenom'] ?? '') ?></td>
+
+                        <!-- Sexe -->
+                        <td class="text-center">
+                            <?php if (($eleve['sexe'] ?? '') === 'F'): ?>
+                            <span class="badge" style="background:#e83e8c">F</span>
+                            <?php elseif (($eleve['sexe'] ?? '') === 'M'): ?>
+                            <span class="badge bg-primary">M</span>
+                            <?php else: ?>
+                            <span class="text-muted">—</span>
+                            <?php endif; ?>
+                        </td>
 
                         <!-- Date naissance -->
                         <td class="text-nowrap">
@@ -214,30 +267,22 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
                             ?>
                         </td>
 
-                        <!-- Sexe -->
-                        <td class="text-center">
-                            <?php if ($eleve['sexe'] === 'F'): ?>
-                            <span class="badge" style="background:#e83e8c">
-                                <i class="fa-solid fa-venus me-1"></i>F
-                            </span>
-                            <?php else: ?>
-                            <span class="badge bg-primary">
-                                <i class="fa-solid fa-mars me-1"></i>M
-                            </span>
-                            <?php endif; ?>
+                        <!-- Province -->
+                        <td class="small text-muted">
+                            <?= !empty($eleve['province']) ? SecurityHelper::e($eleve['province']) : '—' ?>
                         </td>
 
-                        <!-- Dernier établissement -->
+                        <!-- Établissement -->
                         <td>
                             <?php if (!empty($eleve['dernier_etablissement'])): ?>
                             <div class="small"><?= SecurityHelper::e($eleve['dernier_etablissement']) ?></div>
                             <?php if (!empty($eleve['derniere_annee'])): ?>
-                            <div class="text-muted" style="font-size:.75rem">
+                            <div class="text-muted" style="font-size:.72rem;">
                                 (<?= SecurityHelper::e($eleve['derniere_annee']) ?>)
                             </div>
                             <?php endif; ?>
                             <?php else: ?>
-                            <span class="text-muted">—</span>
+                            <span class="text-muted small">—</span>
                             <?php endif; ?>
                         </td>
 
@@ -253,7 +298,7 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
                             };
                             $labels = ['actif'=>'Actif','transfere'=>'Transféré','sorti'=>'Sorti'];
                             ?>
-                            <span class="badge bg-<?= $bg ?>">
+                            <span class="badge bg-<?= $bg ?>" style="font-size:.65rem;">
                                 <i class="fa-solid <?= $icon ?> me-1"></i>
                                 <?= $labels[$statut] ?? $statut ?>
                             </span>
@@ -264,12 +309,13 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
                             <div class="btn-group btn-group-sm">
                                 <a href="<?= BASE_URL ?>/inscription/<?= urlencode($eleve['iue']) ?>"
                                    class="btn btn-outline-primary"
-                                   title="Voir la fiche">
+                                   title="Voir la fiche élève">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
                                 <a href="<?= BASE_URL ?>/inscription/<?= urlencode($eleve['iue']) ?>/imprimer"
                                    class="btn btn-outline-secondary"
-                                   target="_blank" title="Imprimer">
+                                   target="_blank"
+                                   title="Imprimer la fiche">
                                     <i class="fa-solid fa-print"></i>
                                 </a>
                             </div>
@@ -283,14 +329,16 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
     </div>
 </div>
 
-<!-- Pagination Bootstrap -->
+<!-- ── Pagination ─────────────────────────────────────────────────────── -->
 <?php if (($pages ?? 1) > 1): ?>
-<nav aria-label="Pagination" class="mt-3">
+<nav aria-label="Pagination des élèves" class="mt-3">
     <?php
     $params = $_GET;
     unset($params['page']);
     $baseQs = http_build_query($params);
-    $link   = fn(int $p): string => BASE_URL . '/inscription/recherche?' . $baseQs . ($baseQs ? '&' : '') . 'page=' . $p;
+    $link   = fn(int $p): string => BASE_URL . '/inscription/recherche?' . ($baseQs ? $baseQs . '&' : '') . 'page=' . $p;
+    $page   = $page ?? 1;
+    $pages  = $pages ?? 1;
     ?>
     <ul class="pagination justify-content-center mb-0">
         <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
@@ -312,11 +360,23 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
         </li>
     </ul>
     <div class="text-center text-muted small mt-2">
-        Page <?= $page ?> / <?= $pages ?> — <?= $total ?> résultat<?= $total > 1 ? 's' : '' ?>
+        Page <?= $page ?> / <?= $pages ?>
+        — <?= number_format($total ?? 0) ?> élève<?= ($total ?? 0) > 1 ? 's' : '' ?>
     </div>
 </nav>
 <?php endif; ?>
 
 <?php endif; ?>
+
+<!-- CSS impression liste -->
+<style>
+@media print {
+    .app-sidebar, .app-header, nav[aria-label="breadcrumb"], .card-header .btn,
+    form, .pagination, .no-print { display: none !important; }
+    .app-main, .main-content { padding: 0 !important; }
+    table { font-size: 9pt !important; }
+    .badge { border: 1px solid #999 !important; }
+}
+</style>
 
 <?php require BASE_PATH . '/app/views/layouts/app_footer.php'; ?>

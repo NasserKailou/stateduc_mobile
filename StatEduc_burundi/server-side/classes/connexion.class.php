@@ -1,6 +1,6 @@
 <?php
 	 require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
-	  define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
+	  if (!defined('ADODB_ASSOC_CASE')) { define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER); }
 	  $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 
 //Verification de l'existance du  $GLOBALS['PARAM']['dico_DB']
