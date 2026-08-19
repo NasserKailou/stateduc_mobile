@@ -693,7 +693,7 @@ class AdminController
             string $prompt,
             string $title
         ) use ($mainSheet, $maxRows, $sheetName): void {
-            $validation = $mainSheet->getCell($col . '2')->getDataValidation();
+            $validation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
             $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
             $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
             $validation->setAllowBlank(true);
@@ -705,12 +705,12 @@ class AdminController
             $validation->setErrorTitle('Valeur non reconnue');
             $validation->setPrompt($prompt);
             $validation->setPromptTitle($title);
-            $validation->setSqref($col . '2:' . $col . $maxRows);
+            // setSqref() n'existe pas dans cette version — on passe la plage directement à setDataValidation()
             $mainSheet->setDataValidation($col . '2:' . $col . $maxRows, $validation);
         };
 
         // C — Sexe (liste fixe directe : plus simple, pas de ref sheet)
-        $vSexe = $mainSheet->getCell('C2')->getDataValidation();
+        $vSexe = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
         $vSexe->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $vSexe->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
         $vSexe->setAllowBlank(true);
@@ -722,7 +722,7 @@ class AdminController
         $vSexe->setPromptTitle('Sexe');
         $vSexe->setError('Entrez M (Masculin) ou F (Féminin).');
         $vSexe->setErrorTitle('Valeur invalide');
-        $vSexe->setSqref('C2:C' . $maxRows);
+        // setSqref() n'existe pas dans cette version — plage passée directement à setDataValidation()
         $mainSheet->setDataValidation('C2:C' . $maxRows, $vSexe);
 
         // G — Nationalité (codes depuis RefData!C)

@@ -186,7 +186,7 @@ function lancerSync(mode) {
     status.classList.remove('d-none');
 
     const fd = new FormData();
-    fd.append('csrf_token', csrf);
+    fd.append('<?= FIE_CSRF_TOKEN_NAME ?>', csrf);
     fd.append('mode', mode);
 
     fetch('<?= BASE_URL ?>/admin/sync/lancer', {method: 'POST', body: fd})
