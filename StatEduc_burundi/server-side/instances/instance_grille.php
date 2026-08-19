@@ -28,8 +28,20 @@ if(count($_POST) == 0) {
 	
     $curobj_grille = $_SESSION['curobj_instance'];
     
-    // ici fonction VERIF du $_POST
-    $curobj_grille->verif($_POST);    
+    // SESSION 62 FIX — bypass verif() pour les appels curl mobiles (questionnaire_ws.php)
+    // ROOT CAUSE IDENTIFIÉE (log DIAG_TAIL 10:46:11) :
+    //   verif() appelle All_Controle() → une règle de validation échoue → exit()
+    //   exit() tue le script AVANT que questionnaire_ws.php puisse émettre MAJ_OK
+    //   ou ISOKSAVEINDATABASE → data_save.php détecte KOSAVE.
+    //   Le contrôle de cohérence est géré côté Flutter (theme_rule_engine.dart).
+    //   Le serveur ne doit PAS bloquer la sauvegarde mobile sur règles de contrôle.
+    // GUARD : ne_pas_verifier_session=true est positionné par questionnaire_ws.php
+    //   uniquement pour les appels curl internes (jamais pour les navigateurs).
+    if (!isset($GLOBALS['ne_pas_verifier_session']) || !$GLOBALS['ne_pas_verifier_session']) {
+        // ici fonction VERIF du $_POST (navigateur uniquement)
+        $curobj_grille->verif($_POST);
+    }
+    // Mobile curl : verif() skippée → pas d'exit() → sauvegarde continue normalement
     
     // Demarrage de la Transaction pour contr�ler le probl�me d'acc�s simultan� sur le dernier enregistrement
     $curobj_grille->conn->StartTrans();   // Start of trasaction
@@ -65,12 +77,35 @@ if(count($_POST) == 0) {
 }
     echo '<script language="javascript" src="'.$GLOBALS['SISED_URL_JSC'] . 'js.js"></script>' . "\n";
     // param�tre d'�change
-    // Utiliser $_qr_theme_id si disponible (fallback r\u00e9solu dans questionnaire.php quand theme_manager->id = NULL)
-    $id_theme = isset($GLOBALS['_qr_theme_id_resolved']) ? $GLOBALS['_qr_theme_id_resolved']
-              : ($theme_manager->id ?? null);
+    $id_theme			=	$theme_manager->id;    
 	$code_etablissement = $_SESSION['code_etab'];
     $code_annee = $_SESSION['annee'];
-	$code_filtre = $_SESSION['filtre'];
+	// SESSION 59+60 FIX DÉFINITIF — KOSAVE thèmes sans filtre (10502, 10602, 10702)
+	//
+	// ROOT CAUSE COMPLÈTE (sessions 58–60) :
+	//   questionnaire_ws.php → session_start(['read_and_close'=>true]) → Session B
+	//   (cURL interne data_save→questionnaire_ws) est READ-ONLY : toute écriture
+	//   dans $_SESSION est ignorée silencieusement.
+	//   Session B conserve $_SESSION['filtre'] stale d'un appel précédent (ex: '1').
+	//
+	// SESSION 59 FIX (partiel) :
+	//   Lire $_GET['filtre'] directement si présent dans l'URL cURL.
+	//   PROBLÈME RÉSIDUEL : data_save.php n'ajoutait PAS &filtre= (vide) quand
+	//   id_filter=="null" → isset($_GET['filtre']) = false → fallback stale → KOSAVE.
+	//
+	// SESSION 60 FIX (complet) :
+	//   data_save.php ajoute maintenant TOUJOURS &filtre= dans l'URL cURL :
+	//     - filtre réel → &filtre=<id> (ex: &filtre=1)
+	//     - sans filtre → &filtre= (chaîne vide)
+	//   Ainsi isset($_GET['filtre']) = TRUE dans TOUS les cas.
+	//   Pour &filtre= (vide) : $_GET['filtre']='' → code_filtre='' → pas de clause WHERE filtre → OKSAVE.
+	//   Pour &filtre=1       : $_GET['filtre']='1' → code_filtre='1' → WHERE CODE_TYPE_PERIODE=1 → OK.
+	if (isset($_GET['filtre'])) {
+	    $code_filtre = $_GET['filtre'];
+	} else {
+	    // Fallback sécurité (appel direct navigateur sans paramètre filtre)
+	    $code_filtre = $_SESSION['filtre'];
+	}
     $id_systeme	= $_SESSION['secteur'];
 
     if( $_GET['val'] == 'new_etab'){
@@ -79,37 +114,7 @@ if(count($_POST) == 0) {
 
 if(!isset($_SESSION['tab_html_export_hist'])){
 	// Instanciation de la classe
-	// === GUARD theme id vide ===
-	if (empty($id_theme)) {
-		$_diag_ig = date('Y-m-d H:i:s').';instance_grille.php;ERR_ID_THEME_VIDE'
-		    .';theme_sys='.($_GET['theme']??'?').';type_ent_stat='.($_SESSION['type_ent_stat']??'?')."\n";
-		@file_put_contents(dirname(dirname(dirname(__FILE__))).'/moblogs/diag_questionnaire.log', $_diag_ig, FILE_APPEND);
-		echo '<p style="color:red;padding:10px">Erreur : thème non défini (id_theme vide). Vérifier moblogs/diag_questionnaire.log</p>';
-		echo '<script type="text/Javascript">if(typeof jQuery!=="undefined"&&typeof jQuery.unblockUI==="function")jQuery.unblockUI();</script>';
-		return;
-	}
-	// === FIN GUARD ===
-	// --- Trace diagnostic avant instanciation ---
-	$_diag_ig_ok = date('Y-m-d H:i:s').';instance_grille.php;INSTANCIATION'
-	    .';theme_sys='.($_GET['theme']??'?').';id_theme_interne='.$id_theme
-	    .';code_etab='.($code_etablissement??'NULL').';secteur='.$id_systeme."\n";
-	@file_put_contents(dirname(dirname(dirname(__FILE__))).'/moblogs/diag_questionnaire.log', $_diag_ig_ok, FILE_APPEND);
     $curobj_grille		=	new grille($code_etablissement,$code_annee,$id_theme,$id_systeme,$code_filtre);
-	// --- Guard template vide (FRAME non trouvé dans DICO_THEME_SYSTEME) ---
-	if (empty($curobj_grille->template)) {
-		$_diag_ig_tpl = date('Y-m-d H:i:s').';instance_grille.php;ERR_TEMPLATE_VIDE'
-		    .';theme_sys='.($_GET['theme']??'?').';id_theme='.$id_theme.';secteur='.$id_systeme
-		    .';type_ent_stat='.($_SESSION['type_ent_stat']??'?')."\n";
-		@file_put_contents(dirname(dirname(dirname(__FILE__))).'/moblogs/diag_questionnaire.log', $_diag_ig_tpl, FILE_APPEND);
-		error_log('[DIAG_GRILLE] '.$_diag_ig_tpl);
-		echo '<div style="padding:15px;color:#c00;font-family:Arial;font-size:13px">';
-		echo '<b>Formulaire introuvable pour le thème '.(int)($_GET['theme']??0).'</b><br>';
-		echo '(id_interne='.$id_theme.' / secteur='.$id_systeme.' / type_ent_stat='.($_SESSION['type_ent_stat']??'?').')<br>';
-		echo 'Vérifier que DICO_THEME_SYSTEME contient une entrée FRAME non nulle pour ID='.$id_theme.' et ID_SYSTEME='.$id_systeme.'<br>';
-		echo '</div>';
-		echo '<script type="text/Javascript">if(typeof jQuery!=="undefined"&&typeof jQuery.unblockUI==="function")jQuery.unblockUI();</script>';
-		return;
-	}
 	//echo "<pre>";
 	//print_r($curobj_grille);
 	if(isset($_SESSION['tab_html_export']))	$curobj_grille->nb_lignes = $_SESSION['nbre_total_enr'];
@@ -141,26 +146,26 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 						$tabs1 = explode('-',$tabs0[1]);
 						$tabs2 = explode('=',$tabs0[1]);
 						$tabs3 = explode('-',$tabs2[0]);
-						if(preg_match('/ '.$tabs1[0].' /', $sql_tab)){
+						if(ereg(' '.$tabs1[0].' ',$sql_tab)){
 							if($tabs1[0] <> $tab){
-								if((strpos($sql_tab, str_replace('-','.',$tabs2[0])." AS ".$tabs3[1]) === false) && (strpos($list_select_suite, str_replace('-','.',$tabs2[0])." AS ".$tabs3[1]) === false)){
+								if(!ereg(str_replace('-','.',$tabs2[0])." AS ".$tabs3[1],$sql_tab) && !ereg(str_replace('-','.',$tabs2[0])." AS ".$tabs3[1],$list_select_suite)){
 									$list_select_suite .= ", ".str_replace('-','.',$tabs2[0])." AS ".$tabs3[1]." ";
 								}
 								if($i==0) $list_ord .= " ORDER BY ".$tabs3[1].' '.$tabs2[1];
 								else $list_ord .= ', '.$tabs3[1].' '.$tabs2[1].' ';
 							}else{
 								if($i==0) $list_ord .= " ORDER BY ".$tabs3[1].' '.$tabs2[1];
-								elseif((strpos($list_ord, $tabs3[1]) === false))	$list_ord .= ', '.$tabs3[1].' '.$tabs2[1].' ';
+								elseif(!ereg($tabs3[1],$list_ord))	$list_ord .= ', '.$tabs3[1].' '.$tabs2[1].' ';
 							}
 							$i++;
 						}elseif(count($list_sql_tab) > 1){
 							if($tabs2[1] == 'ASC'){
-								if((strpos($sql_tab, " AS ".$tabs3[1]) === false) && (strpos($list_select_suite, " AS ".$tabs3[1]) === false)){
+								if(!ereg(" AS ".$tabs3[1],$sql_tab) && !ereg(" AS ".$tabs3[1],$list_select_suite)){
 									if($tabs0[0] == 'int') $list_select_suite .= ", 4294967295 "." AS ".$tabs3[1]." ";//4294967295 est la valeur maxi d'un entier long non sign�
 									else $list_select_suite .= ", 'zzzzzzzzzz' "." AS ".$tabs3[1]." ";//zzzzzzzzzz etant une valeur tres tres grande d'une chaine de caracteres
 								}
 							}elseif($tabs2[1] == 'DESC'){
-								if((strpos($sql_tab, " AS ".$tabs3[1]) === false) && (strpos($list_select_suite, " AS ".$tabs3[1]) === false)){
+								if(!ereg(" AS ".$tabs3[1],$sql_tab) && !ereg(" AS ".$tabs3[1],$list_select_suite)){
 									if($tabs0[0] == 'int') $list_select_suite .= ", 0 "." AS ".$tabs3[1]." ";//0 est la valeur mini d'un entier long non sign�
 									else $list_select_suite .= ", 'aaaaaaaaaa' "." AS ".$tabs3[1]." ";//aaaaaaaaaa etant une valeur tres tres petite d'une chaine de caracteres
 								}
@@ -197,13 +202,13 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 						if($tabs0[0]=='champ'){
 							$tabs1 = explode('|',$tabs0[1]);
 							$tabs2 = explode('-',$tabs1[1]);//table = $tabs2[0] et champ = $tabs2[1]
-						}elseif(preg_match('/ '.$tabs2[0].' /', $sql_tab)){
+						}elseif(ereg(' '.$tabs2[0].' ',$sql_tab)){
 							if($tabs2[0] <> $tab){
-								if((strpos($sql_tab, str_replace('-','.',$tabs1[1])." AS ".$tabs2[1]) === false) && (strpos($list_select_suite, str_replace('-','.',$tabs1[1])." AS ".$tabs2[1]) === false)){
+								if(!ereg(str_replace('-','.',$tabs1[1])." AS ".$tabs2[1],$sql_tab) && !ereg(str_replace('-','.',$tabs1[1])." AS ".$tabs2[1],$list_select_suite)){
 									$list_select_suite .= ", ".str_replace('-','.',$tabs1[1])." AS ".$tabs2[1]." ";
 								}
 								if($tabs0[0]=='equalint' || $tabs0[0]=='equaltext' || $tabs0[0]=='different' || $tabs0[0]=='superior' || $tabs0[0]=='inferior'){
-									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]]."'".$tabs0[1]."' AND ";
+									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].'\''.$tabs0[1].'\' AND ';
 									else $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].$tabs0[1].' AND ';
 									
 								}elseif($tabs0[0]=='contain' || $tabs0[0]=='notcontain' || $tabs0[0]=='start' || $tabs0[0]=='end'){
@@ -218,7 +223,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 								}
 							}else{
 								if($tabs0[0]=='equalint' || $tabs0[0]=='equaltext' || $tabs0[0]=='different' || $tabs0[0]=='superior' || $tabs0[0]=='inferior')
-									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]]."'".$tabs0[1]."' AND ";
+									if($tabs0[0]=='equaltext') $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].'\''.$tabs0[1].'\' AND ';
 									else $list_crit .= str_replace('-','.',$tabs1[1]).$operators[$tabs0[0]].$tabs0[1].' AND ';
 								elseif($tabs0[0]=='contain' || $tabs0[0]=='notcontain' || $tabs0[0]=='start' || $tabs0[0]=='end'){
 									$list_crit .= str_replace('-','.',$tabs1[1]).str_replace('#',$tabs0[1],$operators[$tabs0[0]]).' AND ';
@@ -233,12 +238,12 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 							}
 						}elseif(count($list_sql_tab) > 1){
 							if($tabs1[0] == 'int'){
-								if((strpos($sql_tab, " AS ".$tabs2[1]) === false) && (strpos($list_select_suite, " AS ".$tabs2[1]) === false)){
+								if(!ereg(" AS ".$tabs2[1],$sql_tab) && !ereg(" AS ".$tabs2[1],$list_select_suite)){
 									$list_select_suite .= ", NULL "." AS ".$tabs2[1]." ";//
 								}
 								$list_crit .= "NULL<>NULL AND ";
 							}else{
-								if((strpos($sql_tab, " AS ".$tabs2[1]) === false) && (strpos($list_select_suite, " AS ".$tabs2[1]) === false)){
+								if(!ereg(" AS ".$tabs2[1],$sql_tab) && !ereg(" AS ".$tabs2[1],$list_select_suite)){
 									$list_select_suite .= ", '' "." AS ".$tabs2[1]." ";//
 								}
 								$list_crit .= "''<>'' AND ";
@@ -297,7 +302,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 					$list_ord = "";
 					$i = 0;
 					foreach($list_sql_tab as $sql_tab){
-						if(preg_match('/ '.$nomtableliee.'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' IN /', $sql_tab)){
+						if(ereg(' '.$nomtableliee.'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' IN ',$sql_tab)){
 							$sql_tab = str_replace('WHERE','WHERE '.$nomtableliee.'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].'='.$teacher_manager->list_sch_teach[$_SESSION['id_teacher']].' AND',$sql_tab);
 						}
 						$tables_sql[] = $sql_tab;

@@ -1725,13 +1725,13 @@
 				{
 					//Modif HEBIE 02/02/2017 Bissau: Possibilité d'utiliser une requete comme table mère
 					if(isset($GLOBALS['PARAM_SYS']['SHOW_VIEWS_IN_MOTHER_TABLES_LIST']) && $GLOBALS['PARAM_SYS']['SHOW_VIEWS_IN_MOTHER_TABLES_LIST']==true){
-						if(!preg_match("/^($deb_fact_tab)/i", $tab) && !preg_match("/^($deb_nomenc)/i", $tab) && !preg_match("/($fin_nomenc_system)$/i", $tab) && !preg_match("/^(DICO_)/i", $tab) && !preg_match("/^(ADMIN_DROITS)/i", $tab) && !preg_match("/^(ADMIN_GROUPES)/i", $tab) && !preg_match("/^(ADMIN_USERS)/i", $tab) && !preg_match("/^(PARAM_DEFAUT)/i", $tab) && !preg_match("/^(SYSTEME)/i", $tab))
+						if(!eregi("^($deb_fact_tab)",$tab) && !eregi("^($deb_nomenc)",$tab) && !eregi("($fin_nomenc_system)$",$tab) && !eregi("^(DICO_)",$tab) && !eregi("^(ADMIN_DROITS)",$tab) && !eregi("^(ADMIN_GROUPES)",$tab) && !eregi("^(ADMIN_USERS)",$tab) && !eregi("^(PARAM_DEFAUT)",$tab) && !eregi("^(SYSTEME)",$tab))
 						{
 							$tables[] = $tab;
 						}
 					}else{
 						if(!in_array($tab,$this->ViewsBD)){
-							if(!preg_match("/^($deb_fact_tab)/i", $tab) && !preg_match("/^($deb_nomenc)/i", $tab) && !preg_match("/($fin_nomenc_system)$/i", $tab) && !preg_match("/^(DICO_)/i", $tab) && !preg_match("/^(ADMIN_DROITS)/i", $tab) && !preg_match("/^(ADMIN_GROUPES)/i", $tab) && !preg_match("/^(ADMIN_USERS)/i", $tab) && !preg_match("/^(PARAM_DEFAUT)/i", $tab) && !preg_match("/^(SYSTEME)/i", $tab))
+							if(!eregi("^($deb_fact_tab)",$tab) && !eregi("^($deb_nomenc)",$tab) && !eregi("($fin_nomenc_system)$",$tab) && !eregi("^(DICO_)",$tab) && !eregi("^(ADMIN_DROITS)",$tab) && !eregi("^(ADMIN_GROUPES)",$tab) && !eregi("^(ADMIN_USERS)",$tab) && !eregi("^(PARAM_DEFAUT)",$tab) && !eregi("^(SYSTEME)",$tab))
 							{
 								$tables[] = $tab;
 							}
@@ -1758,7 +1758,7 @@
 				$fin_nomenc_system = '_'.$GLOBALS['PARAM']['SYSTEME'];
 				foreach($this->TabBD as $tab)
 				{	
-					if(preg_match("/^($deb_nomenc)/i", $tab) && !preg_match("/($fin_nomenc_system)$/i", $tab))
+					if(eregi("^($deb_nomenc)",$tab) && !eregi("($fin_nomenc_system)$",$tab))
 					{
 						$tables[] = $tab;
 					}
@@ -1969,7 +1969,7 @@
 		*/
 		function recherche_libelle($code,$langue,$table){
 				
-				if ( preg_match('/' . '^'.$GLOBALS['PARAM']['TYPE'].'_.*$' . '/', $table)){ // Table de Nomenclature : traduction dans la base courante
+				if ( ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', $table)){ // Table de Nomenclature : traduction dans la base courante
 					$conn                 =   $GLOBALS['conn'];
 				} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 					$conn                 =   $GLOBALS['conn_dico']; 
@@ -1997,7 +1997,7 @@
 		* 
 		*/
 		function recherche_libelles_matrice($code,$langue,$table){
-			if ( preg_match('/' . '^'.$GLOBALS['PARAM']['TYPE'].'_.*$' . '/', $table)){ // Table de Nomenclature : traduction dans la base courante
+			if ( ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', $table)){ // Table de Nomenclature : traduction dans la base courante
 				$conn                 =   $GLOBALS['conn'];
 			} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 				$conn                 =   $GLOBALS['conn_dico']; 
@@ -2082,7 +2082,7 @@
 			$this->ActMAJ = 1;
 			$iTab = $this->iTab;
 
-			if (!preg_match("/^(0|([1-9][0-9]*))$/", trim($_POST['PRIORITE_'.$iTab]))){
+			if (!ereg ("^(0|([1-9][0-9]*))$", trim($_POST['PRIORITE_'.$iTab]))){
 					$this->OkAction = 0;
 					//return 0;
 					//echo 'passe 1';
@@ -2134,7 +2134,7 @@
 				$this->ActMAJ = 1;
 				$iTab = $this->iTab;
 
-				if (!preg_match("/^(0|([1-9][0-9]*))$/", trim($_POST['PRIORITE_'.$iTab]))){
+				if (!ereg ("^(0|([1-9][0-9]*))$", trim($_POST['PRIORITE_'.$iTab]))){
 						$this->OkAction = 0;
 						//return 0;
 				}
@@ -2216,7 +2216,7 @@
 						}
 
 						if( (trim($_POST[$champ['nom']]) <> '') and ($champ['type'] == 'int')) {
-								if (!preg_match("/^(0|([1-9][0-9]*))$/", trim($_POST[$champ['nom']]))) {
+								if (!ereg ("^(0|([1-9][0-9]*))$", trim($_POST[$champ['nom']]))) {
 										$this->OkAction = 0;
 										$this->lib_champ_err 	= recherche_libelle_page($champ['lib']);
 										break;

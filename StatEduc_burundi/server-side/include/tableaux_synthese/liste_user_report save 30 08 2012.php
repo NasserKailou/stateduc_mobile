@@ -94,7 +94,7 @@
 	
 	function get_val_filtre_critere($id_crit, $nom_champ, $nom_table){
 		
-		if ( preg_match('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', strtoupper($table))){ // Table de Nomenclature : traduction dans la base courante
+		if ( ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', strtoupper($table))){ // Table de Nomenclature : traduction dans la base courante
 			$conn                 =   $GLOBALS['conn'];
 		} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 			$conn                 =   $GLOBALS['conn_dico']; 

@@ -27,7 +27,7 @@
 				foreach($TabBD as $tab)
 				{
 					$deb_fact_tab = 'FACT_TABLE_';
-					if(!preg_match("/^($deb_fact_tab)/i", strtoupper($tab)) && !preg_match("/^(DICO_)/i", strtoupper($tab)) && !preg_match("/^(ADMIN_DROITS)/i", strtoupper($tab)) && !preg_match("/^(ADMIN_GROUPES)/i", strtoupper($tab)) && !preg_match("/^(ADMIN_USERS)/i", strtoupper($tab)) && !preg_match("/^(PARAM_DEFAUT)/i", strtoupper($tab)) && !preg_match("/^(SYSTEME)/i", strtoupper($tab)))
+					if(!eregi("^($deb_fact_tab)",strtoupper($tab)) && !eregi("^(DICO_)",strtoupper($tab)) && !eregi("^(ADMIN_DROITS)",strtoupper($tab)) && !eregi("^(ADMIN_GROUPES)",strtoupper($tab)) && !eregi("^(ADMIN_USERS)",strtoupper($tab)) && !eregi("^(PARAM_DEFAUT)",strtoupper($tab)) && !eregi("^(SYSTEME)",strtoupper($tab)))
 					{
 						$tables[] = $tab;
 					}

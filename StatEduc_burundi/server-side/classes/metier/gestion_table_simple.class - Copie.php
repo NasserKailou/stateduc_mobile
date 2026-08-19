@@ -555,7 +555,7 @@ class gestion_table_simple{
 		public function recherche_libelle($code,$langue,$table){
 				// permet de récupérer le libellé dans la table de traduction
 				// en fonction de la langue et de la table  aussi
-				if ( preg_match('/^'.$GLOBALS['PARAM']['TYPE'].'_.*$/', strtoupper($table))){ // Table de Nomenclature : traduction dans la base courante
+				if ( ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', strtoupper($table))){ // Table de Nomenclature : traduction dans la base courante
 					$conn                 =   $GLOBALS['conn'];
 				} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 					$conn                 =   $GLOBALS['conn_dico']; 
@@ -1068,7 +1068,7 @@ class gestion_table_simple{
 						}
 
 						if( (trim($_POST[$champ['nom']]) <> '') and ($champ['type'] == 'int')){// si type champ entier, valeur entier
-								if (!preg_match('/^(0|([1-9][0-9]*))$/', trim($_POST[$champ['nom']]))){
+								if (!ereg ("^(0|([1-9][0-9]*))$", trim($_POST[$champ['nom']]))){
 										$this->ok_action 	= 0;
 										$this->lib_champ_err 	= recherche_libelle_page($champ['lib']);
 										//die('Err Champ 2: '.$champ['nom']);
@@ -1134,7 +1134,7 @@ class gestion_table_simple{
 																 VALUES
 																 ( '.$_POST[trim($champ)].', \''. trim($champs_trad['table']) .'\', \''.$this->langue.'\', '.$this->conn->qstr($_POST[$champs_trad['libelle']]).' )';
 										
-										if ( preg_match('/^'.$GLOBALS['PARAM']['TYPE'].'_.*$/', strtoupper($champs_trad['table']))){ // Table de Nomenclature : traduction dans la base courante
+										if ( ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', strtoupper($champs_trad['table']))){ // Table de Nomenclature : traduction dans la base courante
 											$conn                 =   $GLOBALS['conn'];
 										} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 											$conn                 =   $GLOBALS['conn_dico']; 
@@ -1226,7 +1226,7 @@ class gestion_table_simple{
 																 AND  CODE_LANGUE=\''.$this->langue.'\'
 																 AND NOM_TABLE=\''.trim($champs_trad['table']).'\'';
 													//
-										if ( preg_match('/^'.$GLOBALS['PARAM']['TYPE'].'_.*$/', strtoupper($champs_trad['table']))){ // Table de Nomenclature : traduction dans la base courante
+										if ( ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', strtoupper($champs_trad['table']))){ // Table de Nomenclature : traduction dans la base courante
 											$conn                 =   $GLOBALS['conn'];
 										} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 											$conn                 =   $GLOBALS['conn_dico']; 
@@ -1290,7 +1290,7 @@ class gestion_table_simple{
 														 WHERE CODE_NOMENCLATURE='.$_POST[trim($champ)].' 
 														 AND NOM_TABLE=\''.trim($champs_trad['table']).'\'';
 
-								if ( preg_match('/^'.$GLOBALS['PARAM']['TYPE'].'_.*$/', strtoupper($champs_trad['table']))){ // Table de Nomenclature : traduction dans la base courante
+								if ( ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', strtoupper($champs_trad['table']))){ // Table de Nomenclature : traduction dans la base courante
 									$conn                 =   $GLOBALS['conn'];
 								} else{ // // Autre Table : traduction dans la base de DICO : peut etre externe
 									$conn                 =   $GLOBALS['conn_dico']; 

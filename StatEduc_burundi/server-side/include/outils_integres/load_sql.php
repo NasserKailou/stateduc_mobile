@@ -52,22 +52,22 @@
 			$nb_ch_sql = 0;
 			$nb_ch_sql_fail = 0;
 			foreach($lines as $line) {
-				if(preg_match('/#conn_database#/', $line) || preg_match('/#conn_base#/', $line)){
+				if(ereg('#conn_database#', $line) || ereg('#conn_base#', $line)){
 					$conn_db = $GLOBALS['conn'];
 					continue;
 				}
-				if(preg_match('/#conn_dico#/', $line)){
+				if(ereg('#conn_dico#', $line)){
 					$conn_db = $GLOBALS['conn_dico'];
 					continue;
 				}
-				if(preg_match('/#begin/', $line)){
+				if(ereg('#begin', $line)){
 					$chaine_sql = '';
 					continue;
 				}
-				if(!preg_match('/#begin/', $line) && !preg_match('/#end/', $line) && !preg_match('/#conn_database#/', $line) && !preg_match('/#conn_base#/', $line) && !preg_match('/#conn_dico#/', $line) && trim($line)<>''){
+				if(!ereg('#begin', $line) && !ereg('#end', $line) && !ereg('#conn_database#', $line) && !ereg('#conn_base#', $line) && !ereg('#conn_dico#', $line) && trim($line)<>''){
 					$chaine_sql .= $line;
 				}
-				if(preg_match('/#end/', $line)){
+				if(ereg('#end', $line)){
 					$nb_ch_sql++;
 					$mess = '';
 					echo '<br>' . $chaine_sql .'';

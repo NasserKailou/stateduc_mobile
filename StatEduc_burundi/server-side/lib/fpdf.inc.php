@@ -1262,8 +1262,8 @@ function _putfonts()
 function _putimages()
 {
 	$filter=($this->compress) ? '/Filter /FlateDecode ' : '';
-	// PHP 8 migration: each() removed in PHP 8.0 — replaced with foreach
-	foreach($this->images as $file => $info)
+	reset($this->images);
+	while(list($file,$info)=each($this->images))
 	{
 		$this->_newobj();
 		$this->images[$file]['n']=$this->n;

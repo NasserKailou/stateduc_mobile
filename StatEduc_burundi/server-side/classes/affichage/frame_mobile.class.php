@@ -684,10 +684,7 @@ class frame_mobile{
 					$code[] = $res[$this->get_champ_extract($champ_pere)];
 				}
 				//Modif Hebie pour recuperation eventuelle de codes nomenclature parent
-				$ColTab	=	$this->conn->MetaColumnNames($table_nomenclature);
-				// FIX session10: MetaColumnNames() peut retourner null/false si la table
-				// n'existe pas dans la connexion courante — array_keys(null) = TypeError PHP8
-				if (!is_array($ColTab)) { $ColTab = array(); }
+				$ColTab	=	$this->conn->MetaColumnNames($table_nomenclature);  
 				$champs=array_keys($ColTab);
 				$code_parent = array();
 				if(count($champs)>3) {

@@ -1,8 +1,7 @@
 <?php function manage_magic_quotes(){
-		// PHP 8 migration: get_magic_quotes_gpc() removed in PHP 8.0
-		// Magic quotes have been removed entirely since PHP 5.4 — this function is now a no-op
-		// ini_set("magic_quotes_runtime", 0); // Also removed in PHP 8
-		if(function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() == 1){
+		ini_set("magic_quotes_runtime", 0);
+		# On n'ex�cute la boucle que si n�cessaire
+		if(get_magic_quotes_gpc() == 1){
 				
 				# D�finition de la fonction r�cursive.
 				function remove_magic_quotes(&$array)
@@ -19,6 +18,9 @@
 				}
 				
 				# Appel de la fonction pour chaque variables.
+				# Notes, vous pouvez enlevez celle d'on vous ne vous servez pas.
+				# Personnellement, j'enl�ve $_REQUEST et $_FILES
+				
 				remove_magic_quotes($_POST);
 				remove_magic_quotes($_GET);
 				remove_magic_quotes($_REQUEST);
@@ -141,7 +143,7 @@ function recherche_libelle($code_libelle){
 			if( (isset($GLOBALS['PARAM']['LOG_BY_SCHOOL_USER']) and trim($GLOBALS['PARAM']['LOG_BY_SCHOOL_USER']) <> '') && (isset($GLOBALS['PARAM']['LOG_BY_SCHOOL_PASS']) and trim($GLOBALS['PARAM']['LOG_BY_SCHOOL_PASS']) <> '') ){
 				require_once $GLOBALS['SISED_PATH_LIB'] . 'connexion.inc.php';
 				require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
-				if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER); // PHP 8: guard
+				define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
 			
 				$requete        = ' SELECT '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].', '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT'].'
 									WHERE '.$GLOBALS['PARAM']['LOG_BY_SCHOOL_USER'].'=\''.$login.'\' AND '.$GLOBALS['PARAM']['LOG_BY_SCHOOL_PASS'].'=\''.$password.'\'';
@@ -352,7 +354,7 @@ function recherche_libelle($code_libelle){
 	function set_tab_session($cas, $langue){
 			
 			require_once $GLOBALS['SISED_PATH_CLS'] . 'adodb/adodb.inc.php';
-			if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER); // PHP 8: guard
+			define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
 			require_once $GLOBALS['SISED_PATH_LIB'] . 'connexion.inc.php';
 			$db                 = $GLOBALS['conn'];
 			switch($cas){

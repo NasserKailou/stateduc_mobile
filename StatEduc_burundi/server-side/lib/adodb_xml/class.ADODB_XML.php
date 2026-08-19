@@ -68,11 +68,9 @@ class ADODB_XML
 			 $this->xml->roottag->add_subtag("ROW", array());
 			 $tag = &$this->xml->roottag->curtag;
 			 
-			 // PHP 8 migration: each() removed in PHP 8.0
-			 $_fieldsValues = array_values($rs->fields);
 			 for ($i = 0; $i < $rs->_numOfFields ; $i++)
 			 {
-				$value = $_fieldsValues[$i] ?? null;
+				list($field, $value) = each($rs->fields);
 				$fieldOk = trim($fields[$i]);		 
 				$tag->add_subtag($fieldOk); //echo $field."\n\n";
 				$tag->curtag->cdata = xmlEncode($value);
@@ -122,11 +120,9 @@ class ADODB_XML
 			 $this->xml->roottag->add_subtag("ROW", array());
 			 $tag = &$this->xml->roottag->curtag;
 			 
-			 // PHP 8 migration: each() removed in PHP 8.0
-			 $_fieldsValues = array_values($rs->fields);
 			 for ($i = 0; $i < $rs->_numOfFields ; $i++)
 			 {
-				$value = $_fieldsValues[$i] ?? null;
+				list($field, $value) = each($rs->fields);
 				$fieldOk = trim($fields[$i]);		 
 				$tag->add_subtag($fieldOk); //echo $field."\n\n";
 				$tag->curtag->cdata = xmlEncode($value);

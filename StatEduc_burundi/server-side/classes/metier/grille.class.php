@@ -551,15 +551,14 @@ class grille {
         // === FIN SESSION 28 DIAG ===
         
         // pour récupérer le nom du FRAME, le nombre de lignes, et la CLASSE
-        // STRATÉGIE en 2 passes pour éviter frame NULL :
-        // Passe 1 : avec filtre APPARTENANCE (garantit le bon FRAME quand thème existe dans 2 APPARTENANCE)
-        // Passe 2 : sans filtre APPARTENANCE (fallback si le thème n'est pas déclaré pour cet APPARTENANCE)
-        $_gdico_appart_crit = (isset($_SESSION['type_ent_stat']) && $_SESSION['type_ent_stat']<>'' ? ' AND B.APPARTENANCE='.(int)$_SESSION['type_ent_stat'] : '');
 		$sql 						=   ' SELECT A.*, B.FRAME, B.NB_LIGNES_FRAME  FROM DICO_THEME  A, DICO_THEME_SYSTEME B '.
                                         ' WHERE A.ID=B.ID '.
                                         ' AND A.ID='.$id_theme.
                                         ' AND B.ID_SYSTEME='.$id_systeme.
-                                        $_gdico_appart_crit;
+                                        // Session 28 : filtre APPARTENANCE pour isoler le bon FRAME classique vs mobile
+                                        // Sans ce filtre, quand ID=900 existe en APPARTENANCE=1 ET APPARTENANCE=2,
+                                        // la requete retourne 2 lignes et prend le mauvais FRAME (ex: infos_gen_2.html au lieu de 9002.html)
+                                        (isset($_SESSION['type_ent_stat']) && $_SESSION['type_ent_stat']<>'' ? ' AND B.APPARTENANCE='.$_SESSION['type_ent_stat'] : '');
 									  
 		// Traitement Erreur Cas : Execute / GetOne
 		try {            
@@ -572,25 +571,6 @@ class grille {
 				$dico['template']		=	$rs->fields['FRAME'];
 				$dico['classe']			=	$rs->fields['CLASSE'];
 				$dico['type_frame']		=	$rs->fields['ID_TYPE_THEME'];
-
-                // --- Passe 2 : fallback sans APPARTENANCE si FRAME toujours vide ---
-                if (empty($dico['template']) && $_gdico_appart_crit !== '') {
-                    $sql_fallback = ' SELECT A.*, B.FRAME, B.NB_LIGNES_FRAME  FROM DICO_THEME  A, DICO_THEME_SYSTEME B '.
-                                   ' WHERE A.ID=B.ID '.
-                                   ' AND A.ID='.$id_theme.
-                                   ' AND B.ID_SYSTEME='.$id_systeme.
-                                   ' LIMIT 1';
-                    $rs_fb = $GLOBALS['conn_dico']->Execute($sql_fallback);
-                    if ($rs_fb !== false && !empty($rs_fb->fields['FRAME'])) {
-                        $dico['nb_lignes']  = $rs_fb->fields['NB_LIGNES_FRAME'];
-                        $dico['template']   = $rs_fb->fields['FRAME'];
-                        $dico['classe']     = $rs_fb->fields['CLASSE'];
-                        $dico['type_frame'] = $rs_fb->fields['ID_TYPE_THEME'];
-                        $_diag_fb2 = date('Y-m-d H:i:s').';get_dico_FRAME_FALLBACK2;id_theme='.$id_theme.';id_systeme='.$id_systeme.';frame='.$dico['template']."\n";
-                        error_log('[DIAG_FRAME_FB2] '.$_diag_fb2);
-                        @file_put_contents(dirname(__FILE__).'/../../../../moblogs/diag_grille.log', $_diag_fb2, FILE_APPEND);
-                    }
-                }
 		}
 		catch (Exception $e) {
 			$erreur = new erreur_manager($e,$sql);

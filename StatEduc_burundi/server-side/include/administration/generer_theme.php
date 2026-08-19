@@ -1,242 +1,95 @@
 <?php
 set_time_limit(0);
-ini_set("memory_limit", "256M");
-
-// ── Streaming immédiat : le navigateur voit chaque itération en temps réel ──
-// ignore_user_abort(true) empêche PHP de s'arrêter si le navigateur se déconnecte.
-// ob_implicit_flush(true) + while_ob_end_flush() vident tous les tampons existants
-// afin que echo/print arrive au navigateur sans attendre la fin du script.
-ignore_user_abort(true);
-@ini_set('zlib.output_compression', '0');
-@ini_set('output_buffering', '0');
-// Vider tous les niveaux de tampon déjà ouverts (Apache/FastCGI peuvent en avoir)
-while (ob_get_level() > 0) { @ob_end_flush(); }
-ob_implicit_flush(true);
+ini_set("memory_limit", "128M");
+//On a besoin de la variable de session 'langue'
 
 require_once $GLOBALS['SISED_PATH_CLS'] . 'affichage/frame.class.php';
 if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) require_once $GLOBALS['SISED_PATH_CLS'] . 'affichage/frame_mobile.class.php';
 
-// ══════════════════════════════════════════════════════════════════════════════
-// FIX DÉFINITIF GENTHEME — Session 8
-// ══════════════════════════════════════════════════════════════════════════════
-//
-// CAUSE RACINE CONFIRMÉE (diagnostic Session 7) :
-//
-// DICO_TYPE_THEME contient 8 types dont "Menu" (et autres non-frame).
-// La requête originale "SELECT ID FROM DICO_THEME WHERE ID_TYPE_THEME<>8"
-// excluait le type 8 mais PAS les autres types non-frame (Menu, etc.).
-// Résultat : des ID_THEME appartenant à des types "Menu" étaient passés
-// à generer_frame() → la requête DICO_TYPE_THEME retournait "Menu" →
-// switch → default → "Attention! Dico" → aucun fichier généré.
-//
-// TYPES VALIDES pour le switch dans frame.class.php :
-//   "Formulaire", "Grille", "Grille_eff_1", "Grille_eff_2",
-//   "Grille_eff_3", "Mat_Grille", "Matrice"
-//
-// FIX :
-// 1. Requête $id_themes filtrée par JOIN sur DICO_TYPE_THEME pour ne garder
-//    QUE les thèmes dont le LIBELLE de type est un type-frame valide.
-// 2. $_SESSION['langue'] forcé à 'fr' (bug langue confirmé session 7).
-// 3. Output buffering pour compter les "Attention! Dico" résiduels.
-// ══════════════════════════════════════════════════════════════════════════════
+// Instanciation
+$db             = $GLOBALS['conn'];
 
-// ── 1. Forcer langue 'fr' (frame.class.php utilise $_SESSION['langue'] direct) ─
-$_langue_session_original = isset($_SESSION['langue']) ? $_SESSION['langue'] : 'fr';
-$_SESSION['langue'] = 'fr';
+$langues		=	array();
+$id_themes		=	array();
+$id_systemes	=	array();
 
-// ── 2. Connexions ─────────────────────────────────────────────────────────────
-$db       = $GLOBALS['conn'];
-$db_dico  = $GLOBALS['conn_dico'];
+//$requete   		= "SELECT CODE_LANGUE, LIBELLE_LANGUE FROM DICO_LANGUE WHERE CODE_LANGUE='fr';";
 
-$langues     = array();
-$id_themes   = array();
-$id_systemes = array();
-$errors      = array();
-$info        = array();
-
-// ── 3. Langues ────────────────────────────────────────────────────────────────
-if (isset($_GET['langue_regen'])) {
-    $langues[] = trim($_GET['langue_regen']);
-} else {
-    $all_langues = $db_dico->GetAll("SELECT CODE_LANGUE FROM DICO_LANGUE;");
-    if (is_array($all_langues)) {
-        foreach ($all_langues as $row) {
-            $code = isset($row['CODE_LANGUE']) ? trim($row['CODE_LANGUE'])
-                  : (isset($row['code_langue']) ? trim($row['code_langue']) : '');
-            if ($code !== '') $langues[] = $code;
-        }
-    }
-    if (empty($langues)) {
-        $langues[] = 'fr';
-        $errors[]  = 'DICO_LANGUE vide → langue "fr" forcée.';
-    }
-}
-$info[] = 'Langues : ' . implode(', ', $langues);
-
-// ── 4. Tableau $id_themes — FILTRE SUR LES TYPES FRAME VALIDES ───────────────
-// Types de frames reconnus par le switch de frame.class.php
-$types_frame_valides = ['Formulaire','Grille','Grille_eff_1','Grille_eff_2','Grille_eff_3','Mat_Grille','Matrice'];
-// Placeholders SQL pour les types valides
-$placeholders = implode(',', array_fill(0, count($types_frame_valides), '?'));
-
-// Requête : JOIN DICO_TYPE_THEME pour ne sélectionner QUE les thèmes
-// dont le type est un type-frame valide (exclut "Menu" et autres non-frame)
-// On filtre aussi ID_TYPE_THEME<>8 pour exclure les types système
-$requete_themes = "SELECT DT.ID
-                   FROM   DICO_THEME DT
-                   INNER  JOIN DICO_TYPE_THEME DTT
-                          ON  DTT.ID_TYPE_THEME = DT.ID_TYPE_THEME
-                          AND DTT.CODE_LANGUE   = 'fr'
-                   WHERE  DTT.LIBELLE IN ({$placeholders})";
-
-$all_themes = $db_dico->GetAll($requete_themes, $types_frame_valides);
-
-if (is_array($all_themes)) {
-    foreach ($all_themes as $row) {
-        $id = isset($row['ID']) ? (int)$row['ID']
-            : (isset($row['id']) ? (int)$row['id'] : 0);
-        if ($id > 0) $id_themes[] = $id;
-    }
-    $id_themes = array_unique($id_themes);
+if(isset($_GET['langue_regen'])){
+		$langues[]		=	$_GET['langue_regen'];
+}else{
+		$requete   		= "SELECT CODE_LANGUE, LIBELLE_LANGUE FROM DICO_LANGUE;";
+		$all_langues 	= $GLOBALS['conn_dico']->GetAll($requete);
+		foreach ($all_langues as $langue){
+			$langues[]	=	$langue['CODE_LANGUE'];
+		}
 }
 
-// Fallback : si la requête paramétrée échoue (certaines versions ADODB),
-// utiliser la requête simple avec concaténation sécurisée des types (valeurs fixes)
-if (empty($id_themes)) {
-    $types_quoted = implode(',', array_map(fn($t) => "'" . addslashes($t) . "'", $types_frame_valides));
-    $requete_fb = "SELECT DT.ID
-                   FROM   DICO_THEME DT
-                   INNER  JOIN DICO_TYPE_THEME DTT
-                          ON  DTT.ID_TYPE_THEME = DT.ID_TYPE_THEME
-                          AND DTT.CODE_LANGUE   = 'fr'
-                   WHERE  DTT.LIBELLE IN ({$types_quoted})";
-    $all_themes_fb = $db_dico->GetAll($requete_fb);
-    if (is_array($all_themes_fb)) {
-        foreach ($all_themes_fb as $row) {
-            $id = isset($row['ID']) ? (int)$row['ID']
-                : (isset($row['id']) ? (int)$row['id'] : 0);
-            if ($id > 0) $id_themes[] = $id;
-        }
-        $id_themes = array_unique($id_themes);
-    }
+//$requete   	= "SELECT ID FROM DICO_THEME WHERE ID IN ( 40, 50, 80, 90, 100, 110, 120, 130 );";
+//$requete   		= "SELECT ID FROM DICO_THEME;";
+
+//$requete   	= "SELECT ID FROM DICO_THEME WHERE ID IN ( 150 );";
+
+$requete   		= 'SELECT ID FROM DICO_THEME WHERE ID_TYPE_THEME<>8';
+                  
+$all_themes 	= $GLOBALS['conn_dico']->GetAll($requete);
+foreach ($all_themes as $theme){
+	$id_themes[]	=	$theme['ID'];
 }
 
-$info[] = 'Thèmes (types frame valides uniquement) : ' . count($id_themes);
-if (empty($id_themes)) {
-    $errors[] = 'Aucun thème trouvé pour les types frame valides.';
+//$requete   		= "SELECT ID_SYSTEME FROM DICO_SYSTEME WHERE ID_SYSTEME=1;";
+
+$requete   		= 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].' FROM '.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].';';
+$all_systemes = $db->GetAll($requete);
+foreach ($all_systemes as $systeme){
+	$id_systemes[]	=	$systeme[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT']];
 }
 
-// ── 5. Tableau $id_systemes ───────────────────────────────────────────────────
-$param_code    = $GLOBALS['PARAM']['CODE']                      ?? 'CODE';
-$param_type    = $GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'] ?? 'TYPE_SECTEUR_ENS';
-$col_systeme   = strtoupper($param_code . '_' . $param_type);  // "CODE_TYPE_SECTEUR_ENS"
-$table_systeme = $param_type;                                   // "TYPE_SECTEUR_ENS"
+$form           =	new frame( $id_themes, $langues, $id_systemes, '', '' );
+if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) $form_mobile    =	new frame_mobile( $id_themes, $langues, $id_systemes, '', '' );
 
-$all_systemes = $db->GetAll("SELECT {$col_systeme} FROM {$table_systeme};");
-if (is_array($all_systemes) && count($all_systemes) > 0) {
-    foreach ($all_systemes as $row) {
-        if (isset($row[$col_systeme]))                   { $id_systemes[] = (int)$row[$col_systeme]; }
-        elseif (isset($row[strtolower($col_systeme)]))   { $id_systemes[] = (int)$row[strtolower($col_systeme)]; }
-        else                                             { $id_systemes[] = (int)reset($row); }
-    }
-    $id_systemes = array_values(array_unique(array_filter($id_systemes)));
-}
-if (empty($id_systemes)) {
-    // Fallback SELECT * pour détecter la bonne colonne
-    $all_sys2 = $db->GetAll("SELECT * FROM {$table_systeme};");
-    if (is_array($all_sys2)) {
-        foreach ($all_sys2 as $row) {
-            foreach ($row as $key => $val) {
-                if (stripos($key, 'CODE') !== false && stripos($key, 'TYPE') !== false) {
-                    $id_systemes[] = (int)$val; break;
-                }
-            }
-        }
-        $id_systemes = array_values(array_unique(array_filter($id_systemes)));
-    }
-}
-$info[] = "Systèmes d'enseignement ({$table_systeme}) : " . count($id_systemes) . ' → [' . implode(',', $id_systemes) . ']';
-if (empty($id_systemes)) $errors[] = "Table {$table_systeme} vide ou inaccessible.";
+// Pour chaque langue 
 
-// ── 6. Affichage diagnostic ───────────────────────────────────────────────────
-echo '<div style="font-family:monospace;font-size:13px;margin:8px 0;border:1px solid #ddd;padding:8px;border-radius:4px;">';
-echo '<strong style="font-size:14px;">📋 Diagnostic gentheme</strong><br><br>';
-foreach ($errors as $e) {
-    echo '<span style="color:#c00;">⚠ ' . htmlspecialchars($e) . '</span><br>';
-}
-foreach ($info as $i) {
-    echo '<span style="color:#555;">ℹ ' . htmlspecialchars($i) . '</span><br>';
-}
 
-// ── 7. Arrêt si données manquantes ────────────────────────────────────────────
-if (empty($id_themes) || empty($id_systemes) || empty($langues)) {
-    echo '<br><strong style="color:#c00;">✖ Génération impossible — données manquantes.</strong>';
-    echo '</div>';
-    $_SESSION['langue'] = $_langue_session_original;
-    return;
-}
+//------------------------------------------
 
-echo '<br><span style="color:#555;">⚙ Lancement génération (' . count($id_themes) . ' thèmes × '
-     . count($id_systemes) . ' systèmes × ' . count($langues) . ' langue(s))...</span><br>';
-echo '</div>';
 
-// ── 8. Génération en streaming (SANS ob_start/ob_get_clean) ───────────────────
-//
-// EXPLICATION DU BUG Session 8 :
-//   ob_start() capturait TOUTE la sortie de frame::generer_frame() (1456 itérations
-//   × <H1>/<H2>/<H3>) sans rien envoyer au navigateur → browser timeout/spinner.
-//
-// CORRECTION :
-//   - ob_start/ob_get_clean supprimés pour la génération principale.
-//   - @ob_flush(); @flush(); après la construction → le navigateur reçoit le
-//     résumé immédiatement après la fin du constructeur.
-//   - ignore_user_abort(true) + ob_implicit_flush(true) en tête de script
-//     garantissent que chaque echo/print part tout de suite au navigateur.
-//
-$generation_ok = true;
-$nb_attention  = 0;
+/*
+// Traitement du theme ENV SOCIO ECO (type formulaire)
+$form->set_id_theme(20);
+$form->generer_frame();
 
-try {
-    // Le constructeur appelle generer_frame() en interne.
-    // Chaque itération émet <H1>/<H2>/<H3> — visibles en temps réel grâce
-    // à ob_implicit_flush(true) défini en tête de fichier.
-    $form = new frame($id_themes, $langues, $id_systemes, '', '');
-} catch (Throwable $ex) {
-    $generation_ok = false;
-    echo '<p style="color:#c00;font-weight:bold;">✖ Exception : ' . htmlspecialchars($ex->getMessage()) . '</p>';
-}
+// Traitement du theme LOCAUX (type grille)
+$form->set_id_theme(40);
+$form->generer_frame();
 
-// Forcer l'envoi du tampon vers le navigateur
-@ob_flush();
-@flush();
+// Traitement du theme 2
+//$form->set_id_theme(180);
+//$form->generer_frame();
 
-// ── 9. Mobile ─────────────────────────────────────────────────────────────────
-if ($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) {
-    try {
-        $form_mobile = new frame_mobile($id_themes, $langues, $id_systemes, '', '');
-    } catch (Throwable $ex) {
-        echo '<p style="color:#c00;">✖ frame_mobile : ' . htmlspecialchars($ex->getMessage()) . '</p>';
-    }
-    @ob_flush();
-    @flush();
-}
+// Traitement theme 3 (Matrice 2D)
+$form->set_id_theme(50);
+$form->generer_frame();
 
-// ── 10. Restauration langue + bilan ───────────────────────────────────────────
-$_SESSION['langue'] = $_langue_session_original;
-unset($_langue_session_original);
 
-echo '<div style="font-family:monospace;font-size:13px;margin:8px 0;">';
-if ($generation_ok) {
-    echo '<p style="color:green;font-weight:bold;">✔ Génération terminée avec succès ('
-         . count($id_themes) . ' thèmes, ' . count($id_systemes) . ' systèmes, '
-         . count($langues) . ' langue(s)).</p>';
-    if ($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) {
-        echo '<p style="color:green;">✔ Génération mobile terminée.</p>';
-    }
-} else {
-    echo '<p style="color:#c00;font-weight:bold;">⚠ Génération terminée avec erreurs (voir ci-dessus).</p>';
-}
-echo '</div>';
-@ob_flush();
-@flush();
+// Traitement theme 4 (Matrice 1 dimension /1 ou plusieurs lignes)
+$form->set_id_theme(10);
+$form->generer_frame();
+
+// Traitement theme 4 (Matrice 1 dimension / 2 colonnes)
+$form->set_id_theme(70);
+$form->generer_frame();
+
+// Users
+$form->set_id_theme(2000);
+$form->generer_frame();
+// Bailleurs / Systeme
+$form->set_id_theme(3000);
+$form->generer_frame();
+
+
+*/
+
+//------------------------------------------
+
 ?>
