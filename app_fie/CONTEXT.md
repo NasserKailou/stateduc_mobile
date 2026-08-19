@@ -497,3 +497,31 @@ gh pr comment 4 --body "..."
 `InscriptionController.php`, `BibliothequeController.php`, `Router.php`, `app_layout.php`,
 `SyncService.php`, `bibliotheque/index.php`, `import_eleves.php` (créé),
 `migrations/006_ref_type_nationalite.sql` (créé)
+
+---
+
+## SESSION 15 (2026-08-19) — Charte graphique Burundi + redesign auth + recherche inscrits + dashboard
+
+### Bugs corrigés
+- **`--fie-red` / `--fie-primary`** : `#007bff` (bleu) → `#CE1126` (rouge Burundi officiel) dans `fie.css`
+- **`--bi-red`** : `#1a56db` (bleu) → `#CE1126` dans `home.php` ; `.flag-strip` et `.fie-auth-flag__red` affichent maintenant rouge/blanc/vert
+- **StatEduc `connexion.class.php`** : `define('ADODB_ASSOC_CASE',...)` → `if (!defined('ADODB_ASSOC_CASE')) { define(...) }` (élimine le Warning PHP8)
+
+### Nouvelles fonctionnalités
+- **Navbar** (`app_layout.php`) : icône `fa-graduation-cap` remplacée par `<img armoiries_burundi.gif>` (sidebar + topbar)
+- **Auth page** (`login.php`) : redesign complet inspiré TGIHC — 2 panneaux (gauche sombre+armoirie, droite blanc+form), gov-bar, btn-connexion rouge gradient, responsive
+- **PDF fiche élève** (`print.php`) : `body::before` filigrane armoiries (opacity:0.06), en-tête 3 colonnes (armoiries|texte MENERS/DGESS|drapeau), bande drapeau CSS, tableau historique inscriptions
+- **`/inscription/recherche`** (`InscriptionController.php` + `search.php`) : liste complète par défaut, 9 critères filtres (q, nom, iue, province, commune, colline, ecole, sexe, annee), RBAC (admin=tous / directeur+enseignant=leur établissement), pagination, actions voir+imprimer
+- **Dashboard** (`DashboardController.php` + `index.php`) : graphique ligne évolution mensuelle (Chart.js 4.4.3), barres province top18, tableau top-10 établissements, donut nationalité, barres niveaux, tableau 15 derniers inscrits
+- **Images** : `app_fie/public/images/armoiries_burundi.gif` + `drapeau_burundi.gif` (nouvelles)
+
+### Fichiers modifiés (session 15)
+`StatEduc_burundi/server-side/classes/connexion.class.php`,
+`app_fie/public/css/fie.css`, `app_fie/app/views/public_site/home.php`,
+`app_fie/app/views/layouts/app_layout.php`, `app_fie/app/views/auth/login.php`,
+`app_fie/app/views/inscription/print.php`, `app_fie/app/views/inscription/search.php`,
+`app_fie/app/controllers/InscriptionController.php`,
+`app_fie/app/controllers/DashboardController.php`, `app_fie/app/views/dashboard/index.php`
+
+### Commit session 15
+`9bb480f` — `feat+fix(session15): armoiries+drapeau+rouge-Burundi+auth-redesign+PDF-filigrane+recherche-inscrits+dashboard-charts+ADODB-fix`
