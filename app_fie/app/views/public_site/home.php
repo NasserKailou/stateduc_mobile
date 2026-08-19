@@ -193,7 +193,7 @@
        NAVBAR STICKY
        ══════════════════════════════════════════════════════════════════════════ */
     #mainNav {
-        background: var(--bi-red);
+        background: var(--bi-blue);    /* Bleu institutionnel — conserver */
         padding-top: .9rem;
         padding-bottom: .9rem;
         transition: padding var(--bi-transition), box-shadow var(--bi-transition);
@@ -203,7 +203,8 @@
     }
 
     #mainNav.scrolled {
-        box-shadow: 0 4px 20px rgba(206,17,38,.35);
+        background: var(--bi-blue-d);
+        box-shadow: 0 4px 20px rgba(19,67,168,.40);
         padding-top: .5rem;
         padding-bottom: .5rem;
     }
@@ -242,22 +243,24 @@
     .navbar-toggler { border: none !important; padding: .3rem .5rem; }
     .navbar-toggler:focus { box-shadow: none !important; }
 
-    /* Bouton Connexion en pill blanc */
+    /* Bouton Connexion en pill blanc — texte bleu foncé bien visible */
     .btn-nav-login {
         background: #fff;
-        color: var(--bi-red) !important;
+        color: var(--bi-blue-d) !important;
         font-family: 'Poppins', sans-serif;
         font-weight: 700 !important; font-size: .85rem !important;
-        padding: .45rem 1.3rem !important;
+        padding: .45rem 1.4rem !important;
         border-radius: 50px !important;
-        border: none;
-        transition: transform var(--bi-transition), box-shadow var(--bi-transition) !important;
+        border: 2px solid rgba(255,255,255,.6);
+        transition: transform var(--bi-transition), box-shadow var(--bi-transition), background var(--bi-transition) !important;
         white-space: nowrap;
+        letter-spacing: .02em;
     }
     .btn-nav-login:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(0,0,0,.25);
-        background: #f8f8f8 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,.30);
+        background: #e8f0fe !important;
+        color: var(--bi-blue-d) !important;
     }
 
     /* ══════════════════════════════════════════════════════════════════════════
@@ -1027,8 +1030,9 @@
 
         <!-- LOGO -->
         <a class="navbar-brand" href="<?= BASE_URL ?>/">
-            <div class="nav-logo-box">
-                <i class="fa-solid fa-graduation-cap text-white fa-lg"></i>
+            <div class="nav-logo-box" style="background:rgba(255,255,255,.15);padding:4px;">
+                <img src="<?= BASE_URL ?>/public/images/armoiries_burundi.gif"
+                     alt="Armoiries du Burundi" style="width:30px;height:auto;display:block;">
             </div>
             <div class="d-flex flex-column lh-1">
                 <span class="text-white fw-bold" style="font-size:1.1rem;letter-spacing:-.01em;">FIE</span>

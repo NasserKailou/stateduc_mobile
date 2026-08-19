@@ -50,7 +50,7 @@ $_am       = $active_menu ?? '';
   <!-- ╔═══════════════════════════════════════════════════════╗
        ║  TOPBAR ADMINLTE                                      ║
        ╚═══════════════════════════════════════════════════════╝ -->
-  <nav class="app-header navbar navbar-expand fie-app-topbar" style="background:var(--fie-primary);">
+  <nav class="app-header navbar navbar-expand fie-app-topbar" style="background:#1a56db;">
     <div class="container-fluid">
 
       <!-- Sidebar toggle + Brand -->

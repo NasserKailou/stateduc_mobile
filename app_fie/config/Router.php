@@ -71,6 +71,8 @@ class Router
         $this->get('/contact',         'PublicController', 'contact');
         $this->get('/confidentialite', 'PublicController', 'confidentialite');
         $this->get('/mentions-legales','PublicController', 'mentions');
+        // ── Profil public élève (accessible via QR code, sans connexion) ────
+        $this->get('/eleve/:iue',      'PublicController', 'elevePublic');
 
         // ── Authentification ─────────────────────────────────────────────────
         $this->get('/connexion',  'AuthController', 'loginForm');

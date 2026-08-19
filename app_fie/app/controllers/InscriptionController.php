@@ -275,7 +275,10 @@ class InscriptionController
         ];
 
         $page    = max(1, (int)($_GET['page'] ?? 1));
-        $perPage = 25;
+        // Pagination optimisée pour grands volumes — 50 résultats/page
+        // Limite configurable via ?per_page= (entre 10 et 200)
+        $perPageReq = (int)($_GET['per_page'] ?? 50);
+        $perPage    = max(10, min(200, $perPageReq));
 
         // ── Restriction par rôle ───────────────────────────────────────────
         // Directeur/Enseignant ne voient que leur établissement
@@ -352,14 +355,15 @@ class InscriptionController
         $offset = ($page - 1) * $perPage;
 
         $results = $safe(fn() => Database::fetchAll(
-            "SELECT DISTINCT e.id, e.iue, e.nom, e.prenoms, e.sexe, e.date_naissance,
+            "SELECT e.id, e.iue, e.nom, e.prenoms, e.sexe, e.date_naissance,
                     e.statut, e.doublon_suspect,
                     em.nom_etablissement AS dernier_etablissement,
                     em.province, em.commune,
                     i.code_type_annee AS derniere_annee
              FROM eleves e $join
              WHERE $whereSql
-             ORDER BY e.nom, e.prenoms
+             GROUP BY e.id
+             ORDER BY e.nom ASC, e.prenoms ASC
              LIMIT $perPage OFFSET $offset",
             $params
         ), []) ?: [];

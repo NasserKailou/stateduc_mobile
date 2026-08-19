@@ -16,9 +16,13 @@
     --fie-red:          #CE1126;   /* Rouge Burundi officiel */
     --fie-red-dark:     #a00e1b;
     --fie-red-light:    #fce8ea;
-    --fie-primary:      #CE1126;
+    --fie-primary:      #CE1126;   /* Rouge — boutons/badges/accents */
     --fie-primary-dark: #a00e1b;
     --fie-primary-light:#fce8ea;
+    /* Bleu institutionnel — topbar / sidebar / navigation app */
+    --fie-app-blue:     #1a56db;
+    --fie-app-blue-dark:#1343a8;
+    --fie-app-blue-light:#eff6ff;
     --fie-accent:       #17a2b8;
     --fie-accent-dark:  #117a8b;
     --fie-accent-light: #d1ecf1;

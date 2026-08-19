@@ -329,42 +329,69 @@ require BASE_PATH . '/app/views/layouts/app_layout.php';
     </div>
 </div>
 
-<!-- ── Pagination ─────────────────────────────────────────────────────── -->
-<?php if (($pages ?? 1) > 1): ?>
-<nav aria-label="Pagination des élèves" class="mt-3">
-    <?php
-    $params = $_GET;
-    unset($params['page']);
-    $baseQs = http_build_query($params);
-    $link   = fn(int $p): string => BASE_URL . '/inscription/recherche?' . ($baseQs ? $baseQs . '&' : '') . 'page=' . $p;
-    $page   = $page ?? 1;
-    $pages  = $pages ?? 1;
-    ?>
-    <ul class="pagination justify-content-center mb-0">
-        <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-            <a class="page-link" href="<?= $link(1) ?>" aria-label="Première">«</a>
-        </li>
-        <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-            <a class="page-link" href="<?= $link($page - 1) ?>" aria-label="Précédente">‹</a>
-        </li>
-        <?php for ($i = max(1, $page - 2); $i <= min($pages, $page + 2); $i++): ?>
-        <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-            <a class="page-link" href="<?= $link($i) ?>"><?= $i ?></a>
-        </li>
-        <?php endfor; ?>
-        <li class="page-item <?= $page >= $pages ? 'disabled' : '' ?>">
-            <a class="page-link" href="<?= $link($page + 1) ?>" aria-label="Suivante">›</a>
-        </li>
-        <li class="page-item <?= $page >= $pages ? 'disabled' : '' ?>">
-            <a class="page-link" href="<?= $link($pages) ?>" aria-label="Dernière">»</a>
-        </li>
-    </ul>
-    <div class="text-center text-muted small mt-2">
-        Page <?= $page ?> / <?= $pages ?>
-        — <?= number_format($total ?? 0) ?> élève<?= ($total ?? 0) > 1 ? 's' : '' ?>
-    </div>
-</nav>
-<?php endif; ?>
+<!-- ── Pagination + sélecteur de résultats/page ──────────────────────── -->
+<?php
+$_page    = $page   ?? 1;
+$_pages   = $pages  ?? 1;
+$_total   = $total  ?? 0;
+$_perPage = $perPage ?? 50;
+$_params  = $_GET;
+unset($_params['page']);
+$_baseQs  = http_build_query($_params);
+$_link    = fn(int $p): string => BASE_URL . '/inscription/recherche?' . ($_baseQs ? $_baseQs . '&' : '') . 'page=' . $p;
+?>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-3 mb-2">
+    <!-- Sélecteur résultats/page -->
+    <form method="get" action="<?= BASE_URL ?>/inscription/recherche" class="d-flex align-items-center gap-2 no-print">
+        <?php foreach ($_GET as $k => $v): if ($k === 'per_page' || $k === 'page') continue; ?>
+        <input type="hidden" name="<?= htmlspecialchars($k, ENT_QUOTES) ?>"
+               value="<?= htmlspecialchars((string)$v, ENT_QUOTES) ?>">
+        <?php endforeach; ?>
+        <label class="form-label mb-0 small fw-semibold text-muted" for="perPageSel">Résultats/page :</label>
+        <select name="per_page" id="perPageSel" class="form-select form-select-sm" style="width:auto;"
+                onchange="this.form.submit()">
+            <?php foreach ([25, 50, 100, 200] as $pp): ?>
+            <option value="<?= $pp ?>" <?= $pp === $_perPage ? 'selected' : '' ?>><?= $pp ?></option>
+            <?php endforeach; ?>
+        </select>
+        <span class="text-muted small">
+            <?= number_format($_total) ?> élève<?= $_total > 1 ? 's' : '' ?>
+            &nbsp;·&nbsp;
+            Page <?= $_page ?> / <?= $_pages ?>
+        </span>
+    </form>
+
+    <!-- Contrôles de pagination -->
+    <?php if ($_pages > 1): ?>
+    <nav aria-label="Pagination des élèves">
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item <?= $_page <= 1 ? 'disabled' : '' ?>">
+                <a class="page-link" href="<?= $_link(1) ?>" aria-label="Première page" title="Première">«</a>
+            </li>
+            <li class="page-item <?= $_page <= 1 ? 'disabled' : '' ?>">
+                <a class="page-link" href="<?= $_link($_page - 1) ?>" aria-label="Page précédente">‹</a>
+            </li>
+            <?php
+            // Fenêtre de pages : max 7 liens (± 3 autour de la page courante)
+            $wStart = max(1, $_page - 3);
+            $wEnd   = min($_pages, $_page + 3);
+            if ($wStart > 1): ?><li class="page-item disabled"><span class="page-link">…</span></li><?php endif;
+            for ($i = $wStart; $i <= $wEnd; $i++): ?>
+            <li class="page-item <?= $i === $_page ? 'active' : '' ?>">
+                <a class="page-link" href="<?= $_link($i) ?>"><?= $i ?></a>
+            </li>
+            <?php endfor;
+            if ($wEnd < $_pages): ?><li class="page-item disabled"><span class="page-link">…</span></li><?php endif; ?>
+            <li class="page-item <?= $_page >= $_pages ? 'disabled' : '' ?>">
+                <a class="page-link" href="<?= $_link($_page + 1) ?>" aria-label="Page suivante">›</a>
+            </li>
+            <li class="page-item <?= $_page >= $_pages ? 'disabled' : '' ?>">
+                <a class="page-link" href="<?= $_link($_pages) ?>" aria-label="Dernière page" title="Dernière">»</a>
+            </li>
+        </ul>
+    </nav>
+    <?php endif; ?>
+</div>
 
 <?php endif; ?>
 

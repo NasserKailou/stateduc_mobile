@@ -233,6 +233,11 @@ $base = BASE_URL;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+    /* QR code — forcer l'impression des images */
+    img {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
   }
 </style>
 </head>
@@ -336,6 +341,26 @@ $base = BASE_URL;
     </tbody>
   </table>
   <?php endif; ?>
+
+  <!-- ─── QR code IUE ─────────────────────────────────────────────── -->
+  <?php
+    $iue_val   = SecurityHelper::e($eleve['iue'] ?? '');
+    // URL publique scannée par QR → profil public de l'élève
+    $qr_url    = rtrim(BASE_URL, '/') . '/eleve/' . urlencode($eleve['iue'] ?? '');
+    $qr_api    = 'https://api.qrserver.com/v1/create-qr-code/?size=110x110&data='
+                 . urlencode($qr_url) . '&ecc=M&margin=4';
+  ?>
+  <div style="display:flex;justify-content:flex-end;margin:10px 0 4px;">
+    <div style="border:1.5px solid #ddd;border-radius:6px;padding:8px;background:#fff;
+                text-align:center;width:140px;flex-shrink:0;">
+      <img src="<?= $qr_api ?>" alt="QR code IUE <?= $iue_val ?>"
+           width="110" height="110" style="display:block;margin:0 auto 4px;">
+      <div style="font-size:7pt;color:#555;font-family:monospace;letter-spacing:.04em;word-break:break-all;">
+        <?= $iue_val ?>
+      </div>
+      <div style="font-size:6.5pt;color:#888;margin-top:2px;">Scanner pour vérifier</div>
+    </div>
+  </div>
 
   <!-- ─── Signatures ──────────────────────────────────────────────── -->
   <div class="signatures">

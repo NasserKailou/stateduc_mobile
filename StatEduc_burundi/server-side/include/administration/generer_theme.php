@@ -1,6 +1,8 @@
 <?php
 set_time_limit(0);
 ini_set("memory_limit", "128M");
+// PHP8 compat: desactiver le buffer de sortie pour voir la progression en temps reel
+if (ob_get_level()) { ob_end_flush(); }
 //On a besoin de la variable de session 'langue'
 
 require_once $GLOBALS['SISED_PATH_CLS'] . 'affichage/frame.class.php';
@@ -43,6 +45,13 @@ $requete   		= 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_S
 $all_systemes = $db->GetAll($requete);
 foreach ($all_systemes as $systeme){
 	$id_systemes[]	=	$systeme[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT']];
+}
+
+// PHP8 compat: $_SESSION['langue'] doit etre defini avant que frame::generer_frame() l'utilise
+// (la requete SQL sur DICO_TYPE_THEME filtre par CODE_LANGUE = $_SESSION['langue'])
+// Si langue n'est pas en session, on utilise la premiere langue du tableau
+if (!isset($_SESSION['langue']) || $_SESSION['langue'] === '') {
+    $_SESSION['langue'] = !empty($langues) ? $langues[0] : 'fr';
 }
 
 $form           =	new frame( $id_themes, $langues, $id_systemes, '', '' );

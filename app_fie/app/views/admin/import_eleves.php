@@ -9,7 +9,7 @@ $active_menu = $active_menu ?? 'admin_import_eleves';
 $ecoles      = $ecoles      ?? [];
 $annees      = $annees      ?? [];
 require BASE_PATH . '/app/views/layouts/app_layout.php';
-$csrf = SecurityHelper::csrfToken();
+$csrf = SecurityHelper::getCsrfToken();
 $msgs = $_SESSION['fie_import_eleves_messages'] ?? [];
 unset($_SESSION['fie_import_eleves_messages']);
 ?>

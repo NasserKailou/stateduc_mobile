@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title ?? 'Connexion — FIE Burundi', ENT_QUOTES, 'UTF-8') ?></title>
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#CE1126">
+    <meta name="theme-color" content="#1a56db">
 
     <!-- Bootstrap 5 -->
     <link rel="stylesheet"
@@ -24,38 +24,52 @@
     <link rel="icon" href="<?= BASE_URL ?>/public/img/favicon.png" type="image/png">
 
     <style>
+        /* ── Variables ─────────────────────────────────────────── */
         :root {
-            --bi-red:       #CE1126;   /* Rouge Burundi */
-            --bi-red-dark:  #a00e1b;
-            --bi-red-light: #fce8ea;
-            --bi-green:     #1EB53A;
-            --bi-green-dk:  #178a2b;
-            --bi-white:     #FFFFFF;
-            --bi-dark:      #0f1f0e;
-            --bi-navy:      #1a2636;
+            --red:          #CE1126;
+            --red-dk:       #a00e1b;
+            --green:        #1EB53A;
+            --green-dk:     #178a2b;
+            --blue:         #1a56db;
+            --blue-dk:      #1343a8;
+            --blue-light:   #eff6ff;
+            --blue-mid:     #3b82f6;
+            --navy:         #0f2749;
+            --white:        #ffffff;
+            --gray-50:      #f9fafb;
+            --gray-100:     #f3f4f6;
+            --gray-200:     #e5e7eb;
+            --gray-400:     #9ca3af;
+            --gray-600:     #4b5563;
+            --gray-700:     #374151;
+            --gray-900:     #111827;
+            --shadow-card:  0 20px 60px rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.08);
+            --radius-lg:    1rem;
+            --radius-md:    0.625rem;
+            --transition:   .25s cubic-bezier(.4,0,.2,1);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* ── Corps — fond clair dégradé ── */
         body {
             min-height: 100vh;
-            background: var(--bi-navy);
-            background-image:
-                radial-gradient(ellipse at 20% 50%, rgba(206,17,38,0.18) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(30,181,58,0.10) 0%, transparent 50%);
+            background: linear-gradient(135deg, #e8f0fe 0%, #f0f7ff 40%, #f5f9ff 70%, #e8f5ee 100%);
             display: flex;
             flex-direction: column;
-            font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+            font-family: 'Open Sans', system-ui, sans-serif;
+            color: var(--gray-700);
         }
 
         /* ── Barre institutionnelle supérieure ── */
         .gov-bar {
-            background: linear-gradient(90deg, #0a1520 0%, #1a2636 50%, #0a1520 100%);
-            border-bottom: 3px solid var(--bi-red);
-            padding: 10px 0;
+            background: var(--navy);
+            border-bottom: 3px solid var(--blue);
+            padding: 8px 0;
+            flex-shrink: 0;
         }
         .gov-bar-inner {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 1.5rem;
             display: flex;
@@ -64,25 +78,27 @@
             gap: 1rem;
         }
         .gov-title {
-            color: #fff;
-            font-size: 0.72rem;
+            color: rgba(255,255,255,.75);
+            font-size: 0.70rem;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            opacity: 0.8;
+            letter-spacing: 0.07em;
         }
         .gov-title strong {
-            color: #ffd0d6;
-            font-size: 0.80rem;
+            color: #fff;
+            font-size: 0.78rem;
             display: block;
+            letter-spacing: 0.02em;
+            margin-top: 1px;
         }
-
-        /* Bande tricolore décorative */
         .tri-strip {
-            height: 3px;
-            background: linear-gradient(to right, var(--bi-red) 0% 33.33%, #fff 33.33% 66.66%, var(--bi-green) 66.66% 100%);
-            width: 60px;
-            border-radius: 2px;
+            height: 18px;
+            width: 54px;
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+            flex-shrink: 0;
         }
+        .tri-strip span { flex: 1; display: block; }
 
         /* ── Zone principale ── */
         .login-wrapper {
@@ -90,22 +106,30 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem 1rem;
+            padding: 2.5rem 1rem;
         }
 
-        .login-container {
+        /* ── Carte principale ── */
+        .login-card {
             width: 100%;
             max-width: 960px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            border-radius: 1rem;
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            box-shadow: 0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(206,17,38,0.25);
+            box-shadow: var(--shadow-card);
+            background: var(--white);
         }
 
-        /* ── Panneau gauche institutionnel ── */
+        /* ════════════════════════════════
+           PANNEAU GAUCHE — Bleu institutionnel
+           ════════════════════════════════ */
         .login-left {
-            background: linear-gradient(160deg, #1e1020 0%, #1a2636 50%, #0a1520 100%);
+            background: linear-gradient(155deg,
+                #1343a8 0%,
+                #1a56db 45%,
+                #2563eb 75%,
+                #1e40af 100%);
             padding: 3rem 2.5rem;
             display: flex;
             flex-direction: column;
@@ -113,18 +137,20 @@
             position: relative;
             overflow: hidden;
         }
+
+        /* Cercles décoratifs légers */
         .login-left::before {
             content: '';
-            position: absolute; top: -80px; right: -80px;
-            width: 260px; height: 260px;
-            background: radial-gradient(circle, rgba(206,17,38,0.12) 0%, transparent 70%);
+            position: absolute; top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
             pointer-events: none;
         }
         .login-left::after {
             content: '';
-            position: absolute; bottom: -60px; left: -60px;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(30,181,58,0.12) 0%, transparent 70%);
+            position: absolute; bottom: -40px; left: -40px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(30,181,58,0.15) 0%, transparent 70%);
             pointer-events: none;
         }
 
@@ -136,41 +162,44 @@
             position: relative; z-index: 1;
         }
         .armoirie-badge img {
-            width: 100px;
+            width: 90px;
             height: auto;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 6px 16px rgba(0,0,0,0.30));
+            transition: transform var(--transition);
         }
+        .armoirie-badge img:hover { transform: scale(1.04); }
 
         .fie-brand {
             position: relative; z-index: 1;
             color: #fff;
+            text-align: center;
         }
         .fie-brand .fie-code {
             font-family: 'Poppins', sans-serif;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 800;
             color: #fff;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
             line-height: 1;
         }
         .fie-brand .fie-full {
-            font-size: 0.82rem;
-            opacity: 0.8;
-            margin-top: 0.4rem;
+            font-size: 0.84rem;
+            color: rgba(255,255,255,.85);
+            margin-top: 0.35rem;
             line-height: 1.4;
-            max-width: 220px;
+            font-weight: 500;
         }
         .fie-brand .fie-sub {
             font-size: 0.72rem;
-            color: #ffd0d6;
-            opacity: 0.7;
-            margin-top: 0.3rem;
+            color: rgba(255,255,255,.60);
+            margin-top: 0.2rem;
         }
 
-        .red-divider {
-            height: 2px;
-            background: linear-gradient(90deg, var(--bi-red), transparent);
+        .left-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
             margin: 1.5rem 0;
+            position: relative; z-index: 1;
         }
 
         .features-list {
@@ -179,189 +208,267 @@
         }
         .features-list li {
             display: flex; align-items: flex-start; gap: 0.75rem;
-            color: rgba(255,255,255,0.72);
-            font-size: 0.81rem; margin-bottom: 0.85rem; line-height: 1.4;
+            color: rgba(255,255,255,.80);
+            font-size: 0.80rem; margin-bottom: 0.80rem; line-height: 1.45;
         }
-        .features-list li .icon-bullet {
-            color: #ffd0d6;
-            font-size: 0.95rem;
-            flex-shrink: 0; margin-top: 0.1rem;
+        .features-list .fi-icon {
+            color: rgba(255,255,255,.90);
+            background: rgba(255,255,255,.15);
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.78rem;
         }
 
         .left-footer {
             position: relative; z-index: 1;
         }
         .left-footer small {
-            color: rgba(255,255,255,0.35);
-            font-size: 0.70rem;
+            color: rgba(255,255,255,.40);
+            font-size: 0.68rem;
         }
 
-        /* ── Panneau droit formulaire ── */
+        /* Bande drapeau en bas du panneau gauche */
+        .left-flag {
+            display: flex; height: 4px;
+            position: absolute; bottom: 0; left: 0; right: 0;
+        }
+        .left-flag span { flex: 1; }
+
+        /* ════════════════════════════════
+           PANNEAU DROIT — Formulaire blanc
+           ════════════════════════════════ */
         .login-right {
             background: #fff;
-            padding: 3rem 2.5rem;
+            padding: 3rem 2.75rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .login-right h2 {
-            color: var(--bi-navy);
+        .form-header { margin-bottom: 2rem; }
+        .form-header .form-icon {
+            width: 52px; height: 52px;
+            background: var(--blue-light);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .form-header .form-icon i {
+            color: var(--blue);
+            font-size: 1.4rem;
+        }
+        .form-header h2 {
+            color: var(--gray-900);
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
             font-size: 1.5rem;
             margin-bottom: 0.3rem;
+            line-height: 1.2;
         }
-        .login-right .subtitle {
-            color: #6b7280;
+        .form-header .subtitle {
+            color: var(--gray-400);
             font-size: 0.84rem;
-            margin-bottom: 2rem;
-        }
-
-        .red-accent-bar {
-            height: 3px;
-            background: linear-gradient(90deg, var(--bi-red), var(--bi-red-dark), var(--bi-red));
-            border-radius: 3px;
-            margin-bottom: 1.75rem;
+            margin: 0;
         }
 
         .form-label {
             font-weight: 600;
             font-size: 0.82rem;
-            color: #374151;
-            margin-bottom: 0.35rem;
+            color: var(--gray-700);
+            margin-bottom: 0.4rem;
         }
 
         .form-control {
-            border: 1.5px solid #d1d5db;
-            border-radius: 0.5rem;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
             padding: 0.65rem 0.9rem;
             font-size: 0.9rem;
-            transition: border-color .2s, box-shadow .2s;
+            color: var(--gray-900);
+            background: var(--gray-50);
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
         }
         .form-control:focus {
-            border-color: var(--bi-red);
-            box-shadow: 0 0 0 3px rgba(206,17,38,.12);
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(26,86,219,.13);
+            background: #fff;
             outline: none;
         }
-        .input-group-text {
-            background: #f9fafb;
-            border: 1.5px solid #d1d5db;
-            color: #6b7280;
-        }
-        .input-group .form-control { border-left: 0; }
-        .input-group .btn-outline-secondary {
-            border: 1.5px solid #d1d5db;
-            border-left: 0;
-            color: #6b7280; background: #f9fafb;
-            transition: background .15s;
-        }
-        .input-group .btn-outline-secondary:hover { background: #f3f4f6; }
+        .form-control::placeholder { color: var(--gray-400); }
 
+        .input-group-text {
+            background: var(--gray-100);
+            border: 1.5px solid var(--gray-200);
+            color: var(--gray-400);
+            border-radius: var(--radius-md) 0 0 var(--radius-md) !important;
+        }
+        .input-group .form-control {
+            border-left: 0;
+            border-radius: 0 !important;
+        }
+        .input-group .btn-pw-toggle {
+            border: 1.5px solid var(--gray-200);
+            border-left: 0;
+            background: var(--gray-100);
+            color: var(--gray-400);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+            padding: 0 .85rem;
+            transition: background var(--transition), color var(--transition);
+        }
+        .input-group .btn-pw-toggle:hover {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+        /* Focus ring propagation sur le groupe */
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control,
+        .input-group:focus-within .btn-pw-toggle {
+            border-color: var(--blue);
+        }
+
+        /* Bouton connexion — bleu vif, texte blanc parfaitement lisible */
         .btn-connexion {
-            background: linear-gradient(135deg, var(--bi-red) 0%, var(--bi-red-dark) 100%);
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dk) 100%);
             border: none;
             color: #fff !important;
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
-            font-size: 0.96rem;
-            padding: 0.76rem;
-            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            padding: 0.78rem 1rem;
+            border-radius: var(--radius-md);
             letter-spacing: 0.03em;
-            transition: opacity .2s, transform .1s;
             width: 100%;
             margin-top: 0.5rem;
+            cursor: pointer;
+            transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
+            box-shadow: 0 4px 14px rgba(26,86,219,.35);
         }
-        .btn-connexion:hover { opacity: 0.92; transform: translateY(-1px); }
+        .btn-connexion:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(26,86,219,.40);
+        }
         .btn-connexion:active { transform: translateY(0); }
+
+        /* Séparateur léger */
+        .form-divider {
+            display: flex; align-items: center; gap: .75rem;
+            color: var(--gray-400); font-size: .75rem;
+            margin: 1.5rem 0;
+        }
+        .form-divider::before, .form-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--gray-200);
+        }
 
         .legal-note {
             margin-top: 1.5rem;
             text-align: center;
-            font-size: 0.78rem;
-            color: #9ca3af;
-            line-height: 1.5;
+            font-size: 0.76rem;
+            color: var(--gray-400);
+            line-height: 1.55;
         }
+        .legal-note i { color: var(--blue); }
 
         /* ── Footer ── */
         .login-footer-bar {
-            background: rgba(0,0,0,0.3);
-            border-top: 1px solid rgba(206,17,38,0.2);
-            padding: 0.75rem 1rem;
+            background: var(--navy);
+            border-top: 2px solid var(--blue);
+            padding: 0.7rem 1rem;
             text-align: center;
+            flex-shrink: 0;
         }
-        .login-footer-bar small {
-            color: rgba(255,255,255,0.35);
-            font-size: 0.70rem;
-        }
+        .login-footer-bar small { color: rgba(255,255,255,.35); font-size: .68rem; }
 
         /* ── Responsive ── */
         @media (max-width: 768px) {
-            .login-container { grid-template-columns: 1fr; max-width: 420px; }
-            .login-left { padding: 2rem 1.5rem; }
+            .login-card {
+                grid-template-columns: 1fr;
+                max-width: 440px;
+                border-radius: var(--radius-lg);
+            }
+            .login-left { padding: 2rem 1.75rem; }
             .features-list { display: none; }
-            .red-divider { margin: 1rem 0; }
-            .login-right { padding: 2rem 1.5rem; }
+            .left-divider { margin: 1rem 0; }
+            .login-right { padding: 2rem 1.75rem; }
         }
+
+        /* ── Animation d'entrée douce ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .login-card { animation: fadeUp .45s ease both; }
     </style>
 </head>
 <body>
 
-<!-- ── Barre institutionnelle supérieure ───────────────────────────────── -->
+<!-- ── Barre institutionnelle ─────────────────────────────────────────── -->
 <div class="gov-bar">
     <div class="gov-bar-inner">
         <div class="gov-title">
             République du Burundi
             <strong>Ministère de l'Éducation Nationale et de la Recherche Scientifique</strong>
         </div>
-        <div class="tri-strip" aria-hidden="true"></div>
+        <div class="tri-strip" aria-hidden="true">
+            <span style="background:#CE1126;"></span>
+            <span style="background:#fff;"></span>
+            <span style="background:#1EB53A;"></span>
+        </div>
     </div>
 </div>
 
 <!-- ── Zone principale ────────────────────────────────────────────────── -->
 <div class="login-wrapper">
-    <div class="login-container">
+    <div class="login-card">
 
-        <!-- Panneau gauche — Présentation institutionnelle -->
+        <!-- ══ PANNEAU GAUCHE ══ -->
         <div class="login-left">
 
+            <!-- Bande drapeau -->
+            <div class="left-flag" aria-hidden="true">
+                <span style="background:#CE1126;"></span>
+                <span style="background:#fff;"></span>
+                <span style="background:#1EB53A;"></span>
+            </div>
+
             <div>
-                <!-- Armoirie du Burundi -->
+                <!-- Armoirie -->
                 <div class="armoirie-badge">
                     <img src="<?= BASE_URL ?>/public/images/armoiries_burundi.gif"
                          alt="Armoiries de la République du Burundi">
                 </div>
 
-                <!-- Identité FIE -->
+                <!-- Identité -->
                 <div class="fie-brand">
                     <div class="fie-code">FIE</div>
                     <div class="fie-full">Fichier Informatisé des Élèves</div>
                     <div class="fie-sub">SIGE Burundi — DGESS / MENERS</div>
                 </div>
 
-                <div class="red-divider"></div>
+                <div class="left-divider"></div>
 
-                <!-- Caractéristiques -->
+                <!-- Fonctionnalités -->
                 <ul class="features-list">
                     <li>
-                        <span class="icon-bullet"><i class="fa-solid fa-id-card"></i></span>
-                        <span>Attribution d'un Identifiant Unique de l'Élève (IUE) à chaque apprenant</span>
+                        <div class="fi-icon"><i class="fa-solid fa-id-card"></i></div>
+                        <span>Identifiant Unique de l'Élève (IUE) pour chaque apprenant</span>
                     </li>
                     <li>
-                        <span class="icon-bullet"><i class="fa-solid fa-shield-halved"></i></span>
-                        <span>Détection automatique des doublons pour garantir l'unicité nationale</span>
+                        <div class="fi-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <span>Détection automatique des doublons à l'échelle nationale</span>
                     </li>
                     <li>
-                        <span class="icon-bullet"><i class="fa-solid fa-chart-line"></i></span>
-                        <span>Tableau de bord analytique : répartition par province, secteur, sexe</span>
+                        <div class="fi-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <span>Tableau de bord analytique — province, secteur, sexe</span>
                     </li>
                     <li>
-                        <span class="icon-bullet"><i class="fa-solid fa-sync"></i></span>
-                        <span>Synchronisation bidirectionnelle avec le système StatEduc Burundi</span>
+                        <div class="fi-icon"><i class="fa-solid fa-qrcode"></i></div>
+                        <span>Fiche imprimable avec QR code et filigrane officiel</span>
                     </li>
                     <li>
-                        <span class="icon-bullet"><i class="fa-solid fa-file-pdf"></i></span>
-                        <span>Génération de fiches d'élèves imprimables avec filigrane officiel</span>
+                        <div class="fi-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+                        <span>Synchronisation avec StatEduc Burundi</span>
                     </li>
                 </ul>
             </div>
@@ -372,26 +479,31 @@
             </div>
         </div><!-- /.login-left -->
 
-        <!-- Panneau droit — Formulaire de connexion -->
+        <!-- ══ PANNEAU DROIT ══ -->
         <div class="login-right">
 
-            <div class="red-accent-bar"></div>
-
-            <h2><i class="fa-solid fa-right-to-bracket me-2" style="color:var(--bi-red);font-size:1.2rem;"></i>Connexion sécurisée</h2>
-            <p class="subtitle">Veuillez saisir vos identifiants pour accéder au système FIE</p>
+            <!-- En-tête du formulaire -->
+            <div class="form-header">
+                <div class="form-icon">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                </div>
+                <h2>Connexion sécurisée</h2>
+                <p class="subtitle">Saisissez vos identifiants pour accéder au système FIE</p>
+            </div>
 
             <!-- Message de déconnexion -->
             <?php if (isset($_GET['deconnecte'])): ?>
             <div class="alert alert-info d-flex align-items-center gap-2 py-2 small mb-3" role="alert"
-                 style="background:#e0f4ff;border:1px solid #b3d9f5;color:#1a5276;border-radius:.5rem;">
-                <i class="fa-solid fa-circle-info flex-shrink-0"></i>
+                 style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:.6rem;">
+                <i class="fa-solid fa-circle-check flex-shrink-0"></i>
                 <span>Vous avez été déconnecté(e) avec succès.</span>
             </div>
             <?php endif; ?>
 
             <!-- Message d'erreur -->
             <?php if (!empty($error)): ?>
-            <div class="alert alert-danger d-flex align-items-start gap-2 py-2 small mb-3" role="alert">
+            <div class="alert alert-danger d-flex align-items-start gap-2 py-2 small mb-3" role="alert"
+                 style="border-radius:.6rem;">
                 <i class="fa-solid fa-circle-exclamation flex-shrink-0 mt-1"></i>
                 <span><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></span>
             </div>
@@ -409,12 +521,11 @@
                 <!-- Identifiant -->
                 <div class="mb-3">
                     <label for="username" class="form-label">
-                        <i class="fa-solid fa-user me-1" style="color:var(--bi-red)"></i>Identifiant
-                        <span class="text-danger">*</span>
+                        Identifiant <span class="text-danger">*</span>
                     </label>
                     <div class="input-group">
-                        <span class="input-group-text" style="border-radius:.5rem 0 0 .5rem;">
-                            <i class="fa-solid fa-user" style="color:var(--bi-red)"></i>
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-user" style="font-size:.85rem;"></i>
                         </span>
                         <input
                             type="text"
@@ -434,12 +545,11 @@
                 <!-- Mot de passe -->
                 <div class="mb-4">
                     <label for="password" class="form-label">
-                        <i class="fa-solid fa-lock me-1" style="color:var(--bi-red)"></i>Mot de passe
-                        <span class="text-danger">*</span>
+                        Mot de passe <span class="text-danger">*</span>
                     </label>
                     <div class="input-group">
-                        <span class="input-group-text" style="border-radius:.5rem 0 0 .5rem;">
-                            <i class="fa-solid fa-lock" style="color:var(--bi-red)"></i>
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-lock" style="font-size:.85rem;"></i>
                         </span>
                         <input
                             type="password"
@@ -451,14 +561,14 @@
                             placeholder="••••••••"
                             aria-required="true"
                         >
-                        <button class="btn btn-outline-secondary" type="button" id="togglePwd"
+                        <button class="btn-pw-toggle" type="button" id="togglePwd"
                                 aria-label="Afficher/masquer le mot de passe" tabindex="-1">
                             <i class="fa-solid fa-eye" id="eyeIcon"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Bouton connexion -->
+                <!-- Bouton connexion — bleu vif, texte blanc -->
                 <button type="submit" class="btn-connexion">
                     <i class="fa-solid fa-right-to-bracket me-2"></i>Se connecter
                 </button>
@@ -466,16 +576,16 @@
 
             <!-- Note légale -->
             <p class="legal-note">
-                <i class="fa-solid fa-shield-halved me-1" style="color:var(--bi-red)"></i>
+                <i class="fa-solid fa-shield-halved me-1"></i>
                 Accès réservé aux agents autorisés du MENERS.<br>
                 Conforme à la loi n°1/03-2026 sur la protection des données.
             </p>
 
         </div><!-- /.login-right -->
-    </div><!-- /.login-container -->
+    </div><!-- /.login-card -->
 </div><!-- /.login-wrapper -->
 
-<!-- ── Pied de page ─────────────────────────────────────────────────────── -->
+<!-- ── Pied de page ─────────────────────────────────────────────────── -->
 <div class="login-footer-bar">
     <small>
         FIE Burundi — Système d'Information de Gestion de l'Éducation (SIGE) &nbsp;·&nbsp;
