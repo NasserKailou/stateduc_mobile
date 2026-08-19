@@ -24,7 +24,7 @@ var $OutlineRoot;
 var $entete_page;
 var $pied_page;
 
-function PDFTable($orientation='L',$unit='mm',$format='A4'){
+function __construct($orientation='L',$unit='mm',$format='A4'){
 	FPDF::FPDF($orientation,$unit,$format);
 	$this->SetMargins(20,20,20);
 	$this->SetAuthor('Pham Minh Dung');

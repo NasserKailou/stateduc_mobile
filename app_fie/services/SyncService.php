@@ -206,6 +206,67 @@ class SyncService
     }
 
     // ══════════════════════════════════════════════════════════════════════════
+    // SYNC NATIONALITÉS depuis StatEduc SQL Server
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Synchronise ref_type_nationalite depuis [BURUNDI].[dbo].[TYPE_NATIONALITE]
+     * via l'API StatEduc (endpoint /api/ref/nationalites).
+     *
+     * @param string|null $triggeredBy  identifiant de l'appelant (pour logs)
+     * @return array  ['total' => N, 'upserted' => N, 'errors' => N]
+     */
+    public function syncNationalites(?string $triggeredBy = 'system'): array
+    {
+        $summary = ['total' => 0, 'upserted' => 0, 'errors' => 0];
+
+        try {
+            // Appel API — retourne { "nationalites": [ {code_type_nationalite, libelle, ordre}, ... ] }
+            $data = $this->apiClient->get('/api/ref/nationalites');
+            if (!$data || empty($data['nationalites'])) {
+                throw new \RuntimeException('Aucune nationalité retournée par l\'API StatEduc.');
+            }
+
+            $rows = $data['nationalites'];
+            $summary['total'] = count($rows);
+
+            $pdo = Database::getInstance();
+
+            foreach ($rows as $row) {
+                $code    = (int)($row['code_type_nationalite'] ?? 0);
+                $libelle = trim($row['libelle'] ?? '');
+                $ordre   = (int)($row['ordre'] ?? 0);
+                if ($code <= 0 || $libelle === '') continue;
+
+                $stmt = $pdo->prepare("
+                    INSERT INTO ref_type_nationalite
+                        (code_type_nationalite, libelle, ordre, synced_at)
+                    VALUES (:code, :libelle, :ordre, NOW())
+                    ON DUPLICATE KEY UPDATE
+                        libelle    = VALUES(libelle),
+                        ordre      = VALUES(ordre),
+                        synced_at  = NOW()
+                ");
+                $stmt->execute([
+                    ':code'    => $code,
+                    ':libelle' => $libelle,
+                    ':ordre'   => $ordre,
+                ]);
+                $summary['upserted']++;
+            }
+
+            $this->logger->info("Sync NATIONALITES terminée : {$summary['upserted']} lignes upsertées.");
+
+        } catch (\Throwable $e) {
+            $summary['errors']++;
+            $this->logger->error("Sync NATIONALITES échouée : " . $e->getMessage());
+            throw $e;
+        }
+
+        return $summary;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
     // IMPORT EXCEL (mode dégradé / bootstrap)
     // ══════════════════════════════════════════════════════════════════════════
 

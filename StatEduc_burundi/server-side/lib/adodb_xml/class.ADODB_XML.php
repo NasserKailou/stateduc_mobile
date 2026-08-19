@@ -34,7 +34,7 @@ class ADODB_XML
 	*	@param		string		Codification to be used	
 	*	@access		public
 	*/
-	function ADODB_XML($version = "", $encoding = "") 
+	function __construct($version = "", $encoding = "") 
 	{
 	  $this->xml = new XMLFile($version, $encoding);
 	  $this->ok_tables = array(); 	

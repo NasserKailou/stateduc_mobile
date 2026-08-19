@@ -1,6 +1,6 @@
 # CONTEXT.md — StatEduc_burundi
 > Fichier de référence pour toute nouvelle session IA sur ce projet.
-> **Mis à jour : 2026-08-18 (session 11)** | Branche active : `ak_app_ident`
+> **Mis à jour : 2026-08-19 (session 14)** | Branche active : `ak_app_ident`
 > PR active : https://github.com/NasserKailou/stateduc_mobile/pull/4
 
 ---
@@ -383,3 +383,39 @@ tail -f StatEduc_burundi/moblogs/diag_questionnaire.log
 - [ ] Migration complète PHP 8 (warnings restants)
 - [ ] Documentation API `etabs_fie_ws` (OpenAPI/Swagger)
 - [ ] Index DB sur tables HIERARCHIE, REGROUPEMENT (performance)
+
+---
+
+## SESSION 14 (2026-08-19) — Migration PHP 7→8
+
+### Fichiers corrigés
+
+| Fichier | Correction |
+|---|---|
+| `server-side/instances/instance_grille.php` | 16 `ereg()` → `preg_match()/preg_quote()` |
+| `server-side/lib/fonctions.inc.php` | `manage_magic_quotes()` → no-op PHP 8 (get_magic_quotes_gpc supprimé) |
+| `server-side/classes/metier/aggregated_db_structure.class.php` | 1 `ereg()` → `preg_match()` |
+| `server-side/include/outils_integres/load_sql.php` | 5 `ereg()` → `preg_match()` |
+| `server-side/include/outils_integres/defaut_nomenc_syst.php` | 1 `ereg()` → `preg_match()` |
+| `server-side/include/outils_integres/export_grille.php` | 1 `ereg()` → `preg_match()` |
+| `server-side/include/saisie_donnees/import_excel.php` | 2 `ereg()` → `preg_match()` |
+| `server-side/include/olap_tools/frame_gestion_olap_inst.php` | `eregi()` → `preg_match()` |
+| `server-side/include/olap_tools/frame_gestion_olap_tabm.php` | `eregi()` → `preg_match()` |
+| `server-side/include/olap_tools/gestion_olap_import_cube.php` | `eregi()` → `preg_match()` |
+| `server-side/include/olap_tools/popup_olap_import_un_cube.php` | `eregi()` → `preg_match()` |
+| `server-side/lib/fpdf.inc.php` | `FPDF()` → `__construct()` |
+| `server-side/lib/htmlparser.inc.php` | 4 PHP4 constructors → `__construct()` |
+| `server-side/lib/pclzip.lib.php` | `PclZip()` → `__construct()` |
+| `server-side/lib/pdftable.inc.php` | `PDFTable()` → `__construct()` |
+| `server-side/lib/sms.inc.php` | `SmsSender()` → `__construct()` |
+| `server-side/lib/adodb_xml/class.ADODB_XML.php` | `ADODB_XML()` → `__construct()` |
+| `server-side/lib/adodb_xml/class.xml.php` | 2 constructors → `__construct()` |
+| `server-side/include/saisie_donnees/oleread.inc.php` | `OLERead()` → `__construct()` |
+| `server-side/include/saisie_donnees/reader.php` | `Spreadsheet_Excel_Reader()` → `__construct()` |
+
+### Fichiers NON encore corrigés (PHP 8 — warnings non bloquants)
+- `gestion_zone.classold.php` — fichier `.classold`, non chargé en production
+- `questionnaire.php`/`questionnaire_ws.php` — `split()` = JavaScript (non PHP), ignoré
+- `frame.class.php`, `gestion_zone.class.php` — `each()` = JavaScript embarqué dans PHP, non bloquant
+- `controle.inc.php` — `ereg()` sur lignes complexes multilignes (patterns de dates) — nécessite vérification manuelle
+- `gestion_table_simple.class - Copie.php` — fichier de backup (non actif)

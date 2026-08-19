@@ -1,6 +1,6 @@
 # CONTEXT.md — app_fie
 > Fichier de référence pour toute nouvelle session IA sur ce projet.
-> **Mis à jour : 2026-08-18 (session 12)** | Branche active : `ak_app_ident`
+> **Mis à jour : 2026-08-19 (session 14)** | Branche active : `ak_app_ident`
 > PR active : https://github.com/NasserKailou/stateduc_mobile/pull/4
 
 ---
@@ -469,3 +469,31 @@ gh pr comment 4 --body "..."
 - [ ] Export PDF historiques élèves
 - [ ] Notifications email (transferts)
 - [ ] Pagination dans `/inscription/recherche`
+
+---
+
+## SESSION 13-14 (2026-08-19) — Corrections et nouvelles fonctionnalités
+
+### Bugs corrigés
+- **CSRF ParametresController** : `$_POST['csrf_token']` → `$_POST[FIE_CSRF_TOKEN_NAME]`
+- **parametres.php vue** : `SecurityHelper::generateCsrf()` (inexistant) → `SecurityHelper::getCsrfToken()`
+- **AggregateService** : `SELECT code_type_etat_fonct FROM etablissements_miroir` → `$etatFonct = null;` (colonne supprimée par migration 005)
+- **AdminController** : 4 requêtes `classes` — `code_etablissement` → `ecole_code AS code_etablissement`
+- **CSRF constants** : 5 littéraux `'csrf_token'` → `FIE_CSRF_TOKEN_NAME` dans AdminController
+
+### Nouvelles fonctionnalités
+- **Migration 006** : table `ref_type_nationalite` (7 nationalités par défaut)
+- **Nationalités** : dropdown dans formulaire inscription, champ libre si "Autres"
+- **API AJAX** : `GET /inscription/ajax/nationalites` → JSON `{items:[{code,libelle}]}`
+- **Import élèves** : `GET/POST /admin/import-eleves` — CSV/Excel (ZIP+SimpleXML), génération IUE auto
+- **Template modèle** : `GET /admin/import-eleves/modele` — CSV UTF-8 BOM pour Excel
+- **Bibliothèque popup** : `/bibliotheque` — modal Bootstrap 5 + iframe PDF (`?inline=1`), bouton "Consulter" + téléchargement
+- **BibliothequeController** : `?inline=1` → `Content-Disposition: inline`, compteur téléchargements non incrémenté
+- **Router** : routes statut/supprimer bibliothèque admin passées en GET
+- **SyncService::syncNationalites()** : upsert `ref_type_nationalite` depuis API StatEduc `/api/ref/nationalites`
+
+### Fichiers modifiés
+`ParametresController.php`, `parametres.php`, `AggregateService.php`, `AdminController.php`,
+`InscriptionController.php`, `BibliothequeController.php`, `Router.php`, `app_layout.php`,
+`SyncService.php`, `bibliotheque/index.php`, `import_eleves.php` (créé),
+`migrations/006_ref_type_nationalite.sql` (créé)

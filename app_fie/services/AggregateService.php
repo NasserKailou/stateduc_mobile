@@ -51,11 +51,9 @@ class AggregateService
             if ($ins['sexe'] === 'F') $buckets[$key]['filles']++;
         }
 
-        // Récupérer l'état de fonctionnement de l'établissement
-        $etatFonct = Database::fetchScalar(
-            "SELECT code_type_etat_fonct FROM etablissements_miroir WHERE code_etablissement=?",
-            [$codeEtab]
-        );
+        // code_type_etat_fonct supprimé de etablissements_miroir par migration 005
+        // (DROP 11 colonnes hors ATLAS_COLLINE) — valeur NULL conservée dans l'agrégat
+        $etatFonct = null;
 
         // UPSERT dans agregats_eleves_age_niveau_sexe
         // Supprimer d'abord les lignes obsolètes (élèves désinscrit ou transférés)

@@ -285,7 +285,7 @@ $_am       = $active_menu ?? '';
             ADMINISTRATION
           </li>
 
-          <li class="nav-item <?= in_array($_am, ['admin_home','admin_sync','admin_import','admin_param','admin_audit'], true) ? 'menu-open' : '' ?>">
+          <li class="nav-item <?= in_array($_am, ['admin_home','admin_sync','admin_import','admin_import_eleves','admin_param','admin_audit'], true) ? 'menu-open' : '' ?>">
             <a href="#" class="nav-link">
               <i class="nav-icon fa-solid fa-screwdriver-wrench"></i>
               <p>Système <i class="nav-arrow fa-solid fa-angle-right ms-auto"></i></p>
@@ -306,7 +306,13 @@ $_am       = $active_menu ?? '';
               <li class="nav-item">
                 <a href="<?= BASE_URL ?>/admin/import-excel"
                    class="nav-link <?= $_am === 'admin_import' ? 'active' : '' ?>">
-                  <i class="nav-icon fa-solid fa-file-excel"></i><p>Import Excel</p>
+                  <i class="nav-icon fa-solid fa-file-excel"></i><p>Import établissements</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= BASE_URL ?>/admin/import-eleves"
+                   class="nav-link <?= $_am === 'admin_import_eleves' ? 'active' : '' ?>">
+                  <i class="nav-icon fa-solid fa-users"></i><p>Import élèves (IUE)</p>
                 </a>
               </li>
               <li class="nav-item">

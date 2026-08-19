@@ -732,7 +732,7 @@
 								//todo:Gerer le cas type zone_mat
 								/*if(($chp['type']=='zone_mat') && (($chp['ss_type']=='m') || ($chp['ss_type']=='co'))){
 									$nom_cpte = $chp['champ'];
-									if(ereg('^'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE'].'_.*$',trim($chp['champ']))){
+									if(preg_match('/'.preg_quote('^'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE'].'_.*$', '/').'/', trim($chp['champ']))){
 										$nomenc = substr(trim($chp['champ']),strlen($GLOBALS['PARAM']['CODE'])+1);
 									}else{
 										$nomenc = trim($chp['champ']);

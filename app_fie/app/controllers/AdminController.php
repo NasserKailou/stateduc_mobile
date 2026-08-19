@@ -96,7 +96,7 @@ class AdminController
 
     public function triggerSync(): void
     {
-        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+        if (!SecurityHelper::verifyCsrf($_POST[FIE_CSRF_TOKEN_NAME] ?? '')) {
             $this->jsonError('Jeton CSRF invalide', 403);
             return;
         }
@@ -279,7 +279,7 @@ class AdminController
              ORDER BY nom_etablissement LIMIT 500"
         );
         $classes = Database::fetchAll(
-            "SELECT id, nom_classe, code_etablissement, annee_scolaire
+            "SELECT id, nom_classe, ecole_code AS code_etablissement, annee_scolaire
              FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
         );
         $errors  = [];
@@ -293,7 +293,7 @@ class AdminController
 
     public function userCreate(): void
     {
-        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+        if (!SecurityHelper::verifyCsrf($_POST[FIE_CSRF_TOKEN_NAME] ?? '')) {
             $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
             header('Location: ' . BASE_URL . '/admin/users/nouveau');
             exit;
@@ -306,7 +306,7 @@ class AdminController
                  FROM etablissements_miroir WHERE actif = 1 ORDER BY nom_etablissement LIMIT 500"
             );
             $classes = Database::fetchAll(
-                "SELECT id, nom_classe, code_etablissement, annee_scolaire
+                "SELECT id, nom_classe, ecole_code AS code_etablissement, annee_scolaire
                  FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
             );
             $old     = $_POST;
@@ -357,7 +357,7 @@ class AdminController
              FROM etablissements_miroir WHERE actif = 1 ORDER BY nom_etablissement LIMIT 500"
         );
         $classes = Database::fetchAll(
-            "SELECT id, nom_classe, code_etablissement, annee_scolaire
+            "SELECT id, nom_classe, ecole_code AS code_etablissement, annee_scolaire
              FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
         );
         $errors  = [];
@@ -372,7 +372,7 @@ class AdminController
 
     public function userUpdate(): void
     {
-        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+        if (!SecurityHelper::verifyCsrf($_POST[FIE_CSRF_TOKEN_NAME] ?? '')) {
             $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
             header('Location: ' . BASE_URL . '/admin/users');
             exit;
@@ -386,7 +386,7 @@ class AdminController
                  FROM etablissements_miroir WHERE actif = 1 ORDER BY nom_etablissement LIMIT 500"
             );
             $classes = Database::fetchAll(
-                "SELECT id, nom_classe, code_etablissement, annee_scolaire
+                "SELECT id, nom_classe, ecole_code AS code_etablissement, annee_scolaire
                  FROM classes ORDER BY annee_scolaire DESC, nom_classe LIMIT 500"
             );
             $old = $_POST; $old['id'] = $id;
@@ -427,7 +427,7 @@ class AdminController
 
     public function userDelete(): void
     {
-        if (!SecurityHelper::verifyCsrf($_POST['csrf_token'] ?? '')) {
+        if (!SecurityHelper::verifyCsrf($_POST[FIE_CSRF_TOKEN_NAME] ?? '')) {
             $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
             header('Location: ' . BASE_URL . '/admin/users');
             exit;
@@ -439,6 +439,261 @@ class AdminController
         $_SESSION['fie_flash_success'] = 'Utilisateur désactivé.';
         header('Location: ' . BASE_URL . '/admin/users');
         exit;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // IMPORT EXCEL ÉLÈVES
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /* ── GET /admin/import-eleves ────────────────────────────────────────── */
+
+    public function importElevesForm(): void
+    {
+        $page_title  = 'Import liste élèves — FIE';
+        $active_menu = 'admin_import_eleves';
+        // Liste des établissements pour le select
+        $ecoles = Database::fetchAll(
+            "SELECT code_etablissement, nom_etablissement
+             FROM etablissements_miroir WHERE actif = 1
+             ORDER BY nom_etablissement LIMIT 500"
+        ) ?: [];
+        $annees = Database::fetchAll(
+            "SELECT code_type_annee, libelle, actif FROM ref_type_annee ORDER BY code_type_annee DESC"
+        ) ?: [];
+        require BASE_PATH . '/app/views/admin/import_eleves.php';
+    }
+
+    /* ── GET /admin/import-eleves/modele ─────────────────────────────────── */
+
+    public function downloadElevesTemplate(): void
+    {
+        // Génère un fichier CSV (UTF-8 BOM) téléchargeable comme template
+        $headers = [
+            'nom', 'prenoms', 'sexe', 'date_naissance',
+            'lieu_naissance', 'province_naissance', 'nationalite',
+            'nom_pere', 'nom_mere', 'nom_tuteur', 'telephone_tuteur',
+            'code_etablissement', 'code_type_annee', 'code_type_secteur_ens',
+            'code_type_niveau', 'code_type_section', 'numero_classe', 'date_inscription',
+        ];
+        $exemple = [
+            'NIYONZIMA', 'Jean-Pierre', 'M', '2010-05-14',
+            'Gitega', 'Gitega', 'BDI',
+            'NIYONZIMA Gérard', 'HAKIZIMANA Cécile', '', '+257 79 123 456',
+            '21422', '1', '1',
+            '2', '1', 'CP1-A', date('Y-m-d'),
+        ];
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="modele_import_eleves.csv"');
+        header('Cache-Control: no-cache, no-store');
+
+        $out = fopen('php://output', 'w');
+        // UTF-8 BOM pour Excel
+        fwrite($out, "\xEF\xBB\xBF");
+        fputcsv($out, $headers, ';');
+        fputcsv($out, $exemple, ';');
+        fclose($out);
+        exit;
+    }
+
+    /* ── POST /admin/import-eleves ───────────────────────────────────────── */
+
+    public function processElevesImport(): void
+    {
+        if (!SecurityHelper::verifyCsrf($_POST[FIE_CSRF_TOKEN_NAME] ?? '')) {
+            $_SESSION['fie_flash_error'] = 'Jeton CSRF invalide.';
+            header('Location: ' . BASE_URL . '/admin/import-eleves');
+            exit;
+        }
+
+        if (empty($_FILES['eleves_file']['tmp_name'])) {
+            $_SESSION['fie_flash_error'] = 'Aucun fichier sélectionné.';
+            header('Location: ' . BASE_URL . '/admin/import-eleves');
+            exit;
+        }
+
+        $tmpFile  = $_FILES['eleves_file']['tmp_name'];
+        $origName = $_FILES['eleves_file']['name'];
+        $ext      = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+
+        if (!in_array($ext, ['xlsx', 'xls', 'csv'], true)) {
+            $_SESSION['fie_flash_error'] = 'Format non supporté. Utilisez .xlsx, .xls ou .csv';
+            header('Location: ' . BASE_URL . '/admin/import-eleves');
+            exit;
+        }
+
+        require_once FIE_MODELS_PATH   . 'EleveModel.php';
+        require_once FIE_MODELS_PATH   . 'InscriptionModel.php';
+        require_once FIE_SERVICES_PATH . 'IueGenerator.php';
+        require_once FIE_SERVICES_PATH . 'SyncService.php';  // readExcelNative()
+
+        $cacheDir = BASE_PATH . '/cache';
+        if (!is_dir($cacheDir)) mkdir($cacheDir, 0750, true);
+        $destFile = $cacheDir . '/import_eleves_' . date('YmdHis') . '.' . $ext;
+        if (!move_uploaded_file($tmpFile, $destFile)) {
+            $_SESSION['fie_flash_error'] = "Erreur lors de l'enregistrement du fichier.";
+            header('Location: ' . BASE_URL . '/admin/import-eleves');
+            exit;
+        }
+
+        $this->log->info("Import élèves démarré", [
+            'user' => $_SESSION['fie_user']['username'] ?? 'unknown',
+            'file' => $origName,
+        ]);
+
+        $counts = ['inserted' => 0, 'skipped' => 0, 'errors' => 0, 'total' => 0, 'messages' => []];
+
+        try {
+            if ($ext === 'csv') {
+                $rows = $this->readCsvRows($destFile);
+            } else {
+                $sync = new SyncService();
+                $rows = $sync->readExcelNative($destFile);
+            }
+
+            $userId = (int)($_SESSION['fie_user']['id'] ?? 0);
+
+            foreach ($rows as $i => $row) {
+                $counts['total']++;
+                // Normaliser les clés (minuscules, trim)
+                $r = [];
+                foreach ($row as $k => $v) {
+                    $r[strtolower(trim((string)$k))] = trim((string)$v);
+                }
+
+                // Champs obligatoires
+                $nom    = $r['nom']    ?? '';
+                $prenom = $r['prenoms'] ?? $r['prenom'] ?? '';
+                $sexe   = strtoupper($r['sexe'] ?? '');
+                $ddn    = $r['date_naissance'] ?? '';
+                $etab   = (int)($r['code_etablissement'] ?? 0);
+                $annee  = (int)($r['code_type_annee'] ?? 0);
+                $secteur= (int)($r['code_type_secteur_ens'] ?? 0);
+                $niveau = (int)($r['code_type_niveau'] ?? 0);
+
+                if (strlen($nom) < 2 || strlen($prenom) < 2 || !in_array($sexe, ['M','F'], true)
+                    || !$ddn || $etab <= 0 || $annee <= 0 || $secteur <= 0 || $niveau <= 0) {
+                    $counts['errors']++;
+                    $counts['messages'][] = "Ligne " . ($i + 2) . " ignorée : champs obligatoires manquants (nom, prenoms, sexe, date_naissance, code_etablissement, code_type_annee, code_type_secteur_ens, code_type_niveau).";
+                    continue;
+                }
+
+                // Vérifier date
+                $ddnTs = strtotime($ddn);
+                if (!$ddnTs || $ddnTs > time()) {
+                    $counts['errors']++;
+                    $counts['messages'][] = "Ligne " . ($i + 2) . " ({$nom}) : date_naissance invalide.";
+                    continue;
+                }
+                $ddn = date('Y-m-d', $ddnTs);
+
+                try {
+                    Database::beginTransaction();
+
+                    $result = EleveModel::create([
+                        'nom'                  => $nom,
+                        'prenoms'              => $prenom,
+                        'sexe'                 => $sexe,
+                        'date_naissance'       => $ddn,
+                        'lieu_naissance'       => $r['lieu_naissance'] ?: null,
+                        'province_naissance'   => $r['province_naissance'] ?: null,
+                        'nationalite'          => strtoupper(substr($r['nationalite'] ?? 'BDI', 0, 3)) ?: 'BDI',
+                        'nom_pere'             => $r['nom_pere'] ?: null,
+                        'nom_mere'             => $r['nom_mere'] ?: null,
+                        'nom_tuteur'           => $r['nom_tuteur'] ?: null,
+                        'telephone_tuteur'     => $r['telephone_tuteur'] ?: null,
+                        'created_by'           => $userId,
+                    ], $secteur, $annee);
+
+                    InscriptionModel::create($result['id'], [
+                        'code_etablissement'    => $etab,
+                        'code_type_secteur_ens' => $secteur,
+                        'code_type_annee'       => $annee,
+                        'code_type_niveau'      => $niveau,
+                        'code_type_section'     => (int)($r['code_type_section'] ?? 1),
+                        'numero_classe'         => $r['numero_classe'] ?: null,
+                        'date_inscription'      => $r['date_inscription'] ?: date('Y-m-d'),
+                        'created_by'            => $userId,
+                    ]);
+
+                    Database::commit();
+                    $counts['inserted']++;
+                } catch (\Throwable $rowEx) {
+                    Database::rollback();
+                    $counts['errors']++;
+                    $msg = $rowEx->getMessage();
+                    // Doublon IUE/inscription = skipped pas error
+                    if (str_contains($msg, 'Duplicate') || str_contains($msg, 'uk_eleve_annee_etab')) {
+                        $counts['skipped']++;
+                        $counts['errors']--;
+                        $counts['messages'][] = "Ligne " . ($i + 2) . " ({$nom}) : déjà inscrit cette année dans cet établissement — ignoré.";
+                    } else {
+                        $counts['messages'][] = "Ligne " . ($i + 2) . " ({$nom}) : " . $msg;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            @unlink($destFile);
+            $_SESSION['fie_flash_error'] = "Erreur lors de la lecture du fichier : " . $e->getMessage();
+            header('Location: ' . BASE_URL . '/admin/import-eleves');
+            exit;
+        }
+
+        @unlink($destFile);
+
+        $this->log->info("Import élèves terminé", $counts);
+
+        $summary = sprintf(
+            '%d élève(s) importé(s) avec IUE générée, %d ignoré(s) (doublon), %d erreur(s) — sur %d ligne(s) traitée(s).',
+            $counts['inserted'], $counts['skipped'], $counts['errors'], $counts['total']
+        );
+
+        if ($counts['errors'] > 0 || !empty($counts['messages'])) {
+            $_SESSION['fie_import_eleves_messages'] = array_slice($counts['messages'], 0, 20);
+            $_SESSION['fie_flash_error']            = $summary;
+        } else {
+            $_SESSION['fie_flash_success'] = $summary;
+        }
+
+        header('Location: ' . BASE_URL . '/admin/import-eleves');
+        exit;
+    }
+
+    /** Lit un fichier CSV (séparateur ; ou ,) et retourne tableau de lignes associatives. */
+    private function readCsvRows(string $path): array
+    {
+        $rows = [];
+        $handle = fopen($path, 'r');
+        if (!$handle) return [];
+
+        // Supprimer BOM UTF-8
+        $bom = fread($handle, 3);
+        if ($bom !== "\xEF\xBB\xBF") {
+            fseek($handle, 0);
+        }
+
+        // Détecter séparateur
+        $firstLine = fgets($handle);
+        $sep = (substr_count($firstLine, ';') >= substr_count($firstLine, ',')) ? ';' : ',';
+        fseek($handle, 0);
+        if ($bom === "\xEF\xBB\xBF") fseek($handle, 3);
+
+        $headers = fgetcsv($handle, 0, $sep);
+        if (!$headers) { fclose($handle); return []; }
+        // Nettoyer BOM dans le premier header
+        $headers[0] = ltrim($headers[0], "\xEF\xBB\xBF");
+        $headers = array_map('trim', $headers);
+
+        while (($line = fgetcsv($handle, 0, $sep)) !== false) {
+            if (count($line) < 2) continue;
+            $row = [];
+            foreach ($headers as $idx => $h) {
+                $row[$h] = $line[$idx] ?? '';
+            }
+            $rows[] = $row;
+        }
+        fclose($handle);
+        return $rows;
     }
 
     /* ── Helpers ─────────────────────────────────────────────────────────── */

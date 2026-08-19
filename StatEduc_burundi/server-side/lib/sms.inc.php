@@ -7,7 +7,7 @@ class SmsSender {
 	var $token; //security token
 	var $curl; //class pour envoyer des requetes POST et GET
 	
-	function SmsSender($url_service, $token, $curl) {
+	function __construct($url_service, $token, $curl) {
 		$this->sms_service_url = $url_service;
 		$this->token = $token;
 		$this->curl = $curl;

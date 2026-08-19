@@ -464,12 +464,12 @@ function maj_bdd($ligne,$tab,$num_lig=""){
 									$tab_values[] = $val_chp;
 								}
 							}else{
-								/*if(ereg('^'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE'].'.*$',$chp_row)){
+								/*if(preg_match('/'.preg_quote('^'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE'].'.*$', '/').'/', $chp_row)){
 									 $sql .=  ' , ' . $chp_row . ' = 255' ;
 								}else{
 									if(isset($tab['field_table_ref'])) $chp_table_ref = $tab['field_table_ref'][$i];
 									else $chp_table_ref = '';
-									if( (trim($chp_table_ref) <> '') && (ereg('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', strtoupper($chp_table_ref))) ){
+									if( (trim($chp_table_ref) <> '') && (preg_match('/'.preg_quote('^'.$GLOBALS['PARAM']['TYPE'].'_.*$', '/').'/', strtoupper($chp_table_ref))) ){
 										$sql .=  ' , ' . $chp_row . ' = 255' ;
 									}else{*/
 										if($chp_row <> $GLOBALS['PARAM']['CODE_ETABLISSEMENT_PARENT']){

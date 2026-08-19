@@ -146,26 +146,26 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 						$tabs1 = explode('-',$tabs0[1]);
 						$tabs2 = explode('=',$tabs0[1]);
 						$tabs3 = explode('-',$tabs2[0]);
-						if(ereg(' '.$tabs1[0].' ',$sql_tab)){
+						if(preg_match('/'.preg_quote(' '.$tabs1[0].' ', '/').'/',$sql_tab)){
 							if($tabs1[0] <> $tab){
-								if(!ereg(str_replace('-','.',$tabs2[0])." AS ".$tabs3[1],$sql_tab) && !ereg(str_replace('-','.',$tabs2[0])." AS ".$tabs3[1],$list_select_suite)){
+								if(!preg_match('/'.preg_quote(str_replace('-','.',$tabs2[0])." AS ".$tabs3[1], '/').'/',$sql_tab) && !preg_match('/'.preg_quote(str_replace('-','.',$tabs2[0])." AS ".$tabs3[1], '/').'/',$list_select_suite)){
 									$list_select_suite .= ", ".str_replace('-','.',$tabs2[0])." AS ".$tabs3[1]." ";
 								}
 								if($i==0) $list_ord .= " ORDER BY ".$tabs3[1].' '.$tabs2[1];
 								else $list_ord .= ', '.$tabs3[1].' '.$tabs2[1].' ';
 							}else{
 								if($i==0) $list_ord .= " ORDER BY ".$tabs3[1].' '.$tabs2[1];
-								elseif(!ereg($tabs3[1],$list_ord))	$list_ord .= ', '.$tabs3[1].' '.$tabs2[1].' ';
+								elseif(!preg_match('/'.preg_quote($tabs3[1], '/').'/',$list_ord))	$list_ord .= ', '.$tabs3[1].' '.$tabs2[1].' ';
 							}
 							$i++;
 						}elseif(count($list_sql_tab) > 1){
 							if($tabs2[1] == 'ASC'){
-								if(!ereg(" AS ".$tabs3[1],$sql_tab) && !ereg(" AS ".$tabs3[1],$list_select_suite)){
+								if(!preg_match('/'.preg_quote(" AS ".$tabs3[1], '/').'/',$sql_tab) && !preg_match('/'.preg_quote(" AS ".$tabs3[1], '/').'/',$list_select_suite)){
 									if($tabs0[0] == 'int') $list_select_suite .= ", 4294967295 "." AS ".$tabs3[1]." ";//4294967295 est la valeur maxi d'un entier long non sign�
 									else $list_select_suite .= ", 'zzzzzzzzzz' "." AS ".$tabs3[1]." ";//zzzzzzzzzz etant une valeur tres tres grande d'une chaine de caracteres
 								}
 							}elseif($tabs2[1] == 'DESC'){
-								if(!ereg(" AS ".$tabs3[1],$sql_tab) && !ereg(" AS ".$tabs3[1],$list_select_suite)){
+								if(!preg_match('/'.preg_quote(" AS ".$tabs3[1], '/').'/',$sql_tab) && !preg_match('/'.preg_quote(" AS ".$tabs3[1], '/').'/',$list_select_suite)){
 									if($tabs0[0] == 'int') $list_select_suite .= ", 0 "." AS ".$tabs3[1]." ";//0 est la valeur mini d'un entier long non sign�
 									else $list_select_suite .= ", 'aaaaaaaaaa' "." AS ".$tabs3[1]." ";//aaaaaaaaaa etant une valeur tres tres petite d'une chaine de caracteres
 								}
@@ -202,9 +202,9 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 						if($tabs0[0]=='champ'){
 							$tabs1 = explode('|',$tabs0[1]);
 							$tabs2 = explode('-',$tabs1[1]);//table = $tabs2[0] et champ = $tabs2[1]
-						}elseif(ereg(' '.$tabs2[0].' ',$sql_tab)){
+						}elseif(preg_match('/'.preg_quote(' '.$tabs2[0].' ', '/').'/',$sql_tab)){
 							if($tabs2[0] <> $tab){
-								if(!ereg(str_replace('-','.',$tabs1[1])." AS ".$tabs2[1],$sql_tab) && !ereg(str_replace('-','.',$tabs1[1])." AS ".$tabs2[1],$list_select_suite)){
+								if(!preg_match('/'.preg_quote(str_replace('-','.',$tabs1[1])." AS ".$tabs2[1], '/').'/',$sql_tab) && !preg_match('/'.preg_quote(str_replace('-','.',$tabs1[1])." AS ".$tabs2[1], '/').'/',$list_select_suite)){
 									$list_select_suite .= ", ".str_replace('-','.',$tabs1[1])." AS ".$tabs2[1]." ";
 								}
 								if($tabs0[0]=='equalint' || $tabs0[0]=='equaltext' || $tabs0[0]=='different' || $tabs0[0]=='superior' || $tabs0[0]=='inferior'){
@@ -238,12 +238,12 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 							}
 						}elseif(count($list_sql_tab) > 1){
 							if($tabs1[0] == 'int'){
-								if(!ereg(" AS ".$tabs2[1],$sql_tab) && !ereg(" AS ".$tabs2[1],$list_select_suite)){
+								if(!preg_match('/'.preg_quote(" AS ".$tabs2[1], '/').'/',$sql_tab) && !preg_match('/'.preg_quote(" AS ".$tabs2[1], '/').'/',$list_select_suite)){
 									$list_select_suite .= ", NULL "." AS ".$tabs2[1]." ";//
 								}
 								$list_crit .= "NULL<>NULL AND ";
 							}else{
-								if(!ereg(" AS ".$tabs2[1],$sql_tab) && !ereg(" AS ".$tabs2[1],$list_select_suite)){
+								if(!preg_match('/'.preg_quote(" AS ".$tabs2[1], '/').'/',$sql_tab) && !preg_match('/'.preg_quote(" AS ".$tabs2[1], '/').'/',$list_select_suite)){
 									$list_select_suite .= ", '' "." AS ".$tabs2[1]." ";//
 								}
 								$list_crit .= "''<>'' AND ";
@@ -302,7 +302,7 @@ if(!isset($_SESSION['tab_html_export_hist'])){
 					$list_ord = "";
 					$i = 0;
 					foreach($list_sql_tab as $sql_tab){
-						if(ereg(' '.$nomtableliee.'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' IN ',$sql_tab)){
+						if(preg_match('/'.preg_quote(' '.$nomtableliee.'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' IN ', '/').'/',$sql_tab)){
 							$sql_tab = str_replace('WHERE','WHERE '.$nomtableliee.'.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].'='.$teacher_manager->list_sch_teach[$_SESSION['id_teacher']].' AND',$sql_tab);
 						}
 						$tables_sql[] = $sql_tab;

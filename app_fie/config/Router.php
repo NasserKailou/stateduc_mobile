@@ -94,6 +94,7 @@ class Router
         $this->get('/inscription/ajax/etabs-code',       'InscriptionController', 'ajaxEtabsCode');
         $this->get('/inscription/ajax/etab-detail',      'InscriptionController', 'ajaxEtabDetail');
         $this->post('/inscription/ajax/sync-annees',     'InscriptionController', 'ajaxSyncTypeAnnee');
+        $this->get('/inscription/ajax/nationalites',     'InscriptionController', 'ajaxNationalites');
         // Cascades texte legacy
         $this->get('/inscription/ajax/communes',         'InscriptionController', 'ajaxCommunes');
         $this->get('/inscription/ajax/zones',            'InscriptionController', 'ajaxZones');
@@ -121,6 +122,10 @@ class Router
         $this->post('/admin/sync/lancer',   'AdminController', 'triggerSync');
         $this->get('/admin/import-excel',   'AdminController', 'importExcelForm');
         $this->post('/admin/import-excel',  'AdminController', 'processExcelImport');
+        // Import liste élèves (nouveau)
+        $this->get('/admin/import-eleves',         'AdminController', 'importElevesForm');
+        $this->post('/admin/import-eleves',        'AdminController', 'processElevesImport');
+        $this->get('/admin/import-eleves/modele',  'AdminController', 'downloadElevesTemplate');
         $this->get('/admin/users',          'AdminController', 'users');
         $this->get('/admin/audit',          'AdminController', 'auditLog');
 

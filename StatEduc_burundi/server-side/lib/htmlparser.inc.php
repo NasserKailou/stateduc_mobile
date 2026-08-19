@@ -69,7 +69,7 @@ class HTMLParser {
      * Constructs an HTMLParser instance with
      * the HTML text given.
      */
-    function HTMLParser ($aHtmlText) {
+    function __construct ($aHtmlText) {
         $this->iHtmlText = $aHtmlText;
         $this->iHtmlTextLength = strlen($aHtmlText);
         $this->setTextIndex (0);
@@ -295,7 +295,7 @@ class HTMLParser {
 }
 
 class HTMLFileParser extends HTMLParser {
-	function HTMLFileParser($fileName){
+	function __construct($fileName){
 	    $fp = fopen ($fileName, "r");
 	    $content = "";
 	    while (true) {
@@ -311,7 +311,7 @@ class HTMLFileParser extends HTMLParser {
 }
 
 class HTMLURLParser extends HTMLParser {
-	function HTMLURLParser($url){
+	function __construct($url){
 	    $fp = fopen ($url, "r");
 	    $content = "";
 	    while (true) {
@@ -338,7 +338,7 @@ class TreeHTML{
 	 * @return array
 	 * @desc Tao mot tree node cac phan tu cua HTML
 	 */
-	function TreeHTML($parser, $file=true){
+	function __construct($parser, $file=true){
 	    $i = 0;
 	    if ($file){
 		    while ($parser->parse())

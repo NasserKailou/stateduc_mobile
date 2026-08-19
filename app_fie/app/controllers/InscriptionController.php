@@ -68,6 +68,22 @@ class InscriptionController
         $lastSync  = EtablissementModel::getLastSyncDate();
         $nbEtabs   = EtablissementModel::count();
 
+        // Nationalités depuis ref_type_nationalite (migration 006)
+        try {
+            $nationalites = Database::fetchAll(
+                "SELECT code_type_nationalite AS code, libelle
+                 FROM ref_type_nationalite
+                 ORDER BY ordre ASC, libelle ASC"
+            ) ?: [];
+        } catch (Throwable $e) {
+            $nationalites = [
+                ['code' => 1,  'libelle' => 'Burundaise'],
+                ['code' => 2,  'libelle' => 'Rwandaise'],
+                ['code' => 3,  'libelle' => 'Congolaise (RDC)'],
+                ['code' => 99, 'libelle' => 'Autres'],
+            ];
+        }
+
         $old    = $_SESSION['fie_form_old']     ?? [];
         $errors = $_SESSION['fie_field_errors'] ?? [];
         unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
@@ -102,7 +118,12 @@ class InscriptionController
         $dateNaissance   = $_POST['date_naissance']  ?? '';
         $lieuNaissance   = SecurityHelper::sanitizeStr($_POST['lieu_naissance']   ?? '');
         $provNaissance   = SecurityHelper::sanitizeStr($_POST['province_naissance']?? '');
-        $nationalite     = SecurityHelper::sanitizeStr($_POST['nationalite']      ?? 'BDI', 3);
+        // Nationalité : si "AUTRE" est sélectionné et nationalite_autre est renseigné, utiliser le texte libre (max 3 chars ISO)
+        $natCode         = SecurityHelper::sanitizeStr($_POST['nationalite']       ?? 'BDI');
+        $natAutre        = SecurityHelper::sanitizeStr($_POST['nationalite_autre'] ?? '');
+        $nationalite     = ($natCode === 'AUTRE' && $natAutre !== '')
+                           ? strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $natAutre), 0, 3))
+                           : (strlen($natCode) >= 2 ? strtoupper(substr($natCode, 0, 3)) : 'BDI');
         $nomPere         = SecurityHelper::sanitizeStr($_POST['nom_pere']         ?? '');
         $nomMere         = SecurityHelper::sanitizeStr($_POST['nom_mere']         ?? '');
         $nomTuteur       = SecurityHelper::sanitizeStr($_POST['nom_tuteur']       ?? '');
@@ -512,6 +533,36 @@ class InscriptionController
                 'message' => 'Erreur sync années : ' . $e->getMessage(),
             ]);
         }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // ENDPOINT AJAX — NATIONALITÉS (depuis ref_type_nationalite)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * GET /inscription/ajax/nationalites
+     * Retourne la liste des nationalités depuis ref_type_nationalite.
+     * {"items": [{"code": N, "libelle": "..."}]}
+     */
+    public function ajaxNationalites(): void
+    {
+        SecurityHelper::requireLogin();
+        try {
+            $rows = Database::fetchAll(
+                "SELECT code_type_nationalite AS code, libelle
+                 FROM ref_type_nationalite
+                 ORDER BY ordre ASC, libelle ASC"
+            ) ?: [];
+        } catch (Throwable $e) {
+            // Table absente (migration 006 non exécutée) → liste par défaut
+            $rows = [
+                ['code' => 1,  'libelle' => 'Burundaise'],
+                ['code' => 2,  'libelle' => 'Rwandaise'],
+                ['code' => 3,  'libelle' => 'Congolaise (RDC)'],
+                ['code' => 99, 'libelle' => 'Autres'],
+            ];
+        }
+        SecurityHelper::jsonResponse(['items' => $rows]);
     }
 
     // ══════════════════════════════════════════════════════════════════════════

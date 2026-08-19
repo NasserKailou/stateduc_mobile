@@ -21,7 +21,7 @@ if($_FILES['file']) {
 		$codeErreur    = $fichier["error"];
 		
 		
-		if(eregi("(\.cub)",$nomFichier)) //Extraction nom de fichier
+		if(preg_match('/'.preg_quote("(\.cub)", '/').'/', $nomFichier)) //Extraction nom de fichier
 		{
 			//chemin qui mène au dossier qui va contenir les fichiers upload:
 			$chemin = $rep ;

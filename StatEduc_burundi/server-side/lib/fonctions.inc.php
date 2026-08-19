@@ -1,33 +1,5 @@
-<?php function manage_magic_quotes(){
-		ini_set("magic_quotes_runtime", 0);
-		# On n'ex�cute la boucle que si n�cessaire
-		if(get_magic_quotes_gpc() == 1){
-				
-				# D�finition de la fonction r�cursive.
-				function remove_magic_quotes(&$array)
-				{
-					 foreach($array as $key => $val){
-				
-							 # Si c'est un array, recurssion de la fonction, sinon suppression des slashes
-							 if(is_array($val)){
-									 remove_magic_quotes($array[$key]);
-							 } else if(is_string($val)){
-									 $array[$key] = stripslashes($val);
-							 }
-					 }
-				}
-				
-				# Appel de la fonction pour chaque variables.
-				# Notes, vous pouvez enlevez celle d'on vous ne vous servez pas.
-				# Personnellement, j'enl�ve $_REQUEST et $_FILES
-				
-				remove_magic_quotes($_POST);
-				remove_magic_quotes($_GET);
-				remove_magic_quotes($_REQUEST);
-				remove_magic_quotes($_SERVER);
-				remove_magic_quotes($_FILES);
-				remove_magic_quotes($_COOKIE);
-		}
+<?php function manage_magic_quotes(): void {
+	// PHP 8 : magic_quotes_gpc supprime -- no-op depuis PHP 5.4.
 }
 /*******************************/
 function create_combo($tableau, $nom_combo, $nom_code, $selected_element, $fonction, $disabled='')

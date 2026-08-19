@@ -1,10 +1,12 @@
 <?php
 /**
  * FIE — Vue : Formulaire de nouvelle inscription / émission d'IUE
- * Session 6 — ATLAS_COLLINE + modal doublon + années scolaires select
+ * Session 13 :
+ *   - Nationalités depuis ref_type_nationalite (AJAX + champ libre si "Autres")
+ *   - Vérification doublon : approche INLINE (résultat sous le bouton, plus de modal)
  * Variables injectées par InscriptionController::newForm() :
  *   $annees, $anneeActive, $secteurs, $niveaux, $sections,
- *   $provinces, $csrf, $lastSync, $nbEtabs
+ *   $provinces, $nationalites, $csrf, $lastSync, $nbEtabs
  */
 $page_title  = "Nouvelle Inscription — FIE";
 $active_menu = 'inscription';
@@ -43,33 +45,6 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
         <i class="fa-solid fa-rotate me-1"></i>Synchroniser
     </a>
     <?php endif; ?>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     MODAL — Vérification doublon
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="modal fade" id="modalDoublon" tabindex="-1" aria-labelledby="modalDoublonLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title" id="modalDoublonLabel">
-                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                    Vérification doublon
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="modalDoublonBody">
-                <div class="text-center py-3">
-                    <div class="spinner-border text-warning" role="status"></div>
-                    <p class="mt-2">Vérification en cours…</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <!-- Boutons injectés dynamiquement par JS -->
-                <div id="modalDoublonFooter"></div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
@@ -146,22 +121,61 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
                         <?php endforeach; ?>
                     </select>
                 </div>
+
+                <!-- ── Nationalité (depuis ref_type_nationalite) ── -->
                 <div class="col-md-4">
                     <label for="nationalite" class="form-label fw-semibold">Nationalité</label>
-                    <input type="text" id="nationalite" name="nationalite" maxlength="3"
-                           class="form-control"
-                           value="<?= SecurityHelper::e($old['nationalite'] ?? 'BDI') ?>"
-                           placeholder="BDI">
-                    <div class="form-text">Code ISO 3 lettres</div>
+                    <select id="nationalite" name="nationalite" class="form-select">
+                        <?php
+                        $oldNat = $old['nationalite'] ?? 'BDI';
+                        // Détecter si l'ancienne valeur correspond à une option connue
+                        $natCodes = array_column($nationalites ?? [], 'code');
+                        $natLibelles = array_column($nationalites ?? [], 'libelle');
+                        ?>
+                        <?php if (!empty($nationalites)): ?>
+                            <?php foreach ($nationalites as $nat): ?>
+                            <?php
+                                // Chaque option a pour value le libellé ISO-compatible (ou 'AUTRE' pour Autres)
+                                $isAutre = (strtoupper($nat['libelle']) === 'AUTRES' || (int)$nat['code'] === 99);
+                                $natVal  = $isAutre ? 'AUTRE' : SecurityHelper::e($nat['libelle']);
+                                $selected = ($oldNat === $natVal || (!$isAutre && strtoupper($oldNat) === strtoupper(substr($nat['libelle'],0,3))));
+                            ?>
+                            <option value="<?= $natVal ?>" <?= $selected ? 'selected' : '' ?>>
+                                <?= SecurityHelper::e($nat['libelle']) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="BDI" <?= $oldNat === 'BDI' ? 'selected' : '' ?>>Burundaise</option>
+                            <option value="AUTRE">Autres</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <!-- Champ libre affiché si "Autres" sélectionné -->
+                <div class="col-md-4" id="field-nat-autre" style="display:none;">
+                    <label for="nationalite_autre" class="form-label fw-semibold">
+                        Préciser la nationalité <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" id="nationalite_autre" name="nationalite_autre"
+                           class="form-control" maxlength="50"
+                           placeholder="ex : Français, Américain…"
+                           value="<?= SecurityHelper::e($old['nationalite_autre'] ?? '') ?>">
+                    <div class="form-text">Entrez le nom de la nationalité</div>
                 </div>
             </div>
 
-            <!-- Bouton vérification doublon -->
-            <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
-                <button type="button" id="btn-check-doublon" class="btn btn-outline-warning btn-sm">
-                    <i class="fa-solid fa-magnifying-glass me-1"></i>Vérifier les doublons
-                </button>
-                <span id="fie-doublon-status" class="small text-muted"></span>
+            <!-- Bouton vérification doublon — approche INLINE -->
+            <div class="mt-3 pt-3 border-top">
+                <div class="d-flex align-items-center gap-3">
+                    <button type="button" id="btn-check-doublon" class="btn btn-outline-warning btn-sm">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i>Vérifier les doublons
+                    </button>
+                    <span id="fie-doublon-spinner" class="d-none">
+                        <span class="spinner-border spinner-border-sm text-warning me-1"></span>
+                        Vérification…
+                    </span>
+                </div>
+                <!-- Zone résultat inline (visible après clic) -->
+                <div id="fie-doublon-result" class="mt-2" style="display:none;"></div>
             </div>
         </div>
     </div>
@@ -410,16 +424,16 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
 </form>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     JAVASCRIPT — Cascades ATLAS_COLLINE (codes) + modal doublon + auto-info
+     JAVASCRIPT — Cascades ATLAS_COLLINE + doublon INLINE + nationalité + sync
      ═══════════════════════════════════════════════════════════════════════════ -->
 <script>
 (function () {
   'use strict';
 
-  const BASE    = '<?= BASE_URL ?>/';
-  const CSRF    = document.querySelector('input[name="<?= FIE_CSRF_TOKEN_NAME ?>"]')?.value ?? '';
+  const BASE = '<?= BASE_URL ?>/';
+  const CSRF = document.querySelector('input[name="<?= FIE_CSRF_TOKEN_NAME ?>"]')?.value ?? '';
 
-  /* ── Utilitaires ──────────────────────────────────────────────────────────── */
+  /* ── Utilitaires fetch ─────────────────────────────────────────────────────── */
   function getJSON(url, cb, errCb) {
     fetch(url)
       .then(function(r) {
@@ -443,20 +457,21 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
         if (errCb) errCb(e);
       });
   }
-  function fillSelect(sel, items, placeholder, codeKey='code', libKey='libelle') {
+  function fillSelect(sel, items, placeholder, codeKey, libKey) {
+    codeKey = codeKey || 'code';
+    libKey  = libKey  || 'libelle';
     sel.innerHTML = '<option value="">' + placeholder + '</option>';
     (items||[]).forEach(function(item){
       const o = document.createElement('option');
       o.value       = item[codeKey];
       o.textContent = item[libKey];
-      // Stocker toutes les données pour auto-remplissage
       Object.keys(item).forEach(k => o.dataset[k.replace(/_([a-z])/g, (_,c)=>c.toUpperCase())] = item[k]);
       sel.appendChild(o);
     });
     sel.disabled = (!items || items.length === 0);
   }
 
-  /* ── Références DOM ────────────────────────────────────────────────────── */
+  /* ── Références DOM ─────────────────────────────────────────────────────── */
   const selProv    = document.getElementById('sel-province');
   const selComm    = document.getElementById('sel-commune');
   const selColl    = document.getElementById('sel-colline');
@@ -470,7 +485,7 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     sel.disabled = true;
   }
 
-  /* ── Province → Communes ───────────────────────────────────────────────── */
+  /* ── Province → Communes ─────────────────────────────────────────────────── */
   selProv.addEventListener('change', function() {
     [selComm, selColl, selEtab].forEach(resetFrom);
     etabInfo.innerHTML = 'Sélectionner un établissement';
@@ -481,7 +496,7 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     });
   });
 
-  /* ── Commune → Collines ─────────────────────────────────────────────────── */
+  /* ── Commune → Collines ──────────────────────────────────────────────────── */
   selComm.addEventListener('change', function() {
     [selColl, selEtab].forEach(resetFrom);
     etabInfo.innerHTML = 'Sélectionner un établissement';
@@ -489,12 +504,11 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     if (!cc) return;
     getJSON(BASE + 'inscription/ajax/collines-code?code_commune=' + cc, function(d) {
       fillSelect(selColl, d.items, '— Colline —', 'code', 'libelle');
-      // Si aucune colline, charger directement les établissements de la commune
       if (!d.items || d.items.length === 0) loadEtabs();
     });
   });
 
-  /* ── Colline → Établissements ───────────────────────────────────────────── */
+  /* ── Colline → Établissements ────────────────────────────────────────────── */
   selColl.addEventListener('change', loadEtabs);
   selSecteur.addEventListener('change', function() {
     filterNiveaux(this.value);
@@ -519,7 +533,6 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
         const o = document.createElement('option');
         o.value = e.code;
         o.textContent = e.libelle;
-        // Stocker les données ATLAS_COLLINE pour auto-remplissage
         o.dataset.province   = e.province   || '';
         o.dataset.commune    = e.commune    || '';
         o.dataset.colline    = e.colline    || '';
@@ -536,7 +549,7 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     });
   }
 
-  /* ── Sélection établissement → auto-remplissage infos ───────────────────── */
+  /* ── Sélection établissement → auto-remplissage infos ──────────────────── */
   selEtab.addEventListener('change', function() {
     const opt = this.selectedOptions[0];
     if (!opt || !opt.value) {
@@ -552,7 +565,7 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     etabInfo.innerHTML = html || '<span class="text-muted">Info non disponible</span>';
   });
 
-  /* ── Filtre niveaux par sous-secteur ────────────────────────────────────── */
+  /* ── Filtre niveaux par sous-secteur ─────────────────────────────────────── */
   function filterNiveaux(secteurCode) {
     Array.from(selNiveau.options).forEach(function(opt) {
       if (!opt.dataset.secteur) return;
@@ -563,7 +576,22 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
   }
   if (selSecteur.value) filterNiveaux(selSecteur.value);
 
-  /* ── Sync années scolaires ──────────────────────────────────────────────── */
+  /* ── Nationalité : afficher/masquer champ libre ──────────────────────────── */
+  const selNat       = document.getElementById('nationalite');
+  const fieldNatAutre = document.getElementById('field-nat-autre');
+  const inputNatAutre = document.getElementById('nationalite_autre');
+
+  function toggleNatAutre() {
+    const isAutre = selNat.value === 'AUTRE';
+    fieldNatAutre.style.display = isAutre ? '' : 'none';
+    if (inputNatAutre) inputNatAutre.required = isAutre;
+  }
+  if (selNat) {
+    selNat.addEventListener('change', toggleNatAutre);
+    toggleNatAutre(); // init
+  }
+
+  /* ── Sync années scolaires ───────────────────────────────────────────────── */
   const btnSyncAnnees = document.getElementById('btn-sync-annees');
   if (btnSyncAnnees) {
     btnSyncAnnees.addEventListener('click', function(e) {
@@ -587,89 +615,106 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
     });
   }
 
-  /* ── MODAL DOUBLON ──────────────────────────────────────────────────────── */
-  const btnDoublon = document.getElementById('btn-check-doublon');
-  const statusMsg  = document.getElementById('fie-doublon-status');
-  const btnSubmit  = document.getElementById('btn-submit-insc');
-  let doublonConfirmed = false;
+  /* ── DOUBLON — approche INLINE (résultat affiché sous le bouton) ─────────── */
+  const btnDoublon     = document.getElementById('btn-check-doublon');
+  const doublonSpinner = document.getElementById('fie-doublon-spinner');
+  const doublonResult  = document.getElementById('fie-doublon-result');
 
-  const modalEl    = document.getElementById('modalDoublon');
-  const modalBody  = document.getElementById('modalDoublonBody');
-  const modalFoot  = document.getElementById('modalDoublonFooter');
-  const bsModal    = new bootstrap.Modal(modalEl);
+  if (btnDoublon) {
+    btnDoublon.addEventListener('click', function() {
+      const nom = document.getElementById('nom').value.trim();
+      const prn = document.getElementById('prenoms').value.trim();
+      const ddn = document.getElementById('date_naissance').value;
 
-  btnDoublon.addEventListener('click', function() {
-    const nom = document.getElementById('nom').value.trim();
-    const prn = document.getElementById('prenoms').value.trim();
-    const ddn = document.getElementById('date_naissance').value;
-    if (!nom || !prn || !ddn) {
-      alert('Renseignez le nom, les prénoms et la date de naissance avant de vérifier.');
-      return;
-    }
-    // Afficher modal avec spinner
-    modalBody.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-warning"></div><p class="mt-2">Vérification en cours…</p></div>';
-    modalFoot.innerHTML = '';
-    bsModal.show();
-    btnDoublon.disabled = true;
-
-    postJSON(BASE + 'inscription/ajax/doublon',
-      {nom, prenoms: prn, date_naissance: ddn, '<?= FIE_CSRF_TOKEN_NAME ?>': CSRF},
-      function(resp) {
-        btnDoublon.disabled = false;
-        if (resp.found && resp.count > 0) {
-          // Construire le contenu du modal
-          let rows = '';
-          (resp.doublons||[]).forEach(function(d) {
-            rows += '<tr>'
-              + '<td><a href="' + BASE + 'inscription/' + encodeURIComponent(d.iue) + '" target="_blank" class="fw-bold">' + d.iue + '</a></td>'
-              + '<td>' + d.nom + ' ' + d.prenoms + '</td>'
-              + '<td>' + (d.date_naissance||'') + '</td>'
-              + '<td>' + (d.lieu_naissance||'') + '</td>'
-              + '<td>' + (d.etablissement||'') + '</td>'
-              + '<td>' + (d.annee_scolaire||'') + '</td>'
-              + '</tr>';
-          });
-          modalBody.innerHTML = '<div class="alert alert-warning mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i><strong>' + resp.count + ' élève(s) similaire(s) trouvé(s)</strong></div>'
-            + '<div class="table-responsive"><table class="table table-sm table-bordered">'
-            + '<thead class="table-warning"><tr><th>IUE</th><th>Nom &amp; Prénoms</th><th>Né(e) le</th><th>Lieu</th><th>Établissement</th><th>Année</th></tr></thead>'
-            + '<tbody>' + rows + '</tbody></table></div>'
-            + '<div class="form-check mt-3"><input class="form-check-input" type="checkbox" id="chkConfirmDoublon">'
-            + '<label class="form-check-label" for="chkConfirmDoublon">Je confirme que cet élève n\'est <strong>pas</strong> déjà enregistré et je souhaite continuer.</label></div>';
-
-          modalFoot.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer — vérifier la fiche</button>'
-            + '<button type="button" id="btnModalContinue" class="btn btn-warning" disabled>Continuer malgré tout</button>';
-
-          document.getElementById('chkConfirmDoublon').addEventListener('change', function() {
-            document.getElementById('btnModalContinue').disabled = !this.checked;
-          });
-          document.getElementById('btnModalContinue').addEventListener('click', function() {
-            doublonConfirmed = true;
-            bsModal.hide();
-            statusMsg.innerHTML = '<span class="text-warning"><i class="fa-solid fa-triangle-exclamation me-1"></i>Doublon confirmé — soumission possible.</span>';
-            btnSubmit.disabled = false;
-          });
-          btnSubmit.disabled = true;
-          statusMsg.textContent = '';
-        } else {
-          // Aucun doublon
-          modalBody.innerHTML = '<div class="alert alert-success"><i class="fa-solid fa-circle-check me-2"></i><strong>Aucun doublon détecté !</strong><br>Cet élève n\'existe pas encore dans le système.</div>';
-          modalFoot.innerHTML = '<button type="button" class="btn btn-success" data-bs-dismiss="modal"><i class="fa-solid fa-check me-1"></i>Parfait — continuer</button>';
-          doublonConfirmed = true;
-          btnSubmit.disabled = false;
-          statusMsg.innerHTML = '<span class="text-success"><i class="fa-solid fa-check me-1"></i>Aucun doublon détecté.</span>';
-        }
-      },
-      // ── Gestionnaire d'erreur réseau / HTTP ───────────────────────────────
-      function(err) {
-        btnDoublon.disabled = false;
-        modalBody.innerHTML = '<div class="alert alert-danger"><i class="fa-solid fa-circle-xmark me-2"></i>'
-          + '<strong>Erreur de communication</strong><br>'
-          + '<small class="text-muted">' + (err ? err.message : 'Réponse inattendue du serveur') + '</small>'
-          + '<br><span class="small">Vérifiez la console navigateur (F12) pour plus de détails.</span></div>';
-        modalFoot.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>';
+      if (!nom || !prn || !ddn) {
+        doublonResult.style.display = '';
+        doublonResult.innerHTML = '<div class="alert alert-info py-2 mt-1">'
+          + '<i class="fa-solid fa-circle-info me-2"></i>'
+          + 'Renseignez le nom, les prénoms et la date de naissance avant de vérifier.'
+          + '</div>';
+        return;
       }
-    );
-  });
+
+      // État chargement
+      btnDoublon.disabled    = true;
+      doublonSpinner.classList.remove('d-none');
+      doublonResult.style.display = 'none';
+      doublonResult.innerHTML = '';
+
+      postJSON(BASE + 'inscription/ajax/doublon',
+        {nom: nom, prenoms: prn, date_naissance: ddn, '<?= FIE_CSRF_TOKEN_NAME ?>': CSRF},
+
+        function(resp) {
+          btnDoublon.disabled = false;
+          doublonSpinner.classList.add('d-none');
+          doublonResult.style.display = '';
+
+          if (resp.found && resp.count > 0) {
+            // ── Doublons trouvés ──
+            let rows = '';
+            (resp.doublons || []).forEach(function(d) {
+              rows += '<tr>'
+                + '<td><a href="' + BASE + 'inscription/' + encodeURIComponent(d.iue) + '" target="_blank" class="fw-bold">' + d.iue + '</a></td>'
+                + '<td>' + d.nom + ' ' + d.prenoms + '</td>'
+                + '<td>' + (d.date_naissance || '') + '</td>'
+                + '<td>' + (d.lieu_naissance || '') + '</td>'
+                + '<td>' + (d.etablissement || '') + '</td>'
+                + '<td>' + (d.annee_scolaire || '') + '</td>'
+                + '</tr>';
+            });
+
+            doublonResult.innerHTML =
+              '<div class="alert alert-warning py-2 mb-2">'
+              + '<i class="fa-solid fa-triangle-exclamation me-2"></i>'
+              + '<strong>' + resp.count + ' élève(s) similaire(s) trouvé(s).</strong> '
+              + 'Vérifiez qu\'il ne s\'agit pas du même élève avant de continuer.'
+              + '</div>'
+              + '<div class="table-responsive mb-2">'
+              + '<table class="table table-sm table-bordered table-hover mb-0">'
+              + '<thead class="table-warning"><tr><th>IUE</th><th>Nom &amp; Prénoms</th><th>Né(e) le</th><th>Lieu</th><th>Établissement</th><th>Année</th></tr></thead>'
+              + '<tbody>' + rows + '</tbody></table></div>'
+              + '<div class="form-check">'
+              + '<input class="form-check-input" type="checkbox" id="chkConfirmDoublon">'
+              + '<label class="form-check-label" for="chkConfirmDoublon">'
+              + 'Je confirme que cet élève <strong>n\'est pas</strong> déjà enregistré et je souhaite continuer.'
+              + '</label></div>';
+
+            // Écouter la checkbox pour informer visuellement
+            const chk = document.getElementById('chkConfirmDoublon');
+            if (chk) {
+              chk.addEventListener('change', function() {
+                btnDoublon.classList.toggle('btn-outline-warning', !this.checked);
+                btnDoublon.classList.toggle('btn-outline-success', this.checked);
+              });
+            }
+          } else {
+            // ── Aucun doublon ──
+            doublonResult.innerHTML =
+              '<div class="alert alert-success py-2 mb-0">'
+              + '<i class="fa-solid fa-circle-check me-2"></i>'
+              + '<strong>Aucun doublon détecté.</strong> Cet élève ne semble pas encore enregistré dans le système.'
+              + '</div>';
+            btnDoublon.classList.remove('btn-outline-warning');
+            btnDoublon.classList.add('btn-outline-success');
+          }
+        },
+
+        // ── Erreur réseau ──
+        function(err) {
+          btnDoublon.disabled = false;
+          doublonSpinner.classList.add('d-none');
+          doublonResult.style.display = '';
+          doublonResult.innerHTML =
+            '<div class="alert alert-danger py-2 mb-0">'
+            + '<i class="fa-solid fa-circle-xmark me-2"></i>'
+            + '<strong>Erreur de vérification</strong> — '
+            + (err ? err.message : 'Réponse inattendue du serveur')
+            + '<br><small class="text-muted">Consultez la console (F12) pour plus de détails.</small>'
+            + '</div>';
+        }
+      );
+    });
+  }
 
   /* ── Validation avant soumission ────────────────────────────────────────── */
   document.getElementById('fie-insc-form').addEventListener('submit', function(e) {
@@ -679,9 +724,13 @@ unset($_SESSION['fie_form_old'], $_SESSION['fie_field_errors']);
       selEtab.focus();
       return;
     }
-    // Avertissement si doublon non vérifié (non bloquant — peut être ignoré)
-    // Le bouton submit peut être utilisé sans vérification doublon si l'utilisateur
-    // n'a pas cliqué sur "Vérifier".
+    // Vérif champ nationalite_autre obligatoire si "Autres"
+    if (selNat && selNat.value === 'AUTRE' && inputNatAutre && !inputNatAutre.value.trim()) {
+      e.preventDefault();
+      inputNatAutre.classList.add('is-invalid');
+      inputNatAutre.focus();
+      return;
+    }
   });
 
 }());
