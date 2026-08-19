@@ -32,12 +32,13 @@
     --fie-white:        #FFFFFF;
 
     /* Surcharge Bootstrap pour cohérence */
-    --bs-primary:       #CE1126;
-    --bs-primary-rgb:   206,17,38;
+    /* SESSION 17 : --bs-primary = BLEU (boutons d'action) */
+    --bs-primary:       #1a56db;
+    --bs-primary-rgb:   26,86,219;
     --bs-success:       #1EB53A;
     --bs-success-rgb:   30,181,58;
-    --bs-link-color:    #CE1126;
-    --bs-link-hover-color: #a00e1b;
+    --bs-link-color:    #1a56db;
+    --bs-link-hover-color: #1343a8;
 
     /* Typographie — Poppins pour titres, Open Sans pour corps */
     --fie-font-title:   'Poppins', 'Segoe UI', system-ui, Arial, sans-serif;
@@ -154,22 +155,28 @@ h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title)
 
 /* ═══════════════════════════════════════════════════════════════
    6. SURCHARGE BOUTONS BOOTSTRAP (charte Burundi)
+   SESSION 17 : btn-primary = BLEU (--fie-app-blue), pas rouge
+   Le rouge est réservé aux badges/accents FIE (--fie-primary)
    ═══════════════════════════════════════════════════════════════ */
 .btn-primary {
-    --bs-btn-bg:            var(--fie-primary);
-    --bs-btn-border-color:  var(--fie-primary);
-    --bs-btn-hover-bg:      var(--fie-primary-dark);
-    --bs-btn-hover-border-color: var(--fie-primary-dark);
-    --bs-btn-active-bg:     #7a0a13;
-    --bs-btn-focus-shadow-rgb: 206,17,38;
+    --bs-btn-bg:            var(--fie-app-blue);
+    --bs-btn-border-color:  var(--fie-app-blue);
+    --bs-btn-hover-bg:      var(--fie-app-blue-dark);
+    --bs-btn-hover-border-color: var(--fie-app-blue-dark);
+    --bs-btn-active-bg:     #0f3282;
+    --bs-btn-focus-shadow-rgb: 26,86,219;
+    --bs-btn-color:         #fff;
+    --bs-btn-hover-color:   #fff;
+    --bs-btn-active-color:  #fff;
 }
 .btn-outline-primary {
-    --bs-btn-color:         var(--fie-primary);
-    --bs-btn-border-color:  var(--fie-primary);
-    --bs-btn-hover-bg:      var(--fie-primary);
-    --bs-btn-hover-border-color: var(--fie-primary);
-    --bs-btn-active-bg:     var(--fie-primary-dark);
-    --bs-btn-focus-shadow-rgb: 206,17,38;
+    --bs-btn-color:         var(--fie-app-blue);
+    --bs-btn-border-color:  var(--fie-app-blue);
+    --bs-btn-hover-bg:      var(--fie-app-blue);
+    --bs-btn-hover-border-color: var(--fie-app-blue);
+    --bs-btn-active-bg:     var(--fie-app-blue-dark);
+    --bs-btn-focus-shadow-rgb: 26,86,219;
+    --bs-btn-hover-color:   #fff;
 }
 .btn-success {
     --bs-btn-bg:            var(--fie-green);

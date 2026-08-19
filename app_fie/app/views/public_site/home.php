@@ -1008,7 +1008,9 @@
 <div id="topBar" class="d-none d-md-block">
     <div class="container d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-            <span>🇧🇮</span>
+            <img src="<?= BASE_URL ?>/public/images/drapeau_burundi.gif"
+                 alt="Drapeau du Burundi"
+                 style="height:18px;width:auto;vertical-align:middle;border-radius:2px;">
             <span>République du Burundi — Ministère de l'Éducation Nationale et de la Recherche Scientifique</span>
         </div>
         <div class="d-flex align-items-center">

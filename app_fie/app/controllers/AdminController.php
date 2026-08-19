@@ -467,7 +467,317 @@ class AdminController
 
     public function downloadElevesTemplate(): void
     {
-        // Génère un fichier CSV (UTF-8 BOM) téléchargeable comme template
+        // ── Charger PhpSpreadsheet via l'autoloader du projet StatEduc ──────
+        // BASE_PATH = .../app_fie  — StatEduc est dans le répertoire parent (.../StatEduc_burundi)
+        $candidates = [
+            BASE_PATH . '/../../StatEduc_burundi/server-side/lib/autoload.php',
+            dirname(BASE_PATH) . '/StatEduc_burundi/server-side/lib/autoload.php',
+            realpath(BASE_PATH . '/..') . '/StatEduc_burundi/server-side/lib/autoload.php',
+        ];
+        $autoloaderPath = null;
+        foreach ($candidates as $candidate) {
+            if ($candidate && file_exists($candidate)) {
+                $autoloaderPath = $candidate;
+                break;
+            }
+        }
+
+        if ($autoloaderPath) {
+            require_once $autoloaderPath;
+            $this->downloadElevesTemplateXlsx();
+        } else {
+            // Fallback CSV si PhpSpreadsheet non disponible
+            $this->downloadElevesTemplateCsv();
+        }
+    }
+
+    /** Génère le modèle XLSX avec listes déroulantes (PhpSpreadsheet requis) */
+    private function downloadElevesTemplateXlsx(): void
+    {
+        // Namespace résolu via autoloader : \PhpOffice\PhpSpreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Modèle import élèves');
+
+        // ── 1. En-têtes des colonnes ──────────────────────────────────────
+        $columns = [
+            'A' => 'nom',
+            'B' => 'prenoms',
+            'C' => 'sexe',
+            'D' => 'date_naissance',
+            'E' => 'lieu_naissance',
+            'F' => 'province_naissance',
+            'G' => 'nationalite',
+            'H' => 'nom_pere',
+            'I' => 'nom_mere',
+            'J' => 'nom_tuteur',
+            'K' => 'telephone_tuteur',
+            'L' => 'code_etablissement',
+            'M' => 'code_type_annee',
+            'N' => 'code_type_secteur_ens',
+            'O' => 'code_type_niveau',
+            'P' => 'code_type_section',
+            'Q' => 'numero_classe',
+            'R' => 'date_inscription',
+        ];
+
+        $headerStyle = [
+            'font'      => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
+            'fill'      => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'startColor' => ['argb' => 'FF1A56DB']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+            'borders'   => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+        ];
+
+        foreach ($columns as $col => $label) {
+            $sheet->setCellValue($col . '1', $label);
+            $sheet->getStyle($col . '1')->applyFromArray($headerStyle);
+            $sheet->getColumnDimension($col)->setWidth(20);
+        }
+
+        // ── 2. Ligne d'exemple ────────────────────────────────────────────
+        $exemple = [
+            'A' => 'NIYONZIMA',      'B' => 'Jean-Pierre',
+            'C' => 'M',               'D' => '2010-05-14',
+            'E' => 'Gitega',          'F' => 'Gitega',
+            'G' => 'BDI',             'H' => 'NIYONZIMA Gérard',
+            'I' => 'HAKIZIMANA Cécile','J' => '',
+            'K' => '+257 79 123 456', 'L' => '21422',
+            'M' => '1',               'N' => '1',
+            'O' => '2',               'P' => '1',
+            'Q' => 'CP1-A',           'R' => date('Y-m-d'),
+        ];
+        foreach ($exemple as $col => $val) {
+            $sheet->setCellValue($col . '2', $val);
+        }
+        $sheet->getStyle('A2:R2')->applyFromArray([
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                       'startColor' => ['argb' => 'FFF0F4FF']],
+        ]);
+
+        // ── 3. Onglet caché "RefData" pour les listes déroulantes ─────────
+        $refSheet = $spreadsheet->createSheet();
+        $refSheet->setTitle('RefData');
+
+        // 3a. Sexe
+        $refSheet->setCellValue('A1', 'code_sexe');
+        $refSheet->setCellValue('B1', 'libelle_sexe');
+        $sexeData = [['M', 'Masculin'], ['F', 'Féminin']];
+        $rowIdx = 2;
+        foreach ($sexeData as $row) {
+            $refSheet->setCellValue('A' . $rowIdx, $row[0]);
+            $refSheet->setCellValue('B' . $rowIdx, $row[1]);
+            $rowIdx++;
+        }
+        // La liste affichera "Masculin / Féminin" mais stockera M / F
+        // On crée les labels concaténés pour la validation directe
+        $sexeLabels = '"Masculin,Féminin"';
+
+        // 3b. Nationalités
+        $nationalites = Database::fetchAll(
+            "SELECT code_type_nationalite, libelle FROM ref_type_nationalite ORDER BY libelle LIMIT 200"
+        ) ?: [];
+        $refSheet->setCellValue('C1', 'code_nat');
+        $refSheet->setCellValue('D1', 'libelle_nat');
+        $rowIdx = 2;
+        foreach ($nationalites as $n) {
+            $refSheet->setCellValue('C' . $rowIdx, $n['code_type_nationalite']);
+            $refSheet->setCellValue('D' . $rowIdx, $n['libelle']);
+            $rowIdx++;
+        }
+        $natLastRow = max(2, $rowIdx - 1);
+
+        // 3c. Années scolaires
+        $annees = Database::fetchAll(
+            "SELECT code_type_annee, libelle FROM ref_type_annee ORDER BY code_type_annee DESC LIMIT 20"
+        ) ?: [];
+        $refSheet->setCellValue('E1', 'code_annee');
+        $refSheet->setCellValue('F1', 'libelle_annee');
+        $rowIdx = 2;
+        foreach ($annees as $a) {
+            $refSheet->setCellValue('E' . $rowIdx, $a['code_type_annee']);
+            $refSheet->setCellValue('F' . $rowIdx, $a['libelle'] ?? $a['code_type_annee']);
+            $rowIdx++;
+        }
+        $anneeLastRow = max(2, $rowIdx - 1);
+
+        // 3d. Secteurs enseignement
+        $secteurs = Database::fetchAll(
+            "SELECT code_type_secteur_ens, libelle FROM ref_type_secteur_ens ORDER BY libelle LIMIT 50"
+        ) ?: [];
+        $refSheet->setCellValue('G1', 'code_secteur');
+        $refSheet->setCellValue('H1', 'libelle_secteur');
+        $rowIdx = 2;
+        foreach ($secteurs as $s) {
+            $refSheet->setCellValue('G' . $rowIdx, $s['code_type_secteur_ens']);
+            $refSheet->setCellValue('H' . $rowIdx, $s['libelle'] ?? $s['code_type_secteur_ens']);
+            $rowIdx++;
+        }
+        $sectLastRow = max(2, $rowIdx - 1);
+
+        // 3e. Niveaux
+        $niveaux = Database::fetchAll(
+            "SELECT code_type_niveau, libelle FROM ref_type_niveau ORDER BY libelle LIMIT 50"
+        ) ?: [];
+        $refSheet->setCellValue('I1', 'code_niveau');
+        $refSheet->setCellValue('J1', 'libelle_niveau');
+        $rowIdx = 2;
+        foreach ($niveaux as $nv) {
+            $refSheet->setCellValue('I' . $rowIdx, $nv['code_type_niveau']);
+            $refSheet->setCellValue('J' . $rowIdx, $nv['libelle'] ?? $nv['code_type_niveau']);
+            $rowIdx++;
+        }
+        $niveauLastRow = max(2, $rowIdx - 1);
+
+        // 3f. Sections
+        $sections = Database::fetchAll(
+            "SELECT code_type_section, libelle FROM ref_type_section ORDER BY libelle LIMIT 50"
+        ) ?: [];
+        $refSheet->setCellValue('K1', 'code_section');
+        $refSheet->setCellValue('L1', 'libelle_section');
+        $rowIdx = 2;
+        foreach ($sections as $sec) {
+            $refSheet->setCellValue('K' . $rowIdx, $sec['code_type_section']);
+            $refSheet->setCellValue('L' . $rowIdx, $sec['libelle'] ?? $sec['code_type_section']);
+            $rowIdx++;
+        }
+        $sectionLastRow = max(2, $rowIdx - 1);
+
+        // 3g. Numéros de classe (depuis inscriptions existantes)
+        $classes = Database::fetchAll(
+            "SELECT DISTINCT numero_classe FROM inscriptions WHERE numero_classe IS NOT NULL ORDER BY numero_classe LIMIT 100"
+        ) ?: [];
+        $refSheet->setCellValue('M1', 'numero_classe');
+        $rowIdx = 2;
+        foreach ($classes as $cl) {
+            $refSheet->setCellValue('M' . $rowIdx, $cl['numero_classe']);
+            $rowIdx++;
+        }
+        $classeLastRow = max(2, $rowIdx - 1);
+
+        // Masquer l'onglet RefData
+        $refSheet->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
+
+        // ── 4. Validations de données (listes déroulantes) ────────────────
+        $spreadsheet->setActiveSheetIndex(0);
+        $mainSheet = $spreadsheet->getActiveSheet();
+
+        $maxRows = 500; // Appliquer sur 500 lignes max
+        $sheetName = 'RefData';
+
+        // Helper : crée une validation liste depuis une plage RefData
+        $makeListValidation = function(
+            string $col,
+            string $refRange,
+            string $prompt,
+            string $title
+        ) use ($mainSheet, $maxRows, $sheetName): void {
+            $validation = $mainSheet->getCell($col . '2')->getDataValidation();
+            $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+            $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+            $validation->setAllowBlank(true);
+            $validation->setShowInputMessage(true);
+            $validation->setShowErrorMessage(true);
+            $validation->setShowDropDown(true);
+            $validation->setFormula1($refRange);
+            $validation->setError('Valeur invalide. Choisissez dans la liste.');
+            $validation->setErrorTitle('Valeur non reconnue');
+            $validation->setPrompt($prompt);
+            $validation->setPromptTitle($title);
+            $validation->setSqref($col . '2:' . $col . $maxRows);
+            $mainSheet->setDataValidation($col . '2:' . $col . $maxRows, $validation);
+        };
+
+        // C — Sexe (liste fixe directe : plus simple, pas de ref sheet)
+        $vSexe = $mainSheet->getCell('C2')->getDataValidation();
+        $vSexe->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $vSexe->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $vSexe->setAllowBlank(true);
+        $vSexe->setShowDropDown(true);
+        $vSexe->setShowInputMessage(true);
+        $vSexe->setShowErrorMessage(true);
+        $vSexe->setFormula1('"M,F"');
+        $vSexe->setPrompt('M = Masculin, F = Féminin');
+        $vSexe->setPromptTitle('Sexe');
+        $vSexe->setError('Entrez M (Masculin) ou F (Féminin).');
+        $vSexe->setErrorTitle('Valeur invalide');
+        $vSexe->setSqref('C2:C' . $maxRows);
+        $mainSheet->setDataValidation('C2:C' . $maxRows, $vSexe);
+
+        // G — Nationalité (codes depuis RefData!C)
+        $makeListValidation('G', "RefData!\$C\$2:\$C\${$natLastRow}", 'Choisissez un code nationalité (ex: BDI)', 'Nationalité');
+
+        // M — Année scolaire
+        $makeListValidation('M', "RefData!\$E\$2:\$E\${$anneeLastRow}", 'Choisissez le code année scolaire', 'Année scolaire');
+
+        // N — Secteur enseignement
+        $makeListValidation('N', "RefData!\$G\$2:\$G\${$sectLastRow}", 'Choisissez le code secteur enseignement', 'Secteur');
+
+        // O — Niveau
+        $makeListValidation('O', "RefData!\$I\$2:\$I\${$niveauLastRow}", 'Choisissez le code niveau', 'Niveau');
+
+        // P — Section
+        $makeListValidation('P', "RefData!\$K\$2:\$K\${$sectionLastRow}", 'Choisissez le code section', 'Section');
+
+        // Q — Numéro de classe
+        if ($classeLastRow > 1) {
+            $makeListValidation('Q', "RefData!\$M\$2:\$M\${$classeLastRow}", 'Choisissez ou saisissez le numéro de classe', 'Classe');
+        }
+
+        // ── 5. Ajouter une légende sur un 3e onglet ───────────────────────
+        $helpSheet = $spreadsheet->createSheet();
+        $helpSheet->setTitle('Légende');
+        $helpSheet->setCellValue('A1', 'Colonne');
+        $helpSheet->setCellValue('B1', 'Description');
+        $helpSheet->setCellValue('C1', 'Format / Valeurs');
+        $helpStyle = ['font' => ['bold' => true],
+                      'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                  'startColor' => ['argb' => 'FFCED4DA']]];
+        $helpSheet->getStyle('A1:C1')->applyFromArray($helpStyle);
+
+        $legend = [
+            ['sexe (C)',              'Sexe de l\'élève',                     'M ou F'],
+            ['nationalite (G)',       'Code nationalité',                     'BDI = Burundais, etc. (voir RefData)'],
+            ['code_type_annee (M)',   'Année scolaire (code numérique)',      'Ex: 1 = 2024-2025 (voir RefData)'],
+            ['code_type_secteur_ens (N)', 'Secteur enseignement',             'Code numérique (voir RefData)'],
+            ['code_type_niveau (O)', 'Niveau scolaire',                       'Code numérique (voir RefData)'],
+            ['code_type_section (P)', 'Section / Filière',                   'Code numérique (voir RefData)'],
+            ['numero_classe (Q)',     'Numéro ou nom de la classe',           'Ex: CP1-A, 6A, 1ere-A'],
+            ['date_naissance (D)',    'Date de naissance',                    'Format : AAAA-MM-JJ'],
+            ['date_inscription (R)', 'Date inscription',                      'Format : AAAA-MM-JJ'],
+        ];
+        $r = 2;
+        foreach ($legend as $row) {
+            $helpSheet->setCellValue('A' . $r, $row[0]);
+            $helpSheet->setCellValue('B' . $r, $row[1]);
+            $helpSheet->setCellValue('C' . $r, $row[2]);
+            $r++;
+        }
+        $helpSheet->getColumnDimension('A')->setWidth(28);
+        $helpSheet->getColumnDimension('B')->setWidth(32);
+        $helpSheet->getColumnDimension('C')->setWidth(40);
+
+        // ── 6. Figer la ligne d'en-tête ──────────────────────────────────
+        $spreadsheet->setActiveSheetIndex(0);
+        $mainSheet->freezePane('A2');
+        $mainSheet->getRowDimension(1)->setRowHeight(20);
+
+        // ── 7. Téléchargement ─────────────────────────────────────────────
+        $filename = 'modele_import_eleves_' . date('Y-m-d') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit;
+    }
+
+    /** Fallback CSV si PhpSpreadsheet non disponible */
+    private function downloadElevesTemplateCsv(): void
+    {
         $headers = [
             'nom', 'prenoms', 'sexe', 'date_naissance',
             'lieu_naissance', 'province_naissance', 'nationalite',
@@ -479,8 +789,7 @@ class AdminController
             'NIYONZIMA', 'Jean-Pierre', 'M', '2010-05-14',
             'Gitega', 'Gitega', 'BDI',
             'NIYONZIMA Gérard', 'HAKIZIMANA Cécile', '', '+257 79 123 456',
-            '21422', '1', '1',
-            '2', '1', 'CP1-A', date('Y-m-d'),
+            '21422', '1', '1', '2', '1', 'CP1-A', date('Y-m-d'),
         ];
 
         header('Content-Type: text/csv; charset=UTF-8');
@@ -488,7 +797,6 @@ class AdminController
         header('Cache-Control: no-cache, no-store');
 
         $out = fopen('php://output', 'w');
-        // UTF-8 BOM pour Excel
         fwrite($out, "\xEF\xBB\xBF");
         fputcsv($out, $headers, ';');
         fputcsv($out, $exemple, ';');

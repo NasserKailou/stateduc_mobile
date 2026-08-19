@@ -1,20 +1,21 @@
 /**
  * fie_admin.css — Surcharges AdminLTE pour la charte FIE Burundi
- * Couleur primaire : #007bff (bleu FIE) au lieu du bleu AdminLTE par défaut
+ * SESSION 17 : topbar + boutons primaires = BLEU (#1a56db)
+ * Le rouge (--fie-primary) reste pour badges/accents, PAS pour nav/boutons
  */
 
 /* ── Variables AdminLTE redéfinies ──────────────────────────────────────── */
 :root {
   --lte-sidebar-bg-color:        #1e2a38;
   --lte-sidebar-hover-bg-color:  rgba(255,255,255,.08);
-  --lte-sidebar-active-bg-color: var(--fie-primary);
+  --lte-sidebar-active-bg-color: var(--fie-app-blue);
   --lte-sidebar-color:           rgba(255,255,255,.75);
   --lte-sidebar-hover-color:     #fff;
   --lte-sidebar-active-color:    #fff;
-  --lte-link-color:              var(--fie-primary);
-  --lte-link-hover-color:        var(--fie-primary-dark);
-  --bs-primary:                  var(--fie-primary);
-  --bs-primary-rgb:              0, 123, 255;
+  --lte-link-color:              var(--fie-app-blue);
+  --lte-link-hover-color:        var(--fie-app-blue-dark);
+  --bs-primary:                  var(--fie-app-blue);
+  --bs-primary-rgb:              26, 86, 219;
 }
 
 /* ── Sidebar ────────────────────────────────────────────────────────────── */
@@ -31,12 +32,12 @@
 
 .app-sidebar .nav-link:hover,
 .app-sidebar .nav-link.active {
-  background: rgba(0, 123, 255, .25) !important;
+  background: rgba(26, 86, 219, .25) !important;
   color: #fff !important;
 }
 
 .app-sidebar .nav-link.active {
-  background: var(--fie-primary) !important;
+  background: var(--fie-app-blue) !important;
 }
 
 .app-sidebar .nav-icon {
@@ -49,9 +50,9 @@
   background: rgba(0,0,0,.2);
 }
 
-/* ── Topbar ─────────────────────────────────────────────────────────────── */
+/* ── Topbar AdminLTE générique ──────────────────────────────────────────── */
 .app-header {
-  background: var(--fie-primary) !important;
+  background: var(--fie-app-blue) !important;
   border-bottom: 0 !important;
 }
 
@@ -75,14 +76,22 @@
   box-shadow: 0 .125rem .375rem rgba(0,0,0,.08) !important;
 }
 
-/* ── Bouton primaire ────────────────────────────────────────────────────── */
+/* ── Bouton primaire — BLEU (session 17) ────────────────────────────────── */
 .btn-primary {
-  background-color: var(--fie-primary) !important;
-  border-color:     var(--fie-primary) !important;
+  background-color: var(--fie-app-blue) !important;
+  border-color:     var(--fie-app-blue) !important;
+  color: #fff !important;
 }
 .btn-primary:hover {
-  background-color: var(--fie-primary-dark) !important;
-  border-color:     var(--fie-primary-dark) !important;
+  background-color: var(--fie-app-blue-dark) !important;
+  border-color:     var(--fie-app-blue-dark) !important;
+  color: #fff !important;
+}
+.btn-primary:active,
+.btn-primary:focus {
+  background-color: #0f3282 !important;
+  border-color:     #0f3282 !important;
+  color: #fff !important;
 }
 
 /* ── Badges rôles ───────────────────────────────────────────────────────── */
@@ -115,12 +124,12 @@
 }
 
 .fie-sidebar .nav-link:hover {
-  background: rgba(0, 123, 255, .18) !important;
+  background: rgba(26, 86, 219, .18) !important;
   color: #fff !important;
 }
 
 .fie-sidebar .nav-link.active {
-  background: var(--fie-primary) !important;
+  background: var(--fie-app-blue) !important;
   color: #fff !important;
   font-weight: 600;
 }
@@ -145,9 +154,9 @@
   transform: rotate(90deg);
 }
 
-/* ── Topbar FIE ─────────────────────────────────────────────────────────── */
+/* ── Topbar FIE — BLEU (session 17) ────────────────────────────────────── */
 .fie-app-topbar {
-  background: var(--fie-primary) !important;
+  background: var(--fie-app-blue) !important;
   border-bottom: none !important;
   box-shadow: 0 2px 8px rgba(0,0,0,.15);
 }

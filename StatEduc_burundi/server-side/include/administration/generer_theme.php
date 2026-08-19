@@ -47,12 +47,27 @@ foreach ($all_systemes as $systeme){
 	$id_systemes[]	=	$systeme[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT']];
 }
 
-// PHP8 compat: $_SESSION['langue'] doit etre defini avant que frame::generer_frame() l'utilise
-// (la requete SQL sur DICO_TYPE_THEME filtre par CODE_LANGUE = $_SESSION['langue'])
-// Si langue n'est pas en session, on utilise la premiere langue du tableau
-if (!isset($_SESSION['langue']) || $_SESSION['langue'] === '') {
+// ── FIX S17 : Synchroniser $_SESSION['langue'] avec la valeur réelle de DICO_TYPE_THEME ──
+// frame::generer_frame() (ligne 10543) filtre DICO_TYPE_THEME par CODE_LANGUE = $_SESSION['langue'].
+// Si la table ne contient que 'fr' mais que $_SESSION['langue'] = 'eng' (lu depuis DICO_LANGUE),
+// aucune ligne n'est retournée → $type_frame vide → switch default → "Attention! Dico" → pas de fichier.
+// Solution : interroger DICO_TYPE_THEME pour connaître le CODE_LANGUE effectivement présent.
+$_lang_dico_row = $GLOBALS['conn_dico']->GetRow(
+    "SELECT DISTINCT CODE_LANGUE FROM DICO_TYPE_THEME LIMIT 1"
+);
+if (!empty($_lang_dico_row) && !empty($_lang_dico_row['CODE_LANGUE'])) {
+    // Utiliser la langue trouvée dans le dictionnaire de thèmes
+    $_SESSION['langue'] = $_lang_dico_row['CODE_LANGUE'];
+    // Synchroniser aussi le tableau $langues pour que frame boucle sur la bonne langue
+    if (!in_array($_lang_dico_row['CODE_LANGUE'], $langues)) {
+        // Ajouter la langue réelle si elle n'est pas dans la liste DICO_LANGUE
+        array_unshift($langues, $_lang_dico_row['CODE_LANGUE']);
+    }
+} elseif (!isset($_SESSION['langue']) || $_SESSION['langue'] === '') {
+    // Fallback : première langue de DICO_LANGUE ou 'fr'
     $_SESSION['langue'] = !empty($langues) ? $langues[0] : 'fr';
 }
+unset($_lang_dico_row);
 
 $form           =	new frame( $id_themes, $langues, $id_systemes, '', '' );
 if($GLOBALS['PARAM']['MOBILE_THEME_CONFIG']) $form_mobile    =	new frame_mobile( $id_themes, $langues, $id_systemes, '', '' );

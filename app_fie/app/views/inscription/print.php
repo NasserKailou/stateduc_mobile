@@ -13,21 +13,24 @@ $base = BASE_URL;
 <meta charset="UTF-8">
 <title>Fiche d'inscription — <?= SecurityHelper::e($eleve['iue'] ?? '') ?></title>
 <style>
+  /* ══════════════════════════════════════════════════════
+     FICHE ÉLÈVE — SESSION 17 : UNE SEULE PAGE A4
+     Marges réduites, police compacte, bordures visibles
+     ══════════════════════════════════════════════════════ */
+
   /* ── Foundation ── */
-  @page { size: A4; margin: 1.5cm 1.5cm 2cm 1.5cm; }
+  @page { size: A4; margin: 0.9cm 1cm 0.9cm 1cm; }
   * { box-sizing: border-box; }
   body {
     font-family: 'Times New Roman', serif;
-    font-size: 12pt;
+    font-size: 10pt;
     color: #000;
     margin: 0;
     position: relative;
-    min-height: 100vh;
   }
 
   /* ════════════════════════════════
      FILIGRANE — Armoirie du Burundi
-     Position : centré, couvre toute la page, très transparent
      ════════════════════════════════ */
   body::before {
     content: '';
@@ -35,8 +38,8 @@ $base = BASE_URL;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 500px;
-    height: 620px;
+    width: 460px;
+    height: 560px;
     background-image: url('<?= $base ?>/public/images/armoiries_burundi.gif');
     background-repeat: no-repeat;
     background-size: contain;
@@ -46,198 +49,160 @@ $base = BASE_URL;
     z-index: 0;
   }
 
-  /* Tout le contenu doit passer au-dessus du filigrane */
+  /* Tout le contenu au-dessus du filigrane */
   .page-content { position: relative; z-index: 1; }
 
   /* ════════════════════════════════
-     EN-TÊTE GOUVERNEMENTAL
+     EN-TÊTE GOUVERNEMENTAL (compact)
      ════════════════════════════════ */
   .header-gov {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 3px solid #CE1126;
-    padding-bottom: 10px;
-    margin-bottom: 14px;
+    border-bottom: 2.5px solid #CE1126;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
   }
-  .header-gov .logo-left {
-    width: 70px;
-    flex-shrink: 0;
-  }
-  .header-gov .logo-left img {
-    width: 70px;
-    height: auto;
-    display: block;
-  }
-  .header-gov .logo-right {
-    width: 80px;
-    flex-shrink: 0;
-    text-align: right;
-  }
-  .header-gov .logo-right img {
-    width: 80px;
-    height: auto;
-    display: block;
-    margin-left: auto;
-  }
-  .header-gov .center-text {
-    text-align: center;
-    flex: 1;
-    padding: 0 12px;
-  }
+  .header-gov .logo-left { width: 58px; flex-shrink: 0; }
+  .header-gov .logo-left img { width: 58px; height: auto; display: block; }
+  .header-gov .logo-right { width: 65px; flex-shrink: 0; text-align: right; }
+  .header-gov .logo-right img { width: 65px; height: auto; display: block; margin-left: auto; }
+  .header-gov .center-text { text-align: center; flex: 1; padding: 0 8px; }
   .header-gov .center-text .rep {
-    font-size: 10.5pt;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #CE1126;
-    margin: 0;
-    letter-spacing: 0.05em;
+    font-size: 9.5pt; font-weight: bold; text-transform: uppercase;
+    color: #CE1126; margin: 0; letter-spacing: 0.04em;
   }
-  .header-gov .center-text .min {
-    font-size: 9.5pt;
-    margin: 2px 0;
-    color: #333;
-  }
-  .header-gov .center-text .dgess {
-    font-size: 9pt;
-    margin: 2px 0;
-    color: #555;
-    font-style: italic;
-  }
+  .header-gov .center-text .min { font-size: 8.5pt; margin: 1px 0; color: #333; }
+  .header-gov .center-text .dgess { font-size: 7.5pt; margin: 1px 0; color: #555; font-style: italic; }
   .header-gov .center-text .title-fie {
-    font-size: 13pt;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #CE1126;
-    margin: 5px 0 0;
-    letter-spacing: 0.08em;
+    font-size: 11pt; font-weight: bold; text-transform: uppercase;
+    color: #CE1126; margin: 3px 0 0; letter-spacing: 0.07em;
   }
 
-  /* Bande drapeau tricolore */
+  /* Bande drapeau tricolore (fine) */
   .flag-band {
-    height: 5px;
+    height: 4px;
     background: linear-gradient(to right,
       #CE1126 0% 33.33%,
       #FFFFFF 33.33% 66.66%,
       #1EB53A 66.66% 100%);
-    border: 1px solid #ddd;
-    margin-bottom: 12px;
+    border: 1px solid #bbb;
+    margin-bottom: 6px;
     border-radius: 2px;
   }
 
-  /* ── Badge IUE ── */
+  /* ── Badge IUE (compact) ── */
   .iue-badge {
     text-align: center;
     background: #f5f5f5;
     border: 2px solid #CE1126;
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin: 12px 0;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 5px 0;
   }
   .iue-badge .iue-label {
-    font-size: 9.5pt;
-    text-transform: uppercase;
-    color: #666;
-    letter-spacing: 0.06em;
+    font-size: 8pt; text-transform: uppercase; color: #666; letter-spacing: 0.05em;
   }
   .iue-badge .iue-value {
-    font-size: 24pt;
-    font-weight: bold;
-    letter-spacing: 4px;
-    color: #CE1126;
-    font-family: 'Courier New', monospace;
-    line-height: 1.1;
+    font-size: 18pt; font-weight: bold; letter-spacing: 3px;
+    color: #CE1126; font-family: 'Courier New', monospace; line-height: 1.1;
   }
-  .iue-badge .iue-date {
-    font-size: 9pt;
-    color: #666;
-    margin-top: 3px;
-  }
+  .iue-badge .iue-date { font-size: 8pt; color: #666; margin-top: 1px; }
 
-  /* ── Sections ── */
+  /* ── Titres de sections (compacts) ── */
   .section-title {
-    font-size: 11.5pt;
+    font-size: 9.5pt;
     font-weight: bold;
     color: #CE1126;
     border-bottom: 1.5px solid #CE1126;
-    margin: 14px 0 6px;
-    padding-bottom: 2px;
+    margin: 7px 0 3px;
+    padding-bottom: 1px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
 
-  /* ── Tableau info ── */
+  /* ── Tableau info — BORDURES VISIBLES + LABELS GRAS ── */
   table.info-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 6px 0;
-    font-size: 10.5pt;
+    margin: 3px 0;
+    font-size: 9pt;
   }
   table.info-table th {
-    background: #CE1126;
-    color: #fff;
-    padding: 5px 9px;
-    font-size: 9.5pt;
+    /* Label gras, fond gris clair, texte noir, bordure visible */
+    background: #f0f0f0;
+    color: #000;
+    padding: 3px 7px;
+    font-size: 8.5pt;
     text-align: left;
     width: 36%;
-    font-weight: 600;
+    font-weight: bold;
+    border: 1.5px solid #333;
   }
   table.info-table td {
-    border: 1px solid #ddd;
-    padding: 5px 9px;
-    font-size: 10.5pt;
+    border: 1.5px solid #333;
+    padding: 3px 7px;
+    font-size: 9pt;
+    background: #fff;
   }
-  table.info-table tr:nth-child(even) td { background: #fafafa; }
+  table.info-table thead th {
+    background: #e8e8e8;
+    font-weight: bold;
+    border: 1.5px solid #333;
+  }
 
-  /* ── Signatures ── */
+  /* ── Zone signatures + QR (flex côte à côte) ── */
+  .sig-qr-zone {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 10px;
+    gap: 8px;
+  }
   .signatures {
     display: flex;
     justify-content: space-between;
-    margin-top: 32px;
+    flex: 1;
+    gap: 12px;
   }
   .sig-block {
     text-align: center;
-    width: 44%;
+    flex: 1;
   }
   .sig-block .sig-line {
     border-bottom: 1px solid #000;
-    margin: 45px 0 5px;
+    margin: 30px 0 4px;
   }
-  .sig-block .sig-label {
-    font-size: 9.5pt;
-    color: #333;
+  .sig-block .sig-label { font-size: 8pt; color: #333; }
+
+  /* QR code inline avec signatures */
+  .qr-box {
+    border: 1.5px solid #bbb;
+    border-radius: 5px;
+    padding: 5px;
+    background: #fff;
+    text-align: center;
+    width: 105px;
+    flex-shrink: 0;
   }
+  .qr-box img { display: block; margin: 0 auto 2px; }
+  .qr-box .qr-iue { font-size: 6pt; color: #555; font-family: monospace; letter-spacing: .03em; word-break: break-all; }
+  .qr-box .qr-hint { font-size: 6pt; color: #888; margin-top: 1px; }
 
   /* ── Notice légale ── */
   .legal-notice {
-    font-size: 7.5pt;
+    font-size: 7pt;
     color: #888;
     border-top: 1px solid #ddd;
-    margin-top: 18px;
-    padding-top: 7px;
-    line-height: 1.4;
+    margin-top: 6px;
+    padding-top: 4px;
+    line-height: 1.35;
   }
 
   /* ── Print media ── */
   @media print {
-    body { font-size: 10.5pt; }
     .no-print { display: none !important; }
-
-    /* Le filigrane doit s'imprimer */
-    body::before {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    .header-gov .logo-left img,
-    .header-gov .logo-right img {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    /* QR code — forcer l'impression des images */
-    img {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
@@ -342,35 +307,30 @@ $base = BASE_URL;
   </table>
   <?php endif; ?>
 
-  <!-- ─── QR code IUE ─────────────────────────────────────────────── -->
+  <!-- ─── Signatures + QR code (côte à côte) ────────────────────── -->
   <?php
-    $iue_val   = SecurityHelper::e($eleve['iue'] ?? '');
-    // URL publique scannée par QR → profil public de l'élève
-    $qr_url    = rtrim(BASE_URL, '/') . '/eleve/' . urlencode($eleve['iue'] ?? '');
-    $qr_api    = 'https://api.qrserver.com/v1/create-qr-code/?size=110x110&data='
-                 . urlencode($qr_url) . '&ecc=M&margin=4';
+    $iue_val = SecurityHelper::e($eleve['iue'] ?? '');
+    $qr_url  = rtrim(BASE_URL, '/') . '/eleve/' . urlencode($eleve['iue'] ?? '');
+    $qr_api  = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data='
+               . urlencode($qr_url) . '&ecc=M&margin=3';
   ?>
-  <div style="display:flex;justify-content:flex-end;margin:10px 0 4px;">
-    <div style="border:1.5px solid #ddd;border-radius:6px;padding:8px;background:#fff;
-                text-align:center;width:140px;flex-shrink:0;">
-      <img src="<?= $qr_api ?>" alt="QR code IUE <?= $iue_val ?>"
-           width="110" height="110" style="display:block;margin:0 auto 4px;">
-      <div style="font-size:7pt;color:#555;font-family:monospace;letter-spacing:.04em;word-break:break-all;">
-        <?= $iue_val ?>
+  <div class="sig-qr-zone">
+    <!-- Blocs de signature (gauche + centre) -->
+    <div class="signatures">
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-label">Signature du parent / tuteur</div>
       </div>
-      <div style="font-size:6.5pt;color:#888;margin-top:2px;">Scanner pour vérifier</div>
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-label">Signature et cachet du chef d'établissement</div>
+      </div>
     </div>
-  </div>
-
-  <!-- ─── Signatures ──────────────────────────────────────────────── -->
-  <div class="signatures">
-    <div class="sig-block">
-      <div class="sig-line"></div>
-      <div class="sig-label">Signature du parent / tuteur</div>
-    </div>
-    <div class="sig-block">
-      <div class="sig-line"></div>
-      <div class="sig-label">Signature et cachet du chef d'établissement</div>
+    <!-- QR code (droite) -->
+    <div class="qr-box">
+      <img src="<?= $qr_api ?>" alt="QR IUE <?= $iue_val ?>" width="90" height="90">
+      <div class="qr-iue"><?= $iue_val ?></div>
+      <div class="qr-hint">Scanner pour vérifier</div>
     </div>
   </div>
 

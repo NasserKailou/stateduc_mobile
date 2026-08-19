@@ -90,15 +90,7 @@
             letter-spacing: 0.02em;
             margin-top: 1px;
         }
-        .tri-strip {
-            height: 18px;
-            width: 54px;
-            border-radius: 3px;
-            overflow: hidden;
-            display: flex;
-            flex-shrink: 0;
-        }
-        .tri-strip span { flex: 1; display: block; }
+        /* .tri-strip removed — replaced by drapeau_burundi.gif image */
 
         /* ── Zone principale ── */
         .login-wrapper {
@@ -410,11 +402,9 @@
             République du Burundi
             <strong>Ministère de l'Éducation Nationale et de la Recherche Scientifique</strong>
         </div>
-        <div class="tri-strip" aria-hidden="true">
-            <span style="background:#CE1126;"></span>
-            <span style="background:#fff;"></span>
-            <span style="background:#1EB53A;"></span>
-        </div>
+        <img src="<?= BASE_URL ?>/public/images/drapeau_burundi.gif"
+             alt="Drapeau du Burundi"
+             style="height:22px;width:auto;border-radius:2px;flex-shrink:0;">
     </div>
 </div>
 
