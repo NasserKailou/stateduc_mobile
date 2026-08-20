@@ -22,7 +22,9 @@ dependencies:
   path: ^1.9.0
 
   # Stockage sécurisé PIN + credentials (Keystore/Keychain)
-  flutter_secure_storage: ^9.2.2
+  # v10.x : Java 17, targetSdk 36, minSdk 23 — compatible AGP 8.11 / Gradle 8.14
+  # v9.x utilisait com.squareup:javawriter supprimé de Maven Central → build crash
+  flutter_secure_storage: ^10.3.1
 
   # Hachage SHA-256 pour les réponses aux questions de sécurité
   crypto: ^3.0.3

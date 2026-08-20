@@ -1,5 +1,9 @@
 // app/build.gradle — AGP 8.11.1 + Flutter 3.35.x compatible
 // Plugins déclarés via settings.gradle (new plugin DSL), pas de buildscript block.
+// fix(android): compileSdk 36 + flutter_secure_storage 10.x — build release fix
+//   compileSdk/targetSdk 34→36 (requis par path_provider, shared_prefs, sqflite, webview)
+//   Java 1.8→17 (requis par flutter_secure_storage ≥10.x)
+//   kotlin-stdlib-jdk8 retiré (Kotlin 2.2.20 embarque sa propre stdlib)
 
 plugins {
     id "com.android.application"
@@ -42,16 +46,16 @@ if (releaseSigningConfigured) {
 
 android {
     namespace "ark.android.stateduc"
-    compileSdk 34
+    compileSdk 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     sourceSets {
@@ -60,10 +64,11 @@ android {
 
     defaultConfig {
         applicationId "ark.android.stateduc"
-        // flutter_secure_storage requiert minSdk 18+
+        // flutter_secure_storage v10 requiert minSdk 23+
         // telephony requiert minSdk 21+
+        // path_provider / shared_prefs / sqflite / webview requièrent targetSdk 36
         minSdkVersion flutter.minSdkVersion
-        targetSdk 34
+        targetSdk 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -99,5 +104,6 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
+    // kotlin-stdlib-jdk8 retiré : Kotlin 2.2.20 embarque sa propre stdlib (KGP 2.x)
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
 }
