@@ -149,7 +149,6 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
         return _CampaignCard(
           campaign: c,
           onTap: () => _openCampaign(c, campaigns),
-          onDelete: () => _confirmDelete(c, campaigns),
         );
       },
     );
@@ -220,34 +219,6 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     );
   }
 
-  void _confirmDelete(Campaign c, CampaignProvider campaigns) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Supprimer la campagne'),
-        content: Text(
-            'Supprimer "${c.libCamp}" ? Les données saisies seront perdues.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Annuler')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await campaigns.deleteCampaign(c.idCamp);
-              // Reload list after deletion
-              await campaigns.loadLocalCampaigns();
-            },
-            child: const Text('Supprimer'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _confirmLogout(AuthProvider auth) {
     showDialog(
       context: context,
@@ -283,11 +254,10 @@ class _CampaignCard extends StatelessWidget {
   const _CampaignCard({
     required this.campaign,
     required this.onTap,
-    required this.onDelete,
+    // onDelete retiré — la suppression est déplacée dans Paramètres (pilote)
   });
   final Campaign campaign;
   final VoidCallback onTap;
-  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -308,18 +278,7 @@ class _CampaignCard extends StatelessWidget {
               '${campaign.dateDebut} → ${campaign.dateFin}',
           ].join(' · '),
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.chevron_right),
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: onDelete,
-              color: Theme.of(context).colorScheme.error,
-              tooltip: 'Supprimer',
-            ),
-          ],
-        ),
+        trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
     );

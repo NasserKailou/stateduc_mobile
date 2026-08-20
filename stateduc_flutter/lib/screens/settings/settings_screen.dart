@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/campaign_provider.dart';
+import '../../models/campaign.dart';
 import '../login/pin_screen.dart';
 
 /// SettingsScreen — Server URL config, PIN change, 3-question security setup.
@@ -195,6 +197,89 @@ class _SettingsScreenState extends State<SettingsScreen>
             style: OutlinedButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.error,
             ),
+          ),
+
+          // ── Suppression de campagne (pilote) ────────────────────────────
+          // Déplacé depuis l'écran de liste des campagnes pour éviter
+          // une suppression accidentelle sur le terrain.
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 8),
+          Text(
+            'Gestion des campagnes',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'La suppression d\'une campagne efface toutes les données saisies.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Consumer<CampaignProvider>(
+            builder: (context, campaigns, _) {
+              if (campaigns.campaigns.isEmpty) {
+                return const Text(
+                  'Aucune campagne locale à supprimer.',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                );
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: campaigns.campaigns.map((c) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: OutlinedButton.icon(
+                      onPressed: () => _confirmDeleteCampaign(c, campaigns),
+                      icon: const Icon(Icons.delete_outline),
+                      label: Text('Supprimer « ${c.libCamp} »'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.error,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Confirme et exécute la suppression d'une campagne locale.
+  /// Logique identique à l'ancien _confirmDelete de campaign_list_screen.dart —
+  /// seul le point d'entrée dans l'UI a changé (Paramètres, pas liste principale).
+  void _confirmDeleteCampaign(Campaign c, CampaignProvider campaigns) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Supprimer la campagne'),
+        content: Text(
+            'Supprimer « ${c.libCamp} » ? Les données saisies seront perdues.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Annuler')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await campaigns.deleteCampaign(c.idCamp);
+              await campaigns.loadLocalCampaigns();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('« ${c.libCamp} » supprimée.')),
+                );
+              }
+            },
+            child: const Text('Supprimer'),
           ),
         ],
       ),
