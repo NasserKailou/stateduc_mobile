@@ -766,32 +766,15 @@ class DataEntryProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-    // ── Déclenchement debounced de la cohérence offline ──────────────────
-    // Attend 800 ms après la dernière frappe avant d'évaluer, pour éviter
-    // de sur-solliciter SQLite à chaque caractère saisi.
+    // ── Déclenchement debounced de la cohérence offline — DÉSACTIVÉ (pilote) ──
+    // Le contrôle offline ne se déclenche plus automatiquement à la saisie.
+    // L'agent doit cliquer sur « Vérifier la cohérence » dans le menu pour
+    // lancer checkCoherenceOffline() manuellement.
+    // La fonction checkCoherenceOffline() est intacte — seul son déclencheur
+    // automatique est neutralisé ici. (Modification pilote — ak_secure)
     debugPrint('[DataEntry] updateField: $fieldName = "$value" '
         '(${_formData.length} champs en mémoire) '
-        '— debounce 800ms → checkCoherenceOffline');
-    _coherenceDebounce?.cancel();
-    _coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
-      debugPrint('[DataEntry] debounce fired: '
-          '_formData=${_formData.length} _isCheckingOffline=$_isCheckingOffline');
-      if (!_isCheckingOffline) {
-        checkCoherenceOffline();
-      } else {
-        // SESSION 58 — FIX cohérence offline auto-trigger
-        // Si un check est déjà en cours, on replanifie pour s'assurer que la
-        // dernière valeur saisie sera bien évaluée après la fin du check courant.
-        // Sans ce replanification, une saisie rapide pendant un check en cours
-        // est silencieusement ignorée → cohérence jamais réévaluée après.
-        debugPrint('[DataEntry] debounce: check en cours → replanification 800ms');
-        _coherenceDebounce = Timer(const Duration(milliseconds: 800), () {
-          debugPrint('[DataEntry] debounce replanifié fired: '
-              '_isCheckingOffline=$_isCheckingOffline');
-          if (!_isCheckingOffline) checkCoherenceOffline();
-        });
-      }
-    });
+        '— déclenchement auto désactivé, contrôle manuel uniquement');
   }
 
   // ── Évaluation des champs désactivés (Fix #5) ─────────────────────────────

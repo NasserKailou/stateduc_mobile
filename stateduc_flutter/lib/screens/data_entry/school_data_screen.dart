@@ -299,7 +299,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         // ── Violations de cohérence hors ligne ───────────────────────────
         // Source de vérité : moteur ThemeRuleEngine (DICO_REGLE_THEME).
         // Un seul panneau affiché — pas de doublon avec le moteur paire.
-        // Spinner pendant l'évaluation (debounce 800ms après saisie).
+        // Spinner pendant l'évaluation manuelle (menu → Vérifier la cohérence).
         if (entry.isCheckingOffline)
           const LinearProgressIndicator(),
         if (entry.hasThemeCoherenceErrors)
@@ -545,8 +545,8 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
       _reloadFromServer(context, auth, entry);
     } else if (value == 'check_coherence') {
       // Déclenchement manuel du contrôle de cohérence offline.
-      // Utile si le check automatique (debounce) n'a pas encore pu s'exécuter
-      // (ex. règles pas encore téléchargées depuis le serveur).
+      // Seul point d'entrée du contrôle : le déclenchement automatique
+      // (debounce) a été désactivé — l'agent lance le contrôle explicitement.
       entry.checkCoherenceOffline();
     } else if (value == 'send_all') {
       _sendAllForms(context, auth, entry);
