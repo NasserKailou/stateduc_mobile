@@ -2680,7 +2680,12 @@ class frame{
 									}
 									//Modif Hebie pour affichage libell� nomenclature parent
 									//var_dump($liste_choix);exit;
-									$champs_nomenc = @array_keys($liste_choix[0]);
+									// PHP8 fix S17h: $liste_choix peut être null si requete_nomenclature() échoue
+									if (!is_array($liste_choix) || empty($liste_choix)) {
+										$html .= "\t<TR class='$class_ligne'><TD COLSPAN='4'>&nbsp;</TD></TR>\n";
+										continue; // nomenclature vide pour ce système — ignorer
+									}
+									$champs_nomenc = array_keys($liste_choix[0]); // safe: $liste_choix[0] est garanti non-null
 									$tab_code_parent = array();
 									$tab_liste_choix = array();
 									if(count((array)$champs_nomenc)>3){
