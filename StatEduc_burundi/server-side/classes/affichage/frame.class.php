@@ -2385,7 +2385,7 @@ class frame{
 													foreach($mat_liste_mes as $i_mes => $nom_champ_mes){
 														$html 			.= "\n\t<TR>\n";
 														// On imprime le libell� des mesures
-														$html		.="\t\t<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='".$classe_fond."'>".$tab_libelles_mesures[$i_mes]."</TD>\n";
+														$html		.="\t\t<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='".$classe_fond."'>".($tab_libelles_mesures[$i_mes] ?? '')."</TD>\n"; // PHP8 fix S17i
 																									
 														if(count($mat_codes_colonne)){
 															foreach($mat_codes_colonne as $col => $elem_col){
@@ -2965,6 +2965,7 @@ class frame{
 											$reste_div 		= ($nb_obj-1) % 3;
 											if( $reste_div > 0 ) $rowspan	=	$nb_tr;
 											else $rowspan	=	$nb_tr - 1;
+											$rowspan_tr = ''; // PHP8 fix S17i: init avant if conditionnel
 											if($nb_tr > 1) $rowspan_tr = " rowspan='$rowspan' ";
 											$html.= "\t<TR class='$class_ligne'>\n";
 											$police_gras ='';
@@ -3128,6 +3129,10 @@ class frame{
 					$this->type_theme	= $GLOBALS['conn_dico']->GetOne($req_type_theme);
 					//Fin Recuperation du type de theme	 
 											
+			if (empty($this->dico)) {
+				return; // PHP8 fix S17i: pas de zones pour ce theme/systeme
+			}
+
 			// Les Locaux par exemple
 			$NB_TOTAL_COL 	= 0;
 			$NB_LIGNE_ECRAN	= $this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
@@ -3184,6 +3189,7 @@ class frame{
 			// Calcul du nombre de lignes de libell�s
 			$nb_niv_1             = 1;
 			$nb_niv_2             = 1;
+			$aff_total_vertic = false; // PHP8 fix S17i: init avant foreach conditionnel
 			foreach($dico as $i_elem => $element){
 				if( in_array( ($element['TABLE_MERE'] . '_' . $element['ID_TABLE_MERE_THEME']), $tabms_matricielles )){
 					if($nb_niv_1 < 3){
@@ -3457,6 +3463,7 @@ class frame{
 				}
 				$html .= "\t<TR  style='height:25px;'>\n";
 				$niv_3_entete = false ;
+				$cpt = 0; // PHP8 fix S17i: init avant foreach
 				foreach($dico as $i_elem => $element){
 					//Pour chacun des �l�ments du tableau (de type liste_radio)
 					//imprimer les libell� des nomenclatures (verticaux)
@@ -3886,11 +3893,11 @@ class frame{
 			}
 	
 			//print '<BR>'.$element['FRAME'];
-					if (trim($element['FRAME']) <> '') {
+					if (isset($element) && trim($element['FRAME']) <> '') { // PHP8 fix S17i: garde isset($element)
 							file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.$element['FRAME'], $html);
 							echo $html;
 					}else{
-							if($this->nb_themes_to_generate==1) print ' Template : ' . $GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.$element['FRAME'] . ' : Incorrect !<BR>';
+							if($this->nb_themes_to_generate==1) print ' Template : ' . $GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.(isset($element) ? $element['FRAME'] : '') . ' : Incorrect !<BR>';
 					}
 				//file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.$element['FRAME'], $html);	
 			//echo $html; 

@@ -3194,6 +3194,10 @@ class frame_mobile{
 					$this->type_theme	= $GLOBALS['conn_dico']->GetOne($req_type_theme);
 					//Fin Recuperation du type de theme	 
 											
+			if (empty($this->dico)) {
+				return; // PHP8 fix S17i: pas de zones pour ce theme/systeme
+			}
+
 			// Les Locaux par exemple
 			$NB_TOTAL_COL 	= 0;
 			$NB_LIGNE_ECRAN	= (int)$this->dico[0]['NB_LIGNES_FRAME']; //Nombre de lignes � afficher
@@ -3237,6 +3241,7 @@ class frame_mobile{
 			// Calcul du nombre de lignes de libell�s
 			$nb_niv_1             = 1;
 			$nb_niv_2             = 1;
+			$aff_total_vertic = false; // PHP8 fix S17i: init avant foreach conditionnel
 			foreach($dico as $i_elem => $element){
 				if( in_array( ($element['TABLE_MERE'] . '_' . $element['ID_TABLE_MERE_THEME']), $tabms_matricielles )){
 					if($nb_niv_1 < 3){
@@ -3502,6 +3507,7 @@ class frame_mobile{
 				}
 				$html .= "\t<TR  style='height:25px;'>\n";
 				$niv_3_entete = false ;
+				$cpt = 0; // PHP8 fix S17i: init avant foreach
 				foreach($dico as $i_elem => $element){
 					//Pour chacun des �l�ments du tableau (de type liste_radio)
 					//imprimer les libell� des nomenclatures (verticaux)
@@ -3910,7 +3916,7 @@ class frame_mobile{
 	
 			//print '<BR>'.$element['FRAME'];
 				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
-			if (trim($element['FRAME']) <> '') {
+			if (isset($element) && trim($element['FRAME']) <> '') { // PHP8 fix S17i: garde isset($element)
 					file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 					echo "<b>Mobile Format:</b><br/><br/>".$html;
 			}else{
