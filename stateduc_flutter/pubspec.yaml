@@ -22,9 +22,10 @@ dependencies:
   path: ^1.9.0
 
   # Stockage sécurisé PIN + credentials (Keystore/Keychain)
-  # v10.x : Java 17, targetSdk 36, minSdk 23 — compatible AGP 8.11 / Gradle 8.14
-  # v9.x utilisait com.squareup:javawriter supprimé de Maven Central → build crash
-  flutter_secure_storage: ^10.3.1
+  # v9.2.2 : compatible AGP 8.11 / Gradle 8.14 / Java 17
+  # v10.x incompatible : embarque AGP interne 8.13.2 + new DSL AGP9, cassé avec Flutter 3.35.x
+  # L'erreur javawriter initiale était due à un cache Gradle corrompu (instrumentation-hierarchy.bin)
+  flutter_secure_storage: ^9.2.2
 
   # Hachage SHA-256 pour les réponses aux questions de sécurité
   crypto: ^3.0.3
