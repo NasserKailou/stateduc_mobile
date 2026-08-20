@@ -1864,11 +1864,17 @@ class frame_mobile{
 				$req_type_theme = "SELECT ID_TYPE_THEME FROM DICO_THEME WHERE ID=".$id_theme;
 				$this->type_theme	= $GLOBALS['conn_dico']->GetOne($req_type_theme);
 				//Fin Recuperation du type de theme
+
+				// PHP8 fix S17f: retour anticipe si le dico est vide (theme sans zones pour ce systeme)
+				if (empty($this->dico)) {
+					return; // Pas de zones pour ce theme/systeme - rien a generer
+				}
 		
 
 		// Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
 		// Session 31 : CSS+JS mobile enrichis — centralise dans _get_mobile_css_js()
 		// Injection CSS+JS presentation — aucune logique metier modifiee
+		$html = ''; // PHP8 fix S17f: initialisation explicite avant premier .=
 		$html .= $this->_get_mobile_css_js();
 		$html 	  	 .= ""; 
 		
@@ -3122,10 +3128,11 @@ class frame_mobile{
 		//$html 			.= "\n</Form>";
 		// print '<BR>'.$element['FRAME'];
 				$html .= "</div>\n"; // ── ferme .se-mobile-frame (session 33)
-				if (trim($element['FRAME']) <> '') {
+				// PHP8 fix S17f: $element est garanti defini ici (early return si dico vide)
+				if (isset($element) && trim($element['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.'ws_mob_'.$element['FRAME'], $html);
 						if($code_annee=='' && $code_etablissement=='')	echo "<b>Mobile Format:</b><br/><br/>".$html;
-				}else{
+				} elseif (isset($element)) {
 						if($this->nb_themes_to_generate==1) print ' Template : ' . $GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.$element['FRAME'] . ' : Incorrect !<BR>';
 				}
 	}//Fin function generer_frame_formulaire

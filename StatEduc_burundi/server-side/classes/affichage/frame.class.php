@@ -1643,7 +1643,13 @@ class frame{
 				$req_type_theme = "SELECT ID_TYPE_THEME FROM DICO_THEME WHERE ID=".$id_theme;
 				$this->type_theme	= $GLOBALS['conn_dico']->GetOne($req_type_theme);
 				//Fin Recuperation du type de theme
+
+				// PHP8 fix S17f: retour anticipe si le dico est vide (theme sans zones pour ce systeme)
+				if (empty($this->dico)) {
+					return; // Pas de zones pour ce theme/systeme - rien a generer
+				}
 		
+		$html = ''; // PHP8 fix S17f: initialisation explicite avant premier .=
 		$html 	  	 .= "<BR/>"; 
 		
 		$html 			.= $this->js_Post_Form($id_theme, $id_systeme)."\n";
@@ -3049,10 +3055,11 @@ class frame{
 		}*/
 		//$html 			.= "\n</Form>";
 		// print '<BR>'.$element['FRAME'];
-				if (trim($element['FRAME']) <> '') {
+				// PHP8 fix S17f: $element est garanti defini ici (early return si dico vide)
+				if (isset($element) && trim($element['FRAME']) <> '') {
 						file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.$element['FRAME'], $html);
 						if($code_annee=='' && $code_etablissement=='')	echo $html;
-				}else{
+				} elseif (isset($element)) {
 						if($this->nb_themes_to_generate==1) print ' Template : ' . $GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.$element['FRAME'] . ' : Incorrect !<BR>';
 				}
 		//file_put_contents($GLOBALS['SISED_PATH'] . 'questionnaire/'.$langue.'/'.$element['FRAME'], $html);	

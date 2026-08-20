@@ -180,13 +180,13 @@ $_test_mode = !isset($_GET['full']) && !isset($_GET['langue_regen']);
 
 if ($_test_mode && count($id_themes) > 1) {
     echo '<div style="background:#fff3cd;border:1px solid #ffc107;padding:8px 12px;margin:6px 0;font-size:.8rem;">';
-    echo '⚡ <strong>MODE TEST RAPIDE</strong> — 1 thème / 1 système pour diagnostic.<br>';
+    echo '⚡ <strong>MODE TEST RAPIDE</strong> — 3 thèmes × tous systèmes.<br>';
     echo 'URL pour génération complète : <code>administration.php?val=gentheme&full=1</code><br>';
     echo '</div>';
     flush();
-    // Limiter à 3 premiers thèmes × premier système
+    // Limiter à 3 premiers thèmes — tous les systèmes inclus (S17f)
     $id_themes   = array_slice($id_themes,   0, 3);
-    $id_systemes = array_slice($id_systemes, 0, 1);
+    // $id_systemes : pas de limitation — tous testés
 }
 
 echo '<p style="color:#666;font-size:.8rem;">⏳ Instanciation frame en cours...</p>';
