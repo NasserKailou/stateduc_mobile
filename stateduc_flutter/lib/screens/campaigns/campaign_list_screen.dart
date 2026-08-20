@@ -33,6 +33,9 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   Widget build(BuildContext context) {
     return Consumer2<AuthProvider, CampaignProvider>(
       builder: (context, auth, campaigns, _) {
+        // auth conservé dans Consumer2 : utilisé si des états auth
+        // futurs (ex. affichage login) sont ajoutés. Pour l'instant
+        // l'AppBar n'affiche plus l'icône déconnexion (pilote mod3).
         return Scaffold(
           appBar: AppBar(
             title: const Text('StatEduc'),
@@ -61,15 +64,11 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
                   (route) => false,
                 ),
               ),
-              // Logout
-              IconButton(
-                icon: const Icon(Icons.logout),
-                tooltip: 'Déconnexion',
-                onPressed: () => _confirmLogout(auth),
-              ),
+              // Icône déconnexion retirée de l'AppBar (pilote).
+              // La déconnexion reste accessible via Paramètres → Se déconnecter.
             ],
           ),
-          body: _buildBody(auth, campaigns),
+          body: _buildBody(campaigns),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Navigator.push(
               context,
@@ -85,7 +84,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     );
   }
 
-  Widget _buildBody(AuthProvider auth, CampaignProvider campaigns) {
+  Widget _buildBody(CampaignProvider campaigns) {
     if (campaigns.isLoadingCampaigns) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -219,34 +218,8 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     );
   }
 
-  void _confirmLogout(AuthProvider auth) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Déconnexion'),
-        content:
-            const Text('Vos données locales seront conservées.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Annuler')),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await auth.logout();
-              if (mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const PinScreen()),
-                  (_) => false,
-                );
-              }
-            },
-            child: const Text('Se déconnecter'),
-          ),
-        ],
-      ),
-    );
-  }
+  // _confirmLogout retiré avec l'icône déconnexion (pilote — mod3).
+  // La déconnexion reste disponible dans SettingsScreen → _confirmLogout().
 }
 
 // ─── Campaign card ───────────────────────────────────────────────────────────
