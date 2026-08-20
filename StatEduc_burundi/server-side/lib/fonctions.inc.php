@@ -1488,13 +1488,13 @@ function recherche_libelle($code_libelle){
 	  	$tempString = $str;
 
 		// convert all HTML entities into Unicodes
-		for ($i=0; $i<=count($entities); $i++) {
+		for ($i=0; $i<count($entities); $i++) { // PHP8 fix S17g: < pas <= (évite clé hors-borne)
 			$myVar = $entities[$i];
 			$tempString = str_replace($myVar,$UCchar[$i],$tempString);
 		}
 	  
 		// then convert all Unicodes into HTML entities
-		for ($i=0; $i<=count($UCchar); $i++) {
+		for ($i=0; $i<count($UCchar); $i++) { // PHP8 fix S17g: < pas <= (évite clé hors-borne)
 			$myVar = $UCchar[$i];
 			$tempString = str_replace($myVar,$entities[$i],$tempString);
 		}
@@ -1513,7 +1513,7 @@ function recherche_libelle($code_libelle){
 		$tempString = $str;
 		
 		// convert all Unicodes into HTML entities
-		for ($i=0; $i<=count($entities); $i++) {
+		for ($i=0; $i<count($entities); $i++) { // PHP8 fix S17g: < pas <= (évite clé hors-borne)
 			$myVar = $entities[$i];
 			$tempString = str_replace($myVar,$UCchar[$i],$tempString);
 		}
@@ -1529,13 +1529,13 @@ function recherche_libelle($code_libelle){
 	  	$tempString = $str;
 
 		// convert all HTML entities into Unicodes
-		for ($i=0; $i<=count($entities); $i++) {
+		for ($i=0; $i<count($entities); $i++) { // PHP8 fix S17g: < pas <= (évite clé hors-borne)
 			$myVar = $entities[$i];
 			$tempString = str_replace($myVar,$UCchar[$i],$tempString);
 		}
 	  
 		// then convert all Unicodes into HTML entities
-		for ($i=0; $i<=count($UCchar); $i++) {
+		for ($i=0; $i<count($UCchar); $i++) { // PHP8 fix S17g: < pas <= (évite clé hors-borne)
 			$myVar = $UCchar[$i];
 			$tempString = str_replace($myVar,$entities[$i],$tempString);
 		}
@@ -1551,7 +1551,7 @@ function recherche_libelle($code_libelle){
 		$tempString = $str;
 		
 		// convert all Unicodes into HTML entities
-		for ($i=0; $i<=count($entities); $i++) {
+		for ($i=0; $i<count($entities); $i++) { // PHP8 fix S17g: < pas <= (évite clé hors-borne)
 			$myVar = $entities[$i];
 			$tempString = str_replace($myVar,$UCchar[$i],$tempString);
 		}

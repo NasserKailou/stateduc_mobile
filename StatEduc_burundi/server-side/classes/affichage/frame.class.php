@@ -1484,6 +1484,7 @@ class frame{
 		
 		function get_cell_matrice($ligne ,$code_dims, $element, $fonc_total, $langue, $id_systeme){
 			
+				if (!isset($GLOBALS['cell_mat_index'])) $GLOBALS['cell_mat_index'] = 0; // PHP8 fix S17g
 				$html 		= '';
 
 				if($element['TYPE_OBJET']=='booleen'){
@@ -1740,7 +1741,8 @@ class frame{
 					$tab_champ_cache[] 	= $element['CHAMP_PERE'] ;
 			}
 		}//Fin de parcours du dico
-				$pass_ligne =-1;
+				$pass_ligne = -1;
+				$class_ligne = 'ligne-impaire-left'; // PHP8 fix S17g: init avant le foreach
 				
 					foreach($dico as $element){
 						if( ( $element['TYPE_OBJET'] <> 'dimension_ligne')  && ( $element['TYPE_OBJET'] <> 'dimension_colonne') ){ // si type dimension on ignore
@@ -1807,6 +1809,7 @@ class frame{
 										}
 									}
 									
+									$set_TOTAL_MatFrml_ALL = ''; // PHP8 fix S17g: init avant usage conditionnel
 									$mat_liste_mes 			= array();
 									$tab_libelles_mesures 	= array();
 									$tab_types_mesures 		= array();
@@ -1834,7 +1837,7 @@ class frame{
 											$elem_obj_mesures[$mat_i] 	= $mat_val ;
 											if( $mat_val['AFFICHE_TOTAL'] && ($mat_val['TYPE_OBJET'] == 'text') && ($mat_val['TYPE_ZONE_BASE'] == 'int')){
 												$affiche_totaux_mat_Frml[$mat_i] 	= true;
-												$tab_lib_mes_tot[$mat_i]	=	$tab_libelles_mesures[$mat_i] ;
+												$tab_lib_mes_tot[$mat_i]	=	($tab_libelles_mesures[$mat_i] ?? ''); // PHP8 fix S17g
 												$tab_index_mes_aff_tot[] = $mat_i ;
 											}
 										}
@@ -1991,6 +1994,7 @@ class frame{
 												}
 											}
 											$max_vertic_tot_size = 0 ;
+										$vertic_for_totals = false; // PHP8 fix S17g
 											if(count($affiche_totaux_mat_Frml)){
 												if(count($mat_codes_colonne)){
 													foreach($affiche_totaux_mat_Frml as $i_mes => $tot_mes){
