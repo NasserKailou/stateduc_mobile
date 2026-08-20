@@ -515,7 +515,7 @@ class frame_mobile{
 						if(!is_array($aresult)){                    
 								throw new Exception('ERR_SQL');  
 						} 
-						return $this->_mobile_libelle_clean($aresult[0]['LIBELLE']); // fix session23: Bug A+B
+						return $this->_mobile_libelle_clean(($aresult[0]['LIBELLE'] ?? '')); // fix session23: Bug A+B
 				}
 				catch(Exception $e){
 						$erreur = new erreur_manager($e,$requete);
@@ -1895,7 +1895,7 @@ class frame_mobile{
 						if(!is_array($aresult)){                    
 								throw new Exception('ERR_SQL');  
 						} 
-						$GLOBALS['libelle_oui'] = $aresult[0]['LIBELLE'];									
+						$GLOBALS['libelle_oui'] = ($aresult[0]['LIBELLE'] ?? '');									
 				}
 				catch(Exception $e){
 						$erreur = new erreur_manager($e,$requete);
@@ -1915,7 +1915,7 @@ class frame_mobile{
 						if(!is_array($aresult)){                    
 								throw new Exception('ERR_SQL');  
 						} 
-						$GLOBALS['libelle_non'] = $aresult[0]['LIBELLE'];									
+						$GLOBALS['libelle_non'] = ($aresult[0]['LIBELLE'] ?? '');									
 				}
 				catch(Exception $e){
 						$erreur = new erreur_manager($e,$requete);
@@ -3286,7 +3286,7 @@ class frame_mobile{
 							if(!is_array($aresult)){                    
 									throw new Exception('ERR_SQL');  
 							} 
-							$GLOBALS['libelle_oui'] = $aresult[0]['LIBELLE'];									
+							$GLOBALS['libelle_oui'] = ($aresult[0]['LIBELLE'] ?? '');									
 					}
 					catch(Exception $e){
 							$erreur = new erreur_manager($e,$requete);
@@ -3302,7 +3302,7 @@ class frame_mobile{
 							if(!is_array($aresult)){                    
 									throw new Exception('ERR_SQL');  
 							} 
-							$GLOBALS['libelle_non'] = $aresult[0]['LIBELLE'];									
+							$GLOBALS['libelle_non'] = ($aresult[0]['LIBELLE'] ?? '');									
 					}
 					catch(Exception $e){
 							$erreur = new erreur_manager($e,$requete);
@@ -4187,7 +4187,7 @@ class frame_mobile{
 							if(!is_array($aresult)){                    
 									throw new Exception('ERR_SQL');  
 							} 
-							$GLOBALS['libelle_oui'] = $aresult[0]['LIBELLE'];									
+							$GLOBALS['libelle_oui'] = ($aresult[0]['LIBELLE'] ?? '');									
 					}
 					catch(Exception $e){
 							$erreur = new erreur_manager($e,$requete);
@@ -4203,7 +4203,7 @@ class frame_mobile{
 							if(!is_array($aresult)){                    
 									throw new Exception('ERR_SQL');  
 							} 
-							$GLOBALS['libelle_non'] = $aresult[0]['LIBELLE'];									
+							$GLOBALS['libelle_non'] = ($aresult[0]['LIBELLE'] ?? '');									
 					}
 					catch(Exception $e){
 							$erreur = new erreur_manager($e,$requete);
@@ -5075,7 +5075,7 @@ class frame_mobile{
 							if(!is_array($aresult)){                    
 									throw new Exception('ERR_SQL');  
 							} 
-							$GLOBALS['libelle_oui'] = $aresult[0]['LIBELLE'];									
+							$GLOBALS['libelle_oui'] = ($aresult[0]['LIBELLE'] ?? '');									
 					}
 					catch(Exception $e){
 							$erreur = new erreur_manager($e,$requete);
@@ -5091,7 +5091,7 @@ class frame_mobile{
 							if(!is_array($aresult)){                    
 									throw new Exception('ERR_SQL');  
 							} 
-							$GLOBALS['libelle_non'] = $aresult[0]['LIBELLE'];									
+							$GLOBALS['libelle_non'] = ($aresult[0]['LIBELLE'] ?? '');									
 					}
 					catch(Exception $e){
 							$erreur = new erreur_manager($e,$requete);
@@ -6051,7 +6051,7 @@ class frame_mobile{
 								if(!is_array($aresult)){                    
 										throw new Exception('ERR_SQL');  
 								} 
-								$GLOBALS['libelle_oui'] = $aresult[0]['LIBELLE'];									
+								$GLOBALS['libelle_oui'] = ($aresult[0]['LIBELLE'] ?? '');									
 						}
 						catch(Exception $e){
 								$erreur = new erreur_manager($e,$requete);
@@ -6067,7 +6067,7 @@ class frame_mobile{
 								if(!is_array($aresult)){                    
 										throw new Exception('ERR_SQL');  
 								} 
-								$GLOBALS['libelle_non'] = $aresult[0]['LIBELLE'];									
+								$GLOBALS['libelle_non'] = ($aresult[0]['LIBELLE'] ?? '');									
 						}
 						catch(Exception $e){
 								$erreur = new erreur_manager($e,$requete);
@@ -6994,7 +6994,7 @@ class frame_mobile{
 								if(!is_array($aresult)){                    
 										throw new Exception('ERR_SQL');  
 								} 
-								$GLOBALS['libelle_oui'] = $aresult[0]['LIBELLE'];									
+								$GLOBALS['libelle_oui'] = ($aresult[0]['LIBELLE'] ?? '');									
 						}
 						catch(Exception $e){
 								$erreur = new erreur_manager($e,$requete);
@@ -7010,7 +7010,7 @@ class frame_mobile{
 								if(!is_array($aresult)){                    
 										throw new Exception('ERR_SQL');  
 								} 
-								$GLOBALS['libelle_non'] = $aresult[0]['LIBELLE'];									
+								$GLOBALS['libelle_non'] = ($aresult[0]['LIBELLE'] ?? '');									
 						}
 						catch(Exception $e){
 								$erreur = new erreur_manager($e,$requete);
@@ -9621,6 +9621,7 @@ if(!isset($classe_fond)) {
 								if($code_annee=='' && $code_etablissement=='')	print '<H1>id_systeme = '.$id_systeme.'</H1>';
 								foreach ($this->id_themes as $id_theme){
 										//$this->id_theme = $id_theme;
+										$type_frame = ''; // PHP8 fix S17d : réinitialiser pour éviter valeur périmée du thème précédent
 										$requete        = "SELECT LIBELLE
 															FROM DICO_TRADUCTION 
 															WHERE CODE_NOMENCLATURE=".$id_theme.$id_systeme." AND CODE_LANGUE='".$langue."'
@@ -9632,7 +9633,7 @@ if(!isset($classe_fond)) {
 												if(!is_array($aresult)){                    
 														throw new Exception('ERR_SQL');  
 												} 
-												$this->libelle_long   = $aresult[0]['LIBELLE'];									
+												$this->libelle_long   = ($aresult[0]['LIBELLE'] ?? '');									
 										}
 										catch(Exception $e){
 												$erreur = new erreur_manager($e,$requete);
@@ -9651,7 +9652,7 @@ if(!isset($classe_fond)) {
 																					DICO_TYPE_THEME.LIBELLE
 																		 FROM       DICO_TYPE_THEME , DICO_THEME
 																		 WHERE 		DICO_TYPE_THEME.ID_TYPE_THEME = DICO_THEME.ID_TYPE_THEME
-																		 AND 		DICO_TYPE_THEME.CODE_LANGUE = '".$_SESSION['langue']."'
+																		 AND 		DICO_TYPE_THEME.CODE_LANGUE = '".$langue."'
 																		 AND	    DICO_THEME.ID =".$id_theme;
 										 
 										// Traitement Erreur Cas : GetAll / GetRow
@@ -9660,7 +9661,7 @@ if(!isset($classe_fond)) {
 												if(!is_array($aresult)){                    
 														throw new Exception('ERR_SQL');  
 												} 
-												$type_frame		  = trim($aresult[0]['LIBELLE']);									
+												$type_frame		  = trim(($aresult[0]['LIBELLE'] ?? ''));									
 										}
 										catch(Exception $e){
 												$erreur = new erreur_manager($e,$requete);
