@@ -580,9 +580,27 @@ class DataEntryProvider extends ChangeNotifier {
         if (serverFields == null || serverFields.isEmpty) return;
 
         // Convertit les valeurs serveur en Map<String, String>
-        final Map<String, String> serverStr = serverFields.map(
-          (k, v) => MapEntry(k, v?.toString() ?? ''),
-        );
+        // Le serveur retourne des tableaux [valeur, type] ex: [5, "text"] ou ["CODE_0_6","radio"]
+        // On extrait v[0] et on normalise les IDs radio (même logique que reloadFromServer).
+        // Sans ce traitement, v.toString() produit "[5, text]" au lieu de "5". (fix S18)
+        final Map<String, String> serverStr = {};
+        serverFields.forEach((k, v) {
+          String strVal;
+          if (v is List && v.isNotEmpty) {
+            strVal = v[0]?.toString() ?? '';
+            // Normalise les anciens identifiants radio : "CODE_TYPE_ACCES_0_6" → "6"
+            if (v.length >= 2 && v[1].toString() == 'radio') {
+              final lastUnder = strVal.lastIndexOf('_');
+              if (lastUnder >= 0) {
+                final lastSeg = strVal.substring(lastUnder + 1);
+                if (RegExp(r'^\d+$').hasMatch(lastSeg)) strVal = lastSeg;
+              }
+            }
+          } else {
+            strVal = v?.toString() ?? '';
+          }
+          serverStr[k] = strVal;
+        });
         // Sauvegarde en SQLite pour utilisation hors ligne
         await _db.saveCollectedData(
           idCamp:   idCamp,

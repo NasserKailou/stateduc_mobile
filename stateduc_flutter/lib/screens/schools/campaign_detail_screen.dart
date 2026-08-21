@@ -40,10 +40,34 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // fix AK-F-01 : détecter si cette campagne est l'année active serveur
+    final auth = context.read<AuthProvider>();
+    final serverCodeyear = auth.user?.codeyear ?? '';
+    final isCurrentYear  = serverCodeyear.isNotEmpty &&
+        campaign.idYear == serverCodeyear;
+
     return Consumer<CampaignProvider>(builder: (context, camps, _) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(campaign.libCamp),
+          // fix AK-F-01 : titre avec indicateur d'année
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(campaign.libCamp),
+              if (campaign.libYear != null)
+                Text(
+                  campaign.libYear! + (isCurrentYear ? ' · ✓ Année active' : ''),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isCurrentYear
+                        ? Theme.of(context).colorScheme.inversePrimary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: isCurrentYear ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+            ],
+          ),
           // Affiche le fil d'Ariane sous le titre dès qu'un système est sélectionné
           bottom: camps.selectedSystem != null
               ? PreferredSize(

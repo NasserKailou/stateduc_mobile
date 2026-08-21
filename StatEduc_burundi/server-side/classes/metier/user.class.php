@@ -1407,6 +1407,54 @@
 									$id_type_regroup_par    = isset($tpl['ID_TYPE_REGROUP_PARENTS'])
 										? $tpl['ID_TYPE_REGROUP_PARENTS'] : '';
 
+									// ── fix AK-PHP-01 : enrichissement depuis ETABLISSEMENT_REGROUPEMENT ──────
+									// Quand ID_REGROUP_PARENTS / ID_TYPE_REGROUP_PARENTS restent vides
+									// (nouvelle année sans enregistrement template), on reconstruit la hiérarchie
+									// géographique (colline→commune→province) à partir du CODE_ETAB (col G Excel)
+									// en interrogeant ETABLISSEMENT_REGROUPEMENT → REGROUPEMENT → HIERARCHIE,
+									// filtré sur la chaîne $id_chaine, ordonné par NIVEAU_CHAINE croissant.
+									// Niveau 1 = regroupement direct de l'école (feuille), niveaux suivants = parents.
+									if ((empty($id_regroup_parents) || empty($id_type_regroup_par)) && !empty($raw_code_etab)) {
+										$sql_hier =
+											'SELECT R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AS code_reg'
+											.', R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS code_type_reg'
+											.', H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' AS niveau'
+											.' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].' AS ER'
+											.' INNER JOIN '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS R'
+											.'   ON R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+											.'    = ER.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+											.' INNER JOIN '.$GLOBALS['PARAM']['HIERARCHIE'].' AS H'
+											.'   ON H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+											.'    = R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+											.'  AND H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$id_chaine
+											.' WHERE ER.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' = '.$code_etab_q
+											.' ORDER BY H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' ASC';
+										$hier_rows = $this->conn->GetAll($sql_hier);
+										if (!empty($hier_rows) && is_array($hier_rows)) {
+											$codes_reg      = array();
+											$codes_type_reg = array();
+											foreach ($hier_rows as $hrow) {
+												$codes_reg[]      = $hrow['code_reg'];
+												$codes_type_reg[] = $hrow['code_type_reg'];
+											}
+											// Le 1er niveau (feuille) = regroupement direct de l'école.
+											// ID_REGROUP_PARENTS = niveaux supérieurs (commune, province…),
+											// séparés par virgule dans l'ordre croissant (comme fix_regroup.php).
+											if (count($codes_reg) > 1) {
+												// Les parents sont du 2e au dernier
+												$parent_codes      = array_slice($codes_reg,      1);
+												$parent_type_codes = array_slice($codes_type_reg, 1);
+											} else {
+												// Un seul niveau : l'école est au niveau le plus haut
+												$parent_codes      = $codes_reg;
+												$parent_type_codes = $codes_type_reg;
+											}
+											$id_regroup_parents  = implode(',', $parent_codes);
+											$id_type_regroup_par = implode(',', $parent_type_codes);
+										}
+									}
+									// ── fin fix AK-PHP-01 ──────────────────────────────────────────────────────
+
 									$user_priv_q         = $this->conn->qstr($user_priv);
 									$regroup_parents_q   = $this->conn->qstr($id_regroup_parents);
 									$type_regroup_par_q  = $this->conn->qstr($id_type_regroup_par);
@@ -1471,6 +1519,130 @@
 		return $result;
 	}   
 	
+
+	// ════════════════════════════════════════════════════════════════════════════════
+	// fix AK-PHP-02 : Migration des utilisateurs mobiles vers une nouvelle annee
+	// ═══════════════════════════════════════════════════════════════════════════════
+	/**
+	 * Duplique les entrees DICO_FIXE_REGROUPEMENT vers une nouvelle annee de collecte.
+	 * Ne cree pas de doublon si l'entree existe deja pour la nouvelle annee.
+	 * Enrichit ID_REGROUP_PARENTS / ID_TYPE_REGROUP_PARENTS depuis ETABLISSEMENT_REGROUPEMENT
+	 * quand ces colonnes sont vides (meme logique AK-PHP-01).
+	 *
+	 * @param int $old_annee   Annee source
+	 * @param int $new_annee   Nouvelle annee de collecte
+	 * @param int $new_camp    Nouveau ID_CAMPAGNE
+	 * @param int $new_periode Nouveau ID_PERIODE (0 = conserver l'ancien)
+	 * @param int $id_groupe   Filtre groupe utilisateur (0 = tous)
+	 * @return array           ['migrated'=>N, 'skipped'=>N, 'errors'=>[...]]
+	 */
+	public function migrer_utilisateurs_annee($old_annee, $new_annee, $new_camp, $new_periode = 0, $id_groupe = 0) {
+		$migrated = 0;
+		$skipped  = 0;
+		$errors   = array();
+
+		$sql_src = 'SELECT DFR.*, AU.CODE_GROUPE'
+			.' FROM DICO_FIXE_REGROUPEMENT DFR'
+			.' INNER JOIN ADMIN_USERS AU ON AU.CODE_USER = DFR.ID_USER'
+			.' WHERE DFR.ID_ANNEE = '.(int)$old_annee;
+		if ((int)$id_groupe > 0) {
+			$sql_src .= ' AND AU.CODE_GROUPE = '.(int)$id_groupe;
+		}
+		$rows = $this->conn->GetAll($sql_src);
+		if (empty($rows) || !is_array($rows)) {
+			$errors[] = 'Aucun utilisateur trouve pour l\'annee '.$old_annee;
+			return array('migrated' => 0, 'skipped' => 0, 'errors' => $errors);
+		}
+
+		foreach ($rows as $row) {
+			$id_user        = intval($row['ID_USER']);
+			$id_systeme     = intval($row['ID_SYSTEME']);
+			$id_chaine      = intval($row['ID_CHAINE']);
+			$id_camp_new    = (int)$new_camp;
+			$id_periode_new = ((int)$new_periode > 0) ? (int)$new_periode : intval($row['ID_PERIODE']);
+			$id_type_rg     = intval($row['ID_TYPE_REGROUP']);
+			$id_regroup     = $row['ID_REGROUP'];
+			$id_regroup_q   = $this->conn->qstr($id_regroup);
+			$user_priv      = $row['USER_PRIV'];
+			$id_status      = intval($row['ID_STATUS']);
+
+			// Verifier doublon
+			$sql_chk = 'SELECT COUNT(*) FROM DICO_FIXE_REGROUPEMENT'
+				.' WHERE ID_USER='.$id_user
+				.' AND ID_CAMPAGNE='.$id_camp_new
+				.' AND ID_SYSTEME='.$id_systeme
+				.' AND ID_CHAINE='.$id_chaine
+				.' AND ID_ANNEE='.(int)$new_annee
+				.' AND ID_PERIODE='.$id_periode_new
+				.' AND ID_TYPE_REGROUP='.$id_type_rg
+				.' AND ID_REGROUP='.$id_regroup_q;
+			if (intval($this->conn->GetOne($sql_chk)) > 0) {
+				$skipped++;
+				continue;
+			}
+
+			// Enrichir ID_REGROUP_PARENTS / ID_TYPE_REGROUP_PARENTS si vides
+			$id_regroup_parents  = $row['ID_REGROUP_PARENTS'];
+			$id_type_regroup_par = $row['ID_TYPE_REGROUP_PARENTS'];
+			if ((empty($id_regroup_parents) || empty($id_type_regroup_par)) && !empty($id_regroup) && $id_type_rg == 0) {
+				$sql_hier =
+					'SELECT R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AS code_reg'
+					.', R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS code_type_reg'
+					.', H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' AS niveau'
+					.' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].' AS ER'
+					.' INNER JOIN '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS R'
+					.'   ON R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+					.'    = ER.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+					.' INNER JOIN '.$GLOBALS['PARAM']['HIERARCHIE'].' AS H'
+					.'   ON H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+					.'    = R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+					.'  AND H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$id_chaine
+					.' WHERE ER.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' = '.$id_regroup_q
+					.' ORDER BY H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' ASC';
+				$hier_rows = $this->conn->GetAll($sql_hier);
+				if (!empty($hier_rows) && is_array($hier_rows)) {
+					$codes_reg = array(); $codes_type_reg = array();
+					foreach ($hier_rows as $hrow) {
+						$codes_reg[]      = $hrow['code_reg'];
+						$codes_type_reg[] = $hrow['code_type_reg'];
+					}
+					$parent_codes      = (count($codes_reg) > 1) ? array_slice($codes_reg, 1)      : $codes_reg;
+					$parent_type_codes = (count($codes_reg) > 1) ? array_slice($codes_type_reg, 1) : $codes_type_reg;
+					$id_regroup_parents  = implode(',', $parent_codes);
+					$id_type_regroup_par = implode(',', $parent_type_codes);
+				}
+			}
+
+			$sql_ins = 'INSERT INTO DICO_FIXE_REGROUPEMENT'
+				.' (USER_PRIV, ID_CAMPAGNE, ID_STATUS, ID_USER,'
+				.'  ID_SYSTEME, ID_CHAINE, ID_ANNEE, ID_PERIODE,'
+				.'  ID_TYPE_REGROUP, ID_REGROUP,'
+				.'  ID_REGROUP_PARENTS, ID_TYPE_REGROUP_PARENTS)'
+				.' VALUES ('
+				.$this->conn->qstr($user_priv).', '
+				.$id_camp_new.', '
+				.$id_status.', '
+				.$id_user.', '
+				.$id_systeme.', '
+				.$id_chaine.', '
+				.(int)$new_annee.', '
+				.$id_periode_new.', '
+				.$id_type_rg.', '
+				.$id_regroup_q.', '
+				.$this->conn->qstr($id_regroup_parents).', '
+				.$this->conn->qstr($id_type_regroup_par).')' ;
+
+			if ($this->conn->Execute($sql_ins) === false) {
+				$db_err = method_exists($this->conn, 'ErrorMsg') ? $this->conn->ErrorMsg() : '';
+				$errors[] = 'User '.$id_user.' / '.$id_regroup.': '.substr($db_err, 0, 120);
+			} else {
+				$migrated++;
+			}
+		}
+		return array('migrated' => $migrated, 'skipped' => $skipped, 'errors' => $errors);
+	}
+	// -- fin fix AK-PHP-02 --------------------------------------------------------
+
 	/**
 		* Cr�ation d'un fichier de log
 		* @access public
