@@ -13,6 +13,9 @@ import '../schools/campaign_detail_screen.dart';
 /// Mirrors:
 ///   page_index.js → stmPageLstCamps: displayCamps(), displayCamp()
 ///   index.html    → p_lst_camps page, p_new_camp navigation
+///
+/// fix AK-F-01 : multi-années — mise en avant de la campagne correspondant
+/// à l'année active du serveur (user.codeyear / user.libyear).
 class CampaignListScreen extends StatefulWidget {
   const CampaignListScreen({super.key});
 
@@ -33,9 +36,10 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   Widget build(BuildContext context) {
     return Consumer2<AuthProvider, CampaignProvider>(
       builder: (context, auth, campaigns, _) {
-        // auth conservé dans Consumer2 : utilisé si des états auth
-        // futurs (ex. affichage login) sont ajoutés. Pour l'instant
-        // l'AppBar n'affiche plus l'icône déconnexion (pilote mod3).
+        // fix AK-F-01 : récupérer l'année active du serveur depuis le modèle user
+        final serverCodeyear = auth.user?.codeyear ?? '';
+        final serverLibyear  = auth.user?.libyear  ?? '';
+
         return Scaffold(
           appBar: AppBar(
             title: const Text('StatEduc'),
@@ -52,9 +56,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
                       builder: (_) => const SettingsScreen()),
                 ),
               ),
-              // SESSION 52 — Bouton Accueil : retourne à l'écran de saisie PIN
-              // sans déconnecter l'utilisateur (contrairement au bouton Déconnexion).
-              // Utile pour changer de PIN / revenir à l'accueil rapidement.
+              // SESSION 52 — Bouton Accueil
               IconButton(
                 icon: const Icon(Icons.home_outlined),
                 tooltip: 'Accueil (PIN)',
@@ -64,11 +66,9 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
                   (route) => false,
                 ),
               ),
-              // Icône déconnexion retirée de l'AppBar (pilote).
-              // La déconnexion reste accessible via Paramètres → Se déconnecter.
             ],
           ),
-          body: _buildBody(campaigns),
+          body: _buildBody(campaigns, serverCodeyear, serverLibyear),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Navigator.push(
               context,
@@ -84,7 +84,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     );
   }
 
-  Widget _buildBody(CampaignProvider campaigns) {
+  Widget _buildBody(CampaignProvider campaigns, String serverCodeyear, String serverLibyear) {
     if (campaigns.isLoadingCampaigns) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -92,12 +92,12 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
       return _buildError(campaigns);
     }
     if (campaigns.campaigns.isEmpty) {
-      return _buildEmpty();
+      return _buildEmpty(serverLibyear);
     }
-    return _buildList(campaigns);
+    return _buildList(campaigns, serverCodeyear, serverLibyear);
   }
 
-  Widget _buildEmpty() {
+  Widget _buildEmpty(String serverLibyear) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -112,6 +112,11 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
           const Text(
               'Appuyez sur "Charger campagne" pour télécharger\nune campagne depuis le serveur.',
               textAlign: TextAlign.center),
+          // fix AK-F-01 : afficher l'année active serveur même si aucune campagne locale
+          if (serverLibyear.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _ServerYearBanner(libYear: serverLibyear, isActive: false),
+          ],
         ],
       ),
     );
@@ -139,17 +144,43 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     );
   }
 
-  Widget _buildList(CampaignProvider campaigns) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: campaigns.campaigns.length,
-      itemBuilder: (context, i) {
-        final c = campaigns.campaigns[i];
-        return _CampaignCard(
-          campaign: c,
-          onTap: () => _openCampaign(c, campaigns),
-        );
-      },
+  // fix AK-F-01 : tri des campagnes — l'année active serveur en tête
+  List<Campaign> _sortedCampaigns(List<Campaign> raw, String serverCodeyear) {
+    final list = List<Campaign>.from(raw);
+    list.sort((a, b) {
+      final aMatch = serverCodeyear.isNotEmpty && a.idYear == serverCodeyear ? 0 : 1;
+      final bMatch = serverCodeyear.isNotEmpty && b.idYear == serverCodeyear ? 0 : 1;
+      if (aMatch != bMatch) return aMatch.compareTo(bMatch);
+      // Secondaire : par idCamp décroissant (plus récent en tête)
+      return b.idCamp.compareTo(a.idCamp);
+    });
+    return list;
+  }
+
+  Widget _buildList(CampaignProvider campaigns, String serverCodeyear, String serverLibyear) {
+    final sorted = _sortedCampaigns(campaigns.campaigns, serverCodeyear);
+    return Column(
+      children: [
+        // fix AK-F-01 : bannière année active serveur
+        if (serverLibyear.isNotEmpty)
+          _ServerYearBanner(libYear: serverLibyear, isActive: true),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            itemCount: sorted.length,
+            itemBuilder: (context, i) {
+              final c = sorted[i];
+              // Mettre en valeur la campagne de l'année active serveur
+              final isCurrentYear = serverCodeyear.isNotEmpty && c.idYear == serverCodeyear;
+              return _CampaignCard(
+                campaign: c,
+                isCurrentYear: isCurrentYear,
+                onTap: () => _openCampaign(c, campaigns),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -222,28 +253,104 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   // La déconnexion reste disponible dans SettingsScreen → _confirmLogout().
 }
 
+// ─── Server year banner (fix AK-F-01) ───────────────────────────────────────
+/// Bandeau affichant l'année active configurée sur le serveur.
+class _ServerYearBanner extends StatelessWidget {
+  const _ServerYearBanner({required this.libYear, required this.isActive});
+  final String libYear;
+  final bool   isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isActive
+        ? Theme.of(context).colorScheme.primaryContainer
+        : Theme.of(context).colorScheme.surfaceVariant;
+    final textColor = isActive
+        ? Theme.of(context).colorScheme.onPrimaryContainer
+        : Theme.of(context).colorScheme.onSurfaceVariant;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: color,
+      child: Row(
+        children: [
+          Icon(Icons.calendar_today_outlined, size: 16, color: textColor),
+          const SizedBox(width: 8),
+          Text(
+            'Année active serveur : $libYear',
+            style: TextStyle(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Campaign card ───────────────────────────────────────────────────────────
 class _CampaignCard extends StatelessWidget {
   const _CampaignCard({
     required this.campaign,
     required this.onTap,
+    this.isCurrentYear = false,
     // onDelete retiré — la suppression est déplacée dans Paramètres (pilote)
   });
   final Campaign campaign;
   final VoidCallback onTap;
+  /// fix AK-F-01 : true si cette campagne correspond à l'année active serveur
+  final bool isCurrentYear;
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
+      // Bordure colorée pour la campagne de l'année active serveur
+      shape: isCurrentYear
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: cs.primary, width: 2),
+            )
+          : null,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(Icons.campaign_outlined,
-              color: Theme.of(context).colorScheme.primary),
+          backgroundColor: isCurrentYear
+              ? cs.primary
+              : cs.primaryContainer,
+          child: Icon(
+            Icons.campaign_outlined,
+            color: isCurrentYear ? cs.onPrimary : cs.primary,
+          ),
         ),
-        title: Text(campaign.libCamp,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(campaign.libCamp,
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+            ),
+            // Badge "Année en cours" pour la campagne active
+            if (isCurrentYear)
+              Container(
+                margin: const EdgeInsets.only(left: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: cs.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'En cours',
+                  style: TextStyle(
+                    color: cs.onPrimary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+          ],
+        ),
         subtitle: Text(
           [
             if (campaign.libYear != null) campaign.libYear!,

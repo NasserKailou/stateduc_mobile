@@ -7,6 +7,30 @@ include $GLOBALS['SISED_PATH_LIB'] . 'navigation.inc.php';
 $GLOBALS['conn'] = $GLOBALS['conn_dico'] ;
 $importResult = array();
 $listUserFileName = "";
+
+// ── fix AK-PHP-02 : Migration des utilisateurs vers la nouvelle année ─────────
+$migrate_result  = null;
+$migrate_message = '';
+if (isset($_POST['ak_migrate_annee'])) {
+    if (isset($_SESSION['instance_nomenc'])) {
+        $user_mig = $_SESSION['instance_nomenc'];
+    } else {
+        $lib_nom_table_mig = 'ADMIN_USERS';
+        $user_mig = new user(isset($_GET['id_groupe']) ? (int)$_GET['id_groupe'] : 4, $lib_nom_table_mig, 'user', $_SESSION['langue'], $GLOBALS['conn_dico']);
+    }
+    $old_annee   = intval($_POST['ak_old_annee']);
+    $new_annee   = intval($_POST['ak_new_annee']);
+    $new_camp    = intval($_POST['ak_new_camp']);
+    $new_periode = intval($_POST['ak_new_periode']);
+    $id_grp_fil  = isset($_POST['ak_id_groupe']) ? intval($_POST['ak_id_groupe']) : 0;
+    if ($old_annee > 0 && $new_annee > 0 && $new_camp > 0) {
+        $migrate_result = $user_mig->migrer_utilisateurs_annee($old_annee, $new_annee, $new_camp, $new_periode, $id_grp_fil);
+    } else {
+        $migrate_message = '<span class="error">Veuillez renseigner Année source, Nouvelle année et Nouvelle campagne.</span>';
+    }
+}
+// ── fin fix AK-PHP-02 ────────────────────────────────────────────────────────
+
 if (isset($_POST["import"])) {
 
     // PhpSpreadsheet chargé uniquement lors d'un import (évite erreur fatale si lib absente)
@@ -133,7 +157,107 @@ if (isset($_POST["import"])) {
 		$html .= '</table>';
 	}
 	$html .= '</div></div>';
-	// Fin Inteface import utilisateurs
+	// Fin Interface import utilisateurs
+
+	// ── fix AK-PHP-02 : Bouton migration utilisateurs vers nouvelle année ─────
+	// Récupérer les années et campagnes disponibles pour les combos
+	$tab_annees_dispo = $GLOBALS['conn_dico']->GetAll(
+		'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'].' AS code_annee,'
+		.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'].' AS lib_annee'
+		.' FROM '.$GLOBALS['PARAM']['TYPE_ANNEE']
+		.' ORDER BY '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'].' DESC'
+	);
+	$tab_camps_dispo = $GLOBALS['conn_dico']->GetAll(
+		'SELECT DISTINCT ID_CAMPAGNE, ID_ANNEE FROM DICO_FIXE_REGROUPEMENT ORDER BY ID_CAMPAGNE DESC'
+	);
+
+	$html .= '<div class="inner-box" style="margin-top:20px;">';
+	$html .= '<div class="inner-box-title" style="background:#2980b9;color:#fff;">&#9654; Fixer les agents mobiles sur une nouvelle ann&eacute;e de collecte</div>';
+	$html .= '<div class="inner-box-container">';
+	$html .= '<p style="color:#555;margin-bottom:10px;">Cette action copie les liaisons &eacute;cole/agent depuis une ann&eacute;e source vers la nouvelle ann&eacute;e configur&eacute;e, sans supprimer les donn&eacute;es existantes. Les agents d&eacute;j&agrave; pr&eacute;sents dans la nouvelle ann&eacute;e sont ignor&eacute;s (pas de doublon).</p>';
+
+	// Résultat migration si disponible
+	if ($migrate_result !== null) {
+		$status_cls = (count($migrate_result['errors']) === 0) ? 'success' : 'error';
+		$html .= '<div class="'.$status_cls.' display-block" style="margin-bottom:12px;">';
+		$html .= '<strong>R&eacute;sultat de la migration :</strong> ';
+		$html .= $migrate_result['migrated'].' migr&eacute;(s), ';
+		$html .= $migrate_result['skipped'].' d&eacute;j&agrave; existant(s) ignor&eacute;(s)';
+		if (!empty($migrate_result['errors'])) {
+			$html .= '<br/><strong>Erreurs :</strong><ul>';
+			foreach ($migrate_result['errors'] as $e) {
+				$html .= '<li>'.htmlspecialchars($e).'</li>';
+			}
+			$html .= '</ul>';
+		}
+		$html .= '</div>';
+	}
+	if ($migrate_message) $html .= $migrate_message;
+
+	$html .= '<form action="" method="post" name="frmMigrateAnnee" id="frmMigrateAnnee">';
+	$html .= '<table style="border-collapse:collapse;width:100%;max-width:720px;">';
+
+	// Ligne 1 : Année source
+	$html .= '<tr style="margin-bottom:8px;">';
+	$html .= '<td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap;">Ann&eacute;e source&nbsp;:</td>';
+	$html .= '<td style="padding:6px 0;"><select name="ak_old_annee" style="min-width:180px;">';
+	if (!empty($tab_annees_dispo)) {
+		foreach ($tab_annees_dispo as $an) {
+			$sel = (isset($_SESSION['annee']) && $an['code_annee'] == $_SESSION['annee']) ? ' selected' : '';
+			$html .= '<option value="'.htmlspecialchars($an['code_annee']).'"'.$sel.'>'.htmlspecialchars($an['lib_annee']).'</option>';
+		}
+	}
+	$html .= '</select>';
+	$html .= ' <small style="color:#888;">(ann&eacute;e dont les agents sont d&eacute;j&agrave; configur&eacute;s)</small></td>';
+	$html .= '</tr>';
+
+	// Ligne 2 : Nouvelle année
+	$html .= '<tr>';
+	$html .= '<td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap;">Nouvelle ann&eacute;e&nbsp;:</td>';
+	$html .= '<td style="padding:6px 0;"><select name="ak_new_annee" style="min-width:180px;">';
+	if (!empty($tab_annees_dispo)) {
+		foreach ($tab_annees_dispo as $an) {
+			$html .= '<option value="'.htmlspecialchars($an['code_annee']).'">'.htmlspecialchars($an['lib_annee']).'</option>';
+		}
+	}
+	$html .= '</select></td></tr>';
+
+	// Ligne 3 : Nouveau ID_CAMPAGNE (saisie libre + info)
+	$html .= '<tr>';
+	$html .= '<td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap;">Nouveau ID Campagne&nbsp;:</td>';
+	$html .= '<td style="padding:6px 0;"><input type="number" name="ak_new_camp" value="" style="width:100px;" placeholder="ex: 5" min="1" required />';
+	if (!empty($tab_camps_dispo)) {
+		$html .= ' <small style="color:#888;">Campagnes existantes&nbsp;: ';
+		$parts = array();
+		foreach ($tab_camps_dispo as $c) { $parts[] = 'ID='.$c['ID_CAMPAGNE'].' (ann&eacute;e '.$c['ID_ANNEE'].')'; }
+		$html .= implode(', ', $parts);
+		$html .= '</small>';
+	}
+	$html .= '</td></tr>';
+
+	// Ligne 4 : Nouveau ID_PERIODE (0 = conserver)
+	$html .= '<tr>';
+	$html .= '<td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap;">Nouveau ID P&eacute;riode&nbsp;:</td>';
+	$html .= '<td style="padding:6px 0;"><input type="number" name="ak_new_periode" value="0" style="width:80px;" min="0" />';
+	$html .= ' <small style="color:#888;">(0 = conserver la p&eacute;riode d\'origine de chaque agent)</small></td></tr>';
+
+	// Ligne 5 : Filtre groupe (optionnel)
+	$html .= '<tr>';
+	$html .= '<td style="padding:6px 12px 6px 0;font-weight:bold;white-space:nowrap;">Filtre groupe&nbsp;:</td>';
+	$html .= '<td style="padding:6px 0;"><input type="number" name="ak_id_groupe" value="'.intval(isset($_GET['id_groupe']) ? $_GET['id_groupe'] : 0).'" style="width:80px;" min="0" />';
+	$html .= ' <small style="color:#888;">(0 = tous les groupes)</small></td></tr>';
+
+	$html .= '</table>';
+	$html .= '<div style="margin-top:12px;">';
+	$html .= '<button type="submit" name="ak_migrate_annee" value="1" class="btn-submit" style="background:#2980b9;" ';
+	$html .= 'onclick="return confirm(\'Confirmer la migration des agents vers la nouvelle ann\\u00e9e ?\\nLes agents d\\u00e9j\\u00e0 pr\\u00e9sents dans la nouvelle ann\\u00e9e ne seront pas modifi\\u00e9s.\');">';
+	$html .= '&#9654; Migrer les agents vers la nouvelle ann&eacute;e</button>';
+	$html .= '</div>';
+	$html .= '</form>';
+	$html .= '</div></div>';
+	// ── fin fix AK-PHP-02 ────────────────────────────────────────────────────────
+
+	// Fin interface import utilisateurs
 	
 	$html .= '<table width="50%" class="center-table">';
 	
