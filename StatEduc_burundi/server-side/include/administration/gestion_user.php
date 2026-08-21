@@ -154,12 +154,20 @@ if (isset($_POST["import"])) {
 	// Fin Interface import utilisateurs
 
 	// ── fix AK-PHP-02 (simplifié) : Fixer l'année des agents mobiles ─────────
-	$tab_annees_dispo = $GLOBALS['conn_dico']->GetAll(
-		'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'].' AS code_annee,'
-		.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'].' AS lib_annee'
-		.' FROM '.$GLOBALS['PARAM']['TYPE_ANNEE']
-		.' ORDER BY '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'].' DESC'
-	);
+	// Utilise $_SESSION['tab_annees'] (SELECT * FROM TYPE_ANNEE, peuplé par common.php)
+	// dont les clés sont CODE_TYPE_ANNEE et LIBELLE_TYPE_ANNEE (AdoDB ASSOC_CASE_UPPER).
+	// Fallback : requête directe si la session n'est pas encore peuplée.
+	$col_code = $GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'];     // CODE_TYPE_ANNEE
+	$col_lib  = $GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'];  // LIBELLE_TYPE_ANNEE
+	$col_ord  = $GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'];    // ORDRE_TYPE_ANNEE
+	if (!empty($_SESSION['tab_annees'])) {
+		$tab_annees_dispo = $_SESSION['tab_annees'];
+	} else {
+		$tab_annees_dispo = $GLOBALS['conn_dico']->GetAll(
+			'SELECT * FROM '.$GLOBALS['PARAM']['TYPE_ANNEE']
+			.' ORDER BY '.$col_ord.' DESC'
+		);
+	}
 
 	$html .= '<div class="inner-box" style="margin-top:20px;">';
 	$html .= '<div class="inner-box-title" style="background:#2980b9;color:#fff;">&#9654; Fixer les agents mobiles sur une nouvelle ann&eacute;e de collecte</div>';
@@ -173,12 +181,14 @@ if (isset($_POST["import"])) {
 	$html .= '<form action="" method="post" name="frmUpdateAnnee" id="frmUpdateAnnee" style="margin:0;">';
 	$html .= '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">';
 
-	// Dropdown années (même source que val=param — Année en cours)
+	// Dropdown années — valeur = CODE_TYPE_ANNEE, label = LIBELLE_TYPE_ANNEE
 	$html .= '<select name="ak_new_annee_simple" style="min-width:200px;padding:6px 10px;">';
 	if (!empty($tab_annees_dispo)) {
 		foreach ($tab_annees_dispo as $an) {
-			$sel = (isset($_SESSION['annee']) && $an['code_annee'] == $_SESSION['annee']) ? ' selected' : '';
-			$html .= '<option value="'.htmlspecialchars($an['code_annee']).'"'.$sel.'>'.htmlspecialchars($an['lib_annee']).'</option>';
+			$code_an = isset($an[$col_code]) ? $an[$col_code] : '';
+			$lib_an  = isset($an[$col_lib])  ? $an[$col_lib]  : $code_an;
+			$sel = (isset($_SESSION['annee']) && (string)$code_an === (string)$_SESSION['annee']) ? ' selected' : '';
+			$html .= '<option value="'.htmlspecialchars($code_an).'"'.$sel.'>'.htmlspecialchars($lib_an).'</option>';
 		}
 	}
 	$html .= '</select>';
