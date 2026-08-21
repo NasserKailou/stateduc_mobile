@@ -1512,6 +1512,29 @@ class DatabaseService {
   // Replaces: stm_EtabCollectData_{id_etab}_{id_qst}[_{id_filter}]
   // ═══════════════════════════════════════════════════════════════════════════
 
+  // ── Fix S19 ────────────────────────────────────────────────────────────────
+  // Avant fix S18, _autoReloadFromServerBackground() appelait v.toString() sur
+  // les tableaux serveur de la forme [value, "type"], produisant des chaînes
+  // comme "[0, text]", "[5, text]", "[12, radio]", etc. stockées en SQLite.
+  // Fix S18 a corrigé les nouveaux rechargements, mais les valeurs déjà
+  // persistées en base continuent d'apparaître à l'écran telles quelles.
+  // Ce helper sanitise toute valeur lue depuis SQLite : si elle correspond au
+  // pattern "[X, type]" (liste Dart/JSON à deux éléments), on extrait
+  // uniquement le premier élément (la valeur réelle).
+  // Patterns couverts :
+  //   "[0, text]"   → "0"
+  //   "[5, text]"   → "5"
+  //   "[12, radio]" → "12"
+  //   "[abc, text]" → "abc"
+  //   "42"          → "42"  (valeur propre, retournée telle quelle)
+  // ──────────────────────────────────────────────────────────────────────────
+  static String _sanitizeStoredValue(String raw) {
+    // Pattern : "[<premier_element>, <mot>]" (espaces optionnels)
+    final m = RegExp(r'^\[([^\],]+),\s*\w+\]$').firstMatch(raw.trim());
+    if (m != null) return m.group(1)!.trim();
+    return raw;
+  }
+
   /// Loads all field/value pairs for one school + question [+ optional filter].
   Future<Map<String, String>> getCollectedData({
     required String idCamp,
@@ -1538,7 +1561,9 @@ class DatabaseService {
     }
     final result = <String, String>{};
     for (final r in rows) {
-      result[r['field_name'] as String] = r['field_value'] as String? ?? '';
+      final raw = r['field_value'] as String? ?? '';
+      // Fix S19 : sanitise les valeurs corrompues "[X, type]" stockées avant fix S18
+      result[r['field_name'] as String] = _sanitizeStoredValue(raw);
     }
     return result;
   }
@@ -1568,13 +1593,14 @@ class DatabaseService {
     final result = <String, String>{};
     for (final r in rows) {
       final fieldName  = r['field_name']  as String;
-      final fieldValue = r['field_value'] as String? ?? '';
+      final rawValue   = r['field_value'] as String? ?? '';
       final filterId   = r['id_filter']   as String?;
       // Clé avec suffixe filtre si la donnée est périodique, sinon clé simple
       final key = (filterId != null && filterId.isNotEmpty)
           ? '$fieldName#$filterId'
           : fieldName;
-      result[key] = fieldValue;
+      // Fix S19 : sanitise les valeurs corrompues "[X, type]" stockées avant fix S18
+      result[key] = _sanitizeStoredValue(rawValue);
     }
     return result;
   }
@@ -1611,7 +1637,8 @@ class DatabaseService {
     final sums = <String, double>{};
     for (final r in rows) {
       final fieldName  = (r['field_name'] as String).toUpperCase();
-      final fieldValue = r['field_value'] as String? ?? '';
+      // Fix S19 : sanitise les valeurs corrompues "[X, type]" stockées avant fix S18
+      final fieldValue = _sanitizeStoredValue(r['field_value'] as String? ?? '');
       final v = double.tryParse(fieldValue);
       if (v != null) {
         sums[fieldName] = (sums[fieldName] ?? 0.0) + v;
