@@ -36,9 +36,10 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   Widget build(BuildContext context) {
     return Consumer2<AuthProvider, CampaignProvider>(
       builder: (context, auth, campaigns, _) {
-        // fix AK-F-01 : récupérer l'année active du serveur depuis le modèle user
+        // fix AK-F-01 : tri des campagnes par année active serveur (user.codeyear)
+        // AK-YEAR-02 : la bannière 'Année active serveur' est supprimée —
+        // l'onglet Paramètres → Année gère désormais la sélection d'année.
         final serverCodeyear = auth.user?.codeyear ?? '';
-        final serverLibyear  = auth.user?.libyear  ?? '';
 
         return Scaffold(
           appBar: AppBar(
@@ -68,7 +69,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
               ),
             ],
           ),
-          body: _buildBody(campaigns, serverCodeyear, serverLibyear),
+          body: _buildBody(campaigns, serverCodeyear),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Navigator.push(
               context,
@@ -84,7 +85,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     );
   }
 
-  Widget _buildBody(CampaignProvider campaigns, String serverCodeyear, String serverLibyear) {
+  Widget _buildBody(CampaignProvider campaigns, String serverCodeyear) {
     if (campaigns.isLoadingCampaigns) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -92,12 +93,12 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
       return _buildError(campaigns);
     }
     if (campaigns.campaigns.isEmpty) {
-      return _buildEmpty(serverLibyear);
+      return _buildEmpty();
     }
-    return _buildList(campaigns, serverCodeyear, serverLibyear);
+    return _buildList(campaigns, serverCodeyear);
   }
 
-  Widget _buildEmpty(String serverLibyear) {
+  Widget _buildEmpty() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -112,11 +113,6 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
           const Text(
               'Appuyez sur "Charger campagne" pour télécharger\nune campagne depuis le serveur.',
               textAlign: TextAlign.center),
-          // fix AK-F-01 : afficher l'année active serveur même si aucune campagne locale
-          if (serverLibyear.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            _ServerYearBanner(libYear: serverLibyear, isActive: false),
-          ],
         ],
       ),
     );
@@ -157,13 +153,10 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
     return list;
   }
 
-  Widget _buildList(CampaignProvider campaigns, String serverCodeyear, String serverLibyear) {
+  Widget _buildList(CampaignProvider campaigns, String serverCodeyear) {
     final sorted = _sortedCampaigns(campaigns.campaigns, serverCodeyear);
     return Column(
       children: [
-        // fix AK-F-01 : bannière année active serveur
-        if (serverLibyear.isNotEmpty)
-          _ServerYearBanner(libYear: serverLibyear, isActive: true),
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -253,42 +246,7 @@ class _CampaignListScreenState extends State<CampaignListScreen> {
   // La déconnexion reste disponible dans SettingsScreen → _confirmLogout().
 }
 
-// ─── Server year banner (fix AK-F-01) ───────────────────────────────────────
-/// Bandeau affichant l'année active configurée sur le serveur.
-class _ServerYearBanner extends StatelessWidget {
-  const _ServerYearBanner({required this.libYear, required this.isActive});
-  final String libYear;
-  final bool   isActive;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive
-        ? Theme.of(context).colorScheme.primaryContainer
-        : Theme.of(context).colorScheme.surfaceVariant;
-    final textColor = isActive
-        ? Theme.of(context).colorScheme.onPrimaryContainer
-        : Theme.of(context).colorScheme.onSurfaceVariant;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: color,
-      child: Row(
-        children: [
-          Icon(Icons.calendar_today_outlined, size: 16, color: textColor),
-          const SizedBox(width: 8),
-          Text(
-            'Année active serveur : $libYear',
-            style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// _ServerYearBanner supprimée (AK-YEAR-02) — remplacée par l'onglet Paramètres → Année.
 
 // ─── Campaign card ───────────────────────────────────────────────────────────
 class _CampaignCard extends StatelessWidget {
