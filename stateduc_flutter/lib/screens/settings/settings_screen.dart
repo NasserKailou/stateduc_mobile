@@ -444,8 +444,14 @@ class _SettingsScreenState extends State<SettingsScreen>
           // ── Bouton rafraîchir ─────────────────────────────────────────
           const SizedBox(height: 20),
           OutlinedButton.icon(
-            onPressed: loading ? null : () => auth.loadYears(),
-            icon: const Icon(Icons.refresh),
+            // AK-YEAR-02 : force=true pour forcer le rechargement réseau
+            // même si un chargement précédent est en cours (bouton toujours actif)
+            onPressed: () => auth.loadYears(force: true),
+            icon: loading
+                ? const SizedBox(
+                    width: 16, height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.refresh),
             label: const Text('Rafraîchir la liste'),
           ),
         ],
