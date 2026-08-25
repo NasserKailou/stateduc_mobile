@@ -45,9 +45,11 @@ $app->get('/list/:login', function ($login) use ($lib_status, $lib_message, $lib
     $col_ordre   = $GLOBALS['PARAM']['ORDRE']   . '_' . $GLOBALS['PARAM']['TYPE_ANNEE'];   // ORDRE_TYPE_ANNEE
     $table       = $GLOBALS['PARAM']['TYPE_ANNEE'];                                        // TYPE_ANNEE
 
-    // Vérification connexion DB
-    if (!isset($GLOBALS['conn_dico']) || $GLOBALS['conn_dico'] === false) {
-        error_log('[annees_ws] /list — ERREUR: conn_dico non disponible');
+    // AK-YEAR-03 fix: TYPE_ANNEE est dans la base principale (conn), pas dans dico_DB (conn_dico).
+    // La fonction set_tab_session('annees') dans fonctions.inc.php utilise $GLOBALS['conn'],
+    // ce qui confirme que TYPE_ANNEE appartient à la base de données principale.
+    if (!isset($GLOBALS['conn']) || $GLOBALS['conn'] === false) {
+        error_log('[annees_ws] /list — ERREUR: conn non disponible');
         echo json_encode(array(
             $lib_status  => $status_ko,
             $lib_message => 'DB unavailable',
@@ -56,38 +58,42 @@ $app->get('/list/:login', function ($login) use ($lib_status, $lib_message, $lib
         return;
     }
 
-    // Pas d'alias AS : AdoDB (ADODB_ASSOC_CASE_UPPER) ignore les alias minuscules
-    // et retourne toujours les clés en MAJUSCULES. On lit directement $r[$col_xxx].
-    $requete = 'SELECT '
-        . $col_code    . ', '
-        . $col_libelle . ', '
-        . $col_ordre
-        . ' FROM ' . $table
-        . ' ORDER BY ' . $col_ordre . ' ASC';
+    // SELECT * pour éviter tout problème de nom de colonne — AdoDB retournera les
+    // vrais noms tels qu'ils sont dans la table (ADODB_ASSOC_CASE_UPPER → MAJUSCULES).
+    // On filtre ensuite sur les clés attendues ($col_code, $col_libelle, $col_ordre).
+    $requete = 'SELECT * FROM ' . $table . ' ORDER BY ' . $col_ordre . ' ASC';
 
     error_log('[annees_ws] /list — login=' . $login . ' SQL: ' . $requete);
 
-    $rows = $GLOBALS['conn_dico']->GetAll($requete);
+    $rows = $GLOBALS['conn']->GetAll($requete);
 
     if ($rows === false || !is_array($rows)) {
-        error_log('[annees_ws] /list — requête échouée ou aucune ligne');
+        error_log('[annees_ws] /list — requête échouée: ' . $GLOBALS['conn']->ErrorMsg());
+        error_log('[annees_ws] /list — col_code=' . $col_code . ' table=' . $table);
         $rows = array();
+    } elseif (count($rows) > 0) {
+        // DIAGNOSTIC — clés réelles retournées par AdoDB (à supprimer après vérification)
+        error_log('[annees_ws] DEBUG first row keys: ' . implode(', ', array_keys($rows[0])));
+        error_log('[annees_ws] DEBUG first row: ' . print_r($rows[0], true));
+    } else {
+        error_log('[annees_ws] /list — table ' . $table . ' existe mais est vide');
     }
 
-    // Normaliser : s'assurer que code/ordre sont des entiers, libelle une chaîne propre.
-    //
-    // IMPORTANT — AdoDB ADODB_ASSOC_CASE_UPPER (défini dans fonctions.inc.php via common_ws.php) :
-    // GetAll() retourne TOUJOURS les clés de résultat en MAJUSCULES, même quand on écrit
-    // des alias en minuscules dans le SELECT (ex: "AS code" → clé "CODE").
-    // Solution : supprimer les alias AS et lire directement les noms de colonnes
-    // originaux en MAJUSCULES ($col_code = "CODE_TYPE_ANNEE", etc.).
-    // On reconstruit le tableau de sortie avec les clés minuscules attendues par Flutter.
+    // Reconstruction du tableau de sortie avec les clés minuscules attendues par Flutter.
+    // ADODB_ASSOC_CASE_UPPER (défini dans fonctions.inc.php) force les clés en MAJUSCULES,
+    // ce qui correspond aux noms de colonnes $col_code/$col_libelle/$col_ordre.
+    // En cas d'ambiguïté (SELECT *), on tente aussi array_change_key_case pour sécuriser.
     $annees = array();
     foreach ($rows as $r) {
+        // Normaliser les clés en MAJUSCULES pour être sûr (ADODB_ASSOC_CASE_UPPER)
+        $r_upper = array_change_key_case($r, CASE_UPPER);
+        $code    = isset($r_upper[$col_code])    ? (int)$r_upper[$col_code]            : 0;
+        $libelle = isset($r_upper[$col_libelle]) ? trim((string)$r_upper[$col_libelle]) : '';
+        $ordre   = isset($r_upper[$col_ordre])   ? (int)$r_upper[$col_ordre]            : 0;
         $annees[] = array(
-            'code'    => (int)$r[$col_code],       // clé = "CODE_TYPE_ANNEE" (UPPER)
-            'libelle' => trim((string)$r[$col_libelle]), // clé = "LIBELLE_TYPE_ANNEE" (UPPER)
-            'ordre'   => (int)$r[$col_ordre],       // clé = "ORDRE_TYPE_ANNEE" (UPPER)
+            'code'    => $code,
+            'libelle' => $libelle,
+            'ordre'   => $ordre,
         );
     }
 
