@@ -51,6 +51,7 @@ import '../models/school.dart';
 import '../models/regroup.dart';
 import '../models/education_system.dart';
 import '../models/question.dart';
+import '../models/school_year.dart';
 
 class ApiService {
   late Dio _dio;
@@ -442,6 +443,36 @@ class ApiService {
 
   String? get serverUrl => _serverUrl;
   String? get login => _login;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SCHOOL YEARS — AK-YEAR-01
+  //   GET /annees_ws.php/list/:login
+  //   Response: { se_status:200, se_message:'ok',
+  //               se_data: [{ code, libelle, ordre }, ...] }
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Récupère la liste des années de recensement disponibles depuis le serveur.
+  ///
+  /// Retourne une liste vide (et non une exception) en cas d'erreur réseau,
+  /// afin que l'appelant puisse tomber back sur le cache SQLite.
+  Future<List<SchoolYear>> fetchYears(String login) async {
+    try {
+      final encodedLogin = Uri.encodeComponent(login);
+      final data = await _get('annees_ws.php/list/$encodedLogin');
+      if (data is List) {
+        return data
+            .whereType<Map<String, dynamic>>()
+            .map(SchoolYear.fromJson)
+            .where((y) => y.code > 0)
+            .toList();
+      }
+      debugPrint('[ApiService] fetchYears: unexpected data type → $data');
+      return [];
+    } catch (e) {
+      debugPrint('[ApiService] fetchYears error (non-fatal): $e');
+      return [];
+    }
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // AUTHENTICATION

@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import '../models/user.dart';
+import '../models/school_year.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
+import '../services/database_service.dart';
 
 /// AuthProvider — ChangeNotifier for user session state.
 ///
@@ -46,6 +48,11 @@ class AuthProvider extends ChangeNotifier {
   int _failedAttempts = 0;
   bool _hasSecurityAnswers = false;
 
+  // AK-YEAR-01 — gestion pluriannuelle
+  SchoolYear? _activeYear;          // Année active sélectionnée par l'utilisateur
+  List<SchoolYear> _schoolYears = []; // Cache en mémoire des années disponibles
+  bool _yearsLoading = false;
+
   AuthState get state => _state;
   User? get user => _user;
   String? get error => _error;
@@ -67,6 +74,24 @@ class AuthProvider extends ChangeNotifier {
 
   /// The 3 fixed security question strings (read-only, defined in AuthService).
   List<String> get securityQuestions => AuthService.kSecurityQuestions;
+
+  // AK-YEAR-01 getters
+  /// Année actuellement active (choisie par l'utilisateur dans les Paramètres).
+  /// Null tant que non chargée ou si aucune année n'est disponible.
+  SchoolYear? get activeYear => _activeYear;
+
+  /// Liste complète des années disponibles (cachée en mémoire).
+  List<SchoolYear> get schoolYears => _schoolYears;
+
+  /// True si le chargement des années est en cours.
+  bool get yearsLoading => _yearsLoading;
+
+  /// Code de l'année active : activeYear.code si disponible,
+  /// sinon user.codeyear (compatibilité descendante exacte).
+  String get effectiveYearCode =>
+      _activeYear != null
+          ? _activeYear!.code.toString()
+          : (_user?.codeyear ?? '');
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INITIALIZATION — called from main.dart after Provider tree is ready
@@ -173,6 +198,8 @@ class AuthProvider extends ChangeNotifier {
         _user = storedUser;
         _state = AuthState.loggedIn;
         await _auth.restoreApiSession();
+        // AK-YEAR-01 : restaure l'année active persistée
+        await _loadActiveYearFromStorage();
       } else {
         // PIN ok but no stored user — need server login
         _state = AuthState.needsServerLogin;
@@ -213,6 +240,8 @@ class AuthProvider extends ChangeNotifier {
       // Refresh security answers state after login
       _hasSecurityAnswers = await _auth.hasThreeSecurityAnswers();
       _state = AuthState.loggedIn;
+      // AK-YEAR-01 : init année active (user.codeyear comme défaut)
+      await _loadActiveYearFromStorage();
       notifyListeners();
       return true;
     } on AuthException catch (e) {
@@ -343,6 +372,112 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       notifyListeners();
       return false;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AK-YEAR-01 — GESTION PLURI-ANNUELLE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Charge la liste des années depuis SQLite (cache), puis tente un rafraîchissement
+  /// réseau. Échouera silencieusement si le réseau est absent (on garde le cache).
+  ///
+  /// Appelée à l'ouverture de l'onglet Année dans les Paramètres.
+  Future<void> loadYears() async {
+    if (_yearsLoading) return;
+    _yearsLoading = true;
+    notifyListeners();
+
+    final db  = DatabaseService();
+    final api = ApiService();
+
+    try {
+      // 1. Cache SQLite d'abord (affichage instantané hors ligne)
+      final cached = await db.getSchoolYears();
+      if (cached.isNotEmpty) {
+        _schoolYears = cached;
+        _restoreActiveYear();
+        notifyListeners();
+      }
+
+      // 2. Tentative de rafraîchissement réseau
+      final login = _user?.login ?? '';
+      if (login.isNotEmpty) {
+        final fetched = await api.fetchYears(login);
+        if (fetched.isNotEmpty) {
+          await db.saveSchoolYears(fetched);
+          _schoolYears = fetched;
+          _restoreActiveYear();
+          notifyListeners();
+          debugPrint('[AuthProvider] loadYears: ${fetched.length} année(s) rechargée(s)');
+        } else {
+          debugPrint('[AuthProvider] loadYears: réseau vide — on garde le cache');
+        }
+      }
+    } catch (e) {
+      debugPrint('[AuthProvider] loadYears error (non-fatal): $e');
+    } finally {
+      _yearsLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Restaure l'état de _activeYear depuis SQLite settings ('active_year_code').
+  /// Si aucune préférence n'est stockée, utilise user.codeyear comme valeur par défaut.
+  void _restoreActiveYear() {
+    if (_schoolYears.isEmpty) return;
+    final savedCodeStr = _activeYear != null
+        ? _activeYear!.code.toString()
+        : (_user?.codeyear ?? '');
+    final savedCode = int.tryParse(savedCodeStr) ?? 0;
+    // Cherche dans la liste ; si introuvable, prend la première de la liste
+    _activeYear = _schoolYears.firstWhere(
+      (y) => y.code == savedCode,
+      orElse: () => _schoolYears.first,
+    );
+    debugPrint('[AuthProvider] _restoreActiveYear: activeYear=${_activeYear?.code}/${_activeYear?.libelle}');
+  }
+
+  /// Sélectionne [year] comme année active et la persiste dans SQLite settings.
+  Future<void> setActiveYear(SchoolYear year) async {
+    _activeYear = year;
+    notifyListeners();
+    try {
+      await DatabaseService().setSetting('active_year_code', year.code.toString());
+      debugPrint('[AuthProvider] setActiveYear: ${year.code}/${year.libelle}');
+    } catch (e) {
+      debugPrint('[AuthProvider] setActiveYear persist error (non-fatal): $e');
+    }
+  }
+
+  /// Charge l'année active persistée depuis SQLite settings au démarrage.
+  /// Appelé lors de l'initialisation (après login PIN).
+  Future<void> _loadActiveYearFromStorage() async {
+    try {
+      final db = DatabaseService();
+      final codeStr = await db.getSetting('active_year_code');
+      if (codeStr == null || codeStr.isEmpty) {
+        // Pas encore de préférence — init depuis user.codeyear
+        final defaultCode = int.tryParse(_user?.codeyear ?? '') ?? 0;
+        if (defaultCode > 0) {
+          await db.setSetting('active_year_code', defaultCode.toString());
+        }
+        // _activeYear restera null jusqu'à loadYears()
+        return;
+      }
+      // Essayer de trouver l'année dans le cache SQLite
+      final years = await db.getSchoolYears();
+      final code  = int.tryParse(codeStr) ?? 0;
+      if (years.isNotEmpty) {
+        _schoolYears = years;
+        _activeYear  = years.firstWhere(
+          (y) => y.code == code,
+          orElse: () => years.first,
+        );
+        debugPrint('[AuthProvider] _loadActiveYearFromStorage: ${_activeYear?.code}/${_activeYear?.libelle}');
+      }
+    } catch (e) {
+      debugPrint('[AuthProvider] _loadActiveYearFromStorage error (non-fatal): $e');
     }
   }
 
