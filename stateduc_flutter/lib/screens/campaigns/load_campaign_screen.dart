@@ -189,6 +189,10 @@ class _LoadCampaignScreenState extends State<LoadCampaignScreen> {
       userId:   auth.user!.idUser,   // for all other endpoints (uses id)
     );
     if (ok && mounted) {
+      // AK-YEAR-02 : synchronise AuthProvider avec les années mises en cache
+      // par l'étape 0 de loadCampaignFromServer — fire & forget (non-bloquant).
+      auth.loadYears();
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
               'Campagne "${_selectedCampaign!.libCamp}" chargée avec succès')));

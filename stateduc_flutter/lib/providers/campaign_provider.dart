@@ -5,6 +5,7 @@ import '../models/school.dart';
 import '../models/education_system.dart';
 import '../models/question.dart';
 import '../models/user.dart';
+import '../models/school_year.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 
@@ -368,6 +369,23 @@ class CampaignProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Étape 0 — Années de recensement (AK-YEAR-02 — non-fatale)
+      // Chargé en parallèle du reste du téléchargement pour que la liste
+      // soit disponible dès que la campagne est prête, même sans ouvrir
+      // l'onglet Paramètres → Année.
+      _setLoadStep(0, 'Chargement des années de recensement…');
+      try {
+        final years = await _api.fetchYears(login);
+        if (years.isNotEmpty) {
+          await _db.saveSchoolYears(years);
+          debugPrint('[CampaignProvider] étape 0 : ${years.length} année(s) mises en cache');
+        } else {
+          debugPrint('[CampaignProvider] étape 0 : aucune année retournée (non-fatal)');
+        }
+      } catch (e) {
+        debugPrint('[CampaignProvider] étape 0 (années) SKIPPED (non-fatal) : $e');
+      }
+
       // Étape 1 — Regroupements (utilise LOGIN)
       _setLoadStep(1, 'Chargement des regroupements…');
       final regroups = await _api.getRegroups(login, campaign.idCamp);

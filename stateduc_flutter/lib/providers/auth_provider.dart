@@ -382,9 +382,13 @@ class AuthProvider extends ChangeNotifier {
   /// Charge la liste des années depuis SQLite (cache), puis tente un rafraîchissement
   /// réseau. Échouera silencieusement si le réseau est absent (on garde le cache).
   ///
-  /// Appelée à l'ouverture de l'onglet Année dans les Paramètres.
-  Future<void> loadYears() async {
-    if (_yearsLoading) return;
+  /// Appelée à l'ouverture de l'onglet Année dans les Paramètres ET après le
+  /// téléchargement d'une campagne depuis le serveur (AK-YEAR-02).
+  ///
+  /// [force] : si true, ignore le guard _yearsLoading (permet le bouton Rafraîchir
+  ///           d'interrompre un chargement bloqué). Par défaut false.
+  Future<void> loadYears({bool force = false}) async {
+    if (_yearsLoading && !force) return;
     _yearsLoading = true;
     notifyListeners();
 
@@ -398,21 +402,25 @@ class AuthProvider extends ChangeNotifier {
         _schoolYears = cached;
         _restoreActiveYear();
         notifyListeners();
+        debugPrint('[AuthProvider] loadYears: ${cached.length} année(s) depuis cache SQLite');
       }
 
       // 2. Tentative de rafraîchissement réseau
-      final login = _user?.login ?? '';
+      final login = _user?.login ?? _storedLogin ?? '';
+      debugPrint('[AuthProvider] loadYears: tentative réseau — login="$login"');
       if (login.isNotEmpty) {
         final fetched = await api.fetchYears(login);
+        debugPrint('[AuthProvider] loadYears: réseau → ${fetched.length} année(s)');
         if (fetched.isNotEmpty) {
           await db.saveSchoolYears(fetched);
           _schoolYears = fetched;
           _restoreActiveYear();
           notifyListeners();
-          debugPrint('[AuthProvider] loadYears: ${fetched.length} année(s) rechargée(s)');
         } else {
-          debugPrint('[AuthProvider] loadYears: réseau vide — on garde le cache');
+          debugPrint('[AuthProvider] loadYears: réseau vide (0 années) — cache conservé');
         }
+      } else {
+        debugPrint('[AuthProvider] loadYears: login vide — impossible d\'appeler le réseau');
       }
     } catch (e) {
       debugPrint('[AuthProvider] loadYears error (non-fatal): $e');
