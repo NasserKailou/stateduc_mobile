@@ -9,6 +9,7 @@ import '../models/school.dart';
 import '../models/education_system.dart';
 import '../models/question.dart';
 import '../models/user.dart';
+import '../models/school_year.dart';
 
 /// DatabaseService — Couche d'accès aux données SQLite de l'application StatEduc Mobile.
 ///
@@ -35,6 +36,7 @@ import '../models/user.dart';
 ///   v4 : ajout tables dico_regle_theme + dico_regle_theme_assoc (moteur générique)
 ///   v5 : ajout colonne sql_assoc dans dico_regle_theme_assoc (Session 52 Fix b)
 ///   v6 : ajout colonne lib_localisation dans schools (Session 53 Fix localisation)
+///   v7 : ajout table school_years + clé active_year dans settings (AK-YEAR-01)
 ///
 /// TABLE CRITIQUE — coherence_rules :
 ///   Stocke les règles téléchargées depuis data_rules.php pour l'évaluation offline.
@@ -61,7 +63,7 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
@@ -105,11 +107,6 @@ class DatabaseService {
     }
     if (oldVersion < 6) {
       // v6 : SESSION 53 FIX (localisation) — ajout colonne lib_localisation dans schools.
-      // Stocke la chaîne hiérarchique pré-calculée depuis le graphe des regroupements
-      // (schools.id_regroup → regroups.id_parent_regp → ... → racine).
-      // Calculé une fois à la synchronisation par computeAndStoreLocalisations().
-      // Évite de dépendre de locs_camp qui peut référencer une chaîne administrative
-      // différente de celle affichée par le serveur.
       try {
         await db.execute(
           "ALTER TABLE schools ADD COLUMN lib_localisation TEXT NOT NULL DEFAULT ''",
@@ -118,10 +115,20 @@ class DatabaseService {
         // Column may already exist if DB was recreated from v6 schema
       }
     }
+    if (oldVersion < 7) {
+      // v7 : AK-YEAR-01 — liste des années de recensement en cache local.
+      // Nouvelle table school_years — aucune donnée existante touchée.
+      // La clé settings 'active_year_code' sera créée lors du premier
+      // chargement de l'onglet Année (valeur par défaut = user.codeyear).
+      await _createSchoolYearsTable(db);
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('PRAGMA foreign_keys = ON');
+
+    // ─── School years (AK-YEAR-01) ────────────────────────────────────────
+    await _createSchoolYearsTable(db);
 
     // ─── Settings (replaces loose localStorage items) ─────────────────────
     await db.execute('''
@@ -483,7 +490,18 @@ class DatabaseService {
     });
   }
 
-    Future<void> _createCoherenceRulesTable(Database db) async {
+  // ── v7 : school_years ──────────────────────────────────────────────────────
+  Future<void> _createSchoolYearsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS school_years (
+        code    INTEGER PRIMARY KEY,
+        libelle TEXT    NOT NULL,
+        ordre   INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+  }
+
+  Future<void> _createCoherenceRulesTable(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS coherence_rules (
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -532,6 +550,37 @@ class DatabaseService {
   Future<void> deleteSetting(String key) async {
     final db = await database;
     await db.delete('settings', where: 'key = ?', whereArgs: [key]);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SCHOOL YEARS — AK-YEAR-01
+  // Cache local de TYPE_ANNEE pour consultation hors ligne.
+  // Synchronisé depuis annees_ws.php lors de l'ouverture de l'onglet Année.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Retourne toutes les années triées par ordre croissant.
+  Future<List<SchoolYear>> getSchoolYears() async {
+    final db = await database;
+    final rows = await db.query('school_years', orderBy: 'ordre ASC');
+    return rows.map(SchoolYear.fromSqlite).toList();
+  }
+
+  /// Remplace toute la table school_years par [years] (upsert batch).
+  /// Appelée après un fetch serveur réussi.
+  Future<void> saveSchoolYears(List<SchoolYear> years) async {
+    if (years.isEmpty) return;
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete('school_years');
+      for (final y in years) {
+        await txn.insert(
+          'school_years',
+          y.toSqliteMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+    debugPrint('[DB] saveSchoolYears: ${years.length} année(s) enregistrée(s)');
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

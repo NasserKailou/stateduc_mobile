@@ -75,8 +75,12 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         idRegroupEtab:  widget.school.idRegroup,
         idStatus:       widget.school.idStatus,   // ← statut numérique pour le pré-remplissage radio
         codeEtab:       widget.school.codeEtab,
-        libyear:        auth.user?.libyear,
-        codeyear:       auth.user?.codeyear,
+        libyear:        auth.activeYear?.libelle ?? auth.user?.libyear,
+        // AK-YEAR-01 : utilise l'année active choisie dans Paramètres,
+        // avec fallback sur user.codeyear (comportement pré-AK-YEAR-01).
+        codeyear:       auth.effectiveYearCode.isNotEmpty
+                            ? auth.effectiveYearCode
+                            : auth.user?.codeyear,
         libStatus:      widget.school.libStatus,
         libSubsector:   widget.libSystem,   // type secteur enseignement (ex. "Education de Base")
         adminHierarchy: widget.school.libHierarchy,

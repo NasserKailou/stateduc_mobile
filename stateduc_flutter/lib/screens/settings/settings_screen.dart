@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/campaign_provider.dart';
 import '../../models/campaign.dart';
+import '../../models/school_year.dart';
 import '../login/pin_screen.dart';
 
 /// SettingsScreen — Server URL config, PIN change, 3-question security setup.
@@ -22,6 +23,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  // Clé pour déclencher loadYears() une seule fois
+  bool _yearsInitialized = false;
 
   final _serverUrlController = TextEditingController();
 
@@ -41,7 +44,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(_onTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       if (auth.serverUrl != null) {
@@ -51,8 +55,17 @@ class _SettingsScreenState extends State<SettingsScreen>
     });
   }
 
+  void _onTabChanged() {
+    // Onglet 1 = Année (index 1) — charger les années la première fois
+    if (_tabController.index == 1 && !_yearsInitialized) {
+      _yearsInitialized = true;
+      context.read<AuthProvider>().loadYears();
+    }
+  }
+
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     _serverUrlController.dispose();
     _oldPinController.dispose();
@@ -91,9 +104,10 @@ class _SettingsScreenState extends State<SettingsScreen>
               fontSize: 12,
             ),
             tabs: const [
-              Tab(icon: Icon(Icons.dns_outlined), text: 'Serveur'),
-              Tab(icon: Icon(Icons.lock_outline), text: 'PIN'),
-              Tab(icon: Icon(Icons.help_outline), text: 'Sécurité'),
+              Tab(icon: Icon(Icons.dns_outlined),        text: 'Serveur'),
+              Tab(icon: Icon(Icons.calendar_today),      text: 'Année'),
+              Tab(icon: Icon(Icons.lock_outline),        text: 'PIN'),
+              Tab(icon: Icon(Icons.help_outline),        text: 'Sécurité'),
             ],
           ),
         ),
@@ -101,6 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           controller: _tabController,
           children: [
             _buildServerTab(auth),
+            _buildYearTab(auth),
             _buildPinTab(auth),
             _buildSecurityTab(auth),
           ],
@@ -328,6 +343,194 @@ class _SettingsScreenState extends State<SettingsScreen>
         ],
       ),
     );
+  }
+
+  // ─── Year tab ─────────────────────────────────────────────────────────────────
+  /// Onglet « Année » — sélection de l'année de recensement active.
+  ///
+  /// Comportement :
+  ///  - Affiche la liste des années depuis le cache SQLite (instantané)
+  ///  - Rafraîchit depuis le serveur en arrière-plan à l'ouverture de l'onglet
+  ///  - L'année sélectionnée est persistée et utilisée dans tous les formulaires
+  Widget _buildYearTab(AuthProvider auth) {
+    final years  = auth.schoolYears;
+    final active = auth.activeYear;
+    final loading = auth.yearsLoading;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ── Titre + indicateur réseau ─────────────────────────────────
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Année de recensement',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              if (loading)
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Choisissez l\'année pour la saisie ou la consultation des données.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
+
+          // ── Année active : badge de confirmation ──────────────────────
+          if (active != null) ...[
+            Card(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: ListTile(
+                leading: Icon(
+                  Icons.check_circle_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: const Text('Année active'),
+                subtitle: Text(
+                  active.libelle,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // ── Liste des années disponibles ──────────────────────────────
+          if (years.isEmpty && !loading) ...[
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Icon(Icons.cloud_off_outlined,
+                        size: 40,
+                        color: Theme.of(context).colorScheme.outline),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Aucune année disponible.\n'
+                      'Vérifiez votre connexion et rafraîchissez.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ] else ...[
+            Text(
+              'Sélectionner une année :',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            const SizedBox(height: 8),
+            ...years.map((y) => _buildYearTile(auth, y, active)),
+          ],
+
+          // ── Bouton rafraîchir ─────────────────────────────────────────
+          const SizedBox(height: 20),
+          OutlinedButton.icon(
+            onPressed: loading ? null : () => auth.loadYears(),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Rafraîchir la liste'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Tuile représentant une année sélectionnable.
+  Widget _buildYearTile(
+      AuthProvider auth, SchoolYear year, SchoolYear? active) {
+    final isSelected = active?.code == year.code;
+    final color = isSelected
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.onSurface;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: isSelected
+            ? BorderSide(
+                color: Theme.of(context).colorScheme.primary, width: 2)
+            : BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: isSelected ? null : () => _selectYear(auth, year),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                isSelected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: color,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  year.libelle,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: isSelected
+                        ? FontWeight.w700
+                        : FontWeight.w400,
+                    color: color,
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Active',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Sélectionne [year] et affiche une confirmation SnackBar.
+  Future<void> _selectYear(AuthProvider auth, SchoolYear year) async {
+    await auth.setActiveYear(year);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Année active : ${year.libelle}'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    }
   }
 
   // ─── PIN tab ─────────────────────────────────────────────────────────────────
