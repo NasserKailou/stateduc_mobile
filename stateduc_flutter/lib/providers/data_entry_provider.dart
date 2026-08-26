@@ -1040,7 +1040,7 @@ class DataEntryProvider extends ChangeNotifier {
             qstId:    _selectedQuestion!.idQst,
             etabId:   _idEtab!,
             filter:   serverFilter,   // SESSION 58: filtre effectif serveur
-            yearCode: user.codeyear,
+            yearCode: _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
         } catch (_) {
           _coherenceErrors = []; // Non fatal — ignoré silencieusement
@@ -1510,7 +1510,7 @@ class DataEntryProvider extends ChangeNotifier {
             etabId:   etabId,
             filter:   null,
             formData: data,
-            yearCode: user.codeyear,
+            yearCode: _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
           results[key] = ok;
           if (ok) {

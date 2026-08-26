@@ -106,4 +106,58 @@ $app->get('/list/:login', function ($login) use ($lib_status, $lib_message, $lib
     ));
 });
 
+
+// ─── GET /active/:login ──────────────────────────────────────────────────────
+// AK-YEAR-MULTI-02 : Retourne l'année de collecte ACTIVE du serveur.
+// Utilisé par l'app Flutter avant tout envoi ou rechargement pour vérifier
+// la cohérence entre l'année active mobile et l'année active serveur.
+// $_SESSION['annee'] est défini par common_ws.php via set_tab_session('annees').
+// Réponse JSON : { se_status:200, se_message:'ok',
+//                  se_data: { code: <int>, libelle: <string> } }
+$app->get('/active/:login', function ($login) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+
+    // Récupère l'année active de la session serveur
+    $annee_active = isset($_SESSION['annee']) ? (int)$_SESSION['annee'] : 0;
+
+    if ($annee_active <= 0) {
+        // Pas d'année active en session — erreur explicite
+        error_log('[annees_ws] /active — ERREUR: $_SESSION[annee] absent ou nul pour login=' . $login);
+        echo json_encode(array(
+            $lib_status  => $status_ko,
+            $lib_message => 'Année active non définie sur le serveur',
+            $lib_data    => array('code' => 0, 'libelle' => ''),
+        ));
+        return;
+    }
+
+    // Recherche du libellé de l'année active dans TYPE_ANNEE
+    $col_code    = $GLOBALS['PARAM']['CODE']    . '_' . $GLOBALS['PARAM']['TYPE_ANNEE'];
+    $col_libelle = $GLOBALS['PARAM']['LIBELLE'] . '_' . $GLOBALS['PARAM']['TYPE_ANNEE'];
+    $table       = $GLOBALS['PARAM']['TYPE_ANNEE'];
+
+    $libelle_annee = '';
+    if (isset($GLOBALS['conn']) && $GLOBALS['conn'] !== false) {
+        $sql_lib = 'SELECT ' . $col_libelle . ' FROM ' . $table
+                 . ' WHERE ' . $col_code . ' = ' . $annee_active;
+        $row_lib = $GLOBALS['conn']->GetRow($sql_lib);
+        if ($row_lib !== false && is_array($row_lib)) {
+            $r_upper       = array_change_key_case($row_lib, CASE_UPPER);
+            $libelle_annee = isset($r_upper[$col_libelle])
+                           ? trim((string)$r_upper[$col_libelle])
+                           : '';
+        }
+    }
+
+    error_log('[annees_ws] /active — login=' . $login . ' annee_active=' . $annee_active . ' libelle=' . $libelle_annee);
+
+    echo json_encode(array(
+        $lib_status  => $status_ok,
+        $lib_message => $GLOBALS['PARAM_WS']['OK'],
+        $lib_data    => array(
+            'code'    => $annee_active,
+            'libelle' => $libelle_annee,
+        ),
+    ));
+});
+
 $app->run();

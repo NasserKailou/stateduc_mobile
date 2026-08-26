@@ -318,13 +318,18 @@ class CampaignProvider extends ChangeNotifier {
   // mais qui ne sont pas encore téléchargées localement.
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Future<void> fetchServerCampaigns(String userId) async {
+  // AK-CAMP-03 : ajout du paramètre optionnel [yearCode].
+  // L'écran qui appelle fetchServerCampaigns passe auth.effectiveYearCode
+  // pour que le serveur retourne les campagnes de l'année active mobile,
+  // indépendamment de l'année par défaut sélectionnée côté serveur.
+  Future<void> fetchServerCampaigns(String userId, {String yearCode = ''}) async {
     _error           = null;
     _serverCampaigns = [];
     _loadingCampaigns = true;   // SESSION 38 : active l'indicateur de chargement
     notifyListeners();
     try {
-      _serverCampaigns  = await _api.getAvailableCampaigns(userId);
+      // AK-CAMP-03 : passe l'année active mobile pour filtrer les campagnes côté serveur
+      _serverCampaigns  = await _api.getAvailableCampaigns(userId, yearCode: yearCode);
       _loadingCampaigns = false;
       notifyListeners();
     } on ApiException catch (e) {

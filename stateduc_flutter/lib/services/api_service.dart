@@ -608,8 +608,16 @@ class ApiService {
   //   Response se_data: [ { id, nom, debut, fin, statut, typeRegroups }, ... ]
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Future<List<Campaign>> getAvailableCampaigns(String userId) async {
-    final data = await _get('user_camp.php/new_camp/$userId/1');
+  // AK-CAMP-03 : ajout du paramètre optionnel [yearCode] (CODE_TYPE_ANNEE).
+  // Quand l'app mobile passe l'année active, la route 3-segments est utilisée :
+  //   GET /user_camp.php/new_camp/{userId}/1/{yearCode}
+  // Le serveur retourne alors les campagnes de cette année spécifique,
+  // indépendamment de l'année par défaut sélectionnée côté serveur.
+  // Si yearCode est vide/0, la route 2-segments (comportement original) est utilisée.
+  Future<List<Campaign>> getAvailableCampaigns(String userId, {String yearCode = ''}) async {
+    // AK-CAMP-03 : passe l'année active mobile en 3e segment si valide
+    final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '';
+    final data = await _get('user_camp.php/new_camp/$userId/1$anneeSegment');
     if (data is List) {
       return data.map((c) => Campaign.fromJson(c)).toList();
     }
