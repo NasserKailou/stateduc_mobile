@@ -474,6 +474,43 @@ class ApiService {
     }
   }
 
+  // ─── AK-YEAR-MULTI-02 : Année active du serveur ───────────────────────────
+  //
+  // Consulte le nouvel endpoint GET /annees_ws.php/active/:login qui retourne
+  // l'année active de $_SESSION['annee'] côté serveur.
+  //
+  // Utilisé par _checkYearConsistency() dans DataEntryProvider avant tout envoi
+  // ou rechargement pour s'assurer que l'année mobile == année serveur.
+  //
+  // Retourne ({code: int, libelle: String}) ou lance une exception si :
+  //   - erreur réseau (pas de connexion)
+  //   - le serveur retourne se_status KO (année non définie en session)
+  //   - la réponse ne peut pas être parsée
+  //
+  // L'appelant doit catcher les exceptions — un échec doit BLOQUER l'opération
+  // (comportement fail-safe requis par AK-YEAR-MULTI-02).
+  Future<({int code, String libelle})> fetchServerActiveYear(String login) async {
+    final encodedLogin = Uri.encodeComponent(login);
+    // _get() décode se_data et lève une ApiException si se_status == KO
+    final data = await _get('annees_ws.php/active/$encodedLogin');
+    // data est le contenu de se_data — un Map avec 'code' et 'libelle'
+    if (data is Map<String, dynamic>) {
+      final code    = (data['code']    as num?)?.toInt() ?? 0;
+      final libelle = (data['libelle'] as String?)       ?? '';
+      if (code <= 0) {
+        throw ApiException(
+          'Année active serveur non définie (code=$code). '
+          'Vérifiez la configuration du serveur.',
+        );
+      }
+      debugPrint('[ApiService] fetchServerActiveYear: code=$code libelle=$libelle');
+      return (code: code, libelle: libelle);
+    }
+    throw ApiException(
+      'Réponse inattendue de annees_ws.php/active : $data',
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // AUTHENTICATION
   // Source JS: users.js

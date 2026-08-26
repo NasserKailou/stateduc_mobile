@@ -183,12 +183,18 @@ class ThemeRuleEngine {
       for (final entry in formData.entries) {
         if (entry.value.isEmpty) continue;
         try {
+          // AK-YEAR-MULTI-01 : inclure code_type_annee dans l'INSERT SAVEPOINT.
+          // Depuis la migration v8, la colonne est NOT NULL DEFAULT '' et fait
+          // partie de l'index unique — l'omettre déclencherait une erreur NOT NULL
+          // (le DEFAULT '' s'applique à ALTER TABLE mais pas toujours au rawInsert).
+          // On passe explicitement codeTypeAnnee ?? '' pour être sûr.
           await db.rawInsert(
             'INSERT OR REPLACE INTO collected_data '
-            '(id_camp, id_etab, id_qst, id_filter, field_name, field_value, '
+            '(code_type_annee, id_camp, id_etab, id_qst, id_filter, field_name, field_value, '
             'is_sent, updated_at) '
-            'VALUES (?, ?, ?, ?, ?, ?, 0, ?)',
+            'VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)',
             [
+              codeTypeAnnee ?? '',  // AK-YEAR-MULTI-01 : année active
               idCamp,
               idEtab,
               idQst,

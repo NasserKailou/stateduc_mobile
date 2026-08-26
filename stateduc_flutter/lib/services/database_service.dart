@@ -1709,17 +1709,26 @@ class DatabaseService {
   // Retourne un Map { "FIELD_NAME#FILTER_ID" → value } pour les données filtrées
   // et { "FIELD_NAME" → value } pour les données sans filtre.
   // CoherenceEvaluator._sumFieldAcrossAllFilters() comprend les deux formats.
+  //
+  // AK-YEAR-MULTI-01 (v8) : [codeTypeAnnee] filtre par année active.
+  // Le serveur filtre par CODE_ANNEE dans ses SUM() — on reproduit ce comportement.
+  // Si vide, aucun filtre (compatibilité tests / données pré-v8).
   // ═══════════════════════════════════════════════════════════════════════════
   Future<Map<String, String>> getAllCollectedDataForCoherence({
     required String idCamp,
     required String idEtab,
     required String idQst,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    final anneeFilter = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+    final whereArgs = codeTypeAnnee.isNotEmpty
+        ? [idCamp, idEtab, idQst, codeTypeAnnee]
+        : [idCamp, idEtab, idQst];
     final rows = await db.query(
       'collected_data',
-      where: 'id_camp = ? AND id_etab = ? AND id_qst = ?',
-      whereArgs: [idCamp, idEtab, idQst],
+      where: 'id_camp = ? AND id_etab = ? AND id_qst = ?$anneeFilter',
+      whereArgs: whereArgs,
     );
     final result = <String, String>{};
     for (final r in rows) {
@@ -1752,16 +1761,26 @@ class DatabaseService {
   // Retourne un Map { "FIELD_NAME" → somme de toutes les occurrences } sous forme
   // de String. En cas de champs homonymes sur plusieurs filtres/questions, les
   // valeurs numériques sont SOMMÉES (comportement coherent avec les SUM() du serveur).
+  //
+  // AK-YEAR-MULTI-01 (v8) : [codeTypeAnnee] filtre par année active.
+  // Le serveur filtre par CODE_ANNEE — on reproduit ce comportement pour éviter
+  // d'additionner des données de plusieurs années (faux positifs inter-années).
+  // Si vide, aucun filtre (compatibilité tests / données pré-v8).
   // ═══════════════════════════════════════════════════════════════════════════
   Future<Map<String, String>> getAllCollectedDataForCampEtab({
     required String idCamp,
     required String idEtab,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    final anneeFilter = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+    final whereArgs = codeTypeAnnee.isNotEmpty
+        ? [idCamp, idEtab, codeTypeAnnee]
+        : [idCamp, idEtab];
     final rows = await db.query(
       'collected_data',
-      where: 'id_camp = ? AND id_etab = ?',
-      whereArgs: [idCamp, idEtab],
+      where: 'id_camp = ? AND id_etab = ?$anneeFilter',
+      whereArgs: whereArgs,
     );
     // Accumulate numeric values — same field name may appear across
     // multiple questions/filters: sum them to mirror server SUM() behaviour.
