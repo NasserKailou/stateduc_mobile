@@ -116,8 +116,6 @@ function rules_resolve_theme_id($id_theme, $id_sector) {
         $check_row = $GLOBALS['conn_dico']->GetRow($check_sql);
         $nb = isset($check_row['NB']) ? (int)$check_row['NB'] : 0;
 
-        error_log('[data_rules] resolve_theme_id: composite='.$id_theme
-                  .' strip='.$strip_len.' candidate='.$candidate.' nb_rules='.$nb);
 
         if ($nb > 0) {
             error_log('[data_rules] resolve_theme_id: FOUND raw_theme='.$candidate
@@ -201,11 +199,8 @@ $app->get(
         // qui teste plusieurs longueurs de suffixe et valide contre DICO_REGLE_THEME.
         // Corrige le cas composite=10102 / sector=2 → raw=101 (suffixe "02" 2 digits)
         // que l'ancienne logique strlen("2")=1 ne savait pas gérer (donnait raw=1010).
-        error_log('[data_rules] theme_rules: id_camp='.$id_camp.' id_sector='.$id_sector
-                  .' id_theme='.$id_theme.' id_etab='.$id_etab.' year='.$id_year);
 
         $str_theme_id = rules_resolve_theme_id($id_theme, $id_sector);
-        error_log('[data_rules] theme_rules: raw_theme_id='.$str_theme_id);
 
         $sql_regles_theme = "SELECT *
                               FROM DICO_REGLE_THEME
@@ -214,7 +209,6 @@ $app->get(
                               ORDER BY ORDRE_REGLE_THEME";
 
         $all_regles_theme = $GLOBALS['conn_dico']->GetAll($sql_regles_theme);
-        error_log('[data_rules] theme_rules: nb_regles_found='.(is_array($all_regles_theme) ? count($all_regles_theme) : 'NULL/false'));
 
         if (!is_array($all_regles_theme)) {
             $rps = array(

@@ -63,20 +63,12 @@ $app->get('/list/:login', function ($login) use ($lib_status, $lib_message, $lib
     // On filtre ensuite sur les clés attendues ($col_code, $col_libelle, $col_ordre).
     $requete = 'SELECT * FROM ' . $table . ' ORDER BY ' . $col_ordre . ' ASC';
 
-    error_log('[annees_ws] /list — login=' . $login . ' SQL: ' . $requete);
-
     $rows = $GLOBALS['conn']->GetAll($requete);
 
     if ($rows === false || !is_array($rows)) {
-        error_log('[annees_ws] /list — requête échouée: ' . $GLOBALS['conn']->ErrorMsg());
-        error_log('[annees_ws] /list — col_code=' . $col_code . ' table=' . $table);
+        error_log('[annees_ws] /list — requête échouée: ' . $GLOBALS['conn']->ErrorMsg()
+                  . ' col_code=' . $col_code . ' table=' . $table);
         $rows = array();
-    } elseif (count($rows) > 0) {
-        // DIAGNOSTIC — clés réelles retournées par AdoDB (à supprimer après vérification)
-        error_log('[annees_ws] DEBUG first row keys: ' . implode(', ', array_keys($rows[0])));
-        error_log('[annees_ws] DEBUG first row: ' . print_r($rows[0], true));
-    } else {
-        error_log('[annees_ws] /list — table ' . $table . ' existe mais est vide');
     }
 
     // Reconstruction du tableau de sortie avec les clés minuscules attendues par Flutter.
@@ -96,8 +88,6 @@ $app->get('/list/:login', function ($login) use ($lib_status, $lib_message, $lib
             'ordre'   => $ordre,
         );
     }
-
-    error_log('[annees_ws] /list — ' . count($annees) . ' année(s) retournée(s)');
 
     echo json_encode(array(
         $lib_status  => $status_ok,
@@ -147,8 +137,6 @@ $app->get('/active/:login', function ($login) use ($lib_status, $lib_message, $l
                            : '';
         }
     }
-
-    error_log('[annees_ws] /active — login=' . $login . ' annee_active=' . $annee_active . ' libelle=' . $libelle_annee);
 
     echo json_encode(array(
         $lib_status  => $status_ok,

@@ -63,8 +63,6 @@ $app->get('/theme_camp/:id_camp/:id_sys/:code_lang', function ($id_camp, $id_sys
 	              AND DICO_TRADUCTION.CODE_LANGUE = 'fr';";
 
 	// SESSION 38 : log diagnostique — SQL + paramètres reçus
-	error_log('[data_camp] theme_camp — id_camp='.$id_camp.' id_sys='.$id_sys.' code_lang='.$code_lang);
-	error_log('[data_camp] theme_camp — SQL: '.$requete);
 
 	if (!isset($GLOBALS['conn_dico']) || $GLOBALS['conn_dico'] === false) {
 		error_log('[data_camp] theme_camp — ERREUR: conn_dico non disponible');
@@ -75,7 +73,6 @@ $app->get('/theme_camp/:id_camp/:id_sys/:code_lang', function ($id_camp, $id_sys
 	$qst_list = $GLOBALS['conn_dico']->GetAll($requete);
 
 	// SESSION 38 : log du nombre de lignes retournées
-	error_log('[data_camp] theme_camp — nb lignes SQL: '.(is_array($qst_list) ? count($qst_list) : 'NULL/false'));
 
 	if ($qst_list === false || !is_array($qst_list)) {
 		$db_err = $GLOBALS['conn_dico']->ErrorMsg();
@@ -190,9 +187,7 @@ $app->get('/theme_camp/:id_camp/:id_sys/:code_lang', function ($id_camp, $id_sys
 	}
 
 	// SESSION 38 : log du résultat final
-	error_log('[data_camp] theme_camp — nb themes retournes: '.count($qst_ord));
 	if (count($qst_ord) > 0) {
-		error_log('[data_camp] theme_camp — premier theme: id='.$qst_ord[0]['id'].' title='.$qst_ord[0]['title'].' frame='.(isset($qst_ord[0]['frame']) ? $qst_ord[0]['frame'] : 'N/A'));
 	}
 
 	$rps = array($lib_status=>$status_ok, $lib_message=>$status, $lib_data=>$qst_ord); 
