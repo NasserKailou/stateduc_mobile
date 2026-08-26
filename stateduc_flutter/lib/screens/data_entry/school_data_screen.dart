@@ -55,6 +55,10 @@ class SchoolDataScreen extends StatefulWidget {
 }
 
 class _SchoolDataScreenState extends State<SchoolDataScreen> {
+  // AK-YEAR-MULTI-01 : mémorise l'année active lors du dernier initForSchool()
+  // pour détecter un changement d'année en cours de session (ex. via Paramètres).
+  String? _lastInitYear;
+
   @override
   void initState() {
     super.initState();
@@ -62,30 +66,40 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     // d'appeler initForSchool, car read<Provider>() ne peut pas être appelé
     // pendant le build du widget parent (contrainte Flutter/Provider).
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final auth = context.read<AuthProvider>();
-      final entry = context.read<DataEntryProvider>();
-      // Stocke l'utilisateur courant pour que selectQuestion puisse
-      // déclencher le rechargement automatique depuis le serveur
-      entry.setCurrentUser(auth.user);
-      entry.initForSchool(
-        idCamp:         widget.campaign.idCamp,
-        idEtab:         widget.school.idEtab,
-        libEtab:        widget.school.libEtab,
-        idSystem:       widget.idSystem,
-        idRegroupEtab:  widget.school.idRegroup,
-        idStatus:       widget.school.idStatus,   // ← statut numérique pour le pré-remplissage radio
-        codeEtab:       widget.school.codeEtab,
-        libyear:        auth.activeYear?.libelle ?? auth.user?.libyear,
-        // AK-YEAR-01 : utilise l'année active choisie dans Paramètres,
-        // avec fallback sur user.codeyear (comportement pré-AK-YEAR-01).
-        codeyear:       auth.effectiveYearCode.isNotEmpty
-                            ? auth.effectiveYearCode
-                            : auth.user?.codeyear,
-        libStatus:      widget.school.libStatus,
-        libSubsector:   widget.libSystem,   // type secteur enseignement (ex. "Education de Base")
-        adminHierarchy: widget.school.libHierarchy,
-      );
+      _doInitForSchool();
     });
+  }
+
+  // AK-YEAR-MULTI-01 : initialise (ou ré-initialise) le provider pour l'école
+  // courante avec l'année active au moment de l'appel.
+  void _doInitForSchool() {
+    if (!mounted) return;
+    final auth  = context.read<AuthProvider>();
+    final entry = context.read<DataEntryProvider>();
+    final yearCode = auth.effectiveYearCode.isNotEmpty
+        ? auth.effectiveYearCode
+        : auth.user?.codeyear;
+
+    // Stocke l'utilisateur courant pour que selectQuestion puisse
+    // déclencher le rechargement automatique depuis le serveur
+    entry.setCurrentUser(auth.user);
+    entry.initForSchool(
+      idCamp:         widget.campaign.idCamp,
+      idEtab:         widget.school.idEtab,
+      libEtab:        widget.school.libEtab,
+      idSystem:       widget.idSystem,
+      idRegroupEtab:  widget.school.idRegroup,
+      idStatus:       widget.school.idStatus,
+      codeEtab:       widget.school.codeEtab,
+      libyear:        auth.activeYear?.libelle ?? auth.user?.libyear,
+      // AK-YEAR-MULTI-01 : utilise l'année active choisie dans Paramètres,
+      // avec fallback sur user.codeyear (comportement pré-AK-YEAR-01).
+      codeyear:       yearCode,
+      libStatus:      widget.school.libStatus,
+      libSubsector:   widget.libSystem,
+      adminHierarchy: widget.school.libHierarchy,
+    );
+    _lastInitYear = yearCode;
   }
 
   @override
@@ -94,6 +108,21 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     // et DataEntryProvider (pour l'état du formulaire et des données)
     return Consumer2<AuthProvider, DataEntryProvider>(
       builder: (context, auth, entry, _) {
+        // AK-YEAR-MULTI-01 : détection du changement d'année en cours de session.
+        // AuthProvider.setActiveYear() appelle notifyListeners() → ce builder
+        // est rappelé. Si l'année a changé depuis le dernier initForSchool(),
+        // on ré-initialise le provider pour recharger les données de la nouvelle année.
+        // WidgetsBinding.addPostFrameCallback évite d'appeler setState/initForSchool
+        // pendant le build (contrainte Flutter).
+        final currentYear = auth.effectiveYearCode.isNotEmpty
+            ? auth.effectiveYearCode
+            : auth.user?.codeyear;
+        if (_lastInitYear != null && currentYear != _lastInitYear) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _doInitForSchool();
+          });
+        }
+
         return LoadingOverlay(
           // Overlay de chargement pendant l'envoi au serveur ou le rechargement.
           // En cas de retry (_sendAttempt > 1), affiche le numéro de tentative.

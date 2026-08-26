@@ -603,11 +603,12 @@ class DataEntryProvider extends ChangeNotifier {
         });
         // Sauvegarde en SQLite pour utilisation hors ligne
         await _db.saveCollectedData(
-          idCamp:   idCamp,
-          idEtab:   idEtab,
-          idQst:    question.idQst,
-          idFilter: idFilter,
-          data:     serverStr,
+          idCamp:         idCamp,
+          idEtab:         idEtab,
+          idQst:          question.idQst,
+          idFilter:       idFilter,
+          data:           serverStr,
+          codeTypeAnnee:  _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         // Met à jour en mémoire uniquement si la même question est toujours affichée
         if (_selectedQuestion?.idQst == question.idQst) {
@@ -750,10 +751,11 @@ class DataEntryProvider extends ChangeNotifier {
   Future<void> _loadFormData({String? idFilter}) async {
     if (_idCamp == null || _idEtab == null || _selectedQuestion == null) return;
     _formData = await _db.getCollectedData(
-      idCamp:   _idCamp!,
-      idEtab:   _idEtab!,
-      idQst:    _selectedQuestion!.idQst,
-      idFilter: idFilter,
+      idCamp:        _idCamp!,
+      idEtab:        _idEtab!,
+      idQst:         _selectedQuestion!.idQst,
+      idFilter:      idFilter,
+      codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
     );
   }
 
@@ -924,11 +926,12 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await _db.saveCollectedData(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
-        data:     _formData,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        data:          _formData,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
       _hasUnsavedChanges = false;
       _successMessage    = 'Données sauvegardées localement';
@@ -1075,7 +1078,7 @@ class DataEntryProvider extends ChangeNotifier {
         formData:         _formData,
         etabRegroupId:    _idRegroupEtab,     // pour LOC_REG_0 (première question)
         isFirstQuestion:  _isFirstQuestion,
-        yearCode:         user.codeyear,      // contournement session PHP absente
+        yearCode:         _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
         onRetry: (attempt) {
           // Callback appelé par _withRetry avant chaque nouvelle tentative
           _sendAttempt = attempt + 1;
@@ -1085,10 +1088,11 @@ class DataEntryProvider extends ChangeNotifier {
       if (ok) {
         // Marque les données comme envoyées dans SQLite
         await _db.markCollectedDataSent(
-          idCamp:   _idCamp!,
-          idEtab:   _idEtab!,
-          idQst:    _selectedQuestion!.idQst,
-          idFilter: _selectedFilter?.idFilter,
+          idCamp:        _idCamp!,
+          idEtab:        _idEtab!,
+          idQst:         _selectedQuestion!.idQst,
+          idFilter:      _selectedFilter?.idFilter,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         _successMessage = 'Données envoyées avec succès';
         notifyListeners();
@@ -1129,10 +1133,11 @@ class DataEntryProvider extends ChangeNotifier {
       debugPrint('[DataEntry] KOSAVE pour thème ${e.themeId} : ${e.toString()}');
       try {
         await _db.markCollectedDataSent(
-          idCamp:   _idCamp!,
-          idEtab:   _idEtab!,
-          idQst:    _selectedQuestion!.idQst,
-          idFilter: _selectedFilter?.idFilter,
+          idCamp:        _idCamp!,
+          idEtab:        _idEtab!,
+          idQst:         _selectedQuestion!.idQst,
+          idFilter:      _selectedFilter?.idFilter,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
       } catch (_) { /* non fatal */ }
       _warningMessage = '⚠ Données envoyées mais non enregistrées sur le serveur '
@@ -1344,24 +1349,27 @@ class DataEntryProvider extends ChangeNotifier {
 
       // Remplace les données locales par les données serveur
       await _db.deleteCollectedData(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
       await _db.saveCollectedData(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
-        data:     serverFieldsStr,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        data:          serverFieldsStr,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
       // Marque comme synchronisé (données = serveur)
       await _db.markCollectedDataSent(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
 
       _formData          = serverFieldsStr;
@@ -1427,10 +1435,11 @@ class DataEntryProvider extends ChangeNotifier {
         final q = questionsToSend[i];
         // Charge les données collectées pour cette question depuis SQLite
         final data = await _db.getCollectedData(
-          idCamp:   _idCamp!,
-          idEtab:   _idEtab!,
-          idQst:    q.idQst,
-          idFilter: null,
+          idCamp:        _idCamp!,
+          idEtab:        _idEtab!,
+          idQst:         q.idQst,
+          idFilter:      null,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         if (data.isEmpty) {
           // Aucune donnée locale pour ce formulaire → ignore
@@ -1452,15 +1461,16 @@ class DataEntryProvider extends ChangeNotifier {
             formData:        data,
             etabRegroupId:   _idRegroupEtab,
             isFirstQuestion: isFirst,
-            yearCode:        user.codeyear,
+            yearCode:        _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
           results[q.idQst] = ok;
           if (ok) {
             await _db.markCollectedDataSent(
-              idCamp:   _idCamp!,
-              idEtab:   _idEtab!,
-              idQst:    q.idQst,
-              idFilter: null,
+              idCamp:        _idCamp!,
+              idEtab:        _idEtab!,
+              idQst:         q.idQst,
+              idFilter:      null,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           }
         } on KosaveException catch (e) {
@@ -1470,10 +1480,11 @@ class DataEntryProvider extends ChangeNotifier {
           results[q.idQst] = true;  // Compté comme envoyé (reçu par le serveur)
           try {
             await _db.markCollectedDataSent(
-              idCamp:   _idCamp!,
-              idEtab:   _idEtab!,
-              idQst:    q.idQst,
-              idFilter: null,
+              idCamp:        _idCamp!,
+              idEtab:        _idEtab!,
+              idQst:         q.idQst,
+              idFilter:      null,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           } catch (_) { /* non fatal */ }
           _warningMessage = (_warningMessage == null ? '' : '$_warningMessage\n') +
@@ -1537,7 +1548,10 @@ class DataEntryProvider extends ChangeNotifier {
     final results = <String, bool>{};
 
     // Récupère tous les couples (etab, qst) qui ont des données pour la campagne
-    final etabQstList = await _db.getDistinctEtabQstWithData(idCamp);
+    final etabQstList = await _db.getDistinctEtabQstWithData(
+      idCamp,
+      codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
+    );
     if (etabQstList.isEmpty) {
       _successMessage = 'Aucune donnée locale à envoyer pour cette campagne.';
       notifyListeners();
@@ -1561,10 +1575,11 @@ class DataEntryProvider extends ChangeNotifier {
 
         // Charge les données pour ce couple (etab, qst)
         final data = await _db.getCollectedData(
-          idCamp:   idCamp,
-          idEtab:   etabId,
-          idQst:    qstId,
-          idFilter: null,
+          idCamp:        idCamp,
+          idEtab:        etabId,
+          idQst:         qstId,
+          idFilter:      null,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         if (data.isEmpty) {
           results[key] = false;
@@ -1587,10 +1602,11 @@ class DataEntryProvider extends ChangeNotifier {
           results[key] = ok;
           if (ok) {
             await _db.markCollectedDataSent(
-              idCamp:   idCamp,
-              idEtab:   etabId,
-              idQst:    qstId,
-              idFilter: null,
+              idCamp:        idCamp,
+              idEtab:        etabId,
+              idQst:         qstId,
+              idFilter:      null,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           }
         } on ApiException catch (e) {
@@ -1643,9 +1659,10 @@ class DataEntryProvider extends ChangeNotifier {
       for (final qstId in qstIds) {
         // Récupère les données collectées pour (campagne, établissement, question)
         final data = await _db.getCollectedData(
-          idCamp: idCamp,
-          idEtab: etabId,
-          idQst:  qstId,
+          idCamp:        idCamp,
+          idEtab:        etabId,
+          idQst:         qstId,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         if (data.isEmpty) continue;  // pas de données → ignore
 
@@ -1662,14 +1679,15 @@ class DataEntryProvider extends ChangeNotifier {
             filter:          null,
             formData:        data,
             isFirstQuestion: isFirst,
-            yearCode:        user.codeyear, // contournement session PHP
+            yearCode:        _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
           results['${etabId}_$qstId'] = ok;
           if (ok) {
             await _db.markCollectedDataSent(
-              idCamp: idCamp,
-              idEtab: etabId,
-              idQst:  qstId,
+              idCamp:        idCamp,
+              idEtab:        etabId,
+              idQst:         qstId,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           }
         } catch (_) {

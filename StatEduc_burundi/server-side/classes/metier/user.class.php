@@ -1349,7 +1349,12 @@
 						$sql =  'INSERT INTO '.$this->nom_table.' ('.$this->champ_id.','.$this->champ_name_user.','.$this->champ_email_user.','.$this->champ_tel_user.','.$this->champ_lib.','.$this->champ_ordre.','.$this->champ_systeme.','.$this->champ_user_parent.')'.
 						' VALUES('.$tab[0].','.$this->conn->qstr($tab[1]).','.$this->conn->qstr($tab[2]).','.$this->conn->qstr($tab[3]).','.$this->conn->qstr($tab[4]).','.$this->conn->qstr($tab[5]).','.$this->conn->qstr($tab[6]).','.$_SESSION['code_user'].')';
 						
+						// AK-PHP-02 : transaction atomique INSERT ADMIN_USERS + DICO_FIXE_REGROUPEMENT
+						// BeginTrans() avant le 1er INSERT pour que les deux soient atomiques.
+						// Si l'un des deux echoue -> RollbackTrans() annule les deux.
+						$this->conn->BeginTrans();
 						if ($this->conn->Execute($sql)===false) {
+							$this->conn->RollbackTrans();
 							array_push($tab, '<span class="error">'.$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user').'</span>'); 
 							$logData .= ";".$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user');
 						} else {
@@ -1358,6 +1363,7 @@
 							//   $tab[7]=CODE_ETAB, $tab[8]=ID_CAMP, $tab[9]=ID_SYSTEME,
 							//   $tab[10]=ID_ANNEE, $tab[11]=ID_CHAINE, $tab[12]=ID_PERIODE
 								$regroup_warning = '';
+								$trans_committed = false;  // AK-PHP-02 : indique si CommitTrans/RollbackTrans deja appele
 								if (!empty($tab[7]) && !empty($tab[8]) && !empty($tab[9])) {
 
 									$raw_code_etab   = trim($tab[7]);
@@ -1472,6 +1478,9 @@
 									$exists = intval($this->conn->GetOne($sql_chk));
 
 									if ($exists > 0) {
+										// AK-PHP-02 : doublon DICO ignoré, mais INSERT ADMIN_USERS OK -> CommitTrans
+										$this->conn->CommitTrans();
+										$trans_committed = true;
 										$regroup_warning = ' [École déjà liée — doublon ignoré]';
 									} else {
 										// INSERT avec les colonnes RÉELLES de DICO_FIXE_REGROUPEMENT
@@ -1496,15 +1505,26 @@
 											.$type_regroup_par_q.')';
 
 										if ($this->conn->Execute($sql_regroup) === false) {
+										// AK-PHP-02 : INSERT DICO echoue -> RollbackTrans annule aussi INSERT ADMIN_USERS
+										$this->conn->RollbackTrans();
+										$trans_committed = true;  // RollbackTrans = transaction resolue
 											$db_err = method_exists($this->conn, 'ErrorMsg')
 												? $this->conn->ErrorMsg() : '';
-											$regroup_warning = ' [WARN: école non liée: '
+											$regroup_warning = ' [ERREUR: école non liée + utilisateur annulé: '
 												. htmlspecialchars(substr($db_err, 0, 150)) . ']';
 										} else {
+											// AK-PHP-02 : les deux INSERTs réussis -> CommitTrans valide la transaction
+											$this->conn->CommitTrans();
+											$trans_committed = true;
 											$regroup_warning = ' [École liée OK]';
 										}
 									}
 								}
+							// AK-PHP-02 : CommitTrans si la transaction n'a pas encore ete resolue
+							// (cas: tab[7..9] vides -> pas de INSERT DICO -> transaction toujours ouverte)
+							if (!$trans_committed) {
+								$this->conn->CommitTrans();
+							}
 							array_push($tab, '<span class="success">OK'.$regroup_warning.'</span>'); 	
 							$logData .= ";OK".$regroup_warning;
 						}							
