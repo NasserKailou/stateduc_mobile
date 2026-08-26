@@ -474,12 +474,8 @@ $app->get('/test/', function () use($app) {
     echo json_encode($info, JSON_PRETTY_PRINT);
 });
 
-$app->post('/updateScore/:id', function($id) use($app) { 
-echo $id; 
-$allPostVars = $app->request->post();
-echo "<pre>"; print_r($allPostVars);
-
-});
+// AK-CLEANUP: route /updateScore \u00e9tait du code debug (echo $id + print_r) \u2014 d\u00e9sactiv\u00e9e
+// $app->post('/updateScore/:id', function($id) use($app) { ... });
 
 $app->run();
  

@@ -474,6 +474,43 @@ class ApiService {
     }
   }
 
+  // ─── AK-YEAR-MULTI-02 : Année active du serveur ───────────────────────────
+  //
+  // Consulte le nouvel endpoint GET /annees_ws.php/active/:login qui retourne
+  // l'année active de $_SESSION['annee'] côté serveur.
+  //
+  // Utilisé par _checkYearConsistency() dans DataEntryProvider avant tout envoi
+  // ou rechargement pour s'assurer que l'année mobile == année serveur.
+  //
+  // Retourne ({code: int, libelle: String}) ou lance une exception si :
+  //   - erreur réseau (pas de connexion)
+  //   - le serveur retourne se_status KO (année non définie en session)
+  //   - la réponse ne peut pas être parsée
+  //
+  // L'appelant doit catcher les exceptions — un échec doit BLOQUER l'opération
+  // (comportement fail-safe requis par AK-YEAR-MULTI-02).
+  Future<({int code, String libelle})> fetchServerActiveYear(String login) async {
+    final encodedLogin = Uri.encodeComponent(login);
+    // _get() décode se_data et lève une ApiException si se_status == KO
+    final data = await _get('annees_ws.php/active/$encodedLogin');
+    // data est le contenu de se_data — un Map avec 'code' et 'libelle'
+    if (data is Map<String, dynamic>) {
+      final code    = (data['code']    as num?)?.toInt() ?? 0;
+      final libelle = (data['libelle'] as String?)       ?? '';
+      if (code <= 0) {
+        throw ApiException(
+          'Année active serveur non définie (code=$code). '
+          'Vérifiez la configuration du serveur.',
+        );
+      }
+      debugPrint('[ApiService] fetchServerActiveYear: code=$code libelle=$libelle');
+      return (code: code, libelle: libelle);
+    }
+    throw ApiException(
+      'Réponse inattendue de annees_ws.php/active : $data',
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // AUTHENTICATION
   // Source JS: users.js
@@ -608,8 +645,16 @@ class ApiService {
   //   Response se_data: [ { id, nom, debut, fin, statut, typeRegroups }, ... ]
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Future<List<Campaign>> getAvailableCampaigns(String userId) async {
-    final data = await _get('user_camp.php/new_camp/$userId/1');
+  // AK-CAMP-03 : ajout du paramètre optionnel [yearCode] (CODE_TYPE_ANNEE).
+  // Quand l'app mobile passe l'année active, la route 3-segments est utilisée :
+  //   GET /user_camp.php/new_camp/{userId}/1/{yearCode}
+  // Le serveur retourne alors les campagnes de cette année spécifique,
+  // indépendamment de l'année par défaut sélectionnée côté serveur.
+  // Si yearCode est vide/0, la route 2-segments (comportement original) est utilisée.
+  Future<List<Campaign>> getAvailableCampaigns(String userId, {String yearCode = ''}) async {
+    // AK-CAMP-03 : passe l'année active mobile en 3e segment si valide
+    final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '';
+    final data = await _get('user_camp.php/new_camp/$userId/1$anneeSegment');
     if (data is List) {
       return data.map((c) => Campaign.fromJson(c)).toList();
     }

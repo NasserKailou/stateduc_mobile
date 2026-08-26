@@ -26,9 +26,14 @@ class _LoadCampaignScreenState extends State<LoadCampaignScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       if (auth.user != null) {
+        // AK-CAMP-03 : passe l'année active mobile pour que le serveur
+        // filtre les campagnes par année (et non plus par $_SESSION['annee']).
         context
             .read<CampaignProvider>()
-            .fetchServerCampaigns(auth.user!.idUser);
+            .fetchServerCampaigns(
+              auth.user!.idUser,
+              yearCode: auth.effectiveYearCode,
+            );
       }
     });
   }
@@ -96,9 +101,13 @@ class _LoadCampaignScreenState extends State<LoadCampaignScreen> {
         const Text('Aucune campagne disponible'),
         const SizedBox(height: 12),
         ElevatedButton.icon(
+          // AK-CAMP-03 : passe l'année active mobile lors de l'actualisation.
           onPressed: (auth.user == null || fetching)
               ? null
-              : () => camps.fetchServerCampaigns(auth.user!.idUser),
+              : () => camps.fetchServerCampaigns(
+                    auth.user!.idUser,
+                    yearCode: auth.effectiveYearCode,
+                  ),
           icon: fetching
               ? const SizedBox(
                   width: 18,

@@ -34,25 +34,54 @@ $status_ko = $GLOBALS['PARAM_WS']['STATUS_KO'];
 
 //$app->add(new \HttpAuth());
 
- // cherche les nouvelles campagnes disponibles pour un utilisateur
-$app->get('/new_camp/:user_id/:id_period', function ($user_id, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+ // PARTIE 3 : cherche les nouvelles campagnes disponibles pour un utilisateur.
+// AK-CAMP-03 : deux routes pour le même endpoint :
+//   Route A (MOBILE) : /new_camp/:user_id/:id_period/:id_annee
+//     Le mobile passe son année active en 3e segment.
+//     Si id_annee = 0 ou vide, fallback sur $_SESSION['annee'].
+//   Route B (WEB / compatibilité) : /new_camp/:user_id/:id_period
+//     Le client web n'envoie que 2 segments -> utilise $_SESSION['annee'].
+// L'année de collecte est ainsi pilotée par le mobile, indépendamment
+// de l'année par défaut serveur sélectionnée par l'administrateur.
+
+/**
+ * AK-CAMP-03 : Récupère la liste des campagnes disponibles pour un agent.
+ *
+ * @param int    $user_id  ID de l'utilisateur (DICO_FIXE_REGROUPEMENT.ID_USER)
+ * @param int    $id_period Période de collecte
+ * @param mixed  $id_annee  Année de collecte (CODE_TYPE_ANNEE) ou 0/vide = année serveur
+ */
+function _new_camp_handler($user_id, $id_period, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
 	$status = $GLOBALS['PARAM_WS']['OK'];
-	
+
 	$camp_list = array();
-	$id_year = $_SESSION['annee'];
+
+	// AK-CAMP-03 : détermination de l'année active.
+	// Si l'app mobile passe un id_annee valide (>0), on l'utilise.
+	// Sinon on tombe sur l'année de session serveur (comportement original).
+	$id_annee_int = intval($id_annee);
+	if ($id_annee_int > 0) {
+		$id_year = $id_annee_int;
+		error_log('[user_camp] new_camp : année MOBILE passée : ' . $id_year);
+	} else {
+		$id_year = $_SESSION['annee'];
+		error_log('[user_camp] new_camp : année SERVEUR (session) utilisée : ' . $id_year);
+	}
+
 	$requete = "SELECT DISTINCT ID_CAMPAGNE, ID_TYPE_REGROUP, ID_TYPE_REGROUP_PARENTS
 				FROM DICO_FIXE_REGROUPEMENT
 				WHERE ID_USER=".$user_id."
         		AND ID_ANNEE=".$id_year."   
         		AND ID_PERIODE=".$id_period." 
 				ORDER BY ID_CAMPAGNE;";
+
+	error_log('[user_camp] new_camp : SQL = ' . $requete);
   
 	$camps    = $GLOBALS['conn_dico']->GetAll($requete); 
 	
 	//$camps =	array_change_key_case_recursive($camps);
 	$id_camps = array();
 	$type_regroups = array();
-	//print_r($camps);
 	if (count($camps) > 0) {
 		foreach ($camps as $row) {
 			$id_camp = $row["ID_CAMPAGNE"];
@@ -87,19 +116,29 @@ $app->get('/new_camp/:user_id/:id_period', function ($user_id, $id_period) use (
 			$requete = "SELECT ".$GLOBALS['PARAM']['TYPE_RATTACHEMENT'].".*
 						FROM ".$GLOBALS['PARAM']['TYPE_RATTACHEMENT']."
 						WHERE ".$GLOBALS['PARAM']['TYPE_RATTACHEMENT'].".".$GLOBALS['PARAM']['CODE']."_".$GLOBALS['PARAM']['TYPE_RATTACHEMENT']."=".$id_camp.";";
-			//print_r($type_regroups);
 			$camp = $GLOBALS['conn']->GetAll($requete); 
 			$type_regroups[$id_camp] = array_values($type_regroups[$id_camp]);
-			
 
 			$camp_list[] = array("id"=>$id_camp, "nom"=>utf8_encode(trim($camp[0][$GLOBALS['PARAM']['LIBELLE']."_".$GLOBALS['PARAM']['TYPE_RATTACHEMENT']])), "debut"=>"", "fin"=>"", "statut"=>2, "typeregroups" =>implode(",", $type_regroups[$id_camp]));
 		}
 	}
 	$camp_list =	array_change_key_case_recursive($camp_list);
+	error_log('[user_camp] new_camp : ' . count($camp_list) . ' campagne(s) retournée(s) pour user=' . $user_id . ' annee=' . $id_year);
 	$rps = array($lib_status=>$status_ok,$lib_message=>$status,$lib_data=>$camp_list);
-	//recherche les nouvelles campagnes pour un utilisateur
 	echo json_encode($rps);
+}
+
+// Route A (MOBILE) : année passée en 3e segment (:id_annee)
+// AK-CAMP-03 : cette route est appelée par Flutter avec l'année active mobile.
+$app->get('/new_camp/:user_id/:id_period/:id_annee', function ($user_id, $id_period, $id_annee) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+	_new_camp_handler($user_id, $id_period, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko);
 });
+
+// Route B (COMPATIBILITÉ WEB) : 2 segments seulement, année depuis $_SESSION['annee']
+$app->get('/new_camp/:user_id/:id_period', function ($user_id, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
+	_new_camp_handler($user_id, $id_period, 0, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko);
+});
+
 
 // cherche les syst�mes concern�s par une campagne donn�es pour un utilisateur
 $app->get('/sys_camp/:user_id/:id_camp', function ($user_id, $id_camp) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {

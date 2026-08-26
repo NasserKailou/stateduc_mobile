@@ -9,21 +9,57 @@ $importResult = array();
 $listUserFileName = "";
 
 // ── fix AK-PHP-02 (simplifié) : Mise à jour ID_ANNEE dans DICO_FIXE_REGROUPEMENT ──
+// AK-BUG-05 : CORRECTION CRITIQUE — restriction aux agents mobiles (id_groupe = 4) uniquement.
+// Le bug précédent exécutait UPDATE DICO_FIXE_REGROUPEMENT SET ID_ANNEE = X sans filtre,
+// ce qui mettait à jour l'année de collecte de TOUS les utilisateurs (superviseurs, admins…).
+// Correction : le UPDATE est désormais limité aux ID_USER dont CODE_GROUPE = 4 dans ADMIN_USERS.
 $ak_update_message = '';
 $ak_update_class   = '';
 if (isset($_POST['ak_update_annee'])) {
     $new_annee_simple = intval($_POST['ak_new_annee_simple']);
     if ($new_annee_simple > 0) {
-        $sql_upd = 'UPDATE DICO_FIXE_REGROUPEMENT SET ID_ANNEE = ' . $new_annee_simple;
-        $GLOBALS['conn_dico']->Execute($sql_upd);
-        $ak_update_message = 'ID_ANNEE mis &agrave; jour vers ' . $new_annee_simple . ' pour tous les agents.';
-        $ak_update_class   = 'success';
+        // AK-BUG-05 : Filtre strict sur id_groupe = 4 (agents mobiles uniquement).
+        // La sous-requête IN sélectionne uniquement les CODE_USER dont CODE_GROUPE = 4.
+        // Les superviseurs (groupe 1, 2, 3) et administrateurs ne sont PAS affectés.
+        $sql_upd = 'UPDATE DICO_FIXE_REGROUPEMENT'
+                 . ' SET ID_ANNEE = ' . $new_annee_simple
+                 . ' WHERE ID_USER IN ('
+                 .   'SELECT CODE_USER FROM ADMIN_USERS'
+                 .   ' WHERE CODE_GROUPE = 4'
+                 . ')';
+        // Journaliser la requête pour diagnostic
+        error_log('[gestion_user] AK-BUG-05 : UPDATE agents mobiles — SQL: ' . $sql_upd);
+        $exec_result = $GLOBALS['conn_dico']->Execute($sql_upd);
+        if ($exec_result === false) {
+            $db_err = method_exists($GLOBALS['conn_dico'], 'ErrorMsg')
+                ? $GLOBALS['conn_dico']->ErrorMsg() : 'erreur inconnue';
+            error_log('[gestion_user] AK-BUG-05 : ERREUR SQL — ' . $db_err);
+            $ak_update_message = 'Erreur lors de la mise &agrave; jour : ' . htmlspecialchars(substr($db_err, 0, 200));
+            $ak_update_class   = 'error';
+        } else {
+            // Récupérer le libellé de l'année pour un message plus explicite
+            $col_lib  = $GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE']; // LIBELLE_TYPE_ANNEE
+            $col_code = $GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_ANNEE'];    // CODE_TYPE_ANNEE
+            $sql_lib  = 'SELECT '.$col_lib.' FROM '.$GLOBALS['PARAM']['TYPE_ANNEE']
+                      . ' WHERE '.$col_code.' = '.$new_annee_simple;
+            // TYPE_ANNEE est dans la base principale (conn), pas dans conn_dico
+            $conn_main = isset($GLOBALS['conn_main']) ? $GLOBALS['conn_main'] : null;
+            $lib_annee = '';
+            if ($conn_main) {
+                $lib_annee = $conn_main->GetOne($sql_lib);
+            }
+            $label_annee = $lib_annee ? htmlspecialchars($lib_annee) : $new_annee_simple;
+            $ak_update_message = 'Ann&eacute;e de collecte des agents mobiles (groupe 4) mise &agrave; jour vers '
+                               . $label_annee . '.';
+            $ak_update_class   = 'success';
+            error_log('[gestion_user] AK-BUG-05 : mise à jour réussie vers annee=' . $new_annee_simple);
+        }
     } else {
         $ak_update_message = 'Veuillez s&eacute;lectionner une ann&eacute;e valide.';
         $ak_update_class   = 'error';
     }
 }
-// ── fin fix AK-PHP-02 ────────────────────────────────────────────────────────
+// ── fin fix AK-PHP-02 / AK-BUG-05 ───────────────────────────────────────────
 
 if (isset($_POST["import"])) {
 
@@ -193,10 +229,11 @@ if (isset($_POST["import"])) {
 	}
 	$html .= '</select>';
 
-	// Bouton unique
+	// AK-BUG-05 : message de confirmation précisant que seuls les agents mobiles (groupe 4) sont affectés
 	$html .= '<button type="submit" name="ak_update_annee" value="1" class="btn-submit" style="background:#2980b9;padding:6px 18px;" ';
-	$html .= 'onclick="return confirm(\'Confirmer la mise \u00e0 jour de l\\\'\u00e9ann\u00e9e pour tous les agents ?\');">';
-	$html .= 'Migrer les users</button>';
+	$html .= 'onclick="return confirm(\'Confirmer la mise à jour de l\'année de collecte des agents mobiles (groupe 4) uniquement ?\')">'
+;
+	$html .= 'Migrer les agents mobiles (groupe 4)</button>';
 
 	$html .= '</div>';
 	$html .= '</form>';

@@ -37,6 +37,10 @@ import '../models/school_year.dart';
 ///   v5 : ajout colonne sql_assoc dans dico_regle_theme_assoc (Session 52 Fix b)
 ///   v6 : ajout colonne lib_localisation dans schools (Session 53 Fix localisation)
 ///   v7 : ajout table school_years + clé active_year dans settings (AK-YEAR-01)
+///   v8 : ajout colonne code_type_annee dans collected_data (AK-YEAR-MULTI-01)
+///        Gestion pluriannuelle : chaque saisie est désormais indexée par l'année
+///        active (CODE_TYPE_ANNEE). Migration des lignes existantes via id_year
+///        de la table campaigns.
 ///
 /// TABLE CRITIQUE — coherence_rules :
 ///   Stocke les règles téléchargées depuis data_rules.php pour l'évaluation offline.
@@ -44,7 +48,8 @@ import '../models/school_year.dart';
 ///
 /// TABLE CRITIQUE — collected_data :
 ///   Stocke toutes les saisies de l'agent de collecte (field_name → field_value).
-///   Clé unique : (id_camp, id_etab, id_qst, COALESCE(id_filter,''), field_name)
+///   Clé unique v7 : (id_camp, id_etab, id_qst, COALESCE(id_filter,''), field_name)
+///   Clé unique v8 : (code_type_annee, id_camp, id_etab, id_qst, COALESCE(id_filter,''), field_name)
 ///   Champ is_sent=1 après envoi serveur réussi.
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -63,7 +68,7 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 7,
+      version: 8,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
@@ -121,6 +126,62 @@ class DatabaseService {
       // La clé settings 'active_year_code' sera créée lors du premier
       // chargement de l'onglet Année (valeur par défaut = user.codeyear).
       await _createSchoolYearsTable(db);
+    }
+    if (oldVersion < 8) {
+      // v8 : AK-YEAR-MULTI-01 — gestion pluriannuelle des formulaires.
+      //
+      // 1. Ajout de la colonne code_type_annee dans collected_data.
+      //    Valeur par défaut '' pour compatibilité avec les lignes existantes.
+      try {
+        await db.execute(
+          "ALTER TABLE collected_data ADD COLUMN code_type_annee TEXT NOT NULL DEFAULT ''",
+        );
+      } catch (_) {
+        // Colonne peut déjà exister si la DB a été recréée depuis v8
+      }
+
+      // 2. Migration des lignes existantes : retrouver l'année via la campagne.
+      //    On met à jour code_type_annee avec id_year de la table campaigns
+      //    pour chaque ligne de collected_data dont l'id_camp correspond.
+      //    Les lignes sans campagne correspondante conservent code_type_annee = ''.
+      try {
+        await db.execute(
+          '''
+          UPDATE collected_data
+          SET code_type_annee = COALESCE(
+            (SELECT c.id_year FROM campaigns c WHERE c.id_camp = collected_data.id_camp),
+            ''
+          )
+          WHERE code_type_annee = ''
+          ''',
+        );
+      } catch (e) {
+        debugPrint('[DBService] v8 migration: UPDATE code_type_annee failed: $e');
+      }
+
+      // 3. Reconstruction de l'index unique en intégrant code_type_annee.
+      //    On supprime l'ancien index et on crée le nouveau avec code_type_annee en tête.
+      //    SQLite ne supporte pas ALTER INDEX — il faut DROP + CREATE.
+      //    NOTE : l'ancienne contrainte unique (sans code_type_annee) est supprimée ;
+      //    le nouvel index permet les doublons inter-années (même camp/etab/qst/filter
+      //    pour deux années différentes).
+      try {
+        await db.execute('DROP INDEX IF EXISTS idx_collected_data_key');
+      } catch (_) {}
+      try {
+        await db.execute(
+          '''
+          CREATE UNIQUE INDEX idx_collected_data_key
+            ON collected_data (
+              code_type_annee,
+              id_camp, id_etab, id_qst,
+              COALESCE(id_filter,''), field_name
+            )
+          ''',
+        );
+      } catch (e) {
+        debugPrint('[DBService] v8 migration: CREATE INDEX failed: $e');
+      }
     }
   }
 
@@ -276,23 +337,29 @@ class DatabaseService {
     ''');
 
     // ─── Collected data (stm_EtabCollectData_{etab}_{qst}[_{filter}]) ─────
-    // Key pattern: id_camp + id_etab + id_qst + id_filter (nullable) + field_name → value
+    // Key pattern: code_type_annee + id_camp + id_etab + id_qst + id_filter (nullable) + field_name → value
+    // AK-YEAR-MULTI-01 (v8) : code_type_annee indexe chaque saisie par l'année active.
     await db.execute('''
       CREATE TABLE collected_data (
-        id          INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_camp     TEXT NOT NULL,
-        id_etab     TEXT NOT NULL,
-        id_qst      TEXT NOT NULL,
-        id_filter   TEXT,
-        field_name  TEXT NOT NULL,
-        field_value TEXT,
-        is_sent     INTEGER NOT NULL DEFAULT 0,
-        updated_at  TEXT NOT NULL
+        id                INTEGER PRIMARY KEY AUTOINCREMENT,
+        code_type_annee   TEXT NOT NULL DEFAULT '',
+        id_camp           TEXT NOT NULL,
+        id_etab           TEXT NOT NULL,
+        id_qst            TEXT NOT NULL,
+        id_filter         TEXT,
+        field_name        TEXT NOT NULL,
+        field_value       TEXT,
+        is_sent           INTEGER NOT NULL DEFAULT 0,
+        updated_at        TEXT NOT NULL
       )
     ''');
     await db.execute('''
       CREATE UNIQUE INDEX idx_collected_data_key
-        ON collected_data (id_camp, id_etab, id_qst, COALESCE(id_filter,''), field_name)
+        ON collected_data (
+          code_type_annee,
+          id_camp, id_etab, id_qst,
+          COALESCE(id_filter,''), field_name
+        )
     ''');
     await db.execute('''
       CREATE INDEX idx_collected_data_etab_qst
@@ -1585,27 +1652,42 @@ class DatabaseService {
   }
 
   /// Loads all field/value pairs for one school + question [+ optional filter].
+  ///
+  /// AK-YEAR-MULTI-01 : [codeTypeAnnee] filtre les données par année active.
+  /// Si vide ou null, retourne les données sans restriction d'année (compatibilité
+  /// descendante et cas spéciaux comme getAllCollectedDataForCoherence).
   Future<Map<String, String>> getCollectedData({
     required String idCamp,
     required String idEtab,
     required String idQst,
     String? idFilter,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    // Construction du filtre année : si codeTypeAnnee non vide, filtre strict
+    final anneeFilter = codeTypeAnnee.isNotEmpty
+        ? ' AND code_type_annee = ?'
+        : '';
     List<Map<String, Object?>> rows;
     if (idFilter == null) {
+      final whereArgs = codeTypeAnnee.isNotEmpty
+          ? [idCamp, idEtab, idQst, codeTypeAnnee]
+          : [idCamp, idEtab, idQst];
       rows = await db.query(
         'collected_data',
         where:
-            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter IS NULL',
-        whereArgs: [idCamp, idEtab, idQst],
+            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter IS NULL$anneeFilter',
+        whereArgs: whereArgs,
       );
     } else {
+      final whereArgs = codeTypeAnnee.isNotEmpty
+          ? [idCamp, idEtab, idQst, idFilter, codeTypeAnnee]
+          : [idCamp, idEtab, idQst, idFilter];
       rows = await db.query(
         'collected_data',
         where:
-            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?',
-        whereArgs: [idCamp, idEtab, idQst, idFilter],
+            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?$anneeFilter',
+        whereArgs: whereArgs,
       );
     }
     final result = <String, String>{};
@@ -1627,17 +1709,26 @@ class DatabaseService {
   // Retourne un Map { "FIELD_NAME#FILTER_ID" → value } pour les données filtrées
   // et { "FIELD_NAME" → value } pour les données sans filtre.
   // CoherenceEvaluator._sumFieldAcrossAllFilters() comprend les deux formats.
+  //
+  // AK-YEAR-MULTI-01 (v8) : [codeTypeAnnee] filtre par année active.
+  // Le serveur filtre par CODE_ANNEE dans ses SUM() — on reproduit ce comportement.
+  // Si vide, aucun filtre (compatibilité tests / données pré-v8).
   // ═══════════════════════════════════════════════════════════════════════════
   Future<Map<String, String>> getAllCollectedDataForCoherence({
     required String idCamp,
     required String idEtab,
     required String idQst,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    final anneeFilter = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+    final whereArgs = codeTypeAnnee.isNotEmpty
+        ? [idCamp, idEtab, idQst, codeTypeAnnee]
+        : [idCamp, idEtab, idQst];
     final rows = await db.query(
       'collected_data',
-      where: 'id_camp = ? AND id_etab = ? AND id_qst = ?',
-      whereArgs: [idCamp, idEtab, idQst],
+      where: 'id_camp = ? AND id_etab = ? AND id_qst = ?$anneeFilter',
+      whereArgs: whereArgs,
     );
     final result = <String, String>{};
     for (final r in rows) {
@@ -1670,16 +1761,26 @@ class DatabaseService {
   // Retourne un Map { "FIELD_NAME" → somme de toutes les occurrences } sous forme
   // de String. En cas de champs homonymes sur plusieurs filtres/questions, les
   // valeurs numériques sont SOMMÉES (comportement coherent avec les SUM() du serveur).
+  //
+  // AK-YEAR-MULTI-01 (v8) : [codeTypeAnnee] filtre par année active.
+  // Le serveur filtre par CODE_ANNEE — on reproduit ce comportement pour éviter
+  // d'additionner des données de plusieurs années (faux positifs inter-années).
+  // Si vide, aucun filtre (compatibilité tests / données pré-v8).
   // ═══════════════════════════════════════════════════════════════════════════
   Future<Map<String, String>> getAllCollectedDataForCampEtab({
     required String idCamp,
     required String idEtab,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    final anneeFilter = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+    final whereArgs = codeTypeAnnee.isNotEmpty
+        ? [idCamp, idEtab, codeTypeAnnee]
+        : [idCamp, idEtab];
     final rows = await db.query(
       'collected_data',
-      where: 'id_camp = ? AND id_etab = ?',
-      whereArgs: [idCamp, idEtab],
+      where: 'id_camp = ? AND id_etab = ?$anneeFilter',
+      whereArgs: whereArgs,
     );
     // Accumulate numeric values — same field name may appear across
     // multiple questions/filters: sum them to mirror server SUM() behaviour.
@@ -1698,6 +1799,8 @@ class DatabaseService {
   }
 
   /// Saves (upsert) a single field value.
+  ///
+  /// AK-YEAR-MULTI-01 : [codeTypeAnnee] indexe la saisie par l'année active.
   Future<void> saveCollectedField({
     required String idCamp,
     required String idEtab,
@@ -1705,11 +1808,13 @@ class DatabaseService {
     String? idFilter,
     required String fieldName,
     required String fieldValue,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
     await db.insert(
       'collected_data',
       {
+        'code_type_annee': codeTypeAnnee,  // AK-YEAR-MULTI-01
         'id_camp': idCamp,
         'id_etab': idEtab,
         'id_qst': idQst,
@@ -1724,12 +1829,15 @@ class DatabaseService {
   }
 
   /// Saves a full map of field→value pairs in one transaction.
+  ///
+  /// AK-YEAR-MULTI-01 : [codeTypeAnnee] indexe toutes les saisies par l'année active.
   Future<void> saveCollectedData({
     required String idCamp,
     required String idEtab,
     required String idQst,
     String? idFilter,
     required Map<String, String> data,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
     final now = DateTime.now().toIso8601String();
@@ -1738,6 +1846,7 @@ class DatabaseService {
         await txn.insert(
           'collected_data',
           {
+            'code_type_annee': codeTypeAnnee,  // AK-YEAR-MULTI-01
             'id_camp': idCamp,
             'id_etab': idEtab,
             'id_qst': idQst,
@@ -1754,42 +1863,60 @@ class DatabaseService {
   }
 
   /// Marks all data for a school+question as sent.
+  ///
+  /// AK-YEAR-MULTI-01 : [codeTypeAnnee] cible les lignes de l'année active uniquement.
+  /// Si vide, marque toutes les années (comportement antérieur — compatibilité).
   Future<void> markCollectedDataSent({
     required String idCamp,
     required String idEtab,
     required String idQst,
     String? idFilter,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    final anneeClause = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
     if (idFilter == null) {
+      final whereArgs = codeTypeAnnee.isNotEmpty
+          ? [idCamp, idEtab, idQst, codeTypeAnnee]
+          : [idCamp, idEtab, idQst];
       await db.update(
         'collected_data',
         {'is_sent': 1},
         where:
-            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter IS NULL',
-        whereArgs: [idCamp, idEtab, idQst],
+            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter IS NULL$anneeClause',
+        whereArgs: whereArgs,
       );
     } else {
+      final whereArgs = codeTypeAnnee.isNotEmpty
+          ? [idCamp, idEtab, idQst, idFilter, codeTypeAnnee]
+          : [idCamp, idEtab, idQst, idFilter];
       await db.update(
         'collected_data',
         {'is_sent': 1},
-        where: 'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?',
-        whereArgs: [idCamp, idEtab, idQst, idFilter],
+        where: 'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?$anneeClause',
+        whereArgs: whereArgs,
       );
     }
   }
 
   /// Returns true if there is any unsent data for the given school+question.
+  ///
+  /// AK-YEAR-MULTI-01 : [codeTypeAnnee] filtre par année active si fourni.
   Future<bool> hasUnsentData({
     required String idCamp,
     required String idEtab,
     required String idQst,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    final anneeClause = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+    final whereArgs = codeTypeAnnee.isNotEmpty
+        ? [idCamp, idEtab, idQst, codeTypeAnnee]
+        : [idCamp, idEtab, idQst];
     final rows = await db.query(
       'collected_data',
-      where: 'id_camp = ? AND id_etab = ? AND id_qst = ? AND is_sent = 0',
-      whereArgs: [idCamp, idEtab, idQst],
+      where: 'id_camp = ? AND id_etab = ? AND id_qst = ? AND is_sent = 0$anneeClause',
+      whereArgs: whereArgs,
       limit: 1,
     );
     return rows.isNotEmpty;
@@ -1798,17 +1925,27 @@ class DatabaseService {
   /// Retourne tous les couples distincts (id_etab, id_qst) qui ont des données
   /// collectées pour une campagne donnée (envoyées ou non).
   ///
+  /// AK-YEAR-MULTI-01 : [codeTypeAnnee] filtre par année active si fourni,
+  /// ce qui garantit que l'envoi global ne concerne que l'année en session.
+  ///
   /// Utilisé par [sendAllFormsForCampaign] pour itérer sur tous les formulaires
   /// saisis, même si l'établissement courant n'est pas ouvert dans l'UI.
   Future<List<Map<String, String>>> getDistinctEtabQstWithData(
-      String idCamp) async {
+      String idCamp, {String codeTypeAnnee = ''}) async {
     final db = await database;
     // SELECT DISTINCT pour ne pas envoyer le même formulaire plusieurs fois
     // (plusieurs lignes dans collected_data par formulaire)
-    final rows = await db.rawQuery(
-      'SELECT DISTINCT id_etab, id_qst FROM collected_data WHERE id_camp = ?',
-      [idCamp],
-    );
+    String sql;
+    List<dynamic> sqlArgs;
+    if (codeTypeAnnee.isNotEmpty) {
+      sql = 'SELECT DISTINCT id_etab, id_qst FROM collected_data '
+            'WHERE id_camp = ? AND code_type_annee = ?';
+      sqlArgs = [idCamp, codeTypeAnnee];
+    } else {
+      sql = 'SELECT DISTINCT id_etab, id_qst FROM collected_data WHERE id_camp = ?';
+      sqlArgs = [idCamp];
+    }
+    final rows = await db.rawQuery(sql, sqlArgs);
     return rows
         .map((r) => {
               'id_etab': r['id_etab'] as String? ?? '',
@@ -1819,25 +1956,36 @@ class DatabaseService {
   }
 
   /// Deletes all collected data for a school+question (for reload from server).
+  ///
+  /// AK-YEAR-MULTI-01 : [codeTypeAnnee] cible les lignes de l'année active uniquement.
+  /// Si vide, supprime toutes les années (comportement antérieur).
   Future<void> deleteCollectedData({
     required String idCamp,
     required String idEtab,
     required String idQst,
     String? idFilter,
+    String codeTypeAnnee = '',  // AK-YEAR-MULTI-01
   }) async {
     final db = await database;
+    final anneeClause = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
     if (idFilter == null) {
+      final whereArgs = codeTypeAnnee.isNotEmpty
+          ? [idCamp, idEtab, idQst, codeTypeAnnee]
+          : [idCamp, idEtab, idQst];
       await db.delete(
         'collected_data',
-        where: 'id_camp = ? AND id_etab = ? AND id_qst = ?',
-        whereArgs: [idCamp, idEtab, idQst],
+        where: 'id_camp = ? AND id_etab = ? AND id_qst = ?$anneeClause',
+        whereArgs: whereArgs,
       );
     } else {
+      final whereArgs = codeTypeAnnee.isNotEmpty
+          ? [idCamp, idEtab, idQst, idFilter, codeTypeAnnee]
+          : [idCamp, idEtab, idQst, idFilter];
       await db.delete(
         'collected_data',
         where:
-            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?',
-        whereArgs: [idCamp, idEtab, idQst, idFilter],
+            'id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?$anneeClause',
+        whereArgs: whereArgs,
       );
     }
   }

@@ -603,11 +603,12 @@ class DataEntryProvider extends ChangeNotifier {
         });
         // Sauvegarde en SQLite pour utilisation hors ligne
         await _db.saveCollectedData(
-          idCamp:   idCamp,
-          idEtab:   idEtab,
-          idQst:    question.idQst,
-          idFilter: idFilter,
-          data:     serverStr,
+          idCamp:         idCamp,
+          idEtab:         idEtab,
+          idQst:          question.idQst,
+          idFilter:       idFilter,
+          data:           serverStr,
+          codeTypeAnnee:  _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         // Met à jour en mémoire uniquement si la même question est toujours affichée
         if (_selectedQuestion?.idQst == question.idQst) {
@@ -750,10 +751,11 @@ class DataEntryProvider extends ChangeNotifier {
   Future<void> _loadFormData({String? idFilter}) async {
     if (_idCamp == null || _idEtab == null || _selectedQuestion == null) return;
     _formData = await _db.getCollectedData(
-      idCamp:   _idCamp!,
-      idEtab:   _idEtab!,
-      idQst:    _selectedQuestion!.idQst,
-      idFilter: idFilter,
+      idCamp:        _idCamp!,
+      idEtab:        _idEtab!,
+      idQst:         _selectedQuestion!.idQst,
+      idFilter:      idFilter,
+      codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
     );
   }
 
@@ -924,11 +926,12 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await _db.saveCollectedData(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
-        data:     _formData,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        data:          _formData,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
       _hasUnsavedChanges = false;
       _successMessage    = 'Données sauvegardées localement';
@@ -947,6 +950,70 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AK-YEAR-MULTI-02 — VÉRIFICATION COHÉRENCE ANNÉE MOBILE vs SERVEUR
+  //
+  // Compare l'année active mobile (_codeyear) avec l'année active du serveur
+  // ($_SESSION['annee'] retourné par annees_ws.php/active/:login).
+  //
+  // RÈGLE : si les deux années sont différentes, l'opération est BLOQUÉE avec
+  //   un message bilingue FR/EN clair.
+  //
+  // FAIL-SAFE : si le serveur est injoignable ou retourne une erreur, l'opération
+  //   est aussi BLOQUÉE (principe de refus en cas d'incertitude).
+  //
+  // Retourne true = opération autorisée, false = opération bloquée (_error défini).
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<bool> _checkYearConsistency(User user) async {
+    // Si l'année mobile n'est pas définie, on ne peut pas vérifier → bloquer
+    final mobileCode = int.tryParse(_codeyear ?? '') ?? 0;
+    if (mobileCode <= 0) {
+      _error = 'Année de collecte non définie sur le mobile. '
+               'Sélectionnez une année dans Paramètres puis réessayez.\n'
+               'Collection year not defined on device. '
+               'Please select a year in Settings and try again.';
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      final serverYear = await _api.fetchServerActiveYear(user.login);
+      if (serverYear.code != mobileCode) {
+        // Années différentes — bloquer avec message bilingue précis
+        _error = 'Incohérence d\'année de collecte :\n'
+                 '• Mobile : $_libyear (code $mobileCode)\n'
+                 '• Serveur : ${serverYear.libelle} (code ${serverYear.code})\n'
+                 'Sélectionnez la même année que le serveur dans Paramètres, '
+                 'puis réessayez.\n\n'
+                 'Year mismatch:\n'
+                 '• Device: $_libyear (code $mobileCode)\n'
+                 '• Server: ${serverYear.libelle} (code ${serverYear.code})\n'
+                 'Please match the server year in Settings and try again.';
+        notifyListeners();
+        return false;
+      }
+      debugPrint('[DataEntry] _checkYearConsistency: OK '
+          '(mobile=$mobileCode server=${serverYear.code})');
+      return true;
+    } on ApiException catch (e) {
+      // Le serveur a renvoyé une erreur métier (année non définie côté serveur)
+      _error = 'Impossible de vérifier l\'année du serveur : ${e.message}\n'
+               'Opération annulée par sécurité.\n\n'
+               'Cannot verify server year: ${e.message}\n'
+               'Operation cancelled for safety.';
+      notifyListeners();
+      return false;
+    } catch (e) {
+      // Erreur réseau ou autre — fail-safe : bloquer
+      _error = 'Vérification de l\'année serveur impossible (hors ligne ?).\n'
+               'Vérifiez votre connexion et réessayez.\n\n'
+               'Cannot verify server year (offline?).\n'
+               'Check your connection and try again.';
+      notifyListeners();
+      return false;
+    }
+  }
+
   // ENVOYER AU SERVEUR — réplique stmPageEtab.saveQstOnServer()
   //
   // POST /data_save.php/theme_save/{login}/{campId}/{sysId}/{qstId}/{etabId}/{filter}/0
@@ -955,10 +1022,11 @@ class DataEntryProvider extends ChangeNotifier {
   // Pour la première question : injecte LOC_REG_0={etab.idRegroup} si absent.
   //
   // Workflow :
-  //   1. Sauvegarde locale (assure la persistance)
-  //   2. POST au serveur
-  //   3. Si succès : marque is_sent=1 dans SQLite + contrôle de cohérence serveur
-  //   4. Si échec : _error avec message
+  //   1. Vérification cohérence année (AK-YEAR-MULTI-02)
+  //   2. Sauvegarde locale (assure la persistance)
+  //   3. POST au serveur
+  //   4. Si succès : marque is_sent=1 dans SQLite + contrôle de cohérence serveur
+  //   5. Si échec : _error avec message
   //
   // Le yearCode est injecté dans l'URL pour contourner l'absence de session
   // PHP côté mobile.
@@ -976,6 +1044,9 @@ class DataEntryProvider extends ChangeNotifier {
         _selectedQuestion == null) {
       return false;
     }
+
+    // AK-YEAR-MULTI-02 : vérification cohérence année avant tout envoi
+    if (!await _checkYearConsistency(user)) return false;
 
     // Sauvegarde locale d'abord (assure la persistance même si l'envoi échoue)
     await saveLocally();
@@ -1007,7 +1078,7 @@ class DataEntryProvider extends ChangeNotifier {
         formData:         _formData,
         etabRegroupId:    _idRegroupEtab,     // pour LOC_REG_0 (première question)
         isFirstQuestion:  _isFirstQuestion,
-        yearCode:         user.codeyear,      // contournement session PHP absente
+        yearCode:         _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
         onRetry: (attempt) {
           // Callback appelé par _withRetry avant chaque nouvelle tentative
           _sendAttempt = attempt + 1;
@@ -1017,10 +1088,11 @@ class DataEntryProvider extends ChangeNotifier {
       if (ok) {
         // Marque les données comme envoyées dans SQLite
         await _db.markCollectedDataSent(
-          idCamp:   _idCamp!,
-          idEtab:   _idEtab!,
-          idQst:    _selectedQuestion!.idQst,
-          idFilter: _selectedFilter?.idFilter,
+          idCamp:        _idCamp!,
+          idEtab:        _idEtab!,
+          idQst:         _selectedQuestion!.idQst,
+          idFilter:      _selectedFilter?.idFilter,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         _successMessage = 'Données envoyées avec succès';
         notifyListeners();
@@ -1040,7 +1112,7 @@ class DataEntryProvider extends ChangeNotifier {
             qstId:    _selectedQuestion!.idQst,
             etabId:   _idEtab!,
             filter:   serverFilter,   // SESSION 58: filtre effectif serveur
-            yearCode: user.codeyear,
+            yearCode: _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
         } catch (_) {
           _coherenceErrors = []; // Non fatal — ignoré silencieusement
@@ -1061,10 +1133,11 @@ class DataEntryProvider extends ChangeNotifier {
       debugPrint('[DataEntry] KOSAVE pour thème ${e.themeId} : ${e.toString()}');
       try {
         await _db.markCollectedDataSent(
-          idCamp:   _idCamp!,
-          idEtab:   _idEtab!,
-          idQst:    _selectedQuestion!.idQst,
-          idFilter: _selectedFilter?.idFilter,
+          idCamp:        _idCamp!,
+          idEtab:        _idEtab!,
+          idQst:         _selectedQuestion!.idQst,
+          idFilter:      _selectedFilter?.idFilter,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
       } catch (_) { /* non fatal */ }
       _warningMessage = '⚠ Données envoyées mais non enregistrées sur le serveur '
@@ -1226,6 +1299,10 @@ class DataEntryProvider extends ChangeNotifier {
         _selectedQuestion == null) {
       return false;
     }
+
+    // AK-YEAR-MULTI-02 : vérification cohérence année avant rechargement serveur
+    if (!await _checkYearConsistency(user)) return false;
+
     _isReloading    = true;
     _error          = null;
     _successMessage = null;
@@ -1272,24 +1349,27 @@ class DataEntryProvider extends ChangeNotifier {
 
       // Remplace les données locales par les données serveur
       await _db.deleteCollectedData(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
       await _db.saveCollectedData(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
-        data:     serverFieldsStr,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        data:          serverFieldsStr,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
       // Marque comme synchronisé (données = serveur)
       await _db.markCollectedDataSent(
-        idCamp:   _idCamp!,
-        idEtab:   _idEtab!,
-        idQst:    _selectedQuestion!.idQst,
-        idFilter: _selectedFilter?.idFilter,
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
 
       _formData          = serverFieldsStr;
@@ -1355,10 +1435,11 @@ class DataEntryProvider extends ChangeNotifier {
         final q = questionsToSend[i];
         // Charge les données collectées pour cette question depuis SQLite
         final data = await _db.getCollectedData(
-          idCamp:   _idCamp!,
-          idEtab:   _idEtab!,
-          idQst:    q.idQst,
-          idFilter: null,
+          idCamp:        _idCamp!,
+          idEtab:        _idEtab!,
+          idQst:         q.idQst,
+          idFilter:      null,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         if (data.isEmpty) {
           // Aucune donnée locale pour ce formulaire → ignore
@@ -1380,15 +1461,16 @@ class DataEntryProvider extends ChangeNotifier {
             formData:        data,
             etabRegroupId:   _idRegroupEtab,
             isFirstQuestion: isFirst,
-            yearCode:        user.codeyear,
+            yearCode:        _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
           results[q.idQst] = ok;
           if (ok) {
             await _db.markCollectedDataSent(
-              idCamp:   _idCamp!,
-              idEtab:   _idEtab!,
-              idQst:    q.idQst,
-              idFilter: null,
+              idCamp:        _idCamp!,
+              idEtab:        _idEtab!,
+              idQst:         q.idQst,
+              idFilter:      null,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           }
         } on KosaveException catch (e) {
@@ -1398,10 +1480,11 @@ class DataEntryProvider extends ChangeNotifier {
           results[q.idQst] = true;  // Compté comme envoyé (reçu par le serveur)
           try {
             await _db.markCollectedDataSent(
-              idCamp:   _idCamp!,
-              idEtab:   _idEtab!,
-              idQst:    q.idQst,
-              idFilter: null,
+              idCamp:        _idCamp!,
+              idEtab:        _idEtab!,
+              idQst:         q.idQst,
+              idFilter:      null,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           } catch (_) { /* non fatal */ }
           _warningMessage = (_warningMessage == null ? '' : '$_warningMessage\n') +
@@ -1465,7 +1548,10 @@ class DataEntryProvider extends ChangeNotifier {
     final results = <String, bool>{};
 
     // Récupère tous les couples (etab, qst) qui ont des données pour la campagne
-    final etabQstList = await _db.getDistinctEtabQstWithData(idCamp);
+    final etabQstList = await _db.getDistinctEtabQstWithData(
+      idCamp,
+      codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
+    );
     if (etabQstList.isEmpty) {
       _successMessage = 'Aucune donnée locale à envoyer pour cette campagne.';
       notifyListeners();
@@ -1489,10 +1575,11 @@ class DataEntryProvider extends ChangeNotifier {
 
         // Charge les données pour ce couple (etab, qst)
         final data = await _db.getCollectedData(
-          idCamp:   idCamp,
-          idEtab:   etabId,
-          idQst:    qstId,
-          idFilter: null,
+          idCamp:        idCamp,
+          idEtab:        etabId,
+          idQst:         qstId,
+          idFilter:      null,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         if (data.isEmpty) {
           results[key] = false;
@@ -1510,15 +1597,16 @@ class DataEntryProvider extends ChangeNotifier {
             etabId:   etabId,
             filter:   null,
             formData: data,
-            yearCode: user.codeyear,
+            yearCode: _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
           results[key] = ok;
           if (ok) {
             await _db.markCollectedDataSent(
-              idCamp:   idCamp,
-              idEtab:   etabId,
-              idQst:    qstId,
-              idFilter: null,
+              idCamp:        idCamp,
+              idEtab:        etabId,
+              idQst:         qstId,
+              idFilter:      null,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           }
         } on ApiException catch (e) {
@@ -1571,9 +1659,10 @@ class DataEntryProvider extends ChangeNotifier {
       for (final qstId in qstIds) {
         // Récupère les données collectées pour (campagne, établissement, question)
         final data = await _db.getCollectedData(
-          idCamp: idCamp,
-          idEtab: etabId,
-          idQst:  qstId,
+          idCamp:        idCamp,
+          idEtab:        etabId,
+          idQst:         qstId,
+          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
         );
         if (data.isEmpty) continue;  // pas de données → ignore
 
@@ -1590,14 +1679,15 @@ class DataEntryProvider extends ChangeNotifier {
             filter:          null,
             formData:        data,
             isFirstQuestion: isFirst,
-            yearCode:        user.codeyear, // contournement session PHP
+            yearCode:        _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
           );
           results['${etabId}_$qstId'] = ok;
           if (ok) {
             await _db.markCollectedDataSent(
-              idCamp: idCamp,
-              idEtab: etabId,
-              idQst:  qstId,
+              idCamp:        idCamp,
+              idEtab:        etabId,
+              idQst:         qstId,
+              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
             );
           }
         } catch (_) {

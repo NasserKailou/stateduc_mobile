@@ -561,9 +561,21 @@ class SqlTranslator {
       // en donnant la priorité à l'id_qst courant (règle inter-thème : si le champ
       // n'existe pas dans le questionnaire courant, on prend la valeur d'un autre
       // questionnaire). MAX(id) garantit que SAVEPOINT (inséré en dernier) gagne.
+      //
+      // AK-YEAR-MULTI-01 — filtre code_type_annee dans le CTE :
+      // Depuis la migration v8, collected_data est indexé par (code_type_annee, ...).
+      // Sans ce filtre, les CTE agrégeraient les données de TOUTES les années présentes
+      // en base, causant des faux positifs/négatifs de cohérence inter-années.
+      // Le filtre n'est appliqué que si codeTypeAnnee est non vide (compatibilité
+      // avec les règles qui ignorent l'année et les tests sans contexte).
       final escapedCampStep5 = idCamp.replaceAll("'", "''");
       final escapedEtabStep5 = idEtab.replaceAll("'", "''");
       final escapedQstStep5 = (idQst ?? '').replaceAll("'", "''");
+
+      // Clause année : injectée dans chaque WHERE du CTE si codeTypeAnnee fourni
+      final anneeClause = (codeTypeAnnee != null && codeTypeAnnee.isNotEmpty)
+          ? " AND code_type_annee='${codeTypeAnnee.replaceAll("'", "''")}'"
+          : '';
 
       final String cdCte;
       if (idQst != null && idQst.isNotEmpty) {
@@ -572,39 +584,40 @@ class SqlTranslator {
             "  SELECT field_name, field_value\n"
             "  FROM collected_data\n"
             "  WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
-            "    AND id_qst='$escapedQstStep5'\n"
+            "    AND id_qst='$escapedQstStep5'$anneeClause\n"
             "    AND id IN (\n"
             "      SELECT MAX(id) FROM collected_data\n"
             "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
-            "        AND id_qst='$escapedQstStep5'\n"
+            "        AND id_qst='$escapedQstStep5'$anneeClause\n"
             "      GROUP BY UPPER(field_name)\n"
             "    )\n"
             "  UNION ALL\n"
             "  SELECT field_name, field_value\n"
             "  FROM collected_data\n"
             "  WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
-            "    AND id_qst != '$escapedQstStep5'\n"
+            "    AND id_qst != '$escapedQstStep5'$anneeClause\n"
             "    AND UPPER(field_name) NOT IN (\n"
             "      SELECT UPPER(field_name) FROM collected_data\n"
             "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
-            "        AND id_qst='$escapedQstStep5'\n"
+            "        AND id_qst='$escapedQstStep5'$anneeClause\n"
             "    )\n"
             "    AND id IN (\n"
             "      SELECT MAX(id) FROM collected_data\n"
             "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
-            "        AND id_qst != '$escapedQstStep5'\n"
+            "        AND id_qst != '$escapedQstStep5'$anneeClause\n"
             "      GROUP BY UPPER(field_name)\n"
             "    )\n"
             ")";
       } else {
         // Version sans id_qst (fallback simple : MAX(id) par field_name exact)
+        // AK-YEAR-MULTI-01 : anneeClause appliqué ici aussi
         cdCte = "_cd AS (\n"
             "  SELECT field_name, field_value\n"
             "  FROM collected_data\n"
-            "  WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "  WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'$anneeClause\n"
             "    AND id IN (\n"
             "      SELECT MAX(id) FROM collected_data\n"
-            "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'\n"
+            "      WHERE id_camp='$escapedCampStep5' AND id_etab='$escapedEtabStep5'$anneeClause\n"
             "      GROUP BY UPPER(field_name)\n"
             "    )\n"
             ")";
@@ -1864,6 +1877,7 @@ class CoherenceEvaluator {
       idCamp: idCamp,
       idEtab: idEtab,
       idQst: idQst,
+      codeTypeAnnee: codeTypeAnnee ?? '',  // AK-YEAR-MULTI-01 : filtre année (chemin regex)
     );
     for (final entry in persistedData.entries) {
       final v = double.tryParse(entry.value);
@@ -1873,6 +1887,7 @@ class CoherenceEvaluator {
     final allEtabData = await _db.getAllCollectedDataForCampEtab(
       idCamp: idCamp,
       idEtab: idEtab,
+      codeTypeAnnee: codeTypeAnnee ?? '',  // AK-YEAR-MULTI-01 : filtre année (cross-formó)
     );
     for (final entry in allEtabData.entries) {
       final key = entry.key.toUpperCase();
@@ -1980,11 +1995,16 @@ class CoherenceEvaluator {
           // collected_data.updated_at est TEXT NOT NULL sans DEFAULT →
           // DatabaseException(NOT NULL constraint failed: collected_data.updated_at)
           // → toutes les injections échouaient → 0 champs injectés → S59 neutralisé.
+          //
+          // AK-YEAR-MULTI-01 : inclure code_type_annee (NOT NULL DEFAULT '' depuis v8).
+          // L'omettre déclencherait une erreur de contrainte NOT NULL lors du rawInsert.
+          // On passe codeTypeAnnee ?? '' pour que le SAVEPOINT soit isolé par année.
           await db.execute(
             'INSERT OR REPLACE INTO collected_data '
-            '(id_camp, id_etab, id_qst, id_filter, field_name, field_value, is_sent, updated_at) '
-            'VALUES (?, ?, ?, ?, ?, ?, 0, ?)',
+            '(code_type_annee, id_camp, id_etab, id_qst, id_filter, field_name, field_value, is_sent, updated_at) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)',
             [
+              codeTypeAnnee ?? '',  // AK-YEAR-MULTI-01 : année active
               idCamp,
               idEtab,
               idQst ?? '',
