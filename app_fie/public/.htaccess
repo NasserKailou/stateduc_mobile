@@ -1,0 +1,20 @@
+Options -Indexes
+RewriteEngine On
+
+# Tout sous /public/ → index.php (sauf fichiers/dossiers réels)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Sécurité : interdire accès aux fichiers sensibles
+<FilesMatch "\.(sql|log|env|ini|sh|md|json|lock)$">
+    Require all denied
+</FilesMatch>
+
+# Headers sécurité
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

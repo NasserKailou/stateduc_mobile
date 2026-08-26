@@ -1,0 +1,382 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('(#)Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=7702' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B></B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=2 class='ligne-paire' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=0 class='ligne-paire'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+		<TD ROWSPAN=12 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'><img src='client-side/image/text.php?text=%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B%2B' alt='+++++++++++++++++++++++++++++++++'></TD>
+	</TR>
+	<TR  style='height:25px;'>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_0_0' onClick='MiseEvidenceLigneFrame(0,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_0_1' onClick='MiseEvidenceLigneFrame(0,10)'>$ID_PERSONNEL_0</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_2' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='NOM_PERSONNEL_0' NAME=NOM_PERSONNEL_0 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_3' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='PRENOM_PERSONNEL_0' NAME=PRENOM_PERSONNEL_0 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_4' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_0' NAME=ANNEE_NIASSANCE_PERSONNEL_0 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_5' onClick='MiseEvidenceLigneFrame(0,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_0' NAME=CODE_TYPE_NATIONALITE_0>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_0_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_0_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_0_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_6' onClick='MiseEvidenceLigneFrame(0,10)'><SELECT   ID='CODE_TYPE_QUALIF_0' NAME=CODE_TYPE_QUALIF_0>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_0_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_7' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='DATE_ENGAGEMENT_0' NAME=DATE_ENGAGEMENT_0 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_0"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_8' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='NUMERO_MATRICULE_0' NAME=NUMERO_MATRICULE_0 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_9' onClick='MiseEvidenceLigneFrame(0,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_0' NAME=CODE_TYPE_STATUT_PERSONNEL_0>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_10' onClick='MiseEvidenceLigneFrame(0,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_0' NAME=ANNEE_FORMATION_QUALIF_0 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_0"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_11' onClick='MiseEvidenceLigneFrame(0,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_0' NAME=CODE_TYPE_FONCTION_0>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_12' onClick='MiseEvidenceLigneFrame(0,10)'><SELECT   ID='CODE_TYPE_NIVEAU_0' NAME=CODE_TYPE_NIVEAU_0>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_1_0' onClick='MiseEvidenceLigneFrame(1,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_1_1' onClick='MiseEvidenceLigneFrame(1,10)'>$ID_PERSONNEL_1</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_2' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='NOM_PERSONNEL_1' NAME=NOM_PERSONNEL_1 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_3' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='PRENOM_PERSONNEL_1' NAME=PRENOM_PERSONNEL_1 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_4' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_1' NAME=ANNEE_NIASSANCE_PERSONNEL_1 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_5' onClick='MiseEvidenceLigneFrame(1,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_1' NAME=CODE_TYPE_NATIONALITE_1>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_1_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_1_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_1_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_6' onClick='MiseEvidenceLigneFrame(1,10)'><SELECT   ID='CODE_TYPE_QUALIF_1' NAME=CODE_TYPE_QUALIF_1>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_1_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_7' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='DATE_ENGAGEMENT_1' NAME=DATE_ENGAGEMENT_1 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_1"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_8' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='NUMERO_MATRICULE_1' NAME=NUMERO_MATRICULE_1 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_9' onClick='MiseEvidenceLigneFrame(1,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_1' NAME=CODE_TYPE_STATUT_PERSONNEL_1>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_1_10' onClick='MiseEvidenceLigneFrame(1,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_1' NAME=ANNEE_FORMATION_QUALIF_1 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_1"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_11' onClick='MiseEvidenceLigneFrame(1,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_1' NAME=CODE_TYPE_FONCTION_1>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_1_12' onClick='MiseEvidenceLigneFrame(1,10)'><SELECT   ID='CODE_TYPE_NIVEAU_1' NAME=CODE_TYPE_NIVEAU_1>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_2_0' onClick='MiseEvidenceLigneFrame(2,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_2_1' onClick='MiseEvidenceLigneFrame(2,10)'>$ID_PERSONNEL_2</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_2' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='NOM_PERSONNEL_2' NAME=NOM_PERSONNEL_2 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_3' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='PRENOM_PERSONNEL_2' NAME=PRENOM_PERSONNEL_2 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_4' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_2' NAME=ANNEE_NIASSANCE_PERSONNEL_2 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_5' onClick='MiseEvidenceLigneFrame(2,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_2' NAME=CODE_TYPE_NATIONALITE_2>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_2_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_2_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_2_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_6' onClick='MiseEvidenceLigneFrame(2,10)'><SELECT   ID='CODE_TYPE_QUALIF_2' NAME=CODE_TYPE_QUALIF_2>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_2_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_7' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='DATE_ENGAGEMENT_2' NAME=DATE_ENGAGEMENT_2 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_2"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_8' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='NUMERO_MATRICULE_2' NAME=NUMERO_MATRICULE_2 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_9' onClick='MiseEvidenceLigneFrame(2,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_2' NAME=CODE_TYPE_STATUT_PERSONNEL_2>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_2_10' onClick='MiseEvidenceLigneFrame(2,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_2' NAME=ANNEE_FORMATION_QUALIF_2 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_2"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_11' onClick='MiseEvidenceLigneFrame(2,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_2' NAME=CODE_TYPE_FONCTION_2>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_2_12' onClick='MiseEvidenceLigneFrame(2,10)'><SELECT   ID='CODE_TYPE_NIVEAU_2' NAME=CODE_TYPE_NIVEAU_2>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_3_0' onClick='MiseEvidenceLigneFrame(3,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_3_1' onClick='MiseEvidenceLigneFrame(3,10)'>$ID_PERSONNEL_3</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_2' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='NOM_PERSONNEL_3' NAME=NOM_PERSONNEL_3 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_3' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='PRENOM_PERSONNEL_3' NAME=PRENOM_PERSONNEL_3 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_4' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_3' NAME=ANNEE_NIASSANCE_PERSONNEL_3 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_5' onClick='MiseEvidenceLigneFrame(3,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_3' NAME=CODE_TYPE_NATIONALITE_3>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_3_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_3_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_3_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_6' onClick='MiseEvidenceLigneFrame(3,10)'><SELECT   ID='CODE_TYPE_QUALIF_3' NAME=CODE_TYPE_QUALIF_3>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_3_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_7' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='DATE_ENGAGEMENT_3' NAME=DATE_ENGAGEMENT_3 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_3"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_8' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='NUMERO_MATRICULE_3' NAME=NUMERO_MATRICULE_3 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_9' onClick='MiseEvidenceLigneFrame(3,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_3' NAME=CODE_TYPE_STATUT_PERSONNEL_3>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_3_10' onClick='MiseEvidenceLigneFrame(3,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_3' NAME=ANNEE_FORMATION_QUALIF_3 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_3"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_11' onClick='MiseEvidenceLigneFrame(3,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_3' NAME=CODE_TYPE_FONCTION_3>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_3_12' onClick='MiseEvidenceLigneFrame(3,10)'><SELECT   ID='CODE_TYPE_NIVEAU_3' NAME=CODE_TYPE_NIVEAU_3>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_4_0' onClick='MiseEvidenceLigneFrame(4,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_4_1' onClick='MiseEvidenceLigneFrame(4,10)'>$ID_PERSONNEL_4</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_2' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='NOM_PERSONNEL_4' NAME=NOM_PERSONNEL_4 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_3' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='PRENOM_PERSONNEL_4' NAME=PRENOM_PERSONNEL_4 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_4' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_4' NAME=ANNEE_NIASSANCE_PERSONNEL_4 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_5' onClick='MiseEvidenceLigneFrame(4,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_4' NAME=CODE_TYPE_NATIONALITE_4>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_4_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_4_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_4_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_6' onClick='MiseEvidenceLigneFrame(4,10)'><SELECT   ID='CODE_TYPE_QUALIF_4' NAME=CODE_TYPE_QUALIF_4>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_4_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_7' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='DATE_ENGAGEMENT_4' NAME=DATE_ENGAGEMENT_4 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_4"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_8' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='NUMERO_MATRICULE_4' NAME=NUMERO_MATRICULE_4 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_9' onClick='MiseEvidenceLigneFrame(4,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_4' NAME=CODE_TYPE_STATUT_PERSONNEL_4>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_4_10' onClick='MiseEvidenceLigneFrame(4,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_4' NAME=ANNEE_FORMATION_QUALIF_4 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_4"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_11' onClick='MiseEvidenceLigneFrame(4,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_4' NAME=CODE_TYPE_FONCTION_4>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_4_12' onClick='MiseEvidenceLigneFrame(4,10)'><SELECT   ID='CODE_TYPE_NIVEAU_4' NAME=CODE_TYPE_NIVEAU_4>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_5_0' onClick='MiseEvidenceLigneFrame(5,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_5_1' onClick='MiseEvidenceLigneFrame(5,10)'>$ID_PERSONNEL_5</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_2' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='NOM_PERSONNEL_5' NAME=NOM_PERSONNEL_5 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_3' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='PRENOM_PERSONNEL_5' NAME=PRENOM_PERSONNEL_5 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_4' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_5' NAME=ANNEE_NIASSANCE_PERSONNEL_5 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_5' onClick='MiseEvidenceLigneFrame(5,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_5' NAME=CODE_TYPE_NATIONALITE_5>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_5_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_5_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_5_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_6' onClick='MiseEvidenceLigneFrame(5,10)'><SELECT   ID='CODE_TYPE_QUALIF_5' NAME=CODE_TYPE_QUALIF_5>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_5_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_7' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='DATE_ENGAGEMENT_5' NAME=DATE_ENGAGEMENT_5 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_5"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_8' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='NUMERO_MATRICULE_5' NAME=NUMERO_MATRICULE_5 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_9' onClick='MiseEvidenceLigneFrame(5,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_5' NAME=CODE_TYPE_STATUT_PERSONNEL_5>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_5_10' onClick='MiseEvidenceLigneFrame(5,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_5' NAME=ANNEE_FORMATION_QUALIF_5 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_5"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_11' onClick='MiseEvidenceLigneFrame(5,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_5' NAME=CODE_TYPE_FONCTION_5>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_5_12' onClick='MiseEvidenceLigneFrame(5,10)'><SELECT   ID='CODE_TYPE_NIVEAU_5' NAME=CODE_TYPE_NIVEAU_5>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_6_0' onClick='MiseEvidenceLigneFrame(6,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_6_1' onClick='MiseEvidenceLigneFrame(6,10)'>$ID_PERSONNEL_6</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_2' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='NOM_PERSONNEL_6' NAME=NOM_PERSONNEL_6 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_3' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='PRENOM_PERSONNEL_6' NAME=PRENOM_PERSONNEL_6 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_4' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_6' NAME=ANNEE_NIASSANCE_PERSONNEL_6 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_5' onClick='MiseEvidenceLigneFrame(6,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_6' NAME=CODE_TYPE_NATIONALITE_6>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_6_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_6_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_6_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_6' onClick='MiseEvidenceLigneFrame(6,10)'><SELECT   ID='CODE_TYPE_QUALIF_6' NAME=CODE_TYPE_QUALIF_6>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_6_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_7' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='DATE_ENGAGEMENT_6' NAME=DATE_ENGAGEMENT_6 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_6"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_8' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='NUMERO_MATRICULE_6' NAME=NUMERO_MATRICULE_6 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_9' onClick='MiseEvidenceLigneFrame(6,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_6' NAME=CODE_TYPE_STATUT_PERSONNEL_6>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_6_10' onClick='MiseEvidenceLigneFrame(6,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_6' NAME=ANNEE_FORMATION_QUALIF_6 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_6"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_11' onClick='MiseEvidenceLigneFrame(6,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_6' NAME=CODE_TYPE_FONCTION_6>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_6_12' onClick='MiseEvidenceLigneFrame(6,10)'><SELECT   ID='CODE_TYPE_NIVEAU_6' NAME=CODE_TYPE_NIVEAU_6>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_7_0' onClick='MiseEvidenceLigneFrame(7,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_7_1' onClick='MiseEvidenceLigneFrame(7,10)'>$ID_PERSONNEL_7</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_2' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='NOM_PERSONNEL_7' NAME=NOM_PERSONNEL_7 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_3' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='PRENOM_PERSONNEL_7' NAME=PRENOM_PERSONNEL_7 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_4' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_7' NAME=ANNEE_NIASSANCE_PERSONNEL_7 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_5' onClick='MiseEvidenceLigneFrame(7,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_7' NAME=CODE_TYPE_NATIONALITE_7>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_7_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_7_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_7_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_6' onClick='MiseEvidenceLigneFrame(7,10)'><SELECT   ID='CODE_TYPE_QUALIF_7' NAME=CODE_TYPE_QUALIF_7>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_7_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_7' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='DATE_ENGAGEMENT_7' NAME=DATE_ENGAGEMENT_7 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_7"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_8' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='NUMERO_MATRICULE_7' NAME=NUMERO_MATRICULE_7 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_9' onClick='MiseEvidenceLigneFrame(7,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_7' NAME=CODE_TYPE_STATUT_PERSONNEL_7>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_7_10' onClick='MiseEvidenceLigneFrame(7,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_7' NAME=ANNEE_FORMATION_QUALIF_7 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_7"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_11' onClick='MiseEvidenceLigneFrame(7,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_7' NAME=CODE_TYPE_FONCTION_7>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_7_12' onClick='MiseEvidenceLigneFrame(7,10)'><SELECT   ID='CODE_TYPE_NIVEAU_7' NAME=CODE_TYPE_NIVEAU_7>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_8_0' onClick='MiseEvidenceLigneFrame(8,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_8_1' onClick='MiseEvidenceLigneFrame(8,10)'>$ID_PERSONNEL_8</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_2' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='NOM_PERSONNEL_8' NAME=NOM_PERSONNEL_8 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_3' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='PRENOM_PERSONNEL_8' NAME=PRENOM_PERSONNEL_8 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_4' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_8' NAME=ANNEE_NIASSANCE_PERSONNEL_8 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_5' onClick='MiseEvidenceLigneFrame(8,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_8' NAME=CODE_TYPE_NATIONALITE_8>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_8_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_8_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_8_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_6' onClick='MiseEvidenceLigneFrame(8,10)'><SELECT   ID='CODE_TYPE_QUALIF_8' NAME=CODE_TYPE_QUALIF_8>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_8_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_7' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='DATE_ENGAGEMENT_8' NAME=DATE_ENGAGEMENT_8 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_8"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_8' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='NUMERO_MATRICULE_8' NAME=NUMERO_MATRICULE_8 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_9' onClick='MiseEvidenceLigneFrame(8,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_8' NAME=CODE_TYPE_STATUT_PERSONNEL_8>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_8_10' onClick='MiseEvidenceLigneFrame(8,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_8' NAME=ANNEE_FORMATION_QUALIF_8 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_8"></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_11' onClick='MiseEvidenceLigneFrame(8,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_8' NAME=CODE_TYPE_FONCTION_8>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_8_12' onClick='MiseEvidenceLigneFrame(8,10)'><SELECT   ID='CODE_TYPE_NIVEAU_8' NAME=CODE_TYPE_NIVEAU_8>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_9_0' onClick='MiseEvidenceLigneFrame(9,10)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_9_1' onClick='MiseEvidenceLigneFrame(9,10)'>$ID_PERSONNEL_9</TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_2' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='NOM_PERSONNEL_9' NAME=NOM_PERSONNEL_9 TYPE='text'size=20 VALUE="$NOM_PERSONNEL_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_3' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='PRENOM_PERSONNEL_9' NAME=PRENOM_PERSONNEL_9 TYPE='text'size=20 VALUE="$PRENOM_PERSONNEL_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_4' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='ANNEE_NIASSANCE_PERSONNEL_9' NAME=ANNEE_NIASSANCE_PERSONNEL_9 TYPE='text'size=5 VALUE="$ANNEE_NIASSANCE_PERSONNEL_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_5' onClick='MiseEvidenceLigneFrame(9,10)'><SELECT style="width:80px"  ID='CODE_TYPE_NATIONALITE_9' NAME=CODE_TYPE_NATIONALITE_9>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_9_10>(#)Ougandais</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_9_11>(#)Sud Soudan</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NATIONALITE_9_9>(#)Pays EAC</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_6' onClick='MiseEvidenceLigneFrame(9,10)'><SELECT   ID='CODE_TYPE_QUALIF_9' NAME=CODE_TYPE_QUALIF_9>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_QUALIF_9_46>(#)D7 (Ens 1-6)</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_7' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='DATE_ENGAGEMENT_9' NAME=DATE_ENGAGEMENT_9 TYPE='text'size=7 VALUE="$DATE_ENGAGEMENT_9"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_8' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='NUMERO_MATRICULE_9' NAME=NUMERO_MATRICULE_9 TYPE='text'size=7 VALUE="$NUMERO_MATRICULE_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_9' onClick='MiseEvidenceLigneFrame(9,10)'><SELECT   ID='CODE_TYPE_STATUT_PERSONNEL_9' NAME=CODE_TYPE_STATUT_PERSONNEL_9>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_9_10' onClick='MiseEvidenceLigneFrame(9,10)'><INPUT  ID='ANNEE_FORMATION_QUALIF_9' NAME=ANNEE_FORMATION_QUALIF_9 TYPE='text'size=5 VALUE="$ANNEE_FORMATION_QUALIF_9"></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_11' onClick='MiseEvidenceLigneFrame(9,10)'><SELECT style="width:100px"  ID='CODE_TYPE_FONCTION_9' NAME=CODE_TYPE_FONCTION_9>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_9_12' onClick='MiseEvidenceLigneFrame(9,10)'><SELECT   ID='CODE_TYPE_NIVEAU_9' NAME=CODE_TYPE_NIVEAU_9>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

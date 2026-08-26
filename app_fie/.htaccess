@@ -1,0 +1,88 @@
+# =============================================================================
+# app_fie/.htaccess — Point d'entrée racine XAMPP/Apache
+# =============================================================================
+#
+# SOLUTION COMPLÈTE — deux problèmes résolus :
+#
+#   PROBLÈME 1 : http://localhost:8085/app_fie
+#                → affiche directement le site public FIE (page d'accueil)
+#
+#   PROBLÈME 2 : http://localhost:8085/app_fie/connexion  → 404 Not Found
+#                → résolu : toutes les routes propres sont transmises à
+#                  public/index.php qui les dispatche via le Router PHP
+#
+# ARCHITECTURE :
+#   app_fie/             ← ce fichier .htaccess
+#   app_fie/public/      ← front controller (index.php) + assets (css/js/img)
+#   app_fie/public/.htaccess  ← fallback si accès direct à /app_fie/public/
+#
+# PRÉ-REQUIS XAMPP (à faire une seule fois) :
+#   1. Ouvrir C:\xampp\apache\conf\httpd.conf
+#      → Décommenter : LoadModule rewrite_module modules/mod_rewrite.so
+#   2. Dans httpd.conf (ou httpd-vhosts.conf), ajouter pour le dossier htdocs :
+#        <Directory "C:/xampp/htdocs">
+#            AllowOverride All
+#            Require all granted
+#        </Directory>
+#      OU spécifiquement pour app_fie :
+#        <Directory "C:/xampp/htdocs/app_fie">
+#            AllowOverride All
+#            Require all granted
+#        </Directory>
+#   3. Redémarrer Apache (panneau XAMPP → Stop → Start)
+#
+# VÉRIFICATION :
+#   http://localhost:8085/app_fie             → Page d'accueil FIE ✓
+#   http://localhost:8085/app_fie/connexion   → Page de connexion  ✓
+#   http://localhost:8085/app_fie/aide        → Page d'aide        ✓
+#   http://localhost:8085/app_fie/public/css/fie.css → Fichier CSS ✓
+# =============================================================================
+
+# Désactiver le listage des dossiers
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # ── Base : tout est relatif à /app_fie/ ───────────────────────────────────
+    RewriteBase /app_fie/
+
+    # ── RÈGLE 0 : Ressources physiques de public/ (CSS, JS, images, fonts) ───
+    #    /app_fie/public/css/fie.css → laissé tel quel (fichier réel)
+    RewriteCond %{REQUEST_URI} ^/app_fie/public/
+    RewriteRule ^ - [L]
+
+    # ── RÈGLE 1 : Fichiers et dossiers réels sous app_fie/ ───────────────────
+    #    Évite de réécrire si le fichier/dossier existe déjà sur le disque
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # ── RÈGLE 2 : Tout le reste → front controller ───────────────────────────
+    #    /app_fie              → public/index.php  (REQUEST_URI = /app_fie)
+    #    /app_fie/             → public/index.php  (REQUEST_URI = /app_fie/)
+    #    /app_fie/connexion    → public/index.php  (REQUEST_URI = /app_fie/connexion)
+    #    /app_fie/inscription/123 → public/index.php
+    #
+    #    NOTE : SCRIPT_NAME reste /app_fie/public/index.php
+    #           index.php normalise l'URI en soustrayant /app_fie (pas /app_fie/public)
+    #           → le Router reçoit / ou /connexion ou /inscription/123 etc.
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
+</IfModule>
+
+# ── Sécurité : bloquer l'accès aux fichiers sensibles ────────────────────────
+<FilesMatch "\.(sql|log|env|ini|sh|lock|bak|conf)$">
+    Require all denied
+</FilesMatch>
+
+# ── Sécurité : bloquer l'accès aux répertoires internes ──────────────────────
+<IfModule mod_rewrite.c>
+    RewriteRule ^(config|db|services|app|api/stateduc)(/|$) - [F,L]
+</IfModule>
+
+# ── Headers de sécurité HTTP ─────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

@@ -1,0 +1,558 @@
+/*
+ * FIE — Fichier Informatisé des Élèves
+ * Feuille de style de marque (complément à Bootstrap 5)
+ * Charte chromatique FIE : Rouge #CE1126 · Blanc #FFFFFF · Vert #1EB53A (drapeau Burundi)
+ *
+ * PHASE 4 — Correction charte graphique : rouge Burundi réel (#CE1126)
+ * Ce fichier ne remplace PAS Bootstrap — il surcharge et complète.
+ * Toutes les classes Bootstrap sont utilisables dans les vues.
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   1. VARIABLES CSS — Charte FIE Rouge Burundi
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+    /* Couleurs primaires FIE — Drapeau Burundi : Rouge · Blanc · Vert */
+    --fie-red:          #CE1126;   /* Rouge Burundi officiel */
+    --fie-red-dark:     #a00e1b;
+    --fie-red-light:    #fce8ea;
+    --fie-primary:      #CE1126;   /* Rouge — boutons/badges/accents */
+    --fie-primary-dark: #a00e1b;
+    --fie-primary-light:#fce8ea;
+    /* Bleu institutionnel — topbar / sidebar / navigation app */
+    --fie-app-blue:     #1a56db;
+    --fie-app-blue-dark:#1343a8;
+    --fie-app-blue-light:#eff6ff;
+    --fie-accent:       #17a2b8;
+    --fie-accent-dark:  #117a8b;
+    --fie-accent-light: #d1ecf1;
+    --fie-green:        #1EB53A;
+    --fie-green-dark:   #178a2b;
+    --fie-green-light:  #d1f0d8;
+    --fie-white:        #FFFFFF;
+
+    /* Surcharge Bootstrap pour cohérence */
+    /* SESSION 17 : --bs-primary = BLEU (boutons d'action) */
+    --bs-primary:       #1a56db;
+    --bs-primary-rgb:   26,86,219;
+    --bs-success:       #1EB53A;
+    --bs-success-rgb:   30,181,58;
+    --bs-link-color:    #1a56db;
+    --bs-link-hover-color: #1343a8;
+
+    /* Typographie — Poppins pour titres, Open Sans pour corps */
+    --fie-font-title:   'Poppins', 'Segoe UI', system-ui, Arial, sans-serif;
+    --fie-font-sans:    'Open Sans', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+    --fie-font-mono:    'Courier New', Courier, monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2. BASE
+   ═══════════════════════════════════════════════════════════════ */
+body { font-family: var(--fie-font-sans); background-color: #f8f9fa; }
+h1,h2,h3,h4,h5,h6,.navbar-brand,.card-title { font-family: var(--fie-font-title); }
+.fie-body { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ═══════════════════════════════════════════════════════════════
+   3. NAVBAR
+   ═══════════════════════════════════════════════════════════════ */
+.fie-navbar {
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 100%) !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* Marque */
+.fie-navbar__brand {
+    color: #fff !important;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+}
+.fie-navbar__brand:hover { color: rgba(255,255,255,.9) !important; }
+.fie-navbar__sub { font-size: 0.85em; }
+
+/* Liens nav */
+.fie-nav-link {
+    color: rgba(255,255,255,.85) !important;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem !important;
+    border-bottom: 2px solid transparent;
+    transition: color .15s, background .15s, border-color .15s;
+    border-radius: 4px 4px 0 0;
+}
+.fie-nav-link:hover {
+    color: #fff !important;
+    background: rgba(255,255,255,.1) !important;
+}
+.fie-nav-link.active {
+    color: #fff !important;
+    border-bottom-color: #fff;
+    background: rgba(255,255,255,.12) !important;
+    font-weight: 600;
+}
+
+/* Badge rôle */
+.fie-badge-role {
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 20px;
+    text-transform: lowercase;
+}
+
+/* Boutons navbar */
+.fie-btn-logout {
+    font-size: 0.8rem;
+}
+.fie-btn-login {
+    background: #fff;
+    color: var(--fie-primary);
+    border: none;
+    font-size: 0.85rem;
+}
+.fie-btn-login:hover { background: #f0f0f0; color: var(--fie-primary-dark); }
+
+/* Burger icon */
+.navbar-toggler:focus { box-shadow: none; }
+
+/* Bande tricolore */
+.fie-flag-strip {
+    display: flex;
+    height: 4px;
+}
+.fie-flag-strip__red   { flex: 1; background: var(--fie-red); }
+.fie-flag-strip__white { flex: 1; background: var(--fie-white); }
+.fie-flag-strip__green { flex: 1; background: var(--fie-green); }
+
+/* ═══════════════════════════════════════════════════════════════
+   4. CONTENU PRINCIPAL
+   ═══════════════════════════════════════════════════════════════ */
+.fie-main { flex: 1; }
+
+/* ═══════════════════════════════════════════════════════════════
+   5. PIED DE PAGE
+   ═══════════════════════════════════════════════════════════════ */
+.fie-footer {
+    background: #2d3748;
+    color: #a0aec0;
+    border-top: 3px solid var(--fie-primary);
+}
+.fie-footer__brand { color: #fff; font-size: 1rem; }
+.fie-footer__sub   { color: #cbd5e0; }
+.fie-footer__ministry { color: #a0aec0; }
+.fie-footer__link {
+    color: #90cdf4;
+    text-decoration: none;
+    transition: color .15s;
+}
+.fie-footer__link:hover { color: #fff; }
+.fie-footer__legal { color: #718096; line-height: 1.6; }
+.fie-footer__version { color: #718096; }
+
+/* ═══════════════════════════════════════════════════════════════
+   6. SURCHARGE BOUTONS BOOTSTRAP (charte Burundi)
+   SESSION 17 : btn-primary = BLEU (--fie-app-blue), pas rouge
+   Le rouge est réservé aux badges/accents FIE (--fie-primary)
+   ═══════════════════════════════════════════════════════════════ */
+.btn-primary {
+    --bs-btn-bg:            var(--fie-app-blue);
+    --bs-btn-border-color:  var(--fie-app-blue);
+    --bs-btn-hover-bg:      var(--fie-app-blue-dark);
+    --bs-btn-hover-border-color: var(--fie-app-blue-dark);
+    --bs-btn-active-bg:     #0f3282;
+    --bs-btn-focus-shadow-rgb: 26,86,219;
+    --bs-btn-color:         #fff;
+    --bs-btn-hover-color:   #fff;
+    --bs-btn-active-color:  #fff;
+}
+.btn-outline-primary {
+    --bs-btn-color:         var(--fie-app-blue);
+    --bs-btn-border-color:  var(--fie-app-blue);
+    --bs-btn-hover-bg:      var(--fie-app-blue);
+    --bs-btn-hover-border-color: var(--fie-app-blue);
+    --bs-btn-active-bg:     var(--fie-app-blue-dark);
+    --bs-btn-focus-shadow-rgb: 26,86,219;
+    --bs-btn-hover-color:   #fff;
+}
+.btn-success {
+    --bs-btn-bg:            var(--fie-green);
+    --bs-btn-border-color:  var(--fie-green);
+    --bs-btn-hover-bg:      var(--fie-green-dark);
+    --bs-btn-hover-border-color: var(--fie-green-dark);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   7. CARTES PERSONNALISÉES
+   ═══════════════════════════════════════════════════════════════ */
+.fie-card-header {
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 100%);
+    color: #fff;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+.fie-card-header .card-title { color: #fff; margin-bottom: 0; font-size: 1rem; }
+
+/* Stats dashboard */
+.fie-stat-card {
+    border-top: 3px solid var(--fie-primary);
+    transition: box-shadow .15s, transform .15s;
+}
+.fie-stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
+.fie-stat-card--green { border-top-color: var(--fie-green); }
+.fie-stat-card--blue  { border-top-color: #0d6efd; }
+.fie-stat-card--warn  { border-top-color: #e9a000; }
+.fie-stat-value { font-size: 2rem; font-weight: 700; line-height: 1; }
+.fie-stat-label {
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: .08em; color: #6c757d; font-weight: 600;
+}
+.fie-stat-icon { width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.fie-stat-icon--red   { background: var(--fie-primary-light); color: var(--fie-primary); }
+.fie-stat-icon--green { background: var(--fie-green-light); color: var(--fie-green-dark); }
+.fie-stat-icon--blue  { background: #dbeafe; color: #1d4ed8; }
+.fie-stat-icon--warn  { background: #fef3c7; color: #92400e; }
+
+/* ═══════════════════════════════════════════════════════════════
+   8. FORMULAIRES SPÉCIALISÉS
+   ═══════════════════════════════════════════════════════════════ */
+.form-control:focus, .form-select:focus {
+    border-color: var(--fie-primary);
+    box-shadow: 0 0 0 0.2rem rgba(206,17,38,.15);
+}
+.fie-fieldset-title {
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--fie-primary);
+}
+
+/* ─── Badge IUE ─── */
+.fie-iue-badge {
+    font-family: var(--fie-font-mono);
+    font-size: 0.9rem;
+    letter-spacing: .05em;
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: #212529;
+    display: inline-block;
+}
+.fie-iue-badge--lg {
+    font-size: 1.1rem;
+    padding: 8px 16px;
+    background: linear-gradient(135deg,#f8f9fa,#fff);
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+/* ─── Carte IUE élève ─── */
+.fie-iue-hero {
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 100%);
+    color: #fff;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+.fie-iue-hero__label {
+    font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: .12em; opacity: .75; margin-bottom: 4px;
+}
+.fie-iue-hero__value {
+    font-family: var(--fie-font-mono);
+    font-size: 1.3rem; font-weight: 700; letter-spacing: .06em;
+}
+
+/* ─── Bannière doublon ─── */
+.fie-doublon-banner {
+    display: none;
+    border: 2px solid #f59e0b;
+    background: #fffbeb;
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+}
+.fie-doublon-banner--visible { display: block; }
+
+/* ═══════════════════════════════════════════════════════════════
+   9. TABLEAUX
+   ═══════════════════════════════════════════════════════════════ */
+.table thead th {
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: .06em; font-weight: 700;
+    border-bottom: 2px solid var(--fie-primary);
+    background: #f8f9fa;
+}
+.table-hover tbody tr:hover { background: #f0f4ff; }
+.fie-table-iue { font-family: var(--fie-font-mono); font-size: 0.85rem; }
+
+/* ═══════════════════════════════════════════════════════════════
+   10. PAGE LOGIN
+   ═══════════════════════════════════════════════════════════════ */
+.fie-login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--fie-primary) 0%, var(--fie-primary-dark) 55%, #003d80 100%);
+    display: flex; align-items: center; justify-content: center;
+}
+.fie-login-card {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+.fie-login-logo-title {
+    font-size: 2.5rem; font-weight: 900; color: var(--fie-primary);
+    letter-spacing: .06em; line-height: 1;
+}
+.fie-login-logo-sub { font-size: 0.85rem; color: #6c757d; }
+.fie-auth-flag {
+    height: 6px; border-radius: 20px; overflow: hidden;
+    display: flex; margin: 1rem 0;
+}
+.fie-auth-flag__red   { flex:1; background: var(--fie-red); }
+.fie-auth-flag__white { flex:1; background: #fff; border-top:1px solid #dee2e6; border-bottom:1px solid #dee2e6; }
+.fie-auth-flag__green { flex:1; background: var(--fie-green); }
+
+/* ═══════════════════════════════════════════════════════════════
+   11. PAGE HERO (site public)
+   ═══════════════════════════════════════════════════════════════ */
+.fie-hero {
+    background: linear-gradient(135deg, var(--fie-red) 0%, var(--fie-red-dark) 55%, #6e010e 100%);
+    color: #fff;
+    padding: 5rem 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.fie-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.fie-hero__inner { position: relative; max-width: 760px; margin: 0 auto; }
+.fie-hero__title {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 1rem;
+}
+.fie-hero__subtitle {
+    font-size: 1.1rem; opacity: .9; margin-bottom: 2rem; line-height: 1.6;
+}
+.fie-hero__btn {
+    background: #fff; color: var(--fie-primary); font-weight: 700;
+    padding: 0.75rem 2rem; border-radius: 50px; text-decoration: none;
+    font-size: 1rem; transition: box-shadow .15s, transform .15s;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    display: inline-block;
+}
+.fie-hero__btn:hover { box-shadow: 0 8px 24px rgba(0,0,0,.3); transform: translateY(-2px); color: var(--fie-primary-dark); }
+.fie-hero__btn-outline {
+    border: 2px solid rgba(255,255,255,.7); color: #fff; font-weight: 600;
+    padding: 0.75rem 2rem; border-radius: 50px; text-decoration: none;
+    font-size: 1rem; transition: background .15s;
+    display: inline-block;
+}
+.fie-hero__btn-outline:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+/* Features */
+.fie-feature-icon {
+    width: 56px; height: 56px;
+    background: var(--fie-red-light); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin: 0 auto 1rem;
+    color: var(--fie-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   12. BREADCRUMB BURUNDI
+   ═══════════════════════════════════════════════════════════════ */
+.fie-breadcrumb .breadcrumb-item a { color: var(--fie-primary); }
+.fie-breadcrumb .breadcrumb-item.active { color: #6c757d; }
+.fie-breadcrumb .breadcrumb-item + .breadcrumb-item::before { color: #adb5bd; }
+
+/* ═══════════════════════════════════════════════════════════════
+   13. UTILITAIRES DIVERS
+   ═══════════════════════════════════════════════════════════════ */
+.fie-font-mono { font-family: var(--fie-font-mono); }
+.fie-text-red   { color: var(--fie-red) !important; }
+.fie-text-green { color: var(--fie-green) !important; }
+.fie-border-red { border-color: var(--fie-red) !important; }
+
+/* Spinner AJAX */
+.fie-spinner-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(255,255,255,.65); z-index: 9999;
+    align-items: center; justify-content: center;
+}
+.fie-spinner-overlay--visible { display: flex; }
+
+/* Erreur de champ */
+.fie-field-error { font-size: 0.8rem; color: var(--fie-primary); }
+
+/* Sélect dépendant en chargement */
+.fie-select-loading { opacity: .6; pointer-events: none; }
+
+/* ═══════════════════════════════════════════════════════════════
+   14. IMPRESSION
+   ═══════════════════════════════════════════════════════════════ */
+@media print {
+    .fie-navbar, .navbar, .fie-flag-strip,
+    .fie-footer, footer, .btn-group,
+    .fie-doublon-banner, nav.breadcrumb,
+    .pagination, [data-noprint],
+    .navbar-toggler { display: none !important; }
+
+    body { background: white; color: black; font-size: 11pt; }
+    .container-xl, .fie-main { max-width: 100%; padding: 0; }
+    .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+    .fie-iue-hero { background: white !important; color: black !important; border: 2px solid black; }
+    a[href]::after { content: none; }
+    table { page-break-inside: auto; }
+    tr { page-break-inside: avoid; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   15. RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .fie-login-card { padding: 1.5rem; }
+    .fie-hero { padding: 3rem 1rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   16. KPI CARDS — Dashboard & Site public
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Cartes KPI avec icônes FontAwesome */
+.fie-kpi-card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 12px rgba(0,123,255,.08);
+    transition: transform .18s, box-shadow .18s;
+    overflow: hidden;
+}
+.fie-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,123,255,.16);
+}
+.fie-kpi-card .fie-kpi-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.fie-kpi-card .fie-kpi-value {
+    font-size: 2rem; font-weight: 800;
+    line-height: 1.1; font-family: var(--fie-font-title);
+}
+.fie-kpi-card .fie-kpi-label {
+    font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .07em;
+    color: #6c757d;
+}
+.fie-kpi-card .fie-kpi-sub {
+    font-size: 0.8rem; color: #8a9ab0;
+}
+
+/* Variantes couleurs KPI */
+.fie-kpi--blue   .fie-kpi-icon { background:#dbeafe; color:#1d4ed8; }
+.fie-kpi--sky    .fie-kpi-icon { background:#d1ecf1; color:#117a8b; }
+.fie-kpi--green  .fie-kpi-icon { background:#d1f0d8; color:#178a2b; }
+.fie-kpi--orange .fie-kpi-icon { background:#fef3c7; color:#92400e; }
+.fie-kpi--purple .fie-kpi-icon { background:#ede9fe; color:#6d28d9; }
+.fie-kpi--pink   .fie-kpi-icon { background:#fce7f3; color:#9d174d; }
+.fie-kpi--teal   .fie-kpi-icon { background:#ccfbf1; color:#0f766e; }
+.fie-kpi--indigo .fie-kpi-icon { background:#e0e7ff; color:#3730a3; }
+
+.fie-kpi--blue   .fie-kpi-value { color:#1d4ed8; }
+.fie-kpi--sky    .fie-kpi-value { color:#117a8b; }
+.fie-kpi--green  .fie-kpi-value { color:#178a2b; }
+.fie-kpi--orange .fie-kpi-value { color:#92400e; }
+.fie-kpi--purple .fie-kpi-value { color:#6d28d9; }
+.fie-kpi--pink   .fie-kpi-value { color:#9d174d; }
+.fie-kpi--teal   .fie-kpi-value { color:#0f766e; }
+.fie-kpi--indigo .fie-kpi-value { color:#3730a3; }
+
+/* Bordure colorée top des cartes KPI */
+.fie-kpi--blue   { border-top: 4px solid #1d4ed8 !important; }
+.fie-kpi--sky    { border-top: 4px solid #17a2b8 !important; }
+.fie-kpi--green  { border-top: 4px solid var(--fie-green) !important; }
+.fie-kpi--orange { border-top: 4px solid #fd7e14 !important; }
+.fie-kpi--purple { border-top: 4px solid #6d28d9 !important; }
+.fie-kpi--pink   { border-top: 4px solid #e83e8c !important; }
+.fie-kpi--teal   { border-top: 4px solid #0f766e !important; }
+.fie-kpi--indigo { border-top: 4px solid #3730a3 !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   17. BIBLIOTHÈQUE PUBLIQUE
+   ═══════════════════════════════════════════════════════════════ */
+.fie-library-card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    transition: transform .15s, box-shadow .15s;
+}
+.fie-library-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,123,255,.14);
+}
+.fie-library-card .fie-lib-type-badge {
+    font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    padding: 3px 8px; border-radius: 20px;
+}
+.fie-library-card .fie-lib-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   18. SUIVI PÉDAGOGIQUE
+   ═══════════════════════════════════════════════════════════════ */
+.fie-suivi-table .badge-promotion {
+    background: #d1f0d8; color: #178a2b;
+    font-size: 0.7rem; padding: 3px 8px; border-radius: 20px;
+}
+.fie-suivi-table .badge-redoublement {
+    background: #fef3c7; color: #92400e;
+    font-size: 0.7rem; padding: 3px 8px; border-radius: 20px;
+}
+.fie-suivi-table .badge-transfert {
+    background: #d1ecf1; color: #117a8b;
+    font-size: 0.7rem; padding: 3px 8px; border-radius: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   19. HISTORIQUE ÉLÈVE
+   ═══════════════════════════════════════════════════════════════ */
+.fie-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+.fie-timeline::before {
+    content: '';
+    position: absolute; left: 0.75rem; top: 0; bottom: 0;
+    width: 2px; background: #dee2e6;
+}
+.fie-timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+.fie-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.45rem; top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--fie-primary);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--fie-primary-light);
+}
+.fie-timeline-item--inscription::before { background: var(--fie-green); box-shadow: 0 0 0 2px var(--fie-green-light); }
+.fie-timeline-item--transfert::before   { background: #17a2b8; box-shadow: 0 0 0 2px #d1ecf1; }
+.fie-timeline-item--promotion::before   { background: #6d28d9; box-shadow: 0 0 0 2px #ede9fe; }
+.fie-timeline-item--redoublement::before { background: #fd7e14; box-shadow: 0 0 0 2px #fef3c7; }
+.fie-timeline-item--examen::before      { background: #e83e8c; box-shadow: 0 0 0 2px #fce7f3; }
