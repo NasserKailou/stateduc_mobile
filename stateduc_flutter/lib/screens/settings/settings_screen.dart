@@ -526,8 +526,69 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-  /// Sélectionne [year] et affiche une confirmation SnackBar.
+  /// Affiche un dialogue de confirmation avant de changer l'année active.
+  ///
+  /// Si l'utilisateur confirme → [auth.setActiveYear] est appelé et un SnackBar
+  /// de confirmation s'affiche.
+  /// Si l'utilisateur annule → aucun changement, l'année courante est conservée.
   Future<void> _selectYear(AuthProvider auth, SchoolYear year) async {
+    // ── Dialogue de confirmation ─────────────────────────────────────────────
+    final currentYear = auth.activeYear;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,   // l'utilisateur doit choisir explicitement
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.calendar_today_outlined, size: 32),
+        title: const Text('Changer l\'année active ?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (currentYear != null) ...[
+              Text('Année actuelle :',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+              Text(currentYear.libelle,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 12),
+            ],
+            Text('Nouvelle année :',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+            Text(year.libelle,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Theme.of(ctx).colorScheme.primary)),
+            const SizedBox(height: 12),
+            Text(
+              'Les formulaires affichés seront rechargés pour l\'année sélectionnée.',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(ctx).colorScheme.onSurfaceVariant),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),  // Annuler
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),   // Confirmer
+            child: const Text('Confirmer'),
+          ),
+        ],
+      ),
+    );
+
+    // Si l'utilisateur a annulé (ou fermé le dialogue), ne rien changer
+    if (confirmed != true || !mounted) return;
+
+    // ── Appliquer le changement ──────────────────────────────────────────────
     await auth.setActiveYear(year);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

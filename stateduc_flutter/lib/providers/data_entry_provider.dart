@@ -950,22 +950,28 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // ═══════════════════════════════════════════════════════════════════════════
   // AK-YEAR-MULTI-02 — VÉRIFICATION COHÉRENCE ANNÉE MOBILE vs SERVEUR
   //
   // Compare l'année active mobile (_codeyear) avec l'année active du serveur
   // ($_SESSION['annee'] retourné par annees_ws.php/active/:login).
   //
-  // RÈGLE : si les deux années sont différentes, l'opération est BLOQUÉE avec
-  //   un message bilingue FR/EN clair.
+  // POLITIQUE :
+  //   • MISMATCH CONFIRMÉ (serveur répond, codes différents) → BLOQUER.
+  //     C'est le seul cas où l'envoi doit être refusé pour éviter de polluer
+  //     la base serveur avec des données d'une autre année.
+  //   • SERVEUR INJOIGNABLE / TIMEOUT / ERREUR RÉSEAU → LAISSER PASSER.
+  //     L'intranet MEN peut être temporairement lent. Bloquer l'envoi à cause
+  //     d'un timeout n'est pas acceptable en production terrain.
+  //   • ANNÉE MOBILE NON DÉFINIE → BLOQUER (cas de configuration manquante).
   //
-  // FAIL-SAFE : si le serveur est injoignable ou retourne une erreur, l'opération
-  //   est aussi BLOQUÉE (principe de refus en cas d'incertitude).
+  // TIMEOUT : fetchServerActiveYear utilise un timeout court dédié (8 s)
+  // indépendant du connectTimeout global Dio (60 s). En cas de timeout,
+  // DioException ou TimeoutException est levée → catch général → fail-open.
   //
   // Retourne true = opération autorisée, false = opération bloquée (_error défini).
   // ═══════════════════════════════════════════════════════════════════════════
   Future<bool> _checkYearConsistency(User user) async {
-    // Si l'année mobile n'est pas définie, on ne peut pas vérifier → bloquer
+    // Si l'année mobile n'est pas définie, on ne peut pas opérer → bloquer
     final mobileCode = int.tryParse(_codeyear ?? '') ?? 0;
     if (mobileCode <= 0) {
       _error = 'Année de collecte non définie sur le mobile. '
@@ -979,7 +985,7 @@ class DataEntryProvider extends ChangeNotifier {
     try {
       final serverYear = await _api.fetchServerActiveYear(user.login);
       if (serverYear.code != mobileCode) {
-        // Années différentes — bloquer avec message bilingue précis
+        // ── Vrai mismatch confirmé par le serveur → BLOQUER ─────────────────
         _error = 'Incohérence d\'année de collecte :\n'
                  '• Mobile : $_libyear (code $mobileCode)\n'
                  '• Serveur : ${serverYear.libelle} (code ${serverYear.code})\n'
@@ -992,25 +998,26 @@ class DataEntryProvider extends ChangeNotifier {
         notifyListeners();
         return false;
       }
+      // Années identiques → laisser passer
       debugPrint('[DataEntry] _checkYearConsistency: OK '
           '(mobile=$mobileCode server=${serverYear.code})');
       return true;
+
     } on ApiException catch (e) {
-      // Le serveur a renvoyé une erreur métier (année non définie côté serveur)
-      _error = 'Impossible de vérifier l\'année du serveur : ${e.message}\n'
-               'Opération annulée par sécurité.\n\n'
-               'Cannot verify server year: ${e.message}\n'
-               'Operation cancelled for safety.';
-      notifyListeners();
-      return false;
+      // ── Erreur métier serveur (année non définie en session) ─────────────
+      // L'endpoint a répondu mais avec se_status=KO.
+      // Dans ce cas, le serveur est UP mais mal configuré → LAISSER PASSER
+      // (on ne peut pas savoir s'il y a un mismatch, mais l'envoi peut réussir).
+      debugPrint('[DataEntry] _checkYearConsistency: ApiException → fail-open: ${e.message}');
+      return true;
+
     } catch (e) {
-      // Erreur réseau ou autre — fail-safe : bloquer
-      _error = 'Vérification de l\'année serveur impossible (hors ligne ?).\n'
-               'Vérifiez votre connexion et réessayez.\n\n'
-               'Cannot verify server year (offline?).\n'
-               'Check your connection and try again.';
-      notifyListeners();
-      return false;
+      // ── Timeout, erreur réseau, DioException ─────────────────────────────
+      // Le serveur est inaccessible (réseau lent, hors ligne, pare-feu).
+      // On ne peut PAS confirmer un mismatch → LAISSER PASSER (fail-open).
+      // L'envoi lui-même échouera si le serveur est vraiment HS.
+      debugPrint('[DataEntry] _checkYearConsistency: réseau KO → fail-open: $e');
+      return true;
     }
   }
 

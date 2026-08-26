@@ -483,32 +483,68 @@ class ApiService {
   // ou rechargement pour s'assurer que l'année mobile == année serveur.
   //
   // Retourne ({code: int, libelle: String}) ou lance une exception si :
-  //   - erreur réseau (pas de connexion)
+  //   - erreur réseau (timeout court de 8 s — ne bloque pas l'UI)
   //   - le serveur retourne se_status KO (année non définie en session)
   //   - la réponse ne peut pas être parsée
   //
-  // L'appelant doit catcher les exceptions — un échec doit BLOQUER l'opération
-  // (comportement fail-safe requis par AK-YEAR-MULTI-02).
+  // TIMEOUT COURT (8 s) : ce contrôle est un check léger, pas un envoi de données.
+  // Utilise un Options() dédié pour ne pas hériter du connectTimeout global (60 s).
+  // L'appelant (_checkYearConsistency) gère le cas timeout → fail-open (laisser passer)
+  // ou fail-closed selon la politique en vigueur.
+  static const Duration _kYearCheckTimeout = Duration(seconds: 8);
+
   Future<({int code, String libelle})> fetchServerActiveYear(String login) async {
     final encodedLogin = Uri.encodeComponent(login);
-    // _get() décode se_data et lève une ApiException si se_status == KO
-    final data = await _get('annees_ws.php/active/$encodedLogin');
-    // data est le contenu de se_data — un Map avec 'code' et 'libelle'
-    if (data is Map<String, dynamic>) {
-      final code    = (data['code']    as num?)?.toInt() ?? 0;
-      final libelle = (data['libelle'] as String?)       ?? '';
-      if (code <= 0) {
-        throw ApiException(
-          'Année active serveur non définie (code=$code). '
-          'Vérifiez la configuration du serveur.',
-        );
-      }
-      debugPrint('[ApiService] fetchServerActiveYear: code=$code libelle=$libelle');
-      return (code: code, libelle: libelle);
+    // Requête GET avec timeout court dédié (8 s) — pas le connectTimeout global (60 s)
+    late Response<dynamic> response;
+    try {
+      response = await _dio.get(
+        'annees_ws.php/active/$encodedLogin',
+        options: Options(
+          responseType: ResponseType.plain,
+          sendTimeout:    _kYearCheckTimeout,
+          receiveTimeout: _kYearCheckTimeout,
+        ),
+      ).timeout(
+        _kYearCheckTimeout,
+        onTimeout: () => throw ApiException('Timeout (${_kYearCheckTimeout.inSeconds}s) — serveur trop lent'),
+      );
+    } on DioException catch (e) {
+      final msg = e.message ?? e.type.name;
+      throw ApiException('Erreur réseau : $msg');
     }
-    throw ApiException(
-      'Réponse inattendue de annees_ws.php/active : $data',
-    );
+
+    final statusCode = response.statusCode ?? 0;
+    if (statusCode == 401) throw ApiException('Accès refusé (401)');
+    if (statusCode == 404) throw ApiException('Endpoint introuvable (404) : annees_ws.php/active');
+    if (statusCode >= 300) throw ApiException('Erreur serveur ($statusCode)');
+
+    final rawBody = response.data?.toString().trim() ?? '';
+    if (rawBody.isEmpty) throw ApiException('Réponse vide de annees_ws.php/active');
+
+    dynamic parsed;
+    try {
+      parsed = json.decode(rawBody);
+    } catch (_) {
+      throw ApiException('Réponse non-JSON de annees_ws.php/active : $rawBody');
+    }
+
+    // Unwrap enveloppe se_data
+    final seData = parsed is Map ? (parsed['se_data'] ?? parsed) : null;
+    if (seData is! Map<String, dynamic>) {
+      throw ApiException('Réponse inattendue de annees_ws.php/active : $parsed');
+    }
+
+    final code    = (seData['code']    as num?)?.toInt() ?? 0;
+    final libelle = (seData['libelle'] as String?)        ?? '';
+    if (code <= 0) {
+      throw ApiException(
+        'Année active serveur non définie (code=$code). '
+        'Vérifiez la configuration du serveur.',
+      );
+    }
+    debugPrint('[ApiService] fetchServerActiveYear: code=$code libelle=$libelle');
+    return (code: code, libelle: libelle);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
