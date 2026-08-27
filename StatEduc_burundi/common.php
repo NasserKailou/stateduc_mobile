@@ -90,8 +90,9 @@ if(!(isset($_POST['login']) && isset($_POST['password']))
 		}
 		spl_autoload_register('my_autoloader');
 		
-		ini_set('session.gc_maxlifetime', 3600); 
-		session_start();
+		ini_set('session.gc_maxlifetime', 3600);
+		// AK-FIX-SESSION: guard evite double-lock apres session_write_close() dans questionnaire_ws
+		if (session_status() === PHP_SESSION_NONE) { session_start(); }
     	if(isset($_GET['filtre'])) $_SESSION['filtre'] = $_GET['filtre'];  
 		if(isset($GLOBALS['placer_conn_dico']) && $GLOBALS['placer_conn_dico']) {
 			$GLOBALS['conn'] = $GLOBALS['conn_dico'] ; 
@@ -589,7 +590,8 @@ if(!(isset($_POST['login']) && isset($_POST['password']))
 		|| (isset($_GET['val']) && $_GET['val']=='param_conn')
 		|| (isset($_POST['val']) && $_POST['val']=='param_conn')){ // Si user non encore valide ou connexion impossible
 
-		session_start();
+		// AK-FIX-SESSION: guard evite double-lock sur appels curl internes (questionnaire_ws)
+		if (session_status() === PHP_SESSION_NONE) { session_start(); }
 		require_once $GLOBALS['SISED_PATH_CLS'] . 'connexion.class.php';
 		$connexion = new connexion();
 		$curcnx = $connexion->getActive();
