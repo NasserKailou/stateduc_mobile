@@ -39,28 +39,39 @@ $SISED_AURL         = $SISED_SERVER . $SISED_URL; // URL absolue pour accéder à 
 // $SISED_AURL_INTERNAL  = URL interne (127.0.0.1:port_local)
 // $SISED_HOST_HEADER    = valeur du Host header a passer dans curl
 function _sised_local_port() {
-    // Session 47: CORRECTION SSL-51
-    // Topologie production : Internet -> Nginx:443 (SSL) -> Apache:80 ou :8080 (HTTP)
-    // Les appels curl internes doivent cibler Apache en HTTP, jamais Nginx en HTTPS.
-    // Si on cible https://127.0.0.1, le certificat (pour stateduc.ins.ne) est invalide
-    // pour 127.0.0.1 => erreur cURL 51 "no alternative certificate subject name".
-    // REGLE : exclure le port 443 (et tout port SSL/proxy) de la detection.
-    // Ports HTTP Apache valides pour curl interne : 80, 8080, 8000, 8888.
-    $ports_http_only = array(80, 8080, 8000, 8888);
-    // Priorite 1 : SERVER_PORT si c'est un port HTTP Apache connu (pas 443)
+    // AK-FIX-PORT : Correction bug 404 curl interne sur ports non-standard (ex: 8083).
+    //
+    // ANCIEN COMPORTEMENT (bug) :
+    //   $ports_http_only = [80, 8080, 8000, 8888] -> SERVER_PORT 8083 non present
+    //   -> curl interne vers 127.0.0.1:80 -> 404 -> se_data='404 : HTTP/1.1 404 Not Found'
+    //
+    // NOUVEAU COMPORTEMENT :
+    //   Priorite 1 : SERVER_PORT si HTTP (pas SSL : != 443, != 8443)
+    //     Valide pour TOUT port HTTP : 80, 8080, 8000, 8083, 8888, 9090...
+    //     Un fsockopen verifie que le port repond vraiment en local.
+    //   Priorite 2 : sonder les ports HTTP standard en fallback
+    //   Priorite 3 : fallback 80 si rien ne repond
+    //
+    // SECURITE SSL-51 preservee : ports SSL/proxy (443, 8443) toujours exclus.
+    $ssl_ports = array(443, 8443);   // ports SSL/proxy a exclure
+    $fallback_ports = array(80, 8080, 8000, 8888);  // ports HTTP standard a sonder
+
+    // Priorite 1 : SERVER_PORT si ce n'est pas un port SSL
     if (isset($_SERVER['SERVER_PORT'])) {
         $p = (int)$_SERVER['SERVER_PORT'];
-        if (in_array($p, $ports_http_only)) {
+        if ($p > 0 && !in_array($p, $ssl_ports)) {
             $en = 0; $es = ''; $s = @fsockopen('127.0.0.1', $p, $en, $es, 2);
             if ($s !== false) { fclose($s); return $p; }
         }
-        // SERVER_PORT est un port proxy/SSL (ex: 443, 9191, 8443) -> ignorer
     }
-    // Priorite 2 : sonder les ports HTTP Apache standard (jamais 443)
-    foreach ($ports_http_only as $p) {
+
+    // Priorite 2 : sonder les ports HTTP standard (jamais les ports SSL)
+    foreach ($fallback_ports as $p) {
+        if (in_array($p, $ssl_ports)) continue;
         $en = 0; $es = ''; $s = @fsockopen('127.0.0.1', $p, $en, $es, 2);
         if ($s !== false) { fclose($s); return $p; }
     }
+
     // Fallback absolu : 80
     return 80;
 }
