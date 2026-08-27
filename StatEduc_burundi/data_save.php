@@ -30,7 +30,10 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 // Timeout pour l'appel interne vers questionnaire_ws.php
 // Sans timeout, le curl attend indefiniment si Apache est sature (self-curl deadlock)
 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 15); // echec rapide si connexion impossible
-$curl->setOpt(CURLOPT_TIMEOUT, 120);        // max 120s - questionnaire_ws.php peut prendre >60s sur serveur charge
+// AK-FIX-TIMEOUT: 120s trop court sur serveurs avec memory_limit bas ou charge eleve.
+// questionnaire_ws.php charge HTML+arbre+ADODB -> peut depasser 120s -> erreur 28.
+// 300s = 5min = marge large pour les formulaires les plus lourds.
+$curl->setOpt(CURLOPT_TIMEOUT, 300);        // max 300s (AK-FIX-TIMEOUT)
 // Session 46 : CURLOPT_SSL_VERIFYPEER=false supprime (faille securite).
 // Correction definitive SSL-51 : config_app.php force $_sised_local_scheme='http'
 // -> SISED_AURL_INTERNAL = http://127.0.0.1:PORT/ (jamais https:// vers 127.0.0.1)

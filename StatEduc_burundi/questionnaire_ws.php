@@ -18,7 +18,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 set_time_limit(0);
 ////Recuperation des varibles globales dans $_GET
-ini_set("memory_limit", "64M");
+ini_set("memory_limit", "256M"); // AK-FIX-MEM: 64M insuffisant pour formulaires (HTML+arbre+ADODB)
 $gets = '';
 $i=0;
 if(count($_GET)>0) {
