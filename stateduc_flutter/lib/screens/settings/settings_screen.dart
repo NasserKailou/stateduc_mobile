@@ -349,13 +349,16 @@ class _SettingsScreenState extends State<SettingsScreen>
   /// Onglet « Année » — sélection de l'année de recensement active.
   ///
   /// Comportement :
-  ///  - Affiche la liste des années depuis le cache SQLite (instantané)
-  ///  - Rafraîchit depuis le serveur en arrière-plan à l'ouverture de l'onglet
+  ///  - Affiche uniquement l'année active en session (liste fermée)
+  ///  - Cliquer sur la liste déroulante révèle les autres années disponibles
   ///  - L'année sélectionnée est persistée et utilisée dans tous les formulaires
   Widget _buildYearTab(AuthProvider auth) {
-    final years  = auth.schoolYears;
-    final active = auth.activeYear;
+    final years   = auth.schoolYears;
+    final active  = auth.activeYear;
     final loading = auth.yearsLoading;
+
+    // Années autres que l'année active (celles accessibles en déroulant)
+    final otherYears = years.where((y) => y.code != active?.code).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -381,38 +384,14 @@ class _SettingsScreenState extends State<SettingsScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            'Choisissez l\'année pour la saisie ou la consultation des données.',
+            'L\'année en session est affichée. Déroulez pour en changer.',
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
 
-          // ── Année active : badge de confirmation ──────────────────────
-          if (active != null) ...[
-            Card(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: ListTile(
-                leading: Icon(
-                  Icons.check_circle_outline,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                title: const Text('Année active'),
-                subtitle: Text(
-                  active.libelle,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-
-          // ── Liste des années disponibles ──────────────────────────────
+          // ── Liste déroulante des années ───────────────────────────────
           if (years.isEmpty && !loading) ...[
+            // Aucune année disponible
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -433,12 +412,63 @@ class _SettingsScreenState extends State<SettingsScreen>
               ),
             ),
           ] else ...[
-            Text(
-              'Sélectionner une année :',
-              style: Theme.of(context).textTheme.labelLarge,
+            // ExpansionTile : en-tête = année active, corps = autres années
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 1.5,
+                ),
+              ),
+              child: Theme(
+                // Supprime le diviseur interne par défaut d'ExpansionTile
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  leading: Icon(
+                    Icons.calendar_today,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  // En-tête : année active (ou placeholder si aucune)
+                  title: Text(
+                    active?.libelle ?? 'Aucune année en session',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: active != null
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Année en session — appuyer pour changer',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.expand_more,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  // Corps déroulé : liste des autres années
+                  children: otherYears.isEmpty
+                      ? [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                            child: Text(
+                              'Aucune autre année disponible.',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                        ]
+                      : otherYears
+                          .map((y) => _buildYearDropdownItem(auth, y))
+                          .toList(),
+                ),
+              ),
             ),
-            const SizedBox(height: 8),
-            ...years.map((y) => _buildYearTile(auth, y, active)),
           ],
 
           // ── Bouton rafraîchir ─────────────────────────────────────────
@@ -459,68 +489,45 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-  /// Tuile représentant une année sélectionnable.
-  Widget _buildYearTile(
-      AuthProvider auth, SchoolYear year, SchoolYear? active) {
-    final isSelected = active?.code == year.code;
-    final color = isSelected
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.onSurface;
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: isSelected
-            ? BorderSide(
-                color: Theme.of(context).colorScheme.primary, width: 2)
-            : BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: isSelected ? null : () => _selectYear(auth, year),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                isSelected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_unchecked,
-                color: color,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  year.libelle,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: isSelected
-                        ? FontWeight.w700
-                        : FontWeight.w400,
-                    color: color,
-                  ),
-                ),
-              ),
-              if (isSelected)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Active',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ),
-            ],
+  /// Élément de la liste déroulante représentant une année non active.
+  /// Un tap déclenche le dialog de confirmation puis active l'année.
+  Widget _buildYearDropdownItem(AuthProvider auth, SchoolYear year) {
+    return InkWell(
+      onTap: () => _selectYear(auth, year),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+              width: 0.5,
+            ),
           ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(
+              Icons.radio_button_unchecked,
+              size: 20,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                year.libelle,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: 18,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ],
         ),
       ),
     );
