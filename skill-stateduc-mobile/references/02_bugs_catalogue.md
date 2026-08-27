@@ -305,3 +305,400 @@ git -c credential.helper= push \
   branch:branch
 ```
 → Voir `scripts/push_github.sh`
+
+---
+
+## ══════════════════════════════════════════════════════
+## BUGS SESSIONS 10-19 (ak_app_ident + ak_secure) — 20-27 août 2026
+## ══════════════════════════════════════════════════════
+
+---
+
+## BUG-PHP8-001 — Fatal Error PHP 8 : ereg() undefined function
+
+**Symptôme**
+```
+PHP Fatal error: Uncaught Error: Call to undefined function ereg() in instance_grille.php
+PHP Fatal error: Uncaught Error: Call to undefined function eregi()
+```
+
+**Root cause**
+`ereg()` et `eregi()` ont été supprimées en PHP 7.0. Le codebase StatEduc
+datait de PHP 4/5 et utilisait ces fonctions dans 30+ fichiers.
+
+**Fix**
+```php
+// AVANT (PHP4/5):
+if (ereg('^' . $pattern . '$', $str)) { ... }
+if (eregi('\.cub', $filename)) { ... }
+
+// APRÈS (PHP8):
+if (preg_match('/^' . preg_quote($pattern, '/') . '$/', $str)) { ... }
+if (preg_match('/\.cub/i', $filename)) { ... }  // /i = insensible casse (remplace eregi)
+```
+
+**Fichiers modifiés** : `instance_grille.php` (16 occurrences), `aggregated_db_structure.class.php`, `load_sql.php`, `defaut_nomenc_syst.php`, `export_grille.php`, `import_excel.php`, `olap_tools/*` (4 fichiers)
+
+**Règle** : En PHP 8, toujours utiliser `preg_match()`. Pour `eregi()` (insensible à la casse), utiliser le flag `/i`.
+
+---
+
+## BUG-PHP8-002 — Fatal Error PHP 8 : constructeurs PHP 4 non reconnus
+
+**Symptôme**
+```
+PHP Deprecated: Methods with the same name as their class will not be constructors in PHP8
+PHP Fatal error: Cannot redeclare __construct()
+```
+
+**Root cause**
+PHP 4 utilisait le nom de la classe comme constructeur. PHP 8 ne l'accepte plus.
+15 bibliothèques tierces (fpdf, htmlparser, pclzip, etc.) utilisaient ce pattern.
+
+**Fix**
+```php
+// AVANT (PHP4):
+class FPDF {
+    function FPDF($orientation='P', $unit='mm', $format='A4') { ... }
+}
+
+// APRÈS (PHP8):
+class FPDF {
+    function __construct($orientation='P', $unit='mm', $format='A4') { ... }
+}
+```
+
+**Fichiers modifiés** : `fpdf.inc.php`, `htmlparser.inc.php`, `pclzip.lib.php`, `pdftable.inc.php`, `sms.inc.php`, `class.ADODB_XML.php`, `class.xml.php`, `oleread.inc.php`, `reader.php` (15 constructeurs au total)
+
+---
+
+## BUG-PHP8-003 — E_WARNING generer_frame_grille() : variables non initialisées
+
+**Symptôme (log Apache)**
+```
+PHP Warning: Undefined variable $aff_total_vertic in frame.class.php:3283
+PHP Warning: Undefined variable $rowspan_tr in frame.class.php:2974
+PHP Warning: array_keys(): Argument #1 ($array) must be of type array, null given in frame.class.php:2683
+```
+`gentheme` (génération du formulaire HTML) s'arrêtait silencieusement — fichiers non écrits.
+
+**Root cause**
+En PHP 8.2, `E_WARNING` sur variable non initialisée bloque l'exécution si `error_reporting` est élevé. 6 variables conditionnelles utilisées avant initialisation dans `generer_frame_grille()`.
+
+**Fix**
+```php
+// Fix 1: early return si dico vide
+if (empty($this->dico)) { return ''; }
+
+// Fix 2: initialiser avant foreach conditionnel
+$aff_total_vertic = false;
+foreach (...) { if (...) $aff_total_vertic = true; }
+
+// Fix 3: initialiser $rowspan_tr
+$rowspan_tr = '';
+if ($nb_tr > 1) { $rowspan_tr = ' rowspan="' . $nb_tr . '"'; }
+
+// Fix 4: null-coalescing sur accès tableau
+$lib = ($tab_libelles_mesures[$i_mes] ?? '');
+
+// Fix 5: initialiser compteur avant foreach
+$cpt = 0;
+foreach (...) { $cpt++; }
+
+// Fix 6: guard isset avant file_put_contents
+if (isset($element)) { file_put_contents(...); }
+```
+
+**Fichiers modifiés** : `frame.class.php`, `frame_mobile.class.php`
+
+---
+
+## BUG-PHP8-004 — magic_quotes no-op manquant en PHP 8
+
+**Symptôme**
+```
+PHP Fatal error: Call to undefined function get_magic_quotes_gpc()
+```
+
+**Root cause**
+`get_magic_quotes_gpc()` supprimée en PHP 8. La fonction wrapper `manage_magic_quotes()` l'appelait sans guard.
+
+**Fix**
+```php
+// AVANT:
+function manage_magic_quotes(&$array) {
+    if (get_magic_quotes_gpc()) {  // Fatal en PHP8
+        array_walk_recursive($array, 'stripslashes');
+    }
+}
+
+// APRÈS:
+function manage_magic_quotes(&$array) {
+    // get_magic_quotes_gpc() supprimée en PHP8 — magic quotes désactivées par défaut
+    // Cette fonction est conservée pour compatibilité des appels mais est un no-op
+    return;
+}
+```
+
+**Fichier modifié** : `server-side/lib/fonctions.inc.php`
+
+---
+
+## BUG-ADODB-002 — ADODB_ASSOC_CASE non protégé → conflit define() PHP 8
+
+**Symptôme**
+```
+PHP Notice: Constant ADODB_ASSOC_CASE already defined in connexion.class.php
+```
+
+**Root cause**
+`define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER)` appelé deux fois quand les fichiers sont inclus dans plusieurs chemins d'exécution.
+
+**Fix**
+```php
+// AVANT:
+define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
+
+// APRÈS:
+if (!defined('ADODB_ASSOC_CASE')) {
+    define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_UPPER);
+}
+```
+
+**Fichier modifié** : `connexion.class.php`
+
+---
+
+## BUG-FLUTTER-S18 — [5, text] affiché au lieu de la valeur réelle
+
+**Symptôme**
+L'application Flutter affiche `[5, text]`, `[0, text]`, `[CODE_TYPE_ACCES_0_6, radio]`
+dans les champs de saisie au lieu des valeurs réelles.
+
+**Root cause**
+Le serveur retourne `Map<String, dynamic>` avec des valeurs tableau `[valeur, type]`
+ex: `{"champ1": [5, "text"], "champ2": ["CODE_TYPE_ACCES_0_6", "radio"]}`.
+`_autoReloadFromServerBackground()` utilisait `v.toString()` → `"[5, text]"` stocké en SQLite.
+Cette valeur corrompue était relue et affichée telle quelle.
+
+**Fix**
+```dart
+// AVANT (bug):
+final stored = v.toString();  // → "[5, text]"
+
+// APRÈS:
+dynamic rawVal = v;
+if (rawVal is List && rawVal.isNotEmpty) {
+    rawVal = rawVal[0];  // extraire la vraie valeur
+}
+// Normaliser les IDs radio (CODE_TYPE_ACCES_0_6 → "6")
+if (rawVal is String && rawVal.contains('_')) {
+    final parts = rawVal.split('_');
+    rawVal = parts.last;
+}
+final stored = rawVal?.toString() ?? '';
+```
+
+**Fichier modifié** : `lib/providers/data_entry_provider.dart`
+
+---
+
+## BUG-FLUTTER-S19 — [5, text] en SQLite legacy (données corrompues avant fix S18)
+
+**Symptôme**
+Même après fix S18, certains appareils affichaient encore `[5, text]` car leur SQLite
+contenait déjà des données corrompues persistées avant le fix.
+
+**Root cause**
+Fix S18 corrigeait la persistance future mais pas les données déjà en base.
+`getCollectedData()` lisait SQLite sans sanitiser → affichait les anciennes valeurs corrompues.
+
+**Fix**
+```dart
+// database_service.dart — helper de sanitisation
+static String _sanitizeStoredValue(dynamic raw) {
+    if (raw == null) return '';
+    final s = raw.toString();
+    // Détecter format "[valeur, type]" ou "[valeur,type]"
+    if (s.startsWith('[') && s.endsWith(']')) {
+        final inner = s.substring(1, s.length - 1);
+        final first = inner.split(',').first.trim();
+        return first;
+    }
+    return s;
+}
+
+// Appliqué dans getCollectedData(), getAllCollectedDataForCoherence(),
+// getAllCollectedDataForCampEtab() — lecture systématique avec sanitisation
+```
+
+**Fichier modifié** : `lib/services/database_service.dart`
+
+---
+
+## BUG-CSRF-001 — CSRF token : méthode inexistante SecurityHelper::csrfToken()
+
+**Symptôme (app_fie)**
+```
+PHP Fatal error: Call to undefined method SecurityHelper::csrfToken()
+```
+
+**Root cause**
+`app_fie` utilise `FIE_CSRF_TOKEN_NAME` constant + méthode `getCsrfToken()`.
+Certains fichiers utilisaient le literal string ou `SecurityHelper::csrfToken()` (inexistant).
+
+**Fix**
+```php
+// AVANT (bug):
+'<input type="hidden" name="csrf_token" value="...">'
+// OU:
+$token = SecurityHelper::csrfToken();
+
+// APRÈS:
+'<input type="hidden" name="' . FIE_CSRF_TOKEN_NAME . '" value="' . getCsrfToken() . '">'
+```
+
+**Fichiers modifiés** : `ParametresController.php`, `parametres.php`, `AdminController.php`, `import_eleves.php`
+
+---
+
+## BUG-PDO-001 — SQLSTATE HY093 : placeholders PDO dupliqués
+
+**Symptôme (app_fie)**
+```
+PDOException: SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+```
+
+**Root cause**
+`EleveModel` et `InscriptionModel` utilisaient des requêtes PDO avec des paramètres
+nommés (`:nom`, `:prenom`) mais les passaient dans un array positonnel (`[valeur1, valeur2]`),
+ou inversement mixaient paramètres nommés et positionnels dans la même requête.
+
+**Fix**
+```php
+// AVANT (bug): paramètre nommé + array positionnel
+$stmt = $pdo->prepare("SELECT * FROM eleves WHERE nom = :nom AND prenom = :prenom");
+$stmt->execute([$nom, $prenom]);  // HY093
+
+// APRÈS: cohérent — nommés + nommés
+$stmt = $pdo->prepare("SELECT * FROM eleves WHERE nom = :nom AND prenom = :prenom");
+$stmt->execute([':nom' => $nom, ':prenom' => $prenom]);
+
+// OU positionnel + positionnel
+$stmt = $pdo->prepare("SELECT * FROM eleves WHERE nom = ? AND prenom = ?");
+$stmt->execute([$nom, $prenom]);
+```
+
+**Fichiers modifiés** : `EleveModel.php`, `InscriptionModel.php`
+
+---
+
+## BUG-PILOTE-001 — Cohérence offline déclenchée à chaque frappe (debounce intempestif)
+
+**Symptôme**
+Sur le terrain lors de la phase pilote : chaque frappe de clavier déclenchait une
+vérification de cohérence → lag perceptible → frustration agents de terrain.
+
+**Root cause**
+`checkCoherenceOffline()` se déclenchait via `Timer(Duration(milliseconds: 800), ...)`
+dans `updateField()` — soit à chaque modification de champ.
+
+**Fix**
+Désactiver le debounce automatique. L'agent déclenche la cohérence manuellement
+(bouton dédié) ou à la soumission.
+```dart
+// AVANT:
+void updateField(String key, String value) {
+    _data[key] = value;
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(
+        const Duration(milliseconds: 800),
+        () => checkCoherenceOffline(),  // ← supprimé
+    );
+}
+
+// APRÈS:
+void updateField(String key, String value) {
+    _data[key] = value;
+    notifyListeners();  // pas de debounce auto
+}
+```
+
+**Fichier modifié** : `lib/providers/data_entry_provider.dart`
+
+---
+
+## BUG-PILOTE-002 — Bouton Supprimer campagne trop accessible (risque suppression accidentelle)
+
+**Symptôme (phase pilote)**
+Agents de terrain supprimaient accidentellement des campagnes depuis l'écran principal
+en cliquant `Icons.delete_outline` visible sur chaque CampaignCard.
+
+**Fix**
+Déplacer le bouton « Supprimer » vers l'écran **Paramètres** uniquement.
+```dart
+// AVANT: bouton visible dans chaque _CampaignCard
+IconButton(
+    icon: const Icon(Icons.delete_outline),
+    onPressed: () => _deleteCampaign(context, campaign),
+)
+
+// APRÈS: bouton uniquement dans SettingsScreen
+// CampaignCard: suppression du bouton delete
+// SettingsScreen: ajout section "Gestion campagnes" avec bouton Supprimer
+```
+
+**Fichier modifié** : `lib/screens/campaign/campaign_list_screen.dart`, `lib/screens/settings/settings_screen.dart`
+
+---
+
+## BUG-PILOTE-003 — Icône déconnexion dans AppBar trop visible (déconnexions accidentelles)
+
+**Symptôme (phase pilote)**
+Agents se déconnectaient accidentellement en touchant l'icône `Icons.logout` dans l'AppBar.
+
+**Fix**
+Retirer l'icône déconnexion de l'AppBar de `CampaignListScreen`. La déconnexion
+reste accessible uniquement depuis **Paramètres**.
+
+**Fichier modifié** : `lib/screens/campaign/campaign_list_screen.dart`
+
+---
+
+## BUG-REGROUP-001 — ID_REGROUP_PARENTS / ID_TYPE_REGROUP_PARENTS vides pour nouvelle année
+
+**Symptôme**
+Quand une nouvelle année de collecte est créée, l'import Excel des établissements
+ne remplit pas `ID_REGROUP_PARENTS` / `ID_TYPE_REGROUP_PARENTS` → hiérarchie
+géographique manquante (colline → commune → province).
+
+**Root cause**
+`maj_bdd_excel()` dans `user.class.php` ne reconstruisait pas la hiérarchie
+quand les colonnes parent étaient vides (nouveau template sans données).
+
+**Fix**
+Interroger `ETABLISSEMENT_REGROUPEMENT` via jointure `REGROUPEMENT → HIERARCHIE`
+filtrée sur `id_chaine`, ordonnée par `NIVEAU_CHAINE ASC` pour reconstruire la
+hiérarchie complète.
+
+**Fichier modifié** : `StatEduc_burundi/server-side/classes/metier/user.class.php`
+
+---
+
+## BUG-KOSAVE-002 — KOSAVE bypass verif() exit() pour appels curl mobiles
+
+**Symptôme (session 62)**
+L'envoi de données depuis Flutter retournait `KOSAVE` même avec des données valides.
+Code `10602` spécifique.
+
+**Root cause**
+`verif()` dans `questionnaire_ws.php` appelait `exit()` directement pour les erreurs
+de validation, tronquant la réponse JSON avant que `data_save.php` ne la reçoive.
+Les appels cURL mobiles n'avaient pas de session PHP active → `verif()` déclenchait
+un `exit()` inattendu au lieu de retourner une erreur propre.
+
+**Fix**
+Bypass `verif()` pour les appels cURL internes mobiles — détecter l'appel cURL
+par en-tête HTTP et retourner `{"MAJ_OK": false, "SQLERR": "..."}` au lieu de `exit()`.
+
+**Fichier modifié** : `StatEduc_burundi/questionnaire_ws.php`

@@ -1,217 +1,275 @@
 #!/usr/bin/env bash
-# push_github.sh — Régénération token GitHub App + push + PR update
+# push_github.sh — Régénération token GitHub App + push + mise à jour PR
 #
 # USAGE:
-#   bash push_github.sh "fix(scope): message de commit"
-#   bash push_github.sh "feat(ak-xxx): nouvelle fonctionnalité" --force
+#   bash scripts/push_github.sh "fix(scope): message de commit"
+#   bash scripts/push_github.sh "feat(scope): nouvelle fonctionnalité" --force
 #
-# TAGS: AK-PUSH
+# OPTIONS:
+#   --force   : git push -f (après rebase/squash)
+#   --no-pr   : ne pas créer/mettre à jour la PR
+#
+# TAGS: AK-PUSH-001
+#
+# PROBLÈME RÉSOLU:
+#   Les tokens GitHub App (ghs_NNNN_JWT) expirent après 1h.
+#   Ce script régénère toujours un token frais avant chaque push.
 #
 # PRÉREQUIS:
-#   - setup_github_environment doit avoir été exécuté au moins une fois
-#   - git configuré avec remote 'origin'
-#   - gh CLI installé (optionnel — pour la création/maj de PR)
-#
-# VARIABLES À ADAPTER:
-REPO_OWNER="NasserKailou"
-REPO_NAME="stateduc_mobile"
-BRANCH_DEV="ak_secure"
-BRANCH_BASE="main"
-PR_NUMBER="2"     # Numéro de la PR existante (0 pour créer une nouvelle)
+#   - Outil Genspark `setup_github_environment` disponible dans l'env
+#   - GitHub CLI `gh` installé (pour les opérations PR)
+#   - Être sur la branche ak_secure
 
 set -euo pipefail
 
 # ─────────────────────────────────────────────────────────────────────────────
-# COULEURS
+# CONFIGURATION — adapter selon le projet
 # ─────────────────────────────────────────────────────────────────────────────
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+REPO_OWNER="NasserKailou"
+REPO_NAME="stateduc_mobile"
+BRANCH="ak_secure"
+BASE_BRANCH="main"
+PR_NUMBER=""  # sera détecté automatiquement
 
-info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
-success() { echo -e "${GREEN}[OK]${NC} $1"; }
-warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
-error()   { echo -e "${RED}[ERROR]${NC} $1" >&2; }
-
-# ─────────────────────────────────────────────────────────────────────────────
-# ARGUMENTS
-# ─────────────────────────────────────────────────────────────────────────────
-COMMIT_MSG="${1:-}"
+WORKDIR="/home/user/webapp"
 FORCE_PUSH=false
-if [[ "${2:-}" == "--force" ]] || [[ "${1:-}" == "--force" ]]; then
-    FORCE_PUSH=true
+CREATE_PR=true
+COMMIT_MSG="${1:-}"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PARSE ARGUMENTS
+# ─────────────────────────────────────────────────────────────────────────────
+for arg in "${@:2}"; do
+    case "$arg" in
+        --force)  FORCE_PUSH=true  ;;
+        --no-pr)  CREATE_PR=false  ;;
+    esac
+done
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FONCTIONS UTILITAIRES
+# ─────────────────────────────────────────────────────────────────────────────
+
+log()  { echo "$(date '+%H:%M:%S') [PUSH] $*"; }
+err()  { echo "$(date '+%H:%M:%S') [PUSH] ❌ ERREUR: $*" >&2; }
+ok()   { echo "$(date '+%H:%M:%S') [PUSH] ✅ $*"; }
+warn() { echo "$(date '+%H:%M:%S') [PUSH] ⚠️  $*"; }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ÉTAPE 0 — Vérifications préalables
+# ─────────────────────────────────────────────────────────────────────────────
+
+log "=== Démarrage push_github.sh ==="
+cd "$WORKDIR"
+
+# Vérifier qu'on est sur la bonne branche
+CURRENT_BRANCH=$(git branch --show-current)
+if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
+    warn "Branche courante: $CURRENT_BRANCH (attendu: $BRANCH)"
+    read -rp "Continuer quand même? [y/N] " confirm
+    [ "$confirm" = "y" ] || { err "Push annulé."; exit 1; }
 fi
 
-if [[ -z "$COMMIT_MSG" ]] || [[ "$COMMIT_MSG" == "--force" ]]; then
-    error "Message de commit requis"
-    echo "Usage: bash push_github.sh \"fix(scope): message\" [--force]"
+# ─────────────────────────────────────────────────────────────────────────────
+# ÉTAPE 1 — Validation du message de commit
+# ─────────────────────────────────────────────────────────────────────────────
+
+if [ -z "$COMMIT_MSG" ]; then
+    err "Message de commit manquant."
+    echo "Usage: bash $0 \"fix(scope): message\""
     exit 1
 fi
 
-# ─────────────────────────────────────────────────────────────────────────────
-# ÉTAPE 1 — Vérifier l'état git
-# ─────────────────────────────────────────────────────────────────────────────
-info "=== ÉTAPE 1: État git ==="
-
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-info "Branche actuelle: $CURRENT_BRANCH"
-
-if [[ "$CURRENT_BRANCH" != "$BRANCH_DEV" ]]; then
-    warn "Pas sur $BRANCH_DEV — passage automatique"
-    git checkout "$BRANCH_DEV" || {
-        error "Impossible de passer sur $BRANCH_DEV"
-        exit 1
-    }
+# Valider le format conventionnel (avertissement seulement)
+if ! echo "$COMMIT_MSG" | grep -qE '^(fix|feat|refactor|docs|chore|test|style|perf|revert)\([^)]+\): .+'; then
+    warn "Message ne respecte pas le format conventionnel: type(scope): description"
+    warn "Continuer quand même..."
 fi
 
-# Vérifier si des fichiers sont à committer
-GIT_STATUS=$(git status --porcelain)
-if [[ -n "$GIT_STATUS" ]]; then
-    info "Fichiers modifiés à committer:"
-    git status --short
+log "Message commit: $COMMIT_MSG"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ÉTAPE 2 — Vérification syntaxe Dart
+# ─────────────────────────────────────────────────────────────────────────────
+
+log "Vérification syntaxe Dart..."
+DART_DIR="$WORKDIR/stateduc_flutter/lib"
+if [ -d "$DART_DIR" ]; then
+    SYNTAX_OK=true
+    for dart_file in $(git diff --name-only HEAD | grep '\.dart$' || true); do
+        if [ -f "$dart_file" ]; then
+            log "  Vérification: $dart_file"
+            if ! python3 "$WORKDIR/skill-stateduc-mobile/scripts/syntax_check.py" "$dart_file" > /tmp/dart_check.txt 2>&1; then
+                cat /tmp/dart_check.txt
+                err "Erreur syntaxe Dart dans $dart_file"
+                SYNTAX_OK=false
+            fi
+        fi
+    done
+    if [ "$SYNTAX_OK" = false ]; then
+        err "Corriger les erreurs de syntaxe Dart avant de pousser."
+        exit 1
+    fi
+    ok "Syntaxe Dart validée"
+else
+    warn "Répertoire lib/ introuvable — vérification Dart ignorée"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ÉTAPE 3 — Commit des modifications en attente
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Vérifier s'il y a des fichiers modifiés non committés
+MODIFIED=$(git diff --name-only && git diff --name-only --staged)
+if [ -n "$MODIFIED" ]; then
+    log "Fichiers modifiés détectés — staging et commit..."
     git add -A
     git commit -m "$COMMIT_MSG"
-    success "Commit créé: $COMMIT_MSG"
+    ok "Commit créé: $(git log --oneline -1)"
 else
-    info "Rien à committer — tentative de push du dernier commit"
+    log "Pas de modification à committer — push du HEAD existant"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ÉTAPE 2 — Régénérer le token GitHub App
+# ÉTAPE 4 — Synchronisation avec origin
 # ─────────────────────────────────────────────────────────────────────────────
-info "=== ÉTAPE 2: Régénération token GitHub ==="
 
-# Supprimer les credentials périmés
-if [[ -f ~/.git-credentials ]]; then
-    rm -f ~/.git-credentials
-    info "Credentials périmés supprimés"
+log "Récupération des commits distants..."
+git fetch origin 2>&1 | grep -v "^$" || true
+
+# Vérifier si origin/ak_secure est en avance
+BEHIND=$(git rev-list --count "HEAD..origin/$BRANCH" 2>/dev/null || echo 0)
+if [ "$BEHIND" -gt 0 ]; then
+    log "$BEHIND commits distants non intégrés — rebase en cours..."
+    if ! git rebase "origin/$BRANCH"; then
+        err "Conflits de rebase détectés. Résoudre manuellement:"
+        echo "  git status"
+        echo "  # Éditer les fichiers en conflit"
+        echo "  git add <fichiers>"
+        echo "  git rebase --continue"
+        echo "  bash $0 '$COMMIT_MSG' ${FORCE_PUSH:+--force}"
+        exit 1
+    fi
+    ok "Rebase terminé"
 fi
 
-# Régénérer via setup_github_environment
-# Note: Dans le contexte Claude/Genspark, cette commande est un outil spécial.
-# Dans un vrai bash, on utiliserait l'API GitHub App directement.
-info "Exécuter setup_github_environment pour régénérer le token..."
-info "(Dans Claude: utiliser l'outil setup_github_environment)"
+# ─────────────────────────────────────────────────────────────────────────────
+# ÉTAPE 5 — Régénération token GitHub App
+# ─────────────────────────────────────────────────────────────────────────────
 
-# Attendre que le token soit disponible
-sleep 2
+log "Régénération token GitHub App..."
+
+# Supprimer les credentials en cache (tokens périmés)
+rm -f ~/.git-credentials
+
+# Régénérer via l'outil Genspark (setup_github_environment)
+# NOTE: dans un contexte non-Genspark, remplacer par :
+#   git config credential.helper store
+#   echo "https://x-access-token:VOTRE_TOKEN@github.com" > ~/.git-credentials
+if command -v setup_github_environment &>/dev/null; then
+    setup_github_environment 2>/dev/null || true
+else
+    warn "setup_github_environment non disponible — utiliser le token manuellement"
+    echo ""
+    echo "Entrer le token GitHub App (format: ghs_...):"
+    read -rs TOKEN_MANUAL
+    echo ""
+    echo "https://x-access-token:${TOKEN_MANUAL}@github.com" > ~/.git-credentials
+    chmod 600 ~/.git-credentials
+fi
 
 # Extraire le token du fichier credentials
-if [[ ! -f ~/.git-credentials ]]; then
-    error "~/.git-credentials introuvable après setup_github_environment"
-    error "Exécuter manuellement: setup_github_environment"
+TOKEN=$(grep 'github.com' ~/.git-credentials 2>/dev/null | \
+    sed 's|.*x-access-token:\([^@]*\)@.*|\1|' | head -1)
+
+if [ -z "$TOKEN" ]; then
+    err "Token GitHub App non trouvé dans ~/.git-credentials"
+    err "Vérifier que setup_github_environment a réussi"
     exit 1
 fi
 
-TOKEN=$(grep 'github.com' ~/.git-credentials \
-    | sed 's|.*x-access-token:\(.*\)@.*|\1|' \
-    | head -1)
+ok "Token GitHub App extrait (${#TOKEN} caractères, début: ${TOKEN:0:15}...)"
 
-if [[ -z "$TOKEN" ]]; then
-    error "Token introuvable dans ~/.git-credentials"
-    error "Contenu actuel:"
-    cat ~/.git-credentials 2>/dev/null || echo "(vide)"
-    exit 1
+# ─────────────────────────────────────────────────────────────────────────────
+# ÉTAPE 6 — Push
+# ─────────────────────────────────────────────────────────────────────────────
+
+PUSH_URL="https://x-access-token:${TOKEN}@github.com/${REPO_OWNER}/${REPO_NAME}.git"
+PUSH_FLAGS=""
+if [ "$FORCE_PUSH" = true ]; then
+    PUSH_FLAGS="-f"
+    warn "Force push activé (--force)"
 fi
 
-TOKEN_PREVIEW="${TOKEN:0:20}..."
-success "Token récupéré: $TOKEN_PREVIEW"
-
-# ─────────────────────────────────────────────────────────────────────────────
-# ÉTAPE 3 — Synchroniser avec origin
-# ─────────────────────────────────────────────────────────────────────────────
-info "=== ÉTAPE 3: Synchronisation avec origin ==="
-
-git fetch origin 2>&1 | head -5 || warn "git fetch a échoué — continuer quand même"
-
-# Vérifier si origin/ak_secure existe
-if git rev-parse "origin/$BRANCH_DEV" &>/dev/null; then
-    AHEAD=$(git log --oneline "origin/$BRANCH_DEV..HEAD" 2>/dev/null | wc -l)
-    BEHIND=$(git log --oneline "HEAD..origin/$BRANCH_DEV" 2>/dev/null | wc -l)
-    info "Local: +$AHEAD commit(s) d'avance, -$BEHIND commit(s) de retard"
-
-    if [[ "$BEHIND" -gt 0 && "$AHEAD" -gt 0 ]]; then
-        warn "Historiques divergents — rebase nécessaire"
-        git rebase "origin/$BRANCH_DEV" || {
-            error "Rebase échoué — résoudre les conflits manuellement"
-            error "Commandes: git status → résoudre → git add → git rebase --continue"
-            exit 1
-        }
-        FORCE_PUSH=true
-    elif [[ "$BEHIND" -gt 0 ]]; then
-        git merge "origin/$BRANCH_DEV" --ff-only || {
-            warn "Fast-forward impossible — rebase"
-            git rebase "origin/$BRANCH_DEV"
-            FORCE_PUSH=true
-        }
-    fi
+log "Push vers origin/$BRANCH..."
+# -c credential.helper= : désactiver les helpers credential (évite les hangs)
+if git -c credential.helper= push $PUSH_FLAGS "$PUSH_URL" "$BRANCH" 2>&1; then
+    ok "Push réussi → origin/$BRANCH"
 else
-    info "Branche $BRANCH_DEV n'existe pas encore sur origin — premier push"
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-# ÉTAPE 4 — Push avec le token frais
-# ─────────────────────────────────────────────────────────────────────────────
-info "=== ÉTAPE 4: Push vers origin/$BRANCH_DEV ==="
-
-REMOTE_URL="https://x-access-token:${TOKEN}@github.com/${REPO_OWNER}/${REPO_NAME}.git"
-
-PUSH_OPTS=()
-if [[ "$FORCE_PUSH" == "true" ]]; then
-    PUSH_OPTS+=("-f")
-    warn "Force push activé (-f)"
-fi
-
-git -c credential.helper= push "${PUSH_OPTS[@]}" \
-    "$REMOTE_URL" \
-    "$BRANCH_DEV" && success "Push réussi vers origin/$BRANCH_DEV" || {
-    error "Push échoué"
-    error "Essayer avec --force si l'historique a été réécrit (rebase/squash)"
+    err "Push échoué"
+    echo ""
+    echo "Diagnostics:"
+    echo "  git log --oneline origin/$BRANCH..HEAD  # commits non poussés"
+    echo "  git remote -v                            # vérifier URL remote"
     exit 1
-}
+fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ÉTAPE 5 — Créer ou mettre à jour la PR (optionnel — nécessite gh CLI)
+# ÉTAPE 7 — Créer ou mettre à jour la Pull Request
 # ─────────────────────────────────────────────────────────────────────────────
-info "=== ÉTAPE 5: Pull Request ==="
 
+if [ "$CREATE_PR" = false ]; then
+    log "PR ignorée (--no-pr)"
+    exit 0
+fi
+
+# Vérifier que gh est installé
 if ! command -v gh &>/dev/null; then
-    warn "gh CLI non installé — skipping PR creation"
-    warn "Installer avec: sudo apt install gh"
-    info "PR manuelle: https://github.com/$REPO_OWNER/$REPO_NAME/pull/$PR_NUMBER"
+    warn "GitHub CLI (gh) non disponible — PR non créée/mise à jour"
+    echo "Installer avec: apt install gh"
     exit 0
 fi
 
 # Configurer gh avec le token
-export GH_TOKEN="$TOKEN"
+echo "$TOKEN" | gh auth login --with-token 2>/dev/null || true
 
-if [[ "$PR_NUMBER" -gt 0 ]]; then
-    # Mettre à jour une PR existante
-    LAST_COMMITS=$(git log --oneline -5 | sed 's/^/  - /')
-    gh pr edit "$PR_NUMBER" \
-        --repo "$REPO_OWNER/$REPO_NAME" \
-        --body "## Derniers commits
+log "Vérification PR existante..."
+EXISTING_PR=$(gh pr list \
+    --repo "${REPO_OWNER}/${REPO_NAME}" \
+    --head "$BRANCH" \
+    --base "$BASE_BRANCH" \
+    --json number \
+    --jq '.[0].number' 2>/dev/null || echo "")
+
+# Construire la description de la PR
+LAST_COMMITS=$(git log --oneline "origin/$BASE_BRANCH..$BRANCH" 2>/dev/null | head -10 | \
+    sed 's/^/- /' || echo "- (commits)")
+PR_BODY="## Changements — branche \`$BRANCH\`
 
 $LAST_COMMITS
 
 ---
-*Mis à jour automatiquement par push_github.sh*" 2>/dev/null && \
-        success "PR #$PR_NUMBER mise à jour" || \
-        warn "Mise à jour PR #$PR_NUMBER échouée (peut nécessiter gh auth)"
+*Généré automatiquement par push_github.sh*"
 
-    info "URL PR: https://github.com/$REPO_OWNER/$REPO_NAME/pull/$PR_NUMBER"
+if [ -n "$EXISTING_PR" ]; then
+    log "Mise à jour PR #${EXISTING_PR}..."
+    gh pr edit "$EXISTING_PR" \
+        --repo "${REPO_OWNER}/${REPO_NAME}" \
+        --body "$PR_BODY" 2>/dev/null && \
+        ok "PR #${EXISTING_PR} mise à jour: https://github.com/${REPO_OWNER}/${REPO_NAME}/pull/${EXISTING_PR}"
 else
-    # Créer une nouvelle PR
+    log "Création d'une nouvelle PR..."
     PR_URL=$(gh pr create \
-        --repo "$REPO_OWNER/$REPO_NAME" \
-        --head "$BRANCH_DEV" \
-        --base "$BRANCH_BASE" \
+        --repo  "${REPO_OWNER}/${REPO_NAME}" \
+        --head  "$BRANCH" \
+        --base  "$BASE_BRANCH" \
         --title "$COMMIT_MSG" \
-        --body "## Changements\n$COMMIT_MSG" 2>/dev/null) && \
-        success "PR créée: $PR_URL" || \
-        warn "Création PR échouée — créer manuellement"
+        --body  "$PR_BODY" 2>/dev/null || echo "")
+    if [ -n "$PR_URL" ]; then
+        ok "PR créée: $PR_URL"
+    else
+        warn "Création PR échouée — vérifier les droits GitHub"
+    fi
 fi
 
-success "=== DONE ==="
+log "=== push_github.sh terminé ==="

@@ -3,6 +3,9 @@
 > **Skill réutilisable** extrait de l'intervention complète sur StatEduc Burundi (2026).
 > Couvre l'architecture, les patterns de bugs connus, les corrections prouvées,
 > et les templates prêts à l'emploi pour tout nouveau système similaire.
+>
+> **Sessions couvertes :** Sessions 1-19 (`ak_secure`) + Sessions 1-17 (`ak_app_ident`) — 20 août au 27 août 2026.
+> **Deux applications :** `StatEduc_burundi` (PHP/Slim/ADODB/Access) + `app_fie` (PHP 8/PDO/Bootstrap 5)
 
 ---
 
@@ -11,13 +14,19 @@
 Ce skill s'applique à tout système ayant cette topologie :
 
 ```
-Application mobile Flutter
+Application mobile Flutter  (stateduc_flutter)
         ↓ HTTP (Dio)
-API REST PHP (Slim framework)
+API REST PHP (Slim 2.x)     (StatEduc_burundi)
         ↓ ADODB
-Base de données Microsoft Access (.mdb / .accdb)
+Base de données Access      (.mdb / .accdb)
         ↓ curl interne PHP→PHP
-Moteur de formulaires (questionnaire_ws.php)
+Moteur de formulaires       (questionnaire_ws.php)
+
+Application web admin       (app_fie — PHP 8 / PDO / Bootstrap 5)
+        ↓ HTTP/PDO
+Base de données SQLite ou MySQL
+        ↓ API HTTP
+StatEduc_burundi            (syncNationalites, etab_hier, etc.)
 ```
 
 **Cas typiques :** collecte de données scolaires, enquêtes statistiques nationales,
@@ -32,11 +41,12 @@ skill-stateduc-mobile/
 ├── SKILL.md                          ← Ce fichier — point d'entrée
 ├── references/
 │   ├── 01_architecture.md            ← Architecture complète du système
-│   ├── 02_bugs_catalogue.md          ← Catalogue des bugs avec root cause
+│   ├── 02_bugs_catalogue.md          ← Catalogue des bugs (25+ bugs) avec root cause
 │   ├── 03_php_adodb_patterns.md      ← Patterns PHP/ADODB/Access
 │   ├── 04_flutter_dio_patterns.md    ← Patterns Flutter/Dio
-│   ├── 05_multiannee_pattern.md      ← Gestion pluriannuelle complète
-│   └── 06_git_workflow.md            ← Workflow Git avec GitHub App token
+│   ├── 05_multiannee_pattern.md      ← Gestion pluriannuelle complète (4 phases)
+│   ├── 06_git_workflow.md            ← Workflow Git avec GitHub App token
+│   └── 07_app_fie_patterns.md        ← Patterns app_fie PHP 8/PDO/CSRF/CSS Burundi
 ├── templates/
 │   ├── php/
 │   │   ├── config_app_template.php   ← Détection port HTTP sécurisée
@@ -118,3 +128,45 @@ Logcat: [DioX] connectionTimeout uri=.../annees_ws.php/active/...
 
 8. **Push GitHub** : toujours utiliser `x-access-token` format, jamais le credential store
    directement (les tokens GitHub App expirent en 1h).
+
+9. **PHP 8 migration** : `ereg()` → `preg_match()`, constructeurs PHP4 → `__construct()`,
+   `get_magic_quotes_gpc()` → no-op. Avant tout déploiement, scanner avec `grep -rn "ereg\|eregi"`.
+
+10. **PDO SQLSTATE HY093** : ne jamais mélanger paramètres nommés (`:nom`) et positionnels (`?`)
+    dans la même requête PDO.
+
+11. **CSRF app_fie** : utiliser exclusivement `FIE_CSRF_TOKEN_NAME` + `getCsrfToken()`.
+    Aucun literal string `'csrf_token'`, aucune méthode `SecurityHelper::csrfToken()`.
+
+12. **Données Flutter corrompues `[5, text]`** : toujours sanitiser avec `_sanitizeStoredValue()`
+    à la lecture depuis SQLite — les valeurs tableau `[val, type]` du serveur doivent être
+    normalisées avant persistance ET à la lecture.
+
+---
+
+## 🔍 Guide de diagnostic rapide — Situations additionnelles
+
+### Situation 6 — PHP Fatal Error : ereg() undefined function
+
+→ **Lire** `references/07_app_fie_patterns.md` → Section **APP-FIE-001**
+→ Remplacer toutes les `ereg()` par `preg_match()` (script `grep -rn "ereg"`)
+
+### Situation 7 — PHP Fatal Error : PHP4 constructeurs
+
+→ **Lire** `references/07_app_fie_patterns.md` → Section **APP-FIE-002**
+→ Remplacer les constructeurs `function NomClasse()` par `function __construct()`
+
+### Situation 8 — app_fie: SQLSTATE HY093 PDO
+
+→ **Lire** `references/07_app_fie_patterns.md` → Section **APP-FIE-004**
+→ Unifier les paramètres nommés/positionnels dans toutes les requêtes
+
+### Situation 9 — Flutter: champs affichent `[5, text]`
+
+→ **Lire** `references/02_bugs_catalogue.md` → Section **BUG-FLUTTER-S18** + **BUG-FLUTTER-S19**
+→ Appliquer `_sanitizeStoredValue()` dans `database_service.dart`
+
+### Situation 10 — Agents terrain : suppressions accidentelles campagnes/déconnexions
+
+→ **Lire** `references/02_bugs_catalogue.md` → Sections **BUG-PILOTE-001/002/003**
+→ Déplacer les actions destructives vers Paramètres uniquement

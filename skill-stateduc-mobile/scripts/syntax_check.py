@@ -3,218 +3,262 @@
 syntax_check.py — Vérificateur de balance accolades/parenthèses Dart
 
 USAGE:
-    python3 syntax_check.py fichier.dart
-    python3 syntax_check.py lib/services/api_service.dart lib/providers/*.dart
+    python3 scripts/syntax_check.py <fichier.dart>
+    python3 scripts/syntax_check.py lib/services/api_service.dart
+    python3 scripts/syntax_check.py lib/  # analyse tous les .dart du répertoire
 
-TAGS: AK-FLUTTER
-
-FONCTIONNALITÉS:
-    - Compte { } ( ) en excluant les commentaires // et /* */
-    - Exclut les chaînes de caractères ("..." et '...')
-    - Exclut les string interpolations ${...} (ne pas confondre avec accolades)
-    - Signale les lignes problématiques avec contexte
-    - Mode verbeux (-v) pour voir chaque accolade comptée
+TAGS: AK-DART-SYNTAX
 
 PROBLÈME RÉSOLU:
-    Les $ { } dans les string interpolations Dart ("${variable}") sont des
-    caractères littéraux, pas des délimiteurs structurels. Un faux-positif
-    peut apparaître si on compte naïvement.
-    Ce script distingue: ${expr} (interpolation) vs {code} (bloc).
+    Un net +1 d'accolades dans api_service.dart semblait indiquer une erreur
+    syntaxique. L'investigation a montré que c'était un faux-positif causé par
+    des caractères { dans des commentaires // (lignes 450-451, 555-557).
+    Ce script exclut les commentaires avant de compter, donnant un résultat fiable.
+
+LOGIQUE:
+    1. Supprimer les commentaires de ligne (// ...)
+    2. Supprimer les commentaires de bloc (/* ... */)
+    3. Supprimer les string literals ("..." et '...')
+       SAUF les interpolations ${...} dans les strings — conserver le texte brut
+    4. Compter { vs } et ( vs )
+    5. Signaler les déséquilibres avec numéro de ligne approximatif
 """
 
 import sys
 import re
+import os
 from pathlib import Path
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# STRIPPEUR DE COMMENTAIRES ET CHAÎNES
-# ─────────────────────────────────────────────────────────────────────────────
-
-def strip_comments_and_strings(source: str) -> str:
+def strip_comments_and_strings(source: str) -> tuple[str, dict[int, str]]:
     """
-    Supprime les commentaires // et /* */ et les littéraux string
-    du code source Dart. Remplace par des espaces pour conserver
-    la numérotation de lignes.
-
-    Attention: gestion simplifiée — ne couvre pas 100% des cas edge
-    (raw strings r'...', etc.) mais couvre les cas courants.
+    Retourne le code sans commentaires ni string literals.
+    Retourne aussi un dict {position: commentaire_original} pour debug.
     """
-    result = []
-    i = 0
-    n = len(source)
+    result    = []
+    i         = 0
+    n         = len(source)
+    removed   = {}  # position → contenu supprimé (pour debug)
 
     while i < n:
-        # Commentaire single-line: //
-        if source[i] == '/' and i + 1 < n and source[i + 1] == '/':
-            # Remplacer jusqu'à la fin de ligne par des espaces
-            while i < n and source[i] != '\n':
-                result.append(' ')
-                i += 1
+        # Commentaire de ligne: // ... \n
+        if source[i:i+2] == '//':
+            j = source.find('\n', i)
+            end = j if j != -1 else n
+            removed[i] = source[i:end]
+            result.append('\n')  # garder le saut de ligne pour les numéros de ligne
+            i = end
             continue
 
-        # Commentaire multi-ligne: /* ... */
-        if source[i] == '/' and i + 1 < n and source[i + 1] == '*':
-            result.append(' ')
-            result.append(' ')
-            i += 2
-            while i < n:
-                if source[i] == '*' and i + 1 < n and source[i + 1] == '/':
-                    result.append(' ')
-                    result.append(' ')
-                    i += 2
-                    break
-                result.append('\n' if source[i] == '\n' else ' ')
-                i += 1
+        # Commentaire de bloc: /* ... */
+        if source[i:i+2] == '/*':
+            j = source.find('*/', i + 2)
+            end = j + 2 if j != -1 else n
+            removed[i] = source[i:end]
+            # Garder les sauts de ligne pour compter les lignes correctement
+            newlines = source[i:end].count('\n')
+            result.append('\n' * newlines)
+            i = end
             continue
 
-        # String double-quote: "..." (avec gestion des échappements)
-        if source[i] == '"':
-            result.append(' ')
-            i += 1
-            while i < n and source[i] != '"':
-                if source[i] == '\\':
-                    result.append(' ')
-                    i += 1
-                    if i < n:
-                        result.append(' ')
+        # String triple quote: '''...''' ou """..."""
+        for triple in ('"""', "'''"):
+            if source[i:i+3] == triple:
+                j = source.find(triple, i + 3)
+                end = j + 3 if j != -1 else n
+                newlines = source[i:end].count('\n')
+                result.append('\n' * newlines)
+                i = end
+                break
+        else:
+            # String simple quote: "..." ou '...'
+            # Gérer les interpolations ${...} : CONSERVER les accolades internes
+            if source[i] in ('"', "'"):
+                quote_char = source[i]
+                result.append(quote_char)
+                i += 1
+                while i < n:
+                    if source[i] == '\\':
+                        i += 2  # séquence d'échappement
+                        continue
+                    if source[i] == quote_char:
+                        result.append(quote_char)
                         i += 1
-                    continue
-                # String interpolation ${...} : on veut conserver les accolades?
-                # NON — on supprime tout le contenu de la string
-                result.append('\n' if source[i] == '\n' else ' ')
-                i += 1
-            if i < n:
-                result.append(' ')
-                i += 1
-            continue
-
-        # String single-quote: '...'
-        if source[i] == "'":
-            result.append(' ')
-            i += 1
-            while i < n and source[i] != "'":
-                if source[i] == '\\':
-                    result.append(' ')
+                        break
+                    if source[i:i+2] == '${':
+                        # Interpolation: conserver les accolades
+                        result.append('${')
+                        i += 2
+                        depth = 1
+                        while i < n and depth > 0:
+                            if source[i] == '{':
+                                depth += 1
+                                result.append(source[i])
+                            elif source[i] == '}':
+                                depth -= 1
+                                result.append(source[i])
+                            else:
+                                result.append(source[i])
+                            i += 1
+                        continue
+                    # Caractère normal dans la string → supprimer (sauf \n)
+                    if source[i] == '\n':
+                        result.append('\n')
                     i += 1
-                    if i < n:
-                        result.append(' ')
-                        i += 1
-                    continue
-                result.append('\n' if source[i] == '\n' else ' ')
-                i += 1
-            if i < n:
-                result.append(' ')
-                i += 1
-            continue
+                continue
 
-        result.append(source[i])
-        i += 1
+            # Caractère normal
+            result.append(source[i])
+            i += 1
 
-    return ''.join(result)
+    return ''.join(result), removed
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# VÉRIFICATEUR PRINCIPAL
-# ─────────────────────────────────────────────────────────────────────────────
+def check_balance(source: str) -> dict:
+    """Vérifie la balance { } et ( ) dans le code source épuré."""
+    brace_count  = 0  # { = +1, } = -1
+    paren_count  = 0  # ( = +1, ) = -1
+    brace_issues = []
+    paren_issues = []
 
-def check_balance(filepath: str, verbose: bool = False) -> bool:
-    """
-    Vérifie la balance { } et ( ) dans un fichier Dart.
-    Retourne True si tout est balancé, False sinon.
-    """
-    path = Path(filepath)
-    if not path.exists():
-        print(f"❌ Fichier introuvable: {filepath}")
+    lines = source.split('\n')
+    for lineno, line in enumerate(lines, 1):
+        for char in line:
+            if char == '{':
+                brace_count += 1
+            elif char == '}':
+                brace_count -= 1
+                if brace_count < 0:
+                    brace_issues.append(f'L{lineno}: }} inattendue (net={brace_count})')
+            elif char == '(':
+                paren_count += 1
+            elif char == ')':
+                paren_count -= 1
+                if paren_count < 0:
+                    paren_issues.append(f'L{lineno}: ) inattendue (net={paren_count})')
+
+    return {
+        'brace_net':    brace_count,
+        'paren_net':    paren_count,
+        'brace_issues': brace_issues,
+        'paren_issues': paren_issues,
+    }
+
+
+def analyse_file(filepath: str) -> dict:
+    """Analyse un fichier .dart et retourne le rapport."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            source = f.read()
+    except FileNotFoundError:
+        return {'error': f'Fichier non trouvé: {filepath}'}
+    except Exception as e:
+        return {'error': str(e)}
+
+    # Statistiques brutes (AVANT suppression commentaires)
+    raw_braces = source.count('{') - source.count('}')
+    raw_parens = source.count('(') - source.count(')')
+
+    # Code épuré
+    stripped, removed_sections = strip_comments_and_strings(source)
+
+    # Balance sur code épuré
+    balance = check_balance(stripped)
+
+    return {
+        'file':              filepath,
+        'lines':             source.count('\n') + 1,
+        'raw_brace_net':     raw_braces,
+        'raw_paren_net':     raw_parens,
+        'stripped_brace_net': balance['brace_net'],
+        'stripped_paren_net': balance['paren_net'],
+        'brace_ok':          balance['brace_net'] == 0,
+        'paren_ok':          balance['paren_net'] == 0,
+        'brace_issues':      balance['brace_issues'][:5],  # max 5
+        'paren_issues':      balance['paren_issues'][:5],
+        'comments_removed':  len(removed_sections),
+    }
+
+
+def print_report(report: dict) -> bool:
+    """Affiche le rapport et retourne True si OK, False si erreur."""
+    if 'error' in report:
+        print(f'  ❌ ERREUR: {report["error"]}')
         return False
 
-    source = path.read_text(encoding='utf-8')
-    cleaned = strip_comments_and_strings(source)
-    lines   = cleaned.split('\n')
-    orig_lines = source.split('\n')
+    ok = report['brace_ok'] and report['paren_ok']
+    status = '✅ OK' if ok else '❌ ERREUR'
 
-    # Compteurs
-    brace_depth = 0   # { }
-    paren_depth = 0   # ( )
-    errors = []
-
-    for lineno, line in enumerate(lines, start=1):
-        for col, ch in enumerate(line, start=1):
-            if ch == '{':
-                brace_depth += 1
-                if verbose:
-                    print(f"  L{lineno:4}:{col:3} {{ → depth={brace_depth}")
-            elif ch == '}':
-                brace_depth -= 1
-                if verbose:
-                    print(f"  L{lineno:4}:{col:3} }} → depth={brace_depth}")
-                if brace_depth < 0:
-                    errors.append(
-                        f"  L{lineno}: accolade fermante '}' sans ouvrante\n"
-                        f"    → {orig_lines[lineno-1].strip()}"
-                    )
-            elif ch == '(':
-                paren_depth += 1
-            elif ch == ')':
-                paren_depth -= 1
-                if paren_depth < 0:
-                    errors.append(
-                        f"  L{lineno}: parenthèse fermante ')' sans ouvrante\n"
-                        f"    → {orig_lines[lineno-1].strip()}"
-                    )
-
-    # Rapport
-    ok = (brace_depth == 0 and paren_depth == 0 and not errors)
-
-    if ok:
-        print(f"✅ {filepath}")
-        print(f"   Accolades {{ }}: équilibrées (profondeur finale = 0)")
-        print(f"   Parenthèses ( ): équilibrées (profondeur finale = 0)")
+    print(f'\n  Fichier : {report["file"]}')
+    print(f'  Lignes  : {report["lines"]}')
+    print(f'  Commentaires supprimés : {report["comments_removed"]}')
+    print()
+    print(f'  ACCOLADES {{ }}')
+    print(f'    Brut (avec commentaires) : net = {report["raw_brace_net"]:+d}')
+    print(f'    Épuré (sans commentaires): net = {report["stripped_brace_net"]:+d}', end='')
+    if report['brace_ok']:
+        print(' ✅')
     else:
-        print(f"❌ {filepath}")
-        if brace_depth != 0:
-            print(f"   ⚠ Accolades: déséquilibre net = {brace_depth:+d}")
-            print(f"     (positif = manque des '}}', négatif = manque des '{{')")
-        if paren_depth != 0:
-            print(f"   ⚠ Parenthèses: déséquilibre net = {paren_depth:+d}")
-        for err in errors:
-            print(err)
+        print(f' ❌  → DÉSÉQUILIBRE: {report["stripped_brace_net"]:+d}')
+        for issue in report['brace_issues']:
+            print(f'      {issue}')
+
+    print(f'  PARENTHÈSES ( )')
+    print(f'    Brut (avec commentaires) : net = {report["raw_paren_net"]:+d}')
+    print(f'    Épuré (sans commentaires): net = {report["stripped_paren_net"]:+d}', end='')
+    if report['paren_ok']:
+        print(' ✅')
+    else:
+        print(f' ❌  → DÉSÉQUILIBRE: {report["stripped_paren_net"]:+d}')
+        for issue in report['paren_issues']:
+            print(f'      {issue}')
+
+    print(f'\n  Résultat : {status}')
+
+    if report['raw_brace_net'] != report['stripped_brace_net']:
+        diff = report['raw_brace_net'] - report['stripped_brace_net']
+        print(f'\n  ℹ️  Note: {diff:+d} accolades dans commentaires/strings (faux-positifs exclus)')
 
     return ok
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# POINT D'ENTRÉE
-# ─────────────────────────────────────────────────────────────────────────────
-
 def main():
-    args = sys.argv[1:]
-
-    if not args or args[0] in ('-h', '--help'):
-        print(__doc__)
-        sys.exit(0)
-
-    verbose = '-v' in args
-    files   = [a for a in args if not a.startswith('-')]
-
-    if not files:
-        print("Usage: python3 syntax_check.py [-v] fichier.dart ...")
+    if len(sys.argv) < 2:
+        print('Usage: python3 syntax_check.py <fichier.dart | répertoire/>')
+        print('       python3 syntax_check.py lib/services/api_service.dart')
+        print('       python3 syntax_check.py lib/')
         sys.exit(1)
 
-    all_ok = True
-    for filepath in files:
-        print(f"\n{'─' * 60}")
-        ok = check_balance(filepath, verbose=verbose)
-        if not ok:
+    target = sys.argv[1]
+    files  = []
+
+    if os.path.isdir(target):
+        files = list(Path(target).rglob('*.dart'))
+        print(f'Analyse de {len(files)} fichier(s) .dart dans {target}')
+    elif os.path.isfile(target):
+        files = [Path(target)]
+    else:
+        print(f'Erreur: {target} n\'est ni un fichier ni un répertoire')
+        sys.exit(1)
+
+    all_ok     = True
+    ok_count   = 0
+    fail_count = 0
+
+    for f in sorted(files):
+        report = analyse_file(str(f))
+        ok     = print_report(report)
+        if ok:
+            ok_count += 1
+        else:
+            fail_count += 1
             all_ok = False
 
-    print(f"\n{'═' * 60}")
-    if all_ok:
-        print("✅ Tous les fichiers sont syntaxiquement équilibrés.")
-        sys.exit(0)
-    else:
-        print("❌ Certains fichiers ont des déséquilibres.")
-        sys.exit(1)
+    if len(files) > 1:
+        print(f'\n{"="*50}')
+        print(f'RÉSUMÉ: {ok_count} OK, {fail_count} ERREUR(S) sur {len(files)} fichiers')
+
+    sys.exit(0 if all_ok else 1)
 
 
 if __name__ == '__main__':
