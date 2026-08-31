@@ -4,6 +4,11 @@
 include $GLOBALS['SISED_PATH_LIB'] . 'lib.inc.php';
 include $GLOBALS['SISED_PATH_LIB'] . 'navigation.inc.php';     
 
+// ── NASSER LOG : chargement du logger de diagnostic ──────────────────────────
+require_once $GLOBALS['SISED_PATH'] . 'moblogs/nasser_logger.php';
+NasserLog::debut_requete();
+// ── FIN NASSER LOG ────────────────────────────────────────────────────────────
+
 $GLOBALS['conn'] = $GLOBALS['conn_dico'] ;
 $importResult = array();
 $listUserFileName = "";
@@ -16,6 +21,10 @@ $listUserFileName = "";
 $ak_update_message = '';
 $ak_update_class   = '';
 if (isset($_POST['ak_update_annee'])) {
+    // ── NASSER LOG ────────────────────────────────────────────────────────────
+    NasserLog::clic('MIGRER_ANNEE_CLICK', $_POST, [], $_GET);
+    NasserLog::note('Bouton "Migrer les agents mobiles" cliqué — ak_new_annee_simple=' . ($_POST['ak_new_annee_simple'] ?? 'N/A'));
+    // ── FIN NASSER LOG ────────────────────────────────────────────────────────
     $new_annee_simple = intval($_POST['ak_new_annee_simple']);
     if ($new_annee_simple > 0) {
         // AK-BUG-05 : Filtre strict sur id_groupe = 4 (agents mobiles uniquement).
@@ -29,11 +38,13 @@ if (isset($_POST['ak_update_annee'])) {
                  . ')';
         // Journaliser la requête pour diagnostic
         error_log('[gestion_user] AK-BUG-05 : UPDATE agents mobiles — SQL: ' . $sql_upd);
+        NasserLog::sql('MIGRER_ANNEE_UPDATE', $sql_upd);
         $exec_result = $GLOBALS['conn_dico']->Execute($sql_upd);
         if ($exec_result === false) {
             $db_err = method_exists($GLOBALS['conn_dico'], 'ErrorMsg')
                 ? $GLOBALS['conn_dico']->ErrorMsg() : 'erreur inconnue';
             error_log('[gestion_user] AK-BUG-05 : ERREUR SQL — ' . $db_err);
+            NasserLog::err('MIGRER_ANNEE_UPDATE', $db_err);
             $ak_update_message = 'Erreur lors de la mise &agrave; jour : ' . htmlspecialchars(substr($db_err, 0, 200));
             $ak_update_class   = 'error';
         } else {
@@ -66,6 +77,11 @@ if (isset($_POST['ak_update_annee'])) {
 // ── fin fix AK-PHP-02 / AK-BUG-05 ───────────────────────────────────────────
 
 if (isset($_POST["import"])) {
+    // ── NASSER LOG ────────────────────────────────────────────────────────────
+    NasserLog::clic('IMPORT_EXCEL_CLICK', $_POST, $_FILES, $_GET);
+    NasserLog::note('Bouton "Importer" cliqué — fichier: ' . (isset($_FILES['file']['name']) ? $_FILES['file']['name'] : 'N/A'));
+    NasserLog::note('instance_nomenc en session: ' . (isset($_SESSION['instance_nomenc']) ? 'OUI [objet '.get_class($_SESSION['instance_nomenc']).']' : 'NON — import impossible!'));
+    // ── FIN NASSER LOG ────────────────────────────────────────────────────────
 
     // PhpSpreadsheet chargé uniquement lors d'un import (évite erreur fatale si lib absente)
     require_once ($GLOBALS['SISED_PATH_LIB'].'autoload.php');
@@ -83,25 +99,55 @@ if (isset($_POST["import"])) {
         $targetPath = $GLOBALS['SISED_PATH']."server-side/import_export/" . $listUserFileName;
         move_uploaded_file($_FILES['file']['tmp_name'], $targetPath);
 
+        // ── NASSER LOG ────────────────────────────────────────────────────────
+        NasserLog::etape('FICHIER_ACCEPTE', 'N/A',
+            'Type MIME OK | Fichier déplacé vers: ' . $targetPath, 'OK');
+        // ── FIN NASSER LOG ────────────────────────────────────────────────────
+
         $Reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 
         $spreadSheet = $Reader->load($targetPath);
         $excelSheet = $spreadSheet->getActiveSheet();
         $spreadSheetAry = $excelSheet->toArray();
         $sheetCount = count($spreadSheetAry);
+
+        // ── NASSER LOG ────────────────────────────────────────────────────────
+        NasserLog::etape('EXCEL_PARSE', 'N/A',
+            'PhpSpreadsheet toArray() → ' . $sheetCount . ' lignes (dont entête)', 'OK');
+        // ── FIN NASSER LOG ────────────────────────────────────────────────────
 		
 		if (isset($_SESSION['instance_nomenc'] )){
-			$user   =   $_SESSION['instance_nomenc'];   
-			// R�cup�ration de la valeur du post
+			$user   =   $_SESSION['instance_nomenc'];
+            // ── NASSER LOG ────────────────────────────────────────────────────
+            NasserLog::etape('GET_EXCEL_DATA', 'N/A',
+                'Appel get_excel_data() sur ' . $sheetCount . ' lignes', '');
+            // ── FIN NASSER LOG ────────────────────────────────────────────────
     		$user->get_excel_data($spreadSheetAry, $sheetCount);  
-			
-			$importResult = $user->maj_bdd_excel($targetPath);  
+            // ── NASSER LOG ────────────────────────────────────────────────────
+            NasserLog::etape('MAJ_BDD_EXCEL_START', 'N/A',
+                'Appel maj_bdd_excel("' . basename($targetPath) . '") — début import en base', '');
+            // ── FIN NASSER LOG ────────────────────────────────────────────────
+			$importResult = $user->maj_bdd_excel($targetPath);
+            // ── NASSER LOG ────────────────────────────────────────────────────
+            NasserLog::etape('MAJ_BDD_EXCEL_END', 'N/A',
+                count($importResult) . ' lignes traitées retournées dans $importResult', 'OK');
+            // ── FIN NASSER LOG ────────────────────────────────────────────────
 			$type = "ok"; 
-		} 
+		} else {
+            // ── NASSER LOG ────────────────────────────────────────────────────
+            NasserLog::err('IMPORT_SESSION_MANQUANTE',
+                'instance_nomenc ABSENT de la session — import Excel ANNULÉ (aucun INSERT effectué)');
+            // ── FIN NASSER LOG ────────────────────────────────────────────────
+        }
 		
     } else {
         $type = "error";
         $message = "Invalid File Type. Upload Excel File.";
+        // ── NASSER LOG ────────────────────────────────────────────────────────
+        NasserLog::err('TYPE_FICHIER_INVALIDE',
+            'Type MIME refusé: ' . (isset($_FILES['file']['type']) ? $_FILES['file']['type'] : 'N/A')
+            . ' | Fichier: ' . (isset($_FILES['file']['name']) ? $_FILES['file']['name'] : 'N/A'));
+        // ── FIN NASSER LOG ────────────────────────────────────────────────────
     }
 } else if (count($_POST) > 0 && !isset($_POST['ak_update_annee'])) {
     // BUG-GESTION-USER-001 : guard explicite — ce bloc NE doit JAMAIS s'exécuter
@@ -110,6 +156,11 @@ if (isset($_POST["import"])) {
     // ak_new_annee_simple), déclenchant maj_bdd() avec l'instance_nomenc périmée
     // et supprimant les enregistrements ADMIN_USERS avec CODE_GROUPE=1.
     // Il s'agit du traitement des donnees du POST
+
+    // ── NASSER LOG ────────────────────────────────────────────────────────────
+    NasserLog::clic('USER_EDIT_POST', $_POST, [], $_GET);
+    NasserLog::note('Bloc édition utilisateur (maj_bdd) — instance_nomenc: ' . (isset($_SESSION['instance_nomenc']) ? 'PRESENT' : 'ABSENT'));
+    // ── FIN NASSER LOG ────────────────────────────────────────────────────────
     
     if (isset($_SESSION['instance_nomenc'] )){
         $user   =   $_SESSION['instance_nomenc'];        
@@ -126,6 +177,10 @@ if (isset($_POST["import"])) {
    $user->maj_bdd($user->matrice_donnees_bdd);
    unset($_SESSION['instance_nomenc']);   
     
+} else {
+    // ── NASSER LOG : aucun POST significatif → simple affichage de la page ────
+    NasserLog::clic('AFFICHAGE_PAGE', $_POST, [], $_GET);
+    // ── FIN NASSER LOG ────────────────────────────────────────────────────────
 }
    
 	////////////  Modif Alassane
