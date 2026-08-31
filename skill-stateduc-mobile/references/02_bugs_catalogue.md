@@ -702,3 +702,96 @@ Bypass `verif()` pour les appels cURL internes mobiles — détecter l'appel cUR
 par en-tête HTTP et retourner `{"MAJ_OK": false, "SQLERR": "..."}` au lieu de `exit()`.
 
 **Fichier modifié** : `StatEduc_burundi/questionnaire_ws.php`
+
+---
+
+## BUG-GESTION-USER-001 — Suppressions ADMIN_USERS CODE_GROUPE=1 après "Migrer agents mobiles"
+
+**Symptôme (session 20 / ak_secure)**
+Après avoir cliqué "Migrer les agents mobiles (groupe 4)" dans la page gestion des utilisateurs
+(`administration.php?val=gestionuser`), la mise à jour `DICO_FIXE_REGROUPEMENT.ID_ANNEE`
+s'exécutait correctement, mais tous les enregistrements `ADMIN_USERS` avec `CODE_GROUPE = 1`
+(superviseurs) étaient supprimés.
+
+**Root cause**
+Dans `gestion_user.php`, la logique de dispatch POST était :
+```php
+if (isset($_POST['ak_update_annee'])) {
+    // UPDATE DICO... ← s'exécute correctement
+} // <- ABSENCE de else/return ici !
+
+if (isset($_POST["import"])) {
+    // import Excel
+} else if (count($_POST) > 0) {    // ← BUG : TRUE car $_POST a 2 champs !
+    $user = $_SESSION['instance_nomenc'];  // instance périmée d'une édition précédente
+    $user->get_post_template($_POST);
+    $user->comparer(...);
+    $user->maj_bdd($user->matrice_donnees_bdd);  // ← supprime CODE_GROUPE=1 !
+    unset($_SESSION['instance_nomenc']);
+}
+```
+Le formulaire "Migrer" soumet `$_POST = ['ak_update_annee'=>'1', 'ak_new_annee_simple'=>'X']`.
+Bloc 1 s'exécute. Bloc 2 : `isset($_POST["import"])` = FALSE, mais
+`count($_POST) > 0` = **TRUE** (2 champs présents). Si `$_SESSION['instance_nomenc']`
+est peuplé d'une édition utilisateur antérieure, `maj_bdd()` exécute une opération
+destructive avec les données périmées de la session.
+
+**Fix**
+1. Ajouter `unset($_SESSION['instance_nomenc'])` à la fin du bloc `ak_update_annee`
+   pour invalider toute instance périmée.
+2. Ajouter `&& !isset($_POST['ak_update_annee'])` au `else if` pour
+   empêcher le déclenchement du bloc user-edit lors d'un POST de migration.
+
+```php
+// AVANT (bug) :
+} else if (count($_POST)>0)  {
+
+// APRÈS (fix) :
+} else if (count($_POST) > 0 && !isset($_POST['ak_update_annee']))  {
+```
+Et après le bloc `ak_update_annee` :
+```php
+unset($_SESSION['instance_nomenc']); // BUG-GESTION-USER-001
+```
+
+**Fichier modifié** : `StatEduc_burundi/server-side/include/administration/gestion_user.php`
+
+**Commit** : `fix(gestion_user): BUG-GESTION-USER-001 — guard ak_update_annee + unset session`
+
+---
+
+## BUG-MOBLOG-001 — Import Excel sans traçabilité étape par étape
+
+**Symptôme (session 20 / ak_secure)**
+L'import Excel des utilisateurs (`maj_bdd_excel()`) ne produisait qu'un log CSV minimal
+dans `server-side/import_export/` sans détailler : INSERT ADMIN_USERS, lookup hiérarchique
+`ETABLISSEMENT_REGROUPEMENT`, INSERT DICO_FIXE_REGROUPEMENT, transactions. En cas d'erreur
+silencieuse il était impossible de diagnostiquer quelle étape avait échoué.
+
+**Root cause**
+`create_log_file()` / `record_log_file()` existaient mais ne capturaient que :
+`timestamp;code_user;nom;email;tel;login;groupe;message_final`
+sans les SQL intermédiaires ni les résultats étape par étape.
+
+**Fix**
+Création du système **moblogs** :
+- Répertoire `StatEduc_burundi/moblogs/` (avec `.gitkeep` + `.gitignore` pour les `.log`)
+- 3 nouvelles méthodes dans `user.class.php` :
+  - `create_mob_log($cheminFichierExcel)` — ouvre `moblogs/import_YYYYMMDD_HHMMSS_<nom>.log`
+  - `write_mob_log($ligne, $etape, $login, $detail)` — écrit une ligne tabulaire horodatée
+  - `close_mob_log()` — ferme proprement avec footer
+- `maj_bdd_excel()` instrumenté avec 17 points de log couvrant :
+  `DEBUT_LIGNE | VALIDATION_ECHEC | LOGIN_DOUBLON | TRANSACTION_BEGIN |`
+  `ADMIN_USERS_INSERT | ADMIN_USERS_OK | ADMIN_USERS_ERREUR |`
+  `DICO_PARAMS | DICO_TEMPLATE_LOOKUP | DICO_TEMPLATE_FALLBACK | DICO_TEMPLATE_RESULT |`
+  `HIER_LOOKUP_SQL | HIER_LOOKUP_OK | HIER_LOOKUP_VIDE |`
+  `DICO_VALEURS_FINALES | DICO_DOUBLON_SKIP | DICO_INSERT_SQL |`
+  `DICO_INSERT_OK | DICO_INSERT_ERREUR |`
+  `DICO_SKIP_CHAMPS_VIDES | TRANSACTION_COMMIT_SECURITE | FIN_LIGNE`
+
+**Fichiers modifiés** :
+- `StatEduc_burundi/server-side/classes/metier/user.class.php` (méthodes + instrumentation)
+- `StatEduc_burundi/moblogs/.gitkeep` (nouveau)
+- `StatEduc_burundi/moblogs/.gitignore` (nouveau)
+
+**Commit** : `feat(moblogs): système de log riche import Excel — 17 étapes tracées`
