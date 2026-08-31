@@ -1333,18 +1333,47 @@
 	public function maj_bdd_excel($cheminFichierExcel){   
 		$result = array();
 		if (is_array($this->donnees_post_excel)){      
-			$this->create_log_file($cheminFichierExcel);   
+			// ── LOG LEGACY (import_export/) ─────────────────────────────────────────
+			$this->create_log_file($cheminFichierExcel);
+			// ── LOG RICHE MOBLOGS ────────────────────────────────────────────────────
+			$this->create_mob_log($cheminFichierExcel);
+
+			$num_ligne = 0; // compteur de ligne Excel (1-based pour le log)
 			foreach ($this->donnees_post_excel as $tab) {
+				$num_ligne++;
+				$login_courant = isset($tab[4]) ? $tab[4] : 'N/A';
+
 				$logData = "";
 				$logData .= $tab[0].";".$tab[1].";".$tab[2].";".$tab[3].";".$tab[4].";".$this->get_group_name_by_code($tab[6]);
+
+				// ── MOBLOGS : début traitement ligne ─────────────────────────────────
+				$this->write_mob_log($num_ligne, 'DEBUT_LIGNE',
+					$login_courant,
+					'CODE_USER='.$tab[0].' | NOM='.$tab[1].' | EMAIL='.$tab[2]
+					.' | CODE_GROUPE='.$tab[6].' | CODE_ETAB='.(isset($tab[7]) ? $tab[7] : '')
+				);
+
 				if (empty($tab[4]) || empty($tab[5]) || empty($tab[6])) {
-					array_push($tab, '<span class="error">'.$this->recherche_libelle_page('UserMandatoryDetails',$_SESSION['langue'],'user').'</span>'); 
-					$logData .= ";".$this->recherche_libelle_page('UserMandatoryDetails',$_SESSION['langue'],'user');
+					$msg_manquant = $this->recherche_libelle_page('UserMandatoryDetails',$_SESSION['langue'],'user');
+					array_push($tab, '<span class="error">'.$msg_manquant.'</span>'); 
+					$logData .= ";".$msg_manquant;
+					// ── MOBLOGS : champs obligatoires manquants ───────────────────────
+					$this->write_mob_log($num_ligne, 'VALIDATION_ECHEC',
+						$login_courant,
+						'CHAMPS OBLIGATOIRES MANQUANTS — login='.(empty($tab[4])?'[vide]':$tab[4])
+						.' | pass='.(empty($tab[5])?'[vide]':'OK').' | groupe='.(empty($tab[6])?'[vide]':$tab[6])
+					);
 				} else {
 					$sql =  'SELECT EXISTS ( SELECT '.$this->champ_id.' FROM '.$this->nom_table.' WHERE '.$this->champ_lib.' like '.$this->conn->qstr($tab[4]).' );';
 					if ($this->conn->GetOne($sql)) {
-						array_push($tab, '<span class="error">'.$this->recherche_libelle_page('LoginExist',$_SESSION['langue'],'user').'</span>'); 
-						$logData .= ";".$this->recherche_libelle_page('LoginExist',$_SESSION['langue'],'user');
+						$msg_exist = $this->recherche_libelle_page('LoginExist',$_SESSION['langue'],'user');
+						array_push($tab, '<span class="error">'.$msg_exist.'</span>'); 
+						$logData .= ";".$msg_exist;
+						// ── MOBLOGS : login déjà existant ────────────────────────────
+						$this->write_mob_log($num_ligne, 'LOGIN_DOUBLON',
+							$login_courant,
+							'LOGIN DEJA EXISTANT dans ADMIN_USERS — skip total'
+						);
 					} else {
 						$sql =  'INSERT INTO '.$this->nom_table.' ('.$this->champ_id.','.$this->champ_name_user.','.$this->champ_email_user.','.$this->champ_tel_user.','.$this->champ_lib.','.$this->champ_ordre.','.$this->champ_systeme.','.$this->champ_user_parent.')'.
 						' VALUES('.$tab[0].','.$this->conn->qstr($tab[1]).','.$this->conn->qstr($tab[2]).','.$this->conn->qstr($tab[3]).','.$this->conn->qstr($tab[4]).','.$this->conn->qstr($tab[5]).','.$this->conn->qstr($tab[6]).','.$_SESSION['code_user'].')';
@@ -1353,11 +1382,34 @@
 						// BeginTrans() avant le 1er INSERT pour que les deux soient atomiques.
 						// Si l'un des deux echoue -> RollbackTrans() annule les deux.
 						$this->conn->BeginTrans();
+
+						// ── MOBLOGS : ouverture transaction ───────────────────────────
+						$this->write_mob_log($num_ligne, 'TRANSACTION_BEGIN',
+							$login_courant, 'BeginTrans() ouvert'
+						);
+						// ── MOBLOGS : SQL ADMIN_USERS ─────────────────────────────────
+						$this->write_mob_log($num_ligne, 'ADMIN_USERS_INSERT',
+							$login_courant,
+							'SQL: ' . $sql
+						);
+
 						if ($this->conn->Execute($sql)===false) {
+							$db_err_au = method_exists($this->conn, 'ErrorMsg') ? $this->conn->ErrorMsg() : 'N/A';
 							$this->conn->RollbackTrans();
+							// ── MOBLOGS : INSERT ADMIN_USERS échoué ──────────────────
+							$this->write_mob_log($num_ligne, 'ADMIN_USERS_ERREUR',
+								$login_courant,
+								'ECHEC INSERT ADMIN_USERS — RollbackTrans() | Erreur DB: ' . substr($db_err_au, 0, 200)
+							);
 							array_push($tab, '<span class="error">'.$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user').'</span>'); 
 							$logData .= ";".$this->recherche_libelle_page('ERR_SQL',$_SESSION['langue'],'user');
 						} else {
+							// ── MOBLOGS : INSERT ADMIN_USERS réussi ──────────────────
+							$this->write_mob_log($num_ligne, 'ADMIN_USERS_OK',
+								$login_courant,
+								'INSERT ADMIN_USERS réussi — CODE_USER=' . $tab[0]
+							);
+
 							// Liaison école+campagne : INSERT DICO_FIXE_REGROUPEMENT
 							// Colonnes Excel G-L → $tab[7..12] :
 							//   $tab[7]=CODE_ETAB, $tab[8]=ID_CAMP, $tab[9]=ID_SYSTEME,
@@ -1378,6 +1430,15 @@
 									$id_status       = 2; // valeur réelle : 2
 									$id_type_regroup = 0; // valeur réelle : 0 (établissement)
 
+									// ── MOBLOGS : paramètres DICO ────────────────────
+									$this->write_mob_log($num_ligne, 'DICO_PARAMS',
+										$login_courant,
+										'CODE_ETAB='.$raw_code_etab
+										.' | CAMP='.$id_camp.' | SYS='.$id_systeme
+										.' | ANNEE='.$id_annee.' | CHAINE='.$id_chaine
+										.' | PERIODE='.$id_periode
+									);
+
 									// ----------------------------------------------------------------
 									// Récupérer USER_PRIV, ID_REGROUP_PARENTS, ID_TYPE_REGROUP_PARENTS
 									// depuis un enregistrement existant de la même campagne/chaîne.
@@ -1392,6 +1453,11 @@
 										.' AND ID_ANNEE='.$id_annee
 										.' AND ID_SYSTEME='.$id_systeme
 										.' AND ID_REGROUP='.$code_etab_q;
+									// ── MOBLOGS : recherche template DICO par école ──
+									$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_LOOKUP',
+										$login_courant,
+										'SQL (école exacte): ' . $sql_tpl
+									);
 									$tpl = $this->conn->GetRow($sql_tpl);
 
 									// Si pas de résultat pour ce code école précis → modèle générique
@@ -1403,6 +1469,11 @@
 											.' AND ID_CHAINE='.$id_chaine
 											.' AND ID_ANNEE='.$id_annee
 											.' AND ID_SYSTEME='.$id_systeme;
+										// ── MOBLOGS : fallback template générique ────
+										$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_FALLBACK',
+											$login_courant,
+											'Pas de template école — SQL générique: ' . $sql_tpl2
+										);
 										$tpl = $this->conn->GetRow($sql_tpl2);
 									}
 
@@ -1412,6 +1483,14 @@
 										? $tpl['ID_REGROUP_PARENTS'] : '';
 									$id_type_regroup_par    = isset($tpl['ID_TYPE_REGROUP_PARENTS'])
 										? $tpl['ID_TYPE_REGROUP_PARENTS'] : '';
+
+									// ── MOBLOGS : résultat template ───────────────────
+									$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_RESULT',
+										$login_courant,
+										'USER_PRIV='.$user_priv
+										.' | ID_REGROUP_PARENTS='.(empty($id_regroup_parents)?'[vide]':$id_regroup_parents)
+										.' | ID_TYPE_REGROUP_PARENTS='.(empty($id_type_regroup_par)?'[vide]':$id_type_regroup_par)
+									);
 
 									// ── fix AK-PHP-01 : enrichissement depuis ETABLISSEMENT_REGROUPEMENT ──────
 									// Quand ID_REGROUP_PARENTS / ID_TYPE_REGROUP_PARENTS restent vides
@@ -1435,7 +1514,14 @@
 											.'  AND H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$id_chaine
 											.' WHERE ER.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' = '.$code_etab_q
 											.' ORDER BY H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' ASC';
+
+										// ── MOBLOGS : lookup hiérarchique ETABLISSEMENT_REGROUPEMENT ──
+										$this->write_mob_log($num_ligne, 'HIER_LOOKUP_SQL',
+											$login_courant,
+											'AK-PHP-01 — SQL: ' . $sql_hier
+										);
 										$hier_rows = $this->conn->GetAll($sql_hier);
+
 										if (!empty($hier_rows) && is_array($hier_rows)) {
 											$codes_reg      = array();
 											$codes_type_reg = array();
@@ -1457,6 +1543,25 @@
 											}
 											$id_regroup_parents  = implode(',', $parent_codes);
 											$id_type_regroup_par = implode(',', $parent_type_codes);
+
+											// ── MOBLOGS : résultat hiérarchie ────────
+											$this->write_mob_log($num_ligne, 'HIER_LOOKUP_OK',
+												$login_courant,
+												count($hier_rows).' niveaux trouvés'
+												.' | ID_REGROUP_PARENTS='.$id_regroup_parents
+												.' | ID_TYPE_REGROUP_PARENTS='.$id_type_regroup_par
+												.' | Niveaux détaillés: '.implode(',', array_map(
+													function($r){ return 'R='.$r['code_reg'].'/T='.$r['code_type_reg']; },
+													$hier_rows
+												))
+											);
+										} else {
+											// ── MOBLOGS : hiérarchie non trouvée ─────
+											$this->write_mob_log($num_ligne, 'HIER_LOOKUP_VIDE',
+												$login_courant,
+												'AUCUN enregistrement ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab
+												.' — ID_REGROUP_PARENTS restera vide'
+											);
 										}
 									}
 									// ── fin fix AK-PHP-01 ──────────────────────────────────────────────────────
@@ -1477,11 +1582,26 @@
 										.' AND ID_REGROUP='.$code_etab_q;
 									$exists = intval($this->conn->GetOne($sql_chk));
 
+									// ── MOBLOGS : résumé valeurs finales avant INSERT ─
+									$this->write_mob_log($num_ligne, 'DICO_VALEURS_FINALES',
+										$login_courant,
+										'ID_REGROUP_PARENTS='.(empty($id_regroup_parents)?'[vide]':$id_regroup_parents)
+										.' | ID_TYPE_REGROUP_PARENTS='.(empty($id_type_regroup_par)?'[vide]':$id_type_regroup_par)
+										.' | USER_PRIV='.$user_priv
+										.' | DOUBLON_CHECK='.$exists
+									);
+
 									if ($exists > 0) {
 										// AK-PHP-02 : doublon DICO ignoré, mais INSERT ADMIN_USERS OK -> CommitTrans
 										$this->conn->CommitTrans();
 										$trans_committed = true;
 										$regroup_warning = ' [École déjà liée — doublon ignoré]';
+										// ── MOBLOGS : doublon DICO ────────────────────
+										$this->write_mob_log($num_ligne, 'DICO_DOUBLON_SKIP',
+											$login_courant,
+											'DOUBLON DICO_FIXE_REGROUPEMENT — CommitTrans() (ADMIN_USERS validé, DICO ignoré)'
+											.' | CODE_ETAB='.$raw_code_etab.' | CAMP='.$id_camp.' | ANNEE='.$id_annee
+										);
 									} else {
 										// INSERT avec les colonnes RÉELLES de DICO_FIXE_REGROUPEMENT
 										$sql_regroup =
@@ -1504,6 +1624,12 @@
 											.$regroup_parents_q.', '
 											.$type_regroup_par_q.')';
 
+										// ── MOBLOGS : SQL INSERT DICO ────────────────
+										$this->write_mob_log($num_ligne, 'DICO_INSERT_SQL',
+											$login_courant,
+											'SQL: ' . $sql_regroup
+										);
+
 										if ($this->conn->Execute($sql_regroup) === false) {
 										// AK-PHP-02 : INSERT DICO echoue -> RollbackTrans annule aussi INSERT ADMIN_USERS
 										$this->conn->RollbackTrans();
@@ -1512,18 +1638,43 @@
 												? $this->conn->ErrorMsg() : '';
 											$regroup_warning = ' [ERREUR: école non liée + utilisateur annulé: '
 												. htmlspecialchars(substr($db_err, 0, 150)) . ']';
+											// ── MOBLOGS : DICO INSERT échoué ─────────
+											$this->write_mob_log($num_ligne, 'DICO_INSERT_ERREUR',
+												$login_courant,
+												'ECHEC INSERT DICO_FIXE_REGROUPEMENT — RollbackTrans() annule aussi ADMIN_USERS'
+												.' | DB Erreur: ' . substr($db_err, 0, 200)
+											);
 										} else {
 											// AK-PHP-02 : les deux INSERTs réussis -> CommitTrans valide la transaction
 											$this->conn->CommitTrans();
 											$trans_committed = true;
 											$regroup_warning = ' [École liée OK]';
+											// ── MOBLOGS : succès complet ──────────────
+											$this->write_mob_log($num_ligne, 'DICO_INSERT_OK',
+												$login_courant,
+												'INSERT DICO_FIXE_REGROUPEMENT réussi — CommitTrans() validé'
+												.' | ID_USER='.$tab[0].' | CODE_ETAB='.$raw_code_etab
+												.' | ID_REGROUP_PARENTS='.$id_regroup_parents
+												.' | ID_TYPE_REGROUP_PARENTS='.$id_type_regroup_par
+											);
 										}
 									}
+								} else {
+									// ── MOBLOGS : colonnes DICO absentes → pas d'INSERT DICO ─
+									$this->write_mob_log($num_ligne, 'DICO_SKIP_CHAMPS_VIDES',
+										$login_courant,
+										'CODE_ETAB / ID_CAMP / ID_SYSTEME manquants — pas de liaison DICO'
+									);
 								}
 							// AK-PHP-02 : CommitTrans si la transaction n'a pas encore ete resolue
 							// (cas: tab[7..9] vides -> pas de INSERT DICO -> transaction toujours ouverte)
 							if (!$trans_committed) {
 								$this->conn->CommitTrans();
+								// ── MOBLOGS : CommitTrans de sécurité ────────────
+								$this->write_mob_log($num_ligne, 'TRANSACTION_COMMIT_SECURITE',
+									$login_courant,
+									'CommitTrans() de sécurité (DICO non traité) — ADMIN_USERS seul validé'
+								);
 							}
 							array_push($tab, '<span class="success">OK'.$regroup_warning.'</span>'); 	
 							$logData .= ";OK".$regroup_warning;
@@ -1533,8 +1684,15 @@
 				$tab[6] = $this->get_group_name_by_code($tab[6]);
 				$result[] = $tab;
 				$this->record_log_file($logData);
+				// ── MOBLOGS : fin ligne ───────────────────────────────────────────────
+				$this->write_mob_log($num_ligne, 'FIN_LIGNE',
+					$login_courant,
+					'--- fin traitement ligne '.$num_ligne.' ---'
+				);
 			}
 			$this->close_log_file();
+			// ── MOBLOGS : fermeture ───────────────────────────────────────────────────
+			$this->close_mob_log();
 		}
 		return $result;
 	}   
@@ -1694,7 +1852,94 @@
 		*/
 		function close_log_file(){
 	        fclose($this->fp);    
-	    } 
+	    }
+
+	// ════════════════════════════════════════════════════════════════════════════════
+	// MOBLOGS — Système de log riche pour l'import Excel des utilisateurs
+	// Répertoire cible : StatEduc_burundi/moblogs/
+	// Format : TIMESTAMP | LIGNE | ETAPE | LOGIN | SQL_ou_valeur | RESULTAT
+	// ════════════════════════════════════════════════════════════════════════════════
+
+	/**
+	 * Ouvre le fichier de log riche dans StatEduc_burundi/moblogs/.
+	 * Le nom du fichier est basé sur le timestamp d'ouverture :
+	 *   import_YYYYMMDD_HHMMSS_<basename_excel>.log
+	 *
+	 * @param  string $cheminFichierExcel  Chemin complet du fichier Excel importé
+	 * @return void
+	 */
+	public function create_mob_log($cheminFichierExcel) {
+		// Remonter à la racine StatEduc_burundi/ depuis server-side/import_export/
+		// __FILE__ = .../server-side/classes/metier/user.class.php
+		$base_app = realpath(dirname(__FILE__) . '/../../../..');
+		$mob_dir  = $base_app . DIRECTORY_SEPARATOR . 'moblogs';
+
+		// Créer le répertoire si absent (robustesse déploiement)
+		if (!is_dir($mob_dir)) {
+			@mkdir($mob_dir, 0755, true);
+		}
+
+		$ts       = date('Ymd_His');
+		$basename = basename($cheminFichierExcel, '.xlsx');
+		$this->mob_log_path = $mob_dir . DIRECTORY_SEPARATOR . 'import_' . $ts . '_' . $basename . '.log';
+		$this->mob_fp = @fopen($this->mob_log_path, 'a');
+
+		if ($this->mob_fp) {
+			$sep = str_repeat('=', 100);
+			$header  = $sep . "\n";
+			$header .= "MOBLOGS — Import Excel Utilisateurs StatEduc Burundi\n";
+			$header .= "Fichier   : " . basename($cheminFichierExcel) . "\n";
+			$header .= "Date/heure: " . date('Y-m-d H:i:s') . "\n";
+			$header .= "Initiateur: " . (isset($_SESSION['code_user']) ? $_SESSION['code_user'] : 'N/A') . "\n";
+			$header .= $sep . "\n";
+			$header .= sprintf("%-23s | %-4s | %-30s | %-20s | %-s\n",
+				'TIMESTAMP', 'LGN', 'ETAPE', 'LOGIN', 'DETAIL');
+			$header .= str_repeat('-', 100) . "\n";
+			fputs($this->mob_fp, $header);
+		}
+	}
+
+	/**
+	 * Écrit une ligne de log structurée dans le fichier moblogs.
+	 * Format tabulaire : TIMESTAMP | LIGNE | ETAPE | LOGIN | DETAIL
+	 *
+	 * @param  int    $ligne   Numéro de ligne Excel (1-based)
+	 * @param  string $etape   Étape : ADMIN_USERS_INSERT | HIER_LOOKUP | DICO_INSERT |
+	 *                                 DOUBLON_SKIP | TRANSACTION | VALIDATION | ERROR
+	 * @param  string $login   Login de l'utilisateur traité ($tab[4])
+	 * @param  string $detail  Détail libre : SQL, valeur, message d'erreur…
+	 * @return void
+	 */
+	public function write_mob_log($ligne, $etape, $login, $detail) {
+		if (empty($this->mob_fp)) { return; }
+		$ts = date('Y-m-d H:i:s');
+		$line = sprintf("%-23s | %-4s | %-30s | %-20s | %s\n",
+			$ts,
+			str_pad((string)$ligne, 4, ' ', STR_PAD_LEFT),
+			substr($etape,  0, 30),
+			substr($login,  0, 20),
+			$detail
+		);
+		fputs($this->mob_fp, $line);
+	}
+
+	/**
+	 * Ferme proprement le fichier moblogs et affiche le chemin dans error_log.
+	 * @return void
+	 */
+	public function close_mob_log() {
+		if (empty($this->mob_fp)) { return; }
+		$footer  = str_repeat('-', 100) . "\n";
+		$footer .= "FIN LOG — " . date('Y-m-d H:i:s') . "\n";
+		$footer .= str_repeat('=', 100) . "\n";
+		fputs($this->mob_fp, $footer);
+		fclose($this->mob_fp);
+		$this->mob_fp = null;
+		error_log('[moblogs] Log fermé : ' . (isset($this->mob_log_path) ? $this->mob_log_path : 'N/A'));
+	}
+	// ════════════════════════════════════════════════════════════════════════════════
+	// FIN MOBLOGS
+	// ════════════════════════════════════════════════════════════════════════════════
 
 }
 ?>

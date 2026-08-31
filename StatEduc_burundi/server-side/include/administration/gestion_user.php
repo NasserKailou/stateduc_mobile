@@ -54,10 +54,14 @@ if (isset($_POST['ak_update_annee'])) {
             $ak_update_class   = 'success';
             error_log('[gestion_user] AK-BUG-05 : mise à jour réussie vers annee=' . $new_annee_simple);
         }
-    } else {
-        $ak_update_message = 'Veuillez s&eacute;lectionner une ann&eacute;e valide.';
-        $ak_update_class   = 'error';
-    }
+        } else {
+            $ak_update_message = 'Veuillez s&eacute;lectionner une ann&eacute;e valide.';
+            $ak_update_class   = 'error';
+        }
+    // BUG-GESTION-USER-001 : purge de l'instance en session pour éviter que le bloc
+    // "else if (count($_POST)>0)" ci-dessous ne rappelle maj_bdd() avec des données
+    // périmées lorsque ce même POST contient ak_update_annee.
+    unset($_SESSION['instance_nomenc']);
 }
 // ── fin fix AK-PHP-02 / AK-BUG-05 ───────────────────────────────────────────
 
@@ -99,7 +103,12 @@ if (isset($_POST["import"])) {
         $type = "error";
         $message = "Invalid File Type. Upload Excel File.";
     }
-} else if (count($_POST)>0)  {
+} else if (count($_POST) > 0 && !isset($_POST['ak_update_annee'])) {
+    // BUG-GESTION-USER-001 : guard explicite — ce bloc NE doit JAMAIS s'exécuter
+    // lorsque c'est le formulaire "Migrer les agents mobiles" qui est soumis.
+    // Sans ce guard, count($_POST)>0 était TRUE (POST contient ak_update_annee +
+    // ak_new_annee_simple), déclenchant maj_bdd() avec l'instance_nomenc périmée
+    // et supprimant les enregistrements ADMIN_USERS avec CODE_GROUPE=1.
     // Il s'agit du traitement des donnees du POST
     
     if (isset($_SESSION['instance_nomenc'] )){
