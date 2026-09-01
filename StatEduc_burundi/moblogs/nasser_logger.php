@@ -28,6 +28,14 @@
 
 class NasserLog
 {
+    /**
+     * Interrupteur global des logs.
+     * false = silencieux (production) — tous les appels NasserLog::*() deviennent des no-ops.
+     * true  = actif (debug local) — remet les logs en marche sans toucher aux call-sites.
+     * Pour réactiver temporairement : changer false → true ci-dessous.
+     */
+    private static $enabled = false;
+
     /** Chemin absolu vers nasser.log */
     private static $logFile = null;
 
@@ -66,9 +74,11 @@ class NasserLog
 
     /**
      * Écriture brute dans le fichier log.
+     * No-op immédiat si $enabled === false (mode production).
      */
     private static function write($line)
     {
+        if (!self::$enabled) { return; }
         $path = self::logPath();
         $fp   = @fopen($path, 'a');
         if ($fp) {
