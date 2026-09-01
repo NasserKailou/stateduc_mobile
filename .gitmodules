@@ -1,0 +1,3 @@
+[submodule "stateduc_mobile"]
+	path = stateduc_mobile
+	url = https://github.com/NasserKailou/stateduc_mobile.git
