@@ -1,0 +1,1132 @@
+<style type='text/css'>
+/* session 33 : scoped to .se-mobile-frame — NO bleed to host page */
+.se-mobile-frame *, .se-mobile-frame *::before, .se-mobile-frame *::after { box-sizing: border-box; }
+.se-mobile-frame { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }
+.se-mobile-frame .table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }
+.se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }
+.se-mobile-frame tr.ligne-titre td, .se-mobile-frame tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }
+.se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select, .se-mobile-frame textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }
+.se-mobile-frame input[type=radio], .se-mobile-frame input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }
+.se-mobile-frame label { font-size: 12px; margin-right: 4px; cursor: pointer; }
+.se-mobile-frame .bouton_valider, .se-mobile-frame input[type=submit], .se-mobile-frame button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }
+.se-mobile-frame br { display: none; }
+.se-mobile-frame div[align=center], .se-mobile-frame div[align='center'] { padding: 0 !important; margin: 0 !important; }
+.se-mobile-frame table { margin: 0 !important; }
+@media (max-width: 600px) {
+  .se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }
+  .se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select { font-size: 11px; padding: 2px; }
+  .se-mobile-frame .bouton_valider, .se-mobile-frame input[type=submit] { padding: 10px; font-size: 13px; }
+}
+/* === Mobile usability patch session 31 + 33 === */
+.se-mobile-frame {
+  --mobile-bg: #f5f7fb; --card-bg: #ffffff; --line: #d7deea;
+  --line-strong: #b7c4d8; --title-bg: #dce6f1; --title-fg: #183153;
+  --accent: #1f5fbf; --focus: #ffb200; --soft: #eef4ff;
+  --text: #1c2430; --muted: #5d6b82;
+  --radius: 14px; --shadow: 0 4px 18px rgba(17,37,63,.08);
+}
+.se-mobile-frame.mobile-ready { padding: 10px; }
+.se-mobile-frame div[align=center], .se-mobile-frame div[align='center'] { width: 100%; max-width: 100%; }
+.se-mobile-frame form[name='form1'] { width: 100%; max-width: 100%; }
+.se-mobile-frame .table-questionnaire { width: 100% !important; max-width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: auto; background: var(--card-bg); }
+.se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { line-height: 1.35; border-color: var(--line) !important; }
+.se-mobile-frame tr.ligne-titre td, .se-mobile-frame tr.ligne-titre th, .se-mobile-frame .ligne-titre { background: var(--title-bg) !important; color: var(--title-fg); }
+.se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select, .se-mobile-frame textarea { min-height: 46px; width: 100% !important; max-width: 100% !important; padding: 10px 12px !important; font-size: 16px !important; line-height: 1.25; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; background: #fff; box-shadow: inset 0 1px 2px rgba(17,37,63,.04); }
+.se-mobile-frame input[readonly] { background: #eef1f5 !important; color: #334155; font-weight: 700; }
+.se-mobile-frame input[type=radio], .se-mobile-frame input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; min-height: 20px; accent-color: var(--accent); transform: none !important; margin: 0 !important; }
+.se-mobile-frame label { font-size: 14px !important; line-height: 1.35; margin: 0 !important; }
+.se-mobile-frame .option-chip { display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 8px; margin: 4px 6px 4px 0; padding: 8px 10px; min-height: 40px; border: 1px solid var(--line); border-radius: 999px; background: #fff; vertical-align: middle; }
+.se-mobile-frame .option-chip:hover { background: #f9fbff; }
+.se-mobile-frame .option-chip.is-checked { background: var(--soft); border-color: #96b3ea; }
+.se-mobile-frame .field-active { outline: 2px solid var(--focus); outline-offset: 2px; background: #fffef7 !important; }
+.se-mobile-frame .table-mobile-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); margin: 8px 0 14px; }
+.se-mobile-frame .table-mobile-scroll > .table-questionnaire { min-width: 600px; border: 0 !important; }
+.se-mobile-frame .table-mobile-scroll::after { content: '\u21c6 Faites d\u00e9filer horizontalement'; display: block; padding: 8px 12px 10px; color: var(--muted); font-size: 12px; background: linear-gradient(180deg,rgba(255,255,255,0),rgba(245,247,251,1)); }
+.se-mobile-frame .table-mobile-scroll td:first-child, .se-mobile-frame .table-mobile-scroll th:first-child { position: sticky; left: 0; z-index: 2; background: inherit; box-shadow: 1px 0 0 var(--line); }
+.se-mobile-frame .mobile-card-table { border: 0 !important; background: transparent !important; }
+.se-mobile-frame .mobile-card-table > tbody > tr { display: block; margin: 0 0 12px; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.se-mobile-frame .mobile-card-table > tbody > tr > td, .se-mobile-frame .mobile-card-table > tbody > tr > th { display: block; width: 100% !important; max-width: 100% !important; border-left: 0 !important; border-right: 0 !important; padding: 10px 12px !important; white-space: normal !important; }
+.se-mobile-frame .mobile-card-table .td_space_blanc { display: none !important; }
+.se-mobile-frame .mobile-card-table .police_gras, .se-mobile-frame .mobile-card-table tr.ligne-titre td, .se-mobile-frame .mobile-card-table tr.ligne-titre th { font-weight: 700; }
+.se-mobile-frame .mobile-card-table .td_right, .se-mobile-frame .mobile-card-table .td_left { text-align: left !important; }
+.se-mobile-frame .mobile-card-table > tbody > tr:nth-child(odd) { background: #ffffff; }
+.se-mobile-frame .mobile-card-table > tbody > tr:nth-child(even) { background: #fbfcfe; }
+.se-mobile-frame .mobile-card-table br { display: inline; }
+@media (max-width: 900px) { .se-mobile-frame br { display: inline; } .se-mobile-frame { font-size: 16px; } .se-mobile-frame.mobile-ready { padding: 8px; } }
+@media (max-width: 768px) { .se-mobile-frame .mobile-card-table > tbody > tr > td, .se-mobile-frame .mobile-card-table > tbody > tr > th { font-size: 14px !important; } .se-mobile-frame .table-mobile-scroll > .table-questionnaire { min-width: 480px; } }
+</style>
+<script>
+(function() {
+  // ── session 32 FIX 1 : Stubs pour les fonctions jQuery serveur-side ──────────────
+  if (typeof set_TOTAL_MatFrml_Champ === 'undefined') {
+    window.set_TOTAL_MatFrml_Champ = function() { /* stub — remplacé par computeMatrixTotals() */ };
+  }
+  if (typeof set_TOTAL_MatFrml === 'undefined') {
+    window.set_TOTAL_MatFrml = function() { /* stub — remplacé par computeMatrixTotals() */ };
+  }
+  if (typeof set_TOTAL_ThemeMat2D === 'undefined') {
+    window.set_TOTAL_ThemeMat2D = function() { /* stub */ };
+  }
+
+  // ── session 32 FIX 2 : Auto-totaux pure-JS pour matrices NB_/TOT_ ────────────
+  function computeMatrixTotals(changedInput) {
+    var scope = document.querySelector('.se-mobile-frame') || document;
+    var table = changedInput.closest('table.table-questionnaire');
+    if (!table) return;
+    var allNb = Array.prototype.slice.call(
+      table.querySelectorAll('input[type=text]:not([readonly])')
+    ).filter(function(el) { return /^NB_/i.test(el.name || ''); });
+    if (allNb.length === 0) return;
+    var lignes = {}; var cols = {}; var grandTotal = 0;
+    allNb.forEach(function(el) {
+      var m = el.name.match(/^(NB_[A-Z0-9_]+?)_(\d+)_(\d+)(?:_(\d+))?$/i);
+      if (!m) return;
+      var li = m[3]; var co = m[4];
+      var v = parseFloat(el.value) || 0;
+      grandTotal += v;
+      if (!lignes[li]) lignes[li] = 0; lignes[li] += v;
+      if (co !== undefined) { if (!cols[co]) cols[co] = 0; cols[co] += v; }
+    });
+    var allTot = Array.prototype.slice.call(table.querySelectorAll('input[readonly]'));
+    allTot.forEach(function(el) {
+      var n = el.name || '';
+      var mLi = n.match(/TOT_[^_]+_ALL_MES_LIGNE_\d+_(\d+)$/i);
+      if (mLi) { el.value = lignes[mLi[1]] || 0; return; }
+      var mCo = n.match(/TOT_[^_]+_ALL_MES_COLONNE_\d+_(\d+)$/i);
+      if (mCo) { el.value = cols[mCo[1]] || 0; return; }
+      if (/TOT_[^_]+_ALL_MES(?:_0)?$/i.test(n)) { el.value = grandTotal; }
+    });
+  }
+
+  function onReady(fn) {
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', fn); } else { fn(); }
+  }
+  onReady(function() {
+    // session 33 : scope au wrapper, pas sur document.body
+    var root = document.querySelector('.se-mobile-frame');
+    if (root) root.classList.add('mobile-ready');
+    var scope = root || document;
+
+    // ── session 32 FIX 3 : Classification tables ──────────────────────────────────
+    scope.querySelectorAll('table.table-questionnaire').forEach(function(table) {
+      var hasDataFields = table.querySelector('input[name^="NB_"], input[name^="nb_"], input[readonly]') !== null;
+      var rows = Array.prototype.slice.call(table.rows || []);
+      var maxCells = rows.reduce(function(max, row) { return Math.max(max, row.cells ? row.cells.length : 0); }, 0);
+      if (maxCells > 5 && !table.parentElement.classList.contains('table-mobile-scroll')) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'table-mobile-scroll';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
+    });
+
+    // ── session 32 FIX 4 : Câble les auto-totaux sur tous les inputs NB_ ──────────
+    scope.querySelectorAll('input[type=text]:not([readonly])').forEach(function(input) {
+      if (/^NB_/i.test(input.name || '')) {
+        input.addEventListener('input',  function() { computeMatrixTotals(input); });
+        input.addEventListener('change', function() { computeMatrixTotals(input); });
+      }
+    });
+    scope.querySelectorAll('table.table-questionnaire').forEach(function(table) {
+      var firstNb = table.querySelector('input[type=text]:not([readonly])');
+      if (firstNb && /^NB_/i.test(firstNb.name || '')) { computeMatrixTotals(firstNb); }
+    });
+
+    // ── inputmode numérique sur champs NB_/TOT_ ──────────────────────────────────
+    var numericRegex = /(^|_)(NB|TOT|SUPERFICIE|ANNEE|HEURES|MINITES|MINUTES|NOMBRE|TOTAL|ALL_MES|GP)(_|$)/i;
+    scope.querySelectorAll("input[type='text']").forEach(function(input) {
+      var signature = [input.name || '', input.id || '', input.getAttribute('name_base') || ''].join(' ');
+      if (numericRegex.test(signature)) {
+        input.setAttribute('inputmode', 'numeric');
+        input.setAttribute('pattern', '[0-9]*');
+        input.setAttribute('autocomplete', 'off');
+      }
+      input.setAttribute('autocapitalize', 'off');
+      input.setAttribute('spellcheck', 'false');
+    });
+    scope.querySelectorAll('textarea').forEach(function(el) {
+      el.setAttribute('spellcheck', 'false');
+      el.style.minHeight = '90px';
+    });
+
+    // ── Option-chip : wrapping radio+label ────────────────────────────────────────
+    scope.querySelectorAll('label[for]').forEach(function(label) {
+      var targetId = label.getAttribute('for');
+      var next = label.nextElementSibling;
+      if (!next || next.tagName !== 'INPUT' || next.id !== targetId) return;
+      if (label.parentElement && label.parentElement.classList.contains('option-chip')) return;
+      var wrap = document.createElement('span');
+      wrap.className = 'option-chip';
+      label.parentNode.insertBefore(wrap, label);
+      wrap.appendChild(label);
+      wrap.appendChild(next);
+    });
+    function refreshCheckedState() {
+      scope.querySelectorAll('.option-chip').forEach(function(chip) {
+        var input = chip.querySelector("input[type='radio'], input[type='checkbox']");
+        chip.classList.toggle('is-checked', !!(input && input.checked));
+      });
+    }
+    refreshCheckedState();
+    document.addEventListener('change', function(event) {
+      if (event.target && (event.target.matches("input[type='radio']") || event.target.matches("input[type='checkbox']"))){
+        refreshCheckedState();
+      }
+    });
+
+    // ── Field-active : highlight cellule active ───────────────────────────────────
+    scope.querySelectorAll('input, select, textarea').forEach(function(field) {
+      field.addEventListener('focus', function() { var td = field.closest('td, th'); if (td) td.classList.add('field-active'); });
+      field.addEventListener('blur',  function() { var td = field.closest('td, th'); if (td) td.classList.remove('field-active'); });
+    });
+  });
+})();
+</script>
+<div class="se-mobile-frame">
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=9502' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>4.1. Répartition des élèves par âge, sexe et par année d’études<br></b><script language='javascript' type='text/javascript'>
+var expression_950007 	= "";
+var tot_mes_ligne_950007 	= new Array();
+var tot_mes_col_950007 	= new Array();
+var affich_vertic_mes_950007 	= 0;
+var affiche_sous_totaux_950007 	= 0;
+var tab_mes_950007 	= new Array ("FILLES_AGE_NIVEAU","TOTAL_AGE_NIVEAU");
+var tab_ligne_950007	= new Array ("8","5","6","9","10","11","12","13","14","15","16","18","19","20","21","22","23","24","25","26","27");
+var tab_col_950007	= new Array ("4","5","6","7","8","9","10","11","12");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>1ère année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>2ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>3ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>4ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>5ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>6ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>7ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>8ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>9ème année</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN=3 >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F + F+M</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' ></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_4' id='FILLES_AGE_NIVEAU_0_8_4' name='FILLES_AGE_NIVEAU_0_8_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_4' id='TOTAL_AGE_NIVEAU_0_8_4' name='TOTAL_AGE_NIVEAU_0_8_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_5' id='FILLES_AGE_NIVEAU_0_8_5' name='FILLES_AGE_NIVEAU_0_8_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_5' id='TOTAL_AGE_NIVEAU_0_8_5' name='TOTAL_AGE_NIVEAU_0_8_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_6' id='FILLES_AGE_NIVEAU_0_8_6' name='FILLES_AGE_NIVEAU_0_8_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_6' id='TOTAL_AGE_NIVEAU_0_8_6' name='TOTAL_AGE_NIVEAU_0_8_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_7' id='FILLES_AGE_NIVEAU_0_8_7' name='FILLES_AGE_NIVEAU_0_8_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_7' id='TOTAL_AGE_NIVEAU_0_8_7' name='TOTAL_AGE_NIVEAU_0_8_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_8' id='FILLES_AGE_NIVEAU_0_8_8' name='FILLES_AGE_NIVEAU_0_8_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_8' id='TOTAL_AGE_NIVEAU_0_8_8' name='TOTAL_AGE_NIVEAU_0_8_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_9' id='FILLES_AGE_NIVEAU_0_8_9' name='FILLES_AGE_NIVEAU_0_8_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_9' id='TOTAL_AGE_NIVEAU_0_8_9' name='TOTAL_AGE_NIVEAU_0_8_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_10' id='FILLES_AGE_NIVEAU_0_8_10' name='FILLES_AGE_NIVEAU_0_8_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_10' id='TOTAL_AGE_NIVEAU_0_8_10' name='TOTAL_AGE_NIVEAU_0_8_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_11' id='FILLES_AGE_NIVEAU_0_8_11' name='FILLES_AGE_NIVEAU_0_8_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_11' id='TOTAL_AGE_NIVEAU_0_8_11' name='TOTAL_AGE_NIVEAU_0_8_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_8_12' id='FILLES_AGE_NIVEAU_0_8_12' name='FILLES_AGE_NIVEAU_0_8_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_8_12' id='TOTAL_AGE_NIVEAU_0_8_12' name='TOTAL_AGE_NIVEAU_0_8_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[0][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[0][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_8' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >6ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_4' id='FILLES_AGE_NIVEAU_0_5_4' name='FILLES_AGE_NIVEAU_0_5_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_4' id='TOTAL_AGE_NIVEAU_0_5_4' name='TOTAL_AGE_NIVEAU_0_5_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_5' id='FILLES_AGE_NIVEAU_0_5_5' name='FILLES_AGE_NIVEAU_0_5_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_5' id='TOTAL_AGE_NIVEAU_0_5_5' name='TOTAL_AGE_NIVEAU_0_5_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_6' id='FILLES_AGE_NIVEAU_0_5_6' name='FILLES_AGE_NIVEAU_0_5_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_6' id='TOTAL_AGE_NIVEAU_0_5_6' name='TOTAL_AGE_NIVEAU_0_5_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_7' id='FILLES_AGE_NIVEAU_0_5_7' name='FILLES_AGE_NIVEAU_0_5_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_7' id='TOTAL_AGE_NIVEAU_0_5_7' name='TOTAL_AGE_NIVEAU_0_5_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_8' id='FILLES_AGE_NIVEAU_0_5_8' name='FILLES_AGE_NIVEAU_0_5_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_8' id='TOTAL_AGE_NIVEAU_0_5_8' name='TOTAL_AGE_NIVEAU_0_5_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_9' id='FILLES_AGE_NIVEAU_0_5_9' name='FILLES_AGE_NIVEAU_0_5_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_9' id='TOTAL_AGE_NIVEAU_0_5_9' name='TOTAL_AGE_NIVEAU_0_5_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_10' id='FILLES_AGE_NIVEAU_0_5_10' name='FILLES_AGE_NIVEAU_0_5_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_10' id='TOTAL_AGE_NIVEAU_0_5_10' name='TOTAL_AGE_NIVEAU_0_5_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_11' id='FILLES_AGE_NIVEAU_0_5_11' name='FILLES_AGE_NIVEAU_0_5_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_11' id='TOTAL_AGE_NIVEAU_0_5_11' name='TOTAL_AGE_NIVEAU_0_5_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_5_12' id='FILLES_AGE_NIVEAU_0_5_12' name='FILLES_AGE_NIVEAU_0_5_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_5_12' id='TOTAL_AGE_NIVEAU_0_5_12' name='TOTAL_AGE_NIVEAU_0_5_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[1][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[1][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_5' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >7ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_4' id='FILLES_AGE_NIVEAU_0_6_4' name='FILLES_AGE_NIVEAU_0_6_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_4' id='TOTAL_AGE_NIVEAU_0_6_4' name='TOTAL_AGE_NIVEAU_0_6_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_5' id='FILLES_AGE_NIVEAU_0_6_5' name='FILLES_AGE_NIVEAU_0_6_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_5' id='TOTAL_AGE_NIVEAU_0_6_5' name='TOTAL_AGE_NIVEAU_0_6_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_6' id='FILLES_AGE_NIVEAU_0_6_6' name='FILLES_AGE_NIVEAU_0_6_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_6' id='TOTAL_AGE_NIVEAU_0_6_6' name='TOTAL_AGE_NIVEAU_0_6_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_7' id='FILLES_AGE_NIVEAU_0_6_7' name='FILLES_AGE_NIVEAU_0_6_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_7' id='TOTAL_AGE_NIVEAU_0_6_7' name='TOTAL_AGE_NIVEAU_0_6_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_8' id='FILLES_AGE_NIVEAU_0_6_8' name='FILLES_AGE_NIVEAU_0_6_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_8' id='TOTAL_AGE_NIVEAU_0_6_8' name='TOTAL_AGE_NIVEAU_0_6_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_9' id='FILLES_AGE_NIVEAU_0_6_9' name='FILLES_AGE_NIVEAU_0_6_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_9' id='TOTAL_AGE_NIVEAU_0_6_9' name='TOTAL_AGE_NIVEAU_0_6_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_10' id='FILLES_AGE_NIVEAU_0_6_10' name='FILLES_AGE_NIVEAU_0_6_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_10' id='TOTAL_AGE_NIVEAU_0_6_10' name='TOTAL_AGE_NIVEAU_0_6_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_11' id='FILLES_AGE_NIVEAU_0_6_11' name='FILLES_AGE_NIVEAU_0_6_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_11' id='TOTAL_AGE_NIVEAU_0_6_11' name='TOTAL_AGE_NIVEAU_0_6_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_6_12' id='FILLES_AGE_NIVEAU_0_6_12' name='FILLES_AGE_NIVEAU_0_6_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_6_12' id='TOTAL_AGE_NIVEAU_0_6_12' name='TOTAL_AGE_NIVEAU_0_6_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[2][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[2][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_6' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >8ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_4' id='FILLES_AGE_NIVEAU_0_9_4' name='FILLES_AGE_NIVEAU_0_9_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_4' id='TOTAL_AGE_NIVEAU_0_9_4' name='TOTAL_AGE_NIVEAU_0_9_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_5' id='FILLES_AGE_NIVEAU_0_9_5' name='FILLES_AGE_NIVEAU_0_9_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_5' id='TOTAL_AGE_NIVEAU_0_9_5' name='TOTAL_AGE_NIVEAU_0_9_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_6' id='FILLES_AGE_NIVEAU_0_9_6' name='FILLES_AGE_NIVEAU_0_9_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_6' id='TOTAL_AGE_NIVEAU_0_9_6' name='TOTAL_AGE_NIVEAU_0_9_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_7' id='FILLES_AGE_NIVEAU_0_9_7' name='FILLES_AGE_NIVEAU_0_9_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_7' id='TOTAL_AGE_NIVEAU_0_9_7' name='TOTAL_AGE_NIVEAU_0_9_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_8' id='FILLES_AGE_NIVEAU_0_9_8' name='FILLES_AGE_NIVEAU_0_9_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_8' id='TOTAL_AGE_NIVEAU_0_9_8' name='TOTAL_AGE_NIVEAU_0_9_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_9' id='FILLES_AGE_NIVEAU_0_9_9' name='FILLES_AGE_NIVEAU_0_9_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_9' id='TOTAL_AGE_NIVEAU_0_9_9' name='TOTAL_AGE_NIVEAU_0_9_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_10' id='FILLES_AGE_NIVEAU_0_9_10' name='FILLES_AGE_NIVEAU_0_9_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_10' id='TOTAL_AGE_NIVEAU_0_9_10' name='TOTAL_AGE_NIVEAU_0_9_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_11' id='FILLES_AGE_NIVEAU_0_9_11' name='FILLES_AGE_NIVEAU_0_9_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_11' id='TOTAL_AGE_NIVEAU_0_9_11' name='TOTAL_AGE_NIVEAU_0_9_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_9_12' id='FILLES_AGE_NIVEAU_0_9_12' name='FILLES_AGE_NIVEAU_0_9_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_9_12' id='TOTAL_AGE_NIVEAU_0_9_12' name='TOTAL_AGE_NIVEAU_0_9_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[3][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[3][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_9' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >9ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_4' id='FILLES_AGE_NIVEAU_0_10_4' name='FILLES_AGE_NIVEAU_0_10_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_4' id='TOTAL_AGE_NIVEAU_0_10_4' name='TOTAL_AGE_NIVEAU_0_10_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_5' id='FILLES_AGE_NIVEAU_0_10_5' name='FILLES_AGE_NIVEAU_0_10_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_5' id='TOTAL_AGE_NIVEAU_0_10_5' name='TOTAL_AGE_NIVEAU_0_10_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_6' id='FILLES_AGE_NIVEAU_0_10_6' name='FILLES_AGE_NIVEAU_0_10_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_6' id='TOTAL_AGE_NIVEAU_0_10_6' name='TOTAL_AGE_NIVEAU_0_10_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_7' id='FILLES_AGE_NIVEAU_0_10_7' name='FILLES_AGE_NIVEAU_0_10_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_7' id='TOTAL_AGE_NIVEAU_0_10_7' name='TOTAL_AGE_NIVEAU_0_10_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_8' id='FILLES_AGE_NIVEAU_0_10_8' name='FILLES_AGE_NIVEAU_0_10_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_8' id='TOTAL_AGE_NIVEAU_0_10_8' name='TOTAL_AGE_NIVEAU_0_10_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_9' id='FILLES_AGE_NIVEAU_0_10_9' name='FILLES_AGE_NIVEAU_0_10_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_9' id='TOTAL_AGE_NIVEAU_0_10_9' name='TOTAL_AGE_NIVEAU_0_10_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_10' id='FILLES_AGE_NIVEAU_0_10_10' name='FILLES_AGE_NIVEAU_0_10_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_10' id='TOTAL_AGE_NIVEAU_0_10_10' name='TOTAL_AGE_NIVEAU_0_10_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_11' id='FILLES_AGE_NIVEAU_0_10_11' name='FILLES_AGE_NIVEAU_0_10_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_11' id='TOTAL_AGE_NIVEAU_0_10_11' name='TOTAL_AGE_NIVEAU_0_10_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_10_12' id='FILLES_AGE_NIVEAU_0_10_12' name='FILLES_AGE_NIVEAU_0_10_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_10_12' id='TOTAL_AGE_NIVEAU_0_10_12' name='TOTAL_AGE_NIVEAU_0_10_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[4]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[4][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[4][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_10' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >10ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_4' id='FILLES_AGE_NIVEAU_0_11_4' name='FILLES_AGE_NIVEAU_0_11_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_4' id='TOTAL_AGE_NIVEAU_0_11_4' name='TOTAL_AGE_NIVEAU_0_11_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_5' id='FILLES_AGE_NIVEAU_0_11_5' name='FILLES_AGE_NIVEAU_0_11_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_5' id='TOTAL_AGE_NIVEAU_0_11_5' name='TOTAL_AGE_NIVEAU_0_11_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_6' id='FILLES_AGE_NIVEAU_0_11_6' name='FILLES_AGE_NIVEAU_0_11_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_6' id='TOTAL_AGE_NIVEAU_0_11_6' name='TOTAL_AGE_NIVEAU_0_11_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_7' id='FILLES_AGE_NIVEAU_0_11_7' name='FILLES_AGE_NIVEAU_0_11_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_7' id='TOTAL_AGE_NIVEAU_0_11_7' name='TOTAL_AGE_NIVEAU_0_11_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_8' id='FILLES_AGE_NIVEAU_0_11_8' name='FILLES_AGE_NIVEAU_0_11_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_8' id='TOTAL_AGE_NIVEAU_0_11_8' name='TOTAL_AGE_NIVEAU_0_11_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_9' id='FILLES_AGE_NIVEAU_0_11_9' name='FILLES_AGE_NIVEAU_0_11_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_9' id='TOTAL_AGE_NIVEAU_0_11_9' name='TOTAL_AGE_NIVEAU_0_11_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_10' id='FILLES_AGE_NIVEAU_0_11_10' name='FILLES_AGE_NIVEAU_0_11_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_10' id='TOTAL_AGE_NIVEAU_0_11_10' name='TOTAL_AGE_NIVEAU_0_11_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_11' id='FILLES_AGE_NIVEAU_0_11_11' name='FILLES_AGE_NIVEAU_0_11_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_11' id='TOTAL_AGE_NIVEAU_0_11_11' name='TOTAL_AGE_NIVEAU_0_11_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_11_12' id='FILLES_AGE_NIVEAU_0_11_12' name='FILLES_AGE_NIVEAU_0_11_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_11_12' id='TOTAL_AGE_NIVEAU_0_11_12' name='TOTAL_AGE_NIVEAU_0_11_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[5]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[5][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[5][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_11' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >11ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_4' id='FILLES_AGE_NIVEAU_0_12_4' name='FILLES_AGE_NIVEAU_0_12_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_4' id='TOTAL_AGE_NIVEAU_0_12_4' name='TOTAL_AGE_NIVEAU_0_12_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_5' id='FILLES_AGE_NIVEAU_0_12_5' name='FILLES_AGE_NIVEAU_0_12_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_5' id='TOTAL_AGE_NIVEAU_0_12_5' name='TOTAL_AGE_NIVEAU_0_12_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_6' id='FILLES_AGE_NIVEAU_0_12_6' name='FILLES_AGE_NIVEAU_0_12_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_6' id='TOTAL_AGE_NIVEAU_0_12_6' name='TOTAL_AGE_NIVEAU_0_12_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_7' id='FILLES_AGE_NIVEAU_0_12_7' name='FILLES_AGE_NIVEAU_0_12_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_7' id='TOTAL_AGE_NIVEAU_0_12_7' name='TOTAL_AGE_NIVEAU_0_12_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_8' id='FILLES_AGE_NIVEAU_0_12_8' name='FILLES_AGE_NIVEAU_0_12_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_8' id='TOTAL_AGE_NIVEAU_0_12_8' name='TOTAL_AGE_NIVEAU_0_12_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_9' id='FILLES_AGE_NIVEAU_0_12_9' name='FILLES_AGE_NIVEAU_0_12_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_9' id='TOTAL_AGE_NIVEAU_0_12_9' name='TOTAL_AGE_NIVEAU_0_12_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_10' id='FILLES_AGE_NIVEAU_0_12_10' name='FILLES_AGE_NIVEAU_0_12_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_10' id='TOTAL_AGE_NIVEAU_0_12_10' name='TOTAL_AGE_NIVEAU_0_12_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_11' id='FILLES_AGE_NIVEAU_0_12_11' name='FILLES_AGE_NIVEAU_0_12_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_11' id='TOTAL_AGE_NIVEAU_0_12_11' name='TOTAL_AGE_NIVEAU_0_12_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_12_12' id='FILLES_AGE_NIVEAU_0_12_12' name='FILLES_AGE_NIVEAU_0_12_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_12_12' id='TOTAL_AGE_NIVEAU_0_12_12' name='TOTAL_AGE_NIVEAU_0_12_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[6]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[6][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[6][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_12' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >12ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_4' id='FILLES_AGE_NIVEAU_0_13_4' name='FILLES_AGE_NIVEAU_0_13_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_4' id='TOTAL_AGE_NIVEAU_0_13_4' name='TOTAL_AGE_NIVEAU_0_13_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_5' id='FILLES_AGE_NIVEAU_0_13_5' name='FILLES_AGE_NIVEAU_0_13_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_5' id='TOTAL_AGE_NIVEAU_0_13_5' name='TOTAL_AGE_NIVEAU_0_13_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_6' id='FILLES_AGE_NIVEAU_0_13_6' name='FILLES_AGE_NIVEAU_0_13_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_6' id='TOTAL_AGE_NIVEAU_0_13_6' name='TOTAL_AGE_NIVEAU_0_13_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_7' id='FILLES_AGE_NIVEAU_0_13_7' name='FILLES_AGE_NIVEAU_0_13_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_7' id='TOTAL_AGE_NIVEAU_0_13_7' name='TOTAL_AGE_NIVEAU_0_13_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_8' id='FILLES_AGE_NIVEAU_0_13_8' name='FILLES_AGE_NIVEAU_0_13_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_8' id='TOTAL_AGE_NIVEAU_0_13_8' name='TOTAL_AGE_NIVEAU_0_13_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_9' id='FILLES_AGE_NIVEAU_0_13_9' name='FILLES_AGE_NIVEAU_0_13_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_9' id='TOTAL_AGE_NIVEAU_0_13_9' name='TOTAL_AGE_NIVEAU_0_13_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_10' id='FILLES_AGE_NIVEAU_0_13_10' name='FILLES_AGE_NIVEAU_0_13_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_10' id='TOTAL_AGE_NIVEAU_0_13_10' name='TOTAL_AGE_NIVEAU_0_13_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_11' id='FILLES_AGE_NIVEAU_0_13_11' name='FILLES_AGE_NIVEAU_0_13_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_11' id='TOTAL_AGE_NIVEAU_0_13_11' name='TOTAL_AGE_NIVEAU_0_13_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_13_12' id='FILLES_AGE_NIVEAU_0_13_12' name='FILLES_AGE_NIVEAU_0_13_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_13_12' id='TOTAL_AGE_NIVEAU_0_13_12' name='TOTAL_AGE_NIVEAU_0_13_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[7]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[7][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[7][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_13' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >13ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_4' id='FILLES_AGE_NIVEAU_0_14_4' name='FILLES_AGE_NIVEAU_0_14_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_4' id='TOTAL_AGE_NIVEAU_0_14_4' name='TOTAL_AGE_NIVEAU_0_14_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_5' id='FILLES_AGE_NIVEAU_0_14_5' name='FILLES_AGE_NIVEAU_0_14_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_5' id='TOTAL_AGE_NIVEAU_0_14_5' name='TOTAL_AGE_NIVEAU_0_14_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_6' id='FILLES_AGE_NIVEAU_0_14_6' name='FILLES_AGE_NIVEAU_0_14_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_6' id='TOTAL_AGE_NIVEAU_0_14_6' name='TOTAL_AGE_NIVEAU_0_14_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_7' id='FILLES_AGE_NIVEAU_0_14_7' name='FILLES_AGE_NIVEAU_0_14_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_7' id='TOTAL_AGE_NIVEAU_0_14_7' name='TOTAL_AGE_NIVEAU_0_14_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_8' id='FILLES_AGE_NIVEAU_0_14_8' name='FILLES_AGE_NIVEAU_0_14_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_8' id='TOTAL_AGE_NIVEAU_0_14_8' name='TOTAL_AGE_NIVEAU_0_14_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_9' id='FILLES_AGE_NIVEAU_0_14_9' name='FILLES_AGE_NIVEAU_0_14_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_9' id='TOTAL_AGE_NIVEAU_0_14_9' name='TOTAL_AGE_NIVEAU_0_14_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_10' id='FILLES_AGE_NIVEAU_0_14_10' name='FILLES_AGE_NIVEAU_0_14_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_10' id='TOTAL_AGE_NIVEAU_0_14_10' name='TOTAL_AGE_NIVEAU_0_14_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_11' id='FILLES_AGE_NIVEAU_0_14_11' name='FILLES_AGE_NIVEAU_0_14_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_11' id='TOTAL_AGE_NIVEAU_0_14_11' name='TOTAL_AGE_NIVEAU_0_14_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_14_12' id='FILLES_AGE_NIVEAU_0_14_12' name='FILLES_AGE_NIVEAU_0_14_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_14_12' id='TOTAL_AGE_NIVEAU_0_14_12' name='TOTAL_AGE_NIVEAU_0_14_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[8]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[8][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[8][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_14' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >14ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_4' id='FILLES_AGE_NIVEAU_0_15_4' name='FILLES_AGE_NIVEAU_0_15_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_4' id='TOTAL_AGE_NIVEAU_0_15_4' name='TOTAL_AGE_NIVEAU_0_15_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_5' id='FILLES_AGE_NIVEAU_0_15_5' name='FILLES_AGE_NIVEAU_0_15_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_5' id='TOTAL_AGE_NIVEAU_0_15_5' name='TOTAL_AGE_NIVEAU_0_15_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_6' id='FILLES_AGE_NIVEAU_0_15_6' name='FILLES_AGE_NIVEAU_0_15_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_6' id='TOTAL_AGE_NIVEAU_0_15_6' name='TOTAL_AGE_NIVEAU_0_15_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_7' id='FILLES_AGE_NIVEAU_0_15_7' name='FILLES_AGE_NIVEAU_0_15_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_7' id='TOTAL_AGE_NIVEAU_0_15_7' name='TOTAL_AGE_NIVEAU_0_15_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_8' id='FILLES_AGE_NIVEAU_0_15_8' name='FILLES_AGE_NIVEAU_0_15_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_8' id='TOTAL_AGE_NIVEAU_0_15_8' name='TOTAL_AGE_NIVEAU_0_15_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_9' id='FILLES_AGE_NIVEAU_0_15_9' name='FILLES_AGE_NIVEAU_0_15_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_9' id='TOTAL_AGE_NIVEAU_0_15_9' name='TOTAL_AGE_NIVEAU_0_15_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_10' id='FILLES_AGE_NIVEAU_0_15_10' name='FILLES_AGE_NIVEAU_0_15_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_10' id='TOTAL_AGE_NIVEAU_0_15_10' name='TOTAL_AGE_NIVEAU_0_15_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_11' id='FILLES_AGE_NIVEAU_0_15_11' name='FILLES_AGE_NIVEAU_0_15_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_11' id='TOTAL_AGE_NIVEAU_0_15_11' name='TOTAL_AGE_NIVEAU_0_15_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_15_12' id='FILLES_AGE_NIVEAU_0_15_12' name='FILLES_AGE_NIVEAU_0_15_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_15_12' id='TOTAL_AGE_NIVEAU_0_15_12' name='TOTAL_AGE_NIVEAU_0_15_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[9]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[9][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[9][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_15' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >15ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_4' id='FILLES_AGE_NIVEAU_0_16_4' name='FILLES_AGE_NIVEAU_0_16_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_4' id='TOTAL_AGE_NIVEAU_0_16_4' name='TOTAL_AGE_NIVEAU_0_16_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_5' id='FILLES_AGE_NIVEAU_0_16_5' name='FILLES_AGE_NIVEAU_0_16_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_5' id='TOTAL_AGE_NIVEAU_0_16_5' name='TOTAL_AGE_NIVEAU_0_16_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_6' id='FILLES_AGE_NIVEAU_0_16_6' name='FILLES_AGE_NIVEAU_0_16_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_6' id='TOTAL_AGE_NIVEAU_0_16_6' name='TOTAL_AGE_NIVEAU_0_16_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_7' id='FILLES_AGE_NIVEAU_0_16_7' name='FILLES_AGE_NIVEAU_0_16_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_7' id='TOTAL_AGE_NIVEAU_0_16_7' name='TOTAL_AGE_NIVEAU_0_16_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_8' id='FILLES_AGE_NIVEAU_0_16_8' name='FILLES_AGE_NIVEAU_0_16_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_8' id='TOTAL_AGE_NIVEAU_0_16_8' name='TOTAL_AGE_NIVEAU_0_16_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_9' id='FILLES_AGE_NIVEAU_0_16_9' name='FILLES_AGE_NIVEAU_0_16_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_9' id='TOTAL_AGE_NIVEAU_0_16_9' name='TOTAL_AGE_NIVEAU_0_16_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_10' id='FILLES_AGE_NIVEAU_0_16_10' name='FILLES_AGE_NIVEAU_0_16_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_10' id='TOTAL_AGE_NIVEAU_0_16_10' name='TOTAL_AGE_NIVEAU_0_16_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_11' id='FILLES_AGE_NIVEAU_0_16_11' name='FILLES_AGE_NIVEAU_0_16_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_11' id='TOTAL_AGE_NIVEAU_0_16_11' name='TOTAL_AGE_NIVEAU_0_16_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_16_12' id='FILLES_AGE_NIVEAU_0_16_12' name='FILLES_AGE_NIVEAU_0_16_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_16_12' id='TOTAL_AGE_NIVEAU_0_16_12' name='TOTAL_AGE_NIVEAU_0_16_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[10]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[10][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[10][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_16' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >16ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_4' id='FILLES_AGE_NIVEAU_0_18_4' name='FILLES_AGE_NIVEAU_0_18_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_4' id='TOTAL_AGE_NIVEAU_0_18_4' name='TOTAL_AGE_NIVEAU_0_18_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_5' id='FILLES_AGE_NIVEAU_0_18_5' name='FILLES_AGE_NIVEAU_0_18_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_5' id='TOTAL_AGE_NIVEAU_0_18_5' name='TOTAL_AGE_NIVEAU_0_18_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_6' id='FILLES_AGE_NIVEAU_0_18_6' name='FILLES_AGE_NIVEAU_0_18_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_6' id='TOTAL_AGE_NIVEAU_0_18_6' name='TOTAL_AGE_NIVEAU_0_18_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_7' id='FILLES_AGE_NIVEAU_0_18_7' name='FILLES_AGE_NIVEAU_0_18_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_7' id='TOTAL_AGE_NIVEAU_0_18_7' name='TOTAL_AGE_NIVEAU_0_18_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_8' id='FILLES_AGE_NIVEAU_0_18_8' name='FILLES_AGE_NIVEAU_0_18_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_8' id='TOTAL_AGE_NIVEAU_0_18_8' name='TOTAL_AGE_NIVEAU_0_18_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_9' id='FILLES_AGE_NIVEAU_0_18_9' name='FILLES_AGE_NIVEAU_0_18_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_9' id='TOTAL_AGE_NIVEAU_0_18_9' name='TOTAL_AGE_NIVEAU_0_18_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_10' id='FILLES_AGE_NIVEAU_0_18_10' name='FILLES_AGE_NIVEAU_0_18_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_10' id='TOTAL_AGE_NIVEAU_0_18_10' name='TOTAL_AGE_NIVEAU_0_18_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_11' id='FILLES_AGE_NIVEAU_0_18_11' name='FILLES_AGE_NIVEAU_0_18_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_11' id='TOTAL_AGE_NIVEAU_0_18_11' name='TOTAL_AGE_NIVEAU_0_18_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_18_12' id='FILLES_AGE_NIVEAU_0_18_12' name='FILLES_AGE_NIVEAU_0_18_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_18_12' id='TOTAL_AGE_NIVEAU_0_18_12' name='TOTAL_AGE_NIVEAU_0_18_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[11]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_18'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[11][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_18";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_18'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[11][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_18";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_18' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >17ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_4' id='FILLES_AGE_NIVEAU_0_19_4' name='FILLES_AGE_NIVEAU_0_19_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_4' id='TOTAL_AGE_NIVEAU_0_19_4' name='TOTAL_AGE_NIVEAU_0_19_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_5' id='FILLES_AGE_NIVEAU_0_19_5' name='FILLES_AGE_NIVEAU_0_19_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_5' id='TOTAL_AGE_NIVEAU_0_19_5' name='TOTAL_AGE_NIVEAU_0_19_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_6' id='FILLES_AGE_NIVEAU_0_19_6' name='FILLES_AGE_NIVEAU_0_19_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_6' id='TOTAL_AGE_NIVEAU_0_19_6' name='TOTAL_AGE_NIVEAU_0_19_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_7' id='FILLES_AGE_NIVEAU_0_19_7' name='FILLES_AGE_NIVEAU_0_19_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_7' id='TOTAL_AGE_NIVEAU_0_19_7' name='TOTAL_AGE_NIVEAU_0_19_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_8' id='FILLES_AGE_NIVEAU_0_19_8' name='FILLES_AGE_NIVEAU_0_19_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_8' id='TOTAL_AGE_NIVEAU_0_19_8' name='TOTAL_AGE_NIVEAU_0_19_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_9' id='FILLES_AGE_NIVEAU_0_19_9' name='FILLES_AGE_NIVEAU_0_19_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_9' id='TOTAL_AGE_NIVEAU_0_19_9' name='TOTAL_AGE_NIVEAU_0_19_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_10' id='FILLES_AGE_NIVEAU_0_19_10' name='FILLES_AGE_NIVEAU_0_19_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_10' id='TOTAL_AGE_NIVEAU_0_19_10' name='TOTAL_AGE_NIVEAU_0_19_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_11' id='FILLES_AGE_NIVEAU_0_19_11' name='FILLES_AGE_NIVEAU_0_19_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_11' id='TOTAL_AGE_NIVEAU_0_19_11' name='TOTAL_AGE_NIVEAU_0_19_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_19_12' id='FILLES_AGE_NIVEAU_0_19_12' name='FILLES_AGE_NIVEAU_0_19_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_19_12' id='TOTAL_AGE_NIVEAU_0_19_12' name='TOTAL_AGE_NIVEAU_0_19_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[12]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[12][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[12][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_19' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >18ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_4' id='FILLES_AGE_NIVEAU_0_20_4' name='FILLES_AGE_NIVEAU_0_20_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_4' id='TOTAL_AGE_NIVEAU_0_20_4' name='TOTAL_AGE_NIVEAU_0_20_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_5' id='FILLES_AGE_NIVEAU_0_20_5' name='FILLES_AGE_NIVEAU_0_20_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_5' id='TOTAL_AGE_NIVEAU_0_20_5' name='TOTAL_AGE_NIVEAU_0_20_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_6' id='FILLES_AGE_NIVEAU_0_20_6' name='FILLES_AGE_NIVEAU_0_20_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_6' id='TOTAL_AGE_NIVEAU_0_20_6' name='TOTAL_AGE_NIVEAU_0_20_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_7' id='FILLES_AGE_NIVEAU_0_20_7' name='FILLES_AGE_NIVEAU_0_20_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_7' id='TOTAL_AGE_NIVEAU_0_20_7' name='TOTAL_AGE_NIVEAU_0_20_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_8' id='FILLES_AGE_NIVEAU_0_20_8' name='FILLES_AGE_NIVEAU_0_20_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_8' id='TOTAL_AGE_NIVEAU_0_20_8' name='TOTAL_AGE_NIVEAU_0_20_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_9' id='FILLES_AGE_NIVEAU_0_20_9' name='FILLES_AGE_NIVEAU_0_20_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_9' id='TOTAL_AGE_NIVEAU_0_20_9' name='TOTAL_AGE_NIVEAU_0_20_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_10' id='FILLES_AGE_NIVEAU_0_20_10' name='FILLES_AGE_NIVEAU_0_20_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_10' id='TOTAL_AGE_NIVEAU_0_20_10' name='TOTAL_AGE_NIVEAU_0_20_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_11' id='FILLES_AGE_NIVEAU_0_20_11' name='FILLES_AGE_NIVEAU_0_20_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_11' id='TOTAL_AGE_NIVEAU_0_20_11' name='TOTAL_AGE_NIVEAU_0_20_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_20_12' id='FILLES_AGE_NIVEAU_0_20_12' name='FILLES_AGE_NIVEAU_0_20_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_20_12' id='TOTAL_AGE_NIVEAU_0_20_12' name='TOTAL_AGE_NIVEAU_0_20_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[13]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_20'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[13][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_20";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_20'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[13][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_20";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_20' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >19ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_4' id='FILLES_AGE_NIVEAU_0_21_4' name='FILLES_AGE_NIVEAU_0_21_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_4' id='TOTAL_AGE_NIVEAU_0_21_4' name='TOTAL_AGE_NIVEAU_0_21_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_5' id='FILLES_AGE_NIVEAU_0_21_5' name='FILLES_AGE_NIVEAU_0_21_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_5' id='TOTAL_AGE_NIVEAU_0_21_5' name='TOTAL_AGE_NIVEAU_0_21_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_6' id='FILLES_AGE_NIVEAU_0_21_6' name='FILLES_AGE_NIVEAU_0_21_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_6' id='TOTAL_AGE_NIVEAU_0_21_6' name='TOTAL_AGE_NIVEAU_0_21_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_7' id='FILLES_AGE_NIVEAU_0_21_7' name='FILLES_AGE_NIVEAU_0_21_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_7' id='TOTAL_AGE_NIVEAU_0_21_7' name='TOTAL_AGE_NIVEAU_0_21_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_8' id='FILLES_AGE_NIVEAU_0_21_8' name='FILLES_AGE_NIVEAU_0_21_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_8' id='TOTAL_AGE_NIVEAU_0_21_8' name='TOTAL_AGE_NIVEAU_0_21_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_9' id='FILLES_AGE_NIVEAU_0_21_9' name='FILLES_AGE_NIVEAU_0_21_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_9' id='TOTAL_AGE_NIVEAU_0_21_9' name='TOTAL_AGE_NIVEAU_0_21_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_10' id='FILLES_AGE_NIVEAU_0_21_10' name='FILLES_AGE_NIVEAU_0_21_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_10' id='TOTAL_AGE_NIVEAU_0_21_10' name='TOTAL_AGE_NIVEAU_0_21_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_11' id='FILLES_AGE_NIVEAU_0_21_11' name='FILLES_AGE_NIVEAU_0_21_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_11' id='TOTAL_AGE_NIVEAU_0_21_11' name='TOTAL_AGE_NIVEAU_0_21_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_21_12' id='FILLES_AGE_NIVEAU_0_21_12' name='FILLES_AGE_NIVEAU_0_21_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_21_12' id='TOTAL_AGE_NIVEAU_0_21_12' name='TOTAL_AGE_NIVEAU_0_21_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[14]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_21'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[14][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_21";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_21'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[14][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_21";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_21' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >20ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_4' id='FILLES_AGE_NIVEAU_0_22_4' name='FILLES_AGE_NIVEAU_0_22_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_4' id='TOTAL_AGE_NIVEAU_0_22_4' name='TOTAL_AGE_NIVEAU_0_22_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_5' id='FILLES_AGE_NIVEAU_0_22_5' name='FILLES_AGE_NIVEAU_0_22_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_5' id='TOTAL_AGE_NIVEAU_0_22_5' name='TOTAL_AGE_NIVEAU_0_22_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_6' id='FILLES_AGE_NIVEAU_0_22_6' name='FILLES_AGE_NIVEAU_0_22_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_6' id='TOTAL_AGE_NIVEAU_0_22_6' name='TOTAL_AGE_NIVEAU_0_22_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_7' id='FILLES_AGE_NIVEAU_0_22_7' name='FILLES_AGE_NIVEAU_0_22_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_7' id='TOTAL_AGE_NIVEAU_0_22_7' name='TOTAL_AGE_NIVEAU_0_22_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_8' id='FILLES_AGE_NIVEAU_0_22_8' name='FILLES_AGE_NIVEAU_0_22_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_8' id='TOTAL_AGE_NIVEAU_0_22_8' name='TOTAL_AGE_NIVEAU_0_22_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_9' id='FILLES_AGE_NIVEAU_0_22_9' name='FILLES_AGE_NIVEAU_0_22_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_9' id='TOTAL_AGE_NIVEAU_0_22_9' name='TOTAL_AGE_NIVEAU_0_22_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_10' id='FILLES_AGE_NIVEAU_0_22_10' name='FILLES_AGE_NIVEAU_0_22_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_10' id='TOTAL_AGE_NIVEAU_0_22_10' name='TOTAL_AGE_NIVEAU_0_22_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_11' id='FILLES_AGE_NIVEAU_0_22_11' name='FILLES_AGE_NIVEAU_0_22_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_11' id='TOTAL_AGE_NIVEAU_0_22_11' name='TOTAL_AGE_NIVEAU_0_22_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_22_12' id='FILLES_AGE_NIVEAU_0_22_12' name='FILLES_AGE_NIVEAU_0_22_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_22_12' id='TOTAL_AGE_NIVEAU_0_22_12' name='TOTAL_AGE_NIVEAU_0_22_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[15]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[15][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[15][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_22' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >21ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_4' id='FILLES_AGE_NIVEAU_0_23_4' name='FILLES_AGE_NIVEAU_0_23_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_4' id='TOTAL_AGE_NIVEAU_0_23_4' name='TOTAL_AGE_NIVEAU_0_23_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_5' id='FILLES_AGE_NIVEAU_0_23_5' name='FILLES_AGE_NIVEAU_0_23_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_5' id='TOTAL_AGE_NIVEAU_0_23_5' name='TOTAL_AGE_NIVEAU_0_23_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_6' id='FILLES_AGE_NIVEAU_0_23_6' name='FILLES_AGE_NIVEAU_0_23_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_6' id='TOTAL_AGE_NIVEAU_0_23_6' name='TOTAL_AGE_NIVEAU_0_23_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_7' id='FILLES_AGE_NIVEAU_0_23_7' name='FILLES_AGE_NIVEAU_0_23_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_7' id='TOTAL_AGE_NIVEAU_0_23_7' name='TOTAL_AGE_NIVEAU_0_23_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_8' id='FILLES_AGE_NIVEAU_0_23_8' name='FILLES_AGE_NIVEAU_0_23_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_8' id='TOTAL_AGE_NIVEAU_0_23_8' name='TOTAL_AGE_NIVEAU_0_23_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_9' id='FILLES_AGE_NIVEAU_0_23_9' name='FILLES_AGE_NIVEAU_0_23_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_9' id='TOTAL_AGE_NIVEAU_0_23_9' name='TOTAL_AGE_NIVEAU_0_23_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_10' id='FILLES_AGE_NIVEAU_0_23_10' name='FILLES_AGE_NIVEAU_0_23_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_10' id='TOTAL_AGE_NIVEAU_0_23_10' name='TOTAL_AGE_NIVEAU_0_23_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_11' id='FILLES_AGE_NIVEAU_0_23_11' name='FILLES_AGE_NIVEAU_0_23_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_11' id='TOTAL_AGE_NIVEAU_0_23_11' name='TOTAL_AGE_NIVEAU_0_23_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_23_12' id='FILLES_AGE_NIVEAU_0_23_12' name='FILLES_AGE_NIVEAU_0_23_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_23_12' id='TOTAL_AGE_NIVEAU_0_23_12' name='TOTAL_AGE_NIVEAU_0_23_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[16]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[16][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[16][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_23' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >22ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_4' id='FILLES_AGE_NIVEAU_0_24_4' name='FILLES_AGE_NIVEAU_0_24_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_4' id='TOTAL_AGE_NIVEAU_0_24_4' name='TOTAL_AGE_NIVEAU_0_24_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_5' id='FILLES_AGE_NIVEAU_0_24_5' name='FILLES_AGE_NIVEAU_0_24_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_5' id='TOTAL_AGE_NIVEAU_0_24_5' name='TOTAL_AGE_NIVEAU_0_24_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_6' id='FILLES_AGE_NIVEAU_0_24_6' name='FILLES_AGE_NIVEAU_0_24_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_6' id='TOTAL_AGE_NIVEAU_0_24_6' name='TOTAL_AGE_NIVEAU_0_24_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_7' id='FILLES_AGE_NIVEAU_0_24_7' name='FILLES_AGE_NIVEAU_0_24_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_7' id='TOTAL_AGE_NIVEAU_0_24_7' name='TOTAL_AGE_NIVEAU_0_24_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_8' id='FILLES_AGE_NIVEAU_0_24_8' name='FILLES_AGE_NIVEAU_0_24_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_8' id='TOTAL_AGE_NIVEAU_0_24_8' name='TOTAL_AGE_NIVEAU_0_24_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_9' id='FILLES_AGE_NIVEAU_0_24_9' name='FILLES_AGE_NIVEAU_0_24_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_9' id='TOTAL_AGE_NIVEAU_0_24_9' name='TOTAL_AGE_NIVEAU_0_24_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_10' id='FILLES_AGE_NIVEAU_0_24_10' name='FILLES_AGE_NIVEAU_0_24_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_10' id='TOTAL_AGE_NIVEAU_0_24_10' name='TOTAL_AGE_NIVEAU_0_24_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_11' id='FILLES_AGE_NIVEAU_0_24_11' name='FILLES_AGE_NIVEAU_0_24_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_11' id='TOTAL_AGE_NIVEAU_0_24_11' name='TOTAL_AGE_NIVEAU_0_24_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_24_12' id='FILLES_AGE_NIVEAU_0_24_12' name='FILLES_AGE_NIVEAU_0_24_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_24_12' id='TOTAL_AGE_NIVEAU_0_24_12' name='TOTAL_AGE_NIVEAU_0_24_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[17]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[17][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[17][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_24' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >23ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_4' id='FILLES_AGE_NIVEAU_0_25_4' name='FILLES_AGE_NIVEAU_0_25_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_4' id='TOTAL_AGE_NIVEAU_0_25_4' name='TOTAL_AGE_NIVEAU_0_25_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_5' id='FILLES_AGE_NIVEAU_0_25_5' name='FILLES_AGE_NIVEAU_0_25_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_5' id='TOTAL_AGE_NIVEAU_0_25_5' name='TOTAL_AGE_NIVEAU_0_25_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_6' id='FILLES_AGE_NIVEAU_0_25_6' name='FILLES_AGE_NIVEAU_0_25_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_6' id='TOTAL_AGE_NIVEAU_0_25_6' name='TOTAL_AGE_NIVEAU_0_25_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_7' id='FILLES_AGE_NIVEAU_0_25_7' name='FILLES_AGE_NIVEAU_0_25_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_7' id='TOTAL_AGE_NIVEAU_0_25_7' name='TOTAL_AGE_NIVEAU_0_25_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_8' id='FILLES_AGE_NIVEAU_0_25_8' name='FILLES_AGE_NIVEAU_0_25_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_8' id='TOTAL_AGE_NIVEAU_0_25_8' name='TOTAL_AGE_NIVEAU_0_25_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_9' id='FILLES_AGE_NIVEAU_0_25_9' name='FILLES_AGE_NIVEAU_0_25_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_9' id='TOTAL_AGE_NIVEAU_0_25_9' name='TOTAL_AGE_NIVEAU_0_25_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_10' id='FILLES_AGE_NIVEAU_0_25_10' name='FILLES_AGE_NIVEAU_0_25_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_10' id='TOTAL_AGE_NIVEAU_0_25_10' name='TOTAL_AGE_NIVEAU_0_25_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_11' id='FILLES_AGE_NIVEAU_0_25_11' name='FILLES_AGE_NIVEAU_0_25_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_11' id='TOTAL_AGE_NIVEAU_0_25_11' name='TOTAL_AGE_NIVEAU_0_25_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_25_12' id='FILLES_AGE_NIVEAU_0_25_12' name='FILLES_AGE_NIVEAU_0_25_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_25_12' id='TOTAL_AGE_NIVEAU_0_25_12' name='TOTAL_AGE_NIVEAU_0_25_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[18]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[18][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[18][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_25' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >24ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_4' id='FILLES_AGE_NIVEAU_0_26_4' name='FILLES_AGE_NIVEAU_0_26_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_4' id='TOTAL_AGE_NIVEAU_0_26_4' name='TOTAL_AGE_NIVEAU_0_26_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_5' id='FILLES_AGE_NIVEAU_0_26_5' name='FILLES_AGE_NIVEAU_0_26_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_5' id='TOTAL_AGE_NIVEAU_0_26_5' name='TOTAL_AGE_NIVEAU_0_26_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_6' id='FILLES_AGE_NIVEAU_0_26_6' name='FILLES_AGE_NIVEAU_0_26_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_6' id='TOTAL_AGE_NIVEAU_0_26_6' name='TOTAL_AGE_NIVEAU_0_26_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_7' id='FILLES_AGE_NIVEAU_0_26_7' name='FILLES_AGE_NIVEAU_0_26_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_7' id='TOTAL_AGE_NIVEAU_0_26_7' name='TOTAL_AGE_NIVEAU_0_26_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_8' id='FILLES_AGE_NIVEAU_0_26_8' name='FILLES_AGE_NIVEAU_0_26_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_8' id='TOTAL_AGE_NIVEAU_0_26_8' name='TOTAL_AGE_NIVEAU_0_26_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_9' id='FILLES_AGE_NIVEAU_0_26_9' name='FILLES_AGE_NIVEAU_0_26_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_9' id='TOTAL_AGE_NIVEAU_0_26_9' name='TOTAL_AGE_NIVEAU_0_26_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_10' id='FILLES_AGE_NIVEAU_0_26_10' name='FILLES_AGE_NIVEAU_0_26_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_10' id='TOTAL_AGE_NIVEAU_0_26_10' name='TOTAL_AGE_NIVEAU_0_26_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_11' id='FILLES_AGE_NIVEAU_0_26_11' name='FILLES_AGE_NIVEAU_0_26_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_11' id='TOTAL_AGE_NIVEAU_0_26_11' name='TOTAL_AGE_NIVEAU_0_26_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_26_12' id='FILLES_AGE_NIVEAU_0_26_12' name='FILLES_AGE_NIVEAU_0_26_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_26_12' id='TOTAL_AGE_NIVEAU_0_26_12' name='TOTAL_AGE_NIVEAU_0_26_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[19]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_26'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[19][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_26";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_26'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[19][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_26";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_26' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >>24ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_4' id='FILLES_AGE_NIVEAU_0_27_4' name='FILLES_AGE_NIVEAU_0_27_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_4' id='TOTAL_AGE_NIVEAU_0_27_4' name='TOTAL_AGE_NIVEAU_0_27_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_5' id='FILLES_AGE_NIVEAU_0_27_5' name='FILLES_AGE_NIVEAU_0_27_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_5' id='TOTAL_AGE_NIVEAU_0_27_5' name='TOTAL_AGE_NIVEAU_0_27_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_6' id='FILLES_AGE_NIVEAU_0_27_6' name='FILLES_AGE_NIVEAU_0_27_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_6' id='TOTAL_AGE_NIVEAU_0_27_6' name='TOTAL_AGE_NIVEAU_0_27_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_7' id='FILLES_AGE_NIVEAU_0_27_7' name='FILLES_AGE_NIVEAU_0_27_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_7' id='TOTAL_AGE_NIVEAU_0_27_7' name='TOTAL_AGE_NIVEAU_0_27_7' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_8' id='FILLES_AGE_NIVEAU_0_27_8' name='FILLES_AGE_NIVEAU_0_27_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_8' id='TOTAL_AGE_NIVEAU_0_27_8' name='TOTAL_AGE_NIVEAU_0_27_8' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_9' id='FILLES_AGE_NIVEAU_0_27_9' name='FILLES_AGE_NIVEAU_0_27_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_9' id='TOTAL_AGE_NIVEAU_0_27_9' name='TOTAL_AGE_NIVEAU_0_27_9' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_10' id='FILLES_AGE_NIVEAU_0_27_10' name='FILLES_AGE_NIVEAU_0_27_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_10' id='TOTAL_AGE_NIVEAU_0_27_10' name='TOTAL_AGE_NIVEAU_0_27_10' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_11' id='FILLES_AGE_NIVEAU_0_27_11' name='FILLES_AGE_NIVEAU_0_27_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_11' id='TOTAL_AGE_NIVEAU_0_27_11' name='TOTAL_AGE_NIVEAU_0_27_11' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_AGE_NIVEAU_#_27_12' id='FILLES_AGE_NIVEAU_0_27_12' name='FILLES_AGE_NIVEAU_0_27_12' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_AGE_NIVEAU_#_27_12' id='TOTAL_AGE_NIVEAU_0_27_12' name='TOTAL_AGE_NIVEAU_0_27_12' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[20]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_27'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[20][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_27";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_27'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[20][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_27";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_27' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='2' bgcolor='#CCCCCC'><br>TOTAL</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[0][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[0][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_4";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[1][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[1][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_5";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[2][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[2][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_6";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_7'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[3][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_7";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_7'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[3][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_7";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[4]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[4][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[4][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_8";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[5]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[5][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[5][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_9";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[6]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[6][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[6][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_10";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[7]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[7][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[7][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_11";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[8]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[8][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[8][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_12";
+</script>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  valign='middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  valign='middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  valign='middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_0' size=2></TD>
+
+	</TR>
+
+	<TR>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_4' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_5' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_6' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_7' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_8' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_9' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_10' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_11' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_12' size=2></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE></FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',950007, 0, tab_mes_950007, tab_ligne_950007, tab_col_950007);
+</script>
+</div>

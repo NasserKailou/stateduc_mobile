@@ -1,0 +1,27 @@
+<form name="sch_task_act" method="post">
+      <label>Activate : </label> Yes<input type="radio" name="sch_task" value="1" <?php if (getTaskScheduleState_db()==1) echo 'checked="checked"'; ?> />&nbsp;&nbsp;No<input type="radio" name="sch_task" value="0" <?php if (getTaskScheduleState_db()==0) echo 'checked="checked"'; ?> /> <br/>
+      <label>Period : </label> <input type="text" name="sch_task_period" value="<?php echo getTaskSchedulePeriod_db(); ?>" maxlength="28"> <br/>
+      <input type="submit" value="Ok" name="submit_sch_task"/>
+</form>
+<form name="ff" method="post">
+  <input type="hidden" name="id" value="0"><div align="center"><center><table
+  cellSpacing="1" bgcolor="#008000" cellpadding="4" width="1100">
+    <caption>Scheduled tasks already on the system</caption>
+    <tr>
+      <th align="center" bgcolor="#FFFFFF" width="452">Job Name and script path</th>
+      <th align="center" bgcolor="#FFFFFF" width="108">Time/Date  last fired: </th>
+      <th align="center" bgcolor="#FFFFFF" width="120">Time/Date of next execution:<font
+      color="#FF8000">*</font></th>
+      <th align="center" bgcolor="#FFFFFF" width="95">Interval fire every:</th>
+    </tr>
+
+<?php show_jobs(); ?>
+  </table>
+  </center></div>
+</form>
+
+<p align="center"><font color="#FF8000">* execution time will be within a time frame of: <strong><?php echo (TIME_WINDOW/60)." "; ?>
+minutes</strong>. </font><!--To change the time frame window <a
+href="../readme.html#timeframewindow">please see the readme file</a>--><br>
+<br>
+</p>

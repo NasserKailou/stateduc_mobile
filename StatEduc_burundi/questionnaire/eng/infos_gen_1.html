@@ -1,0 +1,290 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=201' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B></B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;(#)<b>2.1. </b> Niveau d’études disponible à l'école: &nbsp;</TD>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;(#)<b>2.2. </b> Accès à la structure préscolaire:&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;(#)Route accessible à tout véhicule&nbsp;<INPUT NAME='CODE_TYPE_ACCES_0' TYPE='radio'   ID='CODE_TYPE_ACCES_0_6' VALUE=$CODE_TYPE_ACCES_0_6>&nbsp;</TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;(#)<b>2.3. </b> La structure est-elle alimentée en électricité ?      &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='ELECTRICITE_0' TYPE='radio'   ID='ELECTRICITE_0_1' VALUE=$ELECTRICITE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='ELECTRICITE_0' TYPE='radio'   ID='ELECTRICITE_0_0' VALUE=$ELECTRICITE_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;(#)Si oui, le système d'alimentation (Electricité) fonctionne-t-il ? &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='FONCT_ALIMENT_ELECTRICITE_0' TYPE='radio'   ID='FONCT_ALIMENT_ELECTRICITE_0_1' VALUE=$FONCT_ALIMENT_ELECTRICITE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='FONCT_ALIMENT_ELECTRICITE_0' TYPE='radio'   ID='FONCT_ALIMENT_ELECTRICITE_0_0' VALUE=$FONCT_ALIMENT_ELECTRICITE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;(#)a) Quel type d?alimentation l'école utilise-t-elle ?&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;(#)Groupe électrogène&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio' size=10  ID='CODE_TYPE_ENERGIE_0_4' VALUE=$CODE_TYPE_ENERGIE_0_4>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;(#)Pas d&#8217;accès à l&#8217;électricité&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio' size=10  ID='CODE_TYPE_ENERGIE_0_6' VALUE=$CODE_TYPE_ENERGIE_0_6>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;(#)Autre&nbsp;<INPUT NAME='CODE_TYPE_ENERGIE_0' TYPE='radio' size=10  ID='CODE_TYPE_ENERGIE_0_5' VALUE=$CODE_TYPE_ENERGIE_0_5>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='EAU_POTABLE_0' TYPE='radio'   ID='EAU_POTABLE_0_1' VALUE=$EAU_POTABLE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='EAU_POTABLE_0' TYPE='radio'   ID='EAU_POTABLE_0_0' VALUE=$EAU_POTABLE_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='FONCT_ALIMENT_EAU_0' TYPE='radio'   ID='FONCT_ALIMENT_EAU_0_1' VALUE=$FONCT_ALIMENT_EAU_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='FONCT_ALIMENT_EAU_0' TYPE='radio'   ID='FONCT_ALIMENT_EAU_0_0' VALUE=$FONCT_ALIMENT_EAU_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;(#)b) Quel type d’alimentation existe-t-il ?&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;(#)Pas d&#8217;accès à l&#8217;eau&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_8' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_8>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;(#)Autre&nbsp;<INPUT NAME='CODE_TYPE_ALIMENTATION_EAU_0' TYPE='radio'   ID='CODE_TYPE_ALIMENTATION_EAU_0_9' VALUE=$CODE_TYPE_ALIMENTATION_EAU_0_9>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='BOITE_PHARMACIE_0' TYPE='radio'   ID='BOITE_PHARMACIE_0_1' VALUE=$BOITE_PHARMACIE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='BOITE_PHARMACIE_0' TYPE='radio'   ID='BOITE_PHARMACIE_0_0' VALUE=$BOITE_PHARMACIE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.6.</b> Le domaine scolaire est-il délimité ? &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_1' VALUE=$DOMAINE_DELIMITE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_0' VALUE=$DOMAINE_DELIMITE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)Si oui, quelle est sa superficie(en ares) &nbsp;&nbsp;&nbsp;<INPUT NAME='SUPERFICIE_DOMAINE_0' TYPE='text' style = 'width:30px'  ID='SUPERFICIE_DOMAINE_0' VALUE="$SUPERFICIE_DOMAINE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.7. </b> Le domaine scolaire est-il clôturé ?             &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='CLOTURE_DOMAINE_0' TYPE='radio'   ID='CLOTURE_DOMAINE_0_1' VALUE=$CLOTURE_DOMAINE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='CLOTURE_DOMAINE_0' TYPE='radio'   ID='CLOTURE_DOMAINE_0_0' VALUE=$CLOTURE_DOMAINE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.8. </b> Le cycle maternel possède-t-il son propre terrain/espace de jeu ?       &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='POCEDE_TERRAIN_JEU_0' TYPE='radio'   ID='POCEDE_TERRAIN_JEU_0_1' VALUE=$POCEDE_TERRAIN_JEU_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='POCEDE_TERRAIN_JEU_0' TYPE='radio'   ID='POCEDE_TERRAIN_JEU_0_0' VALUE=$POCEDE_TERRAIN_JEU_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.9. </b> Le cycle maternel distribue-t-il une collation pour les enfants ?         &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='DISTRIBUE_COLLATION_0' TYPE='radio'   ID='DISTRIBUE_COLLATION_0_1' VALUE=$DISTRIBUE_COLLATION_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='DISTRIBUE_COLLATION_0' TYPE='radio'   ID='DISTRIBUE_COLLATION_0_0' VALUE=$DISTRIBUE_COLLATION_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.10. </b>a) Le cycle maternel dispose-t-il des latrines/WC ? &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='LATRINES_DISPOSE_0' TYPE='radio'   ID='LATRINES_DISPOSE_0_1' VALUE=$LATRINES_DISPOSE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='LATRINES_DISPOSE_0' TYPE='radio'   ID='LATRINES_DISPOSE_0_0' VALUE=$LATRINES_DISPOSE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='2'   valign=top >&nbsp;(#)Si oui, a. Nombre de latrines/WC fonctionnelles &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_ELEVES_0' VALUE="$NB_LATRINES_ELEVES_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FILLES_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_FILLES_0' VALUE="$NB_LATRINES_FILLES_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)b. Nombre de latrines/WC non fonctionnelles:&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_NON_FONCT_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_ELEVES_NON_FONCT_0' VALUE="$NB_LATRINES_ELEVES_NON_FONCT_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)c) Nombre de latrines/WC  en bon état&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_BON_ETAT_0' VALUE="$NB_LATRINES_BON_ETAT_0" >
+&nbsp;</TD>
+	<TR class='ligne-paire-left'>
+		<TD nowrap  class='td_right'>&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_F_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_BON_ETAT_F_0' VALUE="$NB_LATRINES_BON_ETAT_F_0" >
+&nbsp;</TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.11.	</b>Le cycle maternel dispose-t-il des latrines/WC pour enfants vivant avec handicap ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='DISPOSE_LATRINES_HANDI_0' TYPE='radio'   ID='DISPOSE_LATRINES_HANDI_0_1' VALUE=$DISPOSE_LATRINES_HANDI_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='DISPOSE_LATRINES_HANDI_0' TYPE='radio'   ID='DISPOSE_LATRINES_HANDI_0_0' VALUE=$DISPOSE_LATRINES_HANDI_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='2'   valign=top >&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_TOTAL_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_TOTAL_HANDI_0' VALUE="$NB_LATRINES_TOTAL_HANDI_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_FILLES_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_FILLES_HANDI_0' VALUE="$NB_LATRINES_FILLES_HANDI_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)b. Nombre de latrines/WC non fonctionnelles&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_ELEVES_NON_FONCT_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_ELEVES_NON_FONCT_HANDI_0' VALUE="$NB_LATRINES_ELEVES_NON_FONCT_HANDI_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRINES_BON_ETAT_HANDI_0' TYPE='text' style = 'width:30px'  ID='NB_LATRINES_BON_ETAT_HANDI_0' VALUE="$NB_LATRINES_BON_ETAT_HANDI_0" >
+&nbsp;</TD>
+	<TR class='ligne-paire-left'>
+		<TD nowrap  class='td_right'>&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LATRIN_BON_ETAT_HANDI_F_0' TYPE='text' style = 'width:30px'  ID='NB_LATRIN_BON_ETAT_HANDI_F_0' VALUE="$NB_LATRIN_BON_ETAT_HANDI_F_0" >
+&nbsp;</TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.12. </b>Le cycle maternel dispose-t-il des installations de lavage des mains ?   &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='EXISTE_LAVAGE_MAINS_0' TYPE='radio'   ID='EXISTE_LAVAGE_MAINS_0_1' VALUE=$EXISTE_LAVAGE_MAINS_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='EXISTE_LAVAGE_MAINS_0' TYPE='radio'   ID='EXISTE_LAVAGE_MAINS_0_0' VALUE=$EXISTE_LAVAGE_MAINS_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='LAVAGE_MAINS_PROX_LATRINES_0' TYPE='radio'   ID='LAVAGE_MAINS_PROX_LATRINES_0_1' VALUE=$LAVAGE_MAINS_PROX_LATRINES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='LAVAGE_MAINS_PROX_LATRINES_0' TYPE='radio'   ID='LAVAGE_MAINS_PROX_LATRINES_0_0' VALUE=$LAVAGE_MAINS_PROX_LATRINES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_INSTALL_LAVAGE_MAINS_T_0' TYPE='text' size=1  ID='NB_INSTALL_LAVAGE_MAINS_T_0' VALUE="$NB_INSTALL_LAVAGE_MAINS_T_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_INSTALL_LAVAGE_MAINS_F_0' TYPE='text' size=1  ID='NB_INSTALL_LAVAGE_MAINS_F_0' VALUE="$NB_INSTALL_LAVAGE_MAINS_F_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LAVAGE_MAINS_FONCT_T_0' TYPE='text' size=1  ID='NB_LAVAGE_MAINS_FONCT_T_0' VALUE="$NB_LAVAGE_MAINS_FONCT_T_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LAVAGE_MAINS_FONCT_F_0' TYPE='text' size=1  ID='NB_LAVAGE_MAINS_FONCT_F_0' VALUE="$NB_LAVAGE_MAINS_FONCT_F_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.13. </b> Le cycle maternel a-t-il un comité des parents d’élèves ?     &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='EXISTE_CPE_0' TYPE='radio'   ID='EXISTE_CPE_0_1' VALUE=$EXISTE_CPE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='EXISTE_CPE_0' TYPE='radio'   ID='EXISTE_CPE_0_0' VALUE=$EXISTE_CPE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)         Si oui, a) combien de réunions tenues au courant de l’année dernière ? &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNIONS_TENUES_0' TYPE='text' style = 'width:30px'  ID='NB_REUNIONS_TENUES_0' VALUE="$NB_REUNIONS_TENUES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.14. </b> Distance de l'école maternelle au centre de santé/dispensaire/hôpital le plus proche&nbsp;&nbsp;&nbsp;<INPUT NAME='DISTANCE_CENTRE_SANTE_0' TYPE='text' style = 'width:30px'  ID='DISTANCE_CENTRE_SANTE_0' VALUE="$DISTANCE_CENTRE_SANTE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.15. </b> Tous les enfants fréquentant la structure préscolaire sont-ils enregistrés à l’état-civil ? &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='ENFANTS_ENRG_ETAT_CIVIL_0' TYPE='radio'   ID='ENFANTS_ENRG_ETAT_CIVIL_0_1' VALUE=$ENFANTS_ENRG_ETAT_CIVIL_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='ENFANTS_ENRG_ETAT_CIVIL_0' TYPE='radio'   ID='ENFANTS_ENRG_ETAT_CIVIL_0_0' VALUE=$ENFANTS_ENRG_ETAT_CIVIL_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENFANTS_ENREGSITRES_0' TYPE='text' size=2  ID='NB_ENFANTS_ENREGSITRES_0' VALUE="$NB_ENFANTS_ENREGSITRES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.16.	La structure préscolaire a-t-elle un personnel formé (capable) pour détecter les enfants vivant avec un handicap ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='DETECTER_ENFANT_HANDI_0' TYPE='radio'   ID='DETECTER_ENFANT_HANDI_0_1' VALUE=$DETECTER_ENFANT_HANDI_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='DETECTER_ENFANT_HANDI_0' TYPE='radio'   ID='DETECTER_ENFANT_HANDI_0_0' VALUE=$DETECTER_ENFANT_HANDI_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='CSPEC_DIAGNO_CASDOUTEUX_0' TYPE='radio'   ID='CSPEC_DIAGNO_CASDOUTEUX_0_1' VALUE=$CSPEC_DIAGNO_CASDOUTEUX_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='CSPEC_DIAGNO_CASDOUTEUX_0' TYPE='radio'   ID='CSPEC_DIAGNO_CASDOUTEUX_0_0' VALUE=$CSPEC_DIAGNO_CASDOUTEUX_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.17.	La structure préscolaire est-elle en mesure de recevoir des enfants vivant avec handicap ? &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='RECEV_ENFANT_BESOINSPEC_0' TYPE='radio'   ID='RECEV_ENFANT_BESOINSPEC_0_1' VALUE=$RECEV_ENFANT_BESOINSPEC_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='RECEV_ENFANT_BESOINSPEC_0' TYPE='radio'   ID='RECEV_ENFANT_BESOINSPEC_0_0' VALUE=$RECEV_ENFANT_BESOINSPEC_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>2.18.	      Effectifs totaux :&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ELEVES_F_0' TYPE='text' size=10  ID='NB_ELEVES_F_0' VALUE="$NB_ELEVES_F_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ELEVES_0' TYPE='text' size=10  ID='NB_ELEVES_0' VALUE="$NB_ELEVES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_F_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_F_0' VALUE="$NB_ENSEIGNANTS_F_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_0' VALUE="$NB_ENSEIGNANTS_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_BENEVOLES_F_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_BENEVOLES_F_0' VALUE="$NB_ENSEIGNANTS_BENEVOLES_F_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_ENSEIGNANTS_BENEVOLES_0' TYPE='text' size=10  ID='NB_ENSEIGNANTS_BENEVOLES_0' VALUE="$NB_ENSEIGNANTS_BENEVOLES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_SALLES_CLASSE_0' TYPE='text' style = 'width:30px'  ID='NB_SALLES_CLASSE_0' VALUE="$NB_SALLES_CLASSE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CLASSES_EMPRUNTEES_0' TYPE='text' style = 'width:30px'  ID='NB_CLASSES_EMPRUNTEES_0' VALUE="$NB_CLASSES_EMPRUNTEES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;&nbsp;&nbsp;&nbsp;<INPUT NAME='SDC_PROVISOIRES_0' TYPE='text' style = 'width:40px'  ID='SDC_PROVISOIRES_0' VALUE="$SDC_PROVISOIRES_0" >
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

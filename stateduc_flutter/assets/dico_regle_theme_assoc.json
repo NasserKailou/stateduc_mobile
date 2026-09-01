@@ -1,0 +1,877 @@
+[
+  {
+    "id_assoc": 345,
+    "id_regle_theme": 491,
+    "id_regle_theme_assoc": 404,
+    "critere": ">",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 346,
+    "id_regle_theme": 490,
+    "id_regle_theme_assoc": 122,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 347,
+    "id_regle_theme": 492,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 520,
+    "id_regle_theme": 533,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 521,
+    "id_regle_theme": 534,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 522,
+    "id_regle_theme": 535,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 523,
+    "id_regle_theme": 536,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 524,
+    "id_regle_theme": 537,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 526,
+    "id_regle_theme": 542,
+    "id_regle_theme_assoc": 4,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 527,
+    "id_regle_theme": 542,
+    "id_regle_theme_assoc": 39,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 528,
+    "id_regle_theme": 543,
+    "id_regle_theme_assoc": 39,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 531,
+    "id_regle_theme": 547,
+    "id_regle_theme_assoc": 44,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 532,
+    "id_regle_theme": 548,
+    "id_regle_theme_assoc": 47,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 533,
+    "id_regle_theme": 551,
+    "id_regle_theme_assoc": 48,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 534,
+    "id_regle_theme": 554,
+    "id_regle_theme_assoc": 51,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 549,
+    "id_regle_theme": 578,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 625,
+    "id_regle_theme": 640,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 626,
+    "id_regle_theme": 642,
+    "id_regle_theme_assoc": 4,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 627,
+    "id_regle_theme": 642,
+    "id_regle_theme_assoc": 39,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 628,
+    "id_regle_theme": 643,
+    "id_regle_theme_assoc": 39,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 629,
+    "id_regle_theme": 644,
+    "id_regle_theme_assoc": 106,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 630,
+    "id_regle_theme": 645,
+    "id_regle_theme_assoc": 39,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 631,
+    "id_regle_theme": 647,
+    "id_regle_theme_assoc": 44,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 632,
+    "id_regle_theme": 648,
+    "id_regle_theme_assoc": 47,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 633,
+    "id_regle_theme": 651,
+    "id_regle_theme_assoc": 48,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 634,
+    "id_regle_theme": 654,
+    "id_regle_theme_assoc": 51,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 635,
+    "id_regle_theme": 658,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 636,
+    "id_regle_theme": 659,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 637,
+    "id_regle_theme": 660,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 638,
+    "id_regle_theme": 662,
+    "id_regle_theme_assoc": 102,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 639,
+    "id_regle_theme": 663,
+    "id_regle_theme_assoc": 105,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 640,
+    "id_regle_theme": 665,
+    "id_regle_theme_assoc": 107,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 641,
+    "id_regle_theme": 667,
+    "id_regle_theme_assoc": 109,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 642,
+    "id_regle_theme": 669,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 643,
+    "id_regle_theme": 670,
+    "id_regle_theme_assoc": 37,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 644,
+    "id_regle_theme": 672,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 645,
+    "id_regle_theme": 673,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 646,
+    "id_regle_theme": 675,
+    "id_regle_theme_assoc": 135,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 647,
+    "id_regle_theme": 676,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 648,
+    "id_regle_theme": 677,
+    "id_regle_theme_assoc": 48,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 650,
+    "id_regle_theme": 679,
+    "id_regle_theme_assoc": 379,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 651,
+    "id_regle_theme": 681,
+    "id_regle_theme_assoc": 381,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 701,
+    "id_regle_theme": 711,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 702,
+    "id_regle_theme": 712,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 703,
+    "id_regle_theme": 713,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 704,
+    "id_regle_theme": 714,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 705,
+    "id_regle_theme": 715,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 706,
+    "id_regle_theme": 717,
+    "id_regle_theme_assoc": 12,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 707,
+    "id_regle_theme": 718,
+    "id_regle_theme_assoc": 12,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 708,
+    "id_regle_theme": 719,
+    "id_regle_theme_assoc": 13,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 709,
+    "id_regle_theme": 719,
+    "id_regle_theme_assoc": 14,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 710,
+    "id_regle_theme": 721,
+    "id_regle_theme_assoc": 16,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 711,
+    "id_regle_theme": 722,
+    "id_regle_theme_assoc": 16,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 712,
+    "id_regle_theme": 723,
+    "id_regle_theme_assoc": 18,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 713,
+    "id_regle_theme": 723,
+    "id_regle_theme_assoc": 17,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 714,
+    "id_regle_theme": 724,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 715,
+    "id_regle_theme": 728,
+    "id_regle_theme_assoc": 23,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 716,
+    "id_regle_theme": 729,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 717,
+    "id_regle_theme": 730,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 718,
+    "id_regle_theme": 731,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 719,
+    "id_regle_theme": 732,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 721,
+    "id_regle_theme": 734,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 722,
+    "id_regle_theme": 735,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 723,
+    "id_regle_theme": 736,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 724,
+    "id_regle_theme": 737,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 732,
+    "id_regle_theme": 748,
+    "id_regle_theme_assoc": 47,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 733,
+    "id_regle_theme": 751,
+    "id_regle_theme_assoc": 48,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 734,
+    "id_regle_theme": 754,
+    "id_regle_theme_assoc": 51,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 800,
+    "id_regle_theme": 810,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 801,
+    "id_regle_theme": 811,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 802,
+    "id_regle_theme": 812,
+    "id_regle_theme_assoc": 35,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 804,
+    "id_regle_theme": 817,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 805,
+    "id_regle_theme": 818,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 806,
+    "id_regle_theme": 819,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 807,
+    "id_regle_theme": 820,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 808,
+    "id_regle_theme": 821,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 809,
+    "id_regle_theme": 822,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 810,
+    "id_regle_theme": 823,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 811,
+    "id_regle_theme": 824,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 813,
+    "id_regle_theme": 827,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 814,
+    "id_regle_theme": 828,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 815,
+    "id_regle_theme": 829,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 816,
+    "id_regle_theme": 830,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 817,
+    "id_regle_theme": 831,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 818,
+    "id_regle_theme": 832,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 819,
+    "id_regle_theme": 833,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 820,
+    "id_regle_theme": 834,
+    "id_regle_theme_assoc": 4,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 822,
+    "id_regle_theme": 836,
+    "id_regle_theme_assoc": 382,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 823,
+    "id_regle_theme": 815,
+    "id_regle_theme_assoc": 79,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 900,
+    "id_regle_theme": 910,
+    "id_regle_theme_assoc": 50,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 901,
+    "id_regle_theme": 911,
+    "id_regle_theme_assoc": 53,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 902,
+    "id_regle_theme": 913,
+    "id_regle_theme_assoc": 58,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 905,
+    "id_regle_theme": 917,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 906,
+    "id_regle_theme": 918,
+    "id_regle_theme_assoc": 2,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 907,
+    "id_regle_theme": 919,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 908,
+    "id_regle_theme": 920,
+    "id_regle_theme_assoc": 55,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 909,
+    "id_regle_theme": 921,
+    "id_regle_theme_assoc": 54,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 910,
+    "id_regle_theme": 912,
+    "id_regle_theme_assoc": 59,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 911,
+    "id_regle_theme": 922,
+    "id_regle_theme_assoc": 56,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 913,
+    "id_regle_theme": 925,
+    "id_regle_theme_assoc": 63,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 914,
+    "id_regle_theme": 927,
+    "id_regle_theme_assoc": 93,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 915,
+    "id_regle_theme": 928,
+    "id_regle_theme_assoc": 65,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 916,
+    "id_regle_theme": 930,
+    "id_regle_theme_assoc": 70,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 917,
+    "id_regle_theme": 931,
+    "id_regle_theme_assoc": 928,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 918,
+    "id_regle_theme": 932,
+    "id_regle_theme_assoc": 928,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 919,
+    "id_regle_theme": 933,
+    "id_regle_theme_assoc": 928,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 920,
+    "id_regle_theme": 934,
+    "id_regle_theme_assoc": 928,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 921,
+    "id_regle_theme": 934,
+    "id_regle_theme_assoc": 933,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 922,
+    "id_regle_theme": 935,
+    "id_regle_theme_assoc": 928,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 923,
+    "id_regle_theme": 937,
+    "id_regle_theme_assoc": 936,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 929,
+    "id_regle_theme": 944,
+    "id_regle_theme_assoc": 943,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 1000,
+    "id_regle_theme": 1010,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 1001,
+    "id_regle_theme": 1011,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 1002,
+    "id_regle_theme": 1013,
+    "id_regle_theme_assoc": 150,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 1003,
+    "id_regle_theme": 1014,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 912,
+    "id_regle_theme": 924,
+    "id_regle_theme_assoc": 61,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 924,
+    "id_regle_theme": 938,
+    "id_regle_theme_assoc": 837,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 925,
+    "id_regle_theme": 939,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 926,
+    "id_regle_theme": 940,
+    "id_regle_theme_assoc": 928,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 927,
+    "id_regle_theme": 942,
+    "id_regle_theme_assoc": 941,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 928,
+    "id_regle_theme": 943,
+    "id_regle_theme_assoc": 941,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 930,
+    "id_regle_theme": 945,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 824,
+    "id_regle_theme": 838,
+    "id_regle_theme_assoc": 78,
+    "critere": "<=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 825,
+    "id_regle_theme": 840,
+    "id_regle_theme_assoc": 839,
+    "critere": ">=",
+    "activer_ctrl": 1
+  },
+  {
+    "id_assoc": 826,
+    "id_regle_theme": 841,
+    "id_regle_theme_assoc": 404,
+    "critere": "=",
+    "activer_ctrl": 1
+  }
+]

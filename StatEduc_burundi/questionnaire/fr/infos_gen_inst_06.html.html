@@ -1,0 +1,203 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=5506' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>I. INFORMATIONS GENERALES SUR  L’INSTITUTION <span style='font-weight: bold; font-size: 16px; background-color:#00FFCC; color:#000000; text-align:center'>Pour INSTITUTION uniquement </span> </B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;1.1. Nom de l'Institution :&nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_ETABLISSEMENT_0' TYPE='text' style = 'width:350px'  readonly  ID='NOM_ETABLISSEMENT_0' VALUE="$NOM_ETABLISSEMENT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;1.3. Année d’ouverture de l’Institution:   &nbsp;&nbsp;&nbsp;<INPUT NAME='ANNEE_CREATION_0' TYPE='text' style = 'width:100px'  ID='ANNEE_CREATION_0' VALUE="$ANNEE_CREATION_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;1.4. Adresse postale :  &nbsp;&nbsp;&nbsp;<INPUT NAME='ADRESSE_POSTALE_0' TYPE='text' style = 'width:300px'  ID='ADRESSE_POSTALE_0' VALUE="$ADRESSE_POSTALE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;1.5. Téléphone de l’institution&nbsp;&nbsp;&nbsp;<INPUT NAME='TELEPHONE_0' TYPE='text' style = 'width:150px'  ID='TELEPHONE_0' VALUE="$TELEPHONE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;1.6. Fax:&nbsp;&nbsp;&nbsp;<INPUT NAME='FAX_0' TYPE='text' style = 'width:150px'  ID='FAX_0' VALUE="$FAX_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;1.7. Adresse électronique:&nbsp;&nbsp;&nbsp;<INPUT NAME='ADRESSE_ELECTRONIQUE_0' TYPE='text' style = 'width:200px'  ID='ADRESSE_ELECTRONIQUE_0' VALUE="$ADRESSE_ELECTRONIQUE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;1.8. Nom du Recteur : &nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_CHEF_ETABLISSEMENT_0' TYPE='text' style = 'width:250px'  ID='NOM_CHEF_ETABLISSEMENT_0' VALUE="$NOM_CHEF_ETABLISSEMENT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;1.9. Nombre de campus universitaires appartenant à l’Institution ? &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CAMPUS_0' TYPE='text' size=5  ID='NB_CAMPUS_0' VALUE="$NB_CAMPUS_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;1.10. Nombre total de facultés gérées par l’Institution&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_FACULTES_0' TYPE='text' size=5  ID='NB_FACULTES_0' VALUE="$NB_FACULTES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;1.11. Le  domaine de l’institution est-il délimité ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_1' VALUE=$DOMAINE_DELIMITE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DOMAINE_DELIMITE_0' TYPE='radio'   ID='DOMAINE_DELIMITE_0_0' VALUE=$DOMAINE_DELIMITE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;1.12. Les locaux sont-ils propriété de l’Institution ? &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='LOCAUX_PROPRES_0' TYPE='radio'   ID='LOCAUX_PROPRES_0_1' VALUE=$LOCAUX_PROPRES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='LOCAUX_PROPRES_0' TYPE='radio'   ID='LOCAUX_PROPRES_0_0' VALUE=$LOCAUX_PROPRES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;1.13. Sinon, sont-ils mis à disposition gratuitement ?   &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='LOCAUX_GRATUITS_0' TYPE='radio'   ID='LOCAUX_GRATUITS_0_1' VALUE=$LOCAUX_GRATUITS_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='LOCAUX_GRATUITS_0' TYPE='radio'   ID='LOCAUX_GRATUITS_0_0' VALUE=$LOCAUX_GRATUITS_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Si oui, combien ? &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LOCAUX_GRATUITS_0' TYPE='text' size=5  ID='NB_LOCAUX_GRATUITS_0' VALUE="$NB_LOCAUX_GRATUITS_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;                   ou loués ?  &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='LOCAUX_LOUES_0' TYPE='radio'   ID='LOCAUX_LOUES_0_1' VALUE=$LOCAUX_LOUES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='LOCAUX_LOUES_0' TYPE='radio'   ID='LOCAUX_LOUES_0_0' VALUE=$LOCAUX_LOUES_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Si oui, combien ? &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LOCAUX_LOUES_0' TYPE='text' size=5  ID='NB_LOCAUX_LOUES_0' VALUE="$NB_LOCAUX_LOUES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'   valign=top class='police_gras'>&nbsp;1.14. Nombre de locaux administratifs appartenant à l’Institution :&nbsp;</TD>
+		<TD nowrap  class='td_right'>Bureaux : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_BUREAUX_0' TYPE='text' size=5  ID='NB_BUREAUX_0' VALUE="$NB_BUREAUX_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Salles de réunion : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_SALLES_REUNION_0' TYPE='text' size=5  ID='NB_SALLES_REUNION_0' VALUE="$NB_SALLES_REUNION_0" >
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Autres : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_LOCAUX_AUTRES_0' TYPE='text' size=5  ID='NB_LOCAUX_AUTRES_0' VALUE="$NB_LOCAUX_AUTRES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;1.15. Etat général des locaux administratifs&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Bon/Acceptable&nbsp;<INPUT NAME='ETAT_GENRL_LOCAUX_0' TYPE='radio'   ID='ETAT_GENRL_LOCAUX_0_1' VALUE=$ETAT_GENRL_LOCAUX_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;En mauvais état&nbsp;<INPUT NAME='ETAT_GENRL_LOCAUX_0' TYPE='radio'   ID='ETAT_GENRL_LOCAUX_0_2' VALUE=$ETAT_GENRL_LOCAUX_0_2>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;1.16. L’Institution  possède-t-elle  des terrains/salles de sport ?	&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;                   Basket ball :&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='TERRAIN_BASKET_0' TYPE='radio'   ID='TERRAIN_BASKET_0_1' VALUE=$TERRAIN_BASKET_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='TERRAIN_BASKET_0' TYPE='radio'   ID='TERRAIN_BASKET_0_0' VALUE=$TERRAIN_BASKET_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;                   Hand ball :&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='TERRAIN_HAND_0' TYPE='radio'   ID='TERRAIN_HAND_0_1' VALUE=$TERRAIN_HAND_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='TERRAIN_HAND_0' TYPE='radio'   ID='TERRAIN_HAND_0_0' VALUE=$TERRAIN_HAND_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;                   Football:&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='TERRAIN_FOOT_0' TYPE='radio'   ID='TERRAIN_FOOT_0_1' VALUE=$TERRAIN_FOOT_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='TERRAIN_FOOT_0' TYPE='radio'   ID='TERRAIN_FOOT_0_0' VALUE=$TERRAIN_FOOT_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;                   Volley ball:&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='TERRAIN_VOLLEY_0' TYPE='radio'   ID='TERRAIN_VOLLEY_0_1' VALUE=$TERRAIN_VOLLEY_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='TERRAIN_VOLLEY_0' TYPE='radio'   ID='TERRAIN_VOLLEY_0_0' VALUE=$TERRAIN_VOLLEY_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;                   Gymnastique :&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='TERRAIN_GYM_0' TYPE='radio'   ID='TERRAIN_GYM_0_1' VALUE=$TERRAIN_GYM_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='TERRAIN_GYM_0' TYPE='radio'   ID='TERRAIN_GYM_0_0' VALUE=$TERRAIN_GYM_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;                   Autre :&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='TERRAIN_AUTRES_0' TYPE='radio'   ID='TERRAIN_AUTRES_0_1' VALUE=$TERRAIN_AUTRES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='TERRAIN_AUTRES_0' TYPE='radio'   ID='TERRAIN_AUTRES_0_0' VALUE=$TERRAIN_AUTRES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;1.17. L’institution dispose-t-elle de véhicules de transport en commun ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DISPOSE_VEHICULE_0' TYPE='radio'   ID='DISPOSE_VEHICULE_0_1' VALUE=$DISPOSE_VEHICULE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DISPOSE_VEHICULE_0' TYPE='radio'   ID='DISPOSE_VEHICULE_0_0' VALUE=$DISPOSE_VEHICULE_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Si oui, combien ?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_VEHICULES_0' TYPE='text' style = 'width:30px'  ID='NB_VEHICULES_0' VALUE="$NB_VEHICULES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;1.18. Les facultés/instituts dépendant de l’institution disposent-ils de centres de recherche ?  &nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='CENTRES_RECH_FAC_0' TYPE='radio'   ID='CENTRES_RECH_FAC_0_1' VALUE=$CENTRES_RECH_FAC_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='CENTRES_RECH_FAC_0' TYPE='radio'   ID='CENTRES_RECH_FAC_0_0' VALUE=$CENTRES_RECH_FAC_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Si oui, nombre de centres : &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_CENTRES_RECH_FAC_0' TYPE='text' size=5  ID='NB_CENTRES_RECH_FAC_0' VALUE="$NB_CENTRES_RECH_FAC_0" >
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

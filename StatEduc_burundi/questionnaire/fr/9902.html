@@ -1,0 +1,693 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=9902' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>4.4. Elèves par nationalité, par sexe et par niveau d’études</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> 4.4. Elèves par nationalité, par sexe et par niveau d’études<br></b><script language='javascript' type='text/javascript'>
+var expression_990007 	= "";
+var tot_mes_ligne_990007 	= new Array();
+var tot_mes_col_990007 	= new Array();
+var affich_vertic_mes_990007 	= 0;
+var affiche_sous_totaux_990007 	= 0;
+var tab_mes_990007 	= new Array ("FILLES_NATIONALITE","TOTAL_NATIONALITE");
+var tab_ligne_990007	= new Array ("1","3","8","10","2","11","7","4");
+var tab_col_990007	= new Array ("4","5","6","7","8","9","10","11","12");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>1ère année</TD>
+		<TD CLASS='ligne-titre' align='center'>2ème année</TD>
+		<TD CLASS='ligne-titre' align='center'>3ème année</TD>
+		<TD CLASS='ligne-titre' align='center'>4ème année</TD>
+		<TD CLASS='ligne-titre' align='center'>5ème année</TD>
+		<TD CLASS='ligne-titre' align='center'>6ème année</TD>
+		<TD CLASS='ligne-titre' align='center'>7ème année</TD>
+		<TD CLASS='ligne-titre' align='center'>8ème année</TD>
+		<TD CLASS='ligne-titre' align='center'>9ème année</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >Burundais</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[0]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_4' NAME='FILLES_NATIONALITE_0_1_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_5' NAME='FILLES_NATIONALITE_0_1_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_6' NAME='FILLES_NATIONALITE_0_1_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_7' NAME='FILLES_NATIONALITE_0_1_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_8' NAME='FILLES_NATIONALITE_0_1_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_9' NAME='FILLES_NATIONALITE_0_1_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_10' NAME='FILLES_NATIONALITE_0_1_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_11' NAME='FILLES_NATIONALITE_0_1_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_1_12' NAME='FILLES_NATIONALITE_0_1_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_1_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_1' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[0][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_1";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_1' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_4' NAME='TOTAL_NATIONALITE_0_1_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_5' NAME='TOTAL_NATIONALITE_0_1_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_6' NAME='TOTAL_NATIONALITE_0_1_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_7' NAME='TOTAL_NATIONALITE_0_1_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_8' NAME='TOTAL_NATIONALITE_0_1_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_9' NAME='TOTAL_NATIONALITE_0_1_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_10' NAME='TOTAL_NATIONALITE_0_1_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_11' NAME='TOTAL_NATIONALITE_0_1_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_1_12' NAME='TOTAL_NATIONALITE_0_1_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_1_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 1, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_1' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[0][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_1";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >Congolais</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[1]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_4' NAME='FILLES_NATIONALITE_0_3_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_5' NAME='FILLES_NATIONALITE_0_3_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_6' NAME='FILLES_NATIONALITE_0_3_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_7' NAME='FILLES_NATIONALITE_0_3_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_8' NAME='FILLES_NATIONALITE_0_3_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_9' NAME='FILLES_NATIONALITE_0_3_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_10' NAME='FILLES_NATIONALITE_0_3_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_11' NAME='FILLES_NATIONALITE_0_3_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_3_12' NAME='FILLES_NATIONALITE_0_3_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_3_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_3' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[1][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_3";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_3' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_4' NAME='TOTAL_NATIONALITE_0_3_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_5' NAME='TOTAL_NATIONALITE_0_3_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_6' NAME='TOTAL_NATIONALITE_0_3_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_7' NAME='TOTAL_NATIONALITE_0_3_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_8' NAME='TOTAL_NATIONALITE_0_3_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_9' NAME='TOTAL_NATIONALITE_0_3_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_10' NAME='TOTAL_NATIONALITE_0_3_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_11' NAME='TOTAL_NATIONALITE_0_3_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_3_12' NAME='TOTAL_NATIONALITE_0_3_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_3_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 3, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_3' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[1][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_3";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >Kényans</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[2]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_4' NAME='FILLES_NATIONALITE_0_8_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_5' NAME='FILLES_NATIONALITE_0_8_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_6' NAME='FILLES_NATIONALITE_0_8_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_7' NAME='FILLES_NATIONALITE_0_8_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_8' NAME='FILLES_NATIONALITE_0_8_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_9' NAME='FILLES_NATIONALITE_0_8_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_10' NAME='FILLES_NATIONALITE_0_8_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_11' NAME='FILLES_NATIONALITE_0_8_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_8_12' NAME='FILLES_NATIONALITE_0_8_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_8_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_8' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[2][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_8";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_8' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_4' NAME='TOTAL_NATIONALITE_0_8_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_5' NAME='TOTAL_NATIONALITE_0_8_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_6' NAME='TOTAL_NATIONALITE_0_8_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_7' NAME='TOTAL_NATIONALITE_0_8_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_8' NAME='TOTAL_NATIONALITE_0_8_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_9' NAME='TOTAL_NATIONALITE_0_8_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_10' NAME='TOTAL_NATIONALITE_0_8_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_11' NAME='TOTAL_NATIONALITE_0_8_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_8_12' NAME='TOTAL_NATIONALITE_0_8_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_8_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 8, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_8' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[2][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_8";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >Ougandais</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[3]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_4' NAME='FILLES_NATIONALITE_0_10_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_5' NAME='FILLES_NATIONALITE_0_10_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_6' NAME='FILLES_NATIONALITE_0_10_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_7' NAME='FILLES_NATIONALITE_0_10_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_8' NAME='FILLES_NATIONALITE_0_10_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_9' NAME='FILLES_NATIONALITE_0_10_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_10' NAME='FILLES_NATIONALITE_0_10_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_11' NAME='FILLES_NATIONALITE_0_10_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_10_12' NAME='FILLES_NATIONALITE_0_10_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_10_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_10' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[3][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_10";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_10' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_4' NAME='TOTAL_NATIONALITE_0_10_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_5' NAME='TOTAL_NATIONALITE_0_10_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_6' NAME='TOTAL_NATIONALITE_0_10_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_7' NAME='TOTAL_NATIONALITE_0_10_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_8' NAME='TOTAL_NATIONALITE_0_10_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_9' NAME='TOTAL_NATIONALITE_0_10_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_10' NAME='TOTAL_NATIONALITE_0_10_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_11' NAME='TOTAL_NATIONALITE_0_10_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_10_12' NAME='TOTAL_NATIONALITE_0_10_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_10_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 10, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_10' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[3][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_10";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >Rwandais</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[4]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_4' NAME='FILLES_NATIONALITE_0_2_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_5' NAME='FILLES_NATIONALITE_0_2_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_6' NAME='FILLES_NATIONALITE_0_2_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_7' NAME='FILLES_NATIONALITE_0_2_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_8' NAME='FILLES_NATIONALITE_0_2_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_9' NAME='FILLES_NATIONALITE_0_2_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_10' NAME='FILLES_NATIONALITE_0_2_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_11' NAME='FILLES_NATIONALITE_0_2_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_2_12' NAME='FILLES_NATIONALITE_0_2_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_2_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_2' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[4][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_2";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_2' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_4' NAME='TOTAL_NATIONALITE_0_2_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_5' NAME='TOTAL_NATIONALITE_0_2_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_6' NAME='TOTAL_NATIONALITE_0_2_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_7' NAME='TOTAL_NATIONALITE_0_2_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_8' NAME='TOTAL_NATIONALITE_0_2_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_9' NAME='TOTAL_NATIONALITE_0_2_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_10' NAME='TOTAL_NATIONALITE_0_2_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_11' NAME='TOTAL_NATIONALITE_0_2_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_2_12' NAME='TOTAL_NATIONALITE_0_2_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_2_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 2, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_2' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[4][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_2";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >Sud Soudan</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[5]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_4' NAME='FILLES_NATIONALITE_0_11_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_5' NAME='FILLES_NATIONALITE_0_11_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_6' NAME='FILLES_NATIONALITE_0_11_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_7' NAME='FILLES_NATIONALITE_0_11_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_8' NAME='FILLES_NATIONALITE_0_11_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_9' NAME='FILLES_NATIONALITE_0_11_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_10' NAME='FILLES_NATIONALITE_0_11_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_11' NAME='FILLES_NATIONALITE_0_11_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_11_12' NAME='FILLES_NATIONALITE_0_11_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_11_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_11' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[5][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_11";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_11' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_4' NAME='TOTAL_NATIONALITE_0_11_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_5' NAME='TOTAL_NATIONALITE_0_11_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_6' NAME='TOTAL_NATIONALITE_0_11_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_7' NAME='TOTAL_NATIONALITE_0_11_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_8' NAME='TOTAL_NATIONALITE_0_11_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_9' NAME='TOTAL_NATIONALITE_0_11_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_10' NAME='TOTAL_NATIONALITE_0_11_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_11' NAME='TOTAL_NATIONALITE_0_11_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_11_12' NAME='TOTAL_NATIONALITE_0_11_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_11_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 11, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_11' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[5][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_11";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >Tanzaniens</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[6]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_4' NAME='FILLES_NATIONALITE_0_7_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_5' NAME='FILLES_NATIONALITE_0_7_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_6' NAME='FILLES_NATIONALITE_0_7_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_7' NAME='FILLES_NATIONALITE_0_7_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_8' NAME='FILLES_NATIONALITE_0_7_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_9' NAME='FILLES_NATIONALITE_0_7_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_10' NAME='FILLES_NATIONALITE_0_7_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_11' NAME='FILLES_NATIONALITE_0_7_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_NATIONALITE_0_7_12' NAME='FILLES_NATIONALITE_0_7_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_7_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_7' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[6][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_7";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_7' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_4' NAME='TOTAL_NATIONALITE_0_7_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_5' NAME='TOTAL_NATIONALITE_0_7_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_6' NAME='TOTAL_NATIONALITE_0_7_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_7' NAME='TOTAL_NATIONALITE_0_7_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_8' NAME='TOTAL_NATIONALITE_0_7_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_9' NAME='TOTAL_NATIONALITE_0_7_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_10' NAME='TOTAL_NATIONALITE_0_7_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_11' NAME='TOTAL_NATIONALITE_0_7_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_NATIONALITE_0_7_12' NAME='TOTAL_NATIONALITE_0_7_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_7_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 7, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_7' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[6][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_7";
+</script>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >Autres Nationalités</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[7]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_4' NAME='FILLES_NATIONALITE_0_4_4' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_5' NAME='FILLES_NATIONALITE_0_4_5' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_6' NAME='FILLES_NATIONALITE_0_4_6' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_7' NAME='FILLES_NATIONALITE_0_4_7' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_8' NAME='FILLES_NATIONALITE_0_4_8' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_9' NAME='FILLES_NATIONALITE_0_4_9' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_10' NAME='FILLES_NATIONALITE_0_4_10' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_11' NAME='FILLES_NATIONALITE_0_4_11' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_NATIONALITE_0_4_12' NAME='FILLES_NATIONALITE_0_4_12' TYPE='text' size=5 VALUE="$FILLES_NATIONALITE_0_4_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'FILLES_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_LIGNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[7][1]	= "TOT_990007_FILLES_NATIONALITE_LIGNE_0_4";
+</script>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_LIGNE_0_4' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_4' NAME='TOTAL_NATIONALITE_0_4_4' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 4, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_5' NAME='TOTAL_NATIONALITE_0_4_5' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 5, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_6' NAME='TOTAL_NATIONALITE_0_4_6' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 6, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_7' NAME='TOTAL_NATIONALITE_0_4_7' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 7, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_8' NAME='TOTAL_NATIONALITE_0_4_8' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 8, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_9' NAME='TOTAL_NATIONALITE_0_4_9' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 9, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_10' NAME='TOTAL_NATIONALITE_0_4_10' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 10, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_11' NAME='TOTAL_NATIONALITE_0_4_11' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 11, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_NATIONALITE_0_4_12' NAME='TOTAL_NATIONALITE_0_4_12' TYPE='text' size=5 VALUE="$TOTAL_NATIONALITE_0_4_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 990007, 0, 'TOTAL_NATIONALITE', tab_ligne_990007, tab_col_990007, 4, 12, tab_mes_990007);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_LIGNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_990007[7][2]	= "TOT_990007_TOTAL_NATIONALITE_LIGNE_0_4";
+</script>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='3' style='vertical-align:middle' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>F</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][0]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_5' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][1]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_6' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][2]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_7' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][3]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_7";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_8' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][4]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_9' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][5]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_10' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][6]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_11' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][7]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0_12' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[1][8]	= "TOT_990007_FILLES_NATIONALITE_COLONNE_0_12";
+</script>
+		<td colspan='2' align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_FILLES_NATIONALITE_COLONNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center' bgcolor='#CCCCCC'>F+M</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_4' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][0]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_5' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][1]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_6' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][2]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_7' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][3]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_7";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_8' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][4]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_9' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][5]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_10' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][6]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_11' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][7]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0_12' ></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_990007[2][8]	= "TOT_990007_TOTAL_NATIONALITE_COLONNE_0_12";
+</script>
+		<td colspan='2' align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_TOTAL_NATIONALITE_COLONNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center' bgcolor='#CCCCCC'>F + F+M</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_4' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_5' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_6' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_7' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_8' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_9' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_10' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_11' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold' NAME='TOT_990007_ALL_MES_COLONNE_0_12' ></TD>
+		<td colspan='2' align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_990007_ALL_MES_0' ></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',990007, 0, tab_mes_990007, tab_ligne_990007, tab_col_990007);
+</script>

@@ -1,0 +1,192 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=8807' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B></B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<BR/><b> VII. DONNEES RELATIVES A LA PROTECTION DES APPRENANTS</b>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>7.1	 </b>Le centre dispose-t-il d?un code de conduite des formateurs?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='DISPOSE_CODECONDUITE_ENS_0' TYPE='radio'   ID='DISPOSE_CODECONDUITE_ENS_0_1' VALUE=$DISPOSE_CODECONDUITE_ENS_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='DISPOSE_CODECONDUITE_ENS_0' TYPE='radio'   ID='DISPOSE_CODECONDUITE_ENS_0_0' VALUE=$DISPOSE_CODECONDUITE_ENS_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)Si oui, ce code  interdit-il les punitions corporelles ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='INTERDIT_PUNITIONS_CORPORELLES_0' TYPE='radio'   ID='INTERDIT_PUNITIONS_CORPORELLES_0_1' VALUE=$INTERDIT_PUNITIONS_CORPORELLES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='INTERDIT_PUNITIONS_CORPORELLES_0' TYPE='radio'   ID='INTERDIT_PUNITIONS_CORPORELLES_0_0' VALUE=$INTERDIT_PUNITIONS_CORPORELLES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>7.2	</b>Le centre dispose-t-il d?une stratégie ou mécanisme de protection des apprenants contre les violences sexuelles basées sur le genre ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='DISPOSE_STRATEG_PROTECT_ELEV_0' TYPE='radio'   ID='DISPOSE_STRATEG_PROTECT_ELEV_0_1' VALUE=$DISPOSE_STRATEG_PROTECT_ELEV_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='DISPOSE_STRATEG_PROTECT_ELEV_0' TYPE='radio'   ID='DISPOSE_STRATEG_PROTECT_ELEV_0_0' VALUE=$DISPOSE_STRATEG_PROTECT_ELEV_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<b>7.3	</b>Ya-t-il au sein du centre un mécanisme de détection et référencement des victimes de violence ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='MECANISM_DETECTION_VICTIM_VIOL_0' TYPE='radio'   ID='MECANISM_DETECTION_VICTIM_VIOL_0_1' VALUE=$MECANISM_DETECTION_VICTIM_VIOL_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='MECANISM_DETECTION_VICTIM_VIOL_0' TYPE='radio'   ID='MECANISM_DETECTION_VICTIM_VIOL_0_0' VALUE=$MECANISM_DETECTION_VICTIM_VIOL_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)<BR/><b> VIII.	DONNEES RELATIVES AUX URGENCES</b>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)Est-ce que le centre a été frappé par des intempéries pour l?année scolaire précédente, entrainant une perturbation de l?organisation des formations ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='FRAPPE_INTEMPERIE_0' TYPE='radio'   ID='FRAPPE_INTEMPERIE_0_1' VALUE=$FRAPPE_INTEMPERIE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='FRAPPE_INTEMPERIE_0' TYPE='radio'   ID='FRAPPE_INTEMPERIE_0_0' VALUE=$FRAPPE_INTEMPERIE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)Si oui,  <br/>a)	Quel type d?intempérie ?&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'   valign=top >&nbsp;(#)Inondation &nbsp;&nbsp;&nbsp;<INPUT NAME='INONDATION_0' TYPE='checkbox'   ID='INONDATION_0' VALUE=$INONDATION_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)Tempêtes&nbsp;&nbsp;&nbsp;<INPUT NAME='TEMPETES_0' TYPE='checkbox'   ID='TEMPETES_0' VALUE=$TEMPETES_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)Sècheresse &nbsp;&nbsp;&nbsp;<INPUT NAME='SECHERESSE_0' TYPE='checkbox'   ID='SECHERESSE_0' VALUE=$SECHERESSE_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)Tremblement de terre &nbsp;&nbsp;&nbsp;<INPUT NAME='TREMBLEMENT_TERRE_0' TYPE='checkbox'   ID='TREMBLEMENT_TERRE_0' VALUE=$TREMBLEMENT_TERRE_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)Foudre&nbsp;&nbsp;&nbsp;<INPUT NAME='FOUDRE_0' TYPE='checkbox'   ID='FOUDRE_0' VALUE=$FOUDRE_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)Autres à préciser&nbsp;&nbsp;&nbsp;<INPUT NAME='AUTRES_INTEMPERIES_0' TYPE='text'   ID='AUTRES_INTEMPERIES_0' VALUE="$AUTRES_INTEMPERIES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)b) Combien de salles de classe ont été affectées?&nbsp;&nbsp;&nbsp;<INPUT NAME='NB_SDC_AFFECTEE_0' TYPE='text' Size=10  ID='NB_SDC_AFFECTEE_0' VALUE="$NB_SDC_AFFECTEE_0" >
+&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b>(#)<br/><b>IX.	DONNEES FINANCIERES, GESTION</b><br>(#)<BR/> <b>9.1.</b> RECETTES<br></b></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b>(#)<BR/><b>9.2.</b> DEPENSES<br></b></TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)<br/><b>9.3	 Autres informations de gestion financière</b>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)9.3.1. Le  centre gère-t-il un compte ? &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='GERE_UN_COMPTE_0' TYPE='radio'   ID='GERE_UN_COMPTE_0_1' VALUE=$GERE_UN_COMPTE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='GERE_UN_COMPTE_0' TYPE='radio'   ID='GERE_UN_COMPTE_0_0' VALUE=$GERE_UN_COMPTE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;(#)N° de compte &nbsp;&nbsp;&nbsp;<INPUT NAME='NUMERO_COMPTE_0' TYPE='text' style = 'width:150px'  ID='NUMERO_COMPTE_0' VALUE="$NUMERO_COMPTE_0" >
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;(#)Banque: &nbsp;&nbsp;&nbsp;<INPUT NAME='BANQUE_0' TYPE='text' style = 'width:150px'  ID='BANQUE_0' VALUE="$BANQUE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)9.3.2. Le centre  a-t-il un comité  de gestion ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='EXISTE_COGES_0' TYPE='radio'   ID='EXISTE_COGES_0_1' VALUE=$EXISTE_COGES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='EXISTE_COGES_0' TYPE='radio'   ID='EXISTE_COGES_0_0' VALUE=$EXISTE_COGES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)                  Si oui, combien de réunions tenues au courant de l’année écoulée ?  &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_REUNION_COGES_0' TYPE='text' size=5  ID='NB_REUNION_COGES_0' VALUE="$NB_REUNION_COGES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)9.3.3. Le centre dispose-t-il de pièces comptables ?&nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='EXISTE_PIECES_COMPTALES_0' TYPE='radio'   ID='EXISTE_PIECES_COMPTALES_0_1' VALUE=$EXISTE_PIECES_COMPTALES_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='EXISTE_PIECES_COMPTALES_0' TYPE='radio'   ID='EXISTE_PIECES_COMPTALES_0_0' VALUE=$EXISTE_PIECES_COMPTALES_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='1'   valign=top class='police_gras'>&nbsp;(#)9.3.4. Personne autorisant la sortie des fonds : &nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)Le directeur : &nbsp;&nbsp;&nbsp;<INPUT NAME='SORTIE_FONDS_DIRECTEUR_0' TYPE='checkbox'   ID='SORTIE_FONDS_DIRECTEUR_0' VALUE=$SORTIE_FONDS_DIRECTEUR_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>(#)Le comptable : &nbsp;&nbsp;&nbsp;<INPUT NAME='SORTIE_FONDS_COMPTABLE_0' TYPE='checkbox'   ID='SORTIE_FONDS_COMPTABLE_0' VALUE=$SORTIE_FONDS_COMPTABLE_0>
+&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;(#)9.3.5.  Situation du compte au 30 juin de l?année budgétaire précédente : &nbsp;&nbsp;&nbsp;<INPUT NAME='SITUATION_COMPTE_0' TYPE='text' style = 'width:150px'  ID='SITUATION_COMPTE_0' VALUE="$SITUATION_COMPTE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;(#)9.3.6.  Situation de la caisse au 30 juin  de l?année budgétaire précédente : &nbsp;&nbsp;&nbsp;<INPUT NAME='SITUATION_CAISSE_0' TYPE='text' style = 'width:150px'  ID='SITUATION_CAISSE_0' VALUE="$SITUATION_CAISSE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;(#)9.3.7. Le centre dispose-t-il d?unités d?appui pédagogique (UAP) ? &nbsp;&nbsp;&nbsp;(#)Oui&nbsp;<INPUT NAME='DISPOSE_UNITE_PROD_0' TYPE='radio'   ID='DISPOSE_UNITE_PROD_0_1' VALUE=$DISPOSE_UNITE_PROD_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;(#)Non&nbsp;<INPUT NAME='DISPOSE_UNITE_PROD_0' TYPE='radio'   ID='DISPOSE_UNITE_PROD_0_0' VALUE=$DISPOSE_UNITE_PROD_0_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;(#)Si, oui, combien ? &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_UNITE_PROD_0' TYPE='text' size=5  ID='NB_UNITE_PROD_0' VALUE="$NB_UNITE_PROD_0" >
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

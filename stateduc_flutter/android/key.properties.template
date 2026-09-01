@@ -1,0 +1,19 @@
+# StatEduc — Android release signing configuration
+# ─────────────────────────────────────────────────────────────────
+# IMPORTANT: DO NOT commit key.properties or the .jks file to git!
+#            Both are listed in .gitignore.
+#
+# HOW TO GENERATE YOUR KEYSTORE (run once on your machine):
+#
+#   keytool -genkey -v \
+#     -keystore android/stateduc-release.jks \
+#     -alias stateduc \
+#     -keyalg RSA -keysize 2048 -validity 10000 \
+#     -dname "CN=StatEduc, OU=ARK, O=ARK, L=Dakar, S=Dakar, C=SN"
+#
+# Then copy this file to android/key.properties and fill in your passwords:
+# ─────────────────────────────────────────────────────────────────
+storePassword=REPLACE_WITH_YOUR_STORE_PASSWORD
+keyPassword=REPLACE_WITH_YOUR_KEY_PASSWORD
+keyAlias=stateduc
+storeFile=../stateduc-release.jks
