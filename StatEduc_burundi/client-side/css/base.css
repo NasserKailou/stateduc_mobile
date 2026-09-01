@@ -1,0 +1,335 @@
+/* CSS Document */
+/* Style commun à toutes les CSS */
+/*
+#sortable input.uniform-input, #sortable select.uniform-multiselect, #sortable textarea.uniform {
+	background-color:#E2E2E2 !important;
+}
+*/
+img {
+	border:none;
+}
+.lien {
+	cursor:pointer;
+}
+input[readonly] {
+	background:none;
+	background-color:#E9E9E9;
+}
+input.uniform-input, select.uniform-multiselect, textarea.uniform {
+	color:#000000;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+	color:#000000;
+}
+div.selector select {
+	background-color:#FFFFFF;
+}
+div.selector.disabled span, div.selector span, div.selector.disabled.active span {
+	color:#000000;
+	text-align:left;
+}
+div.selector, .ui-widget, input.uniform-input, select.uniform-multiselect, textarea.uniformdetails_zone_table {
+	font-size: 11px;
+}
+.Evidence_Ligne div.selector.disabled span {
+	color: #FFF !important;
+	text-shadow: 0 1px 0 #000 !important;
+}
+select.uniform-multiselect, textarea.uniform {
+	background-color:#FFF;
+}
+input.ui-button {
+	padding: .2em .5em;
+}
+.isPopup {
+	/*background:none;*/
+}
+.toTop {
+	z-index:1000;
+}
+.surToTop {
+	z-index:1500;
+}
+#div_dialog, #div_sousdialog, #div_confirm {
+	display:none;
+	text-align:center;
+}
+#div_confirm {
+	text-align:left;
+}
+.ui-widget-overlay {
+	z-index:900;
+	background:#000;
+}
+#dialog_content, #sousdialog_content {
+	width:98%;
+	height:99%;
+}
+.dialogstyleperso .ui-state-warning {
+    border: 1px solid #E36802;
+    background: #FD8119;   /* orangé */
+    color: #ffffff;
+}
+table, .classe_table {
+	border-collapse:separate;
+	text-align:left;
+}
+td {
+	padding:0;
+}
+.inner-box {
+	margin: 15px auto;
+  width: 50%;
+}
+.table-questionnaire td {
+	padding:1px !important;
+}
+#footer {
+	display:block;
+	position:absolute;
+	width:100%;
+	top:78%;
+}
+
+a#backToTop {
+    width:48px;
+    height:48px;
+    position:fixed;
+    bottom:5px;
+    right:10px;
+    display:none;
+    text-indent:-10000px;
+    outline:none !important;
+    background-image: url('../image/b_top.png');
+    background-repeat: no-repeat;
+}
+
+/*            INFO PARAM                  */
+#accordion_base_access {
+	width:790px;
+	margin:0 auto;
+}
+#add_single_database, #add_other_single_database { 
+	float:right;
+	cursor:pointer;
+}
+#add_other_single_database {
+	margin-right:30px;
+}
+
+.active_base td {
+	border: 1px solid #009900;
+	padding:1px;
+}
+
+.non_active_base td {
+	border: 1px solid #A6A6A6;
+	padding:1px;
+}
+
+.liste_elt_a {
+	background-color:#F4F4F4;
+}
+.liste_elt_b {
+	background-color:#E7E7E7;
+}
+
+/*     CONFIGURATION ZONE    */
+.readonly_input {
+	background:none #E8E8E8 !important;
+}
+
+.sous_liste_form th {
+	padding:10px;
+}
+
+.sous_liste_form td {
+}
+
+.zone_liste {
+	border-right:1px solid #CCCCCC;
+	border-left:1px solid #CCCCCC;
+}
+
+.details_tr {
+	display:none;
+}
+
+.details_td {
+	max-width:1000px;
+}
+
+.float_left {
+	float:left;
+}
+
+.float_right {
+	float:right;
+}
+
+.hidden {
+	display:none;
+}
+
+.clear {
+	clear:both;
+}
+
+.details_zone_table {	
+	padding:5px 5px;
+}
+
+.details_zone_table td {
+	padding:0;
+	line-height:26px;
+}
+
+.hidden_fields {
+	color: #FFF;
+	margin: 0 10px;
+	font-weight: bold;
+	text-decoration: none;
+	line-height:23px;
+}
+
+a.hidden_fields:hover {
+	text-decoration:underline;
+}
+
+.valid_zone {
+	display:none;
+}
+
+.img_td img {
+	margin-top:5px;
+}
+
+.img_add_zone {
+	margin-bottom:-8px;
+	cursor:pointer;
+}
+
+#table_mere_liste .table_mere_label {
+	padding-left:10px;
+	line-height:23px;	
+}
+
+#table_mere_liste .table_mere_label div, #table_mere_liste .table_mere_label input {
+	margin-left:-5px;
+}
+.edit_zone {
+	text-align:center;
+}
+.champs_lies {
+	display:none;
+}
+.insert_zone_status {
+	float:right;
+	margin:2px 10px 2px 0;
+}
+#btnValidZone, #existNonValidZone {
+	color: #FF0000;
+	display:none;
+	font-weight:bold;
+}
+
+/* log import css */
+.div_log {
+  width: 1024px;
+  max-height: 300px;
+}
+.log_loading {
+  float: right;
+}
+
+#save_info_title {
+   cursor: pointer;
+}
+
+#save_info_div {
+  display: none;    
+  position: absolute;
+  width: 176px;
+  margin-left: -10px;
+}
+
+.ctrl_elt {
+  min-width: 200px;
+}
+
+BODY.no_bg {
+ 	background-image:none !important;
+}
+.rpt_frame {
+	width:100%;
+	min-height:500px;
+}
+.rpt_frame_lst {
+	width:100%;
+	height: 80px;
+    padding: 2px 0;
+}
+
+
+#user_rpt_conf_box {
+	margin:0 10px;
+}
+#user_rpt_conf_box .tab-content {
+	margin-top:1px;
+}
+.resp-tabs-list li {
+    padding: 4px 6px;
+	font-size: 12px;
+}
+
+.resp-tab-active {
+    padding: 4px 5px 5px 5px !important;
+}
+
+.mail_error {
+    color: red;
+}
+
+.full_div {
+	width:100%;
+}
+
+.btnRev {
+	margin:5px;
+}
+
+#div_liste_rev {
+	max-height:1000px;
+	overflow:auto;
+}
+
+#response {
+	padding: 10px;
+	margin-top: 10px;
+	border-radius: 2px;
+	display: none;
+}
+
+#response td {
+	padding: 5px;
+}
+
+.success {
+	background: #c7efd9;
+	border: #bbe2cd 1px solid;
+}
+
+.error {
+	background: #fbcfcf;
+	border: #f3c6c7 1px solid;
+}
+
+div#response.display-block {
+	display: block;
+}
+
+.page_loading {
+	display:block;
+	margin:12px auto 0;
+}

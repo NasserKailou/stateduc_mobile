@@ -1,0 +1,545 @@
+BODY {	
+	font-size: 11px;
+	font-family: Arial;
+	background-color:#000000;
+	margin:0;
+	padding:0;
+	background-image: url(../image/fond-contraste.gif) ;
+	background-repeat: no-repeat;
+	background-position:0px 0px;
+}
+
+
+a {	
+	
+	color:#F4C100;
+	text-decoration:underline;	
+}
+
+a:hover {	
+	
+	color:#FFFFFF;
+	text-decoration:none;	
+	
+}
+
+/*Espace entre menu genereal et hierarchie*/
+
+
+#bandeau {
+	height:40px;
+	margin:7px;
+	margin-top:3px;
+	width:100%;	
+}
+
+/*  Affichage drapeau pays  */
+
+#drapeau {
+	position: absolute;
+	right: 0px;
+	top:3px;
+}
+
+/*  Menu hierarchique  */
+
+#hierarchie {	
+	
+	border: #CB8B17; border-style: solid; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 9px;
+	color:#CB8B17;
+	padding:0px;
+	
+	padding-left:5px;
+	padding-bottom:0px;
+	margin-top:15px;
+	margin-left:17px;
+	margin-right:10px;
+	margin-bottom:5px;
+	font-family: Verdana;
+	font-size: 10px;
+	width:100%;
+	
+}
+
+/*  Rappel des infos etablissements  */
+
+
+#rappel {		
+	border: #133168; border-style: solid; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 9px;
+	padding:0px;
+	padding-left:5px;
+	padding-bottom:0px;
+	margin-top:10px;
+	margin-left:17px;
+	margin-right:10px;
+	margin-bottom:10px;
+}
+
+#rappel p {	
+	margin-top:0px;
+	margin-bottom:4px;
+	margin-left:5px;
+	text-align : left;
+	color:#FFFFCC;	
+	font-family: Verdana;
+	font-size: 10px;
+}
+
+/* Contenu pour GC*/
+
+#contenu {
+
+	width: 100%;
+	min-height: 78%;
+	text-align: center;
+
+}
+/* Contenu pour IE*/
+* html #contenu {
+	height: 78%;
+}
+/* Contenu pour FF*/
+@-moz-document url-prefix()
+{
+    #contenu {
+		height: 78%;
+	}
+}
+
+/*  Questionnaire  */
+
+.table-questionnaire {
+	border:0px solid #FFDB53;
+	border-collapse:collapse;
+	padding:0px;
+	font-size: 11px;
+	font-family: Arial;
+	background-color:#CCD9E6;
+	/*margin:auto;*/
+}
+
+.center-table {
+	margin:0 auto;
+}
+
+table {
+	border: 1px solid #FFDB53;
+	border-collapse:collapse;
+	padding:0px;
+	font-size: 11px;
+	font-family: Arial;
+	background-color:#FFDB53;
+	/*margin:auto;*/
+	color:#000000;
+}
+
+.border_table {
+	border: 1px solid #FFDB53;
+}
+
+.classe_table {
+	border: 1px solid #FFDB53;
+	border-collapse:collapse;
+	padding:0px;
+	font-size: 11px;
+	font-family: Arial;
+	background-color:#FFDB53;
+	margin:auto;
+	color:#000000;
+}
+
+/*  Titre questionnaire  */
+.titre_campagne {
+  overflow: hidden;
+  top: 54px;
+  left: 100px;
+  height: 20px;
+  border: 1px solid #133168;
+  position: absolute;
+  width: 790px;
+}
+
+.titre_campagne, .inner-box-title, caption { 
+ 	padding:5px;
+  	background-color:#133168;
+  	vertical-align:middle;
+  	color:#FFFFFF;
+  	font-weight:bold;
+  	font-size: 11px;
+	font-family: Verdana;
+	text-align:left;
+	margin:auto;
+	white-space: nowrap;
+
+}
+
+.ligne-titre {	
+	background-color:#FFDB53;
+	text-align: center;
+}
+
+.inner-box-container {
+	border: 1px solid #133168;
+	padding: 5px 5px;
+	border-radius: 2px;
+	background-color:#FFDB53;
+}
+
+.ligne-paire {	
+	background-color:#FFDB53;
+	text-align: center;
+}
+
+.ligne-paire-left {	
+	background-color:#FFDB53;
+	text-align: left;
+}
+
+.ligne-impaire-left {	
+	background-color:#F4C100;
+	text-align: left;
+}
+
+.ligne-paire td {	
+	background-color:#FFDB53;
+	text-align: center;
+}
+
+.ligne-impaire {	
+	background-color:#F4C100;
+	text-align: center;
+}
+
+.ligne-impaire td{	
+	background-color:#F4C100;
+	text-align: center;
+}
+
+.ligne-nomenc-parent {	
+	padding:5px;
+  	background-color:#99CCCC;
+  	vertical-align:middle;
+  	color:#000000;
+  	font-weight:bold;
+  	font-size: 11px;
+	font-family: Verdana;
+	text-align:left;
+	margin:auto;
+	white-space: nowrap;
+}
+
+td { 
+	font-size: 11px;
+	font-family: Arial;
+ 	padding:3px;
+  	margin:0px;
+  	vertical-align:top;
+
+}
+
+/*  Premiere colonne en gras  */
+
+th { 
+	font-size: 11px;
+	font-family: Arial;
+ 	padding:3px;
+  	margin:0px;
+  	vertical-align:top;
+	font-weight:bold;
+	text-align:left;
+}
+
+tr { 
+ 	padding:0px;
+  	margin:0px;
+}
+
+/*  Liens vers questionnaires suivant et precedent  */
+
+#suite {	
+	margin:10px;
+	text-align:center;
+	font-family: Verdana;
+	font-size: 10px;
+	padding-bottom:10px;
+	border: #336699; border-style: solid; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px;
+
+}
+
+
+.precedent {
+
+	background-image: url(../image/precedent-contraste.gif) ;
+	background-repeat: no-repeat;
+	background-position:center left;
+	padding-left:20px;
+	padding-top:3px;
+	padding-bottom:3px;
+	margin-right:20px;
+	}
+	
+.suivant {
+
+	background-image: url(../image/suivant-contraste.gif) ;
+	background-repeat: no-repeat;
+	background-position:center right;
+	padding-right:20px;
+	padding-top:3px;
+	padding-bottom:3px;
+	margin-left:20px;
+	}
+
+#pied {	
+	border: #336699; border-style: solid; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 10px;
+	color:#003366;
+	padding:50px;
+	padding-left:5px;
+	padding-bottom:0px;
+	margin-top:15px;
+	margin-left:10px;
+	margin-right:10px;
+	margin-bottom:5px;
+	font-family: Verdana;
+	font-size: 10px;
+	background-image: url(image/unesco-pm.gif) ;
+	background-repeat: no-repeat;
+	background-position:center right;		
+}
+
+/*  Affichage logo ISU + credits  */
+
+#gauche {
+	position: absolute;
+	left:10px;
+	background-image: url(../image/isu-pm-contraste.gif) ;
+	background-repeat: no-repeat;
+	background-position:0px 0px;
+	height:63px;
+	padding-left:75px;
+	padding-top:31px;
+}
+#centre {
+	position: absolute;
+	text-align: center;
+	font-size: 11px;
+	font-family: Arial;
+	font-weight: bold;
+	color:#FFFFFF;
+	padding-top : 31px;
+	width: 100%;
+}
+#droite {
+	position: absolute;
+	margin-top:31px;
+	right:10px;
+}
+
+INPUT {
+	border-width:1px;
+	border-color:#000000;
+	font-size:11;
+	font-family: Arial;
+	padding:2px;
+	color:#000000;
+
+}
+SELECT {
+	font-size:11;
+	font-family: Arial;
+	border-width:1px;
+	border-color:#000000;
+	color:#000000;
+}
+
+/*  Affichage en vertical  */
+
+.vertical {	
+	text-align: center;
+	writing-mode: tb-rl ;
+	height:120;
+}
+.vertical_gras {	
+	text-align: center;
+	writing-mode: tb-rl ;
+	height:120;	
+	font-weight: bolder;
+}
+
+/*  Bandeau photos  */
+
+#photo {	
+
+	position: absolute;
+
+	left: 0px;
+	top: 0px;
+
+	width: 100%;
+	height: 100%;
+
+	Z-index: -1;
+
+	background-image: url(../image/photos.php);
+	background-position: center center;
+	background-repeat: no-repeat;
+
+}
+
+#photo-light {	
+
+	position: absolute;
+
+	left: 0px;
+	top: 0px;
+
+	width: 100%;
+	height: 100%;
+
+	Z-index: -1;
+
+	background-image: url(../image/photos-light.php);
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+/* Menu */
+
+/* Menu - default styles - do not edit */
+.clCMEvent{position:absolute; z-index:300; width:100%; height:100%; clip:rect(0,100%,100%,0); left:0; top:0; visibility:hidden}
+.clCMAbs{position:absolute; width:10; height:10; left:0; top:0; visibility:hidden}
+/* Menu - default styles - end */
+  
+
+.clT, .clTover, .clS, .clSover, .clS2, .clS2over{position:absolute; overflow:hidden; width:130; height:25; cursor:pointer; cursor:hand}
+.clT, .clTover{padding:4px; font-size:11px; font-weight:bold}
+.clT{color:#000000;}   
+.clTover{color:#FFFFCC;}
+.clS, .clSover{padding:2px; font-size:11px; font-weight:bold}
+.clS2, .clS2over{padding:2px; font-size:10px;}
+.clS, .clS2{color:#000000; background-color:#FFDB53; layer-background-color:#FFDB53;}
+.clSover, .clS2over{color:#FFFFCC;}
+.clSover, .clS2over, .clTover, .clB, .clBar{layer-background-color:#FFDB53; background-color:#FFCC00;}
+.clB{position:absolute; visibility:hidden; z-index:300}
+.clBar{position:absolute; width:10; height:10; visibility:hidden; }
+
+/* Arbo */
+
+.arbre {
+	text-align : left;  
+	left: 100px;
+	overflow: auto;
+	border:1px solid #FFDB53;
+	position: absolute;
+	height: 325px; 
+	top: 115px;
+	width: 300px;
+	background-color: #FFDB53;
+}
+
+.etablissement {
+  text-align : center;
+  left: 400px; 
+  width: 500px;  
+  overflow: auto;
+  border:1px solid #FFDB53;
+  position: absolute;
+  height: 325px; 
+  top: 115px;
+  background-color: #FFDB53;
+}
+
+.chaine {
+  overflow: hidden;
+  text-align : center;
+  top: 85px;
+  left: 100px;
+  height: 30px;    
+  border:1px solid #FFDB53;
+  background-color: #FFDB53;
+  position: absolute;
+  width: 300px;
+}
+
+.systeme {
+  overflow: hidden;
+  text-align : center;
+  top: 85px;
+  left: 400px;
+  height: 30px;  
+  border:1px solid #FFDB53;
+  background-color: #FFDB53;
+  position: absolute;
+  width: 500px;
+}
+
+.code_admin {
+  overflow: hidden;
+  text-align : center;
+  top: 440px;
+  left: 100px;
+  height: 35px;  
+  border:1px solid #FFDB53;
+  background-color: #FFDB53;
+  position: absolute;
+  width: 800px;
+}
+
+.gestion_theme {
+  left: 50px;
+  overflow: auto;
+  border:1px solid #FEE4BE;
+  position: absolute;
+  height: 450px; 
+  top: 100px;
+  width: 450px;
+  background-color: #F1D178;
+}
+.gestion_theme_systeme {
+  left: 500px;
+  overflow: auto;
+  border:1px solid #FEE4BE;
+  position: absolute;
+  height: 450px; 
+  top: 100px;
+  width: 450px;
+  background-color: #F1D178;
+}
+.gestion_menu {
+  left: 287px;
+  overflow: auto;
+  border:1px solid #FEE4BE;
+  position: absolute;
+  height: 460px; 
+  top: 90px;
+  width: 450px;
+  background-color: #F1D178;
+}
+
+/*  Styles ajoutés pour la Partie Gestion Zone*/ 
+.Evidence_Ligne {
+	background-color: #CA6E02;
+	text-align: center;
+}
+.Evidence_Ligne td{
+	background-color: #CA6E02;
+	text-align: center;
+}
+
+.Evidence_TM_Ligne {
+	background-color: #CA6E02;
+	text-align: left;
+}
+
+.Evidence_TM_Ligne td{
+	background-color: #CA6E02;
+	text-align: left;
+}
+
+.Defaut_Ligne {
+	background-color: #FFDB53;
+	text-align: center;
+}
+
+.details_tr {
+	background-color: #CFAC26;
+}

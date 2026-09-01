@@ -1,0 +1,136 @@
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=7803&type_ent_stat=2' METHOD='POST' class='grille_ligne'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR  style="height:25px;">
+				<TD ROWSPAN='2' class='ligne-paire'></TD>
+		<TD ROWSPAN='2' class='ligne-paire'>#</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>N&Acirc;&deg;</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>NOM</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Pr&Atilde;&copy;nom</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Ann&Atilde;&copy;e de naissance</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=2 class='ligne-paire'>Sexe</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Nationalit&Atilde;&copy;</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=5 class='ligne-paire'>Etat civil</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Dipl&Atilde;&acute;me ou certificat</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Domaine de formation</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Date d&apos;engagement</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Matricule</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD style='height:25px;' COLSPAN=7 class='ligne-paire'>Mati&Atilde;&uml;res enseign&Atilde;&copy;es</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Statut</TD>
+		<TD class='col_sep' ROWSPAN='3' style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=2 class='ligne-paire'>Charge horaire Hebdo.</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>M</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>F</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Mari&Atilde;&copy;</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>C&Atilde;&copy;libataire</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Divorc&Atilde;&copy;</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Veuf/veuve</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Consacr&Atilde;&copy;</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Maths</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Physique</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Chimie</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Biologie</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Technologie</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Fran&Atilde;&sect;ais</TD>
+		<TD class='ligne-impaire' style='height:25px;' ROWSPAN=1 nowrap  align='center'>Anglais</TD>
+	</TR>
+	<TR class='data_line'>
+		<TD class='ligne-paire' id='ligne-paire_0_0'><div class='edit_zone'><a href='#' class='ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all ui-btn-inline' id='b_delete_0'>&nbsp;</a></div></TD>
+		<TD class='ligne-paire inc_number' id='ligne-paire_0_1'>1</TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_2' >$ID_PERSONNEL_0</TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_3'><div class='input_text'></div><input name_base='NOM_PERSONNEL_#' id='NOM_PERSONNEL_0' name='NOM_PERSONNEL_0' type='text' value=''></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_4'><div class='input_text'></div><input name_base='PRENOM_PERSONNEL_#' id='PRENOM_PERSONNEL_0' name='PRENOM_PERSONNEL_0' type='text' value=''></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_5'><div class='input_text'></div><input name_base='ANNEE_NIASSANCE_PERSONNEL_#' id='ANNEE_NIASSANCE_PERSONNEL_0' name='ANNEE_NIASSANCE_PERSONNEL_0' type='text' value=''></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_6'><input name_base='CODE_TYPE_SEXE_#_1' id='CODE_TYPE_SEXE_0_1' name='CODE_TYPE_SEXE_0' type='radio' value='CODE_TYPE_SEXE_0_1' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_7'><input name_base='CODE_TYPE_SEXE_#_2' id='CODE_TYPE_SEXE_0_2' name='CODE_TYPE_SEXE_0' type='radio' value='CODE_TYPE_SEXE_0_2' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_8'>
+<SELECT style="width:80px" name_base='CODE_TYPE_NATIONALITE_#' id='CODE_TYPE_NATIONALITE_0' name=CODE_TYPE_NATIONALITE_0 data-mini='true'>
+			<OPTION VALUE='' data-placeholder='true'>---</OPTION>
+			<OPTION VALUE='1'>Burundais</OPTION>
+			<OPTION VALUE='3'>Congolais</OPTION>
+			<OPTION VALUE='8'>K&Atilde;&copy;nyans</OPTION>
+			<OPTION VALUE='10'>Ougandais</OPTION>
+			<OPTION VALUE='2'>Rwandais</OPTION>
+			<OPTION VALUE='11'>Sud Soudan</OPTION>
+			<OPTION VALUE='7'>Tanzaniens</OPTION>
+			<OPTION VALUE='4'>Autres Nationalit&Atilde;&copy;s</OPTION>
+			<OPTION VALUE='9'>Nationalit&Atilde;&copy;s  EAC non burundais</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_9'><input name_base='CODE_TYPE_ETAT_CIVIL_#_1' id='CODE_TYPE_ETAT_CIVIL_0_1' name='CODE_TYPE_ETAT_CIVIL_0' type='radio' value='CODE_TYPE_ETAT_CIVIL_0_1' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_10'><input name_base='CODE_TYPE_ETAT_CIVIL_#_2' id='CODE_TYPE_ETAT_CIVIL_0_2' name='CODE_TYPE_ETAT_CIVIL_0' type='radio' value='CODE_TYPE_ETAT_CIVIL_0_2' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_11'><input name_base='CODE_TYPE_ETAT_CIVIL_#_3' id='CODE_TYPE_ETAT_CIVIL_0_3' name='CODE_TYPE_ETAT_CIVIL_0' type='radio' value='CODE_TYPE_ETAT_CIVIL_0_3' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_12'><input name_base='CODE_TYPE_ETAT_CIVIL_#_4' id='CODE_TYPE_ETAT_CIVIL_0_4' name='CODE_TYPE_ETAT_CIVIL_0' type='radio' value='CODE_TYPE_ETAT_CIVIL_0_4' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_13'><input name_base='CODE_TYPE_ETAT_CIVIL_#_5' id='CODE_TYPE_ETAT_CIVIL_0_5' name='CODE_TYPE_ETAT_CIVIL_0' type='radio' value='CODE_TYPE_ETAT_CIVIL_0_5' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_14'>
+<SELECT  name_base='CODE_TYPE_QUALIF_#' id='CODE_TYPE_QUALIF_0' name=CODE_TYPE_QUALIF_0 data-mini='true'>
+			<OPTION VALUE='' data-placeholder='true'>---</OPTION>
+			<OPTION VALUE='22'>REG. TECHN.</OPTION>
+			<OPTION VALUE='23'>GRADUE</OPTION>
+			<OPTION VALUE='24'>ISCO</OPTION>
+			<OPTION VALUE='25'>I.P.</OPTION>
+			<OPTION VALUE='26'>ENS III</OPTION>
+			<OPTION VALUE='39'>ENS V</OPTION>
+			<OPTION VALUE='27'>IPA III</OPTION>
+			<OPTION VALUE='28'>IPA V</OPTION>
+			<OPTION VALUE='41'>BAC III</OPTION>
+			<OPTION VALUE='4'>D6</OPTION>
+			<OPTION VALUE='5'>D4 </OPTION>
+			<OPTION VALUE='11'>HG</OPTION>
+			<OPTION VALUE='18'>A2</OPTION>
+			<OPTION VALUE='19'>A3</OPTION>
+			<OPTION VALUE='20'>A4</OPTION>
+			<OPTION VALUE='29'>LICENCIE</OPTION>
+			<OPTION VALUE='30'>ING. TECHN.</OPTION>
+			<OPTION VALUE='31'>ING. IND.</OPTION>
+			<OPTION VALUE='32'>ING. CIVIL</OPTION>
+			<OPTION VALUE='33'>MAITRISE / MASTER</OPTION>
+			<OPTION VALUE='34'>DOCTEUR</OPTION>
+			<OPTION VALUE='35'>AUTRE 1er CYCLE *</OPTION>
+			<OPTION VALUE='36'>AUTRE 2&Atilde;&uml;me CYCLE *</OPTION>
+			<OPTION VALUE='37'>AUTRE 3&Atilde;&uml;me CYCLE *</OPTION>
+			<OPTION VALUE='3'>D7</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_15'><div class='input_text'></div><input name_base='DOMAINE_FORMATION_#' id='DOMAINE_FORMATION_0' name='DOMAINE_FORMATION_0' type='text' value=''></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_16'><div class='input_text'></div><input name_base='DATE_ENGAGEMENT_#' id='DATE_ENGAGEMENT_0' name='DATE_ENGAGEMENT_0' type='text' value=''></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_17'><div class='input_text'></div><input name_base='NUMERO_MATRICULE_#' id='NUMERO_MATRICULE_0' name='NUMERO_MATRICULE_0' type='text' value=''></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_18'><INPUT  name_base='CODE_TYPE_DISCIPLINE_#_1' ID='CODE_TYPE_DISCIPLINE_0_1' NAME=CODE_TYPE_DISCIPLINE_0_1 TYPE='checkbox' VALUE='1' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_19'><INPUT  name_base='CODE_TYPE_DISCIPLINE_#_2' ID='CODE_TYPE_DISCIPLINE_0_2' NAME=CODE_TYPE_DISCIPLINE_0_2 TYPE='checkbox' VALUE='2' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_20'><INPUT  name_base='CODE_TYPE_DISCIPLINE_#_3' ID='CODE_TYPE_DISCIPLINE_0_3' NAME=CODE_TYPE_DISCIPLINE_0_3 TYPE='checkbox' VALUE='3' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_21'><INPUT  name_base='CODE_TYPE_DISCIPLINE_#_4' ID='CODE_TYPE_DISCIPLINE_0_4' NAME=CODE_TYPE_DISCIPLINE_0_4 TYPE='checkbox' VALUE='4' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_22'><INPUT  name_base='CODE_TYPE_DISCIPLINE_#_5' ID='CODE_TYPE_DISCIPLINE_0_5' NAME=CODE_TYPE_DISCIPLINE_0_5 TYPE='checkbox' VALUE='5' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_23'><INPUT  name_base='CODE_TYPE_DISCIPLINE_#_6' ID='CODE_TYPE_DISCIPLINE_0_6' NAME=CODE_TYPE_DISCIPLINE_0_6 TYPE='checkbox' VALUE='6' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_24'><INPUT  name_base='CODE_TYPE_DISCIPLINE_#_7' ID='CODE_TYPE_DISCIPLINE_0_7' NAME=CODE_TYPE_DISCIPLINE_0_7 TYPE='checkbox' VALUE='7' data-mini='true'></TD>
+		<TD  class='ligne-paire' id='ligne-paire_0_25'>
+<SELECT  name_base='CODE_TYPE_STATUT_PERSONNEL_#' id='CODE_TYPE_STATUT_PERSONNEL_0' name=CODE_TYPE_STATUT_PERSONNEL_0 data-mini='true'>
+			<OPTION VALUE='' data-placeholder='true'>---</OPTION>
+			<OPTION VALUE='1'>S/S</OPTION>
+			<OPTION VALUE='2'>S/C</OPTION>
+			<OPTION VALUE='3'>Hors cadre</OPTION>
+			<OPTION VALUE='4'>CONT</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_0_26'><div class='input_text'></div><input name_base='VOLUME_HORAIRE_#' id='VOLUME_HORAIRE_0' name='VOLUME_HORAIRE_0' type='text' value=''></TD>
+	</TR>
+	<TR>
+			<td colspan='20' align='left'><a href='#' class='ui-btn ui-icon-plus ui-btn-icon-notext ui-corner-all ui-btn-inline' id='b_add'>&nbsp;</a></td>
+	</TR>
+</TABLE></FORM></div>

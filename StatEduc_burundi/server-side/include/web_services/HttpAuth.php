@@ -1,0 +1,85 @@
+<?php
+
+/**
+ * HttpAuth.php
+ *
+ * Middleware d'authentification HTTP Basic pour les Web Services mobiles Slim v2.
+ * Etend \Slim\Middleware et intercepte chaque requete avant le routeur.
+ * Verifie les entetes Authorization (Basic base64) et bloque les acces
+ * non autorises avec une reponse 401 WWW-Authenticate.
+ *
+ * @auteur  kailounasser@gmail.com - Abdoul Nasser Kailou
+ * @projet  StatEduc Burundi -- Application mobile de collecte scolaire
+ * @sessions 1-19
+ * @modifie Modifie par kailounasser@gmail.com Abdoul Nasser Kailou
+ *          Toutes les modifications et nouveautes sont documentees
+ *          directement dans le code avec des commentaires en francais.
+ */
+// Class destin�e � g�rer l'authentification
+class HttpAuth extends \Slim\Middleware
+{
+    /**
+     * @var string
+     */
+    protected $realm;
+ 
+    /**
+     * Constructor
+     *
+     * @param   string  $realm      The HTTP Authentication realm
+     */
+    public function __construct($realm = 'Protected Area')
+    {
+        $this->realm = $realm;
+    }
+ 
+    /**
+     * Deny Access
+     *
+     */   
+    public function deny_access() {
+        $res = $this->app->response();
+        $res->status(401);
+        $res->header('WWW-Authenticate', sprintf('Basic realm="%s"', $this->realm));        
+    }
+ 
+    /**
+     * Authenticate 
+     *
+     * @param   string  $username   The HTTP Authentication username
+     * @param   string  $password   The HTTP Authentication password     
+     *
+     */
+    public function authenticate($username, $password) {
+        // session 35 : migration md5 -> bcrypt
+        // valide_user_ws accepte desormais le mot de passe en clair et fait password_verify en interne
+        // session 36 : suppression du ctype_alnum qui bloquait les logins avec tirets/points/underscores
+        if (empty($username) || empty($password)) {
+            return false;
+        }
+
+        // password_verify est effectue dans valide_user_ws (fonctions.inc.php)
+        return valide_user_ws($username, $password);
+    }
+ 
+    /**
+     * Call
+     *
+     * This method will check the HTTP request headers for previous authentication. If
+     * the request has already authenticated, the next middleware is called. Otherwise,
+     * a 401 Authentication Required response is returned to the client.
+     */
+    public function call()
+    {
+        $req = $this->app->request();
+        $res = $this->app->response();
+        $authUser = $req->headers('PHP_AUTH_USER');
+        $authPass = $req->headers('PHP_AUTH_PW');
+         
+        if ($this->authenticate($authUser, $authPass)) {
+            $this->next->call();
+        } else {
+            $this->deny_access();
+        }
+    }
+}

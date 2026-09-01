@@ -1,0 +1,387 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=9402' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>3.4 Manuels pour les élèves </B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> 3.4. Manuels pour les élèves      <br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>1ère année</TD>
+		<TD   CLASS='ligne-titre' align='center'>2ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>3ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>4ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>5ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>6ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>7ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>8ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>9ème année</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Kirundi/Français/ Art dramatique : Ndashikiriza ivyiyumviro mu mvugo, mu nyandiko no mu bimenyetso</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_4' NAME='NB_MANUELS_ELEVE_0_21_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_5' NAME='NB_MANUELS_ELEVE_0_21_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_6' NAME='NB_MANUELS_ELEVE_0_21_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_7' NAME='NB_MANUELS_ELEVE_0_21_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_8' NAME='NB_MANUELS_ELEVE_0_21_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_9' NAME='NB_MANUELS_ELEVE_0_21_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_10' NAME='NB_MANUELS_ELEVE_0_21_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_11' NAME='NB_MANUELS_ELEVE_0_21_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_21_12' NAME='NB_MANUELS_ELEVE_0_21_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_21_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Maths et sciences d&#8217;observation : Ndakora ibiharuro, ndatahuza ibibera aho mbaye</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_4' NAME='NB_MANUELS_ELEVE_0_22_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_5' NAME='NB_MANUELS_ELEVE_0_22_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_6' NAME='NB_MANUELS_ELEVE_0_22_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_7' NAME='NB_MANUELS_ELEVE_0_22_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_8' NAME='NB_MANUELS_ELEVE_0_22_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_9' NAME='NB_MANUELS_ELEVE_0_22_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_10' NAME='NB_MANUELS_ELEVE_0_22_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_11' NAME='NB_MANUELS_ELEVE_0_22_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_22_12' NAME='NB_MANUELS_ELEVE_0_22_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_22_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >ST/SH/EPS/AP/Entrepreneuriat : Ndatahura ibibera aho mbaye</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_4' NAME='NB_MANUELS_ELEVE_0_23_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_5' NAME='NB_MANUELS_ELEVE_0_23_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_6' NAME='NB_MANUELS_ELEVE_0_23_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_7' NAME='NB_MANUELS_ELEVE_0_23_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_8' NAME='NB_MANUELS_ELEVE_0_23_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_9' NAME='NB_MANUELS_ELEVE_0_23_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_10' NAME='NB_MANUELS_ELEVE_0_23_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_11' NAME='NB_MANUELS_ELEVE_0_23_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_23_12' NAME='NB_MANUELS_ELEVE_0_23_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_23_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Maths: Manuels de l'élève</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_4' NAME='NB_MANUELS_ELEVE_0_12_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_5' NAME='NB_MANUELS_ELEVE_0_12_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_6' NAME='NB_MANUELS_ELEVE_0_12_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_7' NAME='NB_MANUELS_ELEVE_0_12_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_8' NAME='NB_MANUELS_ELEVE_0_12_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_9' NAME='NB_MANUELS_ELEVE_0_12_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_10' NAME='NB_MANUELS_ELEVE_0_12_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_11' NAME='NB_MANUELS_ELEVE_0_12_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_12_12' NAME='NB_MANUELS_ELEVE_0_12_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_12_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Langues : ME, Tome1</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_4' NAME='NB_MANUELS_ELEVE_0_18_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_5' NAME='NB_MANUELS_ELEVE_0_18_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_6' NAME='NB_MANUELS_ELEVE_0_18_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_7' NAME='NB_MANUELS_ELEVE_0_18_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_8' NAME='NB_MANUELS_ELEVE_0_18_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_9' NAME='NB_MANUELS_ELEVE_0_18_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_10' NAME='NB_MANUELS_ELEVE_0_18_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_11' NAME='NB_MANUELS_ELEVE_0_18_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_18_12' NAME='NB_MANUELS_ELEVE_0_18_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_18_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Langues : ME, Tome2</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_4' NAME='NB_MANUELS_ELEVE_0_19_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_5' NAME='NB_MANUELS_ELEVE_0_19_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_6' NAME='NB_MANUELS_ELEVE_0_19_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_7' NAME='NB_MANUELS_ELEVE_0_19_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_8' NAME='NB_MANUELS_ELEVE_0_19_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_9' NAME='NB_MANUELS_ELEVE_0_19_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_10' NAME='NB_MANUELS_ELEVE_0_19_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_11' NAME='NB_MANUELS_ELEVE_0_19_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_19_12' NAME='NB_MANUELS_ELEVE_0_19_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_19_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Langues : ME, Tome3</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_4' NAME='NB_MANUELS_ELEVE_0_20_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_5' NAME='NB_MANUELS_ELEVE_0_20_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_6' NAME='NB_MANUELS_ELEVE_0_20_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_7' NAME='NB_MANUELS_ELEVE_0_20_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_8' NAME='NB_MANUELS_ELEVE_0_20_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_9' NAME='NB_MANUELS_ELEVE_0_20_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_10' NAME='NB_MANUELS_ELEVE_0_20_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_11' NAME='NB_MANUELS_ELEVE_0_20_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_20_12' NAME='NB_MANUELS_ELEVE_0_20_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_20_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Sciences Humaines: ME</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_4' NAME='NB_MANUELS_ELEVE_0_14_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_5' NAME='NB_MANUELS_ELEVE_0_14_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_6' NAME='NB_MANUELS_ELEVE_0_14_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_7' NAME='NB_MANUELS_ELEVE_0_14_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_8' NAME='NB_MANUELS_ELEVE_0_14_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_9' NAME='NB_MANUELS_ELEVE_0_14_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_10' NAME='NB_MANUELS_ELEVE_0_14_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_11' NAME='NB_MANUELS_ELEVE_0_14_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_14_12' NAME='NB_MANUELS_ELEVE_0_14_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_14_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Sciences et technologies: ME</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_4' NAME='NB_MANUELS_ELEVE_0_15_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_5' NAME='NB_MANUELS_ELEVE_0_15_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_6' NAME='NB_MANUELS_ELEVE_0_15_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_7' NAME='NB_MANUELS_ELEVE_0_15_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_8' NAME='NB_MANUELS_ELEVE_0_15_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_9' NAME='NB_MANUELS_ELEVE_0_15_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_10' NAME='NB_MANUELS_ELEVE_0_15_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_11' NAME='NB_MANUELS_ELEVE_0_15_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_15_12' NAME='NB_MANUELS_ELEVE_0_15_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_15_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Entrepreneuriat: ME</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_4' NAME='NB_MANUELS_ELEVE_0_16_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_5' NAME='NB_MANUELS_ELEVE_0_16_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_6' NAME='NB_MANUELS_ELEVE_0_16_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_7' NAME='NB_MANUELS_ELEVE_0_16_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_8' NAME='NB_MANUELS_ELEVE_0_16_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_9' NAME='NB_MANUELS_ELEVE_0_16_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_10' NAME='NB_MANUELS_ELEVE_0_16_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_11' NAME='NB_MANUELS_ELEVE_0_16_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_16_12' NAME='NB_MANUELS_ELEVE_0_16_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_16_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Autres : Inyigisho y’indero runtu no gukundisha igihugu</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_4' NAME='NB_MANUELS_ELEVE_0_10_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_5' NAME='NB_MANUELS_ELEVE_0_10_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_6' NAME='NB_MANUELS_ELEVE_0_10_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_7' NAME='NB_MANUELS_ELEVE_0_10_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_8' NAME='NB_MANUELS_ELEVE_0_10_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_9' NAME='NB_MANUELS_ELEVE_0_10_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_10' NAME='NB_MANUELS_ELEVE_0_10_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_11' NAME='NB_MANUELS_ELEVE_0_10_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_10_12' NAME='NB_MANUELS_ELEVE_0_10_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_10_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Autres : Inyigisho zijanye n’inyifato mu kugwanya umugera wa SIDA  mu mashure</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_4' NAME='NB_MANUELS_ELEVE_0_11_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_5' NAME='NB_MANUELS_ELEVE_0_11_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_6' NAME='NB_MANUELS_ELEVE_0_11_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_7' NAME='NB_MANUELS_ELEVE_0_11_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_8' NAME='NB_MANUELS_ELEVE_0_11_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_9' NAME='NB_MANUELS_ELEVE_0_11_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_10' NAME='NB_MANUELS_ELEVE_0_11_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_11' NAME='NB_MANUELS_ELEVE_0_11_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_ELEVE_0_11_12' NAME='NB_MANUELS_ELEVE_0_11_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_11_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Langues: Manuels de l'élève</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_4' NAME='NB_MANUELS_ELEVE_0_13_4' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_5' NAME='NB_MANUELS_ELEVE_0_13_5' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_6' NAME='NB_MANUELS_ELEVE_0_13_6' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_7' NAME='NB_MANUELS_ELEVE_0_13_7' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_8' NAME='NB_MANUELS_ELEVE_0_13_8' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_9' NAME='NB_MANUELS_ELEVE_0_13_9' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_10' NAME='NB_MANUELS_ELEVE_0_13_10' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_11' NAME='NB_MANUELS_ELEVE_0_13_11' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_ELEVE_0_13_12' NAME='NB_MANUELS_ELEVE_0_13_12' TYPE='text' size=5 VALUE="$NB_MANUELS_ELEVE_0_13_12"  tabindex=''>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
