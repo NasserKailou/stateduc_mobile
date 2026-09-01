@@ -1572,117 +1572,235 @@
 									.' | ID_TYPE_REGROUP_PARENTS=[ignoré — lookup ER forcé]'
 								);
 
-									// ── fix AK-PHP-01 (amélioré BUG-REGROUP-001) : ──────────────────────────────
-									// Toujours reconstruire ID_REGROUP_PARENTS depuis ETABLISSEMENT_REGROUPEMENT
-									// en utilisant le CODE_ETAB réel de l'Excel (col G).
-									// Le template générique ne fournit qu'USER_PRIV (valeur invariante).
-									// Sans ce lookup, tous les agents importés héritent des parents du 1er
-									// enregistrement DICO trouvé, peu importe leur établissement réel.
-									if (!empty($raw_code_etab)) {
-										$sql_hier =
-											'SELECT R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AS code_reg'
-											.', R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS code_type_reg'
-											.', H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' AS niveau'
-											.' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].' AS ER'
-											.' INNER JOIN '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS R'
-											.'   ON R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
-											.'    = ER.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
-											.' INNER JOIN '.$GLOBALS['PARAM']['HIERARCHIE'].' AS H'
-											.'   ON H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
-											.'    = R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
-											.'  AND H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$id_chaine
-											.' WHERE ER.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' = '.$code_etab_q
-											.' ORDER BY H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' ASC';
+									// ── fix AK-PHP-01 v2 (BUG-REGROUP-001 round 2) : ──────────────────────────
+								// Logique LIAISONS inspirée de arbre5::getparentsid() et build_chaine().
+								// Le JOIN direct ER→REGROUPEMENT→HIERARCHIE était bogué (retournait VIDE).
+								// Algorithme correct en 3 étapes :
+								//   1. ETABLISSEMENT_REGROUPEMENT  → CODE_REGROUPEMENT de l'école
+								//   2. HIERARCHIE (build_chaine)   → liste des CODE_TYPE_REGROUPEMENT de la chaîne
+								//                                     (triée DESC = du plus haut au plus bas)
+								//   3. LIAISONS (PERE_CODE_REGROUPEMENT) → remonter niveau par niveau
+								if (!empty($raw_code_etab)) {
 
-										// ── NASSER LOG : SQL hiérarchie ──────────────────────
 									if (class_exists('NasserLog')) {
-										NasserLog::note('AK-PHP-01 — Déclenchement lookup ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine);
-										NasserLog::sql('HIER_ETABLISSEMENT_REGROUPEMENT', $sql_hier);
+										NasserLog::note('AK-PHP-01 v2 — début lookup LIAISONS pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine);
 									}
-									// ── FIN NASSER LOG ────────────────────────────────────
-									// ── MOBLOGS : lookup hiérarchique ETABLISSEMENT_REGROUPEMENT ──
-									$this->write_mob_log($num_ligne, 'HIER_LOOKUP_SQL',
-										$login_courant,
-										'AK-PHP-01 — SQL: ' . $sql_hier
-									);
-									$hier_rows = $this->conn->GetAll($sql_hier);
 
-									if (!empty($hier_rows) && is_array($hier_rows)) {
-										$codes_reg      = array();
-										$codes_type_reg = array();
-										foreach ($hier_rows as $hrow) {
-											$codes_reg[]      = $hrow['code_reg'];
-											$codes_type_reg[] = $hrow['code_type_reg'];
-										}
-										// Le 1er niveau (feuille) = regroupement direct de l'école.
-										// ID_REGROUP_PARENTS = niveaux supérieurs (commune, province…),
-										// séparés par virgule dans l'ordre croissant (comme fix_regroup.php).
-										if (count($codes_reg) > 1) {
-											// Les parents sont du 2e au dernier
-											$parent_codes      = array_slice($codes_reg,      1);
-											$parent_type_codes = array_slice($codes_type_reg, 1);
-										} else {
-											// Un seul niveau : l'école est au niveau le plus haut
-											$parent_codes      = $codes_reg;
-											$parent_type_codes = $codes_type_reg;
-										}
-										$id_regroup_parents  = implode(',', $parent_codes);
-										$id_type_regroup_par = implode(',', $parent_type_codes);
+									// ─── ÉTAPE 1 : CODE_REGROUPEMENT direct de l'école ────────────────────────
+									$sql_etab_reg =
+										'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AS code_reg'
+										.' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT']
+										.' WHERE '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' = '.$code_etab_q;
 
-										// ── NASSER LOG : résultat hiérarchie ─────────────
+									if (class_exists('NasserLog')) { NasserLog::sql('AK2_ETAPE1_ETAB_REG', $sql_etab_reg); }
+
+									$code_reg_ecole = $this->conn->GetOne($sql_etab_reg);
+
+									if (class_exists('NasserLog')) {
+										NasserLog::valeur('ETAPE1 code_reg_ecole', $code_reg_ecole,
+											empty($code_reg_ecole) ? '◄◄ VIDE — CODE_ETAB absent de ETABLISSEMENT_REGROUPEMENT' : 'OK');
+									}
+
+									if (!empty($code_reg_ecole)) {
+
+										// ─── ÉTAPE 2 : types de la chaîne (build_chaine-like, DESC = haut→bas) ────
+										// HIERARCHIE avec CODE_TYPE_CHAINE_LOC=$id_chaine, ordonné NIVEAU_HIERARCHIE DESC
+										// → index 0 = plus haut niveau (province/région), dernier = niveau feuille (école)
+										$sql_chaine =
+											'SELECT DISTINCT T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS code_type_reg'
+											.', T_C.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' AS niveau'
+											.' FROM '.$GLOBALS['PARAM']['HIERARCHIE'].' AS T_C'
+											.' WHERE T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$id_chaine
+											.' ORDER BY T_C.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' DESC';
+
+										if (class_exists('NasserLog')) { NasserLog::sql('AK2_ETAPE2_BUILD_CHAINE', $sql_chaine); }
+
+										$chaine_types = $this->conn->GetAll($sql_chaine);
+
 										if (class_exists('NasserLog')) {
-											NasserLog::sql('HIER_ETABLISSEMENT_REGROUPEMENT_RESULT',
-												'(GetAll)', $hier_rows);
-											NasserLog::valeur('ID_REGROUP_PARENTS (ETAB_REG)',
-												$id_regroup_parents, 'ETABLISSEMENT_REGROUPEMENT');
-											NasserLog::valeur('ID_TYPE_REGROUP_PARENTS (ETAB_REG)',
-												$id_type_regroup_par, 'ETABLISSEMENT_REGROUPEMENT');
-											NasserLog::note('Décomposition: codes_reg=['.implode(',', $codes_reg).'] | codes_type_reg=['.implode(',', $codes_type_reg).'] | parent_codes=['.implode(',', $parent_codes).']');
+											NasserLog::valeur('ETAPE2 chaine_types count', count($chaine_types),
+												empty($chaine_types) ? '◄◄ AUCUN TYPE trouvé pour chaine='.$id_chaine : 'OK');
+											if (!empty($chaine_types)) {
+												NasserLog::note('ETAPE2 types (DESC): '.implode(',', array_column($chaine_types, 'code_type_reg')));
+											}
 										}
-										// ── FIN NASSER LOG ────────────────────────────────
-										// ── MOBLOGS : résultat hiérarchie ────────
-										$this->write_mob_log($num_ligne, 'HIER_LOOKUP_OK',
-											$login_courant,
-											count($hier_rows).' niveaux trouvés'
-											.' | ID_REGROUP_PARENTS='.$id_regroup_parents
-											.' | ID_TYPE_REGROUP_PARENTS='.$id_type_regroup_par
-											.' | Niveaux détaillés: '.implode(',', array_map(
-												function($r){ return 'R='.$r['code_reg'].'/T='.$r['code_type_reg']; },
-												$hier_rows
-											))
-										);
+
+										if (!empty($chaine_types)) {
+
+											// ─── ÉTAPE 3 : navigation LIAISONS du niveau feuille vers la racine ──────
+											// On détermine d'abord quel est le CODE_TYPE_REGROUPEMENT de l'école
+											// en le cherchant dans REGROUPEMENT.
+											$sql_type_ecole =
+												'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS code_type_reg'
+												.' FROM '.$GLOBALS['PARAM']['REGROUPEMENT']
+												.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' = '.(int)$code_reg_ecole;
+
+											if (class_exists('NasserLog')) { NasserLog::sql('AK2_ETAPE3A_TYPE_ECOLE', $sql_type_ecole); }
+
+											$code_type_reg_ecole = $this->conn->GetOne($sql_type_ecole);
+
+											if (class_exists('NasserLog')) {
+												NasserLog::valeur('ETAPE3A code_type_reg_ecole', $code_type_reg_ecole,
+													empty($code_type_reg_ecole) ? '◄◄ VIDE' : 'OK');
+											}
+
+											// Trouver l'index de l'école dans la chaîne (= niveau feuille)
+											// La chaîne est triée DESC donc le dernier élément = niveau feuille
+											// On cherche la position du type de l'école dans le tableau
+											$idx_ecole = -1;
+											foreach ($chaine_types as $idx => $ct) {
+												if ((int)$ct['code_type_reg'] === (int)$code_type_reg_ecole) {
+													$idx_ecole = $idx;
+													break;
+												}
+											}
+
+											if (class_exists('NasserLog')) {
+												NasserLog::note('ETAPE3B idx_ecole dans chaine='.$idx_ecole
+													.' | nb_niveaux='.count($chaine_types)
+													.' (0=haut, '.(count($chaine_types)-1).'=feuille)');
+											}
+
+											// Remonter via LIAISONS depuis l'école jusqu'au sommet
+											// Résultat : tableau de [code_reg, code_type_reg] dans l'ordre croissant
+											// (feuille → racine comme fix_regroup.php : ETABLISSEMENT, colline, commune, province)
+											$all_levels        = array(); // [code_reg, code_type_reg] de l'école incluse
+											$cur_code_reg      = (int)$code_reg_ecole;
+											$cur_code_type_reg = (int)$code_type_reg_ecole;
+
+											// Ajouter l'école elle-même en premier
+											$all_levels[] = array(
+												'code_reg'      => $cur_code_reg,
+												'code_type_reg' => $cur_code_type_reg,
+											);
+
+											// Remonter vers la racine en suivant LIAISONS (PERE_CODE_REGROUPEMENT)
+											// On s'arrête quand il n'y a plus de parent ou qu'on a dépassé le sommet
+											$max_iterations = count($chaine_types) + 2; // garde-fou boucle infinie
+											$iterations     = 0;
+											while ($iterations < $max_iterations) {
+												$iterations++;
+
+												// getparentsid-like : trouver le PERE via LIAISONS
+												// PERE.CODE_REGROUPEMENT = L.PERE_CODE_REGROUPEMENT
+												// L.CODE_REGROUPEMENT    = FILS.CODE_REGROUPEMENT
+												// FILS.CODE_REGROUPEMENT = $cur_code_reg
+												// FILS.CODE_TYPE_REGROUPEMENT = $cur_code_type_reg
+												// PERE.CODE_TYPE_REGROUPEMENT IN (types de la chaîne)
+												$sql_parent =
+													'SELECT PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AS code_reg'
+													.', PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS code_type_reg'
+													.' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE'
+													.', '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS'
+													.', '.$GLOBALS['PARAM']['LIAISONS'].' AS L'
+													.', '.$GLOBALS['PARAM']['HIERARCHIE'].' AS H'
+													.' WHERE PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+													.'     = L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT']
+													.' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+													.'   = FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+													.' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' = '.$cur_code_reg
+													.' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.$cur_code_type_reg
+													.' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+													.'   = H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+													.' AND H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$id_chaine;
+
+												if (class_exists('NasserLog')) {
+													NasserLog::sql('AK2_ETAPE3C_PARENT_iter'.$iterations, $sql_parent);
+												}
+
+												$parent_row = $this->conn->GetRow($sql_parent);
+
+												if (empty($parent_row) || empty($parent_row['code_reg'])) {
+													// Plus de parent : on est au sommet de la hiérarchie
+													if (class_exists('NasserLog')) {
+														NasserLog::note('ETAPE3C iter='.$iterations.' — aucun parent LIAISONS → sommet atteint');
+													}
+													break;
+												}
+
+												$cur_code_reg      = (int)$parent_row['code_reg'];
+												$cur_code_type_reg = (int)$parent_row['code_type_reg'];
+												$all_levels[]      = array(
+													'code_reg'      => $cur_code_reg,
+													'code_type_reg' => $cur_code_type_reg,
+												);
+
+												if (class_exists('NasserLog')) {
+													NasserLog::note('ETAPE3C iter='.$iterations.' → parent trouvé: code_reg='.$cur_code_reg.' code_type_reg='.$cur_code_type_reg);
+												}
+											}
+
+											// all_levels est dans l'ordre [école, parent1, parent2, …, racine]
+											// ID_REGROUP_PARENTS = tous les codes sauf l'école (= index 0)
+											// comme fix_regroup.php : les parents sans l'établissement lui-même
+											if (count($all_levels) > 1) {
+												$parent_entries = array_slice($all_levels, 1); // exclure l'école (index 0)
+											} else {
+												// Un seul niveau (école = racine), on l'inclut quand même
+												$parent_entries = $all_levels;
+											}
+
+											// Reconstruire les listes en ordre inverse (racine → feuille sans école)
+											// pour correspondre au format attendu : province,commune,colline,…
+											$parent_entries_asc = array_reverse($parent_entries);
+
+											$parent_codes      = array();
+											$parent_type_codes = array();
+											foreach ($parent_entries_asc as $entry) {
+												$parent_codes[]      = $entry['code_reg'];
+												$parent_type_codes[] = $entry['code_type_reg'];
+											}
+
+											$id_regroup_parents  = implode(',', $parent_codes);
+											$id_type_regroup_par = implode(',', $parent_type_codes);
+
+											if (class_exists('NasserLog')) {
+												NasserLog::note('ETAPE3 RÉSULTAT : all_levels=['.implode(',', array_column($all_levels,'code_reg')).']');
+												NasserLog::note('ETAPE3 parent_entries_asc=['
+													.implode(',', array_map(function($e){return 'R='.$e['code_reg'].'/T='.$e['code_type_reg'];}, $parent_entries_asc)).']');
+												NasserLog::valeur('ID_REGROUP_PARENTS (LIAISONS)', $id_regroup_parents,
+													empty($id_regroup_parents) ? '◄◄ VIDE après remontée LIAISONS' : 'LIAISONS — OK');
+												NasserLog::valeur('ID_TYPE_REGROUP_PARENTS (LIAISONS)', $id_type_regroup_par, 'LIAISONS');
+											}
+
+											$this->write_mob_log($num_ligne, 'AK2_HIER_LIAISONS_OK', $login_courant,
+												count($all_levels).' niveaux total | '
+												.count($parent_entries_asc).' parents'
+												.' | ID_REGROUP_PARENTS='.$id_regroup_parents
+												.' | ID_TYPE_REGROUP_PARENTS='.$id_type_regroup_par
+											);
+
+										} else {
+											// Chaîne vide : aucun type trouvé pour $id_chaine → fallback template
+											if (!empty($id_regroup_parents_tpl)) {
+												$id_regroup_parents  = $id_regroup_parents_tpl;
+												$id_type_regroup_par = $id_type_regroup_par_tpl;
+											}
+											if (class_exists('NasserLog')) {
+												NasserLog::err('AK2_CHAINE_VIDE',
+													'build_chaine retourne VIDE pour chaine='.$id_chaine
+													.' | Fallback template='.$id_regroup_parents);
+											}
+											$this->write_mob_log($num_ligne, 'AK2_CHAINE_VIDE', $login_courant,
+												'HIERARCHIE sans résultat pour chaine='.$id_chaine.' — fallback template: '.$id_regroup_parents);
+										}
+
 									} else {
-										// Fallback : si ETABLISSEMENT_REGROUPEMENT ne retourne rien pour ce CODE_ETAB,
-										// on utilise la valeur du template comme dernier recours (mieux que vide).
+										// Aucune ligne dans ETABLISSEMENT_REGROUPEMENT pour ce CODE_ETAB → fallback
 										if (!empty($id_regroup_parents_tpl)) {
 											$id_regroup_parents  = $id_regroup_parents_tpl;
 											$id_type_regroup_par = $id_type_regroup_par_tpl;
 										}
-										// ── NASSER LOG : aucun résultat — fallback template ──────
 										if (class_exists('NasserLog')) {
-											NasserLog::err('HIER_LOOKUP_VIDE',
-												'GetAll() retourne VIDE pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine
-												.' | Table ER='.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT']
-												.' | col_etab='.$GLOBALS['PARAM']['CODE_ETABLISSEMENT']
-												.' | Table H='.$GLOBALS['PARAM']['HIERARCHIE']
-												.' | col_chaine='.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT']
-											);
-											if (!empty($id_regroup_parents)) {
-												NasserLog::note('FALLBACK TEMPLATE appliqué : ID_REGROUP_PARENTS='.$id_regroup_parents.' (valeur template — approximative)');
-											} else {
-												NasserLog::note('CONSEQUENCE: ID_REGROUP_PARENTS et ID_TYPE_REGROUP_PARENTS resteront VIDES — aucune source disponible');
-											}
+											NasserLog::err('AK2_ETAB_REG_VIDE',
+												'ETABLISSEMENT_REGROUPEMENT retourne VIDE pour CODE_ETAB='.$raw_code_etab
+												.' | Fallback template='.$id_regroup_parents);
 										}
-										// ── FIN NASSER LOG ────────────────────────────────
-										// ── MOBLOGS : hiérarchie non trouvée ─────
-										$this->write_mob_log($num_ligne, 'HIER_LOOKUP_VIDE',
-											$login_courant,
-											'AUCUN enregistrement ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab
-											.' — fallback template: '.(empty($id_regroup_parents)?'VIDE':$id_regroup_parents)
-										);
+										$this->write_mob_log($num_ligne, 'AK2_ETAB_REG_VIDE', $login_courant,
+											'Aucun CODE_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab.' — fallback template: '.$id_regroup_parents);
 									}
 								}
-								// ── fin fix AK-PHP-01 (BUG-REGROUP-001) ────────────────────────────────────
+								// ── fin fix AK-PHP-01 v2 (BUG-REGROUP-001 round 2) ──────────────────────────
 
 								// ── NASSER LOG : valeurs FINALES avant INSERT DICO ───────
 								if (class_exists('NasserLog')) {
