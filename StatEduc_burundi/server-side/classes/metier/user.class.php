@@ -1540,36 +1540,45 @@
 									// ── FIN NASSER LOG ────────────────────────────────
 								}
 
+								// fix BUG-REGROUP-001 :
+								// Du template on ne prend QUE USER_PRIV (valeur générique invariante).
+								// ID_REGROUP_PARENTS et ID_TYPE_REGROUP_PARENTS dépendent du CODE_ETAB réel
+								// et ne peuvent PAS être copiés depuis un enregistrement d'un autre établissement.
+								// Ces deux champs seront TOUJOURS calculés via le lookup ETABLISSEMENT_REGROUPEMENT.
 								$user_priv              = isset($tpl['USER_PRIV'])
 									? $tpl['USER_PRIV'] : '';
-								$id_regroup_parents     = isset($tpl['ID_REGROUP_PARENTS'])
+								// Valeurs du template conservées en fallback ultime seulement
+								$id_regroup_parents_tpl = isset($tpl['ID_REGROUP_PARENTS'])
 									? $tpl['ID_REGROUP_PARENTS'] : '';
-								$id_type_regroup_par    = isset($tpl['ID_TYPE_REGROUP_PARENTS'])
+								$id_type_regroup_par_tpl= isset($tpl['ID_TYPE_REGROUP_PARENTS'])
 									? $tpl['ID_TYPE_REGROUP_PARENTS'] : '';
+								// Initialisation : vide — sera rempli par le lookup ETABLISSEMENT_REGROUPEMENT
+								$id_regroup_parents     = '';
+								$id_type_regroup_par    = '';
 
 								// ── NASSER LOG : valeurs issues du template ───────────
 								if (class_exists('NasserLog')) {
 									NasserLog::valeur('USER_PRIV (template)',          $user_priv,            'TEMPLATE_DICO');
-									NasserLog::valeur('ID_REGROUP_PARENTS (template)', $id_regroup_parents,   'TEMPLATE_DICO');
-									NasserLog::valeur('ID_TYPE_REGROUP_PARENTS (tpl)', $id_type_regroup_par,  'TEMPLATE_DICO');
+									NasserLog::valeur('ID_REGROUP_PARENTS (template — ignoré)', $id_regroup_parents_tpl, 'TEMPLATE_DICO — NON UTILISÉ (dépend CODE_ETAB)');
+									NasserLog::valeur('ID_TYPE_REGROUP_PARENTS (tpl — ignoré)', $id_type_regroup_par_tpl, 'TEMPLATE_DICO — NON UTILISÉ');
+									NasserLog::note('fix BUG-REGROUP-001 : ID_REGROUP_PARENTS sera calculé via ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab);
 								}
 								// ── FIN NASSER LOG ────────────────────────────────────
 								// ── MOBLOGS : résultat template ───────────────────
 								$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_RESULT',
 									$login_courant,
 									'USER_PRIV='.$user_priv
-									.' | ID_REGROUP_PARENTS='.(empty($id_regroup_parents)?'[vide]':$id_regroup_parents)
-									.' | ID_TYPE_REGROUP_PARENTS='.(empty($id_type_regroup_par)?'[vide]':$id_type_regroup_par)
+									.' | ID_REGROUP_PARENTS=[ignoré — lookup ER forcé]'
+									.' | ID_TYPE_REGROUP_PARENTS=[ignoré — lookup ER forcé]'
 								);
 
-									// ── fix AK-PHP-01 : enrichissement depuis ETABLISSEMENT_REGROUPEMENT ──────
-									// Quand ID_REGROUP_PARENTS / ID_TYPE_REGROUP_PARENTS restent vides
-									// (nouvelle année sans enregistrement template), on reconstruit la hiérarchie
-									// géographique (colline→commune→province) à partir du CODE_ETAB (col G Excel)
-									// en interrogeant ETABLISSEMENT_REGROUPEMENT → REGROUPEMENT → HIERARCHIE,
-									// filtré sur la chaîne $id_chaine, ordonné par NIVEAU_CHAINE croissant.
-									// Niveau 1 = regroupement direct de l'école (feuille), niveaux suivants = parents.
-									if ((empty($id_regroup_parents) || empty($id_type_regroup_par)) && !empty($raw_code_etab)) {
+									// ── fix AK-PHP-01 (amélioré BUG-REGROUP-001) : ──────────────────────────────
+									// Toujours reconstruire ID_REGROUP_PARENTS depuis ETABLISSEMENT_REGROUPEMENT
+									// en utilisant le CODE_ETAB réel de l'Excel (col G).
+									// Le template générique ne fournit qu'USER_PRIV (valeur invariante).
+									// Sans ce lookup, tous les agents importés héritent des parents du 1er
+									// enregistrement DICO trouvé, peu importe leur établissement réel.
+									if (!empty($raw_code_etab)) {
 										$sql_hier =
 											'SELECT R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AS code_reg'
 											.', R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS code_type_reg'
@@ -1643,7 +1652,13 @@
 											))
 										);
 									} else {
-										// ── NASSER LOG : aucun résultat — raison du bug ──────
+										// Fallback : si ETABLISSEMENT_REGROUPEMENT ne retourne rien pour ce CODE_ETAB,
+										// on utilise la valeur du template comme dernier recours (mieux que vide).
+										if (!empty($id_regroup_parents_tpl)) {
+											$id_regroup_parents  = $id_regroup_parents_tpl;
+											$id_type_regroup_par = $id_type_regroup_par_tpl;
+										}
+										// ── NASSER LOG : aucun résultat — fallback template ──────
 										if (class_exists('NasserLog')) {
 											NasserLog::err('HIER_LOOKUP_VIDE',
 												'GetAll() retourne VIDE pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine
@@ -1652,26 +1667,30 @@
 												.' | Table H='.$GLOBALS['PARAM']['HIERARCHIE']
 												.' | col_chaine='.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT']
 											);
-											NasserLog::note('CONSEQUENCE: ID_REGROUP_PARENTS et ID_TYPE_REGROUP_PARENTS resteront VIDES dans DICO_FIXE_REGROUPEMENT');
+											if (!empty($id_regroup_parents)) {
+												NasserLog::note('FALLBACK TEMPLATE appliqué : ID_REGROUP_PARENTS='.$id_regroup_parents.' (valeur template — approximative)');
+											} else {
+												NasserLog::note('CONSEQUENCE: ID_REGROUP_PARENTS et ID_TYPE_REGROUP_PARENTS resteront VIDES — aucune source disponible');
+											}
 										}
 										// ── FIN NASSER LOG ────────────────────────────────
 										// ── MOBLOGS : hiérarchie non trouvée ─────
 										$this->write_mob_log($num_ligne, 'HIER_LOOKUP_VIDE',
 											$login_courant,
 											'AUCUN enregistrement ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab
-											.' — ID_REGROUP_PARENTS restera vide'
+											.' — fallback template: '.(empty($id_regroup_parents)?'VIDE':$id_regroup_parents)
 										);
 									}
 								}
-								// ── fin fix AK-PHP-01 ──────────────────────────────────────────────────────
+								// ── fin fix AK-PHP-01 (BUG-REGROUP-001) ────────────────────────────────────
 
 								// ── NASSER LOG : valeurs FINALES avant INSERT DICO ───────
 								if (class_exists('NasserLog')) {
 									NasserLog::note('VALEURS FINALES à insérer dans DICO_FIXE_REGROUPEMENT :');
 									NasserLog::valeur('ID_USER',                  $tab[0],              'Excel col A');
 									NasserLog::valeur('ID_REGROUP (CODE_ETAB)',   $raw_code_etab,       'Excel col G');
-									NasserLog::valeur('ID_REGROUP_PARENTS',       $id_regroup_parents,  empty($id_regroup_parents)?'VIDE/MANQUANT':'ok');
-									NasserLog::valeur('ID_TYPE_REGROUP_PARENTS',  $id_type_regroup_par, empty($id_type_regroup_par)?'VIDE/MANQUANT':'ok');
+									NasserLog::valeur('ID_REGROUP_PARENTS',       $id_regroup_parents,  empty($id_regroup_parents)?'◄◄ VIDE/MANQUANT':'ETAB_REGROUPEMENT');
+									NasserLog::valeur('ID_TYPE_REGROUP_PARENTS',  $id_type_regroup_par, empty($id_type_regroup_par)?'◄◄ VIDE/MANQUANT':'ETAB_REGROUPEMENT');
 									NasserLog::valeur('USER_PRIV',                $user_priv,           '');
 									NasserLog::valeur('ID_CAMPAGNE',              $id_camp,             '');
 									NasserLog::valeur('ID_SYSTEME',               $id_systeme,          '');
