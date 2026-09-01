@@ -1,0 +1,336 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=8103' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B></B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<BR/><b> V. DONNEES RELATIVES A LA PROTECTION DES ENFANTS </b>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b> 5.1.  </b> La structure préscolaire dispose-t-elle d'un code de conduite des enseignants qui interdit les punitions corporelles?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DISPOSE_CODECONDUITE_ENS_0' TYPE='radio'   ID='DISPOSE_CODECONDUITE_ENS_0_1' VALUE=$DISPOSE_CODECONDUITE_ENS_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DISPOSE_CODECONDUITE_ENS_0' TYPE='radio'   ID='DISPOSE_CODECONDUITE_ENS_0_0' VALUE=$DISPOSE_CODECONDUITE_ENS_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b> 5.2.  </b> L'école dispose-t-elle d'une d'une stratégie ou mécanisme de protection des élèves contre les violences sexuelles basées sur le genre?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='DISPOSE_STRATEG_PROTECT_ELEV_0' TYPE='radio'   ID='DISPOSE_STRATEG_PROTECT_ELEV_0_1' VALUE=$DISPOSE_STRATEG_PROTECT_ELEV_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='DISPOSE_STRATEG_PROTECT_ELEV_0' TYPE='radio'   ID='DISPOSE_STRATEG_PROTECT_ELEV_0_0' VALUE=$DISPOSE_STRATEG_PROTECT_ELEV_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b> 5.3.  </b> Y a-t-il au sein de l'école un mécanisme de détection et référencement des victimes de violence?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='MECANISM_DETECTION_VICTIM_VIOL_0' TYPE='radio'   ID='MECANISM_DETECTION_VICTIM_VIOL_0_1' VALUE=$MECANISM_DETECTION_VICTIM_VIOL_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='MECANISM_DETECTION_VICTIM_VIOL_0' TYPE='radio'   ID='MECANISM_DETECTION_VICTIM_VIOL_0_0' VALUE=$MECANISM_DETECTION_VICTIM_VIOL_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<BR/><b> VI.	DONNEES RELATIVES AUX URGENCES</b>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Est-ce que l'école a été frappée par les intempéries pour l'année scolaire précédente,entrainant une perturbation de l'organisation des enseignements?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='FRAPPE_INTEMPERIE_0' TYPE='radio'   ID='FRAPPE_INTEMPERIE_0_1' VALUE=$FRAPPE_INTEMPERIE_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='FRAPPE_INTEMPERIE_0' TYPE='radio'   ID='FRAPPE_INTEMPERIE_0_0' VALUE=$FRAPPE_INTEMPERIE_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Si oui,  <br/>a)	Quel type d?intempérie ?&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'   valign=top >&nbsp;Inondation&nbsp;&nbsp;&nbsp;<INPUT NAME='INONDATION_0' TYPE='checkbox'   ID='INONDATION_0' VALUE=$INONDATION_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Tempêtes&nbsp;&nbsp;&nbsp;<INPUT NAME='TEMPETES_0' TYPE='checkbox'   ID='TEMPETES_0' VALUE=$TEMPETES_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Sécheresse&nbsp;&nbsp;&nbsp;<INPUT NAME='SECHERESSE_0' TYPE='checkbox'   ID='SECHERESSE_0' VALUE=$SECHERESSE_0>
+&nbsp;</TD>
+		<TD nowrap  class='td_right'>Tremblement de terre&nbsp;&nbsp;&nbsp;<INPUT NAME='TREMBLEMENT_TERRE_0' TYPE='checkbox'   ID='TREMBLEMENT_TERRE_0' VALUE=$TREMBLEMENT_TERRE_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  class='td_left' colspan='2'>&nbsp;Foudre&nbsp;&nbsp;&nbsp;<INPUT NAME='FOUDRE_0' TYPE='checkbox'   ID='FOUDRE_0' VALUE=$FOUDRE_0>
+&nbsp;</TD>
+		<TD  class='td_left' colspan='2'>&nbsp;Autres, à préciser&nbsp;&nbsp;&nbsp;<INPUT NAME='AUTRES_INTEMPERIES_0' TYPE='text'   ID='AUTRES_INTEMPERIES_0' VALUE="$AUTRES_INTEMPERIES_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;b) Nombre de salles de classe ont été affectées &nbsp;&nbsp;&nbsp;<INPUT NAME='NB_SDC_AFFECTEE_0' TYPE='text'   ID='NB_SDC_AFFECTEE_0' VALUE="$NB_SDC_AFFECTEE_0" >
+&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR/><b>VII. DONNEES FINANCIERES</b><br><BR/><b> 7.1.</b> RECETTES<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Montant recette</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Report</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_RECETTES_0_19' NAME='MONTANT_RECETTES_0_19' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_19"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Minerval</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_RECETTES_0_9' NAME='MONTANT_RECETTES_0_9' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_9"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Subvention de l’Etat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_RECETTES_0_13' NAME='MONTANT_RECETTES_0_13' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_13"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >contributions de collectivité</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_RECETTES_0_18' NAME='MONTANT_RECETTES_0_18' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_18"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Organismes privés, congrégations religieuses</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_RECETTES_0_10' NAME='MONTANT_RECETTES_0_10' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_10"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >ONG, Partenaires technique et financiers</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_RECETTES_0_8' NAME='MONTANT_RECETTES_0_8' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_8"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Autofinancement</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_RECETTES_0_16' NAME='MONTANT_RECETTES_0_16' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_16"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Autres recettes</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_RECETTES_0_5' NAME='MONTANT_RECETTES_0_5' TYPE='text' size=10 VALUE="$MONTANT_RECETTES_0_5"  tabindex=''>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR/><b>7.2. & 7.3</b> DEPENSES DU SECTEUR PEDAGOGIQUE ET SOCIALES<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Montant dépenses</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Achat mobilier / Aménagment locaux</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_28' NAME='MONTANT_DEPENSES_0_28' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_28"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Rénovation mobilier</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_6' NAME='MONTANT_DEPENSES_0_6' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_6"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Rénovation/Réhabilitation locaux</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_7' NAME='MONTANT_DEPENSES_0_7' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_7"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Matériel pédagogique</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_8' NAME='MONTANT_DEPENSES_0_8' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_8"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Matériel informatique/bureautique</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_18' NAME='MONTANT_DEPENSES_0_18' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_18"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Salaire enseignants du privé</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_16' NAME='MONTANT_DEPENSES_0_16' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_16"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Salaire personnel administratif du privé</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_17' NAME='MONTANT_DEPENSES_0_17' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_17"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Salaire personnel autre</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_13' NAME='MONTANT_DEPENSES_0_13' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_13"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Sorties scolaires/rencontres sportives</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_19' NAME='MONTANT_DEPENSES_0_19' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_19"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Entretien internat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_20' NAME='MONTANT_DEPENSES_0_20' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_20"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Restauration</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_21' NAME='MONTANT_DEPENSES_0_21' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_21"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Rénovation locaux (social)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_22' NAME='MONTANT_DEPENSES_0_22' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_22"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Equipement restauration</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_29' NAME='MONTANT_DEPENSES_0_29' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_29"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Carburant</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_24' NAME='MONTANT_DEPENSES_0_24' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_24"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Autres dépenses (social)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='MONTANT_DEPENSES_0_25' NAME='MONTANT_DEPENSES_0_25' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_25"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Autres dépenses</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='MONTANT_DEPENSES_0_14' NAME='MONTANT_DEPENSES_0_14' TYPE='text' size=10 VALUE="$MONTANT_DEPENSES_0_14"  tabindex=''>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

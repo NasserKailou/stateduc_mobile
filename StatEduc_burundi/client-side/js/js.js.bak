@@ -1,0 +1,1856 @@
+// JavaScript Document
+<!--
+//////////////////////////
+
+jQuery.fn.exists = function(){return jQuery(this).length>0;}
+$.extend({
+	getUrlVars: function() {
+		var vars = [], hash;
+		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		for (var i = 0; i < hashes.length; i++) {
+			hash = hashes[i].split('=');
+			vars.push(hash[0]);
+			vars[hash[0]] = hash[1];
+		}
+		return vars;
+	},
+	getUrlVar: function(name) {
+		return $.getUrlVars()[name];
+	}
+});
+//true si un dialog box est affiché
+var dialog = false;
+//true si un sous dialog box est affiché
+var sousdialog = false;
+
+
+total = 1000;
+
+function Non_Evidence(n){
+document.getElementById(n).style.visibility = 'hidden';
+}
+function Oui_Evidence(n){
+document.getElementById(n).style.visibility = 'visible';
+}
+function Controle_Evidence(n){
+	for(i = 1; i < total; i++) {
+		if((document.getElementById(i).style.visibility = 'visible')&&(i != n)){
+			document.getElementById(i).style.visibility = 'hidden';
+		}
+   }
+}
+/////////////////////////////
+
+function recherche_reg(CODE_REG,LIBELLE_REG,ETAB_SECTOR,CHAINE_SECTOR='') {
+ //alert(CODE_REG+'+'+LIBELLE_REG);
+  /*var popup =window.open('saisie_donnees.php?val=OpenPopupChoixReg&code_reg='+CODE_REG+'&libelle_reg='+LIBELLE_REG+'&etab_sector='+ETAB_SECTOR+'','rech_reg1', 'toolbar=no,location=no,directories=no,menubar=no, scrollbars=yes, status=no,resizable=0,width=500, height=300, left=350, top=100')
+	popup.document.close();
+	popup.focus();*/
+	open_dialog('rech_reg1', 500, 300, 'saisie_donnees.php?val=OpenPopupChoixReg&code_reg='+CODE_REG+'&libelle_reg='+LIBELLE_REG+'&etab_sector='+ETAB_SECTOR+'&chaine_sector='+CHAINE_SECTOR);
+}
+
+function recherche_etab(CODE_ETAB, NOM_ETAB, ETAB_SECTOR, OPT_REG, CHAINE_SECTOR='') {
+	//alert(CODE_ETAB + ' / ' + NOM_ETAB + ' / ' + OPT_REG);
+  	/*popup1=window.open('saisie_donnees.php?val=OpenPopupChoixEtab&code_etab='+CODE_ETAB+'&nom_etab='+NOM_ETAB+'&etab_sector='+ETAB_SECTOR+'&option_reg='+OPT_REG+'','rech_etab1', 'toolbar=no,location=no,directories=no,menubar=no, scrollbars=yes, status=no, resizable=0,width=500, height=350, left=350, top=100')
+	popup1.document.close();
+	popup1.focus();*/
+	open_dialog('rech_etab1', 500, 350, 'saisie_donnees.php?val=OpenPopupChoixEtab&codetab='+CODE_ETAB+'&nom_etab='+NOM_ETAB+'&etab_sector='+ETAB_SECTOR+'&option_reg='+OPT_REG+'&chaine_sector='+CHAINE_SECTOR);
+}
+
+function OpenPopupLocEtab(iLoc,CodeCh,NbNiv) {
+	//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+	/*popup=window.open('saisie_donnees.php?val=popup&type=atlas&code_ch='+CodeCh+'&nb_niveau_arbo='+NbNiv+'&iLoc='+iLoc,'poploc', 'toolbar=no,location=no,directories=no,menubar=no, scrollbars=yes, status=no,resizable=0,width=500, height=300, left=350, top=100')
+	popup.document.close();
+	popup.focus();*/
+	open_dialog('poploc', 500, 300, 'saisie_donnees.php?val=popup&type=atlas&code_ch='+CodeCh+'&nb_niveau_arbo='+NbNiv+'&iLoc='+iLoc);
+}
+
+function recherche_local(NUM_LOCAL,CODE_ETAB,CODE_ANNEE,CODES_TYPE_LOCAL='') {
+//alert(CODE_REG+'+'+LIBELLE_REG);
+  /*popup1=window.open('recherche_local.php?num_local='+NUM_LOCAL+'&code_annee='+CODE_ANNEE+'&code_etablissement='+CODE_ETAB+'','rech_local1', 'toolbar=no,location=no,directories=no,menubar=no, scrollbars=yes,status=no,resizable=0,width=300, height=300')*/
+	open_dialog('rech_local1', 300, 300, 'recherche_local.php?num_local='+NUM_LOCAL+'&code_annee='+CODE_ANNEE+'&code_etablissement='+CODE_ETAB+'&codes_type_local='+CODES_TYPE_LOCAL);
+}
+function recherche_ens(NUM_ENS,VUE_ENS,CODE_ETAB,CODE_ANNEE,CHAMP_FILTRE_ADD='',VALS_FILTRE_ADD='') {
+//alert(CODE_REG+'+'+LIBELLE_REG);
+  /*popup1=window.open('recherche_ens.php?num_ens='+NUM_ENS+'&vue_ens='+VUE_ENS+'&code_annee='+CODE_ANNEE+'&code_etablissement='+CODE_ETAB+'','rech_ens1', 'toolbar=no,location=no,directories=no,menubar=no, scrollbars=yes,status=no,resizable=0,width=500, height=300')*/
+	open_dialog('rech_ens1', 550, 320, 'recherche_ens.php?num_ens='+NUM_ENS+'&vue_ens='+VUE_ENS+'&code_annee='+CODE_ANNEE+'&code_etablissement='+CODE_ETAB+'&champ_filtre_add='+CHAMP_FILTRE_ADD+'&vals_filtre_add='+VALS_FILTRE_ADD);
+}
+
+		function MiseEvidenceTablesMeres(NumTab) {
+				var iTab = 0 ;				
+				while ( document.getElementById( 'TableMere' + iTab ) ){
+						if(iTab==NumTab){
+								document.getElementById( 'TableMere' + iTab).className='Evidence_TM_Ligne'
+						}
+						else{
+								document.getElementById( 'TableMere' + iTab).className=((iTab % 2) == 0)?'ligne-paire-left':'ligne-impaire-left';
+						}
+						iTab++;
+				}
+		}
+		
+		function SetClasseLigne(i_TR, old_class, new_class){
+				var i_TD = 0;
+				while ( document.getElementById( old_class + '_' + i_TR + '_' + i_TD ) ){
+						document.getElementById( old_class + '_' + i_TR + '_' + i_TD ).className	=	new_class;
+						i_TD++;
+				}
+		}
+		
+		function MiseEvidenceLigne(i_TR, nb_TR) {
+				for( itr=0; itr < nb_TR; itr++ ){
+						if(itr==i_TR){
+								if(document.getElementById( 'ligne-paire_'+i_TR +'_0' ) ){
+										SetClasseLigne(i_TR, 'ligne-paire', 'Evidence_Ligne')
+								}
+								else if(document.getElementById( 'ligne-impaire_'+i_TR +'_0' ) ){
+										SetClasseLigne(i_TR, 'ligne-impaire', 'Evidence_Ligne')
+								}
+						}
+						else{
+								SetClasseLigne(itr, 'ligne-paire', 'ligne-paire')
+								SetClasseLigne(itr, 'ligne-impaire', 'ligne-impaire')
+						}
+				}
+		}
+        derniere_ligne_en_evidence = 1000;
+
+		function MiseEvidenceLigneFrame(i_TR, nb_TR) {
+            if( derniere_ligne_en_evidence != i_TR){
+                //for( itr=0; itr < nb_TR; itr++ ){
+                    //if(itr==i_TR){
+                    if(document.getElementById( 'ligne-paire_'+i_TR +'_0' ) ){
+                            SetClasseLigne(i_TR, 'ligne-paire', 'Evidence_Ligne')
+                    }
+                    else if(document.getElementById( 'ligne-impaire_'+i_TR +'_0' ) ){
+                            SetClasseLigne(i_TR, 'ligne-impaire', 'Evidence_Ligne')
+                    }
+                   // }
+                   // else{
+                            SetClasseLigne(derniere_ligne_en_evidence, 'ligne-paire', 'ligne-paire')
+                            SetClasseLigne(derniere_ligne_en_evidence, 'ligne-impaire', 'ligne-impaire')
+                   // }
+                //}
+                derniere_ligne_en_evidence = i_TR ;
+            }
+		}	
+		
+		function MiseEvidenceZones(NumTab, NumLi, NbTab) {
+				for( iTab=0; iTab <= NbTab; iTab++ ){
+						var VarLi = 0 ;				
+						while ( document.getElementById( 'LigneTableMere' + iTab +'_' + VarLi ) ){
+								if(VarLi==NumLi && iTab==NumTab){
+										document.getElementById( 'LigneTableMere' + iTab +'_' + VarLi ).className='Evidence_Ligne'
+										//document.getElementById( 'LigneTableMere' + NumTab +'_' + VarLi ).style.backgroundColor='#ffffff';
+										document.getElementById( 'NumLigne' + iTab +'_' + VarLi ).value='->'
+										//alert('LigneTableMere' + NumTab +'_' + VarLi)
+								}
+								else{
+										document.getElementById( 'LigneTableMere' + iTab +'_' + VarLi ).className='Defaut_Ligne'
+										document.getElementById( 'NumLigne' + iTab +'_' + VarLi ).value=VarLi+1;
+								}
+								VarLi++;
+						}
+				}
+		}
+		
+		function MiseEvidenceLigneZone(NumTab, NumLi) {
+			$("#DivTableMere" + NumTab + " .Evidence_Ligne").removeClass("Evidence_Ligne");	
+			$("#LigneTableMere" + NumTab + "_" + NumLi).addClass("Evidence_Ligne");	
+		}
+
+/*
+* Montre ou Cache le div ayant de préfixe nom et de numéro numero
+*/
+		function Montrer_Cacher_Div( nom, numero ){
+				var divID = nom + numero;
+				if ( document.getElementById && document.getElementById( divID ) ){ // Pour les navigateurs récents
+						Obj_Div = document.getElementById( divID );
+						Exist_Div  = true;
+				}
+				else if ( document.all && document.all[ divID ] ){ // Pour les veilles versions
+						Obj_Div = document.all[ divID ];
+						Exist_Div  = true;
+				}
+				else if ( document.layers && document.layers[ divID ] ){ // Pour les très veilles versions
+						Obj_Div = document.layers[ divID ];
+						Exist_Div  = true;
+				}
+				else   {
+						Exist_Div = false;
+				}
+				if ( Exist_Div ){
+						Obj_Div.className = ( Obj_Div.className == 'cachediv' ) ? 'montrediv' : 'cachediv';
+				}
+		}
+
+/*
+* Cache tous les divs ayant le même préfixe
+*/
+		function CacheTout( nom ){
+				var NumDiv = 0;
+				if ( document.getElementById ){ // Pour les navigateurs récents
+						while ( document.getElementById( nom + NumDiv) ){
+								SetDiv = document.getElementById( nom + NumDiv );
+								if ( SetDiv && SetDiv.className != 'cachediv' ){
+										Montrer_Cacher_Div( nom, NumDiv );
+								}
+								NumDiv++;
+						 }
+				}
+				else if ( document.all ){ // Pour les veilles versions
+						while ( document.all[ nom + NumDiv ] ){
+								SetDiv = document.all[ nom + NumDiv ];
+								if ( SetDiv && SetDiv.className != 'cachediv' ){
+										Montrer_Cacher_Div( nom, NumDiv );
+								}
+								NumDiv++;
+						}
+				}
+				else if ( document.layers ){ // Pour les très veilles versions
+						while ( document.layers[ nom + NumDiv ] ){
+								SetDiv = document.layers[ nom + NumDiv ];
+								if ( SetDiv && SetDiv.className != 'cachediv' ){
+										Montrer_Cacher_Div( nom, NumDiv );
+								}
+								NumDiv++;
+						}
+				}
+		}
+
+/*
+* Montre tous les divs ayant le même préfixe
+*/
+		function MontreTout( nom ){
+				var NumDiv = 0;
+				if ( document.getElementById ){ // Pour les navigateurs récents
+						while ( document.getElementById( nom + NumDiv) ){
+								SetDiv = document.getElementById( nom + NumDiv );
+								if ( SetDiv && SetDiv.className != '' ){
+										Montrer_Cacher_Div( nom, NumDiv );
+								}
+								NumDiv++;
+						}
+				}
+				else if ( document.all ){ // Pour les veilles versions
+						while ( document.all[ nom + NumDiv ] ){
+								SetDiv = document.all[ nom + NumDiv ];
+								if ( SetDiv && SetDiv.className != '' ){
+										Montrer_Cacher_Div( nom, NumDiv );
+								}
+								NumDiv++;
+						 }
+				 }
+				else if ( document.layers ) { // Pour les très veilles versions
+						while ( document.layers[ nom + NumDiv ] ){
+								SetDiv = document.layers[ nom + NumDiv ];
+								if ( SetDiv && SetDiv.className != '' ){
+										Montrer_Cacher_Div( nom, NumDiv );
+								}
+								NumDiv++;
+						 }
+				}
+		}
+
+/*
+* Inverse les divs: Cache les divs visible et montre le divs cachés :)
+*/
+		function InverseTout( nom ){
+				var NumDiv = 0;
+				if ( document.getElementById ){ // Pour les navigateurs récents
+						while ( document.getElementById( nom + NumDiv ) ){
+								SetDiv = document.getElementById( nom + NumDiv );
+								Montrer_Cacher_Div( nom, NumDiv );
+								NumDiv++;
+						}
+				}
+				else if ( document.all ){// Pour les veilles versions
+						while ( document.all[ nom + NumDiv ] ){
+								SetDiv = document.all[ nom + NumDiv ];
+								Montrer_Cacher_Div( nom, NumDiv );
+								NumDiv++;
+						}
+				}
+				else if ( document.layers ){ // Pour les très veilles versions
+						while ( document.layers[ nom + NumDiv ] ){
+								SetDiv = document.layers[ nom + NumDiv ];
+								Montrer_Cacher_Div( nom, NumDiv );
+								NumDiv++;
+						}
+				}
+		}
+		function ChangerTheme(id_theme) {
+						location.href   = '?val=gestzone&id_theme_choisi='+id_theme;
+		}
+		function ChangerThemeExcel(id_theme) {
+						location.href   = '?val=excel_file_descrip&id_theme_choisi='+id_theme;
+		}
+		function OpenAggregateDBStructure() {
+				/*var	popup	=	window.open('administration.php?val=aggregated_db_structure','popaggregdbstruct', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=625, left=200, top=25')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popaggregdbstruct', 750, 645, 'administration.php?val=aggregated_db_structure');
+		}
+		function OpenAggregExcelFileDescrip() {
+				/*var	popup	=	window.open('administration.php?val=aggregated_excel_file_desc','popaggregexceldesc', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=625, left=200, top=25')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popaggregexceldesc', 750, 645,'administration.php?val=aggregated_excel_file_desc' );
+		}
+		function ChangerSysteme(id_systeme) {
+						location.href   = '?val=OpenPopupZoneSysteme&id_systeme_choisi='+id_systeme;
+		}
+		function ChangerSystemeLoc(id_systeme) {
+						location.href   = '?val=gestchaineloc&id_systeme_choisi='+id_systeme;
+		}
+		function ChangerSystemeOrdre(id_systeme) {
+						location.href   = '?val=OpenPopupZoneOrdre&id_systeme_choisi='+id_systeme;
+		}
+		function ChargerOLAP(id_OLAP, base_OLAP) {
+						location.href   = '?val=view&id_OLAP='+id_OLAP+'&base_OLAP='+base_OLAP;
+		}
+		function ChargerBaseOLAP(base_OLAP) {
+						location.href   = '?val=view&base_OLAP='+base_OLAP;
+		}
+
+		function OpenPopupZoneSysteme(id_zone) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupZoneSysteme&id_zone_active='+id_zone,'popsyst', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=670, height=750, left=270, top=25')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popsyst', 720, 710, 'administration.php?val=OpenPopupZoneSysteme&id_zone_active='+id_zone);
+		}
+		function OpenPopupExcelTables(table,theme,type_theme,secteur) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupExcelTables&table='+table+'&theme='+theme+'&type_theme='+type_theme+'&secteur='+secteur,'PopDonneesTable', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=550, height=300, left=270, top=25')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('PopDonneesTable', 585, 315, 'administration.php?val=OpenPopupExcelTables&table='+table+'&theme='+theme+'&type_theme='+type_theme+'&secteur='+secteur);
+		}
+		function OpenPopupExcelAggregTables() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupExcelAggregTables','PopDonneesTable', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=825, height=350, left=120, top=25')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('PopDonneesTable', 875, 370, 'administration.php?val=OpenPopupExcelAggregTables');
+		}
+		function OpenPopupExcelAssocQuery() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupExcelAssocQuery','PopDonneesRequete', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=825, height=400, left=120, top=25')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('PopDonneesRequete', 875, 420, 'administration.php?val=OpenPopupExcelAssocQuery');
+		}
+		function OpenPopupExportGrilleXls() {
+				/*var	popup	=	window.open('administration.php?val=videForXls','PopupExportXls', 'toolbar=yes,location=yes,directories=no,menubar=yes,scrollbars=yes,status=yes,resizable=1,width=600, height=370, left=200, top=150')
+				var chaine_eval = "popup.window.location.href   = 'administration.php?val=OpenPopupExportGrilleXls';";
+        		eval(chaine_eval);
+				popup.focus();
+				popup.document.close();*/
+				open_dialog('PopupExportXls', 650, 390, 'administration.php?val=videForXls');
+		}
+		
+		function OpenPopupAjouterZone(iTab, table_mere, id_theme) {
+			var nom_zone = jQuery('#LIST_CHAMP_AJOUT_'+iTab+' option:selected').val();
+			open_dialog('popinszone', 1000, 100, 'administration.php?val=OpenPopupAjouterZone&zn='+nom_zone+'&tm='+table_mere+'&th='+id_theme);
+		}
+		
+		function OpenPopupZoneJoin(id_zone, id_tab) {
+			open_dialog('popjoin', 600, 270, 'administration.php?val=OpenPopupZoneJoin&id_zone_active='+id_zone+'&id_tab_active='+id_tab);
+		}
+		function OpenPopupZoneRegle(id_zone) {
+			open_dialog('popzone', 800, 600, 'administration.php?val=OpenPopupZoneRegle&id_zone_active='+id_zone);
+		}
+		
+		function OpenPopupExcelFieldsDef(table,theme,type_theme,secteur) {
+				$.alert(table+'_'+theme+'_'+type_theme+'_'+secteur, '_');
+				open_dialog('popExcelFieldsDef', 600, 420, 'administration.php?val=OpenPopupExcelFieldsDef&table='+table+'&theme='+theme+'&type_theme='+type_theme+'&secteur='+secteur);
+		}
+
+		function OpenPopupZoneOrdre(titre) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupZoneOrdre','popordre', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=780, height=600, left=300, top=30')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog(titre, 830, 620, 'administration.php?val=OpenPopupZoneOrdre');
+		}
+		function OpenPopupRechLibelle() {
+				val_lib=document.getElementById( 'LIBELLE' ).value
+				/*var	popup	=	window.open('administration.php?val=OpenPopupRechLibelle&libelle='+val_lib,'poplib', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=500, height=300, left=300, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('poplib', 550, 320, 'administration.php?val=OpenPopupRechLibelle&libelle='+val_lib);
+		}
+		function OpenPopupGestDim() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupGestDim','popdim', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=450, left=250, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popdim', 750, 470, 'administration.php?val=OpenPopupGestDim');
+		}
+		function OpenAggregExportFiltre(id_systeme,id_chaine,type_reg) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=frame_gestion_aggreg_export_filtre&id_systeme='+id_systeme+'&id_chaine='+id_chaine+'&type_reg='+type_reg,'popfiltre', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=500, height=170, left=250, top=200')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popfiltre', 550, 190, 'administration.php?val=frame_gestion_aggreg_export_filtre&id_systeme='+id_systeme+'&id_chaine='+id_chaine+'&type_reg='+type_reg);
+		}
+        function OpenPopupZoneIndexes(id_zone,table) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupZoneIndexes&id_zone='+id_zone+'&table='+table,'popInd', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=650, height=300, left=300, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popInd', 700, 320, 'administration.php?val=OpenPopupZoneIndexes&id_zone='+id_zone+'&table='+table);
+		}			
+		function OpenPopupGestRegZone() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupGestRegZone','popRegZ', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=650, height=500, left=300, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popRegZ', 700, 520, 'administration.php?val=OpenPopupGestRegZone');
+		}
+		function OpenPopupGestRegTheme(id_theme) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupGestRegTheme&id_theme='+id_theme,'popThReg', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=800, height=430, left=100, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popThReg', 900, 500, 'administration.php?val=OpenPopupGestRegTheme&id_theme='+id_theme);
+		}
+		function OpenPopupGestRegSuivi() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupGestRegSuivi','popSuiviReg', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=800, height=430, left=100, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popSuiviReg', 850, 450, 'administration.php?val=OpenPopupGestRegSuivi');
+		}
+		function OpenPopupRechEns(type_pers,theme,teach_number) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('saisie_donnees.php?val=rech_ens&type_pers='+type_pers+'&theme='+theme+'&teach_number='+teach_number,'popRechEns', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=900, height=400, left=100, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popRechEns', 950, 420, 'saisie_donnees.php?val=rech_ens&type_pers='+type_pers+'&theme='+theme+'&teach_number='+teach_number);
+		}
+		function OpenPopupImpTheme(id_thm, typ_thm) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=ImpTheme&cur_thm='+id_thm+'&typ_thm='+typ_thm,'ImpTheme', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=300, height=130, left=500, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('ImpTheme', 350, 150, 'administration.php?val=ImpTheme&cur_thm='+id_thm+'&typ_thm='+typ_thm);
+		}
+		
+		function OpenPopupImpZonesSys(id_thm, id_sys) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=ImpZoneSyst&cur_thm='+id_thm+'&to_syst='+id_sys,'ImpZonSyst', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=300, height=130, left=500, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('ImpZonSyst', 350, 150, 'administration.php?val=ImpZoneSyst&cur_thm='+id_thm+'&to_syst='+id_sys);
+		}
+			
+		function OpenPopupRegThmAsc(id_regle_theme) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=OpenPopupRegThmAsc&id_regle_theme='+id_regle_theme,'popThRegAsc', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=750, height=320, left=120, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popThRegAsc', 800, 380, 'administration.php?val=OpenPopupRegThmAsc&id_regle_theme='+id_regle_theme);
+		}
+				
+		function OpenPopupUserRptSyst(id_rpt, id_sys) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=OpenPopupRptSyst&id_rpt='+id_rpt+'&id_syst='+id_sys,'popUserRptSyst', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=750, height=550, left=120, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popUserRptSyst', 800, 570, 'synthese.php?val=OpenPopupRptSyst&id_rpt='+id_rpt+'&id_syst='+id_sys);
+		}
+				
+		function OpenPopupRptCritere(id_rpt) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=OpenPopupRptCrit&id_rpt='+id_rpt,'popUserRptCrit', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=450, left=200, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popUserRptCrit', 650, 470, 'synthese.php?val=OpenPopupRptCrit&id_rpt='+id_rpt);
+		}
+		
+		function OpenPopupRptMesure(id_rpt) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=OpenPopupRptMes&id_rpt='+id_rpt,'popUserRptMes', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=370, left=200, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popUserRptMes', 650, 390, 'synthese.php?val=OpenPopupRptMes&id_rpt='+id_rpt);
+		}
+		
+		function OpenPopupRptDim(id_rpt) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=OpenPopupRptDim&id_rpt='+id_rpt,'popUserRptDim', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=370, left=200, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popUserRptDim', 650, 390, 'synthese.php?val=OpenPopupRptDim&id_rpt='+id_rpt);
+		}
+		
+		function OpenPopupRptAgg(id_rpt) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=OpenPopupRptAgg&id_rpt='+id_rpt,'popUserRptAgg', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=370, left=200, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popUserRptAgg', 650, 390, 'synthese.php?val=OpenPopupRptAgg&id_rpt='+id_rpt);
+		}
+		
+		function OpenPopupRptQry(id_rpt) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=OpenPopupRptQry&id_rpt='+id_rpt,'popUserRptQry', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=460, left=200, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popUserRptQry', 750, 480, 'synthese.php?val=OpenPopupRptQry&id_rpt='+id_rpt);
+		}
+		
+		function OpenPopupOlapDim(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_dim&id_olap='+id_olap,'popOlapDim', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=370, left=200, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popOlapDim', 750, 390, 'olap.php?val=pop_olap_dim&id_olap='+id_olap);
+		}
+		
+		function OpenPopupImportDim(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_import_dim&id_olap='+id_olap,'popImportDim', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=350, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popImportDim', 650, 370, 'olap.php?val=pop_import_dim&id_olap='+id_olap);
+		}
+		
+		function OpenPopupImportRptTable(id_rpt) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				///*var	popup	=	window.open('synthese.php?val=pop_import_rpt_table&id_rpt='+id_rpt,'popImportDim', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=350, left=300, top=50')
+				//popup.document.close();
+				//popup.focus();
+		}
+		
+        function OpenPopupCritValue(id_olap,nom_table,nom_chp) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_valeur_critere&id_olap='+id_olap+'&nom_table='+nom_table+'&nom_chp='+nom_chp,'popCritValue', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=350, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popCritValue', 650, 370, 'olap.php?val=pop_valeur_critere&id_olap='+id_olap+'&nom_table='+nom_table+'&nom_chp='+nom_chp);
+		}        
+
+		function OpenPopupRptCritValue(id_rpt,nom_table,nom_chp,val_chp) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=pop_valeur_critere&id_rpt='+id_rpt+'&nom_table='+nom_table+'&nom_chp='+nom_chp+'&val_chp='+val_chp,'popCritValue', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=350, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popCritValue', 650, 370, 'synthese.php?val=pop_valeur_critere&id_rpt='+id_rpt+'&nom_table='+nom_table+'&nom_chp='+nom_chp+'&val_chp='+val_chp);
+		}        
+		
+		function OpenPopupUserPriv(id_user, name_user, id_groupe) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=gestionuserpriv&id_user='+id_user+'&name_user='+name_user+'&id_groupe='+id_groupe,'popUserPrivManagement', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=950, height=400, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popUserPrivManagement', 1160, 420, 'administration.php?val=gestionuserpriv&id_user='+id_user+'&name_user='+name_user+'&id_groupe='+id_groupe);
+		}        
+
+		function OpenPopupPlageCodesAssoc(type_regroup, nom_champ) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('administration.php?val=gest_plages_codes_assoc&type_regroup='+type_regroup+'&nom_champ='+nom_champ,'popPlageCodesRattachAdd', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=250, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('popPlageCodesAssoc', 630, 260, 'administration.php?val=gest_plages_codes_assoc&type_regroup='+type_regroup+'&nom_champ='+nom_champ);
+		}
+		function OpenPopupFieldsRowCol(nom_table,dim,lignes,colonnes) {
+				/*var	popup	=	window.open('administration.php?val=OpenPopupFieldsRowCol&nom_table='+nom_table+'&dim='+dim+'&lignes='+lignes+'&colonnes='+colonnes,'PopupFieldsRowCol', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=550, height=450, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('PopupFieldsRowCol', 600, 490, 'administration.php?val=OpenPopupFieldsRowCol&nom_table='+nom_table+'&dim='+dim+'&lignes='+lignes+'&colonnes='+colonnes);
+		}
+		function OpenPopupAggregFixeVal(id_table,nom_table) {
+				/*var	popup	=	window.open('administration.php?val=OpenPopupAggregFixeVal&id_table='+id_table+'&nom_table='+nom_table,'PopupAggregFixeVal', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=550, height=300, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('PopupAggregFixeVal', 600, 320, 'administration.php?val=OpenPopupAggregFixeVal&id_table='+id_table+'&nom_table='+nom_table);
+		}
+		function OpenPopupFiltreVal(nom_table) {
+				/*var	popup	=	window.open('administration.php?val=OpenPopupFiltreVal&nom_table='+nom_table,'PopupFiltreVal', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=450, height=250, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('OpenPopupFiltreVal', 500, 270, 'administration.php?val=OpenPopupFiltreVal&nom_table='+nom_table);
+		}
+		function OpenPopupAggregFieldsRowCol(nom_table,dim,lignes,colonnes) {
+				/*var	popup	=	window.open('administration.php?val=OpenPopupAggregFieldsRowCol&nom_table='+nom_table+'&dim='+dim+'&lignes='+lignes+'&colonnes='+colonnes,'PopupFieldsRowCol', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=550, height=450, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 600, 470, 'administration.php?val=OpenPopupAggregFieldsRowCol&nom_table='+nom_table+'&dim='+dim+'&lignes='+lignes+'&colonnes='+colonnes);
+		}
+		function OpenPopupFieldsTable(nom_table,nom_table2) {
+				/*var	popup	=	window.open('administration.php?val=fields_aggregated_table&nom_table='+nom_table+'&nom_table2='+nom_table2,'PopupFieldsTable', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=550, height=400, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 600, 420, 'administration.php?val=fields_aggregated_table&nom_table='+nom_table+'&nom_table2='+nom_table2);
+		}
+		function OpenPopupChildTable(nom_requete,nom_champ) {
+				/*var	popup	=	window.open('administration.php?val=excel_table_fille_requete&nom_requete='+nom_requete+'&nom_champ='+nom_champ,'PopupQueryChildTable', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=650, height=420, left=250, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 700, 440, 'administration.php?val=excel_table_fille_requete&nom_requete='+nom_requete+'&nom_champ='+nom_champ);
+		}
+		function OpenPopupFieldsRequete(nom_requete) {
+				/*var	popup	=	window.open('administration.php?val=fields_aggregated_table&nom_requete='+nom_requete,'PopupFieldsTable', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=550, height=400, left=300, top=50')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 600, 420, 'administration.php?val=fields_aggregated_table&nom_requete='+nom_requete);
+		}
+		function OpenPopupOlapMes(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_mes&id_olap='+id_olap,'popOlapMes', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=370, left=200, top=150')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 650, 390, 'olap.php?val=pop_olap_mes&id_olap='+id_olap);
+		}
+		
+		function OpenPopupOlapQry(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_qry&id_olap='+id_olap,'popOlapQry', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=750, height=450, left=200, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 800, 470, 'olap.php?val=pop_olap_qry&id_olap='+id_olap);
+		}
+		
+		function OpenPopupOlapTabM(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_tabm&id_olap='+id_olap,'popOlapTab', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=750, height=310, left=200, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 800, 330, 'olap.php?val=pop_olap_tabm&id_olap='+id_olap);
+		}
+        
+        function OpenPopupImportCube(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_import_cube&id_olap='+id_olap,'popOlapImportCube', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=350, left=200, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 650, 370, 'olap.php?val=pop_olap_import_cube&id_olap='+id_olap);
+		}
+		
+		function OpenPopupOlapChp(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_chp&id_olap='+id_olap,'popOlapChp', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=770, height=445, left=200, top=130')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 820, 465, 'olap.php?val=pop_olap_chp&id_olap='+id_olap);
+		}
+		
+		
+		function OpenPopupOlapJnt(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_jnt&id_olap='+id_olap,'popOlapJnt', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=850, height=330, left=150, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 900, 350, 'olap.php?val=pop_olap_jnt&id_olap='+id_olap);
+		}
+		
+        function OpenPopupOlapCrit(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=popup_olap_crit&id_olap='+id_olap,'PopupOlapCrit', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=770, height=430, left=200, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 820, 450, 'olap.php?val=popup_olap_crit&id_olap='+id_olap);
+		}
+		
+		
+		function OpenPopupOlapGen(id_olap) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_gen&id_olap='+id_olap,'popOlapGen', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=350, left=200, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 750, 370, 'olap.php?val=pop_olap_gen&id_olap='+id_olap);
+		}
+		
+		
+		
+		function OpenPopupOLAP(id_OLAP, type_sgbd) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				//var	popup	=	window.open('olap.php?val=pop_OLAP&id_OLAP='+id_OLAP,'popOLAP', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=460, left=200, top=150')
+                /*var	popup	=	window.open('olap.php?val=pop_OLAP&id_OLAP='+id_OLAP+'&type_sgbd='+type_sgbd,'popOLAP', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=460, left=200, top=150')                
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 750, 480, 'olap.php?val=pop_OLAP&id_OLAP='+id_OLAP+'&type_sgbd='+type_sgbd);
+		}
+		
+		function OpenPopupOlapDoc(id_OLAP,fich_OlapDoc) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_doc&id_OLAP='+id_OLAP+'&fich_OlapDoc='+fich_OlapDoc,'fich_OlapDoc', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=460, left=250, top=200')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 750, 480, 'olap.php?val=pop_olap_doc&id_OLAP='+id_OLAP+'&fich_OlapDoc='+fich_OlapDoc);
+		}
+        
+        function OpenPopupOlapImg(id_OLAP,fich_OlapImg) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_img&id_OLAP='+id_OLAP+'&fich_OlapImg='+fich_OlapImg,'fich_OlapImg', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=700, height=460, left=250, top=200')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 750, 480, 'olap.php?val=pop_olap_img&id_OLAP='+id_OLAP+'&fich_OlapImg='+fich_OlapImg);
+		}
+        
+        function OpenPopupImportCubDoc() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_import_cube_doc','fich_OlapDocAssoc', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=160, left=250, top=200')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 650, 200, 'olap.php?val=pop_olap_import_cube_doc');
+		}    
+        
+        function OpenPopupImportCubImg() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_import_cube_img','fich_OlapImgAssoc', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=160, left=250, top=200')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 650, 200, 'olap.php?val=pop_olap_import_cube_img');
+		} 
+
+        function OpenPopupImportUnCub() {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('olap.php?val=pop_olap_import_un_cube','fich_OlapImportUnCub', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=600, height=160, left=250, top=200')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 650, 200, 'olap.php?val=pop_olap_import_un_cube');
+		} 
+
+		function OpenPopupAnnRptParamsSys(id_rpt, id_syst) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_rpt_sys&id_rpt='+id_rpt+'&id_syst='+id_syst,'pop_rpt_sys', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=700, height=450, left=300, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_rpt_sys', 750, 470, 'annuaire.php?val=pop_rpt_sys&id_rpt='+id_rpt+'&id_syst='+id_syst);
+		}
+
+		function OpenPopupAnnFoncSys(id_fonc,id_syst) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_fonc_sys&id_fonc='+id_fonc+'&id_syst='+id_syst,'pop_fonc_sys', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=580, height=280, left=390, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_fonc_sys', 620, 410, 'annuaire.php?val=pop_fonc_sys&id_fonc='+id_fonc+'&id_syst='+id_syst);
+		}
+
+		function OpenPopupAnnRubSys(id_rub,id_syst) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_rub_sys&id_rub='+id_rub+'&id_syst='+id_syst,'pop_rub_sys', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=580, height=280, left=390, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_rub_sys', 620, 410, 'annuaire.php?val=pop_rub_sys&id_rub='+id_rub+'&id_syst='+id_syst);
+		}
+
+		function OpenPopupAnnCompSys(id_comp,id_syst) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_comp_sys&id_comp='+id_comp+'&id_syst='+id_syst,'pop_fonc_sys', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=580, height=320, left=390, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_fonc_sys', 620, 410,'annuaire.php?val=pop_comp_sys&id_comp='+id_comp+'&id_syst='+id_syst );
+		}
+
+		function OpenPopupAnnFoncNivRub(id_fonc, id_agg, id_syst, id_rub) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_fonc_niv_rub&id_fonc='+id_fonc+'&id_agg='+id_agg+'&id_syst='+id_syst+'&id_rub='+id_rub,'pop_fonc_niv_rub', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=580, height=330, left=390, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_fonc_niv_rub', 620, 350, 'annuaire.php?val=pop_fonc_niv_rub&id_fonc='+id_fonc+'&id_agg='+id_agg+'&id_syst='+id_syst+'&id_rub='+id_rub);
+		}
+
+		function OpenPopupAnnFoncRub(id_fonc, id_rub) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_fonc_rub&id_fonc='+id_fonc+'&id_rub='+id_rub,'pop_fonc_rub', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=580, height=300, left=390, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_fonc_rub', 620, 320, 'annuaire.php?val=pop_fonc_rub&id_fonc='+id_fonc+'&id_rub='+id_rub);
+		}
+
+		function OpenPopupAnnLinkRub(id_rub, id_ss_rub) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_link_rub&id_rub='+id_rub+'&id_ss_rub='+id_ss_rub,'pop_link_rub', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=550, height=300, left=370, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_link_rub', 600, 390, 'annuaire.php?val=pop_link_rub&id_rub='+id_rub+'&id_ss_rub='+id_ss_rub);
+		}
+
+
+		function OpenPopupAnnCompFonc(id_fonc, id_comp) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_comp_fonc&id_fonc='+id_fonc+'&id_comp='+id_comp,'pop_comp_fonc', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=550, height=300, left=430, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_comp_fonc',600 , 450, 'annuaire.php?val=pop_comp_fonc&id_fonc='+id_fonc+'&id_comp='+id_comp);
+		}
+
+		function OpenPopupAnnRubNiv( id_rub, id_agg, id_syst ) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('annuaire.php?val=pop_rub_niv&id_agg='+id_agg+'&id_syst='+id_syst+'&id_rub='+id_rub,'pop_fonc_niv_rub', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=0,width=580, height=300, left=390, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('pop_fonc_niv_rub', 630, 320, 'annuaire.php?val=pop_rub_niv&id_agg='+id_agg+'&id_syst='+id_syst+'&id_rub='+id_rub);
+		}
+		
+		function MontrerElemZone(nom_div,nom_classe){
+
+				document.getElementById( nom_div ).className 		= nom_classe ;
+				//document.getElementById( nom_div ).style.right 	= event.clientX + document.body.scrollLeft;
+				//document.getElementById( nom_div ).style.top 		= event.clientY + document.body.scrollTop;
+				document.getElementById( nom_div ).style.right 	= event.clientX - 115;
+				document.getElementById( nom_div ).style.top 		= event.clientY + 55;
+				//document.getElementById( nom_div ).focus() ;
+				var chaine_eval = "document.Formulaire."+nom_div+".focus();";
+				eval(chaine_eval);
+				//document.Formulaire.nom_div.focus() ;
+			
+		}
+		function CacherElemZone(nom_div){
+				document.getElementById( nom_div ).className = 'cachediv' ;
+		}
+
+		function Action(iTab,iZone,cas_elem,action){
+
+				if(cas_elem=='Zone'){
+					//alert( iTab + '|' + iZone + '|' + cas_elem + '|' + action );
+						//alert( document.Formulaire.ActionZone + '|' + iZone + '|' + cas_elem + '|' + action );
+						document.getElementById( 'ActionZone' ).value = action;
+						document.getElementById( 'ZoneActive' ).value = iZone;
+						document.getElementById( 'TabMActive' ).value = iTab;
+				}
+				else if(cas_elem=='TabM'){
+						document.getElementById( 'ActionTabM' ).value = action;
+						document.getElementById( 'TabMActive' ).value = iTab;
+				}
+				//alert(iTab+'-'+iZone+'-'+cas_elem+'-'+action);
+				//alert(document.getElementById( 'TabMActive' ).value);
+				document.Formulaire.submit();	
+		}
+		
+		
+		function POST_switch_theme(theme){
+				if ( document.getElementById ){
+						//document.getElementById( 'bool_switch_theme' ).value = '1';
+						document.getElementById( 'switch_theme_id' ).value = theme;
+				}
+				else{
+						//document.form1.bool_switch_theme.value = '1';
+						document.form1.switch_theme_id.value = theme;
+				}
+				document.form1.submit();	
+		}
+		
+		function SuppLocEtab(iLoc,nb_regs){
+				for ( i = 0 ; i < nb_regs ; i++ ){
+						if( document.getElementById( 'LIBELLE_REG_'+iLoc+'_' + i ) ){
+								document.getElementById( 'LIBELLE_REG_'+iLoc+'_' + i ).value = '' ;
+						}
+				}
+				if( document.getElementById( 'LOC_REG_'+iLoc ) ){
+						document.getElementById( 'LOC_REG_'+iLoc ).value = '' ;
+				}
+		}
+		
+		/////////////////////////////////////////////////////////////// FONCTION CALCUL TOTAL POUR THEME MATRICE 2 DIMENSIONS
+		function do_concat_dims_ThemeMat2D(nb_dims, tab_dim){
+			var tab_concat = new Array();
+			for (var i_dim = 0; i_dim < nb_dims; i_dim++){
+				if(i_dim == 0){
+					tab_concat = tab_dim[i_dim];
+				}else{
+					var tmp_tab = new Array;
+					var k = 0 ;
+					for (var i = 0; i < tab_concat.length; i++){
+						for (var j = 0; j < tab_dim[i_dim].length; j++){
+							tmp_tab[k] = tab_concat[i]+'_'+tab_dim[i_dim][j] ;
+							k++;
+						}
+					}
+					tab_concat = tmp_tab ;
+				}
+			}
+			return tab_concat;
+		}
+		
+		function calcul_Total_ThemeMat2D(form, champ_total, tab_mes, tab_ligne, tab_col, tot_all, li){
+		
+			if( (form != '') && (champ_total != '') && (tab_mes.length > 0) && ( (tab_ligne.length > 0) || (tab_col.length > 0) ) ){
+				//alert(' /mes= '+tab_mes.length+' /li= '+tab_ligne.length+' / col='+tab_col.length );
+				
+				var total 			= 0;
+				var nb_dim 			= 0;
+				var tab_concat_dims	= new Array();
+				var tab_dims		= new Array();
+				var affiche_meme_si_zero = false;
+				
+				if(tab_ligne.length > 0){
+					tab_dims[nb_dim] = new Array();
+					for (var i = 0; i < tab_ligne.length; i++){
+						tab_dims[nb_dim][i] = tab_ligne[i];
+						//alert(tab_dims[nb_dim][i]);
+					}
+					nb_dim++;
+				}
+				
+				if(tab_col.length > 0){
+					tab_dims[nb_dim] = new Array();
+					for (var i = 0; i < tab_col.length; i++){
+						tab_dims[nb_dim][i] = tab_col[i];
+					}
+					nb_dim++;
+				}
+				
+				tab_concat_dims = do_concat_dims_ThemeMat2D(nb_dim, tab_dims);
+				//alert(tab_concat_dims.length);
+				//alert(tab_mes.length);
+				if((tot_all=='TOT_ALL_MES_LIGNE') || (tot_all=='TOT_ALL_MES') || (tot_all=='TOT_ALL_MES_COLONNE')){
+					//alert(tot_all);
+					var text = expression.toString() ;
+					var resultat='';
+					var maReg;
+					var text_rech='';
+					if(tot_all=='TOT_ALL_MES_LIGNE'){
+						for (var i = 0; i < tab_mes.length; i++){
+							text_rech=tab_mes[i].toString();
+							maReg = new RegExp(text_rech) ;
+							if((eval('document.'+form+'.'+tot_tab_mes[li][i]+'.value') != '') && ( text.search( maReg ) != -1 ))
+								affiche_meme_si_zero=true;
+							if(eval('document.'+form+'.'+tot_tab_mes[li][i]+'.value') == '')
+								text = text.replace( maReg, 'parseFloat(0)' ) ;
+							else
+								text = text.replace( maReg, 'parseFloat('+form+'.'+tot_tab_mes[li][i]+'.value)' ) ;
+						}
+					}else if(tot_all=='TOT_ALL_MES'){
+							for (var i = 0; i < tab_mes.length; i++){
+								text_rech=tab_mes[i].toString();
+								maReg = new RegExp(text_rech) ;
+								if((eval('document.'+form+'.'+tot_tab_col[i]+'.value') != '') && ( text.search( maReg ) != -1 ))
+									affiche_meme_si_zero=true;
+								if(eval('document.'+form+'.'+tot_tab_col[i]+'.value') == '')
+									text = text.replace( maReg, 'parseFloat(0)' ) ;
+								else
+									text = text.replace( maReg, 'parseFloat('+form+'.'+tot_tab_col[i]+'.value)' ) ;
+							}
+					}else if(tot_all=='TOT_ALL_MES_COLONNE'){
+						for (var i = 0; i < tab_mes.length; i++){
+							text_rech=tab_mes[i].toString();
+							maReg = new RegExp(text_rech) ;
+							if((eval('document.'+form+'.'+tot_tab_col[i]+'_'+li+'.value') != '') && ( text.search( maReg ) != -1 ))
+								affiche_meme_si_zero=true;
+							if(eval('document.'+form+'.'+tot_tab_col[i]+'_'+li+'.value') == '')
+								text = text.replace( maReg, 'parseFloat(0)' ) ;
+							else
+								text = text.replace( maReg, 'parseFloat('+form+'.'+tot_tab_col[i]+'_'+li+'.value)' ) ;
+						}
+					}
+
+					if(eval(text))
+						resultat=eval(text);
+					else
+						resultat = 0 ;
+					eval ('total = parseFloat(resultat);');
+				}else{
+					for (var i = 0; i < tab_mes.length; i++){
+						if(tab_concat_dims.length > 0){
+							for (var j = 0; j < tab_concat_dims.length; j++){
+								//alert(tab_concat_dims[j]);
+								//alert('document.'+form+'.'+tab_mes[i]+'_'+tab_concat_dims[j]);
+								if(eval ('document.'+form+'.'+tab_mes[i]+'_'+tab_concat_dims[j])){
+										if(eval ('parseFloat(document.'+form+'.'+tab_mes[i]+'_'+tab_concat_dims[j]+'.value)')){
+											eval ('total += parseFloat(document.'+form+'.'+tab_mes[i]+'_'+tab_concat_dims[j]+'.value);');
+										}
+								}
+							}
+						}
+					}
+				}
+				if(eval('document.'+form+'.'+champ_total)){
+					//alert(total);
+					total=Math.round(total*100)/100;
+					if((total == 0) && (!affiche_meme_si_zero)){
+						total = "''" ;
+					}
+					eval('document.'+form+'.'+champ_total+'.value='+total+';');
+					
+				}/**/
+
+			}
+		}
+		
+		function set_TOTAL_ThemeMat2D(){
+			for (var li = 0; li < tab_ligne.length; li++){
+				for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+					calcul_Total_ThemeMat2D('form1', eval('Array("TOT_'+tab_mes[i_mes]+'_LIGNE_'+li+'")'), eval('Array("'+tab_mes[i_mes]+'")'), eval('Array("'+tab_ligne[li]+'")'), tab_col);
+				}
+				if(expression != ""){
+					calcul_Total_ThemeMat2D('form1', eval('Array("TOT_ALL_MES_LIGNE_'+li+'")'), tab_mes, eval('Array("'+tab_ligne[li]+'")'), tab_col, 'TOT_ALL_MES_LIGNE', li);
+				}else{
+					calcul_Total_ThemeMat2D('form1', eval('Array("TOT_ALL_MES_LIGNE_'+li+'")'), tab_mes, eval('Array("'+tab_ligne[li]+'")'), tab_col);
+				}
+			}
+			//eval('Array("'++'")')
+			for (var col = 0; col < tab_col.length; col++){
+				for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+					calcul_Total_ThemeMat2D('form1', eval('Array("TOT_'+tab_mes[i_mes]+'_COLONNE_'+col+'")'), eval('Array("'+tab_mes[i_mes]+'")'), tab_ligne, eval('Array("'+tab_col[col]+'")') );
+				}
+				if(expression != ""){
+					calcul_Total_ThemeMat2D('form1', eval('Array("TOT_ALL_MES_COLONNE_'+col+'")'), tab_mes, tab_ligne, eval('Array("'+tab_col[col]+'")'), 'TOT_ALL_MES_COLONNE', col);
+				}else{
+					calcul_Total_ThemeMat2D('form1', eval('Array("TOT_ALL_MES_COLONNE_'+col+'")'), tab_mes, tab_ligne, eval('Array("'+tab_col[col]+'")'));
+				}
+			}
+	
+			if(tab_mes.length > 0){
+				for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+					calcul_Total_ThemeMat2D('form1', eval('Array("TOT_'+tab_mes[i_mes]+'_COLONNE'+'")'), eval('Array("'+tab_mes[i_mes]+'")'), tab_ligne, tab_col);
+				}
+			}
+			if(expression != ""){
+				calcul_Total_ThemeMat2D('form1', 'TOT_ALL_MES', tab_mes, tab_ligne, tab_col, 'TOT_ALL_MES');
+			}else{
+				calcul_Total_ThemeMat2D('form1', 'TOT_ALL_MES', tab_mes, tab_ligne, tab_col);
+			}
+		}
+		
+		////////////////////////////////////////////////////////////// FIN FONCTION CALCUL TOTAL POUR THEME MATRICE 2 DIMENSIONS
+
+		
+		
+		////////////////////////////////////////////////////////////// FONCTION CALCUL TOTAL POUR  MATRICE  DANS FORMULAIRE
+
+		function do_concat_dims_MatFrml(nb_dims, tab_dim){
+			var tab_concat = new Array();
+			for (var i_dim = 0; i_dim < nb_dims; i_dim++){
+				if(i_dim == 0){
+					tab_concat = tab_dim[i_dim];
+				}else{
+					var tmp_tab = new Array();
+					var k = 0 ;
+					for (var i = 0; i < tab_concat.length; i++){
+						for (var j = 0; j < tab_dim[i_dim].length; j++){
+							tmp_tab[k] = tab_concat[i]+'_'+tab_dim[i_dim][j] ;
+							k++;
+						}
+					}
+					tab_concat = tmp_tab ;
+				}
+			}
+			return tab_concat;
+		}
+		
+		function calcul_Total_MatFrml(form, num_line, champ_total, tab_mes, tab_ligne, tab_col, tot_all, tot_zone){
+			if( (form != '') && (champ_total != '') && (tab_mes.length > 0) && ( (tab_ligne.length > 0) || (tab_col.length > 0) ) ){
+				//alert(' /mes= '+tab_mes.length+' /li= '+tab_ligne.length+' / col='+tab_col.length );
+				var total 			= 0;
+				var nb_dim 			= 0;
+				var tab_concat_dims	= new Array();
+				var tab_dims		= new Array();
+				
+				if( parseInt(num_line) >= 0 ){
+					var plus_line 	= '_' + num_line ;
+				}else{
+					var plus_line 	= '' ;	
+				}
+				//alert('a'+plus_line+'b');
+				if(tab_ligne.length > 0){
+					tab_dims[nb_dim] = new Array();
+					for (var i = 0; i < tab_ligne.length; i++){
+						tab_dims[nb_dim][i] = tab_ligne[i];
+						//alert(tab_dims[nb_dim][i]);
+					}
+					nb_dim++;
+				}
+				
+				if(tab_col.length > 0){
+					
+					tab_dims[nb_dim] = new Array();
+					for (var i = 0; i < tab_col.length; i++){
+						tab_dims[nb_dim][i] = tab_col[i];
+					}
+					nb_dim++;
+				}
+				
+				tab_concat_dims = do_concat_dims_MatFrml(nb_dim, tab_dims);
+				//alert(tab_concat_dims.length);
+				//alert(tab_mes);
+				var pos=champ_total.indexOf('_',4);
+				var zone=champ_total.substring(4,pos);
+				var text = eval('expression_'+zone).toString() ;
+				var resultat='';
+				var maReg;
+				var text_rech='';
+				var affiche_meme_si_zero=false;
+				if((tot_all=='ALL_MES_LIGNE') || (tot_all=='ALL_MES') || (tot_all=='TOT_ALL_MES') || (tot_all=='ALL_MES_COLONNE')){
+					for (var i = 0; i < tab_mes.length; i++){
+						if(tot_all=='ALL_MES_LIGNE'){
+							if(tab_concat_dims.length == 1){
+								//alert(tab_concat_dims.length);
+								for (var j = 0; j < tab_concat_dims.length; j++){		
+									//alert('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]);
+									if(eval ('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j])){
+										//alert('For Total : '+champ_total+'/ '+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]);
+										//if(eval ('parseFloat(document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value)')){
+												text_rech=tab_mes[i].toString();
+												//alert(text_rech);
+												//alert(text);
+												maReg = new RegExp(text_rech) ;
+												if((eval('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value') != '') && ( text.search( maReg ) != -1 ))
+													affiche_meme_si_zero=true;
+												if(eval('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value') == '')
+													text = text.replace( maReg, 'parseFloat(0)' ) ;
+												else
+													text = text.replace( maReg, 'parseFloat('+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value)' ) ;
+												
+										//}
+									}
+								}
+							}else if(tab_concat_dims.length > 1){
+								if(eval ('document.'+form+'.'+eval('tot_mes_ligne_'+zone)[tot_zone][i])){// A noter tot_zone=numero de la ligne dans ce cas
+									//alert('For Total : '+champ_total+'/ '+tot_mes_ligne[tot_zone][i]);
+									//if(eval ('parseFloat(document.'+form+'.'+tot_mes_ligne[tot_zone][i]+'.value)')){
+											text_rech=tab_mes[i].toString();
+											//alert(text_rech);
+											//alert(text);
+											maReg = new RegExp(text_rech) ;
+											if((eval('document.'+form+'.'+eval('tot_mes_ligne_'+zone)[tot_zone][i]+'.value') != '') && ( text.search( maReg ) != -1 ))
+												affiche_meme_si_zero=true;
+											if(eval('document.'+form+'.'+eval('tot_mes_ligne_'+zone)[tot_zone][i]+'.value') == '')
+												text = text.replace( maReg, 'parseFloat(0)' ) ;
+											else
+												text = text.replace( maReg, 'parseFloat('+form+'.'+eval('tot_mes_ligne_'+zone)[tot_zone][i]+'.value)' ) ;
+									//}
+								}
+							}
+						}else if(tot_all=='ALL_MES'){
+							
+							text_rech=tab_mes[i].toString();
+							maReg = new RegExp(text_rech) ;
+							
+							if((tab_col.length == 0) || ((tab_col.length > 0) && (tab_ligne.length > 0))){
+								if((eval('document.'+form+'.'+tot_zone+tab_mes[i]+'_COLONNE'+plus_line+'.value') != '') && ( text.search( maReg ) != -1 ))
+									affiche_meme_si_zero=true;
+								if(eval('document.'+form+'.'+tot_zone+tab_mes[i]+'_COLONNE'+plus_line+'.value') == '')
+									text = text.replace( maReg, 'parseFloat(0)' ) ;
+								else
+									text = text.replace( maReg, 'parseFloat('+form+'.'+tot_zone+tab_mes[i]+'_COLONNE'+plus_line+'.value)' ) ;	
+							}else{
+								if((eval('document.'+form+'.'+tot_zone+tab_mes[i]+'_LIGNE'+plus_line+'.value') != '') && ( text.search( maReg ) != -1 ))
+									affiche_meme_si_zero=true;
+								if(eval('document.'+form+'.'+tot_zone+tab_mes[i]+'_LIGNE'+plus_line+'.value') == '')
+									text = text.replace( maReg, 'parseFloat(0)' ) ;
+								else
+									text = text.replace( maReg, 'parseFloat('+form+'.'+tot_zone+tab_mes[i]+'_LIGNE'+plus_line+'.value)' ) ;	
+							}
+						}else if(tot_all=='ALL_MES_COLONNE'){
+							
+							if((!eval('affich_vertic_mes_'+zone)) && (tab_ligne.length > 0)){
+								
+								if(eval ('document.'+form+'.'+eval('tot_mes_col_'+zone)[tot_zone][i])){// A noter tot_zone=numero de la colonne dans ce cas
+									//alert('For Total : '+champ_total+'/ '+tot_mes_col[tot_zone][i]);
+									//if(eval ('parseFloat(document.'+form+'.'+tot_mes_col[tot_zone][i]+'.value)')){
+											text_rech=tab_mes[i].toString();
+											//alert(text_rech);
+											//alert(text);
+											maReg = new RegExp(text_rech) ;
+											if((eval('document.'+form+'.'+eval('tot_mes_col_'+zone)[tot_zone][i]+'.value') != '') && ( text.search( maReg ) != -1 ))
+												affiche_meme_si_zero=true;
+											if(eval('document.'+form+'.'+eval('tot_mes_col_'+zone)[tot_zone][i]+'.value') == '')
+												text = text.replace( maReg, 'parseFloat(0)' ) ;
+											else
+												text = text.replace( maReg, 'parseFloat('+form+'.'+eval('tot_mes_col_'+zone)[tot_zone][i]+'.value)' ) ;
+									//}
+								}
+							}else{
+								if((tot_zone != '') || ((eval('affich_vertic_mes_'+zone)) && (tab_col.length > 0) && (tab_ligne.length > 0))){
+									//alert('ici');
+									if(eval ('document.'+form+'.'+eval('tot_mes_col_'+zone)[i][tot_zone])){// A noter tot_zone=numero de la colonne dans ce cas
+										//alert('For Total : '+champ_total+'/ '+tot_mes_col[i][tot_zone]);
+										//if(eval ('parseFloat(document.'+form+'.'+tot_mes_col[i][tot_zone]+'.value)')){
+												text_rech=tab_mes[i].toString();
+												//alert(text_rech);
+												//alert(text);
+												maReg = new RegExp(text_rech) ;
+												if((eval('document.'+form+'.'+eval('tot_mes_col_'+zone)[i][tot_zone]+'.value') != '') && ( text.search( maReg ) != -1 ))
+													affiche_meme_si_zero=true;
+												if(eval('document.'+form+'.'+eval('tot_mes_col_'+zone)[i][tot_zone]+'.value') == '')
+													text = text.replace( maReg, 'parseFloat(0)' ) ;
+												else
+													text = text.replace( maReg, 'parseFloat('+form+'.'+eval('tot_mes_col_'+zone)[i][tot_zone]+'.value)' ) ;
+										//}
+									}
+								}else{
+									for (var j = 0; j < tab_concat_dims.length; j++){		
+										//alert('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]);
+										if(eval ('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j])){
+											//alert('For Total : '+champ_total+'/ '+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]);
+											//if(eval ('parseFloat(document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value)')){
+													text_rech=tab_mes[i].toString();
+													//alert(text_rech);
+													//alert(text);
+													maReg = new RegExp(text_rech) ;
+													if((eval('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value') != '') && ( text.search( maReg ) != -1 ))
+														affiche_meme_si_zero=true;
+													if(eval('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value') == '')
+														text = text.replace( maReg, 'parseFloat(0)' ) ;
+													else
+														text = text.replace( maReg, 'parseFloat('+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value)' ) ;
+											//}
+										}
+									}
+								}
+							}
+						}
+					}
+					//alert(text)
+					if(eval(text))
+						resultat=eval(text);
+					else
+						resultat = 0 ;
+					eval ('total = parseFloat(resultat);');
+				}else{
+					for (var i = 0; i < tab_mes.length; i++){
+						if(tab_concat_dims.length > 0){
+							for (var j = 0; j < tab_concat_dims.length; j++){
+								if(eval ('document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j])){
+									//alert('For Total : '+champ_total+'/ '+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]);
+									if(eval ('parseFloat(document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value)')){
+											eval ('total += parseFloat(document.'+form+'.'+tab_mes[i]+''+plus_line+'_'+tab_concat_dims[j]+'.value);');
+									}
+								}
+							}
+						}
+					}
+				}
+				//alert(champ_total);
+				//document.write(champ_total + '<br>');
+				if(eval('document.'+form+'.'+champ_total)){
+					//alert('document.'+form+'.'+champ_total);
+					//alert( 'TOT:' + champ_total + '=' + total);
+					total=Math.round(total*100)/100;
+					if((total == 0) && (!affiche_meme_si_zero)){
+						total = "''" ;
+					}
+					eval('document.'+form+'.'+champ_total+'.value='+total+';');
+				}
+			}
+		}
+
+		function set_TOTAL_MatFrml(form, zone, num_line, tab_mes, tab_ligne, tab_col){
+			
+			//alert( ' form='+form +', zone='+ zone +', num_li='+ num_line +', mes='+ tab_mes.length +', tab_li='+ tab_ligne.length +', tab_col='+ tab_col.length );
+			if( parseInt(num_line) >= 0 ){
+				var plus_line 	= '_' + num_line ;
+			}else{
+				var plus_line 	= '' ;	
+			}
+			
+			if(tab_ligne.length > 0){
+				for (var li = 0; li < tab_ligne.length; li++){
+					if(tab_col.length > 0){ // si 2 dims
+						for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+tab_mes[i_mes]+'_LIGNE'+plus_line+'_'+tab_ligne[li], eval('Array("'+tab_mes[i_mes]+'")'), eval('Array("'+tab_ligne[li]+'")'), tab_col);
+						}
+					}
+					if(tab_mes.length > 0){
+						if(eval('expression_'+zone)==''){
+							if(eval('affiche_sous_totaux_'+zone)){
+								for(var co = 0; co < tab_col.length; co++){
+									var colonne = new Array();
+									colonne[0]=tab_col[co];
+									calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE_'+tab_ligne[li]+'_'+tab_col[co], tab_mes, eval('Array("'+tab_ligne[li]+'")'), colonne);
+								}
+							}
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE'+plus_line+'_'+tab_ligne[li], tab_mes, eval('Array("'+tab_ligne[li]+'")'), tab_col);
+						}else{
+							if(eval('affiche_sous_totaux_'+zone)){
+								for(var co = 0; co < tab_col.length; co++){
+									var colonne = new Array();
+									colonne[0]=tab_col[co];
+									calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE_'+tab_ligne[li]+'_'+tab_col[co], tab_mes, eval('Array("'+tab_ligne[li]+'")'), colonne, 'ALL_MES_LIGNE', li);
+								}
+							}
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE'+plus_line+'_'+tab_ligne[li], tab_mes, eval('Array("'+tab_ligne[li]+'")'), tab_col, 'ALL_MES_LIGNE', li);
+						}
+					}
+				}
+				
+				if(tab_col.length > 0){
+					for (var col = 0; col < tab_col.length; col++){
+						for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+tab_mes[i_mes]+'_COLONNE'+plus_line+'_'+tab_col[col], eval('Array("'+tab_mes[i_mes]+'")'), tab_ligne, eval('Array("'+tab_col[col]+'")') );
+						}
+						if(tab_mes.length > 0){
+							if(eval('expression_'+zone)==''){
+								if(eval('affiche_sous_totaux_'+zone)){
+									for(var l = 0; l < tab_ligne.length; l++){
+										var ligne = new Array();
+										ligne[0]=tab_ligne[l];
+										calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE_'+tab_ligne[l]+'_'+tab_col[col], tab_mes, ligne,eval('Array("'+tab_col[col]+'")') );
+									}
+								}
+								calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line+'_'+tab_col[col], tab_mes, tab_ligne, eval('Array("'+tab_col[col]+'")') );
+							}else{
+								if(eval('affiche_sous_totaux_'+zone)){
+									for(var l = 0; l < tab_ligne.length; l++){
+										var ligne = new Array();
+										ligne[0]=tab_ligne[l];
+										calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE_'+tab_ligne[l]+'_'+tab_col[col], tab_mes, ligne,eval('Array("'+tab_col[col]+'")'), 'ALL_MES_COLONNE', col );
+									}
+								}
+								calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line+'_'+tab_col[col], tab_mes, tab_ligne, eval('Array("'+tab_col[col]+'")'), 'ALL_MES_COLONNE', col );	
+							}
+						}
+					}
+					if(tab_mes.length > 0){
+						for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+tab_mes[i_mes]+'_COLONNE'+plus_line, eval('Array("'+tab_mes[i_mes]+'")'), tab_ligne, tab_col );
+						}
+					}
+		
+				}else{
+					for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+tab_mes[i_mes]+'_COLONNE'+plus_line, eval('Array("'+tab_mes[i_mes]+'")'), tab_ligne, tab_col );
+					}
+					if(tab_mes.length > 0){
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line, tab_mes, tab_ligne, tab_col );
+					}					
+				}
+				
+			}else if(tab_col.length > 0){
+				for (var col = 0; col < tab_col.length; col++){
+					if(tab_mes.length > 0){
+						if(eval('expression_'+zone)==''){
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line+'_'+tab_col[col], tab_mes, tab_ligne, eval('Array("'+tab_col[col]+'")'));
+						}else{
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line+'_'+tab_col[col], tab_mes, tab_ligne, eval('Array("'+tab_col[col]+'")'), 'ALL_MES_COLONNE', '' );
+						}
+					}
+				}
+				for (var i_mes = 0; i_mes < tab_mes.length; i_mes++){
+					if(eval('expression_'+zone)==''){
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+tab_mes[i_mes]+'_LIGNE'+plus_line, eval('Array("'+tab_mes[i_mes]+'")'), tab_ligne, tab_col );
+					}else{
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+tab_mes[i_mes]+'_LIGNE'+plus_line, eval('Array("'+tab_mes[i_mes]+'")'), tab_ligne, tab_col );	
+					}
+				}
+				if(tab_mes.length > 0){
+					if(eval('expression_'+zone)==''){
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE'+plus_line, tab_mes, tab_ligne, tab_col );
+					}else{
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE'+plus_line, tab_mes, tab_ligne, tab_col, 'ALL_MES', 'TOT_'+zone+'_' );	
+					}
+				}
+			}
+			if(eval('expression_'+zone) != "")
+				calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES'+plus_line, tab_mes, tab_ligne, tab_col, 'ALL_MES', 'TOT_'+zone+'_');
+			else
+				calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES'+plus_line, tab_mes, tab_ligne, tab_col);
+		}
+		
+		
+		function set_TOTAL_MatFrml_Champ(form, zone, num_line, champ, tab_ligne, tab_col, var_li, var_col, tab_mes){
+			
+			//alert( ' form='+form +', zone='+ zone +', champ='+ champ  +', num_li='+ num_line +', mes='+ tab_mes.length +', tab_li='+ tab_ligne.length +', tab_col='+ tab_col.length +' var_li='+var_li+' var_col='+var_col);
+			if( parseInt(num_line) >= 0 ){
+				var plus_line 	= '_' + num_line ;
+			}else{
+				var plus_line 	= '' ;	
+			}
+			var colonne = new Array();
+			var ligne = new Array();
+			colonne[0]=var_col;
+			ligne[0]=var_li;
+			if(tab_ligne.length > 0){
+					
+				if(tab_col.length > 0){ // si 2 dims
+					
+					calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+champ+'_LIGNE'+plus_line+'_'+var_li, eval('Array("'+champ+'")'), eval('Array("'+var_li+'")'), tab_col);
+					calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+champ+'_COLONNE'+plus_line+'_'+var_col, eval('Array("'+champ+'")'), tab_ligne, eval('Array("'+var_col+'")') );
+					
+					if(eval('expression_'+zone) == ""){
+						if(eval('affiche_sous_totaux_'+zone))
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE_'+var_li+'_'+var_col, tab_mes, eval('Array("'+var_li+'")'), colonne);
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE'+plus_line+'_'+var_li, tab_mes, eval('Array("'+var_li+'")'), tab_col);
+					}else{
+						
+						if(eval('affiche_sous_totaux_'+zone))
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE_'+var_li+'_'+var_col, tab_mes, eval('Array("'+var_li+'")'), colonne, 'ALL_MES_LIGNE', var_li);
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE'+plus_line+'_'+var_li, tab_mes, eval('Array("'+var_li+'")'), tab_col, 'ALL_MES_LIGNE', var_li);
+					
+					}
+					
+					if(eval('expression_'+zone) == ""){
+						if(eval('affiche_sous_totaux_'+zone))
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE_'+var_li+'_'+var_col, tab_mes, ligne, eval('Array("'+var_col+'")') );
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line+'_'+var_col, tab_mes, tab_ligne, eval('Array("'+var_col+'")') );
+					}else{
+						if(eval('affiche_sous_totaux_'+zone))
+							calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE_'+var_li+'_'+var_col, tab_mes, ligne, eval('Array("'+var_col+'")'), 'ALL_MES_COLONNE', var_col );
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line+'_'+var_col, tab_mes, tab_ligne, eval('Array("'+var_col+'")'), 'ALL_MES_COLONNE', var_col );
+					}
+					
+					calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+champ+'_COLONNE'+plus_line, eval('Array("TOT_'+zone+'_'+champ+'_LIGNE")'), tab_ligne, eval('Array()') );
+					
+					if(eval('expression_'+zone) == ""){
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES'+plus_line, eval('Array("TOT_'+zone+'_ALL_MES_LIGNE")'), tab_ligne, eval('Array()'));
+					}else{
+						calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES'+plus_line, tab_mes, tab_ligne, eval('Array()'), 'ALL_MES', 'TOT_'+zone+'_');
+						//calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES'+plus_line, eval('Array("TOT_'+zone+'_ALL_MES_LIGNE")'), tab_ligne, eval('Array()'), 'ALL_MES', '');
+					}
+					
+				}else{
+					calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+champ+'_COLONNE'+plus_line, eval('Array("'+champ+'")'), tab_ligne, tab_col );
+					
+					calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_LIGNE'+plus_line+'_'+var_li, tab_mes, eval('Array("'+var_li+'")'), tab_col);
+					
+					calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES'+plus_line, eval('Array("TOT_'+zone+'_ALL_MES_LIGNE")'), tab_ligne, eval('Array()'));
+				}
+				
+			}else if(tab_col.length > 0){
+				
+				calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES_COLONNE'+plus_line+'_'+var_col, tab_mes, tab_ligne, eval('Array("'+var_col+'")'));
+				
+				calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+champ+'_COLONNE'+plus_line, eval('Array("'+champ+'")'), tab_ligne, tab_col );
+				
+				calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_ALL_MES'+plus_line, eval('Array("TOT_'+zone+'_ALL_MES_COLONNE")'), tab_ligne, eval('Array()'));
+			}
+			//calcul_Total_MatFrml(form, num_line, 'TOT_'+zone+'_'+num_line+'_ALL_MES', tab_mes, tab_ligne, tab_col);
+		}
+		////////////////////////////////////////////////////////////// FIN FONCTION CALCUL TOTAL POUR  MATRICE  DANS FORMULAIRE
+		////////////////////////////////////////////////////////////// FONCTION CALCUL TOTAL DANS FORMULAIRE
+		function set_Total_ChpsFrml(form, expr){
+			
+			if( (form != '') && (expr != '') ){
+				var text = expr.toString() ;
+				var array_expr = text.split('=');
+				var chp_total = array_expr[0];
+				//alert(chp_total);
+				var maReg;
+				var text_rech='';
+				var affiche_meme_si_zero=false;
+				for (var i = 0; i < tab_chps.length; i++){
+					if(eval ('document.'+form+'.'+tab_chps[i]+'_0')){
+						text_rech=tab_chps[i].toString();
+						maReg = new RegExp(text_rech) ;
+						if((eval('document.'+form+'.'+tab_chps[i]+'_0'+'.value') != '') && ( text.search( maReg ) != -1 ))
+							affiche_meme_si_zero=true;
+						if((eval('document.'+form+'.'+tab_chps[i]+'_0'+'.value') == '') && (tab_chps[i] != chp_total))
+							text = text.replace( maReg, 'parseFloat(0)' ) ;
+						else if(tab_chps[i] != chp_total)
+							text = text.replace( maReg, 'parseFloat('+form+'.'+tab_chps[i]+'_0'+'.value)' ) ;
+						else
+							text = text.replace( maReg, form+'.'+tab_chps[i]+'_0'+'.value' ) ;
+					}
+				}
+				//alert(text);
+				eval(text);
+				if(eval('document.'+form+'.'+chp_total+'_0')){
+					//alert('document.'+form+'.'+chp_total+'.value;');
+					//alert( 'TOT:' + champ_total + '=' + total);
+					var total = eval('document.'+form+'.'+chp_total+'_0.value');
+					if((total == 0) && (!affiche_meme_si_zero)){
+					//if((total == 0) ){
+						total = "''" ;
+					}
+					eval('document.'+form+'.'+chp_total+'_0.value='+total+';');
+				}
+			}
+		}
+		////////////////////////////////////////////////////////////// FIN FONCTION CALCUL TOTAL DANS FORMULAIRE
+		function OpenPopupRptChp(id) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=pop_rpt_chp&id='+id,'popRptChp', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=770, height=445, left=200, top=130')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 800, 465, 'synthese.php?val=pop_rpt_chp&id='+id);
+		}	
+        function OpenPopupRptJnt(id) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=pop_rpt_jnt&id='+id,'popRptJnt', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=850, height=330, left=150, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 900, 350, 'synthese.php?val=pop_rpt_jnt&id='+id);
+		}
+        function OpenPopupRptCrit(id) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=popup_rpt_crit&id='+id,'PopupRptCrit', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=770, height=430, left=200, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 800, 450, 'synthese.php?val=popup_rpt_crit&id='+id);
+		}	
+			
+		function OpenPopupRptChp(id) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=pop_rpt_chp&id='+id,'popRptChp', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=770, height=445, left=200, top=130')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 800, 465, 'synthese.php?val=pop_rpt_chp&id='+id);
+		}	
+		function OpenPopupRptTabM(id) {
+				//location.href   = '?val=gestzone&id_zone_active='+id_zone;
+				/*var	popup	=	window.open('synthese.php?val=pop_rpt_tabm&ID='+id,'popRptTab', 'toolbar=no,location=no,directories=no,menubar=no,scrollbars=yes,status=no,resizable=1,width=750, height=310, left=200, top=100')
+				popup.document.close();
+				popup.focus();*/
+				open_dialog('', 800, 330, 'synthese.php?val=pop_rpt_tabm&ID='+id);
+		} 
+		
+	var err_Ob_fields = new Array ();
+	
+	function are_Ob_fields_if(Ob_fields, objID, values, lib_err){
+		//alert(document.form1.elements.length)
+		//for (var i = 0; i < document.form1.elements.length; i++){
+			//alert(document.form1.elements[i].name + '/' +document.form1.elements[i].value);
+		//}
+		if( (objID != '') && (values.length > 0) && (Ob_fields.length > 0)){
+			
+			for (var i = 0; i < values.length; i++){
+				
+				//alert(eval ('document.form1.'+main_field+plus_line+'.value'));
+				
+				if( eval ('document.getElementById("'+objID+'")')){
+					//alert( 'document.getElementById("'+objID+'").value');
+					eval ('var main_field = document.getElementById("'+objID+'");') ;
+					var go_1 = false ;
+					//
+					if(main_field.value  == values[i] ){
+						//alert(main_field.value + '/' + values[i]);
+						if ( ( main_field.getAttribute("type") == "radio") || (main_field.getAttribute("type") == "checkbox") ) {
+							if(main_field.checked){	go_1 = true ;	}
+						}else{	go_1 = true ;	}
+					}
+					
+					if(go_1 == true){
+						
+						for(var j = 0; j < Ob_fields.length; j++){
+							//alert (main_field +' / '+list_of_values+' / '+depended_fields+' / '+bool);
+							if(eval ('document.getElementById("'+Ob_fields[j]+'")')){
+								var is_empty = true ;
+								eval ('var obli_field = document.getElementById("'+Ob_fields[j]+'");') ;
+								if ((obli_field.getAttribute("type") == "radio") || (obli_field.getAttribute("type") == "checkbox") ) {
+									if(obli_field.checked){	is_empty = false;	break;	}
+								}
+								else if(eval ('document.getElementById("'+Ob_fields[j]+'").value != ""')){	is_empty = false ;	break;	}
+								//alert(obli_field.value + '/');
+								if(is_empty == true ){
+									var itab = err_Ob_fields.length ;
+									err_Ob_fields[itab] = Ob_fields[j] 
+									//alert(err_Ob_fields[itab]);
+								}
+							}
+						}
+					}
+				} 
+			}
+		}
+		if( (err_Ob_fields.length > 0) && (is_empty == true) ){
+			/*var txt_chps_err = '';
+			for(var i = 0; i < err_Ob_fields.length; i++){
+				txt_chps_err += ' "' + err_Ob_fields[i] + '" '	
+			}*/
+			do_submit = false ;
+			alert(' Champ(s) Obligatoire(s) : ' + lib_err);
+			mise_evidence(err_Ob_fields);
+			eval('setInterval("flash2('+tab_fields+')", 700) ;');
+		}
+		err_Ob_fields = new Array();
+	}
+	
+	//var tab_chp 	= new Array ("NOM_ETABLISSEMENT_0");
+	function mise_evidence(tab_fields){
+		
+		if(tab_fields.length > 0){
+			//eval('document.getElementById("'+tab_fields[0]+'").focus()');
+			for (var i = 0; i < tab_fields.length; i++){
+				eval ('document.getElementById("'+tab_fields[i]+'").style.border ="2px inset red"');
+			}
+		}
+	}
+	
+	function flash2(tab_fields){
+		//alert(' A '+ tab_fields.length);
+		for (var i = 0; i < tab_fields.length; i++){
+			if (eval('document.getElementById("'+tab_fields[i]+'").style.borderColor=="red"')){
+				eval('document.getElementById("'+tab_fields[i]+'").style.borderColor="white"');
+			}
+			else{
+				eval('document.getElementById("'+tab_fields[i]+'").style.borderColor="red"');
+			}
+		}
+	}
+	
+	function Activation( depended_fields, objID, values, bool, op){
+	
+		if( (objID != '') && (values.length > 0) && (depended_fields.length > 0)){
+			var found = false ;
+			var opp_bool = (bool == true) ? false : true;
+			
+			if( eval ('document.getElementById("'+objID+'")')){
+				eval ('var main_field = document.getElementById("'+objID+'");') ;
+				for (var i = 0; i < values.length; i++){
+				
+					var go_0 = false ;
+					var go_1 = false ;
+					//
+					if( (op != 'IN') ){
+						if( main_field.value != values[i] ){
+							go_0 = true ;
+						}
+					}else{
+						if( main_field.value == values[i] ){
+							go_0 = true ;
+						}
+					}
+					//alert(main_field.value +op_ctrl+' '+values[i]); 
+					if( go_0 == true ){
+						
+						if ( ( main_field.getAttribute("type") == "radio") || (main_field.getAttribute("type") == "checkbox") ) {
+							if(main_field.checked){	go_1 = true ;	}
+						}else{	go_1 = true ;	}
+					}
+					if(go_1 == true){
+						
+						for(var j = 0; j < depended_fields.length; j++){
+							//alert (main_field +' / '+list_of_values+' / '+depended_fields+' / '+bool);
+							if(eval ('document.getElementById("'+depended_fields[j]+'")')){
+								eval ('document.getElementById("'+depended_fields[j]+'").disabled = '+bool+';');
+								 Check_Hide_Obj( depended_fields[j] , opp_bool);
+							}
+						}
+						found = true ;
+						break;
+					
+					}
+				}
+				if(found == false){
+					
+					for(var j = 0; j < depended_fields.length; j++){
+						//alert (main_field +' / '+list_of_values+' / '+depended_fields+' / '+bool);
+						if(eval ('document.getElementById("'+depended_fields[j]+'")')){
+							eval ('document.getElementById("'+depended_fields[j]+'").disabled = '+opp_bool+';');
+							Check_Hide_Obj( depended_fields[j] , bool);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	function Check_Hide_Obj( objID , bool){
+		if(bool){
+			document.getElementById(objID).style.visibility = 'visible';	
+		}else{
+			document.getElementById(objID).style.visibility = 'hidden';
+		}
+	}
+	function check_radio_tick(objID){
+		//alert(objID);
+		
+		if( eval ('document.getElementById("'+objID+'")')){
+			eval ('var field = document.getElementById("'+objID+'");') ;
+			if ( field.getAttribute("type") == "radio") {
+				
+				if(field.checked){
+					field.setAttribute("checked") == false ;
+				}else {
+					field.setAttribute("checked") == true ;	
+				}
+				//eval ('document.getElementById("'+objID+'").checked = 0;');
+			}
+		}
+	}
+	
+	
+	function open_dialog(_title, _width, _heigth, _url) {
+		if ($("#bandeau").length == 0) {
+			window.parent.jQuery('#div_sousdialog').dialog({
+				dialogClass: "surToTop",
+				draggable: true,	
+				title: '_',
+				width: _width,
+				modal:true,
+				position: { my: "center top", at: "center bottom", of: window.parent.jQuery('#bandeau')},
+				open: function( event, ui ) {
+					window.parent.jQuery("#sousdialog_content").attr("src", _url);
+					window.parent.jQuery(".ui-widget-overlay:eq(1)").css("z-index", 1100);
+					window.parent.jQuery("#sousdialog_content").load(function() {
+						var hauteur = this.contentWindow.document.body.offsetHeight;
+						if (hauteur < 60) {
+							hauteur = _heigth - 50;
+						}
+						this.style.height = hauteur + 'px';
+					});					
+					sousdialog = true;
+				},
+				beforeClose: function( event, ui ) {
+					sousdialog = false;
+					window.parent.jQuery("#sousdialog_content").attr("src", "");
+				}
+			});
+		} else {
+			$( "#div_dialog" ).dialog({
+				dialogClass: "toTop",	
+				draggable: true,
+				//title: _title.length==0?'_':_title,
+				title: '_',
+				width: _width,
+				/*minHeight: _heigth,
+				maxHeight: _heigth,*/
+				modal:true,
+				position: { my: "center top", at: "center bottom", of: $("#bandeau")},
+				open: function( event, ui ) {
+					$("#dialog_content").attr("src", _url);
+					$('#dialog_content').load(function() {
+						var hauteur = this.contentWindow.document.body.offsetHeight;
+						var largeur = this.contentWindow.document.body.offsetWidth;
+						if (hauteur < 60) {
+							hauteur = _heigth - 50;
+						}	
+						if (largeur < _width) {
+							largeur = _width;
+						}
+						if (_title == 'popinstabmere' || _title == 'popinszone') {
+							hauteur = hauteur + 50;
+							largeur = largeur - 30;
+						}	
+						this.style.height = hauteur + 'px';
+						this.style.width = largeur + 'px';
+					});
+					//window.parent.jQuery("#div_dialog").dialog("option", "height", $(document).height()-20);
+					dialog = true;
+				},
+				beforeClose: function( event, ui ) {
+					dialog = false;
+					jQuery("#dialog_content").attr("src", "");
+				}
+			});
+		}
+	}	
+	
+  function open_dialog_refresh(_title, _width, _heigth, _url) {
+		$( "#div_dialog" ).dialog({
+				dialogClass: "toTop",	
+				draggable: true,
+				//title: _title.length==0?'_':_title,
+				title: '_',
+				width: _width,
+				/*minHeight: _heigth,
+				maxHeight: _heigth,*/
+				modal:true,
+				position: { my: "center top", at: "center bottom", of: $("#bandeau")},
+				open: function( event, ui ) {
+					$("#dialog_content").attr("src", _url);
+					$('#dialog_content').load(function() {
+						var hauteur = this.contentWindow.document.body.offsetHeight;
+						var largeur = this.contentWindow.document.body.offsetWidth;
+						if (hauteur < 60) {
+							hauteur = _heigth - 50;
+						}	
+						if (largeur < _width) {
+							largeur = _width;
+						}
+						if (_title == 'popinstabmere' || _title == 'popinszone') {
+							hauteur = hauteur + 50;
+							largeur = largeur - 30;
+						}	
+						this.style.height = hauteur + 'px';
+						this.style.width = largeur + 'px';
+					});
+					//window.parent.jQuery("#div_dialog").dialog("option", "height", $(document).height()-20);
+					dialog = true;
+				},
+				beforeClose: function( event, ui ) {
+					dialog = false;
+					jQuery("#dialog_content").attr("src", "");
+          window.parent.location.reload();
+				},        
+				close: function( event, ui ) {
+          window.parent.location.reload();
+				}
+			});
+	}	
+  
+	function scrollTo(target) {
+	    //e.preventDefault();
+		alert(target);
+	    $target = $(target);
+		
+		if ($target == null || $target.offset() == null) {
+			return false;
+		}
+
+	    $('html, body').stop().animate({
+	        'scrollTop': $target.offset().top
+	    }, 900, 'swing', function () {
+	        window.location.hash = target;
+	    });
+	}
+	
+	/**
+	 * Override javascript confirm() and wrap it into a jQuery-UI Dialog box
+	 *
+	 * @depends $.getOrCreateDialog
+	 *
+	 * @param { String } the alert message
+	 * @param { String/Object } the confirm callback
+	 * @param { Object } jQuery Dialog box options 
+	 */
+	function confirmDialog(message, callback, options) {
+	 	if (options.title == '_') {
+			options.title = 'StatEduc';	
+		}
+		var defaults = {
+			modal		: true,
+			resizable	: false,
+			buttons		: {
+				Ok: function() {
+					$(this).dialog('close');
+					return (typeof callback == 'string') ?
+					  window.location.href = callback :
+					  callback();
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+					return false;
+				}
+			},
+			show		: 'fade',
+			hide		: 'fade',
+			minHeight	: 50,
+			dialogClass: "surToTop",
+			draggable: true//,
+			//position: { my: "center top", at: "center middle", of: $("body")}
+		}
+	 
+		$confirm = $.getOrCreateDialog('confirm');	
+		// set message
+		$("p", $confirm).html(message);
+		// init dialog
+		$confirm.dialog($.extend({}, defaults, options));
+	}
+				
+	function postChamps(service, params, callback) {
+		$.ajax({type:'get', url: service, data: params, 
+			success: function(response) {
+				if (response.se_statut == 101) {
+					if (response.se_message == 'session_end') {
+						window.document.location = 'index.php';	
+					} else {
+						$.alert(response.se_message, '_');
+					}
+				} else if (response.se_statut == 200) {
+					//console.log(response.se_data);
+					var funcSetData = callback.bind(callback, response.se_data);
+					funcSetData();
+				}
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+				$.alert('ERREUR : ' + textStatus + '-' + errorThrown, '_');        
+			}, 
+			dataType:'json',
+			timeout: 120000
+		});
+	}
+	
+	function inArray(needle, haystack) {
+		var length = haystack.length;
+		for(var i = 0; i < length; i++) {
+			if(haystack[i] == needle) return true;
+		}
+		return false;
+	}

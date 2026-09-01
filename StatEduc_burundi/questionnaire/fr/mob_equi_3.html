@@ -1,0 +1,973 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=1803' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>III. INFORMATIONS RELATIVES AUX SALLES DE CLASSES, AUX MOBILIERS ET AUX EQUIPEMENTS </B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR>3.1. Salles de classes et Mobilier par années d’étude<br></b><script language='javascript' type='text/javascript'>
+var expression_180044 	= "";
+var tot_mes_ligne_180044 	= new Array();
+var tot_mes_col_180044 	= new Array();
+var affich_vertic_mes_180044 	= 0;
+var affiche_sous_totaux_180044 	= 0;
+var tab_mes_180044 	= new Array ("NB_SALLES_CLASSE");
+var tab_ligne_180044	= new Array ("10","11","12","51","52","53","54","70","55","56","57","58","59","71","60","61","62","63","64","72","65","66","67","68");
+var tab_col_180044	= new Array ();
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Salles de classe</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >7ème année</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_10' NAME='NB_SALLES_CLASSE_0_10' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_10"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >8ème année</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_11' NAME='NB_SALLES_CLASSE_0_11' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_11"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >9ème année</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_12' NAME='NB_SALLES_CLASSE_0_12' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_12"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >1ère Année PF LA</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_51' NAME='NB_SALLES_CLASSE_0_51' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_51"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >1ère Année PF Sc</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_52' NAME='NB_SALLES_CLASSE_0_52' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_52"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >1ère Année PF Eco</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_53' NAME='NB_SALLES_CLASSE_0_53' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_53"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >1ère Année PF SSH</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_54' NAME='NB_SALLES_CLASSE_0_54' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_54"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >1ère Année Maths Stat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_70' NAME='NB_SALLES_CLASSE_0_70' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_70"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >2ème Année  PF LA</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_55' NAME='NB_SALLES_CLASSE_0_55' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_55"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année PF Sc Math Physique Tech</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_56' NAME='NB_SALLES_CLASSE_0_56' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_56"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >2ème Année PF Sc. Biologie Chimie Sc de Terre</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_57' NAME='NB_SALLES_CLASSE_0_57' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_57"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année PF Eco</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_58' NAME='NB_SALLES_CLASSE_0_58' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_58"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >2ème Année PF SSH</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_59' NAME='NB_SALLES_CLASSE_0_59' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_59"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année Maths Stat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_71' NAME='NB_SALLES_CLASSE_0_71' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_71"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF LA</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_60' NAME='NB_SALLES_CLASSE_0_60' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_60"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >3ème Année PF Sc Maths Physique Tech</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_61' NAME='NB_SALLES_CLASSE_0_61' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_61"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF Sc. Biologie Chimie Sc. de la Terre</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_62' NAME='NB_SALLES_CLASSE_0_62' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_62"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >3ème Année PF Eco</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_63' NAME='NB_SALLES_CLASSE_0_63' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_63"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF SSH</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_64' NAME='NB_SALLES_CLASSE_0_64' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_64"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >3ème Année Maths Stat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_72' NAME='NB_SALLES_CLASSE_0_72' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_72"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >1ère Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_65' NAME='NB_SALLES_CLASSE_0_65' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_65"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_66' NAME='NB_SALLES_CLASSE_0_66' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_66"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_SALLES_CLASSE_0_67' NAME='NB_SALLES_CLASSE_0_67' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_67"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >4ème Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_SALLES_CLASSE_0_68' NAME='NB_SALLES_CLASSE_0_68' TYPE='text' size=5 VALUE="$NB_SALLES_CLASSE_0_68"  onchange="set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_180044_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<script language='javascript' type='text/javascript'>
+var expression_180009 	= "";
+var tot_mes_ligne_180009 	= new Array();
+var tot_mes_col_180009 	= new Array();
+var affich_vertic_mes_180009 	= 0;
+var affiche_sous_totaux_180009 	= 0;
+var tab_mes_180009 	= new Array ("NB_MOBILIER");
+var tab_ligne_180009	= new Array ("10","11","12","51","52","53","54","70","55","56","57","58","59","71","60","61","62","63","64","72","65","66","67","68");
+var tab_col_180009	= new Array ("4","6","7","1","23","2","3");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>Bancs pupitres</TD>
+		<TD   CLASS='ligne-titre' align='center'>Tables pour élèves</TD>
+		<TD   CLASS='ligne-titre' align='center'>Chaises/Tabourets pour élèves</TD>
+		<TD   CLASS='ligne-titre' align='center'>Tableaux</TD>
+		<TD   CLASS='ligne-titre' align='center'>Armoires/Etagères</TD>
+		<TD   CLASS='ligne-titre' align='center'>Bureaux du  maître/prof</TD>
+		<TD   CLASS='ligne-titre' align='center'>Chaises pour maître/prof</TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >7ème année</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_10_4' NAME='NB_MOBILIER_0_10_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 10, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_10_6' NAME='NB_MOBILIER_0_10_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_10_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 10, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_10_7' NAME='NB_MOBILIER_0_10_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_10_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 10, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_10_1' NAME='NB_MOBILIER_0_10_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_10_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 10, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_10_23' NAME='NB_MOBILIER_0_10_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_10_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 10, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_10_2' NAME='NB_MOBILIER_0_10_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_10_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 10, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_10_3' NAME='NB_MOBILIER_0_10_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_10_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 10, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_10'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >8ème année</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_11_4' NAME='NB_MOBILIER_0_11_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 11, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_11_6' NAME='NB_MOBILIER_0_11_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_11_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 11, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_11_7' NAME='NB_MOBILIER_0_11_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_11_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 11, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_11_1' NAME='NB_MOBILIER_0_11_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_11_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 11, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_11_23' NAME='NB_MOBILIER_0_11_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_11_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 11, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_11_2' NAME='NB_MOBILIER_0_11_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_11_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 11, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_11_3' NAME='NB_MOBILIER_0_11_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_11_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 11, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_11'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >9ème année</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_12_4' NAME='NB_MOBILIER_0_12_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_12_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 12, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_12_6' NAME='NB_MOBILIER_0_12_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_12_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 12, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_12_7' NAME='NB_MOBILIER_0_12_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_12_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 12, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_12_1' NAME='NB_MOBILIER_0_12_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_12_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 12, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_12_23' NAME='NB_MOBILIER_0_12_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_12_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 12, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_12_2' NAME='NB_MOBILIER_0_12_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_12_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 12, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_12_3' NAME='NB_MOBILIER_0_12_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_12_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 12, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_12'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >1ère Année PF LA</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_51_4' NAME='NB_MOBILIER_0_51_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_51_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 51, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_51_6' NAME='NB_MOBILIER_0_51_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_51_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 51, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_51_7' NAME='NB_MOBILIER_0_51_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_51_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 51, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_51_1' NAME='NB_MOBILIER_0_51_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_51_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 51, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_51_23' NAME='NB_MOBILIER_0_51_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_51_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 51, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_51_2' NAME='NB_MOBILIER_0_51_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_51_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 51, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_51_3' NAME='NB_MOBILIER_0_51_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_51_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 51, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_51'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >1ère Année PF Sc</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_52_4' NAME='NB_MOBILIER_0_52_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_52_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 52, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_52_6' NAME='NB_MOBILIER_0_52_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_52_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 52, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_52_7' NAME='NB_MOBILIER_0_52_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_52_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 52, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_52_1' NAME='NB_MOBILIER_0_52_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_52_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 52, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_52_23' NAME='NB_MOBILIER_0_52_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_52_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 52, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_52_2' NAME='NB_MOBILIER_0_52_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_52_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 52, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_52_3' NAME='NB_MOBILIER_0_52_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_52_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 52, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_52'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >1ère Année PF Eco</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_53_4' NAME='NB_MOBILIER_0_53_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_53_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 53, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_53_6' NAME='NB_MOBILIER_0_53_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_53_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 53, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_53_7' NAME='NB_MOBILIER_0_53_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_53_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 53, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_53_1' NAME='NB_MOBILIER_0_53_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_53_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 53, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_53_23' NAME='NB_MOBILIER_0_53_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_53_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 53, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_53_2' NAME='NB_MOBILIER_0_53_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_53_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 53, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_53_3' NAME='NB_MOBILIER_0_53_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_53_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 53, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_53'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >1ère Année PF SSH</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_54_4' NAME='NB_MOBILIER_0_54_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_54_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 54, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_54_6' NAME='NB_MOBILIER_0_54_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_54_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 54, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_54_7' NAME='NB_MOBILIER_0_54_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_54_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 54, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_54_1' NAME='NB_MOBILIER_0_54_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_54_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 54, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_54_23' NAME='NB_MOBILIER_0_54_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_54_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 54, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_54_2' NAME='NB_MOBILIER_0_54_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_54_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 54, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_54_3' NAME='NB_MOBILIER_0_54_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_54_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 54, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_54'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >1ère Année Maths Stat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_70_4' NAME='NB_MOBILIER_0_70_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_70_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 70, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_70_6' NAME='NB_MOBILIER_0_70_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_70_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 70, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_70_7' NAME='NB_MOBILIER_0_70_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_70_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 70, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_70_1' NAME='NB_MOBILIER_0_70_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_70_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 70, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_70_23' NAME='NB_MOBILIER_0_70_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_70_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 70, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_70_2' NAME='NB_MOBILIER_0_70_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_70_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 70, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_70_3' NAME='NB_MOBILIER_0_70_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_70_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 70, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_70'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >2ème Année  PF LA</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_55_4' NAME='NB_MOBILIER_0_55_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_55_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 55, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_55_6' NAME='NB_MOBILIER_0_55_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_55_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 55, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_55_7' NAME='NB_MOBILIER_0_55_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_55_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 55, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_55_1' NAME='NB_MOBILIER_0_55_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_55_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 55, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_55_23' NAME='NB_MOBILIER_0_55_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_55_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 55, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_55_2' NAME='NB_MOBILIER_0_55_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_55_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 55, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_55_3' NAME='NB_MOBILIER_0_55_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_55_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 55, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_55'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année PF Sc Math Physique Tech</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_56_4' NAME='NB_MOBILIER_0_56_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_56_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 56, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_56_6' NAME='NB_MOBILIER_0_56_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_56_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 56, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_56_7' NAME='NB_MOBILIER_0_56_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_56_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 56, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_56_1' NAME='NB_MOBILIER_0_56_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_56_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 56, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_56_23' NAME='NB_MOBILIER_0_56_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_56_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 56, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_56_2' NAME='NB_MOBILIER_0_56_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_56_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 56, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_56_3' NAME='NB_MOBILIER_0_56_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_56_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 56, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_56'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >2ème Année PF Sc. Biologie Chimie Sc de Terre</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_57_4' NAME='NB_MOBILIER_0_57_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_57_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 57, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_57_6' NAME='NB_MOBILIER_0_57_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_57_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 57, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_57_7' NAME='NB_MOBILIER_0_57_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_57_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 57, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_57_1' NAME='NB_MOBILIER_0_57_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_57_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 57, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_57_23' NAME='NB_MOBILIER_0_57_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_57_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 57, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_57_2' NAME='NB_MOBILIER_0_57_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_57_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 57, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_57_3' NAME='NB_MOBILIER_0_57_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_57_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 57, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_57'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année PF Eco</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_58_4' NAME='NB_MOBILIER_0_58_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_58_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 58, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_58_6' NAME='NB_MOBILIER_0_58_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_58_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 58, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_58_7' NAME='NB_MOBILIER_0_58_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_58_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 58, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_58_1' NAME='NB_MOBILIER_0_58_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_58_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 58, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_58_23' NAME='NB_MOBILIER_0_58_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_58_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 58, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_58_2' NAME='NB_MOBILIER_0_58_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_58_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 58, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_58_3' NAME='NB_MOBILIER_0_58_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_58_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 58, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_58'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >2ème Année PF SSH</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_59_4' NAME='NB_MOBILIER_0_59_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_59_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 59, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_59_6' NAME='NB_MOBILIER_0_59_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_59_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 59, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_59_7' NAME='NB_MOBILIER_0_59_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_59_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 59, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_59_1' NAME='NB_MOBILIER_0_59_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_59_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 59, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_59_23' NAME='NB_MOBILIER_0_59_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_59_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 59, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_59_2' NAME='NB_MOBILIER_0_59_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_59_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 59, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_59_3' NAME='NB_MOBILIER_0_59_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_59_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 59, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_59'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année Maths Stat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_71_4' NAME='NB_MOBILIER_0_71_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_71_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 71, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_71_6' NAME='NB_MOBILIER_0_71_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_71_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 71, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_71_7' NAME='NB_MOBILIER_0_71_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_71_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 71, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_71_1' NAME='NB_MOBILIER_0_71_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_71_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 71, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_71_23' NAME='NB_MOBILIER_0_71_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_71_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 71, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_71_2' NAME='NB_MOBILIER_0_71_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_71_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 71, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_71_3' NAME='NB_MOBILIER_0_71_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_71_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 71, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_71'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF LA</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_60_4' NAME='NB_MOBILIER_0_60_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_60_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 60, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_60_6' NAME='NB_MOBILIER_0_60_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_60_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 60, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_60_7' NAME='NB_MOBILIER_0_60_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_60_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 60, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_60_1' NAME='NB_MOBILIER_0_60_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_60_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 60, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_60_23' NAME='NB_MOBILIER_0_60_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_60_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 60, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_60_2' NAME='NB_MOBILIER_0_60_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_60_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 60, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_60_3' NAME='NB_MOBILIER_0_60_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_60_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 60, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_60'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >3ème Année PF Sc Maths Physique Tech</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_61_4' NAME='NB_MOBILIER_0_61_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_61_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 61, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_61_6' NAME='NB_MOBILIER_0_61_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_61_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 61, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_61_7' NAME='NB_MOBILIER_0_61_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_61_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 61, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_61_1' NAME='NB_MOBILIER_0_61_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_61_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 61, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_61_23' NAME='NB_MOBILIER_0_61_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_61_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 61, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_61_2' NAME='NB_MOBILIER_0_61_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_61_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 61, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_61_3' NAME='NB_MOBILIER_0_61_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_61_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 61, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_61'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF Sc. Biologie Chimie Sc. de la Terre</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_62_4' NAME='NB_MOBILIER_0_62_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_62_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 62, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_62_6' NAME='NB_MOBILIER_0_62_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_62_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 62, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_62_7' NAME='NB_MOBILIER_0_62_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_62_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 62, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_62_1' NAME='NB_MOBILIER_0_62_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_62_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 62, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_62_23' NAME='NB_MOBILIER_0_62_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_62_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 62, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_62_2' NAME='NB_MOBILIER_0_62_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_62_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 62, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_62_3' NAME='NB_MOBILIER_0_62_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_62_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 62, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_62'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >3ème Année PF Eco</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_63_4' NAME='NB_MOBILIER_0_63_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_63_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 63, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_63_6' NAME='NB_MOBILIER_0_63_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_63_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 63, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_63_7' NAME='NB_MOBILIER_0_63_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_63_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 63, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_63_1' NAME='NB_MOBILIER_0_63_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_63_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 63, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_63_23' NAME='NB_MOBILIER_0_63_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_63_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 63, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_63_2' NAME='NB_MOBILIER_0_63_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_63_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 63, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_63_3' NAME='NB_MOBILIER_0_63_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_63_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 63, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_63'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF SSH</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_64_4' NAME='NB_MOBILIER_0_64_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_64_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 64, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_64_6' NAME='NB_MOBILIER_0_64_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_64_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 64, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_64_7' NAME='NB_MOBILIER_0_64_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_64_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 64, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_64_1' NAME='NB_MOBILIER_0_64_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_64_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 64, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_64_23' NAME='NB_MOBILIER_0_64_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_64_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 64, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_64_2' NAME='NB_MOBILIER_0_64_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_64_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 64, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_64_3' NAME='NB_MOBILIER_0_64_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_64_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 64, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_64'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >3ème Année Maths Stat</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_72_4' NAME='NB_MOBILIER_0_72_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_72_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 72, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_72_6' NAME='NB_MOBILIER_0_72_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_72_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 72, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_72_7' NAME='NB_MOBILIER_0_72_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_72_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 72, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_72_1' NAME='NB_MOBILIER_0_72_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_72_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 72, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_72_23' NAME='NB_MOBILIER_0_72_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_72_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 72, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_72_2' NAME='NB_MOBILIER_0_72_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_72_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 72, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_72_3' NAME='NB_MOBILIER_0_72_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_72_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 72, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_72'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >1ère Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_65_4' NAME='NB_MOBILIER_0_65_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_65_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 65, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_65_6' NAME='NB_MOBILIER_0_65_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_65_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 65, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_65_7' NAME='NB_MOBILIER_0_65_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_65_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 65, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_65_1' NAME='NB_MOBILIER_0_65_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_65_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 65, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_65_23' NAME='NB_MOBILIER_0_65_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_65_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 65, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_65_2' NAME='NB_MOBILIER_0_65_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_65_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 65, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_65_3' NAME='NB_MOBILIER_0_65_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_65_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 65, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_65'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >2ème Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_66_4' NAME='NB_MOBILIER_0_66_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_66_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 66, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_66_6' NAME='NB_MOBILIER_0_66_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_66_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 66, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_66_7' NAME='NB_MOBILIER_0_66_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_66_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 66, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_66_1' NAME='NB_MOBILIER_0_66_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_66_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 66, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_66_23' NAME='NB_MOBILIER_0_66_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_66_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 66, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_66_2' NAME='NB_MOBILIER_0_66_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_66_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 66, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_66_3' NAME='NB_MOBILIER_0_66_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_66_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 66, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_66'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >3ème Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_67_4' NAME='NB_MOBILIER_0_67_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_67_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 67, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_67_6' NAME='NB_MOBILIER_0_67_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_67_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 67, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_67_7' NAME='NB_MOBILIER_0_67_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_67_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 67, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_67_1' NAME='NB_MOBILIER_0_67_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_67_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 67, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_67_23' NAME='NB_MOBILIER_0_67_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_67_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 67, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_67_2' NAME='NB_MOBILIER_0_67_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_67_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 67, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MOBILIER_0_67_3' NAME='NB_MOBILIER_0_67_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_67_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 67, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_67'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >4ème Année PF Pédag</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_68_4' NAME='NB_MOBILIER_0_68_4' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_68_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 68, 4, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_68_6' NAME='NB_MOBILIER_0_68_6' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_68_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 68, 6, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_68_7' NAME='NB_MOBILIER_0_68_7' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_68_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 68, 7, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_68_1' NAME='NB_MOBILIER_0_68_1' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_68_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 68, 1, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_68_23' NAME='NB_MOBILIER_0_68_23' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_68_23"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 68, 23, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_68_2' NAME='NB_MOBILIER_0_68_2' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_68_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 68, 2, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MOBILIER_0_68_3' NAME='NB_MOBILIER_0_68_3' TYPE='text' size=5 VALUE="$NB_MOBILIER_0_68_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 180009, 0, 'NB_MOBILIER', tab_ligne_180009, tab_col_180009, 68, 3, tab_mes_180009);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_180009_ALL_MES_LIGNE_0_68'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_180009_ALL_MES_COLONNE_0_4'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_180009_ALL_MES_COLONNE_0_6'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_180009_ALL_MES_COLONNE_0_7'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_180009_ALL_MES_COLONNE_0_1'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_180009_ALL_MES_COLONNE_0_23'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_180009_ALL_MES_COLONNE_0_2'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_180009_ALL_MES_COLONNE_0_3'></TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_180009_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> 3.2. Equipement informatique, bureautique, audio-visuel<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>&nbsp;</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>Nombre</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Ordinateurs pour administratifs</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_18' NAME='NB_EQUIPEMENT_0_18' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_18"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Imprimantes pour administratifs</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_19' NAME='NB_EQUIPEMENT_0_19' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_19"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Photocopieuse pour admin</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_20' NAME='NB_EQUIPEMENT_0_20' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_20"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Stencilleuse pour admin</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_21' NAME='NB_EQUIPEMENT_0_21' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_21"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Machine à écrire pour admin</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_22' NAME='NB_EQUIPEMENT_0_22' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_22"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Rétroprojecteur admin</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_37' NAME='NB_EQUIPEMENT_0_37' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_37"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Radio/chaîne music admin</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_45' NAME='NB_EQUIPEMENT_0_45' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_45"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Ordinateurs pour élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_23' NAME='NB_EQUIPEMENT_0_23' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_23"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Imprimantes pour élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_24' NAME='NB_EQUIPEMENT_0_24' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_24"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Télévision pour élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_25' NAME='NB_EQUIPEMENT_0_25' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_25"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Lecteur vidéo pour élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_26' NAME='NB_EQUIPEMENT_0_26' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_26"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Sonorisation pour élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_27' NAME='NB_EQUIPEMENT_0_27' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_27"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Rétroprojecteur élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_46' NAME='NB_EQUIPEMENT_0_46' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_46"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Radio/chaîne music élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_47' NAME='NB_EQUIPEMENT_0_47' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_47"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Tablettes pour admin</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_EQUIPEMENT_0_48' NAME='NB_EQUIPEMENT_0_48' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_48"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Tablettes pour élèves</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_EQUIPEMENT_0_49' NAME='NB_EQUIPEMENT_0_49' TYPE='text' size=5 VALUE="$NB_EQUIPEMENT_0_49"  onchange="set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);"  tabindex=''>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',180044, 0, tab_mes_180044, tab_ligne_180044, tab_col_180044);
+ set_TOTAL_MatFrml('form1',180009, 0, tab_mes_180009, tab_ligne_180009, tab_col_180009);
+</script>

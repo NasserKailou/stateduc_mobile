@@ -1,0 +1,465 @@
+.StyleImputData {
+	color: #FF0000;
+	font-weight: normal;
+	background-color: #FFFF00;
+	border: medium solid #FF0000;
+	z-index: 3;
+	width: auto;
+	float: right;
+	height: 30px;
+	font-style: italic;
+	text-transform: capitalize;
+	text-align: center;
+	vertical-align: middle;
+	padding-top: 2px;
+	padding-right: 1px;
+	padding-bottom: 1px;
+	padding-left: 1px;
+	letter-spacing: 1px;
+	font-size: 12px;
+}
+#info_imput {
+	vertical-align: middle;
+	height: 49px;
+	top: 68px;
+	right: 225px;
+	position: absolute;
+	z-index: 3;
+}
+.StyleVerrou {
+	color: #FF0000;
+	font-weight: normal;
+	background-color: #FFFF00;
+	border: medium solid #FF0000;
+	z-index: 3;
+	width: auto;
+	height: 30px;
+	font-style: italic;
+	text-transform: capitalize;
+	text-align: center;
+	vertical-align: middle;
+	padding-top: 2px;
+	padding-right: 1px;
+	padding-bottom: 1px;
+	padding-left: 1px;
+	letter-spacing: 1px;
+	font-size: 12px;
+}
+#info_verrou {
+	vertical-align: middle;
+	height: 49px;
+	top: 78px;
+	right: 0px;
+	position: absolute;
+	z-index: 3;
+}
+.StyleSortFiltData {
+	color: #FF0000;
+	font-weight: normal;
+	background-color: #FFFF00;
+	border: medium solid #FF0000;
+	z-index: 3;
+	float: right;
+	height: 30px;
+	font-style: italic;
+	text-transform: capitalize;
+	text-align: center;
+	vertical-align: middle;
+	padding-top: 2px;
+	padding-right: 1px;
+	padding-bottom: 1px;
+	padding-left: 1px;
+	letter-spacing: 1px;
+	font-size: 12px;
+}
+#info_sort {
+	vertical-align: middle;
+	height: 49px;
+	top: 64px;
+	right: 480px;
+	position: absolute;
+	z-index: 3;
+}
+#info_filter {
+	vertical-align: middle;
+	height: 49px;
+	top: 68px;
+	right: 370px;
+	position: absolute;
+	z-index: 3;
+}
+#show_form_imput {
+	vertical-align: middle;
+	height: 21px;
+	top: 100px;
+	right: 80px;
+	position: absolute;
+	z-index: 2;
+}
+#hide_form_imput {
+	vertical-align: middle;
+	height: 21px;
+	top: 100px;
+	right: 80px;
+	position: absolute;
+	visibility: hidden;
+	z-index: 4;
+}
+#form_imput {
+	visibility: hidden;
+	position:relative;
+	display:none;
+	top:122px;
+	z-index:6;
+	right: 80px;
+	width: 275px;
+	height: auto;
+}
+#form_imput #tabl_imput {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	visibility: inherit;
+}
+#form_imput #tabl_imput td {
+	visibility: inherit;
+}
+#imput_running {
+	visibility: hidden;
+	text-align: center;
+	z-index: 5;
+	position: relative;
+	display:none;
+	top:126px;
+	right: 80px;
+	width: 275px;
+}
+.aa{
+	position: absolute;
+	width:272px;
+	height:25px;
+	border:1px solid #000000;
+	font-family:Verdana;
+	font-size:13px;
+	color:#000000;
+	z-index:3;
+	vertical-align: middle;
+	left: 1px;
+	right: 1px;
+	top: 25px;
+	visibility: inherit;
+}
+.bb{
+	position: absolute;
+	width:0%;
+	height:25px;
+	background-color:#00FF00;
+	z-index:2;
+	vertical-align: middle;
+	left: 1px;
+	right: 1px;
+	top: 25px;
+	visibility: inherit;
+}
+#add_new_teach {
+	vertical-align: middle;
+	height: 21px;
+	top: 104px;
+	right: 600px;
+	position: absolute;
+	z-index: 10;
+}
+#show_form_import {
+	vertical-align: middle;
+	height: 21px;
+	top: 110px;
+	right: 80px;
+	position: absolute;
+	z-index: 2;
+}
+#hide_form_import {
+	vertical-align: middle;
+	height: 21px;
+	top: 110px;
+	right: 80px;
+	position: absolute;
+	visibility: hidden;
+	z-index: 4;
+}
+#form_import {
+	visibility: hidden;
+	position: relative;
+	display:none;
+	top:134px;
+	z-index:6;
+	right: 80px;
+	width: 275px;
+	height: auto;
+}
+#form_import #tabl_import {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	visibility: inherit;
+}
+#form_import #tabl_import td {
+	visibility: inherit;
+}
+#hide_form_sort {
+	vertical-align: middle;
+	height: 17px;
+	top: 104px;
+	right: 480px;
+	position: absolute;
+	visibility: hidden;
+	z-index: 8;
+}
+#show_form_sort {
+	vertical-align: middle;
+	height: 21px;
+	top: 104px;
+	right: 480px;
+	position: absolute;
+	z-index: 10;
+}
+#form_sort {
+	visibility: hidden;
+	position: relative;
+	display:none;
+	top:126px;
+	z-index:12;
+	right: 480px;
+	width: 300px;
+	height: 240px;
+	overflow:scroll;
+	border-style:double;
+}
+#form_sort #tabl_sort {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	visibility: inherit;
+}
+#form_sort #tabl_sort td {
+	visibility: inherit;
+}
+#sort_action {
+	visibility:hidden;
+	position: relative;
+	display:none;
+	z-index:14;
+	right: 0px;
+	width: 100%;
+	height: 30px;
+	background:#CCD9E6;
+}
+
+#hide_form_filter {
+	vertical-align: middle;
+	height: 21px;
+	top: 104px;
+	right: 370px;
+	position: absolute;
+	visibility: hidden;
+	z-index: 8;
+}
+#show_form_filter {
+	vertical-align: middle;
+	height: 21px;
+	top: 104px;
+	right: 370px;
+	position: absolute;
+	z-index: 10;
+}
+#form_filter {
+	visibility: hidden;
+	position: relative;
+	display:none;
+	top:126px;
+	z-index:12;
+	right: 370px;
+	width: 280px;
+	height: 255px;
+	overflow: scroll;
+	border-style:double;
+}
+#tb_text {
+	right: 0px;
+}
+#tb_int {
+	right: 0px;
+}
+#form_filter #tabl_filter {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	visibility: inherit;
+}
+#form_filter #tabl_filter td {
+	visibility: inherit;
+}
+#filter_action {
+	visibility:hidden;
+	position:relative;
+	display:none;
+	z-index:14;
+	right: 0px;
+	width: 100%;
+	top:208px;
+	height: 30px;
+	background:#CCD9E6;
+}
+#hide_form_export {
+	vertical-align: middle;
+	height: 21px;
+	top: 104px;
+	right: 260px;
+	position: absolute;
+	visibility: hidden;
+	z-index: 8;
+}
+#show_form_export {
+	vertical-align: middle;
+	height: 21px;
+	top: 104px;
+	right: 260px;
+	position: absolute;
+	z-index: 10;
+}
+#form_export {
+	visibility: hidden;
+	position: relative;
+	display:none;
+	top:126px;
+	z-index:12;
+	right: 260px;
+	width: 300px;
+	height: 400px;
+	overflow: scroll;
+	border-style:double;
+}
+#form_export #tabl_export {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	visibility: inherit;
+}
+#form_export #tabl_export td {
+	visibility: inherit;
+}
+#export_action {
+	visibility:hidden;
+	position: relative;
+	display:none;
+	z-index:14;
+	right: 0px;
+	width: 100%;
+	height: 30px;
+	background:#CCD9E6;
+	
+}
+#pagination {
+	float: right;
+	margin-top: 5px;
+}
+
+.StyleSupprData {
+	color: #FF0000;
+	font-weight: bold;
+	background-color: #FFFF00;
+	border: medium solid #FF0000;
+	z-index: 3;
+	width: auto;
+	float: right;
+	height: 30px;
+	font-style: italic;
+	text-transform: capitalize;
+	text-align: center;
+	vertical-align: middle;
+	padding-top: 3px;
+	padding-right: 2px;
+	padding-bottom: 2px;
+	padding-left: 2px;
+	letter-spacing: 2px;
+	font-size: 14px;
+}
+#info_suppr {
+	vertical-align: middle;
+	height: 49px;
+	top: 20px;
+	right: 257px;
+	position: absolute;
+	z-index: 3;
+}
+#show_form_suppr {
+	height: 21px;
+	position: absolute; float:right;
+	z-index: 2;
+}
+#hide_form_suppr {
+	vertical-align: middle;
+	height: 21px;
+	position: absolute; float:right;
+	visibility: hidden;
+	z-index: 4;
+}
+#form_suppr {
+	visibility: hidden;
+	position:absolute;
+	display:none;
+	top:30px;
+	z-index:6;
+	text-align:center;
+	width: 300px;
+	height: auto;
+}
+#form_suppr #tabl_suppr {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	visibility: inherit;
+}
+#form_suppr #tabl_suppr td {
+	visibility: inherit;
+}
+#suppr_running {
+	visibility: hidden;
+	display:none;
+	text-align: center;
+	z-index: 5;
+	top:30px;
+	position: absolute; float:right;
+	width: 275px;
+}
+
+	

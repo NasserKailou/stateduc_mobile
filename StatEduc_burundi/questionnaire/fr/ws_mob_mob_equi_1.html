@@ -1,0 +1,580 @@
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=401&type_ent_stat=2' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;BR&amp;gt; 3.1. NBRE SALLES DE CLASSE PAR NIVEAU<br></b><script language='javascript' type='text/javascript'>
+var expression_40049 	= "";
+var tot_mes_ligne_40049 	= new Array();
+var tot_mes_col_40049 	= new Array();
+var affich_vertic_mes_40049 	= 0;
+var affiche_sous_totaux_40049 	= 0;
+var tab_mes_40049 	= new Array ("NB_SALLES_CLASSE","NB_CLASSES_BON_ETAT");
+var tab_ligne_40049	= new Array ();
+var tab_col_40049	= new Array ("1","2","3");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>1&Atilde;&uml;re </TD>
+		<TD CLASS='ligne-titre' align='center'>2&Atilde;&uml;me  </TD>
+		<TD CLASS='ligne-titre' align='center'>3&Atilde;&uml;me  </TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'>Nombre de salles de classe</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_#_1' id='NB_SALLES_CLASSE_0_1' name='NB_SALLES_CLASSE_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_#_2' id='NB_SALLES_CLASSE_0_2' name='NB_SALLES_CLASSE_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_SALLES_CLASSE_#_3' id='NB_SALLES_CLASSE_0_3' name='NB_SALLES_CLASSE_0_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_40049_NB_SALLES_CLASSE_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'>Salles de classe en bon &Atilde;&copy;tat</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_CLASSES_BON_ETAT_#_1' id='NB_CLASSES_BON_ETAT_0_1' name='NB_CLASSES_BON_ETAT_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_CLASSES_BON_ETAT_#_2' id='NB_CLASSES_BON_ETAT_0_2' name='NB_CLASSES_BON_ETAT_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_CLASSES_BON_ETAT_#_3' id='NB_CLASSES_BON_ETAT_0_3' name='NB_CLASSES_BON_ETAT_0_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_40049_NB_CLASSES_BON_ETAT_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'>Nombre de salles de classe propres &Atilde;  la structure</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_1' id='NB_CLASSES_PROPR_STRUCTURE_0_1' name='NB_CLASSES_PROPR_STRUCTURE_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_2' id='NB_CLASSES_PROPR_STRUCTURE_0_2' name='NB_CLASSES_PROPR_STRUCTURE_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_CLASSES_PROPR_STRUCTURE_#_3' id='NB_CLASSES_PROPR_STRUCTURE_0_3' name='NB_CLASSES_PROPR_STRUCTURE_0_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_40049_NB_CLASSES_PROPR_STRUCTURE_LIGNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD  COLSPAN=2  align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_40049_ALL_MES_COLONNE_0_1' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_40049_ALL_MES_COLONNE_0_2' ></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_40049_ALL_MES_COLONNE_0_3' ></TD>
+		<td align='center' bgcolor='#CCCCCC'  valign='middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_40049_ALL_MES_0' ></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;BR&amp;gt;3.2. MOBILIER DES SALLES DE CLASSE<br>Type de mobiliers : Nombre <br></b><script language='javascript' type='text/javascript'>
+var expression_40018 	= "";
+var tot_mes_ligne_40018 	= new Array();
+var tot_mes_col_40018 	= new Array();
+var affich_vertic_mes_40018 	= 0;
+var affiche_sous_totaux_40018 	= 0;
+var tab_mes_40018 	= new Array ("NB_MOBILIER");
+var tab_ligne_40018	= new Array ("4","6","7","1","23","2","3","8");
+var tab_col_40018	= new Array ("1","2","3");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>1&Atilde;&uml;re </TD>
+		<TD   CLASS='ligne-titre' align='center'>2&Atilde;&uml;me  </TD>
+		<TD   CLASS='ligne-titre' align='center'>3&Atilde;&uml;me  </TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Bancs pupitres</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_4_1' id='NB_MOBILIER_0_4_1' name='NB_MOBILIER_0_4_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_4_2' id='NB_MOBILIER_0_4_2' name='NB_MOBILIER_0_4_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_4_3' id='NB_MOBILIER_0_4_3' name='NB_MOBILIER_0_4_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_4'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Tables pour &Atilde;&copy;l&Atilde;&uml;ves</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_6_1' id='NB_MOBILIER_0_6_1' name='NB_MOBILIER_0_6_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_6_2' id='NB_MOBILIER_0_6_2' name='NB_MOBILIER_0_6_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_6_3' id='NB_MOBILIER_0_6_3' name='NB_MOBILIER_0_6_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_6'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Chaises/Tabourets pour &Atilde;&copy;l&Atilde;&uml;ves</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_7_1' id='NB_MOBILIER_0_7_1' name='NB_MOBILIER_0_7_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_7_2' id='NB_MOBILIER_0_7_2' name='NB_MOBILIER_0_7_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_7_3' id='NB_MOBILIER_0_7_3' name='NB_MOBILIER_0_7_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_7'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Tableaux</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_1_1' id='NB_MOBILIER_0_1_1' name='NB_MOBILIER_0_1_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_1_2' id='NB_MOBILIER_0_1_2' name='NB_MOBILIER_0_1_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_1_3' id='NB_MOBILIER_0_1_3' name='NB_MOBILIER_0_1_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_1'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Armoires/Etag&Atilde;&uml;res</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_23_1' id='NB_MOBILIER_0_23_1' name='NB_MOBILIER_0_23_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_23_2' id='NB_MOBILIER_0_23_2' name='NB_MOBILIER_0_23_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_23_3' id='NB_MOBILIER_0_23_3' name='NB_MOBILIER_0_23_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_23'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Bureaux du  ma&Atilde;&reg;tre/prof</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_2_1' id='NB_MOBILIER_0_2_1' name='NB_MOBILIER_0_2_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_2_2' id='NB_MOBILIER_0_2_2' name='NB_MOBILIER_0_2_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_2_3' id='NB_MOBILIER_0_2_3' name='NB_MOBILIER_0_2_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_2'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Chaises pour ma&Atilde;&reg;tre/prof</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_3_1' id='NB_MOBILIER_0_3_1' name='NB_MOBILIER_0_3_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_3_2' id='NB_MOBILIER_0_3_2' name='NB_MOBILIER_0_3_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_3_3' id='NB_MOBILIER_0_3_3' name='NB_MOBILIER_0_3_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_3'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Kit de jeu</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_8_1' id='NB_MOBILIER_0_8_1' name='NB_MOBILIER_0_8_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_8_2' id='NB_MOBILIER_0_8_2' name='NB_MOBILIER_0_8_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_#_8_3' id='NB_MOBILIER_0_8_3' name='NB_MOBILIER_0_8_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40018_ALL_MES_LIGNE_0_8'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40018_ALL_MES_COLONNE_0_1'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40018_ALL_MES_COLONNE_0_2'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40018_ALL_MES_COLONNE_0_3'></TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_40018_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;br&amp;gt; Type de mobiliers : Etat<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>Bon/Acceptable</TD>
+		<TD   CLASS='ligne-titre' align='center'>En mauvais &Atilde;&copy;tat</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Bancs pupitres</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_4_1' id='NB_MOBILIER_ETAT_0_4_1' name='NB_MOBILIER_ETAT_0_4_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_4_2' id='NB_MOBILIER_ETAT_0_4_2' name='NB_MOBILIER_ETAT_0_4_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Tables pour &Atilde;&copy;l&Atilde;&uml;ves</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_6_1' id='NB_MOBILIER_ETAT_0_6_1' name='NB_MOBILIER_ETAT_0_6_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_6_2' id='NB_MOBILIER_ETAT_0_6_2' name='NB_MOBILIER_ETAT_0_6_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Chaises/Tabourets pour &Atilde;&copy;l&Atilde;&uml;ves</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_7_1' id='NB_MOBILIER_ETAT_0_7_1' name='NB_MOBILIER_ETAT_0_7_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_7_2' id='NB_MOBILIER_ETAT_0_7_2' name='NB_MOBILIER_ETAT_0_7_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Tableaux</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_1_1' id='NB_MOBILIER_ETAT_0_1_1' name='NB_MOBILIER_ETAT_0_1_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_1_2' id='NB_MOBILIER_ETAT_0_1_2' name='NB_MOBILIER_ETAT_0_1_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Armoires/Etag&Atilde;&uml;res</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_23_1' id='NB_MOBILIER_ETAT_0_23_1' name='NB_MOBILIER_ETAT_0_23_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_23_2' id='NB_MOBILIER_ETAT_0_23_2' name='NB_MOBILIER_ETAT_0_23_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Bureaux du  ma&Atilde;&reg;tre/prof</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_2_1' id='NB_MOBILIER_ETAT_0_2_1' name='NB_MOBILIER_ETAT_0_2_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_2_2' id='NB_MOBILIER_ETAT_0_2_2' name='NB_MOBILIER_ETAT_0_2_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Chaises pour ma&Atilde;&reg;tre/prof</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_3_1' id='NB_MOBILIER_ETAT_0_3_1' name='NB_MOBILIER_ETAT_0_3_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_3_2' id='NB_MOBILIER_ETAT_0_3_2' name='NB_MOBILIER_ETAT_0_3_2' type='text' value=''></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Kit de jeu</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_8_1' id='NB_MOBILIER_ETAT_0_8_1' name='NB_MOBILIER_ETAT_0_8_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MOBILIER_ETAT_#_8_2' id='NB_MOBILIER_ETAT_0_8_2' name='NB_MOBILIER_ETAT_0_8_2' type='text' value=''></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;BR&amp;gt; 3.3. MANUELS POUR LE MAITRE/EDUCATEUR <br></b><script language='javascript' type='text/javascript'>
+var expression_40024 	= "";
+var tot_mes_ligne_40024 	= new Array();
+var tot_mes_col_40024 	= new Array();
+var affich_vertic_mes_40024 	= 0;
+var affiche_sous_totaux_40024 	= 0;
+var tab_mes_40024 	= new Array ("NB_MANUELS_MAITRE");
+var tab_ligne_40024	= new Array ("1","2","3","4","5","6","22","23","7");
+var tab_col_40024	= new Array ("1","2","3");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>1&Atilde;&uml;re </TD>
+		<TD   CLASS='ligne-titre' align='center'>2&Atilde;&uml;me  </TD>
+		<TD   CLASS='ligne-titre' align='center'>3&Atilde;&uml;me  </TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Programme national d&acirc;€™&Atilde;&copy;ducation pr&Atilde;&copy;scolaire au Burundi</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_1_1' id='NB_MANUELS_MAITRE_0_1_1' name='NB_MANUELS_MAITRE_0_1_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_1_2' id='NB_MANUELS_MAITRE_0_1_2' name='NB_MANUELS_MAITRE_0_1_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_1_3' id='NB_MANUELS_MAITRE_0_1_3' name='NB_MANUELS_MAITRE_0_1_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_1'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Urutonde rw&acirc;€™inyigisho zitegekanirijwe abana bimenyereza gutangura&amp;lt;br/&amp;gt; amashure y&acirc;€™intango kuva ku myaka itatu gushika kuri itandatu</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_2_1' id='NB_MANUELS_MAITRE_0_2_1' name='NB_MANUELS_MAITRE_0_2_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_2_2' id='NB_MANUELS_MAITRE_0_2_2' name='NB_MANUELS_MAITRE_0_2_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_2_3' id='NB_MANUELS_MAITRE_0_2_3' name='NB_MANUELS_MAITRE_0_2_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_2'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Igitabu mfashanyigisho ku bana bimenyereza  gutangura  amashure y&acirc;€™intango mu Burundi</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_3_1' id='NB_MANUELS_MAITRE_0_3_1' name='NB_MANUELS_MAITRE_0_3_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_3_2' id='NB_MANUELS_MAITRE_0_3_2' name='NB_MANUELS_MAITRE_0_3_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_3_3' id='NB_MANUELS_MAITRE_0_3_3' name='NB_MANUELS_MAITRE_0_3_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_3'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Guide pour l&acirc;€™&Atilde;&copy;ducateur/ Kerebuka- Agatabo k&acirc;€™umwigisha /Kerebuka</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_4_1' id='NB_MANUELS_MAITRE_0_4_1' name='NB_MANUELS_MAITRE_0_4_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_4_2' id='NB_MANUELS_MAITRE_0_4_2' name='NB_MANUELS_MAITRE_0_4_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_4_3' id='NB_MANUELS_MAITRE_0_4_3' name='NB_MANUELS_MAITRE_0_4_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_4'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Livret des droits de l&acirc;€™enfant</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_5_1' id='NB_MANUELS_MAITRE_0_5_1' name='NB_MANUELS_MAITRE_0_5_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_5_2' id='NB_MANUELS_MAITRE_0_5_2' name='NB_MANUELS_MAITRE_0_5_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_5_3' id='NB_MANUELS_MAITRE_0_5_3' name='NB_MANUELS_MAITRE_0_5_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_5'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Ivyirwa vyo guteza imbere indero kivyeyi  y&acirc;€™umwana kuva akiri muto cane</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_6_1' id='NB_MANUELS_MAITRE_0_6_1' name='NB_MANUELS_MAITRE_0_6_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_6_2' id='NB_MANUELS_MAITRE_0_6_2' name='NB_MANUELS_MAITRE_0_6_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_6_3' id='NB_MANUELS_MAITRE_0_6_3' name='NB_MANUELS_MAITRE_0_6_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_6'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Agatabok&apos;indirimbo</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_22_1' id='NB_MANUELS_MAITRE_0_22_1' name='NB_MANUELS_MAITRE_0_22_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_22_2' id='NB_MANUELS_MAITRE_0_22_2' name='NB_MANUELS_MAITRE_0_22_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_22_3' id='NB_MANUELS_MAITRE_0_22_3' name='NB_MANUELS_MAITRE_0_22_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_22'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Agatabok&apos;imigani</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_23_1' id='NB_MANUELS_MAITRE_0_23_1' name='NB_MANUELS_MAITRE_0_23_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_23_2' id='NB_MANUELS_MAITRE_0_23_2' name='NB_MANUELS_MAITRE_0_23_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_23_3' id='NB_MANUELS_MAITRE_0_23_3' name='NB_MANUELS_MAITRE_0_23_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_23'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Autres</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_7_1' id='NB_MANUELS_MAITRE_0_7_1' name='NB_MANUELS_MAITRE_0_7_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_7_2' id='NB_MANUELS_MAITRE_0_7_2' name='NB_MANUELS_MAITRE_0_7_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_MAITRE_#_7_3' id='NB_MANUELS_MAITRE_0_7_3' name='NB_MANUELS_MAITRE_0_7_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40024_ALL_MES_LIGNE_0_7'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40024_ALL_MES_COLONNE_0_1'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40024_ALL_MES_COLONNE_0_2'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40024_ALL_MES_COLONNE_0_3'></TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_40024_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;BR&amp;gt;3.4. MANUELS POUR LES ELEVES <br></b><script language='javascript' type='text/javascript'>
+var expression_40048 	= "";
+var tot_mes_ligne_40048 	= new Array();
+var tot_mes_col_40048 	= new Array();
+var affich_vertic_mes_40048 	= 0;
+var affiche_sous_totaux_40048 	= 0;
+var tab_mes_40048 	= new Array ("NB_MANUELS_ELEVE");
+var tab_ligne_40048	= new Array ("1","2");
+var tab_col_40048	= new Array ("1","2","3");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>1&Atilde;&uml;re </TD>
+		<TD   CLASS='ligne-titre' align='center'>2&Atilde;&uml;me  </TD>
+		<TD   CLASS='ligne-titre' align='center'>3&Atilde;&uml;me  </TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Cahier d&acirc;€™activit&Atilde;&copy;s de l&acirc;€™&Atilde;&copy;l&Atilde;&uml;ve/Kerebuka &acirc;€“Umwana w&acirc;€™imyaka 5-6</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_ELEVE_#_1_1' id='NB_MANUELS_ELEVE_0_1_1' name='NB_MANUELS_ELEVE_0_1_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_ELEVE_#_1_2' id='NB_MANUELS_ELEVE_0_1_2' name='NB_MANUELS_ELEVE_0_1_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_MANUELS_ELEVE_#_1_3' id='NB_MANUELS_ELEVE_0_1_3' name='NB_MANUELS_ELEVE_0_1_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40048_ALL_MES_LIGNE_0_1'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Autres</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_ELEVE_#_2_1' id='NB_MANUELS_ELEVE_0_2_1' name='NB_MANUELS_ELEVE_0_2_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_ELEVE_#_2_2' id='NB_MANUELS_ELEVE_0_2_2' name='NB_MANUELS_ELEVE_0_2_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_MANUELS_ELEVE_#_2_3' id='NB_MANUELS_ELEVE_0_2_3' name='NB_MANUELS_ELEVE_0_2_3' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40048_ALL_MES_LIGNE_0_2'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40048_ALL_MES_COLONNE_0_1'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40048_ALL_MES_COLONNE_0_2'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40048_ALL_MES_COLONNE_0_3'></TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_40048_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;Autre manuel, &Atilde;  pr&Atilde;&copy;ciser&nbsp;&nbsp;&nbsp;<INPUT NAME='AUTRE_MANUEL_ELEVES_0' TYPE='text'   ID='AUTRE_MANUEL_ELEVES_0' VALUE="" >
+&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;BR&amp;gt;3.5. EQUIPEMENT DE JEU<br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>Balan&Atilde;&sect;oire</TD>
+		<TD CLASS='ligne-titre' align='center'>Toboggan</TD>
+		<TD CLASS='ligne-titre' align='center'>Bac &Atilde;  sable</TD>
+		<TD CLASS='ligne-titre' align='center'>Balles</TD>
+		<TD CLASS='ligne-titre' align='center'>Ballons</TD>
+		<TD CLASS='ligne-titre' align='center'>Cerceaux</TD>
+		<TD CLASS='ligne-titre' align='center'>Pneus</TD>
+		<TD CLASS='ligne-titre' align='center'>Radio cassettes</TD>
+		<TD CLASS='ligne-titre' align='center'>Autres</TD>
+		<TD CLASS='ligne-titre' align='center'>Recreation kits recus</TD>
+
+	</TR>
+
+	<TR>
+		<TD  COLSPAN=2  nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'>Nombre</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_38' id='NB_EQUIPEMENT_0_38' name='NB_EQUIPEMENT_0_38' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_39' id='NB_EQUIPEMENT_0_39' name='NB_EQUIPEMENT_0_39' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_40' id='NB_EQUIPEMENT_0_40' name='NB_EQUIPEMENT_0_40' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_1' id='NB_EQUIPEMENT_0_1' name='NB_EQUIPEMENT_0_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_2' id='NB_EQUIPEMENT_0_2' name='NB_EQUIPEMENT_0_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_3' id='NB_EQUIPEMENT_0_3' name='NB_EQUIPEMENT_0_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_4' id='NB_EQUIPEMENT_0_4' name='NB_EQUIPEMENT_0_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_5' id='NB_EQUIPEMENT_0_5' name='NB_EQUIPEMENT_0_5' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_6' id='NB_EQUIPEMENT_0_6' name='NB_EQUIPEMENT_0_6' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_EQUIPEMENT_#_42' id='NB_EQUIPEMENT_0_42' name='NB_EQUIPEMENT_0_42' type='text' value=''></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<b>&amp;lt;BR&amp;gt;3.6. JEUX EDUCATIFS POUR LA CLASSE <br></b><script language='javascript' type='text/javascript'>
+var expression_40052 	= "";
+var tot_mes_ligne_40052 	= new Array();
+var tot_mes_col_40052 	= new Array();
+var affich_vertic_mes_40052 	= 0;
+var affiche_sous_totaux_40052 	= 0;
+var tab_mes_40052 	= new Array ("NB_JEUX_EDUCATIFS");
+var tab_ligne_40052	= new Array ("1","2","3","4","5","6");
+var tab_col_40052	= new Array ("1","2","3","69");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>1&Atilde;&uml;re </TD>
+		<TD   CLASS='ligne-titre' align='center'>2&Atilde;&uml;me  </TD>
+		<TD   CLASS='ligne-titre' align='center'>3&Atilde;&uml;me  </TD>
+		<TD   CLASS='ligne-titre' align='center'>collectif</TD>
+		<TD  CLASS='ligne-titre' align='center' >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Puzzle, pi&Atilde;&uml;ces g&Atilde;&copy;om&Atilde;&copy;triques</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_1_1' id='NB_JEUX_EDUCATIFS_0_1_1' name='NB_JEUX_EDUCATIFS_0_1_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_1_2' id='NB_JEUX_EDUCATIFS_0_1_2' name='NB_JEUX_EDUCATIFS_0_1_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_1_3' id='NB_JEUX_EDUCATIFS_0_1_3' name='NB_JEUX_EDUCATIFS_0_1_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_1_69' id='NB_JEUX_EDUCATIFS_0_1_69' name='NB_JEUX_EDUCATIFS_0_1_69' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40052_ALL_MES_LIGNE_0_1'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Jeux  de construction</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_2_1' id='NB_JEUX_EDUCATIFS_0_2_1' name='NB_JEUX_EDUCATIFS_0_2_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_2_2' id='NB_JEUX_EDUCATIFS_0_2_2' name='NB_JEUX_EDUCATIFS_0_2_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_2_3' id='NB_JEUX_EDUCATIFS_0_2_3' name='NB_JEUX_EDUCATIFS_0_2_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_2_69' id='NB_JEUX_EDUCATIFS_0_2_69' name='NB_JEUX_EDUCATIFS_0_2_69' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40052_ALL_MES_LIGNE_0_2'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Jeux de d&Atilde;&copy;s, cartes, damiers</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_3_1' id='NB_JEUX_EDUCATIFS_0_3_1' name='NB_JEUX_EDUCATIFS_0_3_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_3_2' id='NB_JEUX_EDUCATIFS_0_3_2' name='NB_JEUX_EDUCATIFS_0_3_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_3_3' id='NB_JEUX_EDUCATIFS_0_3_3' name='NB_JEUX_EDUCATIFS_0_3_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_3_69' id='NB_JEUX_EDUCATIFS_0_3_69' name='NB_JEUX_EDUCATIFS_0_3_69' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40052_ALL_MES_LIGNE_0_3'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Jeux m&Atilde;&copy;nagers, poup&Atilde;&copy;es, animaux</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_4_1' id='NB_JEUX_EDUCATIFS_0_4_1' name='NB_JEUX_EDUCATIFS_0_4_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_4_2' id='NB_JEUX_EDUCATIFS_0_4_2' name='NB_JEUX_EDUCATIFS_0_4_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_4_3' id='NB_JEUX_EDUCATIFS_0_4_3' name='NB_JEUX_EDUCATIFS_0_4_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_4_69' id='NB_JEUX_EDUCATIFS_0_4_69' name='NB_JEUX_EDUCATIFS_0_4_69' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40052_ALL_MES_LIGNE_0_4'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >Instruments de musique</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_5_1' id='NB_JEUX_EDUCATIFS_0_5_1' name='NB_JEUX_EDUCATIFS_0_5_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_5_2' id='NB_JEUX_EDUCATIFS_0_5_2' name='NB_JEUX_EDUCATIFS_0_5_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_5_3' id='NB_JEUX_EDUCATIFS_0_5_3' name='NB_JEUX_EDUCATIFS_0_5_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_5_69' id='NB_JEUX_EDUCATIFS_0_5_69' name='NB_JEUX_EDUCATIFS_0_5_69' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40052_ALL_MES_LIGNE_0_5'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >Peinture, crayons couleur</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_6_1' id='NB_JEUX_EDUCATIFS_0_6_1' name='NB_JEUX_EDUCATIFS_0_6_1' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_6_2' id='NB_JEUX_EDUCATIFS_0_6_2' name='NB_JEUX_EDUCATIFS_0_6_2' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_6_3' id='NB_JEUX_EDUCATIFS_0_6_3' name='NB_JEUX_EDUCATIFS_0_6_3' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='NB_JEUX_EDUCATIFS_#_6_69' id='NB_JEUX_EDUCATIFS_0_6_69' name='NB_JEUX_EDUCATIFS_0_6_69' type='text' value=''></TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_40052_ALL_MES_LIGNE_0_6'></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD align='center' bgcolor='#CCCCCC'>TOTAL</TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40052_ALL_MES_COLONNE_0_1'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40052_ALL_MES_COLONNE_0_2'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40052_ALL_MES_COLONNE_0_3'></TD>
+		<TD align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_40052_ALL_MES_COLONNE_0_69'></TD>
+		<TD colspan='1' align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_40052_ALL_MES_0' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE></FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',40049, 0, tab_mes_40049, tab_ligne_40049, tab_col_40049);
+ set_TOTAL_MatFrml('form1',40018, 0, tab_mes_40018, tab_ligne_40018, tab_col_40018);
+ set_TOTAL_MatFrml('form1',40024, 0, tab_mes_40024, tab_ligne_40024, tab_col_40024);
+ set_TOTAL_MatFrml('form1',40048, 0, tab_mes_40048, tab_ligne_40048, tab_col_40048);
+ set_TOTAL_MatFrml('form1',40052, 0, tab_mes_40052, tab_ligne_40052, tab_col_40052);
+</script>

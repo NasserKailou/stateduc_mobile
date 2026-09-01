@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>Avertissement</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="css/site/defaut.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<script language="JavaScript">
+	var pathname=location.pathname;
+	var myDomain=pathname.substring(0,pathname.lastIndexOf('/')) +'/';
+	var date_exp = new Date();
+	date_exp.setTime(date_exp.getTime()+(30*24*3600*1000));	// Ici on définit une durée de vie de 30 jours
+	
+	function SetCookie (name, value) {
+		var argv=SetCookie.arguments;
+		var argc=SetCookie.arguments.length;
+		var expires=(argc > 2) ? argv[2] : null;
+		var path=(argc > 3) ? argv[3] : null;
+		var domain=(argc > 4) ? argv[4] : null;
+		var secure=(argc > 5) ? argv[5] : false;
+		document.cookie=name+"="+escape(value)+
+			((expires==null) ? "" : ("; expires="+expires.toGMTString()))+
+			((path==null) ? "" : ("; path="+path))+
+			((domain==null) ? "" : ("; domain="+domain))+
+			((secure==true) ? "; secure" : "");
+	}
+<!-- Cherche si la taille de l'écran est égale à 640 en largeur et 480 en hauteur -->
+if((screen.width==640)&&(screen.height==480))
+<!-- Affiche le Texte que vous souhaitez que le Visiteur voit si sa Résolution est égale à du 640 x 480. -->
+{
+	document.write("Votre résolution est 640 x 480.<br>Pour votre confort nous vous conseillons de passer en <B>1024x768</B>.<BR>Il vous suffit d'aller dans:<BR> Panneau de configuration - Affichage - Paramètres - Résolution de l'écran.");
+	SetCookie("resolution","640x480",date_exp,myDomain);
+}
+else
+if((screen.width==800)&&(screen.height==600))
+	{
+		document.write("Votre résolution est de 800 x 600.<br>Pour votre confort nous vous conseillons de passer en <B>1024x768</B>.<BR>Il vous suffit d'aller dans:<BR> Panneau de configuration - Affichage - Paramètres - Résolution de l'écran.");
+		SetCookie("resolution","800x600",date_exp,myDomain);
+	}
+</script>
+<FORM>
+	<DIV align="center"><INPUT TYPE="button" value="Fermer" onClick="parent.close()"></DIV>
+</FORM>
+</body>
+</html>  
