@@ -1337,6 +1337,18 @@
 			$this->create_log_file($cheminFichierExcel);
 			// ── LOG RICHE MOBLOGS ────────────────────────────────────────────────────
 			$this->create_mob_log($cheminFichierExcel);
+			// ── NASSER LOG : chargement du logger si pas encore inclus ────────────────
+			if (!class_exists('NasserLog')) {
+				$nasser_logger_path = realpath(dirname(__FILE__).'/../../../..').DIRECTORY_SEPARATOR.'moblogs'.DIRECTORY_SEPARATOR.'nasser_logger.php';
+				if (file_exists($nasser_logger_path)) { require_once $nasser_logger_path; }
+			}
+			// ── NASSER LOG : contexte import ─────────────────────────────────────────
+			if (class_exists('NasserLog')) {
+				NasserLog::etape('MAJ_BDD_EXCEL_ENTREE', 'N/A',
+					'Fichier="'.basename($cheminFichierExcel).'" | Nb lignes données='.count($this->donnees_post_excel), '');
+				NasserLog::params_hierarchie();
+			}
+			// ── FIN NASSER LOG ────────────────────────────────────────────────────────
 
 			$num_ligne = 0; // compteur de ligne Excel (1-based pour le log)
 			foreach ($this->donnees_post_excel as $tab) {
@@ -1345,6 +1357,15 @@
 
 				$logData = "";
 				$logData .= $tab[0].";".$tab[1].";".$tab[2].";".$tab[3].";".$tab[4].";".$this->get_group_name_by_code($tab[6]);
+
+				// ── NASSER LOG : séparateur de ligne ─────────────────────────────────
+				if (class_exists('NasserLog')) {
+					NasserLog::ligne($num_ligne, $login_courant,
+						isset($tab[0]) ? $tab[0] : 'N/A',
+						isset($tab[7]) ? $tab[7] : 'N/A'
+					);
+				}
+				// ── FIN NASSER LOG ────────────────────────────────────────────────────
 
 				// ── MOBLOGS : début traitement ligne ─────────────────────────────────
 				$this->write_mob_log($num_ligne, 'DEBUT_LIGNE',
@@ -1383,6 +1404,12 @@
 						// Si l'un des deux echoue -> RollbackTrans() annule les deux.
 						$this->conn->BeginTrans();
 
+						// ── NASSER LOG : transaction + SQL INSERT ADMIN_USERS ─────────
+						if (class_exists('NasserLog')) {
+							NasserLog::transaction('BEGIN', $login_courant, 'BeginTrans() avant INSERT ADMIN_USERS');
+							NasserLog::sql('ADMIN_USERS_INSERT', $sql);
+						}
+						// ── FIN NASSER LOG ────────────────────────────────────────────
 						// ── MOBLOGS : ouverture transaction ───────────────────────────
 						$this->write_mob_log($num_ligne, 'TRANSACTION_BEGIN',
 							$login_courant, 'BeginTrans() ouvert'
@@ -1396,6 +1423,11 @@
 						if ($this->conn->Execute($sql)===false) {
 							$db_err_au = method_exists($this->conn, 'ErrorMsg') ? $this->conn->ErrorMsg() : 'N/A';
 							$this->conn->RollbackTrans();
+							// ── NASSER LOG ────────────────────────────────────────────
+							if (class_exists('NasserLog')) {
+								NasserLog::err('ADMIN_USERS_INSERT', 'ECHEC + RollbackTrans | DB: ' . $db_err_au);
+							}
+							// ── FIN NASSER LOG ────────────────────────────────────────
 							// ── MOBLOGS : INSERT ADMIN_USERS échoué ──────────────────
 							$this->write_mob_log($num_ligne, 'ADMIN_USERS_ERREUR',
 								$login_courant,
@@ -1430,14 +1462,24 @@
 									$id_status       = 2; // valeur réelle : 2
 									$id_type_regroup = 0; // valeur réelle : 0 (établissement)
 
-									// ── MOBLOGS : paramètres DICO ────────────────────
-									$this->write_mob_log($num_ligne, 'DICO_PARAMS',
-										$login_courant,
+								// ── NASSER LOG : paramètres DICO ────────────────
+								if (class_exists('NasserLog')) {
+									NasserLog::etape('DICO_PARAMS', $login_courant,
 										'CODE_ETAB='.$raw_code_etab
 										.' | CAMP='.$id_camp.' | SYS='.$id_systeme
 										.' | ANNEE='.$id_annee.' | CHAINE='.$id_chaine
 										.' | PERIODE='.$id_periode
-									);
+										.' | ID_STATUS='.$id_status.' | ID_TYPE_REGROUP='.$id_type_regroup, '');
+								}
+								// ── FIN NASSER LOG ────────────────────────────────────
+								// ── MOBLOGS : paramètres DICO ────────────────────
+								$this->write_mob_log($num_ligne, 'DICO_PARAMS',
+									$login_courant,
+									'CODE_ETAB='.$raw_code_etab
+									.' | CAMP='.$id_camp.' | SYS='.$id_systeme
+									.' | ANNEE='.$id_annee.' | CHAINE='.$id_chaine
+									.' | PERIODE='.$id_periode
+								);
 
 									// ----------------------------------------------------------------
 									// Récupérer USER_PRIV, ID_REGROUP_PARENTS, ID_TYPE_REGROUP_PARENTS
@@ -1453,44 +1495,72 @@
 										.' AND ID_ANNEE='.$id_annee
 										.' AND ID_SYSTEME='.$id_systeme
 										.' AND ID_REGROUP='.$code_etab_q;
-									// ── MOBLOGS : recherche template DICO par école ──
-									$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_LOOKUP',
-										$login_courant,
-										'SQL (école exacte): ' . $sql_tpl
-									);
-									$tpl = $this->conn->GetRow($sql_tpl);
+								// ── NASSER LOG : SQL template DICO (école exacte) ───
+								if (class_exists('NasserLog')) {
+									NasserLog::sql('DICO_TEMPLATE_ECOLE_EXACTE', $sql_tpl);
+								}
+								// ── FIN NASSER LOG ────────────────────────────────────
+								// ── MOBLOGS : recherche template DICO par école ──
+								$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_LOOKUP',
+									$login_courant,
+									'SQL (école exacte): ' . $sql_tpl
+								);
+								$tpl = $this->conn->GetRow($sql_tpl);
+								// ── NASSER LOG : résultat template école ─────────────
+								if (class_exists('NasserLog')) {
+									NasserLog::sql('DICO_TEMPLATE_ECOLE_EXACTE_RESULT', '(GetRow)', $tpl ? [$tpl] : []);
+								}
+								// ── FIN NASSER LOG ────────────────────────────────────
 
-									// Si pas de résultat pour ce code école précis → modèle générique
-									if (empty($tpl)) {
-										$sql_tpl2 = 'SELECT TOP 1 USER_PRIV, ID_REGROUP_PARENTS,'
-											.' ID_TYPE_REGROUP_PARENTS'
-											.' FROM DICO_FIXE_REGROUPEMENT'
-											.' WHERE ID_CAMPAGNE='.$id_camp
-											.' AND ID_CHAINE='.$id_chaine
-											.' AND ID_ANNEE='.$id_annee
-											.' AND ID_SYSTEME='.$id_systeme;
-										// ── MOBLOGS : fallback template générique ────
-										$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_FALLBACK',
-											$login_courant,
-											'Pas de template école — SQL générique: ' . $sql_tpl2
-										);
-										$tpl = $this->conn->GetRow($sql_tpl2);
+								// Si pas de résultat pour ce code école précis → modèle générique
+								if (empty($tpl)) {
+									$sql_tpl2 = 'SELECT TOP 1 USER_PRIV, ID_REGROUP_PARENTS,'
+										.' ID_TYPE_REGROUP_PARENTS'
+										.' FROM DICO_FIXE_REGROUPEMENT'
+										.' WHERE ID_CAMPAGNE='.$id_camp
+										.' AND ID_CHAINE='.$id_chaine
+										.' AND ID_ANNEE='.$id_annee
+										.' AND ID_SYSTEME='.$id_systeme;
+									// ── NASSER LOG : fallback template générique ──────
+									if (class_exists('NasserLog')) {
+										NasserLog::note('Aucun template pour CODE_ETAB='.$raw_code_etab.' → fallback générique');
+										NasserLog::sql('DICO_TEMPLATE_GENERIQUE', $sql_tpl2);
 									}
-
-									$user_priv              = isset($tpl['USER_PRIV'])
-										? $tpl['USER_PRIV'] : '';
-									$id_regroup_parents     = isset($tpl['ID_REGROUP_PARENTS'])
-										? $tpl['ID_REGROUP_PARENTS'] : '';
-									$id_type_regroup_par    = isset($tpl['ID_TYPE_REGROUP_PARENTS'])
-										? $tpl['ID_TYPE_REGROUP_PARENTS'] : '';
-
-									// ── MOBLOGS : résultat template ───────────────────
-									$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_RESULT',
+									// ── FIN NASSER LOG ────────────────────────────────
+									// ── MOBLOGS : fallback template générique ────
+									$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_FALLBACK',
 										$login_courant,
-										'USER_PRIV='.$user_priv
-										.' | ID_REGROUP_PARENTS='.(empty($id_regroup_parents)?'[vide]':$id_regroup_parents)
-										.' | ID_TYPE_REGROUP_PARENTS='.(empty($id_type_regroup_par)?'[vide]':$id_type_regroup_par)
+										'Pas de template école — SQL générique: ' . $sql_tpl2
 									);
+									$tpl = $this->conn->GetRow($sql_tpl2);
+									// ── NASSER LOG : résultat fallback générique ─────
+									if (class_exists('NasserLog')) {
+										NasserLog::sql('DICO_TEMPLATE_GENERIQUE_RESULT', '(GetRow)', $tpl ? [$tpl] : []);
+									}
+									// ── FIN NASSER LOG ────────────────────────────────
+								}
+
+								$user_priv              = isset($tpl['USER_PRIV'])
+									? $tpl['USER_PRIV'] : '';
+								$id_regroup_parents     = isset($tpl['ID_REGROUP_PARENTS'])
+									? $tpl['ID_REGROUP_PARENTS'] : '';
+								$id_type_regroup_par    = isset($tpl['ID_TYPE_REGROUP_PARENTS'])
+									? $tpl['ID_TYPE_REGROUP_PARENTS'] : '';
+
+								// ── NASSER LOG : valeurs issues du template ───────────
+								if (class_exists('NasserLog')) {
+									NasserLog::valeur('USER_PRIV (template)',          $user_priv,            'TEMPLATE_DICO');
+									NasserLog::valeur('ID_REGROUP_PARENTS (template)', $id_regroup_parents,   'TEMPLATE_DICO');
+									NasserLog::valeur('ID_TYPE_REGROUP_PARENTS (tpl)', $id_type_regroup_par,  'TEMPLATE_DICO');
+								}
+								// ── FIN NASSER LOG ────────────────────────────────────
+								// ── MOBLOGS : résultat template ───────────────────
+								$this->write_mob_log($num_ligne, 'DICO_TEMPLATE_RESULT',
+									$login_courant,
+									'USER_PRIV='.$user_priv
+									.' | ID_REGROUP_PARENTS='.(empty($id_regroup_parents)?'[vide]':$id_regroup_parents)
+									.' | ID_TYPE_REGROUP_PARENTS='.(empty($id_type_regroup_par)?'[vide]':$id_type_regroup_par)
+								);
 
 									// ── fix AK-PHP-01 : enrichissement depuis ETABLISSEMENT_REGROUPEMENT ──────
 									// Quand ID_REGROUP_PARENTS / ID_TYPE_REGROUP_PARENTS restent vides
@@ -1515,60 +1585,105 @@
 											.' WHERE ER.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' = '.$code_etab_q
 											.' ORDER BY H.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' ASC';
 
-										// ── MOBLOGS : lookup hiérarchique ETABLISSEMENT_REGROUPEMENT ──
-										$this->write_mob_log($num_ligne, 'HIER_LOOKUP_SQL',
-											$login_courant,
-											'AK-PHP-01 — SQL: ' . $sql_hier
-										);
-										$hier_rows = $this->conn->GetAll($sql_hier);
-
-										if (!empty($hier_rows) && is_array($hier_rows)) {
-											$codes_reg      = array();
-											$codes_type_reg = array();
-											foreach ($hier_rows as $hrow) {
-												$codes_reg[]      = $hrow['code_reg'];
-												$codes_type_reg[] = $hrow['code_type_reg'];
-											}
-											// Le 1er niveau (feuille) = regroupement direct de l'école.
-											// ID_REGROUP_PARENTS = niveaux supérieurs (commune, province…),
-											// séparés par virgule dans l'ordre croissant (comme fix_regroup.php).
-											if (count($codes_reg) > 1) {
-												// Les parents sont du 2e au dernier
-												$parent_codes      = array_slice($codes_reg,      1);
-												$parent_type_codes = array_slice($codes_type_reg, 1);
-											} else {
-												// Un seul niveau : l'école est au niveau le plus haut
-												$parent_codes      = $codes_reg;
-												$parent_type_codes = $codes_type_reg;
-											}
-											$id_regroup_parents  = implode(',', $parent_codes);
-											$id_type_regroup_par = implode(',', $parent_type_codes);
-
-											// ── MOBLOGS : résultat hiérarchie ────────
-											$this->write_mob_log($num_ligne, 'HIER_LOOKUP_OK',
-												$login_courant,
-												count($hier_rows).' niveaux trouvés'
-												.' | ID_REGROUP_PARENTS='.$id_regroup_parents
-												.' | ID_TYPE_REGROUP_PARENTS='.$id_type_regroup_par
-												.' | Niveaux détaillés: '.implode(',', array_map(
-													function($r){ return 'R='.$r['code_reg'].'/T='.$r['code_type_reg']; },
-													$hier_rows
-												))
-											);
-										} else {
-											// ── MOBLOGS : hiérarchie non trouvée ─────
-											$this->write_mob_log($num_ligne, 'HIER_LOOKUP_VIDE',
-												$login_courant,
-												'AUCUN enregistrement ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab
-												.' — ID_REGROUP_PARENTS restera vide'
-											);
-										}
+										// ── NASSER LOG : SQL hiérarchie ──────────────────────
+									if (class_exists('NasserLog')) {
+										NasserLog::note('AK-PHP-01 — Déclenchement lookup ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine);
+										NasserLog::sql('HIER_ETABLISSEMENT_REGROUPEMENT', $sql_hier);
 									}
-									// ── fin fix AK-PHP-01 ──────────────────────────────────────────────────────
+									// ── FIN NASSER LOG ────────────────────────────────────
+									// ── MOBLOGS : lookup hiérarchique ETABLISSEMENT_REGROUPEMENT ──
+									$this->write_mob_log($num_ligne, 'HIER_LOOKUP_SQL',
+										$login_courant,
+										'AK-PHP-01 — SQL: ' . $sql_hier
+									);
+									$hier_rows = $this->conn->GetAll($sql_hier);
 
-									$user_priv_q         = $this->conn->qstr($user_priv);
-									$regroup_parents_q   = $this->conn->qstr($id_regroup_parents);
-									$type_regroup_par_q  = $this->conn->qstr($id_type_regroup_par);
+									if (!empty($hier_rows) && is_array($hier_rows)) {
+										$codes_reg      = array();
+										$codes_type_reg = array();
+										foreach ($hier_rows as $hrow) {
+											$codes_reg[]      = $hrow['code_reg'];
+											$codes_type_reg[] = $hrow['code_type_reg'];
+										}
+										// Le 1er niveau (feuille) = regroupement direct de l'école.
+										// ID_REGROUP_PARENTS = niveaux supérieurs (commune, province…),
+										// séparés par virgule dans l'ordre croissant (comme fix_regroup.php).
+										if (count($codes_reg) > 1) {
+											// Les parents sont du 2e au dernier
+											$parent_codes      = array_slice($codes_reg,      1);
+											$parent_type_codes = array_slice($codes_type_reg, 1);
+										} else {
+											// Un seul niveau : l'école est au niveau le plus haut
+											$parent_codes      = $codes_reg;
+											$parent_type_codes = $codes_type_reg;
+										}
+										$id_regroup_parents  = implode(',', $parent_codes);
+										$id_type_regroup_par = implode(',', $parent_type_codes);
+
+										// ── NASSER LOG : résultat hiérarchie ─────────────
+										if (class_exists('NasserLog')) {
+											NasserLog::sql('HIER_ETABLISSEMENT_REGROUPEMENT_RESULT',
+												'(GetAll)', $hier_rows);
+											NasserLog::valeur('ID_REGROUP_PARENTS (ETAB_REG)',
+												$id_regroup_parents, 'ETABLISSEMENT_REGROUPEMENT');
+											NasserLog::valeur('ID_TYPE_REGROUP_PARENTS (ETAB_REG)',
+												$id_type_regroup_par, 'ETABLISSEMENT_REGROUPEMENT');
+											NasserLog::note('Décomposition: codes_reg=['.implode(',', $codes_reg).'] | codes_type_reg=['.implode(',', $codes_type_reg).'] | parent_codes=['.implode(',', $parent_codes).']');
+										}
+										// ── FIN NASSER LOG ────────────────────────────────
+										// ── MOBLOGS : résultat hiérarchie ────────
+										$this->write_mob_log($num_ligne, 'HIER_LOOKUP_OK',
+											$login_courant,
+											count($hier_rows).' niveaux trouvés'
+											.' | ID_REGROUP_PARENTS='.$id_regroup_parents
+											.' | ID_TYPE_REGROUP_PARENTS='.$id_type_regroup_par
+											.' | Niveaux détaillés: '.implode(',', array_map(
+												function($r){ return 'R='.$r['code_reg'].'/T='.$r['code_type_reg']; },
+												$hier_rows
+											))
+										);
+									} else {
+										// ── NASSER LOG : aucun résultat — raison du bug ──────
+										if (class_exists('NasserLog')) {
+											NasserLog::err('HIER_LOOKUP_VIDE',
+												'GetAll() retourne VIDE pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine
+												.' | Table ER='.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT']
+												.' | col_etab='.$GLOBALS['PARAM']['CODE_ETABLISSEMENT']
+												.' | Table H='.$GLOBALS['PARAM']['HIERARCHIE']
+												.' | col_chaine='.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT']
+											);
+											NasserLog::note('CONSEQUENCE: ID_REGROUP_PARENTS et ID_TYPE_REGROUP_PARENTS resteront VIDES dans DICO_FIXE_REGROUPEMENT');
+										}
+										// ── FIN NASSER LOG ────────────────────────────────
+										// ── MOBLOGS : hiérarchie non trouvée ─────
+										$this->write_mob_log($num_ligne, 'HIER_LOOKUP_VIDE',
+											$login_courant,
+											'AUCUN enregistrement ETABLISSEMENT_REGROUPEMENT pour CODE_ETAB='.$raw_code_etab
+											.' — ID_REGROUP_PARENTS restera vide'
+										);
+									}
+								}
+								// ── fin fix AK-PHP-01 ──────────────────────────────────────────────────────
+
+								// ── NASSER LOG : valeurs FINALES avant INSERT DICO ───────
+								if (class_exists('NasserLog')) {
+									NasserLog::note('VALEURS FINALES à insérer dans DICO_FIXE_REGROUPEMENT :');
+									NasserLog::valeur('ID_USER',                  $tab[0],              'Excel col A');
+									NasserLog::valeur('ID_REGROUP (CODE_ETAB)',   $raw_code_etab,       'Excel col G');
+									NasserLog::valeur('ID_REGROUP_PARENTS',       $id_regroup_parents,  empty($id_regroup_parents)?'VIDE/MANQUANT':'ok');
+									NasserLog::valeur('ID_TYPE_REGROUP_PARENTS',  $id_type_regroup_par, empty($id_type_regroup_par)?'VIDE/MANQUANT':'ok');
+									NasserLog::valeur('USER_PRIV',                $user_priv,           '');
+									NasserLog::valeur('ID_CAMPAGNE',              $id_camp,             '');
+									NasserLog::valeur('ID_SYSTEME',               $id_systeme,          '');
+									NasserLog::valeur('ID_CHAINE',                $id_chaine,           '');
+									NasserLog::valeur('ID_ANNEE',                 $id_annee,            '');
+									NasserLog::valeur('ID_PERIODE',               $id_periode,          '');
+								}
+								// ── FIN NASSER LOG ────────────────────────────────────────
+
+								$user_priv_q         = $this->conn->qstr($user_priv);
+								$regroup_parents_q   = $this->conn->qstr($id_regroup_parents);
+								$type_regroup_par_q  = $this->conn->qstr($id_type_regroup_par);
 
 									// Vérifier doublon PK avant INSERT
 									$sql_chk = 'SELECT COUNT(*) FROM DICO_FIXE_REGROUPEMENT'
@@ -1581,6 +1696,13 @@
 										.' AND ID_TYPE_REGROUP='.$id_type_regroup
 										.' AND ID_REGROUP='.$code_etab_q;
 									$exists = intval($this->conn->GetOne($sql_chk));
+
+									// ── NASSER LOG : SQL vérif doublon ───────────────────────
+									if (class_exists('NasserLog')) {
+										NasserLog::sql('DICO_DOUBLON_CHECK', $sql_chk, [$exists]);
+										NasserLog::valeur('DOUBLON_EXISTS', $exists, $exists > 0 ? 'OUI — skip INSERT DICO' : 'NON — INSERT DICO à faire');
+									}
+									// ── FIN NASSER LOG ───────────────────────────────────────
 
 									// ── MOBLOGS : résumé valeurs finales avant INSERT ─
 									$this->write_mob_log($num_ligne, 'DICO_VALEURS_FINALES',
@@ -1596,7 +1718,14 @@
 										$this->conn->CommitTrans();
 										$trans_committed = true;
 										$regroup_warning = ' [École déjà liée — doublon ignoré]';
-										// ── MOBLOGS : doublon DICO ────────────────────
+										// ── NASSER LOG : doublon DICO → CommitTrans ────────────
+									if (class_exists('NasserLog')) {
+										NasserLog::transaction('COMMIT', $login_courant,
+											'DOUBLON DICO ignoré — ADMIN_USERS seul validé | CODE_ETAB='.$raw_code_etab.' CAMP='.$id_camp.' ANNEE='.$id_annee);
+										NasserLog::note('DICO_DOUBLON_SKIP : enregistrement déjà présent dans DICO_FIXE_REGROUPEMENT — aucun INSERT DICO');
+									}
+									// ── FIN NASSER LOG ───────────────────────────────────────
+									// ── MOBLOGS : doublon DICO ────────────────────
 										$this->write_mob_log($num_ligne, 'DICO_DOUBLON_SKIP',
 											$login_courant,
 											'DOUBLON DICO_FIXE_REGROUPEMENT — CommitTrans() (ADMIN_USERS validé, DICO ignoré)'
@@ -1624,6 +1753,11 @@
 											.$regroup_parents_q.', '
 											.$type_regroup_par_q.')';
 
+										// ── NASSER LOG : SQL complet INSERT DICO ────────────────
+										if (class_exists('NasserLog')) {
+											NasserLog::sql('DICO_INSERT_SQL', $sql_regroup);
+										}
+										// ── FIN NASSER LOG ───────────────────────────────────────
 										// ── MOBLOGS : SQL INSERT DICO ────────────────
 										$this->write_mob_log($num_ligne, 'DICO_INSERT_SQL',
 											$login_courant,
@@ -1638,6 +1772,15 @@
 												? $this->conn->ErrorMsg() : '';
 											$regroup_warning = ' [ERREUR: école non liée + utilisateur annulé: '
 												. htmlspecialchars(substr($db_err, 0, 150)) . ']';
+											// ── NASSER LOG : RollbackTrans + erreur DICO ────────────
+											if (class_exists('NasserLog')) {
+												NasserLog::transaction('ROLLBACK', $login_courant,
+													'ECHEC INSERT DICO_FIXE_REGROUPEMENT — ADMIN_USERS annulé aussi (atomique)');
+												NasserLog::err('DICO_INSERT_ERREUR',
+													'Execute() retourne false | DB Erreur: '.substr($db_err, 0, 300)
+													.' | SQL: '.$sql_regroup);
+											}
+											// ── FIN NASSER LOG ───────────────────────────────────────
 											// ── MOBLOGS : DICO INSERT échoué ─────────
 											$this->write_mob_log($num_ligne, 'DICO_INSERT_ERREUR',
 												$login_courant,
@@ -1649,6 +1792,19 @@
 											$this->conn->CommitTrans();
 											$trans_committed = true;
 											$regroup_warning = ' [École liée OK]';
+											// ── NASSER LOG : CommitTrans succès complet ─────────────
+											if (class_exists('NasserLog')) {
+												NasserLog::transaction('COMMIT', $login_courant,
+													'INSERT DICO_FIXE_REGROUPEMENT réussi — transaction validée (ADMIN_USERS + DICO)');
+												NasserLog::note('DICO_INSERT_OK :'
+													.' ID_USER='.$tab[0]
+													.' | CODE_ETAB='.$raw_code_etab
+													.' | ID_REGROUP_PARENTS='.(empty($id_regroup_parents)?'◄◄ VIDE':$id_regroup_parents)
+													.' | ID_TYPE_REGROUP_PARENTS='.(empty($id_type_regroup_par)?'◄◄ VIDE':$id_type_regroup_par)
+													.' | USER_PRIV='.$user_priv
+												);
+											}
+											// ── FIN NASSER LOG ───────────────────────────────────────
 											// ── MOBLOGS : succès complet ──────────────
 											$this->write_mob_log($num_ligne, 'DICO_INSERT_OK',
 												$login_courant,
@@ -1660,6 +1816,16 @@
 										}
 									}
 								} else {
+									// ── NASSER LOG : champs DICO manquants ───────────────────
+									if (class_exists('NasserLog')) {
+										NasserLog::note('DICO_SKIP_CHAMPS_VIDES : tab[7..9] absents ou vides — aucun INSERT DICO_FIXE_REGROUPEMENT');
+										NasserLog::valeur('tab[7] CODE_ETAB',  isset($tab[7]) ? $tab[7] : 'non défini', 'Excel col H');
+										NasserLog::valeur('tab[8] ID_CAMP',    isset($tab[8]) ? $tab[8] : 'non défini', 'Excel col I');
+										NasserLog::valeur('tab[9] ID_SYSTEME', isset($tab[9]) ? $tab[9] : 'non défini', 'Excel col J');
+										NasserLog::err('DICO_SKIP_CHAMPS_VIDES',
+											'Liaison DICO ignorée — colonnes Excel insuffisantes pour ligne '.$num_ligne.' login='.$login_courant);
+									}
+									// ── FIN NASSER LOG ───────────────────────────────────────
 									// ── MOBLOGS : colonnes DICO absentes → pas d'INSERT DICO ─
 									$this->write_mob_log($num_ligne, 'DICO_SKIP_CHAMPS_VIDES',
 										$login_courant,
@@ -1670,6 +1836,13 @@
 							// (cas: tab[7..9] vides -> pas de INSERT DICO -> transaction toujours ouverte)
 							if (!$trans_committed) {
 								$this->conn->CommitTrans();
+								// ── NASSER LOG : CommitTrans sécurité ────────────────────────
+								if (class_exists('NasserLog')) {
+									NasserLog::transaction('COMMIT', $login_courant,
+										'CommitTrans() de SÉCURITÉ — transaction encore ouverte (DICO non traité) — seul ADMIN_USERS validé');
+									NasserLog::note('TRANSACTION_COMMIT_SECURITE : cas anormal — vérifier pourquoi DICO n\'a pas été traité pour login='.$login_courant);
+								}
+								// ── FIN NASSER LOG ───────────────────────────────────────────
 								// ── MOBLOGS : CommitTrans de sécurité ────────────
 								$this->write_mob_log($num_ligne, 'TRANSACTION_COMMIT_SECURITE',
 									$login_courant,
@@ -1684,6 +1857,11 @@
 				$tab[6] = $this->get_group_name_by_code($tab[6]);
 				$result[] = $tab;
 				$this->record_log_file($logData);
+				// ── NASSER LOG : fin de traitement de la ligne ───────────────────────
+				if (class_exists('NasserLog')) {
+					NasserLog::note('═══ FIN LIGNE '.$num_ligne.' — login='.$login_courant.' ═══');
+				}
+				// ── FIN NASSER LOG ────────────────────────────────────────────────────
 				// ── MOBLOGS : fin ligne ───────────────────────────────────────────────
 				$this->write_mob_log($num_ligne, 'FIN_LIGNE',
 					$login_courant,
@@ -1691,6 +1869,15 @@
 				);
 			}
 			$this->close_log_file();
+			// ── NASSER LOG : fin import complet ──────────────────────────────────────
+			if (class_exists('NasserLog')) {
+				NasserLog::note('');
+				NasserLog::note('╔══════════════════════════════════════════════════════════════════════════════════╗');
+				NasserLog::note('║           FIN IMPORT EXCEL — maj_bdd_excel() terminé                           ║');
+				NasserLog::note('╚══════════════════════════════════════════════════════════════════════════════════╝');
+				NasserLog::note('Total lignes traitées : '.count($result).' | Fichier: '.basename($cheminFichierExcel));
+			}
+			// ── FIN NASSER LOG ────────────────────────────────────────────────────────
 			// ── MOBLOGS : fermeture ───────────────────────────────────────────────────
 			$this->close_mob_log();
 		}
