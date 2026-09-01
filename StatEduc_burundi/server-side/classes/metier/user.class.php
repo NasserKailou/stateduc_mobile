@@ -1601,6 +1601,44 @@
 											empty($code_reg_ecole) ? '◄◄ VIDE — CODE_ETAB absent de ETABLISSEMENT_REGROUPEMENT' : 'OK');
 									}
 
+									// ─── DIAGNOSTIC ÉTAPE 1 VIDE : trouver ce qui existe en base pour cet étab ──
+									if (empty($code_reg_ecole) && class_exists('NasserLog')) {
+										// Chercher si le CODE_ETABLISSEMENT existe dans la table (sans filtre)
+										$sql_diag_etab =
+											'SELECT TOP 5 '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT']
+											.', '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+											.' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT']
+											.' WHERE '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' LIKE '
+											.$this->conn->qstr('%'.substr(trim($raw_code_etab),0,3).'%');
+										NasserLog::sql('AK2_DIAG_ER_SAMPLE', $sql_diag_etab);
+										$diag_rows = $this->conn->GetAll($sql_diag_etab);
+										NasserLog::note('DIAG ER : '.count($diag_rows).' lignes ETABLISSEMENT_REGROUPEMENT avec CODE_ETAB LIKE %'.substr(trim($raw_code_etab),0,3).'%');
+										if (!empty($diag_rows)) {
+											foreach ($diag_rows as $dr) {
+												NasserLog::note('  DIAG ER ligne: '.json_encode($dr));
+											}
+										}
+										// Chercher aussi le compte total de la table pour vérifier qu'elle n'est pas vide
+										$sql_diag_count = 'SELECT COUNT(*) FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'];
+										NasserLog::sql('AK2_DIAG_ER_COUNT', $sql_diag_count);
+										$total_er = $this->conn->GetOne($sql_diag_count);
+										NasserLog::note('DIAG ER : total lignes dans ETABLISSEMENT_REGROUPEMENT = '.$total_er);
+										// Chercher dans REGROUPEMENT si le code 61555 existe (peut être un code_regroupement direct)
+										$sql_diag_reg =
+											'SELECT TOP 3 '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+											.', '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+											.', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
+											.' FROM '.$GLOBALS['PARAM']['REGROUPEMENT']
+											.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' = '.(int)$raw_code_etab;
+										NasserLog::sql('AK2_DIAG_REG_DIRECT', $sql_diag_reg);
+										$diag_reg = $this->conn->GetAll($sql_diag_reg);
+										NasserLog::note('DIAG REGROUPEMENT direct CODE='.$raw_code_etab.' : '.count($diag_reg).' ligne(s)');
+										if (!empty($diag_reg)) {
+											foreach ($diag_reg as $dr) { NasserLog::note('  DIAG REG: '.json_encode($dr)); }
+										}
+									}
+									// ─── FIN DIAGNOSTIC ────────────────────────────────────────────────────────
+
 									if (!empty($code_reg_ecole)) {
 
 										// ─── ÉTAPE 2 : types de la chaîne (build_chaine-like, DESC = haut→bas) ────
