@@ -95,6 +95,15 @@ if(!(isset($_POST['login']) && isset($_POST['password']))
 		if (session_status() === PHP_SESSION_NONE) { session_start(); }
     	if(isset($_GET['filtre'])) $_SESSION['filtre'] = $_GET['filtre'];  
 		if(isset($GLOBALS['placer_conn_dico']) && $GLOBALS['placer_conn_dico']) {
+			// AK-CONN-SAVE (BUG-REGROUP-001 r4) : sauvegarder la connexion principale
+			// (SQL Server BURUNDI) avant que placer_conn_dico l'écrase avec conn_dico.
+			// Sans cette sauvegarde, $this->conn dans user.class.php pointe vers
+			// conn_dico (Access/.mdb) et les lookups dans ETABLISSEMENT_REGROUPEMENT,
+			// HIERARCHIE, LIAISONS (tables SQL Server BURUNDI) retournent VIDE.
+			// Utilisé par : $conn_geo dans le bloc AK-PHP-01 v2 de user.class.php.
+			if (isset($GLOBALS['conn']) && $GLOBALS['conn'] !== false) {
+				$GLOBALS['conn_original'] = $GLOBALS['conn'];
+			}
 			$GLOBALS['conn'] = $GLOBALS['conn_dico'] ; 
 		}
 		require_once $GLOBALS['SISED_PATH_CLS'] . 'metier/' . 'erreur_manager.class.php';

@@ -1582,8 +1582,20 @@
 								//   3. LIAISONS (PERE_CODE_REGROUPEMENT) → remonter niveau par niveau
 								if (!empty($raw_code_etab)) {
 
+									// AK-CONN-GEO (BUG-REGROUP-001 r4) : utiliser la connexion SQL Server BURUNDI
+									// (base principale) pour les tables géographiques ETABLISSEMENT_REGROUPEMENT,
+									// REGROUPEMENT, HIERARCHIE, LIAISONS — toutes dans [BURUNDI].[dbo].
+									// Quand administration.php passe placer_conn_dico=true, common.php écrase
+									// $GLOBALS['conn'] avec conn_dico (Access/.mdb) et sauvegarde l'original dans
+									// $GLOBALS['conn_original']. Sans cette sauvegarde, $this->conn (= conn_dico)
+									// ne peut pas voir ETABLISSEMENT_REGROUPEMENT → ETAPE1 retourne VIDE.
+									$conn_geo = (isset($GLOBALS['conn_original']) && $GLOBALS['conn_original'] !== false)
+										? $GLOBALS['conn_original']
+										: $this->conn;
+
 									if (class_exists('NasserLog')) {
-										NasserLog::note('AK-PHP-01 v2 — début lookup LIAISONS pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine);
+										$conn_geo_type = ($conn_geo === $this->conn) ? 'this->conn (fallback)' : 'conn_original (SQL Server BURUNDI)';
+										NasserLog::note('AK-PHP-01 v2 — début lookup LIAISONS pour CODE_ETAB='.$raw_code_etab.' chaine='.$id_chaine.' | conn_geo='.$conn_geo_type);
 									}
 
 									// ─── ÉTAPE 1 : CODE_REGROUPEMENT direct de l'école ────────────────────────
@@ -1594,7 +1606,7 @@
 
 									if (class_exists('NasserLog')) { NasserLog::sql('AK2_ETAPE1_ETAB_REG', $sql_etab_reg); }
 
-									$code_reg_ecole = $this->conn->GetOne($sql_etab_reg);
+									$code_reg_ecole = $conn_geo->GetOne($sql_etab_reg);
 
 									if (class_exists('NasserLog')) {
 										NasserLog::valeur('ETAPE1 code_reg_ecole', $code_reg_ecole,
@@ -1609,9 +1621,9 @@
 											.', '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']
 											.' FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT']
 											.' WHERE '.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' LIKE '
-											.$this->conn->qstr('%'.substr(trim($raw_code_etab),0,3).'%');
+											.$conn_geo->qstr('%'.substr(trim($raw_code_etab),0,3).'%');
 										NasserLog::sql('AK2_DIAG_ER_SAMPLE', $sql_diag_etab);
-										$diag_rows = $this->conn->GetAll($sql_diag_etab);
+										$diag_rows = $conn_geo->GetAll($sql_diag_etab);
 										NasserLog::note('DIAG ER : '.count($diag_rows).' lignes ETABLISSEMENT_REGROUPEMENT avec CODE_ETAB LIKE %'.substr(trim($raw_code_etab),0,3).'%');
 										if (!empty($diag_rows)) {
 											foreach ($diag_rows as $dr) {
@@ -1621,7 +1633,7 @@
 										// Chercher aussi le compte total de la table pour vérifier qu'elle n'est pas vide
 										$sql_diag_count = 'SELECT COUNT(*) FROM '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'];
 										NasserLog::sql('AK2_DIAG_ER_COUNT', $sql_diag_count);
-										$total_er = $this->conn->GetOne($sql_diag_count);
+										$total_er = $conn_geo->GetOne($sql_diag_count);
 										NasserLog::note('DIAG ER : total lignes dans ETABLISSEMENT_REGROUPEMENT = '.$total_er);
 										// Chercher dans REGROUPEMENT si le code 61555 existe (peut être un code_regroupement direct)
 										$sql_diag_reg =
@@ -1631,7 +1643,7 @@
 											.' FROM '.$GLOBALS['PARAM']['REGROUPEMENT']
 											.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' = '.(int)$raw_code_etab;
 										NasserLog::sql('AK2_DIAG_REG_DIRECT', $sql_diag_reg);
-										$diag_reg = $this->conn->GetAll($sql_diag_reg);
+										$diag_reg = $conn_geo->GetAll($sql_diag_reg);
 										NasserLog::note('DIAG REGROUPEMENT direct CODE='.$raw_code_etab.' : '.count($diag_reg).' ligne(s)');
 										if (!empty($diag_reg)) {
 											foreach ($diag_reg as $dr) { NasserLog::note('  DIAG REG: '.json_encode($dr)); }
@@ -1653,7 +1665,7 @@
 
 										if (class_exists('NasserLog')) { NasserLog::sql('AK2_ETAPE2_BUILD_CHAINE', $sql_chaine); }
 
-										$chaine_types = $this->conn->GetAll($sql_chaine);
+										$chaine_types = $conn_geo->GetAll($sql_chaine);
 
 										if (class_exists('NasserLog')) {
 											NasserLog::valeur('ETAPE2 chaine_types count', count($chaine_types),
@@ -1675,7 +1687,7 @@
 
 											if (class_exists('NasserLog')) { NasserLog::sql('AK2_ETAPE3A_TYPE_ECOLE', $sql_type_ecole); }
 
-											$code_type_reg_ecole = $this->conn->GetOne($sql_type_ecole);
+											$code_type_reg_ecole = $conn_geo->GetOne($sql_type_ecole);
 
 											if (class_exists('NasserLog')) {
 												NasserLog::valeur('ETAPE3A code_type_reg_ecole', $code_type_reg_ecole,
@@ -1746,7 +1758,7 @@
 													NasserLog::sql('AK2_ETAPE3C_PARENT_iter'.$iterations, $sql_parent);
 												}
 
-												$parent_row = $this->conn->GetRow($sql_parent);
+												$parent_row = $conn_geo->GetRow($sql_parent);
 
 												if (empty($parent_row) || empty($parent_row['code_reg'])) {
 													// Plus de parent : on est au sommet de la hiérarchie

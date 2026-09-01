@@ -240,11 +240,45 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 	if ($is_mobile_request) {
 		$annee_serveur = $GLOBALS['conn_dico']->GetOne('SELECT CODE_ANNEE FROM PARAM_DEFAUT');
 		if ($annee_serveur && (int)$annee_serveur > 0 && (int)$id_annee !== (int)$annee_serveur) {
+			// AK-YEAR-LABEL : récupérer les libellés lisibles (ex: "2009-2010", "2026-2027")
+			// depuis TYPE_ANNEE (base principale SQL Server, connexion $GLOBALS['conn']).
+			// Colonnes : CODE_TYPE_ANNEE (code numérique) et LIBELLE_TYPE_ANNEE (libellé affiché).
+			// Fallback sur le code numérique brut si la table est inaccessible ou le libellé vide.
+			$col_code_ta    = $GLOBALS['PARAM']['CODE']    . '_' . $GLOBALS['PARAM']['TYPE_ANNEE']; // CODE_TYPE_ANNEE
+			$col_libelle_ta = $GLOBALS['PARAM']['LIBELLE'] . '_' . $GLOBALS['PARAM']['TYPE_ANNEE']; // LIBELLE_TYPE_ANNEE
+			$table_ta       = $GLOBALS['PARAM']['TYPE_ANNEE'];                                       // TYPE_ANNEE
+
+			$lib_annee_mobile  = (string)(int)$id_annee;   // fallback = code brut
+			$lib_annee_serveur = (string)(int)$annee_serveur; // fallback = code brut
+
+			if (isset($GLOBALS['conn']) && $GLOBALS['conn'] !== false) {
+				// Libellé de l'année mobile (envoyée par l'app)
+				$sql_lib_m = 'SELECT ' . $col_libelle_ta . ' FROM ' . $table_ta
+				           . ' WHERE ' . $col_code_ta . ' = ' . (int)$id_annee;
+				$row_m = $GLOBALS['conn']->GetRow($sql_lib_m);
+				if ($row_m !== false && is_array($row_m)) {
+					$r_upper = array_change_key_case($row_m, CASE_UPPER);
+					if (!empty($r_upper[$col_libelle_ta])) {
+						$lib_annee_mobile = trim((string)$r_upper[$col_libelle_ta]);
+					}
+				}
+				// Libellé de l'année active du serveur
+				$sql_lib_s = 'SELECT ' . $col_libelle_ta . ' FROM ' . $table_ta
+				           . ' WHERE ' . $col_code_ta . ' = ' . (int)$annee_serveur;
+				$row_s = $GLOBALS['conn']->GetRow($sql_lib_s);
+				if ($row_s !== false && is_array($row_s)) {
+					$r_upper = array_change_key_case($row_s, CASE_UPPER);
+					if (!empty($r_upper[$col_libelle_ta])) {
+						$lib_annee_serveur = trim((string)$r_upper[$col_libelle_ta]);
+					}
+				}
+			}
+
 			$rps = array(
 				$lib_status  => $status_ko,
 				$lib_message => $GLOBALS['PARAM_WS']['KO'],
 				$lib_data    => 'Annee incorrecte : votre application utilise l\'annee '
-					. $id_annee . ' mais le serveur est sur l\'annee ' . $annee_serveur
+					. $lib_annee_mobile . ' mais le serveur est sur l\'annee ' . $lib_annee_serveur
 					. '. Veuillez vous reconnecter pour mettre a jour l\'annee active.'
 			);
 			echo json_encode($rps);
