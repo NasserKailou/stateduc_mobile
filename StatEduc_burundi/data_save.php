@@ -231,6 +231,28 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 		if ($_def && (int)$_def > 0) { $id_year = $_def; $_SESSION['annee'] = $id_year; }
 	}
 
+	// --- AK-YEAR-CHECK : Vérification année mobile vs serveur ---
+	// La pluriannualité permet de CONSULTER les données des années précédentes,
+	// mais l'ENVOI de données doit toujours cibler l'année active du serveur.
+	// Si l'app mobile envoie une année différente de l'année active serveur,
+	// on rejette l'envoi immédiatement avec un message explicite.
+	$is_mobile_request = ($id_annee != '' && $id_annee != '0');
+	if ($is_mobile_request) {
+		$annee_serveur = $GLOBALS['conn_dico']->GetOne('SELECT CODE_ANNEE FROM PARAM_DEFAUT');
+		if ($annee_serveur && (int)$annee_serveur > 0 && (int)$id_annee !== (int)$annee_serveur) {
+			$rps = array(
+				$lib_status  => $status_ko,
+				$lib_message => $GLOBALS['PARAM_WS']['KO'],
+				$lib_data    => 'Annee incorrecte : votre application utilise l\'annee '
+					. $id_annee . ' mais le serveur est sur l\'annee ' . $annee_serveur
+					. '. Veuillez vous reconnecter pour mettre a jour l\'annee active.'
+			);
+			echo json_encode($rps);
+			return;
+		}
+	}
+	// --- FIN AK-YEAR-CHECK ---
+
 	// --- Verification acces campagne ---
 	// Pour les requetes mobiles (id_annee fourni dans l'URL), on effectue d'abord
 	// la verification normale via DICO_FIXE_REGROUPEMENT. Si elle echoue
