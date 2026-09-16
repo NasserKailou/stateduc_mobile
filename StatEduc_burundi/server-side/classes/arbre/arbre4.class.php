@@ -1,0 +1,1380 @@
+<?php class arbre {
+
+    public $chaine;
+    public $init_depht;
+    public $result;
+    public $code_chaine;
+	
+    // Ajout Alassane
+    public $type_access;
+
+    public function __construct($code_chaine) {
+
+        $this->conn = $GLOBALS['conn'];
+		$this->code_chaine = $code_chaine;
+        $this->chaine = $this->build_chaine($code_chaine);
+        $this->nbtyperegroup = count($this->chaine);
+
+        $this->init();
+
+    }
+		
+		function __wakeup(){
+			$this->conn	= $GLOBALS['conn'];
+		}
+
+    public function build_chaine($code_chaine) {
+		$chaine_fille = array();
+
+        if(count($chaine_fille) == 0) {
+
+            $requete     = 'SELECT DISTINCT T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', T_C.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].', T_R.'.$GLOBALS['PARAM']['LIBELLE'] .'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+                            .' FROM '.$GLOBALS['PARAM']['HIERARCHIE'].' AS T_C, '.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS T_R'
+                            .' WHERE T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'=T_R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'  AND T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.(int)$code_chaine.'
+                            ORDER BY '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' DESC;';
+            
+            //$result = $this->conn->CacheGetAll($requete);
+            $result = $this->conn->GetAll($requete);
+
+            for($i=0;$i<(count($result));$i++) {
+
+                $result[$i][$GLOBALS['PARAM']['NIVEAU_CHAINE']] = $i;
+
+                $result[$i]['NIVEAU_CHAINE_SUIVANT'] = array();
+
+                if(isset($result[($i+1)])) {
+
+                    $result[$i]['NIVEAU_CHAINE_SUIVANT'] = array(($i+1));
+
+                }
+
+            }
+
+            return $result;
+
+        } else {
+
+            $result = array();
+            $temp = array();
+            $chaines = array();
+
+            foreach($chaine_fille as $cf) {
+
+                $requete     = 'SELECT DISTINCT T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', T_C.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].', T_R.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']
+                                .' FROM '.$GLOBALS['PARAM']['HIERARCHIE'].' AS T_C, '.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS T_R '
+                                .' WHERE T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'=T_R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AND T_C.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.(int)$cf[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT']].'
+                                ORDER BY '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' DESC;';
+
+                //$temp = $this->conn->CacheGetAll($requete);
+                $temp = $this->conn->GetAll($requete);
+
+                for($i=0;$i<count($temp);$i++) {
+
+                    $temp[$i][$GLOBALS['PARAM']['NIVEAU_CHAINE']] = $i;
+
+                }
+
+                $result = array_merge($result, $temp);
+
+            }
+
+            uasort($result, array('arbre', 'order_by_niveau_chaine'));
+
+            $temp = $result;
+            $result = array();
+            $codes_type_reg = array();
+
+            foreach($temp as $t) {
+
+                if(!in_array($t[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']], $codes_type_reg)) {
+
+                    array_push($codes_type_reg, $t[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']]);
+                    array_push($result, $t);
+
+                }
+
+            }
+
+            foreach($result as $i1=>$r1) {
+
+                $result[$i1]['NIVEAU_CHAINE_SUIVANT'] = array();
+
+                foreach($result as $i2=>$r2) {
+
+                    if($r2[$GLOBALS['PARAM']['NIVEAU_CHAINE']] == ($r1[$GLOBALS['PARAM']['NIVEAU_CHAINE']]+1)) {
+
+                        array_push($result[$i1]['NIVEAU_CHAINE_SUIVANT'], $i2);
+
+                    }
+
+                }
+
+            }
+
+            return $result;
+
+        }
+
+    }
+
+    public function order_by_niveau_chaine($a, $b) {
+
+        if($a[$GLOBALS['PARAM']['NIVEAU_CHAINE']] > $b[$GLOBALS['PARAM']['NIVEAU_CHAINE']]) {
+
+            return 1;
+
+        }
+
+        if($b[$GLOBALS['PARAM']['NIVEAU_CHAINE']] > $a[$GLOBALS['PARAM']['NIVEAU_CHAINE']]) {
+
+            return -1;
+
+        }
+
+        return 0;
+
+    }
+
+    public function init($depht=0) {
+
+        $this->init_depht = $depht;
+
+    }
+	
+	public function get_libelle_type_reg($code_type_reg){
+		
+		$requete     = 'SELECT '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AS LIBELLE_TYPE_REG
+						FROM '.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'
+						WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.$code_type_reg.';';
+
+                $temp = $this->conn->GetAll($requete);	
+				return ($temp[0]['LIBELLE_TYPE_REG']);
+	}
+
+    public function create_entete($init_depht=0, $final_depht=false, $combo_br=false) {
+
+        $result = array();
+                // bass
+				$tab_lib_reg_cache = array();
+				// fin bass
+
+        $result['html'] = '';
+        $result['coderegroup'] = 0;
+
+        if(!$final_depht) {
+
+            $final_depht = $this->init_depht - 1;
+
+        }
+
+        //on initialise $code_regroups à vide
+        $code_regroups = array();
+        $combo_regroups = array();
+        $combo_regroups_js = array();
+
+        //on boucle entre 0 et prev_depht 
+        
+		$regroupement_filtres = array() ;
+        // modification apportée par Alssane 
+            if($this->type_access=='config' && $final_depht>0){
+                    $final_depht    =   $final_depht-1;
+            }
+        // fin de la modification apportée alssane        
+        
+        for($i=$init_depht; $i<=$final_depht; $i++) {
+
+            //si $i est à 0 c'est qu'on doit trouver le premier niveau
+            if($i == $init_depht) {
+
+                //on trouve le type courant de regoupement
+                $curcodetyperegroup = $this->chaine[$i][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+
+                //on construit la requête
+                //$requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$curcodetyperegroup.';';
+                if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])){
+					 $requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$curcodetyperegroup.
+								' ORDER BY '.$GLOBALS['CHAMP_ORDRE'].';';
+				}else{
+					$requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$curcodetyperegroup.
+								' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ('.$_SESSION['fixe_regs'][$curcodetyperegroup].')'.
+					 			' ORDER BY '.$GLOBALS['CHAMP_ORDRE'].';';
+				}
+                $regroupement = $this->conn->GetAll($requete);
+
+                /*if(!isset($_GET['code_regroup_' . $i])) {
+
+                    $code_regroups[$i] = $regroupement[0][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+
+                } elseif(isset($_GET['code_regroup_' . $i])) {
+                    $code_regroups[$i] = $_GET['code_regroup_' . $i];
+                }*/
+				if(isset($_GET['code_regroup_' . $i])) {
+
+                    $code_regroups[$i] = $_GET['code_regroup_' . $i];
+					$_SESSION['reg_parents_tmis'][$i] = $_GET['code_regroup_' . $i];
+					for($k=$i; $k<$final_depht; $k++){
+						if(isset($_SESSION['reg_parents_tmis'][$k+1])) $_SESSION['reg_parents_tmis'][$k+1] = '';
+					}
+					$_SESSION['code_etab_tmis'] = 0;
+
+                } elseif(isset($_SESSION['fixe_reg_parents'][$curcodetyperegroup][$i]) && $_SESSION['fixe_reg_parents'][$curcodetyperegroup][$i]<>''){
+					
+					$code_regroups[$i] = $_SESSION['fixe_reg_parents'][$curcodetyperegroup][$i];
+				
+				} elseif(isset($_SESSION['reg_parents_tmis'][$i]) && $_SESSION['reg_parents_tmis'][$i]<>''){
+
+					$code_regroups[$i] = $_SESSION['reg_parents_tmis'][$i];
+				
+				}
+				/*elseif(isset($_SESSION['fixe_regs'][$curcodetyperegroup]) && $_SESSION['fixe_regs'][$curcodetyperegroup]<>''){
+
+                    $code_regroups[$i] = $_SESSION['fixe_regs'][$curcodetyperegroup];//$regroupement->fields[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+
+                }*/
+				else{
+
+                    $code_regroups[$i] = $regroupement[0][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+
+                }
+				
+                $j = 0;
+				$combo_regroups[$i] = '<tr><td width="40%">'.$this->get_libelle_type_reg($curcodetyperegroup).'</td>'."\n".'<td  width="60%">';
+                $combo_regroups[$i] .= '<select name="combo_regroup_'.$i.'" id="combo_regroup_'.$i.'" onchange="toggle_combo_'.$i.'();" style=\'width:100%;\'>' . "\n";
+                $deja_sel = false;
+                //on boucle sur le résultat
+               foreach($regroupement as $i_regrp => $regrp) {	
+
+                    $sel = '';
+					
+                    if(in_array($regrp[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']],explode(',',$code_regroups[$i])) && !$deja_sel) {
+
+                        $sel = ' selected';
+                        // bass
+                        $tab_lib_reg_cache[$i] = '<input type="hidden" name="LIBELLE_REG_'.$i.'" id="LIBELLE_REG_'.$i.'" value="' . $regrp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '">';
+                        // fin bass
+						$_SESSION['nom_reg_parents_tmis'][$i] = $regrp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+						$deja_sel = true;
+                    }
+
+                    $combo_regroups[$i] .= '<option value="' . $regrp[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '"'.$sel.'>' . $regrp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '</option>' . "\n";
+
+                    $j++;
+
+                }
+
+                // Modif Alassane
+                $combo_regroups[$i] .= '</select>' . "\n";
+				$combo_regroups[$i] .= '</td></tr>' . "\n";
+                // Fin Modif Alassane
+                //$combo_regroups[$i] .= '</select>. "\n";
+
+            } else {
+
+                //on trouve le type courant de regoupement
+                $curcodetyperegroup = $this->chaine[$i][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+
+                //puis on fabrique la requête à partir du code regoupement et du type de regoupement
+                /*$requete =  'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+                            ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+                            ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroups[($i-1)].''.
+                            ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.';';*/
+                if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])){           
+					$requete =  'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+								' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+								' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroups[($i-1)].''.
+								' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+								' ORDER BY FILS.'.$GLOBALS['CHAMP_ORDRE'].';';
+				}else{
+					$requete =  'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+								' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+								' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroups[($i-1)].''.
+								' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+								' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ('.$_SESSION['fixe_regs'][$curcodetyperegroup].')'.
+								' ORDER BY FILS.'.$GLOBALS['CHAMP_ORDRE'].';';
+				}
+				
+                //on exécute la requête
+                $regroupement = $this->conn->GetAll($requete);
+
+                /*if(!isset($_GET['code_regroup_' . $i])) {
+
+                    $code_regroups[$i] = 0;//$regroupement[0][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+
+                } elseif(isset($_GET['code_regroup_' . $i])) {
+					$code_regroups[$i] = $_GET['code_regroup_' . $i];
+					
+                }*/
+
+				if(isset($_GET['code_regroup_' . $i])) {
+
+                    $code_regroups[$i] = $_GET['code_regroup_' . $i];
+					$_SESSION['reg_parents_tmis'][$i] = $_GET['code_regroup_' . $i];
+					for($k=$i; $k<$final_depht; $k++){
+						if(isset($_SESSION['reg_parents_tmis'][$k+1])) $_SESSION['reg_parents_tmis'][$k+1] = '';
+					}
+					$_SESSION['code_etab_tmis'] = 0;
+
+                }elseif(isset($_SESSION['fixe_reg_parents'][$curcodetyperegroup][$i]) && $_SESSION['fixe_reg_parents'][$curcodetyperegroup][$i]<>''){
+					
+					$code_regroups[$i] = $_SESSION['fixe_reg_parents'][$curcodetyperegroup][$i];
+
+				}elseif(isset($_SESSION['reg_parents_tmis'][$i]) && $_SESSION['reg_parents_tmis'][$i]<>''){
+					
+					$code_regroups[$i] = $_SESSION['reg_parents_tmis'][$i];
+
+				}
+				/*elseif(isset($_SESSION['fixe_regs'][$curcodetyperegroup]) && $_SESSION['fixe_regs'][$curcodetyperegroup]<>''){
+
+                    $code_regroups[$i] = $_SESSION['fixe_regs'][$curcodetyperegroup];//$regroupement->fields[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+
+                }*/
+				else{
+
+                    $code_regroups[$i] = 0;//$regroupement->fields[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+
+                }
+				
+                $j = 0;
+				$combo_regroups[$i] = '<tr><td width="40%">'.$this->get_libelle_type_reg($curcodetyperegroup).'</td>'."\n".'<td  width="60%">';
+                $combo_regroups[$i] .= '<select name="combo_regroup_'.$i.'" id="combo_regroup_'.$i.'" onchange="toggle_combo_'.$i.'();" style=\'width:100%;\'>' . "\n";
+				if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])) $combo_regroups[$i] .= '<option value="0">' . recherche_libelle_page('All') . '</option>' . "\n";
+				$deja_sel = false;
+				//on boucle sur le résultat
+				foreach($regroupement as $i_regrp => $regrp) {						
+					$sel = '';
+
+					if(in_array($regrp[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']],explode(',',$code_regroups[$i])) && !$deja_sel) {
+
+						$sel = ' selected';
+						// bass
+						$tab_lib_reg_cache[$i] = '<input type="hidden" name="LIBELLE_REG_'.$i.'" id="LIBELLE_REG_'.$i.'" value="' . $regrp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '">';
+						// fin bass
+						$_SESSION['nom_reg_parents_tmis'][$i] = $regrp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+						$deja_sel = true;
+					}
+
+					$combo_regroups[$i] .= '<option value="' . $regrp[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '"'.$sel.'>' . $regrp[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '</option>' . "\n";
+
+					$j++;
+				}
+			
+                // Modif Alassane
+                $combo_regroups[$i] .= '</select>' . "\n";
+				$combo_regroups[$i] .= '</td></tr>' . "\n";
+				 
+                // Fin Modif Alassane
+                //$combo_regroups[$i] .= '</select>' . "\n";
+
+            }
+        }
+
+        $result['code_regroup'] = $code_regroups[$final_depht];
+        $GLOBALS['last_reg'] 	= $result['code_regroup'] ;
+		
+		for($i=$init_depht; $i<=$final_depht; $i++) {
+			if(isset($code_regroups[$i]) && $code_regroups[$i]<>0){
+				$tab_code_regs = explode(',',$code_regroups[$i]);
+				$first_code_reg = $tab_code_regs[0];
+				$final_reg_choisi = $first_code_reg;//on aurait pu utiliser (int)$code_regroups[$i] pr recuperer le 1er chiffre de la chaine (en cas de selection multiple de regroupement)
+				$profondeur = $i;
+			}
+		}
+		
+		//Ajouter le combo de la liste des ecoles
+		if (isset($final_reg_choisi)) {
+			if(isset($_GET['code_etab'])){
+				$_SESSION['code_etab_tmis'] = $_GET['code_etab'];
+			}
+			//echo $_SESSION['code_etab'];
+			$_SESSION['code_regroup'] = $final_reg_choisi;
+			//création de la liste des coderegs enfants
+			$list_code_reg = $this->getchildsid($profondeur,$_SESSION['code_regroup'],$_SESSION['chaine']);
+			 // Modif Bass depuis Niger
+			$crit_in = array();
+			foreach($list_code_reg as $i_code_reg => $code_reg){
+				if( !in_array( $code_reg[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']], $crit_in) ){
+					$crit_in[] = $code_reg[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] ;
+				}
+			}
+			$where               = 'E_R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ( '.implode(', ',$crit_in).' )';
+			// Fin Modif Bass depuis Niger
+			$with_code_admin =  '';
+			if( exist_champ_in_table($GLOBALS['PARAM']['CODE_ADMINISTRATIF'], $GLOBALS['PARAM']['ETABLISSEMENT']) && ($GLOBALS['PARAM']['CONCAT_CODE_ADMIN']) ){
+				$with_code_admin = ', E.'.$GLOBALS['PARAM']['CODE_ADMINISTRATIF'] ;
+			}
+			
+			$req_etab        = 'SELECT E_R.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].', E_R.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', E.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].', E.'.$GLOBALS['PARAM']['NOM_ETABLISSEMENT'] . $with_code_admin . '
+									FROM '.$GLOBALS['PARAM']['ETABLISSEMENT'].' AS E, '.$GLOBALS['PARAM']['ETABLISSEMENT_REGROUPEMENT'].' AS E_R  
+									WHERE E.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].' = E_R.'.$GLOBALS['PARAM']['CODE_ETABLISSEMENT'].'
+									AND '.$where.' AND E.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].'='.$_SESSION['secteur'].'
+									ORDER BY '.$GLOBALS['PARAM']['NOM_ETABLISSEMENT'];
+			//echo $req_etab;
+			$liste_etab = $this->conn->GetAll($req_etab);
+				 
+			if(is_array($liste_etab)){ 
+				$nb_etabs_reg = count($liste_etab);
+			}
+			//création de la liste des coderegs parents
+			//$list_code_reg = $arbre->getparentsid(substr($_SESSION['nom_regroupement'],1),$_SESSION['code_regroupement']);
+	
+			//$parent_reg = $list_code_reg[count($list_code_reg)-1][$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']];
+	
+			//$liste_etab_html .= "<B>".$nb_etabs_reg.' '.recherche_libelle_page(EtabPour).' '.$parent_reg." :<BR><BR>"."</B>";
+	
+			$liste_etab_html = '<tr><td width="40%">'.$nb_etabs_reg.' '.recherche_libelle_page('NomEtab').'</td>'."\n".'<td  width="60%">';
+			$liste_etab_html .= '<select name="combo_etab" id="combo_etab" onchange="toggle_combo_etab();" style=\'width:100%;\'>' . "\n";
+			if (is_array($liste_etab) && count($liste_etab)>1){
+				$liste_etab_html .= '<option value="0">' . recherche_libelle_page('All') . '</option>' . "\n";
+			}elseif(is_array($liste_etab) && count($liste_etab)==1){
+				$_SESSION['code_etab_tmis'] = $liste_etab[0][$GLOBALS['PARAM']['CODE_ETABLISSEMENT']];
+			}elseif(is_array($liste_etab) && count($liste_etab)==0){
+				unset($_SESSION['liste_etab']);
+				$_SESSION['code_etab']=0;
+				echo "<script language='JavaScript' type='text/javascript'>\n";
+				echo "alert('".recherche_libelle_page('no_school_found')."');\n";
+				echo "</script>\n";
+			}
+
+			if (is_array($liste_etab)){
+				unset($_SESSION['liste_etab']);
+				$_SESSION['liste_etab'] = array();
+				$_SESSION['liste_etablissements'] = array();
+				$_SESSION['liste_etablissements'] = $liste_etab;
+				foreach ($liste_etab as $i_etab => $row) {
+					$nom_link = $row[$GLOBALS['PARAM']['NOM_ETABLISSEMENT']] ;
+					if( trim($with_code_admin) <> '' ){
+						//die($row[$GLOBALS['PARAM']['CODE_ADMINISTRATIF']]);
+						(trim($row[$GLOBALS['PARAM']['CODE_ADMINISTRATIF']]) <> '') ? ($pls_code_adm = ' &nbsp;&nbsp; <em>('.$row[$GLOBALS['PARAM']['CODE_ADMINISTRATIF']].')</em>') : ($pls_code_adm = '') ;
+					}
+					
+					$sel = '';
+					if(isset($_GET['code_etab']) && $_GET['code_etab']<>0){
+						if($row[$GLOBALS['PARAM']['CODE_ETABLISSEMENT']] == $_GET['code_etab']) {
+							$sel = ' selected';
+							
+						}
+					}elseif($_SESSION['code_etab_tmis']<>0){
+						if($row[$GLOBALS['PARAM']['CODE_ETABLISSEMENT']] == $_SESSION['code_etab_tmis']) {
+							$sel = ' selected';
+						}
+					}
+
+					$liste_etab_html .= '<option value="' . $row[$GLOBALS['PARAM']['CODE_ETABLISSEMENT']] . '"'.$sel.'>' . $nom_link .$pls_code_adm. '</option>' . "\n";
+					
+					$_SESSION['liste_etab'][] = $row[$GLOBALS['PARAM']['CODE_ETABLISSEMENT']];
+					$_SESSION['code_etab'] = '';
+				}
+			}
+			$liste_etab_html .= '</select>' . "\n";
+			$liste_etab_html .= '</td></tr>' . "\n";		
+		}
+		if(isset($_GET['code_etab']) && $_GET['code_etab']<>0){
+			unset($_SESSION['liste_etab']);
+			$_SESSION['liste_etab'][] = $_GET['code_etab'];
+			$_SESSION['code_etab'] = $_GET['code_etab'];
+		}
+		if(!isset($_GET['code_etab']) && $_SESSION['code_etab_tmis']<>0){
+			unset($_SESSION['liste_etab']);
+			$_SESSION['liste_etab'][] = $_SESSION['code_etab_tmis'];
+			$_SESSION['code_etab'] = $_SESSION['code_etab_tmis'];
+		}
+		//
+		
+        $result['html'] .= "\n";
+
+        $result['html'] .= '<script type="text/Javascript">' . "\n";
+
+
+        foreach($code_regroups as $i=>$code_regroup) {
+
+            $result['html'] .= "\n";
+
+            $result['html'] .= 'function toggle_combo_'.$i.'() {' . "\n";
+
+            $result['html'] .= "\n";
+
+            $vars = '';
+
+            for($j=0; $j<=$i; $j++) {
+
+                $result['html'] .= "\t".'if (document.combo_regroups)  ' . "\n";
+                $result['html'] .= "\t".'var combo_'.$j.' = document.combo_regroups.combo_regroup_'.$j . ';' . "\n";
+                $result['html'] .= "\t".'else if (document.Formulaire) ' . "\n";
+                $result['html'] .= "\t".'var combo_'.$j.' = document.Formulaire.combo_regroup_'.$j . ';' . "\n";
+               	
+				$result['html'] .= "\t".'combo_'.$j.'_val = combo_'.$j.'.options[combo_'.$j.'.selectedIndex].value;' . "\n";
+
+                $vars .= 'code_regroup_' . $j . '=\'+combo_'.$j.'_val';
+
+                if($j<$i) {
+
+                    $vars .= '+\'&';
+
+                }
+            }
+
+            $curpage = $_SERVER['PHP_SELF'];
+
+            $gets = '';
+			$i_count_gets = -1 ;
+            foreach($_GET as $i_get=>$g) {
+
+                $i_count_gets++;
+				$catch = false;
+
+                if(!preg_match('`^code_regroup_`', $i_get) && !preg_match('`^code_etab`', $i_get) && !preg_match('`^suite`', $i_get) && !preg_match('`^debut`', $i_get) && !preg_match('`^ret_list`', $i_get) && !preg_match('`^line`', $i_get) && !preg_match('`^nb_line`', $i_get) && !preg_match('`^annee`', $i_get) && !preg_match('`^id_chaine_tmis`', $i_get) && !preg_match('`^secteur`', $i_get)) {
+
+                    $catch = true;
+
+                    $gets .= $i_get . '=' . $g;
+
+                }
+
+                if($catch && $i_count_gets<(count($_GET))) {
+
+                    $gets .= '&';
+
+                }
+
+            }
+
+            $result['html'] .= "\t".'document.location.href = \''.$curpage.'?' . $gets . $vars . ';' . "\n";
+			
+
+            $result['html'] .= "\n";
+
+            $result['html'] .= '}' . "\n";
+
+            $result['html'] .= "\n";
+
+        }
+		
+		//Definition toggle combo_etab
+		$result['html'] .= "\n";
+
+		$result['html'] .= 'function toggle_combo_etab() {' . "\n";
+
+		$result['html'] .= "\n";
+
+		$vars = '';
+
+		for($j=0; $j<count($code_regroups); $j++) {
+			$result['html'] .= "\t".'if (document.combo_regroups)  ' . "\n";
+			$result['html'] .= "\t".'var combo_'.$j.' = document.combo_regroups.combo_regroup_'.$j . ';' . "\n";
+			$result['html'] .= "\t".'else if (document.Formulaire) ' . "\n";
+			$result['html'] .= "\t".'var combo_'.$j.' = document.Formulaire.combo_regroup_'.$j . ';' . "\n";
+			
+			$result['html'] .= "\t".'var combo_'.$j.'_val = combo_'.$j.'.options[combo_'.$j.'.selectedIndex].value;' . "\n";
+
+			$vars .= 'code_regroup_' . $j . '=\'+combo_'.$j.'_val';
+			$vars .= '+\'&';
+		}
+		
+		$result['html'] .= "\t".'if (document.combo_regroups)  ' . "\n";
+		$result['html'] .= "\t".'var combo_etabl = document.combo_regroups.combo_etab;' . "\n";
+		$result['html'] .= "\t".'else if (document.Formulaire) ' . "\n";
+		$result['html'] .= "\t".'var combo_etabl = document.Formulaire.combo_etab;' . "\n";
+		
+		$result['html'] .= "\t".'var combo_etab_val = combo_etabl.options[combo_etabl.selectedIndex].value;' . "\n";
+		
+		//if($_GET['code_etab']<>0){
+			//$vars .= '+\'&';
+			$vars .= 'code_etab=\'+combo_etab_val';
+		//}
+
+		$curpage = $_SERVER['PHP_SELF'];
+
+		$gets = '';
+		$i_count_gets = -1 ;
+		foreach($_GET as $i_get=>$g) {
+
+			$i_count_gets++ ;
+			$catch = false;
+
+			if(!preg_match('`^code_regroup_`', $i_get) && !preg_match('`^code_etab`', $i_get) && !preg_match('`^suite`', $i_get) && !preg_match('`^debut`', $i_get) && !preg_match('`^ret_list`', $i_get) && !preg_match('`^line`', $i_get) && !preg_match('`^nb_line`', $i_get) && !preg_match('`^annee`', $i_get) && !preg_match('`^id_chaine_tmis`', $i_get) &&  !preg_match('`^secteur`', $i_get)) {
+
+				$catch = true;
+
+				$gets .= $i_get . '=' . $g;
+
+			}
+
+			if($catch && $i_count_gets<(count($_GET))) {
+
+				$gets .= '&';
+
+			}
+
+		}
+
+		$result['html'] .= "\t".'document.location.href = \''.$curpage.'?' . $gets . $vars . ';' . "\n";
+		
+
+		$result['html'] .= "\n";
+
+		$result['html'] .= '}' . "\n";
+
+		$result['html'] .= "\n";
+		
+		$result['html'] .= '</script>' . "\n";
+
+        $result['html'] .= "\n";
+
+       // $result['html'] .= '<div align="center">' . "\n";
+        //$result['html'] .= '<form name="combo_regroups">' . "\n";
+        // bass
+        foreach($tab_lib_reg_cache as $lib_reg_cache) {
+                $result['html'] .= $lib_reg_cache . "\n";
+        }
+        // fin bass
+       // $result['html'] .= '<br>'."\n";
+        foreach($combo_regroups as $combo_regroup) {
+
+            $result['html'] .= $combo_regroup . ''."\n";
+
+            if($combo_br) {
+
+               // $result['html'] .= '<br>'."\n";
+
+            }
+
+        }
+		
+		$result['html'] .= $liste_etab_html;
+		
+        // bass
+				//lit_libelles_page('/popup.php');
+        //$result['html'] .= '<div align="center"><br><INPUT type="button" value="'.recherche_libelle_page(valider).'" onClick="transmettre_regroups();"></div>' . "\n";
+        
+		//$result['html'] .= '<div align="center"><br><INPUT type="button" value=" OK " onClick="transmettre_regroups();"></div>' . "\n";
+				// fin bass
+
+       // $result['html'] .= '</form>' . "\n";
+       // $result['html'] .= '</div>' . "\n";
+        
+        // bass
+				$result['html'] .='<script language="javascript" type="text/javascript">'."\n";
+				$result['html'] .='function transmettre_regroups(){'."\n";
+				$result['html'] .='var chaine_eval;'."\n"; 
+				$result['html'] .='var val;'."\n"; 
+				//if( isset($_GET['val']) and (trim($_GET['val'])<>'') ){
+						//$_SESSION['val_popup_reg'] = $_GET['val'];
+				//}
+				//switch ($_SESSION['val_popup_reg']) {
+				switch ($_GET['val']) {
+        		case 'popup':
+								
+								$result['html'] .='for ( i = 0 ; i < '.$this->init_depht.' ; i++ ){'."\n"; 
+										$result['html'] .='if( parent.document.getElementById( \'LIBELLE_REG_'.$_SESSION['iLoc'].'_'.'\' + i ) ){'."\n"; 
+												$result['html'] .='chaine_eval = \'val = document.combo_regroups.LIBELLE_REG_\'+i+\'.value;\''."\n"; 
+												$result['html'] .='eval(chaine_eval);'."\n"; 
+												$result['html'] .='parent.document.getElementById( \'LIBELLE_REG_'.$_SESSION['iLoc'].'_\' + i ).value = val ;'."\n"; 
+										$result['html'] .='}'."\n"; 
+								$result['html'] .='}'."\n"; 
+								$result['html'] .='if( parent.document.getElementById( \'LOC_REG_'.$_SESSION['iLoc'].'\' ) ){'."\n"; 
+										$result['html'] .='chaine_eval = \'val = document.combo_regroups.combo_regroup_'.($this->init_depht - 1).'.value;\''."\n"; 
+										$result['html'] .='eval(chaine_eval);'."\n"; 
+										$result['html'] .='parent.document.getElementById( \'LOC_REG_'.$_SESSION['iLoc'].'\' ).value = val ;'."\n"; 
+								$result['html'] .='}'."\n"; 
+						break;
+						
+						case 'OpenPopupChoixReg':
+								$result['html'] .='chaine_eval = \'val = document.combo_regroups.combo_regroup_'.($this->init_depht - 1).'.value;\''."\n"; 
+								$result['html'] .='eval(chaine_eval);'."\n"; 
+								$result['html'] .=	'parent.document.form1.'.$_GET['code_reg'].'.value=val;'."\n";
+									
+								$result['html'] .='chaine_eval = \'val = document.combo_regroups.LIBELLE_REG_'.($this->init_depht - 1).'.value;\''."\n"; 
+								$result['html'] .='eval(chaine_eval);'."\n"; 
+								$result['html'] .=	'parent.document.form1.'.$_GET['libelle_reg'].'.value=val;'."\n";	
+						break;
+				}
+				
+				$result['html'] .='fermer() ;'."\n";	 
+				$result['html'] .='}'."\n";
+				$result['html'] .='</script>'."\n";
+				// fin bass
+
+        return $result;
+
+    }
+
+    public function build($link, $target='', $depht=0, $code_regroupement=false) {
+
+        if($depht == 0) {
+
+            $depht = $this->init_depht;
+
+        }
+
+        //on initialise le résultat
+        $result = '';
+
+        //si la fonction init a été utilisée on a besoin de trouver le code regroupement courant
+        if($depht == $this->init_depht && $this->init_depht != 0) {
+
+            $entete = $this->create_entete();
+
+            $code_regroupement = $entete['code_regroup'];
+            $result .= $entete['html'];
+
+        }
+
+        //on initialise l'indentation
+        $depht_space = '';
+
+        //on définit l'identation à partir de la profondeur de la chaine courante
+        for($i=0;$i<$this->chaine[$depht][$GLOBALS['PARAM']['NIVEAU_CHAINE']];$i++) {
+
+            $depht_space .= "\t";
+
+        }
+
+        //s'il y'a un code regroupement on va chercher les regoupements de ce code
+        if($code_regroupement) {
+
+            //si le niveau atteint de cette chaine existe <= normalement devrait toujours être le cas
+            if(isset($this->chaine[$depht])) {
+
+                //on trouve le type courant de regoupement
+                $curcodetyperegroup = $this->chaine[$depht][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+
+                //puis on fabrique la requête à partir du code regoupement et du type de regoupement
+                /*$requete = 'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+                               ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+                               ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+                               ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.';';*/
+                if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])){               
+					$requete = 'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+								   ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+								   ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+								   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+								   ' ORDER BY FILS.'.$GLOBALS['CHAMP_ORDRE'].';';
+				}else{
+					$requete = 'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+								   ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+								   ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+								   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+								   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ('.$_SESSION['fixe_regs'][$curcodetyperegroup].')'.
+								   ' ORDER BY FILS.'.$GLOBALS['CHAMP_ORDRE'].';';
+				}
+
+                //on récupère les regoupements
+                //$regroupements = $this->conn->CacheGetAll($requete);
+                $regroupements = $this->conn->GetAll($requete);
+
+            //si le niveau atteint de cette chaine d'nexiste pas
+            } else {
+
+                //on initialise les regoupements à vide
+                $regroupements = array();
+
+            }
+
+        //il n'y a pas de code de regoupement on est donc au début de la création de l'arbre
+        } else {
+
+            //si le niveau atteint de cette chaine existe <= normalement devrait toujours être le cas
+            if(isset($this->chaine[$depht])) {
+
+                //on trouve le type courant de regoupement
+                $curcodetyperegroup = $this->chaine[$depht][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+
+                //puis on fabrique la requête à partir du type de regoupement
+                //$requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$curcodetyperegroup.';';
+                if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])){
+					$requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$curcodetyperegroup.
+								' ORDER BY '.$GLOBALS['CHAMP_ORDRE'].';';
+				}else{
+					$requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$curcodetyperegroup.
+								' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ('.$_SESSION['fixe_regs'][$curcodetyperegroup].')'.
+								' ORDER BY '.$GLOBALS['CHAMP_ORDRE'].';';
+				}
+
+                //on récupère les regoupements
+                //$regroupements = $this->conn->CacheGetAll($requete);
+                $regroupements = $this->conn->GetAll($requete);
+
+            //si le niveau atteint de cette chaine d'nexiste pas
+            } else {
+
+                //on initialise les regoupements à vide
+                $regroupements = array();
+
+            }
+
+        }
+
+        //si la profondeur est à 0 on est donc au début de la création de l'arbre
+        if($depht == $this->init_depht) {
+
+            $result .= $depht_space . '<ol class="menu">' . "\n";
+            // bass
+            if($GLOBALS['popup'] <> 1){
+                $result .= $depht_space . '<li>' . '<img src="'.$GLOBALS['SISED_URL_IMG'].'arbre/root.gif" onclick="expand(this)" />' . trim($_SESSION['NOM_PAYS']) . '</li>' . "\n";
+            }
+            // fin bass
+            
+        }
+
+        //on boucle sur les regroupements
+        foreach($regroupements as $r) {
+
+            //s'il n'y a pas de niveau suivant on affiche simplement le lien
+            if(count($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT']) == 0) {
+
+                //on commence la liste courante
+                $result .= $depht_space . '<li>' . "\n";
+
+                //on met le libellé de ce regroupement
+                $curlink = preg_replace(array('`\$code_regroup`', '`\$nom_regroup`'), array($r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']], 'C'.$depht), $link);
+
+                if($target != '') {
+
+                    $curtarget = ' target="'.$target.'"';
+
+                } else {
+
+                    $curtarget = '';
+
+                }
+
+                //on met le libellé de ce regroupement
+                $result .= $depht_space . '<a href="'.$curlink.'"'.$curtarget.'>' . $r[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '</a>' . "\n";
+
+                //on finit la liste courante
+                $result .= $depht_space . '</li>' . "\n";
+
+            } else {
+
+                //on commence la liste courante
+                $result .= $depht_space . '<li>' . "\n";
+
+                $haschilds = false;
+
+                //on boucle sur les niveaux suivants afin de savoir s'il y'a des enfants
+                foreach($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT'] as $i=>$ncs) {
+
+                    if($this->haschilds($ncs, $r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']])) {
+    
+                        $haschilds = true;
+                        break;
+    
+                    }
+
+                }
+
+                $curlink = preg_replace(array('`\$code_regroup`', '`\$nom_regroup`'), array($r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']], 'C'.$depht), $link);
+
+                if($target != '') {
+
+                    $curtarget = ' target="'.$target.'"';
+
+                } else {
+
+                    $curtarget = '';
+
+                }
+
+                //si il y a des enfants
+                if($haschilds) {
+
+                    //on met l'image pour développer l'arborescence puis le libellé de ce regoupement
+                    $result .= $depht_space . '<img src="'.$GLOBALS['SISED_URL_IMG'].'arbre/plus.gif" onclick="expand(this)" />';
+                    $result .= '<a href="'.$curlink.'"'.$curtarget.'>' . $r[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '</a>' . "\n";
+                    $result .= $depht_space . '<ol>' . "\n";
+
+                //si il n'y a pas d'enfants
+                } else {
+
+                    //on met le libellé de ce regroupement
+                    $result .= '<a href="'.$curlink.'"'.$curtarget.'>' . $r[$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']] . '</a>' . "\n";
+
+                }
+
+                //on boucle sur les niveaux suivants afin de savoir s'il y'a des enfants
+                foreach($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT'] as $ncs) {
+
+                    if($this->haschilds($ncs, $r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']])) {
+    
+                        $result .= $this->build($link, $target, $ncs, $r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']]);
+    
+                    }
+
+                }
+
+                //si il y a des enfants
+                if($haschilds) {
+
+                    $result .= $depht_space . '</ol>' . "\n";
+
+                }
+
+                //on finit la liste courante
+                $result .= $depht_space . '</li>' . "\n";
+
+            }
+
+        }
+
+        //si la profondeur est à 0 on est donc au début de la création de l'arbre
+        if($depht == $this->init_depht) {
+
+            $result .= $depht_space . '</ol>' . "\n";
+
+        }
+
+        //on retourne le résultat
+        return $result;
+
+    }
+
+    public function haschilds($depht, $code_regroupement) {
+
+        $result = false;
+
+        if(isset($this->chaine[$depht])) {
+
+            $curcodetyperegroup = $this->chaine[$depht][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+    		if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])){
+				$requete =  'SELECT COUNT(FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].') AS NB FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+							' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+							' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+							' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.';';
+			}else{
+				$requete =  'SELECT COUNT(FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].') AS NB FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+							' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+							' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+							' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+							' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ('.$_SESSION['fixe_regs'][$curcodetyperegroup].');';
+			}
+            //$regroupements = $this->conn->CacheGetAll($requete);
+            $regroupements = $this->conn->GetAll($requete);
+
+            if((int)$regroupements[0]['NB'] > 0) {
+    
+                $result = true;
+    
+            }
+
+        }
+
+        return $result;
+
+    }
+
+    public function count_nodes($depht=0, $code_regroupement=false) {
+
+        $result = 0;
+
+        if($code_regroupement) {
+
+            if(isset($this->chaine[$depht])) {
+
+                $curcodetyperegroup = $this->chaine[$depht][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+
+                if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])){
+					$requete = 'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+								' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+								' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].''.
+								' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+								' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+								' ORDER BY FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].';';
+				}else{
+					$requete = 'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+								   ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+								   ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].''.
+								   ' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+								   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+								   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ('.$_SESSION['fixe_regs'][$curcodetyperegroup].')'.
+								   ' ORDER BY FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].';';
+				}
+                //$regroupements = $this->conn->CacheGetAll($requete);
+                $regroupements = $this->conn->GetAll($requete);
+
+            } else {
+
+                $regroupements = array();
+
+            }
+
+        } else {
+
+            if(isset($this->chaine[$depht])) {
+
+                $curcodetyperegroup = $this->chaine[$depht][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+				if(!in_array($curcodetyperegroup,$_SESSION['fixe_type_regs'])){
+                	$requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.';';
+				}else{
+					$requete  = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' IN ('.$_SESSION['fixe_regs'][$curcodetyperegroup].');';
+				}
+
+                //$regroupements = $this->conn->CacheGetAll($requete);
+                $regroupements = $this->conn->GetAll($requete);
+
+
+            } else {
+
+                $regroupements = array();
+
+            }
+
+        }
+
+        foreach($regroupements as $r) {
+
+            if(count($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT']) == 0) {
+
+                $result++;
+
+            } else {
+
+                $result++;
+
+                foreach($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT'] as $ncs) {
+
+                    if($this->haschilds($ncs, $r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']])) {
+    
+                        $result += $this->count_nodes($ncs, $r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']]);
+    
+                    }
+
+                }
+
+            }
+
+        }
+
+        return $result;
+
+    }
+
+    public function getchildsid($depht, $code_regroupement, $id_chaine, $recur=false) {
+
+        $result = array();
+
+        $haschilds = false;
+
+        //on boucle sur les niveaux suivants afin de savoir s'il y'a des enfants
+        if (is_array($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT'])){
+			foreach($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT'] as $i=>$ncs) {
+	
+				if($this->haschilds($ncs, $code_regroupement)) {
+		
+					$haschilds = true;
+					break;
+		
+				}
+	
+			}
+		}
+
+        if(!$haschilds) {
+
+            $result = array(0=>array($GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']=>$code_regroupement));
+
+        } else {
+
+            if(isset($this->chaine[$depht])) {
+
+                $curcodetyperegroup = $this->chaine[$depht][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+
+                /*$requete = 'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+                                   ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+                                   ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+                                   ' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.';';*/
+                                   
+                $requete = 'SELECT FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', FILS.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L , '.$GLOBALS['PARAM']['HIERARCHIE'].' AS H'.
+                                   ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+                                   ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+                                   ' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+								   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].
+								   ' AND  H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.$id_chaine.
+                                   ' ORDER BY FILS.'.$GLOBALS['CHAMP_ORDRE'].';';
+
+
+                //$result = $this->conn->CacheGetAll($requete);
+                $result = $this->conn->GetAll($requete);
+
+                foreach($result as $r) {
+    
+                    foreach($this->chaine[$depht]['NIVEAU_CHAINE_SUIVANT'] as $i=>$ncs) {
+        
+                        $result = array_merge($this->getchildsid($ncs, $r[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']], $id_chaine, true), $result); 
+    
+                    }
+        
+
+                }
+
+            }
+
+        }
+
+        return $result;
+
+    }
+
+    public function getparentsid($depht, $code_regroupement, $id_chaine, $recur=false) {
+
+        $result = array();
+
+        if(isset($this->chaine[$depht])) {
+
+            $curcodetyperegroup = $this->chaine[$depht]['CODE_TYPE_REGROUPEMENT'];
+
+            /*$requete = 'SELECT PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', PERE.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L '.
+                                   ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.REG_CODE_REGROUPEMENT'.
+                                   ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+                                   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.';';*/
+                                   
+             $requete = 'SELECT PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', PERE.'.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS PERE, '.$GLOBALS['PARAM']['REGROUPEMENT'].' AS FILS, '.$GLOBALS['PARAM']['LIAISONS'].' AS L , '.$GLOBALS['PARAM']['HIERARCHIE'].' AS H'.
+                                   ' WHERE  PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=L.'.$GLOBALS['PARAM']['REG_CODE_REGROUPEMENT'].
+                                   ' AND L.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'=FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+                                   ' AND FILS.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+                                   ' AND PERE.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].
+								   ' AND  H.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'='.$id_chaine.
+								   ' ORDER BY PERE.'.$GLOBALS['CHAMP_ORDRE'].';';
+
+
+            //$dbresult = $this->conn->CacheGetAll($requete);
+            $dbresult = $this->conn->GetAll($requete);
+
+            foreach($this->chaine as $ncp=>$c) {
+
+                if(in_array($depht, $c['NIVEAU_CHAINE_SUIVANT'])) {
+
+                    $result = array_merge($this->getparentsid($ncp, $dbresult[0][$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT']], $id_chaine, true), $dbresult);
+                    break;
+
+                }
+    
+            }
+
+            if(!$recur) {
+
+                /*$requete = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].
+                                   ' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+                                   ' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.';';*/
+                
+                $requete = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].
+                                   ' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'= '.(int)$code_regroupement.''.
+                                   ' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'='.(int)$curcodetyperegroup.
+                                   ' ORDER BY '.$GLOBALS['CHAMP_ORDRE'].';';
+
+
+                //$dbresult = $this->conn->CacheGetAll($requete);
+                $dbresult = $this->conn->GetAll($requete);
+
+                $result = array_merge($result, $dbresult);
+
+            }
+
+        }
+
+        return $result;
+
+    }
+
+    /**
+     * Fonctions d'administration de l'arbre
+     *
+     */
+    
+    public function get_typeregs() {
+    
+        $requete = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].
+                   ' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].'<255 ORDER BY '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].';';
+        //return $this->conn->CacheGetAll($requete);
+        return $this->conn->GetAll($requete);
+    
+    }
+
+    public function add_typereg($libelle, $ordre) {
+    
+        $newcodetypereg = 0;
+    
+        foreach($this->get_typeregs() as $t) {
+    
+            if($t[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']] > $newcodetypereg && $t[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']] < 255) {
+    
+                $newcodetypereg = $t[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']];
+    
+            }
+    
+        }
+    
+        $requete = 'INSERT INTO '.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' ('.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].') VALUES ('.(int)$newcodetypereg.', '.$this->conn->qstr($libelle).', '.(int)$ordre.');';
+        return $this->conn->Execute($requete);
+    
+    }
+    
+    public function mod_typereg($id, $libelle, $ordre) {
+    
+        $requete = 'UPDATE '.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' SET '.$GLOBALS['PARAM']['LIBELLE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.$this->conn->qstr($libelle).', '.$GLOBALS['PARAM']['ORDRE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$ordre.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$id.';';
+        return $this->conn->Execute($requete);
+    
+    }
+    
+    public function del_typereg($id) {
+
+        //vérification d'existance dans une chaine
+
+        $requete = 'SELECT COUNT('.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].') AS COUNT FROM '.$GLOBALS['PARAM']['HIERARCHIE'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$id.';';
+        //$count = $this->conn->CacheGetAll($requete);
+        $count = $this->conn->GetAll($requete);
+
+        if(isset($count[0]) && $count[0]['COUNT'] > 0) {
+
+            return false;
+
+        } else {
+
+            $requete = 'DELETE FROM '.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'] .' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$id.';';
+            return $this->conn->Execute($requete);
+
+        }
+    
+    }
+
+    public function get_chaine_unused_typeregs() {
+
+        $result = array();
+
+        $typeregs = $this->get_typeregs();
+
+        foreach($typeregs as $t) {
+
+            $unused = true;
+
+            foreach($this->chaine as $c) {
+
+                if($t[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']] == $c[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']]) {
+
+                    $unused = false;
+                    break;
+
+                }
+
+            }
+
+            if($unused) {
+
+                array_push($result, $t);
+
+            }
+
+        }
+
+        return $result;
+
+    }
+
+    public function save_chaine_typeregs($list) {
+
+        $result = false;
+
+        //règle de gestion de cohérence
+        $coherence = true;
+
+        //mise à jour des données
+        if($coherence) {
+
+            $j = count($list);
+    
+            foreach($list as $i=>$l) {
+    
+                $requete = 'UPDATE '.$GLOBALS['PARAM']['HIERARCHIE'].' SET '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' = '.(int)$j.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$_SESSION['chaine'].' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$i.';';
+                $this->conn->Execute($requete);
+    
+                $j--;
+    
+            }
+
+            $result = true;
+
+        }
+
+        $this->chaine = $this->build_chaine($_SESSION['chaine']);
+
+        return $result;
+
+    }
+
+    public function add_chaine_typereg($id) {
+
+        $result = false;
+
+        //règle de gestion de cohérence
+        $coherence = true;
+
+        //mise à jour des données
+        if($coherence) {
+
+            $requete = 'UPDATE '.$GLOBALS['PARAM']['HIERARCHIE'].' SET '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' = '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].'+1 WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$_SESSION['chaine'].';';
+            $this->conn->Execute($requete);
+
+            $requete = 'INSERT INTO '.$GLOBALS['PARAM']['HIERARCHIE'].' ('.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].', '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].', '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].') VALUES ('.(int)$_SESSION['chaine'].', '.$id.', 1);';
+            $this->conn->Execute($requete);
+
+            $result = true;
+
+        }
+
+        $this->chaine = $this->build_chaine($_SESSION['chaine']);
+
+        return $result;
+
+    }
+
+    public function del_chaine_typereg($id) {
+
+        $result = false;
+
+        //règle de gestion de cohérence
+        $coherence = true;
+
+        //mise à jour des données
+        if($coherence) {
+
+            $requete = 'DELETE FROM '.$GLOBALS['PARAM']['HIERARCHIE'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$_SESSION['chaine'].' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$id.';';
+            $this->conn->Execute($requete);
+
+            $requete = 'SELECT '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['HIERARCHIE'].' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$_SESSION['chaine'].' ORDER BY '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' DESC;';
+            //$hierarchie = $this->conn->CacheGetAll($requete);
+            $hierarchie = $this->conn->GetAll($requete);
+
+            $j = count($hierarchie);
+
+            foreach($hierarchie as $h) {
+
+                $requete = 'UPDATE '.$GLOBALS['PARAM']['HIERARCHIE'].' SET '.$GLOBALS['PARAM']['NIVEAU_CHAINE'].' = '.(int)$j.' WHERE '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.(int)$_SESSION['chaine'].' AND '.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.(int)$h[$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT']].';';
+                $this->conn->Execute($requete);
+
+                $j--;
+
+            }
+
+            $result = true;
+
+        }
+
+        $this->chaine = $this->build_chaine($_SESSION['chaine']);
+
+        return $result;
+
+    }
+		function get_chaine_reg_loc($reg_loc){
+				
+				$requete ='SELECT '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' FROM '.$GLOBALS['PARAM']['REGROUPEMENT'].', '.$GLOBALS['PARAM']['HIERARCHIE'].', '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].
+										' WHERE '.$GLOBALS['PARAM']['REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' = '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_REGROUPEMENT'].' AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' = '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].' AND  '.$GLOBALS['PARAM']['REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['REGROUPEMENT'].'='.$reg_loc.
+										' AND  '.$GLOBALS['PARAM']['HIERARCHIE'].'.'.$GLOBALS['PARAM']['NIVEAU_CHAINE'].'=1'.
+										' AND  '.$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT'].'.'.$GLOBALS['PARAM']['CODE'].'_'.$GLOBALS['PARAM']['TYPE_SYSTEME_ENSEIGNEMENT'].'='.$_SESSION['secteur'];
+		
+				$result = $this->conn->Getrow($requete);
+				return($result[$GLOBALS['PARAM']['TYPE_CHAINE_REGROUPEMENT']]);
+				
+		}
+
+}
+
+?>

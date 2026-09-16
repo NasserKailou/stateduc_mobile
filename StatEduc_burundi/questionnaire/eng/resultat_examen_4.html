@@ -1,0 +1,403 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('(#)Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=6904' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B></B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=3 class='ligne-paire' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'></TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'></TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+<script language='javascript' type='text/javascript'>
+var expression_690006 	= "";
+var affiche_sous_totaux_690006 = 0;
+var tab_mes_690006 	= new Array ("FILLES_RESULTAT_EXAMEN_SEC_GP","TOTAL_RESULTAT_EXAMEN_SEC_GP");
+var tab_ligne_690006	= new Array ("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14");
+var tab_col_690006	= new Array ("10","11");
+
+</script>
+		<TD style='height:25px;' COLSPAN=7 class='ligne-paire'>(#)Nationalité</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>(#)Ougandais</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>(#)Sud Soudan</TD>
+		<TD bgcolor='#CCCCCC'   align='center'  colspan=3><b>(#)TOTAL</b></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>(#)F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'></TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>(#)F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'></TD>
+		<TD bgcolor='#CCCCCC' class='ligne-paire' align='center' nowrap='nowrap'>(#)F</TD>
+		<TD bgcolor='#CCCCCC' class='ligne-paire' align='center' nowrap='nowrap'></TD>
+		<TD bgcolor='#CCCCCC' class='ligne-paire' align='center' nowrap='nowrap'>(#)F + </TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_0_0' onClick='MiseEvidenceLigneFrame(0,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_0_1' onClick='MiseEvidenceLigneFrame(0,15)'><SELECT   ID='CODE_TYPE_SECTION_0' NAME=CODE_TYPE_SECTION_0>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_0-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_0_2' onClick='MiseEvidenceLigneFrame(0,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_0' NAME=CODE_TYPE_ELEVE_EXAM_0>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_3' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_4' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 0, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_5' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 0, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_6' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 0, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_0' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_0' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_0' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_1_0' onClick='MiseEvidenceLigneFrame(1,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_1_1' onClick='MiseEvidenceLigneFrame(1,15)'><SELECT   ID='CODE_TYPE_SECTION_1' NAME=CODE_TYPE_SECTION_1>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_1-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_1_2' onClick='MiseEvidenceLigneFrame(1,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_1' NAME=CODE_TYPE_ELEVE_EXAM_1>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_3' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_1_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_1_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_1_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 0, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_4' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_1_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_1_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_1_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 1, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_5' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_1_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_1_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_1_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 1, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_6' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_1_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_1_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_1_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 1, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_1' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_1' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_1' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_2_0' onClick='MiseEvidenceLigneFrame(2,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_2_1' onClick='MiseEvidenceLigneFrame(2,15)'><SELECT   ID='CODE_TYPE_SECTION_2' NAME=CODE_TYPE_SECTION_2>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_2-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_2_2' onClick='MiseEvidenceLigneFrame(2,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_2' NAME=CODE_TYPE_ELEVE_EXAM_2>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_3' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_2_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_2_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_2_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 1, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_4' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_2_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_2_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_2_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 2, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_5' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_2_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_2_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_2_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 2, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_6' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_2_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_2_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_2_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 2, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_2' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_2' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_2' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_3_0' onClick='MiseEvidenceLigneFrame(3,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_3_1' onClick='MiseEvidenceLigneFrame(3,15)'><SELECT   ID='CODE_TYPE_SECTION_3' NAME=CODE_TYPE_SECTION_3>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_3-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_3_2' onClick='MiseEvidenceLigneFrame(3,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_3' NAME=CODE_TYPE_ELEVE_EXAM_3>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_3' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_3_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_3_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_3_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 2, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_4' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_3_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_3_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_3_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 3, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_5' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_3_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_3_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_3_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 3, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_6' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_3_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_3_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_3_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 3, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_3' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_3' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_3' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_4_0' onClick='MiseEvidenceLigneFrame(4,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_4_1' onClick='MiseEvidenceLigneFrame(4,15)'><SELECT   ID='CODE_TYPE_SECTION_4' NAME=CODE_TYPE_SECTION_4>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_4-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_4_2' onClick='MiseEvidenceLigneFrame(4,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_4' NAME=CODE_TYPE_ELEVE_EXAM_4>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_3' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_4_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_4_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_4_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 3, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_4' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_4_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_4_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_4_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 4, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_5' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_4_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_4_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_4_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 4, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_6' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_4_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_4_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_4_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 4, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_4' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_4' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_4' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_5_0' onClick='MiseEvidenceLigneFrame(5,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_5_1' onClick='MiseEvidenceLigneFrame(5,15)'><SELECT   ID='CODE_TYPE_SECTION_5' NAME=CODE_TYPE_SECTION_5>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_5-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_5_2' onClick='MiseEvidenceLigneFrame(5,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_5' NAME=CODE_TYPE_ELEVE_EXAM_5>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_3' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_5_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_5_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_5_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 4, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_4' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_5_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_5_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_5_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 5, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_5' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_5_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_5_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_5_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 5, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_6' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_5_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_5_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_5_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 5, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_5' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_5' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_5' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_6_0' onClick='MiseEvidenceLigneFrame(6,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_6_1' onClick='MiseEvidenceLigneFrame(6,15)'><SELECT   ID='CODE_TYPE_SECTION_6' NAME=CODE_TYPE_SECTION_6>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_6-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_6_2' onClick='MiseEvidenceLigneFrame(6,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_6' NAME=CODE_TYPE_ELEVE_EXAM_6>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_3' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_6_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_6_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_6_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 5, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_4' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_6_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_6_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_6_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 6, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_5' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_6_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_6_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_6_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 6, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_6' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_6_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_6_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_6_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 6, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_6' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_6' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_6' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_7_0' onClick='MiseEvidenceLigneFrame(7,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_7_1' onClick='MiseEvidenceLigneFrame(7,15)'><SELECT   ID='CODE_TYPE_SECTION_7' NAME=CODE_TYPE_SECTION_7>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_7-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_7_2' onClick='MiseEvidenceLigneFrame(7,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_7' NAME=CODE_TYPE_ELEVE_EXAM_7>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_3' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_7_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_7_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_7_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 6, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_4' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_7_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_7_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_7_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 7, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_5' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_7_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_7_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_7_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 7, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_6' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_7_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_7_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_7_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 7, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_7' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_7' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_7' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_8_0' onClick='MiseEvidenceLigneFrame(8,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_8_1' onClick='MiseEvidenceLigneFrame(8,15)'><SELECT   ID='CODE_TYPE_SECTION_8' NAME=CODE_TYPE_SECTION_8>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_8-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_8_2' onClick='MiseEvidenceLigneFrame(8,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_8' NAME=CODE_TYPE_ELEVE_EXAM_8>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_3' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_8_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_8_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 7, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_4' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_8_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_8_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 8, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_5' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_8_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_8_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 8, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_6' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_8_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_8_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 8, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_8' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_8' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_8' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_9_0' onClick='MiseEvidenceLigneFrame(9,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_9_1' onClick='MiseEvidenceLigneFrame(9,15)'><SELECT   ID='CODE_TYPE_SECTION_9' NAME=CODE_TYPE_SECTION_9>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_9-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_9_2' onClick='MiseEvidenceLigneFrame(9,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_9' NAME=CODE_TYPE_ELEVE_EXAM_9>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_3' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_9_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_9_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_9_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 8, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_4' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_9_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_9_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_9_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 9, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_5' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_9_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_9_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_9_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 9, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_6' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_9_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_9_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_9_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 9, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_9' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_9' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_9' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_10_0' onClick='MiseEvidenceLigneFrame(10,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_10 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_10_1' onClick='MiseEvidenceLigneFrame(10,15)'><SELECT   ID='CODE_TYPE_SECTION_10' NAME=CODE_TYPE_SECTION_10>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_10-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_10_2' onClick='MiseEvidenceLigneFrame(10,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_10' NAME=CODE_TYPE_ELEVE_EXAM_10>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_3' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_10_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_10_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 9, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_4' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_10_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_10_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 10, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_5' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_10_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_10_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 10, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_6' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_10_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_10_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 10, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_10' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_10' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_10' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_11_0' onClick='MiseEvidenceLigneFrame(11,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_11 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_11_1' onClick='MiseEvidenceLigneFrame(11,15)'><SELECT   ID='CODE_TYPE_SECTION_11' NAME=CODE_TYPE_SECTION_11>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_11-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_11_2' onClick='MiseEvidenceLigneFrame(11,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_11' NAME=CODE_TYPE_ELEVE_EXAM_11>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_3' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_11_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_11_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 10, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_4' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_11_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_11_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 11, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_5' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_11_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_11_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 11, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_6' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_11_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_11_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 11, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_11' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_11' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_11' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_12_0' onClick='MiseEvidenceLigneFrame(12,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_12 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_12_1' onClick='MiseEvidenceLigneFrame(12,15)'><SELECT   ID='CODE_TYPE_SECTION_12' NAME=CODE_TYPE_SECTION_12>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_12-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_12_2' onClick='MiseEvidenceLigneFrame(12,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_12' NAME=CODE_TYPE_ELEVE_EXAM_12>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_3' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_12_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_12_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_12_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 11, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_4' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_12_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_12_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_12_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 12, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_5' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_12_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_12_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_12_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 12, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_6' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_12_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_12_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_12_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 12, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_12' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_12' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_12' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_13_0' onClick='MiseEvidenceLigneFrame(13,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_13 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_13_1' onClick='MiseEvidenceLigneFrame(13,15)'><SELECT   ID='CODE_TYPE_SECTION_13' NAME=CODE_TYPE_SECTION_13>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_13-->
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_13_2' onClick='MiseEvidenceLigneFrame(13,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_13' NAME=CODE_TYPE_ELEVE_EXAM_13>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_3' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_13_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_13_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_13_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 12, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_4' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_13_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_13_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_13_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 13, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_5' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_13_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_13_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_13_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 13, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_6' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_13_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_13_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_13_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 13, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_13' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_13' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_13' size=2></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_14_0' onClick='MiseEvidenceLigneFrame(14,15)' title='(#)Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_14 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_14_1' onClick='MiseEvidenceLigneFrame(14,15)'><SELECT   ID='CODE_TYPE_SECTION_14' NAME=CODE_TYPE_SECTION_14>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_690010_CODE_TYPE_SECTION_14-->
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_14_2' onClick='MiseEvidenceLigneFrame(14,15)'><SELECT   ID='CODE_TYPE_ELEVE_EXAM_14' NAME=CODE_TYPE_ELEVE_EXAM_14>
+			<OPTION VALUE=''>---</OPTION>
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_3' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_14_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_14_10' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_14_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 13, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_4' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_14_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_14_10' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_14_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 14, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_5' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_14_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_14_11' TYPE='text' size=2 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_14_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 14, 10, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_6' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_14_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_14_11' TYPE='text' size=2 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_14_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 690006, '', 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_690006, tab_col_690006, 14, 11, tab_mes_690006);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_14' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_690006_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_14' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_690006_ALL_MES_LIGNE_14' size=2></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',690006, '', tab_mes_690006, tab_ligne_690006, tab_col_690006);
+</script>

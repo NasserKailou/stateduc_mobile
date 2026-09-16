@@ -1,0 +1,203 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=5906' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>FILIERES   <span style='font-weight: bold; font-size: 16px; background-color:#00FF00; color:#000000; text-align:center;'>Pour Faculté/Institut/Département:</span> </B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;2.13. Filières organisées par la faculté/institut/département : <b>Instruction </b>: Cocher les filières existantes dans la liste suivante &nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='23'  valign=top class='police_gras'>&nbsp;&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;26. Agronomie Agriculture&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_26' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_26' VALUE=$CODE_TYPE_FILIERE_0_26>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;48. Aménagement du territoire&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_48' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_48' VALUE=$CODE_TYPE_FILIERE_0_48>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;61. Anesthésie réanimation&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_61' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_61' VALUE=$CODE_TYPE_FILIERE_0_61>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;4. Anglais /kirundi&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_4' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_4' VALUE=$CODE_TYPE_FILIERE_0_4>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;43. Audit et contrôle de gestion&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_43' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_43' VALUE=$CODE_TYPE_FILIERE_0_43>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;10. Bible et théologie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_10' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_10' VALUE=$CODE_TYPE_FILIERE_0_10>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;56. Bibliothéconomie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_56' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_56' VALUE=$CODE_TYPE_FILIERE_0_56>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;16. Bio-chimie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_16' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_16' VALUE=$CODE_TYPE_FILIERE_0_16>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;14. Biologie /chimie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_14' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_14' VALUE=$CODE_TYPE_FILIERE_0_14>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;15. Chimie/géologie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_15' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_15' VALUE=$CODE_TYPE_FILIERE_0_15>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;35. Communication &nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_35' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_35' VALUE=$CODE_TYPE_FILIERE_0_35>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;36. Communication audio&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_36' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_36' VALUE=$CODE_TYPE_FILIERE_0_36>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;38. Communication pour le développement&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_38' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_38' VALUE=$CODE_TYPE_FILIERE_0_38>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;49. Comptabilité&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_49' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_49' VALUE=$CODE_TYPE_FILIERE_0_49>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;57. Coopérative&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_57' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_57' VALUE=$CODE_TYPE_FILIERE_0_57>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;54. Développement communautaire et management&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_54' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_54' VALUE=$CODE_TYPE_FILIERE_0_54>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;6. Droit&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_6' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_6' VALUE=$CODE_TYPE_FILIERE_0_6>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;40. Economie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_40' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_40' VALUE=$CODE_TYPE_FILIERE_0_40>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;33. Education physique et sport&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_33' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_33' VALUE=$CODE_TYPE_FILIERE_0_33>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;23. Electronique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_23' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_23' VALUE=$CODE_TYPE_FILIERE_0_23>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;11. études islamiques&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_11' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_11' VALUE=$CODE_TYPE_FILIERE_0_11>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;50. Finances comptabilité&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_50' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_50' VALUE=$CODE_TYPE_FILIERE_0_50>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;51. Fiscalité&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_51' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_51' VALUE=$CODE_TYPE_FILIERE_0_51>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;5. Français/kirundi&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_5' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_5' VALUE=$CODE_TYPE_FILIERE_0_5>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;20. Génie civil&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_20' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_20' VALUE=$CODE_TYPE_FILIERE_0_20>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;22. Génie électrique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_22' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_22' VALUE=$CODE_TYPE_FILIERE_0_22>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;30. Génie informatique et télécommunications&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_30' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_30' VALUE=$CODE_TYPE_FILIERE_0_30>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;24. Génie mécanique électromécanique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_24' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_24' VALUE=$CODE_TYPE_FILIERE_0_24>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;25. Génie rural eaux et forêts&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_25' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_25' VALUE=$CODE_TYPE_FILIERE_0_25>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;8. Géographie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_8' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_8' VALUE=$CODE_TYPE_FILIERE_0_8>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;46. Gestion commerciale et industrielle&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_46' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_46' VALUE=$CODE_TYPE_FILIERE_0_46>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;66. Gestion des soins de sante&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_66' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_66' VALUE=$CODE_TYPE_FILIERE_0_66>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;47. Gestion et administration&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_47' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_47' VALUE=$CODE_TYPE_FILIERE_0_47>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;42. Gestion et administration des affaires&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_42' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_42' VALUE=$CODE_TYPE_FILIERE_0_42>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;45. Gestion et commerce&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_45' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_45' VALUE=$CODE_TYPE_FILIERE_0_45>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;41. Gestion et économie appliquée&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_41' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_41' VALUE=$CODE_TYPE_FILIERE_0_41>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;65. Gestion hospitalière&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_65' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_65' VALUE=$CODE_TYPE_FILIERE_0_65>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;44. Hautes études commerciales&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_44' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_44' VALUE=$CODE_TYPE_FILIERE_0_44>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;7. Histoire&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_7' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_7' VALUE=$CODE_TYPE_FILIERE_0_7>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;29. Informatique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_29' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_29' VALUE=$CODE_TYPE_FILIERE_0_29>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;58. Informatique et gestion&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_58' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_58' VALUE=$CODE_TYPE_FILIERE_0_58>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;34. Interprétariat traduction&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_34' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_34' VALUE=$CODE_TYPE_FILIERE_0_34>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;64. Laboratoire&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_64' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_64' VALUE=$CODE_TYPE_FILIERE_0_64>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;3. Langues et littérature  anglaises&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_3' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_3' VALUE=$CODE_TYPE_FILIERE_0_3>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;1. Langues et littérature africaines&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_1' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_1' VALUE=$CODE_TYPE_FILIERE_0_1>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;2. Langues et littérature françaises&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_2' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_2' VALUE=$CODE_TYPE_FILIERE_0_2>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;17. Maths&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_17' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_17' VALUE=$CODE_TYPE_FILIERE_0_17>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;18. Maths physique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_18' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_18' VALUE=$CODE_TYPE_FILIERE_0_18>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;59. Médecine&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_59' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_59' VALUE=$CODE_TYPE_FILIERE_0_59>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;67. Paramédical&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_67' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_67' VALUE=$CODE_TYPE_FILIERE_0_67>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;32. Pédagogie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_32' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_32' VALUE=$CODE_TYPE_FILIERE_0_32>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;63. Pharmacie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_63' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_63' VALUE=$CODE_TYPE_FILIERE_0_63>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;21. Physique/technologie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_21' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_21' VALUE=$CODE_TYPE_FILIERE_0_21>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;19. Polytechnique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_19' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_19' VALUE=$CODE_TYPE_FILIERE_0_19>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;12. Psychologie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_12' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_12' VALUE=$CODE_TYPE_FILIERE_0_12>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;62. Radiologie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_62' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_62' VALUE=$CODE_TYPE_FILIERE_0_62>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;68. Sage femme&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_68' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_68' VALUE=$CODE_TYPE_FILIERE_0_68>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;60. Santé publique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_60' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_60' VALUE=$CODE_TYPE_FILIERE_0_60>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;31. Sciences de l’éducation&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_31' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_31' VALUE=$CODE_TYPE_FILIERE_0_31>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;39. Sciences économiques et administratives, gestion&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_39' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_39' VALUE=$CODE_TYPE_FILIERE_0_39>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;13. Sciences fondamentales&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_13' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_13' VALUE=$CODE_TYPE_FILIERE_0_13>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;9. Sciences sociales&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_9' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_9' VALUE=$CODE_TYPE_FILIERE_0_9>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;53. Secrétariat&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_53' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_53' VALUE=$CODE_TYPE_FILIERE_0_53>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;52. Secrétariat gestion&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_52' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_52' VALUE=$CODE_TYPE_FILIERE_0_52>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;55. Service social et dév. communautaire&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_55' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_55' VALUE=$CODE_TYPE_FILIERE_0_55>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;69. Soins infirmiers&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_69' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_69' VALUE=$CODE_TYPE_FILIERE_0_69>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;27. Technologies industrie agro -alimentaire&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_27' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_27' VALUE=$CODE_TYPE_FILIERE_0_27>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;37. Télécommunication&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_37' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_37' VALUE=$CODE_TYPE_FILIERE_0_37>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;28. Zootechnique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_28' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_28' VALUE=$CODE_TYPE_FILIERE_0_28>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<br><b> Autres filières :  </b><span style='color: #FF0000;font-weight: bold;font-size: 12px;'>S'il manque des filières  sur la liste 2.13 (ci-dessus), bien  vouloir les signaler à votre administrateur pour qu'il les intégre.</span> <br>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='4'  valign=top class='police_gras'>&nbsp;2.14. Niveau atteint au sein de la filière :&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;ISCO&nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_1' VALUE=$CODE_TYPE_NIV_FILIERE_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;IPA cycle 1 &nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_2' VALUE=$CODE_TYPE_NIV_FILIERE_0_2>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;IPA Cycle 2 &nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_3' VALUE=$CODE_TYPE_NIV_FILIERE_0_3>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;ENS cycle 1 &nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_4' VALUE=$CODE_TYPE_NIV_FILIERE_0_4>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;ENS Cycle 2 &nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_5' VALUE=$CODE_TYPE_NIV_FILIERE_0_5>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Licence&nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_6' VALUE=$CODE_TYPE_NIV_FILIERE_0_6>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;Maîtrise&nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_7' VALUE=$CODE_TYPE_NIV_FILIERE_0_7>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;DEA&nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_8' VALUE=$CODE_TYPE_NIV_FILIERE_0_8>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Mastère &nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_9' VALUE=$CODE_TYPE_NIV_FILIERE_0_9>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;Doctorat&nbsp;<INPUT NAME='CODE_TYPE_NIV_FILIERE_0' TYPE='radio'   ID='CODE_TYPE_NIV_FILIERE_0_10' VALUE=$CODE_TYPE_NIV_FILIERE_0_10>&nbsp;</TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

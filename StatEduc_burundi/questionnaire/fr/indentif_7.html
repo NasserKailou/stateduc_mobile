@@ -1,0 +1,254 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=4007' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B><b> I. LOCALISATION ET IDENTIFICATION DU CENTRE </b></B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>I.1. </b> Nom du centre :&nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_ETABLISSEMENT_0' TYPE='text' style = 'width:300px'  ID='NOM_ETABLISSEMENT_0' VALUE="$NOM_ETABLISSEMENT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Ancien nom du centre (si applicable)&nbsp;&nbsp;&nbsp;<INPUT NAME='ANCIEN_NOM_ETABLISSEMENT_0' TYPE='text' style = 'width:300px'  ID='ANCIEN_NOM_ETABLISSEMENT_0' VALUE="$ANCIEN_NOM_ETABLISSEMENT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='2'  valign=top class='police_gras'>&nbsp;<b>I.2. </b> Type de centre :   &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;CEM&nbsp;<INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_1' VALUE=$CODE_TYPE_ETABLISSEMENT_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;CFP&nbsp;<INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_2' VALUE=$CODE_TYPE_ETABLISSEMENT_0_2>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;CFA&nbsp;<INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_3' VALUE=$CODE_TYPE_ETABLISSEMENT_0_3>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;CFPP&nbsp;<INPUT NAME='CODE_TYPE_ETABLISSEMENT_0' TYPE='radio'   ID='CODE_TYPE_ETABLISSEMENT_0_4' VALUE=$CODE_TYPE_ETABLISSEMENT_0_4>&nbsp;</TD>
+		<TD COLSPAN='2'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>I.3. </b> Code du centre : &nbsp;&nbsp;&nbsp;<INPUT NAME='CODE_ECOLE_PAYS_0' TYPE='text' style = 'width:150px'  ID='CODE_ECOLE_PAYS_0' VALUE="$CODE_ECOLE_PAYS_0" >
+&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<table><tr>
+<td valign='top'><table>
+<tr>
+<td colspan="2" nowrap="nowrap"><b>I.4. Localisation  administrative :</b>&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td nowrap>
+<INPUT type='text' name='LOC_REG_0' id='LOC_REG_0' value="$LOC_REG_0" size=5 readonly>
+<INPUT type='button' onClick='OpenPopupLocEtab(0,7,3);' style='background-image: url(client-side/image/sav_loc.gif); height: 25px; width: 25px;'>
+<INPUT type='button' onClick='SuppLocEtab(0,3);' style='background-image: url(client-side/image/sup_loc.gif); height: 25px; width: 25px;'>
+</td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Province</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_0_0" name='LIBELLE_REG_0_0' id='LIBELLE_REG_0_0' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Commune</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_0_1" name='LIBELLE_REG_0_1' id='LIBELLE_REG_0_1' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Colline ou Quartier</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_0_2" name='LIBELLE_REG_0_2' id='LIBELLE_REG_0_2' size='20' readonly></td>
+</tr>
+</table></td>
+<td valign='top'><table>
+<tr>
+<td colspan="2" nowrap="nowrap"><b>Chaine Ens. des metiers_NVX_DECOUPAGE</b>&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td nowrap>
+<INPUT type='text' name='LOC_REG_1' id='LOC_REG_1' value="$LOC_REG_1" size=5 readonly>
+<INPUT type='button' onClick='OpenPopupLocEtab(1,15,4);' style='background-image: url(client-side/image/sav_loc.gif); height: 25px; width: 25px;'>
+<INPUT type='button' onClick='SuppLocEtab(1,4);' style='background-image: url(client-side/image/sup_loc.gif); height: 25px; width: 25px;'>
+</td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>PROVINCE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_1_0" name='LIBELLE_REG_1_0' id='LIBELLE_REG_1_0' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>COMMUNE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_1_1" name='LIBELLE_REG_1_1' id='LIBELLE_REG_1_1' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>ZONE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_1_2" name='LIBELLE_REG_1_2' id='LIBELLE_REG_1_2' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>COLLINE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_1_3" name='LIBELLE_REG_1_3' id='LIBELLE_REG_1_3' size='20' readonly></td>
+</tr>
+</table></td>
+</tr></table>
+</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;<b>I.5. </b> Milieu :&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;urbain&nbsp;<INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_1' VALUE=$CODE_TYPE_MILIEU_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;rural &nbsp;<INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_2' VALUE=$CODE_TYPE_MILIEU_0_2>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>I.6. </b> Distance par rapport au chef lieu de la province : &nbsp;&nbsp;&nbsp;<INPUT NAME='DISTANCE_CHEF_LIEU_0' TYPE='text' style='width:100px'  ID='DISTANCE_CHEF_LIEU_0' VALUE="$DISTANCE_CHEF_LIEU_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>I.8. </b> Adresse électronique: &nbsp;&nbsp;&nbsp;<INPUT NAME='ADRESSE_ELECTRONIQUE_0' TYPE='text' style = 'width:150px'  ID='ADRESSE_ELECTRONIQUE_0' VALUE="$ADRESSE_ELECTRONIQUE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<B>I.9. </B>Télephone du centre et/ou du responsable du centre &nbsp;&nbsp;&nbsp;<INPUT NAME='TELEPHONE_0' TYPE='text' style = 'width:250px'  ID='TELEPHONE_0' VALUE="$TELEPHONE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<B>I.11. </B>Année de création:   &nbsp;&nbsp;&nbsp;<INPUT NAME='ANNEE_CREATION_0' TYPE='text' size=5  ID='ANNEE_CREATION_0' VALUE="$ANNEE_CREATION_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='1'  valign=top class='police_gras'>&nbsp;<B>I.13.</B> Statut :           &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Public/Etat  &nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_6' VALUE=$CODE_TYPE_STATUT_ORG_0_6>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Public sous convention  &nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_7' VALUE=$CODE_TYPE_STATUT_ORG_0_7>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Privé  &nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_8' VALUE=$CODE_TYPE_STATUT_ORG_0_8>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>I.14.</b>Appui extérieur actuel :&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='EXISTE_APPUI_EXTERIEUR_0' TYPE='radio'   ID='EXISTE_APPUI_EXTERIEUR_0_1' VALUE=$EXISTE_APPUI_EXTERIEUR_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='EXISTE_APPUI_EXTERIEUR_0' TYPE='radio'   ID='EXISTE_APPUI_EXTERIEUR_0_0' VALUE=$EXISTE_APPUI_EXTERIEUR_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Si  oui, le(s)quel(s)&nbsp;&nbsp;&nbsp;<INPUT NAME='APPUI_EXTERIEUR_ACTUEL_0' TYPE='text' style = 'width:150px'  ID='APPUI_EXTERIEUR_ACTUEL_0' VALUE="$APPUI_EXTERIEUR_ACTUEL_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='12'  valign=top class='police_gras'>&nbsp;<b>I.15. </b>Filières proposées :      &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Agri-élevage&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_86' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_86' VALUE=$CODE_TYPE_FILIERE_0_86>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Agroalimentaire&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_85' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_85' VALUE=$CODE_TYPE_FILIERE_0_85>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Bambou&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_95' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_95' VALUE=$CODE_TYPE_FILIERE_0_95>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Bâtiment &nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_75' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_75' VALUE=$CODE_TYPE_FILIERE_0_75>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Boulangerie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_84' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_84' VALUE=$CODE_TYPE_FILIERE_0_84>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Bureautique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_96' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_96' VALUE=$CODE_TYPE_FILIERE_0_96>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Céramique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_97' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_97' VALUE=$CODE_TYPE_FILIERE_0_97>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Comptabilité&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_83' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_83' VALUE=$CODE_TYPE_FILIERE_0_83>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Couture&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_74' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_74' VALUE=$CODE_TYPE_FILIERE_0_74>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Electricité d&#8217;équipement&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_94' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_94' VALUE=$CODE_TYPE_FILIERE_0_94>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Electricité domestique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_93' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_93' VALUE=$CODE_TYPE_FILIERE_0_93>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Forge&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_80' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_80' VALUE=$CODE_TYPE_FILIERE_0_80>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Hôtellerie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_89' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_89' VALUE=$CODE_TYPE_FILIERE_0_89>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Imprimérie &nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_98' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_98' VALUE=$CODE_TYPE_FILIERE_0_98>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Informatique &nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_91' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_91' VALUE=$CODE_TYPE_FILIERE_0_91>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Maçonnerie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_73' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_73' VALUE=$CODE_TYPE_FILIERE_0_73>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Maroquinerie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_88' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_88' VALUE=$CODE_TYPE_FILIERE_0_88>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Mécanique&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_72' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_72' VALUE=$CODE_TYPE_FILIERE_0_72>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Menuiserie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_76' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_76' VALUE=$CODE_TYPE_FILIERE_0_76>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Plomberie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_77' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_77' VALUE=$CODE_TYPE_FILIERE_0_77>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Rotin&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_99' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_99' VALUE=$CODE_TYPE_FILIERE_0_99>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Secrétariat&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_82' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_82' VALUE=$CODE_TYPE_FILIERE_0_82>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Sérigraphie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_100' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_100' VALUE=$CODE_TYPE_FILIERE_0_100>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Soudure&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_78' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_78' VALUE=$CODE_TYPE_FILIERE_0_78>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Terre cuite&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_90' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_90' VALUE=$CODE_TYPE_FILIERE_0_90>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;TIC &nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_101' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_101' VALUE=$CODE_TYPE_FILIERE_0_101>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Vannerie&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_87' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_87' VALUE=$CODE_TYPE_FILIERE_0_87>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Mysciculture&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_102' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_102' VALUE=$CODE_TYPE_FILIERE_0_102>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Apiculture&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_103' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_103' VALUE=$CODE_TYPE_FILIERE_0_103>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Technologie-Agroalimentaire(TAA)&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_104' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_104' VALUE=$CODE_TYPE_FILIERE_0_104>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Banque et Assurance&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_105' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_105' VALUE=$CODE_TYPE_FILIERE_0_105>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Informatique de Maintenance&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_106' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_106' VALUE=$CODE_TYPE_FILIERE_0_106>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Agriculture&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_107' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_107' VALUE=$CODE_TYPE_FILIERE_0_107>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;Elevage&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_108' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_108' VALUE=$CODE_TYPE_FILIERE_0_108>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Transformation Industrielle&nbsp;<INPUT NAME='CODE_TYPE_FILIERE_0_109' TYPE='checkbox'   ID='CODE_TYPE_FILIERE_0_109' VALUE=$CODE_TYPE_FILIERE_0_109>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Autres filières à préciser: &nbsp;&nbsp;&nbsp;<INPUT NAME='AUTRES_FILIERES_0' TYPE='text' size = 50  ID='AUTRES_FILIERES_0' VALUE="$AUTRES_FILIERES_0" >
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

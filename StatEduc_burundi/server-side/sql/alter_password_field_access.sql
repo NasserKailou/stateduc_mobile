@@ -1,0 +1,98 @@
+-- =============================================================================
+-- alter_password_field_access.sql
+-- StatEduc Burundi -- Session 37
+-- =============================================================================
+-- PROBLEME CRITIQUE : Migration MD5 (32 chars) -> bcrypt (60 chars)
+--
+-- Un hash bcrypt genere par PHP password_hash($pwd, PASSWORD_BCRYPT) mesure
+-- EXACTEMENT 60 caracteres, par exemple :
+--   $2y$12$BKWYlzyZuR5GrapX6c2ApuoxHONZ6GEGANd3ZA3DmaDe76LGYVGV2
+--
+-- Si le champ PASSWORD de la table ADMIN_USERS dans dico_DB.mdb / dico_DB.accdb
+-- est defini en TEXT(32) ou TEXT(50), Microsoft Access tronque silencieusement
+-- le hash lors de l'INSERT/UPDATE, ne stockant que les N premiers caracteres.
+-- Resultat : password_verify() echoue TOUJOURS -> HTTP 401 permanent sur
+-- tous les endpoints data_camp.php (HttpAuth actif).
+--
+-- SOLUTION : agrandir le champ PASSWORD a TEXT(255) dans la base Access.
+-- =============================================================================
+
+-- =============================================================================
+-- METHODE 1 : Via Microsoft Access (interface graphique)
+-- =============================================================================
+--
+-- 1. Ouvrir dico_DB.mdb (ou dico_DB.accdb) dans Microsoft Access.
+-- 2. Ouvrir la table ADMIN_USERS en mode Creation (Design View).
+-- 3. Trouver le champ PASSWORD.
+-- 4. Dans la propriete "Taille du champ" (Field Size), changer la valeur en 255.
+-- 5. Cliquer sur Enregistrer (Ctrl+S).
+-- 6. Access peut afficher un avertissement de troncature des donnees existantes :
+--    si les mots de passe stockes font moins de 255 chars (ce qui est le cas),
+--    cliquer OUI pour confirmer.
+-- 7. Fermer Access.
+--
+-- =============================================================================
+-- METHODE 2 : Via SQL DDL (si le moteur Jet/ACE supporte ALTER TABLE)
+-- Note : Microsoft Access Jet/ACE supporte ALTER TABLE pour modifier la taille
+-- des champs TEXT. A executer via ADODB, phpMyAdmin ODBC, ou Access VBA.
+-- =============================================================================
+
+ALTER TABLE ADMIN_USERS ALTER COLUMN PASSWORD TEXT(255);
+
+-- =============================================================================
+-- METHODE 3 : Script VBA a executer dans Access (Module -> Nouveau module)
+-- =============================================================================
+--
+-- Sub AugmenterChampPassword()
+--     Dim db As DAO.Database
+--     Dim tdf As DAO.TableDef
+--     Dim fld As DAO.Field
+--
+--     Set db = CurrentDb()
+--     Set tdf = db.TableDefs("ADMIN_USERS")
+--
+--     ' Supprimer l'ancien champ
+--     tdf.Fields.Delete "PASSWORD"
+--
+--     ' Creer le nouveau champ TEXT(255)
+--     Set fld = tdf.CreateField("PASSWORD", dbText, 255)
+--     tdf.Fields.Append fld
+--
+--     tdf.Fields.Refresh
+--     db.Close
+--
+--     MsgBox "Champ PASSWORD agrandi a 255 caracteres avec succes."
+-- End Sub
+--
+-- ATTENTION : cette methode supprime les mots de passe existants.
+-- Relancer create_admin_nasser_bcrypt.sql apres pour reinjecter les hashes.
+--
+-- =============================================================================
+-- VERIFICATION post-modification
+-- =============================================================================
+--
+-- Apres modification, executer depuis PHP (ou phpMyAdmin) :
+--   SELECT NOM_USER, LEN(PASSWORD) AS len_pwd, PASSWORD FROM ADMIN_USERS;
+--
+-- Resultat attendu pour un hash bcrypt correct :
+--   NOM_USER  | len_pwd | PASSWORD
+--   nasser    | 60      | $2y$12$BKWYlzy...
+--
+-- Si len_pwd < 60 et PASSWORD commence par $2y$ : le champ est encore tronque.
+-- Si len_pwd = 32 et PASSWORD = 32 hex chars : hash MD5 legacy (sera migre auto
+--   par valide_user_ws() / infos_user_ws() au prochain login reussi).
+--
+-- =============================================================================
+-- RAPPEL : hash bcrypt de reference pour l'admin nasser
+-- (voir aussi create_admin_nasser_bcrypt.sql)
+-- =============================================================================
+--
+-- Mot de passe : nasser@2026  (EXEMPLE - remplacer par le vrai mot de passe)
+-- Hash bcrypt  : $2y$12$BKWYlzyZuR5GrapX6c2ApuoxHONZ6GEGANd3ZA3DmaDe76LGYVGV2
+-- Longueur     : 60 caracteres
+--
+-- UPDATE ADMIN_USERS
+-- SET PASSWORD = '$2y$12$BKWYlzyZuR5GrapX6c2ApuoxHONZ6GEGANd3ZA3DmaDe76LGYVGV2'
+-- WHERE NOM_USER = 'nasser';
+--
+-- =============================================================================

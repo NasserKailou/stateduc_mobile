@@ -1,0 +1,286 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=2404' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>I/. IDENTIFICATION ET LOCALISATION DE L'ECOLE</B></CAPTION>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>1.1.</b> Nom de l'école : &nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_ETABLISSEMENT_0' TYPE='text' style = 'width:300px'  ID='NOM_ETABLISSEMENT_0' VALUE="$NOM_ETABLISSEMENT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Ancien nom de l'école (si applicable)&nbsp;&nbsp;&nbsp;<INPUT NAME='ANCIEN_NOM_ETABLISSEMENT_0' TYPE='text' style = 'width:300px'  ID='ANCIEN_NOM_ETABLISSEMENT_0' VALUE="$ANCIEN_NOM_ETABLISSEMENT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>1.2.</b> Code de l'école : &nbsp;&nbsp;&nbsp;<INPUT NAME='CODE_ECOLE_PAYS_0' TYPE='text' style = 'width:100px'  ID='CODE_ECOLE_PAYS_0' VALUE="$CODE_ECOLE_PAYS_0" >
+&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan=4 valign='top'>&nbsp;<table><tr>
+<td valign='top'><table>
+<tr>
+<td colspan="2" nowrap="nowrap"><b>1.3. Localisation  administrative :</b>&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td nowrap>
+<INPUT type='text' name='LOC_REG_0' id='LOC_REG_0' value="$LOC_REG_0" size=5 readonly>
+<INPUT type='button' onClick='OpenPopupLocEtab(0,4,2);' style='background-image: url(client-side/image/sav_loc.gif); height: 25px; width: 25px;'>
+<INPUT type='button' onClick='SuppLocEtab(0,2);' style='background-image: url(client-side/image/sup_loc.gif); height: 25px; width: 25px;'>
+</td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Province</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_0_0" name='LIBELLE_REG_0_0' id='LIBELLE_REG_0_0' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Commune</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_0_1" name='LIBELLE_REG_0_1' id='LIBELLE_REG_0_1' size='20' readonly></td>
+</tr>
+</table></td>
+<td valign='top'><table>
+<tr>
+<td colspan="2" nowrap="nowrap"><b>1.3. Localisation  administrative Colline</b>&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td nowrap>
+<INPUT type='text' name='LOC_REG_1' id='LOC_REG_1' value="$LOC_REG_1" size=5 readonly>
+<INPUT type='button' onClick='OpenPopupLocEtab(1,9,3);' style='background-image: url(client-side/image/sav_loc.gif); height: 25px; width: 25px;'>
+<INPUT type='button' onClick='SuppLocEtab(1,3);' style='background-image: url(client-side/image/sup_loc.gif); height: 25px; width: 25px;'>
+</td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Province</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_1_0" name='LIBELLE_REG_1_0' id='LIBELLE_REG_1_0' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Commune</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_1_1" name='LIBELLE_REG_1_1' id='LIBELLE_REG_1_1' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>Colline ou Quartier</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_1_2" name='LIBELLE_REG_1_2' id='LIBELLE_REG_1_2' size='20' readonly></td>
+</tr>
+</table></td>
+<td valign='top'><table>
+<tr>
+<td colspan="2" nowrap="nowrap"><b>Chaine du Secondaire Tech. A2_NVX_DECOUPAGE</b>&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td nowrap>
+<INPUT type='text' name='LOC_REG_2' id='LOC_REG_2' value="$LOC_REG_2" size=5 readonly>
+<INPUT type='button' onClick='OpenPopupLocEtab(2,13,4);' style='background-image: url(client-side/image/sav_loc.gif); height: 25px; width: 25px;'>
+<INPUT type='button' onClick='SuppLocEtab(2,4);' style='background-image: url(client-side/image/sup_loc.gif); height: 25px; width: 25px;'>
+</td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>PROVINCE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_2_0" name='LIBELLE_REG_2_0' id='LIBELLE_REG_2_0' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>COMMUNE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_2_1" name='LIBELLE_REG_2_1' id='LIBELLE_REG_2_1' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>ZONE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_2_2" name='LIBELLE_REG_2_2' id='LIBELLE_REG_2_2' size='20' readonly></td>
+</tr>
+<tr>
+<td><div style='margin-left: 10px;'>COLLINE_NOUV_DECOUPAGE</div></td>
+<td><INPUT type='text' value="$LIBELLE_REG_2_3" name='LIBELLE_REG_2_3' id='LIBELLE_REG_2_3' size='20' readonly></td>
+</tr>
+</table></td>
+</tr></table>
+</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  valign=top class='police_gras'>&nbsp;<b>1.4.<b> Milieu : </b> &nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;urbain&nbsp;<INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_1' VALUE=$CODE_TYPE_MILIEU_0_1>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;rural &nbsp;<INPUT NAME='CODE_TYPE_MILIEU_0' TYPE='radio'   ID='CODE_TYPE_MILIEU_0_2' VALUE=$CODE_TYPE_MILIEU_0_2>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>I.5. </b> Distance par rapport au chef lieu de la province : (km)&nbsp;&nbsp;&nbsp;<INPUT NAME='DISTANCE_CHEF_LIEU_0' TYPE='text' size=5  ID='DISTANCE_CHEF_LIEU_0' VALUE="$DISTANCE_CHEF_LIEU_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>1.7.</b> Téléphone  de l'école:  &nbsp;&nbsp;&nbsp;<INPUT NAME='TELEPHONE_0' TYPE='text' style = 'width:100px'  ID='TELEPHONE_0' VALUE="$TELEPHONE_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;I.6.	Nom du directeur&nbsp;&nbsp;&nbsp;<INPUT NAME='NOM_CHEF_ETABLISSEMENT_0' TYPE='text' style = 'width:250px'  ID='NOM_CHEF_ETABLISSEMENT_0' VALUE="$NOM_CHEF_ETABLISSEMENT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;<b>I.8. </b>Téléphone de celui qui répond au questionnaire : &nbsp;&nbsp;&nbsp;<INPUT NAME='TELEPHONE_REPONDANT_0' TYPE='text' style='width:100px'  ID='TELEPHONE_REPONDANT_0' VALUE="$TELEPHONE_REPONDANT_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;<b>1.9.</b> Année de création de l'école: &nbsp;&nbsp;&nbsp;<INPUT NAME='ANNEE_CREATION_0' TYPE='text' size=5  ID='ANNEE_CREATION_0' VALUE="$ANNEE_CREATION_0" >
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  rowspan='2'  valign=top class='police_gras'>&nbsp;<b>1.11.</b> Statut :&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Public/Etat  &nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_6' VALUE=$CODE_TYPE_STATUT_ORG_0_6>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Public / Commune &nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_10' VALUE=$CODE_TYPE_STATUT_ORG_0_10>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Privé  &nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_8' VALUE=$CODE_TYPE_STATUT_ORG_0_8>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-paire-left'>
+		<TD class='td_right' nowrap>&nbsp;Privé à Programme étranger&nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_13' VALUE=$CODE_TYPE_STATUT_ORG_0_13>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Consulaire  &nbsp;<INPUT NAME='CODE_TYPE_STATUT_ORG_0' TYPE='radio'   ID='CODE_TYPE_STATUT_ORG_0_9' VALUE=$CODE_TYPE_STATUT_ORG_0_9>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD colspan='4'>&nbsp;                  Si publique Commune/Etat, l'école est-elle sous convention ?&nbsp;&nbsp;&nbsp;Oui&nbsp;<INPUT NAME='EXISTE_CONVENTION_0' TYPE='radio'   ID='EXISTE_CONVENTION_0_1' VALUE=$EXISTE_CONVENTION_0_1>
+		&nbsp;&nbsp;&nbsp;&nbsp;Non&nbsp;<INPUT NAME='EXISTE_CONVENTION_0' TYPE='radio'   ID='EXISTE_CONVENTION_0_0' VALUE=$EXISTE_CONVENTION_0_0>
+&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD  valign=top class='police_gras'>&nbsp; <b>I.12. </b>Cycle organisé :&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Post Fondamental Tech&nbsp;<INPUT NAME='CODE_TYPE_CYCLE_0' TYPE='radio'   ID='CODE_TYPE_CYCLE_0_9' VALUE=$CODE_TYPE_CYCLE_0_9>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Post Fondamental Tech +F4&nbsp;<INPUT NAME='CODE_TYPE_CYCLE_0' TYPE='radio'   ID='CODE_TYPE_CYCLE_0_10' VALUE=$CODE_TYPE_CYCLE_0_10>&nbsp;</TD>
+		<TD COLSPAN='1'>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-impaire-left'>
+		<TD  rowspan='14'  valign=top class='police_gras'>&nbsp;1.13. <b>Sections Offertes par l'école</b>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;CYCLE F4&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_57' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_57' VALUE=$CODE_TYPE_SECTION_0_57>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;A/C &nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_8' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_8' VALUE=$CODE_TYPE_SECTION_0_8>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;AGRICULTURE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_9' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_9' VALUE=$CODE_TYPE_SECTION_0_9>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;ARTISTIQUE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_10' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_10' VALUE=$CODE_TYPE_SECTION_0_10>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;ARTS PLASTIQUES&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_58' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_58' VALUE=$CODE_TYPE_SECTION_0_58>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;ASS. SOCIALE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_11' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_11' VALUE=$CODE_TYPE_SECTION_0_11>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;ASSAINISSEMENT&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_41' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_41' VALUE=$CODE_TYPE_SECTION_0_41>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;BANQUE/ASSURANCE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_40' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_40' VALUE=$CODE_TYPE_SECTION_0_40>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;CONDUCTEURS TRAVAUX&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_17' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_17' VALUE=$CODE_TYPE_SECTION_0_17>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;DESS. PROJETEURS&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_18' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_18' VALUE=$CODE_TYPE_SECTION_0_18>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;E . Industrielle&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_19' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_19' VALUE=$CODE_TYPE_SECTION_0_19>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;E. I&M&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_20' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_20' VALUE=$CODE_TYPE_SECTION_0_20>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;EAUX & FORET&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_21' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_21' VALUE=$CODE_TYPE_SECTION_0_21>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;ECONOMIE FAMILIALE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_22' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_22' VALUE=$CODE_TYPE_SECTION_0_22>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;ELECTROMECANIQUE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_23' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_23' VALUE=$CODE_TYPE_SECTION_0_23>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;ELECTRONIQUE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_24' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_24' VALUE=$CODE_TYPE_SECTION_0_24>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;GENIE CIVIL&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_25' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_25' VALUE=$CODE_TYPE_SECTION_0_25>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;GENIE RURAL&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_26' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_26' VALUE=$CODE_TYPE_SECTION_0_26>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;GESTION ET COMPTABILITE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_27' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_27' VALUE=$CODE_TYPE_SECTION_0_27>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;GETO&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_28' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_28' VALUE=$CODE_TYPE_SECTION_0_28>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;HOTELERIE ET RESTAURATION&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_52' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_52' VALUE=$CODE_TYPE_SECTION_0_52>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;HOTELLERIE-TOURISME&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_50' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_50' VALUE=$CODE_TYPE_SECTION_0_50>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;HYDRAULIQUE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_54' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_54' VALUE=$CODE_TYPE_SECTION_0_54>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;INFORM -Maintenance&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_30' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_30' VALUE=$CODE_TYPE_SECTION_0_30>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;INFORM -Opérateur&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_31' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_31' VALUE=$CODE_TYPE_SECTION_0_31>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;INFORMATIQUE-GESTION&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_47' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_47' VALUE=$CODE_TYPE_SECTION_0_47>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;INFORM-TELECOMMUNICATION&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_48' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_48' VALUE=$CODE_TYPE_SECTION_0_48>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;JURIDIQUE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_32' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_32' VALUE=$CODE_TYPE_SECTION_0_32>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;LABORATOIRE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_46' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_46' VALUE=$CODE_TYPE_SECTION_0_46>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;MEC. GENERALE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_33' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_33' VALUE=$CODE_TYPE_SECTION_0_33>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;NUTRITION&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_55' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_55' VALUE=$CODE_TYPE_SECTION_0_55>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;PHARMACIE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_39' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_39' VALUE=$CODE_TYPE_SECTION_0_39>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;SECRETARIAT&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_35' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_35' VALUE=$CODE_TYPE_SECTION_0_35>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;TIAA&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_37' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_37' VALUE=$CODE_TYPE_SECTION_0_37>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;TECH. SANTE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_36' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_36' VALUE=$CODE_TYPE_SECTION_0_36>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;TEXTILE ET HABILLEMENT&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_53' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_53' VALUE=$CODE_TYPE_SECTION_0_53>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;VETERINAIRES&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_38' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_38' VALUE=$CODE_TYPE_SECTION_0_38>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Autres&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_56' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_56' VALUE=$CODE_TYPE_SECTION_0_56>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;Géologie, mine et carrière&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_59' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_59' VALUE=$CODE_TYPE_SECTION_0_59>&nbsp;</TD>
+	</TR>
+	<TR class='ligne-impaire-left'>
+		<TD class='td_right' nowrap>&nbsp;SOINS INFIRMIER&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_60' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_60' VALUE=$CODE_TYPE_SECTION_0_60>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;COMMERCIALE ET GESTION&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_61' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_61' VALUE=$CODE_TYPE_SECTION_0_61>&nbsp;</TD>
+		<TD class='td_right' nowrap>&nbsp;TECHNIQUE SOCIALE&nbsp;<INPUT NAME='CODE_TYPE_SECTION_0_62' TYPE='checkbox'   ID='CODE_TYPE_SECTION_0_62' VALUE=$CODE_TYPE_SECTION_0_62>&nbsp;</TD>
+	</TR>
+		<TR><TD COLSPAN='4' class='td_space_blanc'></TD></TR>
+	<TR class='ligne-paire-left'>
+		<TD colspan='4'>&nbsp;Autres, à préciser&nbsp;&nbsp;&nbsp;<INPUT NAME='AUTRES_SECTIONS_0' TYPE='text' size=60  ID='AUTRES_SECTIONS_0' VALUE="$AUTRES_SECTIONS_0" >
+&nbsp;</TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

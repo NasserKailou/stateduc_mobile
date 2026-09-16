@@ -1,0 +1,954 @@
+<script language='javascript' type='text/javascript'>
+<!--
+function Alert_Supp(checkbox){
+var chaine_eval ='document.form1.'+checkbox+'.checked == true';
+if (eval(chaine_eval)){
+alert ('Attention ! Ce clic entrainera la suppression de  la ligne entière');
+}
+}
+//-->
+</script>
+<style type="text/css">
+	.total {
+		background-color:#CCCCCC; 
+		font-weight:bold;
+	}
+</style>
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<div align=center>
+<FORM NAME='form1' ACTION='questionnaire.php?theme_frame=7104' METHOD='POST'>
+<TABLE class='table-questionnaire' border='1'>
+	<CAPTION><B>IV. INFORMATIONS RELATIVES AUX ELEVES<br/>4.1 Elèves par année d'étude, par nationalité et par sexe</B></CAPTION><TR  style="height:25px;">
+				<TD ROWSPAN=3 class='ligne-paire' title='Click sur la case à cocher pour supprimer la ligne entière'><img src='client-side/image/b_drop.png' width='16' height='16'></TD>		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Niveaux</TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Section</TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+<script language='javascript' type='text/javascript'>
+var expression_710010 	= "";
+var affiche_sous_totaux_710010 = 0;
+var tab_mes_710010 	= new Array ("FILLES_NATIONALITE","TOTAL_NATIONALITE");
+var tab_ligne_710010	= new Array ("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14");
+var tab_col_710010	= new Array ("1","3","8","10","2","11","7","4");
+
+</script>
+		<TD style='height:25px;' COLSPAN=19 class='ligne-paire'>Nationalité</TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Redoublants F</TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Redoublants M+F</TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Abandons F</TD>
+		<TD ROWSPAN=19 style='width: 1px; padding: 1px;'></TD>
+		<TD ROWSPAN=3 class='ligne-paire'>Abandons M+F</TD>
+	</TR>
+	<TR  style='height:25px;'>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Burundais</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Congolais</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Kényans</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Ougandais</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Rwandais</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Sud Soudan</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Tanzaniens</TD>
+		<TD class='ligne-impaire' align='center' COLSPAN=2>Autres Nationalités</TD>
+		<TD bgcolor='#CCCCCC'   align='center'  colspan=3><b>TOTAL</b></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F</TD>
+		<TD class='ligne-paire'  align='center'  nowrap='nowrap'>F+M</TD>
+		<TD bgcolor='#CCCCCC' class='ligne-paire' align='center' nowrap='nowrap'>F</TD>
+		<TD bgcolor='#CCCCCC' class='ligne-paire' align='center' nowrap='nowrap'>F+M</TD>
+		<TD bgcolor='#CCCCCC' class='ligne-paire' align='center' nowrap='nowrap'>F + F+M</TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_0_0' onClick='MiseEvidenceLigneFrame(0,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_0 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_0_1' onClick='MiseEvidenceLigneFrame(0,15)'><SELECT   ID='CODE_TYPE_NIVEAU_0' NAME=CODE_TYPE_NIVEAU_0>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_0_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_0_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_0_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_0_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_0_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_0_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_0_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_0_2' onClick='MiseEvidenceLigneFrame(0,15)'><SELECT   ID='CODE_TYPE_SECTION_0' NAME=CODE_TYPE_SECTION_0>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_0-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_3' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_1' NAME='FILLES_NATIONALITE_0_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_1"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_4' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_1' NAME='TOTAL_NATIONALITE_0_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_5' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_3' NAME='FILLES_NATIONALITE_0_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_6' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_3' NAME='TOTAL_NATIONALITE_0_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_7' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_8' NAME='FILLES_NATIONALITE_0_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_8' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_8' NAME='TOTAL_NATIONALITE_0_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_9' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_10' NAME='FILLES_NATIONALITE_0_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_10' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_10' NAME='TOTAL_NATIONALITE_0_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_11' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_2' NAME='FILLES_NATIONALITE_0_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_12' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_2' NAME='TOTAL_NATIONALITE_0_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_13' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_11' NAME='FILLES_NATIONALITE_0_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_14' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_11' NAME='TOTAL_NATIONALITE_0_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_15' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_7' NAME='FILLES_NATIONALITE_0_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_16' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_7' NAME='TOTAL_NATIONALITE_0_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_17' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='FILLES_NATIONALITE_0_4' NAME='FILLES_NATIONALITE_0_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_0_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_0_18' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='TOTAL_NATIONALITE_0_4' NAME='TOTAL_NATIONALITE_0_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_0_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_0' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_0' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_0' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_0_19' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='RED_FILLES_0' NAME=RED_FILLES_0 TYPE='text'size=2 VALUE="$RED_FILLES_0"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_0_20' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='RED_TOTAL_0' NAME=RED_TOTAL_0 TYPE='text'size=2 VALUE="$RED_TOTAL_0"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_0_21' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='ABANDON_FILLES_0' NAME=ABANDON_FILLES_0 TYPE='text'size=2 VALUE="$ABANDON_FILLES_0"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_0_22' onClick='MiseEvidenceLigneFrame(0,15)'><INPUT  ID='ABANDON_TOTAL_0' NAME=ABANDON_TOTAL_0 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_0"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_1_0' onClick='MiseEvidenceLigneFrame(1,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_1 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_1_1' onClick='MiseEvidenceLigneFrame(1,15)'><SELECT   ID='CODE_TYPE_NIVEAU_1' NAME=CODE_TYPE_NIVEAU_1>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_1_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_1_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_1_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_1_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_1_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_1_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_1_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_1_2' onClick='MiseEvidenceLigneFrame(1,15)'><SELECT   ID='CODE_TYPE_SECTION_1' NAME=CODE_TYPE_SECTION_1>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_1-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_3' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_1' NAME='FILLES_NATIONALITE_1_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 0, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_4' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_1' NAME='TOTAL_NATIONALITE_1_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_5' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_3' NAME='FILLES_NATIONALITE_1_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_6' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_3' NAME='TOTAL_NATIONALITE_1_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_7' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_8' NAME='FILLES_NATIONALITE_1_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_8' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_8' NAME='TOTAL_NATIONALITE_1_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_9' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_10' NAME='FILLES_NATIONALITE_1_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_10' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_10' NAME='TOTAL_NATIONALITE_1_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_11' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_2' NAME='FILLES_NATIONALITE_1_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_12' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_2' NAME='TOTAL_NATIONALITE_1_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_13' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_11' NAME='FILLES_NATIONALITE_1_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_14' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_11' NAME='TOTAL_NATIONALITE_1_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_15' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_7' NAME='FILLES_NATIONALITE_1_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_16' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_7' NAME='TOTAL_NATIONALITE_1_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_17' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='FILLES_NATIONALITE_1_4' NAME='FILLES_NATIONALITE_1_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_1_18' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='TOTAL_NATIONALITE_1_4' NAME='TOTAL_NATIONALITE_1_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_1_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_1' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_1' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_1' size=2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_1_19' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='RED_FILLES_1' NAME=RED_FILLES_1 TYPE='text'size=2 VALUE="$RED_FILLES_1"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_1_20' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='RED_TOTAL_1' NAME=RED_TOTAL_1 TYPE='text'size=2 VALUE="$RED_TOTAL_1"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_1_21' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='ABANDON_FILLES_1' NAME=ABANDON_FILLES_1 TYPE='text'size=2 VALUE="$ABANDON_FILLES_1"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_1_22' onClick='MiseEvidenceLigneFrame(1,15)'><INPUT  ID='ABANDON_TOTAL_1' NAME=ABANDON_TOTAL_1 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_1"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_2_0' onClick='MiseEvidenceLigneFrame(2,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_2 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_2_1' onClick='MiseEvidenceLigneFrame(2,15)'><SELECT   ID='CODE_TYPE_NIVEAU_2' NAME=CODE_TYPE_NIVEAU_2>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_2_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_2_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_2_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_2_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_2_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_2_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_2_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_2_2' onClick='MiseEvidenceLigneFrame(2,15)'><SELECT   ID='CODE_TYPE_SECTION_2' NAME=CODE_TYPE_SECTION_2>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_2-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_3' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_1' NAME='FILLES_NATIONALITE_2_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 1, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_4' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_1' NAME='TOTAL_NATIONALITE_2_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_5' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_3' NAME='FILLES_NATIONALITE_2_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_6' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_3' NAME='TOTAL_NATIONALITE_2_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_7' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_8' NAME='FILLES_NATIONALITE_2_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_8' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_8' NAME='TOTAL_NATIONALITE_2_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_9' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_10' NAME='FILLES_NATIONALITE_2_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_10' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_10' NAME='TOTAL_NATIONALITE_2_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_11' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_2' NAME='FILLES_NATIONALITE_2_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_12' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_2' NAME='TOTAL_NATIONALITE_2_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_13' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_11' NAME='FILLES_NATIONALITE_2_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_14' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_11' NAME='TOTAL_NATIONALITE_2_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_15' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_7' NAME='FILLES_NATIONALITE_2_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_16' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_7' NAME='TOTAL_NATIONALITE_2_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_17' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='FILLES_NATIONALITE_2_4' NAME='FILLES_NATIONALITE_2_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_2_18' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='TOTAL_NATIONALITE_2_4' NAME='TOTAL_NATIONALITE_2_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_2' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_2' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_2' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_2_19' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='RED_FILLES_2' NAME=RED_FILLES_2 TYPE='text'size=2 VALUE="$RED_FILLES_2"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_2_20' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='RED_TOTAL_2' NAME=RED_TOTAL_2 TYPE='text'size=2 VALUE="$RED_TOTAL_2"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_2_21' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='ABANDON_FILLES_2' NAME=ABANDON_FILLES_2 TYPE='text'size=2 VALUE="$ABANDON_FILLES_2"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_2_22' onClick='MiseEvidenceLigneFrame(2,15)'><INPUT  ID='ABANDON_TOTAL_2' NAME=ABANDON_TOTAL_2 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_2"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_3_0' onClick='MiseEvidenceLigneFrame(3,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_3 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_3_1' onClick='MiseEvidenceLigneFrame(3,15)'><SELECT   ID='CODE_TYPE_NIVEAU_3' NAME=CODE_TYPE_NIVEAU_3>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_3_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_3_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_3_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_3_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_3_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_3_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_3_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_3_2' onClick='MiseEvidenceLigneFrame(3,15)'><SELECT   ID='CODE_TYPE_SECTION_3' NAME=CODE_TYPE_SECTION_3>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_3-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_3' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_1' NAME='FILLES_NATIONALITE_3_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 2, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_4' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_1' NAME='TOTAL_NATIONALITE_3_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_5' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_3' NAME='FILLES_NATIONALITE_3_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_6' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_3' NAME='TOTAL_NATIONALITE_3_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_7' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_8' NAME='FILLES_NATIONALITE_3_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_8' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_8' NAME='TOTAL_NATIONALITE_3_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_9' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_10' NAME='FILLES_NATIONALITE_3_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_10' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_10' NAME='TOTAL_NATIONALITE_3_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_11' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_2' NAME='FILLES_NATIONALITE_3_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_12' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_2' NAME='TOTAL_NATIONALITE_3_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_13' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_11' NAME='FILLES_NATIONALITE_3_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_14' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_11' NAME='TOTAL_NATIONALITE_3_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_15' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_7' NAME='FILLES_NATIONALITE_3_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_16' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_7' NAME='TOTAL_NATIONALITE_3_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_17' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='FILLES_NATIONALITE_3_4' NAME='FILLES_NATIONALITE_3_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_3_18' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='TOTAL_NATIONALITE_3_4' NAME='TOTAL_NATIONALITE_3_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_3' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_3' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_3' size=2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_3_19' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='RED_FILLES_3' NAME=RED_FILLES_3 TYPE='text'size=2 VALUE="$RED_FILLES_3"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_3_20' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='RED_TOTAL_3' NAME=RED_TOTAL_3 TYPE='text'size=2 VALUE="$RED_TOTAL_3"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_3_21' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='ABANDON_FILLES_3' NAME=ABANDON_FILLES_3 TYPE='text'size=2 VALUE="$ABANDON_FILLES_3"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_3_22' onClick='MiseEvidenceLigneFrame(3,15)'><INPUT  ID='ABANDON_TOTAL_3' NAME=ABANDON_TOTAL_3 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_3"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_4_0' onClick='MiseEvidenceLigneFrame(4,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_4 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_4_1' onClick='MiseEvidenceLigneFrame(4,15)'><SELECT   ID='CODE_TYPE_NIVEAU_4' NAME=CODE_TYPE_NIVEAU_4>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_4_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_4_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_4_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_4_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_4_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_4_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_4_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_4_2' onClick='MiseEvidenceLigneFrame(4,15)'><SELECT   ID='CODE_TYPE_SECTION_4' NAME=CODE_TYPE_SECTION_4>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_4-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_3' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_1' NAME='FILLES_NATIONALITE_4_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 3, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_4' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_1' NAME='TOTAL_NATIONALITE_4_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_5' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_3' NAME='FILLES_NATIONALITE_4_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_6' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_3' NAME='TOTAL_NATIONALITE_4_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_7' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_8' NAME='FILLES_NATIONALITE_4_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_8' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_8' NAME='TOTAL_NATIONALITE_4_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_9' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_10' NAME='FILLES_NATIONALITE_4_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_10' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_10' NAME='TOTAL_NATIONALITE_4_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_11' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_2' NAME='FILLES_NATIONALITE_4_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_12' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_2' NAME='TOTAL_NATIONALITE_4_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_13' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_11' NAME='FILLES_NATIONALITE_4_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_14' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_11' NAME='TOTAL_NATIONALITE_4_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_15' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_7' NAME='FILLES_NATIONALITE_4_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_16' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_7' NAME='TOTAL_NATIONALITE_4_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_17' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='FILLES_NATIONALITE_4_4' NAME='FILLES_NATIONALITE_4_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_4_18' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='TOTAL_NATIONALITE_4_4' NAME='TOTAL_NATIONALITE_4_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_4' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_4' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_4' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_4_19' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='RED_FILLES_4' NAME=RED_FILLES_4 TYPE='text'size=2 VALUE="$RED_FILLES_4"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_4_20' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='RED_TOTAL_4' NAME=RED_TOTAL_4 TYPE='text'size=2 VALUE="$RED_TOTAL_4"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_4_21' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='ABANDON_FILLES_4' NAME=ABANDON_FILLES_4 TYPE='text'size=2 VALUE="$ABANDON_FILLES_4"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_4_22' onClick='MiseEvidenceLigneFrame(4,15)'><INPUT  ID='ABANDON_TOTAL_4' NAME=ABANDON_TOTAL_4 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_4"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_5_0' onClick='MiseEvidenceLigneFrame(5,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_5 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_5_1' onClick='MiseEvidenceLigneFrame(5,15)'><SELECT   ID='CODE_TYPE_NIVEAU_5' NAME=CODE_TYPE_NIVEAU_5>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_5_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_5_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_5_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_5_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_5_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_5_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_5_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_5_2' onClick='MiseEvidenceLigneFrame(5,15)'><SELECT   ID='CODE_TYPE_SECTION_5' NAME=CODE_TYPE_SECTION_5>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_5-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_3' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_1' NAME='FILLES_NATIONALITE_5_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 4, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_4' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_1' NAME='TOTAL_NATIONALITE_5_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_5' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_3' NAME='FILLES_NATIONALITE_5_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_6' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_3' NAME='TOTAL_NATIONALITE_5_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_7' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_8' NAME='FILLES_NATIONALITE_5_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_8' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_8' NAME='TOTAL_NATIONALITE_5_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_9' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_10' NAME='FILLES_NATIONALITE_5_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_10' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_10' NAME='TOTAL_NATIONALITE_5_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_11' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_2' NAME='FILLES_NATIONALITE_5_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_12' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_2' NAME='TOTAL_NATIONALITE_5_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_13' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_11' NAME='FILLES_NATIONALITE_5_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_14' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_11' NAME='TOTAL_NATIONALITE_5_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_15' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_7' NAME='FILLES_NATIONALITE_5_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_16' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_7' NAME='TOTAL_NATIONALITE_5_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_17' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='FILLES_NATIONALITE_5_4' NAME='FILLES_NATIONALITE_5_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_5_18' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='TOTAL_NATIONALITE_5_4' NAME='TOTAL_NATIONALITE_5_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_5' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_5' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_5' size=2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_5_19' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='RED_FILLES_5' NAME=RED_FILLES_5 TYPE='text'size=2 VALUE="$RED_FILLES_5"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_5_20' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='RED_TOTAL_5' NAME=RED_TOTAL_5 TYPE='text'size=2 VALUE="$RED_TOTAL_5"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_5_21' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='ABANDON_FILLES_5' NAME=ABANDON_FILLES_5 TYPE='text'size=2 VALUE="$ABANDON_FILLES_5"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_5_22' onClick='MiseEvidenceLigneFrame(5,15)'><INPUT  ID='ABANDON_TOTAL_5' NAME=ABANDON_TOTAL_5 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_5"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_6_0' onClick='MiseEvidenceLigneFrame(6,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_6 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_6_1' onClick='MiseEvidenceLigneFrame(6,15)'><SELECT   ID='CODE_TYPE_NIVEAU_6' NAME=CODE_TYPE_NIVEAU_6>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_6_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_6_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_6_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_6_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_6_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_6_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_6_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_6_2' onClick='MiseEvidenceLigneFrame(6,15)'><SELECT   ID='CODE_TYPE_SECTION_6' NAME=CODE_TYPE_SECTION_6>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_6-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_3' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_1' NAME='FILLES_NATIONALITE_6_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 5, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_4' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_1' NAME='TOTAL_NATIONALITE_6_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_5' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_3' NAME='FILLES_NATIONALITE_6_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_6' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_3' NAME='TOTAL_NATIONALITE_6_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_7' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_8' NAME='FILLES_NATIONALITE_6_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_8' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_8' NAME='TOTAL_NATIONALITE_6_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_9' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_10' NAME='FILLES_NATIONALITE_6_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_10' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_10' NAME='TOTAL_NATIONALITE_6_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_11' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_2' NAME='FILLES_NATIONALITE_6_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_12' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_2' NAME='TOTAL_NATIONALITE_6_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_13' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_11' NAME='FILLES_NATIONALITE_6_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_14' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_11' NAME='TOTAL_NATIONALITE_6_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_15' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_7' NAME='FILLES_NATIONALITE_6_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_16' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_7' NAME='TOTAL_NATIONALITE_6_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_17' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='FILLES_NATIONALITE_6_4' NAME='FILLES_NATIONALITE_6_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_6_18' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='TOTAL_NATIONALITE_6_4' NAME='TOTAL_NATIONALITE_6_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_6' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_6' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_6' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_6_19' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='RED_FILLES_6' NAME=RED_FILLES_6 TYPE='text'size=2 VALUE="$RED_FILLES_6"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_6_20' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='RED_TOTAL_6' NAME=RED_TOTAL_6 TYPE='text'size=2 VALUE="$RED_TOTAL_6"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_6_21' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='ABANDON_FILLES_6' NAME=ABANDON_FILLES_6 TYPE='text'size=2 VALUE="$ABANDON_FILLES_6"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_6_22' onClick='MiseEvidenceLigneFrame(6,15)'><INPUT  ID='ABANDON_TOTAL_6' NAME=ABANDON_TOTAL_6 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_6"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_7_0' onClick='MiseEvidenceLigneFrame(7,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_7 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_7_1' onClick='MiseEvidenceLigneFrame(7,15)'><SELECT   ID='CODE_TYPE_NIVEAU_7' NAME=CODE_TYPE_NIVEAU_7>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_7_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_7_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_7_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_7_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_7_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_7_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_7_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_7_2' onClick='MiseEvidenceLigneFrame(7,15)'><SELECT   ID='CODE_TYPE_SECTION_7' NAME=CODE_TYPE_SECTION_7>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_7-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_3' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_1' NAME='FILLES_NATIONALITE_7_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 6, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_4' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_1' NAME='TOTAL_NATIONALITE_7_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_5' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_3' NAME='FILLES_NATIONALITE_7_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_6' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_3' NAME='TOTAL_NATIONALITE_7_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_7' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_8' NAME='FILLES_NATIONALITE_7_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_8' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_8' NAME='TOTAL_NATIONALITE_7_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_9' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_10' NAME='FILLES_NATIONALITE_7_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_10' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_10' NAME='TOTAL_NATIONALITE_7_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_11' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_2' NAME='FILLES_NATIONALITE_7_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_12' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_2' NAME='TOTAL_NATIONALITE_7_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_13' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_11' NAME='FILLES_NATIONALITE_7_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_14' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_11' NAME='TOTAL_NATIONALITE_7_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_15' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_7' NAME='FILLES_NATIONALITE_7_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_16' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_7' NAME='TOTAL_NATIONALITE_7_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_17' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='FILLES_NATIONALITE_7_4' NAME='FILLES_NATIONALITE_7_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_7_18' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='TOTAL_NATIONALITE_7_4' NAME='TOTAL_NATIONALITE_7_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_7_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_7' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_7' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_7' size=2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_7_19' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='RED_FILLES_7' NAME=RED_FILLES_7 TYPE='text'size=2 VALUE="$RED_FILLES_7"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_7_20' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='RED_TOTAL_7' NAME=RED_TOTAL_7 TYPE='text'size=2 VALUE="$RED_TOTAL_7"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_7_21' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='ABANDON_FILLES_7' NAME=ABANDON_FILLES_7 TYPE='text'size=2 VALUE="$ABANDON_FILLES_7"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_7_22' onClick='MiseEvidenceLigneFrame(7,15)'><INPUT  ID='ABANDON_TOTAL_7' NAME=ABANDON_TOTAL_7 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_7"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_8_0' onClick='MiseEvidenceLigneFrame(8,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_8 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_8_1' onClick='MiseEvidenceLigneFrame(8,15)'><SELECT   ID='CODE_TYPE_NIVEAU_8' NAME=CODE_TYPE_NIVEAU_8>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_8_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_8_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_8_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_8_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_8_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_8_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_8_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_8_2' onClick='MiseEvidenceLigneFrame(8,15)'><SELECT   ID='CODE_TYPE_SECTION_8' NAME=CODE_TYPE_SECTION_8>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_8-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_3' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_1' NAME='FILLES_NATIONALITE_8_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 7, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_4' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_1' NAME='TOTAL_NATIONALITE_8_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_5' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_3' NAME='FILLES_NATIONALITE_8_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_6' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_3' NAME='TOTAL_NATIONALITE_8_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_7' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_8' NAME='FILLES_NATIONALITE_8_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_8' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_8' NAME='TOTAL_NATIONALITE_8_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_9' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_10' NAME='FILLES_NATIONALITE_8_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_10' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_10' NAME='TOTAL_NATIONALITE_8_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_11' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_2' NAME='FILLES_NATIONALITE_8_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_12' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_2' NAME='TOTAL_NATIONALITE_8_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_13' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_11' NAME='FILLES_NATIONALITE_8_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_14' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_11' NAME='TOTAL_NATIONALITE_8_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_15' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_7' NAME='FILLES_NATIONALITE_8_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_16' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_7' NAME='TOTAL_NATIONALITE_8_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_17' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='FILLES_NATIONALITE_8_4' NAME='FILLES_NATIONALITE_8_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_8_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_8_18' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='TOTAL_NATIONALITE_8_4' NAME='TOTAL_NATIONALITE_8_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_8_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_8' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_8' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_8' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_8_19' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='RED_FILLES_8' NAME=RED_FILLES_8 TYPE='text'size=2 VALUE="$RED_FILLES_8"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_8_20' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='RED_TOTAL_8' NAME=RED_TOTAL_8 TYPE='text'size=2 VALUE="$RED_TOTAL_8"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_8_21' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='ABANDON_FILLES_8' NAME=ABANDON_FILLES_8 TYPE='text'size=2 VALUE="$ABANDON_FILLES_8"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_8_22' onClick='MiseEvidenceLigneFrame(8,15)'><INPUT  ID='ABANDON_TOTAL_8' NAME=ABANDON_TOTAL_8 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_8"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_9_0' onClick='MiseEvidenceLigneFrame(9,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_9 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_9_1' onClick='MiseEvidenceLigneFrame(9,15)'><SELECT   ID='CODE_TYPE_NIVEAU_9' NAME=CODE_TYPE_NIVEAU_9>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_9_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_9_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_9_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_9_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_9_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_9_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_9_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_9_2' onClick='MiseEvidenceLigneFrame(9,15)'><SELECT   ID='CODE_TYPE_SECTION_9' NAME=CODE_TYPE_SECTION_9>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_9-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_3' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_1' NAME='FILLES_NATIONALITE_9_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 8, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_4' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_1' NAME='TOTAL_NATIONALITE_9_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_5' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_3' NAME='FILLES_NATIONALITE_9_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_6' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_3' NAME='TOTAL_NATIONALITE_9_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_7' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_8' NAME='FILLES_NATIONALITE_9_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_8' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_8' NAME='TOTAL_NATIONALITE_9_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_9' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_10' NAME='FILLES_NATIONALITE_9_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_10' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_10' NAME='TOTAL_NATIONALITE_9_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_11' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_2' NAME='FILLES_NATIONALITE_9_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_12' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_2' NAME='TOTAL_NATIONALITE_9_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_13' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_11' NAME='FILLES_NATIONALITE_9_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_14' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_11' NAME='TOTAL_NATIONALITE_9_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_15' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_7' NAME='FILLES_NATIONALITE_9_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_16' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_7' NAME='TOTAL_NATIONALITE_9_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_17' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='FILLES_NATIONALITE_9_4' NAME='FILLES_NATIONALITE_9_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_9_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_9_18' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='TOTAL_NATIONALITE_9_4' NAME='TOTAL_NATIONALITE_9_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_9_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_9' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_9' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_9' size=2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_9_19' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='RED_FILLES_9' NAME=RED_FILLES_9 TYPE='text'size=2 VALUE="$RED_FILLES_9"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_9_20' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='RED_TOTAL_9' NAME=RED_TOTAL_9 TYPE='text'size=2 VALUE="$RED_TOTAL_9"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_9_21' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='ABANDON_FILLES_9' NAME=ABANDON_FILLES_9 TYPE='text'size=2 VALUE="$ABANDON_FILLES_9"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_9_22' onClick='MiseEvidenceLigneFrame(9,15)'><INPUT  ID='ABANDON_TOTAL_9' NAME=ABANDON_TOTAL_9 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_9"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_10_0' onClick='MiseEvidenceLigneFrame(10,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_10 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_10_1' onClick='MiseEvidenceLigneFrame(10,15)'><SELECT   ID='CODE_TYPE_NIVEAU_10' NAME=CODE_TYPE_NIVEAU_10>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_10_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_10_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_10_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_10_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_10_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_10_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_10_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_10_2' onClick='MiseEvidenceLigneFrame(10,15)'><SELECT   ID='CODE_TYPE_SECTION_10' NAME=CODE_TYPE_SECTION_10>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_10-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_3' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_1' NAME='FILLES_NATIONALITE_10_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 9, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_4' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_1' NAME='TOTAL_NATIONALITE_10_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_5' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_3' NAME='FILLES_NATIONALITE_10_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_6' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_3' NAME='TOTAL_NATIONALITE_10_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_7' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_8' NAME='FILLES_NATIONALITE_10_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_8' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_8' NAME='TOTAL_NATIONALITE_10_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_9' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_10' NAME='FILLES_NATIONALITE_10_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_10' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_10' NAME='TOTAL_NATIONALITE_10_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_11' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_2' NAME='FILLES_NATIONALITE_10_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_12' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_2' NAME='TOTAL_NATIONALITE_10_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_13' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_11' NAME='FILLES_NATIONALITE_10_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_14' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_11' NAME='TOTAL_NATIONALITE_10_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_15' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_7' NAME='FILLES_NATIONALITE_10_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_16' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_7' NAME='TOTAL_NATIONALITE_10_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_17' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='FILLES_NATIONALITE_10_4' NAME='FILLES_NATIONALITE_10_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_10_18' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='TOTAL_NATIONALITE_10_4' NAME='TOTAL_NATIONALITE_10_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_10' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_10' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_10' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_10_19' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='RED_FILLES_10' NAME=RED_FILLES_10 TYPE='text'size=2 VALUE="$RED_FILLES_10"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_10_20' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='RED_TOTAL_10' NAME=RED_TOTAL_10 TYPE='text'size=2 VALUE="$RED_TOTAL_10"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_10_21' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='ABANDON_FILLES_10' NAME=ABANDON_FILLES_10 TYPE='text'size=2 VALUE="$ABANDON_FILLES_10"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_10_22' onClick='MiseEvidenceLigneFrame(10,15)'><INPUT  ID='ABANDON_TOTAL_10' NAME=ABANDON_TOTAL_10 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_10"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_11_0' onClick='MiseEvidenceLigneFrame(11,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_11 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_11_1' onClick='MiseEvidenceLigneFrame(11,15)'><SELECT   ID='CODE_TYPE_NIVEAU_11' NAME=CODE_TYPE_NIVEAU_11>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_11_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_11_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_11_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_11_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_11_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_11_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_11_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_11_2' onClick='MiseEvidenceLigneFrame(11,15)'><SELECT   ID='CODE_TYPE_SECTION_11' NAME=CODE_TYPE_SECTION_11>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_11-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_3' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_1' NAME='FILLES_NATIONALITE_11_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 10, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_4' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_1' NAME='TOTAL_NATIONALITE_11_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_5' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_3' NAME='FILLES_NATIONALITE_11_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_6' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_3' NAME='TOTAL_NATIONALITE_11_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_7' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_8' NAME='FILLES_NATIONALITE_11_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_8' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_8' NAME='TOTAL_NATIONALITE_11_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_9' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_10' NAME='FILLES_NATIONALITE_11_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_10' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_10' NAME='TOTAL_NATIONALITE_11_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_11' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_2' NAME='FILLES_NATIONALITE_11_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_12' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_2' NAME='TOTAL_NATIONALITE_11_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_13' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_11' NAME='FILLES_NATIONALITE_11_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_14' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_11' NAME='TOTAL_NATIONALITE_11_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_15' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_7' NAME='FILLES_NATIONALITE_11_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_16' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_7' NAME='TOTAL_NATIONALITE_11_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_17' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='FILLES_NATIONALITE_11_4' NAME='FILLES_NATIONALITE_11_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_11_18' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='TOTAL_NATIONALITE_11_4' NAME='TOTAL_NATIONALITE_11_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_11' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_11' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_11' size=2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_11_19' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='RED_FILLES_11' NAME=RED_FILLES_11 TYPE='text'size=2 VALUE="$RED_FILLES_11"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_11_20' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='RED_TOTAL_11' NAME=RED_TOTAL_11 TYPE='text'size=2 VALUE="$RED_TOTAL_11"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_11_21' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='ABANDON_FILLES_11' NAME=ABANDON_FILLES_11 TYPE='text'size=2 VALUE="$ABANDON_FILLES_11"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_11_22' onClick='MiseEvidenceLigneFrame(11,15)'><INPUT  ID='ABANDON_TOTAL_11' NAME=ABANDON_TOTAL_11 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_11"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_12_0' onClick='MiseEvidenceLigneFrame(12,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_12 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_12_1' onClick='MiseEvidenceLigneFrame(12,15)'><SELECT   ID='CODE_TYPE_NIVEAU_12' NAME=CODE_TYPE_NIVEAU_12>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_12_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_12_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_12_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_12_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_12_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_12_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_12_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_12_2' onClick='MiseEvidenceLigneFrame(12,15)'><SELECT   ID='CODE_TYPE_SECTION_12' NAME=CODE_TYPE_SECTION_12>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_12-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_3' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_1' NAME='FILLES_NATIONALITE_12_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 11, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_4' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_1' NAME='TOTAL_NATIONALITE_12_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_5' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_3' NAME='FILLES_NATIONALITE_12_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_6' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_3' NAME='TOTAL_NATIONALITE_12_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_7' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_8' NAME='FILLES_NATIONALITE_12_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_8' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_8' NAME='TOTAL_NATIONALITE_12_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_9' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_10' NAME='FILLES_NATIONALITE_12_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_10' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_10' NAME='TOTAL_NATIONALITE_12_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_11' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_2' NAME='FILLES_NATIONALITE_12_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_12' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_2' NAME='TOTAL_NATIONALITE_12_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_13' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_11' NAME='FILLES_NATIONALITE_12_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_14' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_11' NAME='TOTAL_NATIONALITE_12_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_15' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_7' NAME='FILLES_NATIONALITE_12_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_16' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_7' NAME='TOTAL_NATIONALITE_12_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_17' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='FILLES_NATIONALITE_12_4' NAME='FILLES_NATIONALITE_12_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_12_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_12_18' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='TOTAL_NATIONALITE_12_4' NAME='TOTAL_NATIONALITE_12_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_12_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_12' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_12' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_12' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_12_19' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='RED_FILLES_12' NAME=RED_FILLES_12 TYPE='text'size=2 VALUE="$RED_FILLES_12"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_12_20' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='RED_TOTAL_12' NAME=RED_TOTAL_12 TYPE='text'size=2 VALUE="$RED_TOTAL_12"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_12_21' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='ABANDON_FILLES_12' NAME=ABANDON_FILLES_12 TYPE='text'size=2 VALUE="$ABANDON_FILLES_12"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_12_22' onClick='MiseEvidenceLigneFrame(12,15)'><INPUT  ID='ABANDON_TOTAL_12' NAME=ABANDON_TOTAL_12 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_12"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-paire' id='ligne-paire_13_0' onClick='MiseEvidenceLigneFrame(13,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_13 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-paire' id='ligne-paire_13_1' onClick='MiseEvidenceLigneFrame(13,15)'><SELECT   ID='CODE_TYPE_NIVEAU_13' NAME=CODE_TYPE_NIVEAU_13>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_13_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_13_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_13_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_13_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_13_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_13_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_13_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-paire' id='ligne-paire_13_2' onClick='MiseEvidenceLigneFrame(13,15)'><SELECT   ID='CODE_TYPE_SECTION_13' NAME=CODE_TYPE_SECTION_13>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_13-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_3' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_1' NAME='FILLES_NATIONALITE_13_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 12, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_4' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_1' NAME='TOTAL_NATIONALITE_13_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_5' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_3' NAME='FILLES_NATIONALITE_13_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_6' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_3' NAME='TOTAL_NATIONALITE_13_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_7' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_8' NAME='FILLES_NATIONALITE_13_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_8' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_8' NAME='TOTAL_NATIONALITE_13_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_9' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_10' NAME='FILLES_NATIONALITE_13_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_10' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_10' NAME='TOTAL_NATIONALITE_13_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_11' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_2' NAME='FILLES_NATIONALITE_13_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_12' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_2' NAME='TOTAL_NATIONALITE_13_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_13' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_11' NAME='FILLES_NATIONALITE_13_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_14' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_11' NAME='TOTAL_NATIONALITE_13_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_15' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_7' NAME='FILLES_NATIONALITE_13_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_16' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_7' NAME='TOTAL_NATIONALITE_13_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_17' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='FILLES_NATIONALITE_13_4' NAME='FILLES_NATIONALITE_13_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_13_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire' id='ligne-paire_13_18' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='TOTAL_NATIONALITE_13_4' NAME='TOTAL_NATIONALITE_13_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_13_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_13' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_13' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_13' size=2></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_13_19' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='RED_FILLES_13' NAME=RED_FILLES_13 TYPE='text'size=2 VALUE="$RED_FILLES_13"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_13_20' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='RED_TOTAL_13' NAME=RED_TOTAL_13 TYPE='text'size=2 VALUE="$RED_TOTAL_13"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_13_21' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='ABANDON_FILLES_13' NAME=ABANDON_FILLES_13 TYPE='text'size=2 VALUE="$ABANDON_FILLES_13"></TD>
+		<TD  class='ligne-paire'  id='ligne-paire_13_22' onClick='MiseEvidenceLigneFrame(13,15)'><INPUT  ID='ABANDON_TOTAL_13' NAME=ABANDON_TOTAL_13 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_13"></TD>
+	</TR>
+	<TR>
+		<TD class='ligne-impaire' id='ligne-impaire_14_0' onClick='MiseEvidenceLigneFrame(14,15)' title='Click sur la case à cocher pour supprimer la ligne entière'><INPUT NAME=DELETE_14 TYPE='checkbox' VALUE=1 onClick=Alert_Supp(this.name);></TD>		<TD  class='ligne-impaire' id='ligne-impaire_14_1' onClick='MiseEvidenceLigneFrame(14,15)'><SELECT   ID='CODE_TYPE_NIVEAU_14' NAME=CODE_TYPE_NIVEAU_14>
+			<OPTION VALUE=''>---</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_14_10>7ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_14_11>8ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_14_12>9ème année</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_14_32>1ère A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_14_33>2ème A2 </OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_14_34>3ème A2</OPTION>
+			<OPTION VALUE=$CODE_TYPE_NIVEAU_14_35>4ème A2</OPTION>
+		</SELECT></TD>
+		<TD  class='ligne-impaire' id='ligne-impaire_14_2' onClick='MiseEvidenceLigneFrame(14,15)'><SELECT   ID='CODE_TYPE_SECTION_14' NAME=CODE_TYPE_SECTION_14>
+			<OPTION VALUE=''>---</OPTION>
+<!--DynContentObj_710004_CODE_TYPE_SECTION_14-->
+		</SELECT></TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_3' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_1' NAME='FILLES_NATIONALITE_14_1' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 13, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_4' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_1' NAME='TOTAL_NATIONALITE_14_1' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_5' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_3' NAME='FILLES_NATIONALITE_14_3' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 1, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_6' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_3' NAME='TOTAL_NATIONALITE_14_3' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_7' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_8' NAME='FILLES_NATIONALITE_14_8' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 3, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_8' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_8' NAME='TOTAL_NATIONALITE_14_8' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_9' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_10' NAME='FILLES_NATIONALITE_14_10' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 8, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_10' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_10' NAME='TOTAL_NATIONALITE_14_10' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_11' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_2' NAME='FILLES_NATIONALITE_14_2' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 10, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_12' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_2' NAME='TOTAL_NATIONALITE_14_2' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_13' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_11' NAME='FILLES_NATIONALITE_14_11' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 2, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_14' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_11' NAME='TOTAL_NATIONALITE_14_11' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_15' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_7' NAME='FILLES_NATIONALITE_14_7' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 11, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_16' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_7' NAME='TOTAL_NATIONALITE_14_7' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_17' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='FILLES_NATIONALITE_14_4' NAME='FILLES_NATIONALITE_14_4' TYPE='text' size=2 VALUE="$FILLES_NATIONALITE_14_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'TOTAL_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 7, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire' id='ligne-impaire_14_18' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='TOTAL_NATIONALITE_14_4' NAME='TOTAL_NATIONALITE_14_4' TYPE='text' size=2 VALUE="$TOTAL_NATIONALITE_14_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 710010, '', 'FILLES_NATIONALITE', tab_ligne_710010, tab_col_710010, 14, 4, tab_mes_710010);"  tabindex=''>
+</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_FILLES_NATIONALITE_LIGNE_14' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1'  class='total' NAME='TOT_710010_TOTAL_NATIONALITE_LIGNE_14' size=2></TD>
+		<TD  align='center' bgcolor='#CCCCCC'>  <INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_710010_ALL_MES_LIGNE_14' size=2></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_14_19' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='RED_FILLES_14' NAME=RED_FILLES_14 TYPE='text'size=2 VALUE="$RED_FILLES_14"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_14_20' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='RED_TOTAL_14' NAME=RED_TOTAL_14 TYPE='text'size=2 VALUE="$RED_TOTAL_14"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_14_21' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='ABANDON_FILLES_14' NAME=ABANDON_FILLES_14 TYPE='text'size=2 VALUE="$ABANDON_FILLES_14"></TD>
+		<TD  class='ligne-impaire'  id='ligne-impaire_14_22' onClick='MiseEvidenceLigneFrame(14,15)'><INPUT  ID='ABANDON_TOTAL_14' NAME=ABANDON_TOTAL_14 TYPE='text'size=2 VALUE="$ABANDON_TOTAL_14"></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',710010, '', tab_mes_710010, tab_ligne_710010, tab_col_710010);
+</script>

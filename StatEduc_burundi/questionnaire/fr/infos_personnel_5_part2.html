@@ -1,0 +1,1588 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=3805' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>V. INFORMATIONS RELATIVES AU PERSONNEL... (SUITE)</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> 5.3. Personnels administratifs et d’encadrement qui donnent des cours par qualification, par nationalité et par sexe. <br></b><script language='javascript' type='text/javascript'>
+var expression_380014 	= "";
+var tot_mes_ligne_380014 	= new Array();
+var tot_mes_col_380014 	= new Array();
+var affich_vertic_mes_380014 	= 0;
+var affiche_sous_totaux_380014 	= 0;
+var tab_mes_380014 	= new Array ("F_PERS_NAT_QUALIF","T_PERS_NAT_QUALIF");
+var tab_ligne_380014	= new Array ("22","23","24","25","26","27","28","4","5","18","19","20","29","30","31","32","33","34","35","36","37","3");
+var tab_col_380014	= new Array ("1","3","2","4");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Burundais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Congolais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Rwandais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Autres Nationalités</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN=3 >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F + F+M</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >REG. TECHN.</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_22_1' NAME='F_PERS_NAT_QUALIF_0_22_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_22_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_22_1' NAME='T_PERS_NAT_QUALIF_0_22_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_22_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_22_3' NAME='F_PERS_NAT_QUALIF_0_22_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_22_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_22_3' NAME='T_PERS_NAT_QUALIF_0_22_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_22_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_22_2' NAME='F_PERS_NAT_QUALIF_0_22_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_22_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_22_2' NAME='T_PERS_NAT_QUALIF_0_22_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_22_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_22_4' NAME='F_PERS_NAT_QUALIF_0_22_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_22_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_22_4' NAME='T_PERS_NAT_QUALIF_0_22_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_22_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 22, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[0][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[0][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_22' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >GRADUE</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_23_1' NAME='F_PERS_NAT_QUALIF_0_23_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_23_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_23_1' NAME='T_PERS_NAT_QUALIF_0_23_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_23_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_23_3' NAME='F_PERS_NAT_QUALIF_0_23_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_23_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_23_3' NAME='T_PERS_NAT_QUALIF_0_23_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_23_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_23_2' NAME='F_PERS_NAT_QUALIF_0_23_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_23_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_23_2' NAME='T_PERS_NAT_QUALIF_0_23_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_23_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_23_4' NAME='F_PERS_NAT_QUALIF_0_23_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_23_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_23_4' NAME='T_PERS_NAT_QUALIF_0_23_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_23_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 23, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[1][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[1][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_23' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >ISCO</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_24_1' NAME='F_PERS_NAT_QUALIF_0_24_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_24_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_24_1' NAME='T_PERS_NAT_QUALIF_0_24_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_24_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_24_3' NAME='F_PERS_NAT_QUALIF_0_24_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_24_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_24_3' NAME='T_PERS_NAT_QUALIF_0_24_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_24_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_24_2' NAME='F_PERS_NAT_QUALIF_0_24_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_24_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_24_2' NAME='T_PERS_NAT_QUALIF_0_24_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_24_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_24_4' NAME='F_PERS_NAT_QUALIF_0_24_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_24_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_24_4' NAME='T_PERS_NAT_QUALIF_0_24_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_24_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 24, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[2][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[2][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_24' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >I.P.</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_25_1' NAME='F_PERS_NAT_QUALIF_0_25_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_25_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_25_1' NAME='T_PERS_NAT_QUALIF_0_25_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_25_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_25_3' NAME='F_PERS_NAT_QUALIF_0_25_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_25_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_25_3' NAME='T_PERS_NAT_QUALIF_0_25_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_25_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_25_2' NAME='F_PERS_NAT_QUALIF_0_25_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_25_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_25_2' NAME='T_PERS_NAT_QUALIF_0_25_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_25_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_25_4' NAME='F_PERS_NAT_QUALIF_0_25_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_25_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_25_4' NAME='T_PERS_NAT_QUALIF_0_25_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_25_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 25, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[3][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[3][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_25' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >ENS III</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_26_1' NAME='F_PERS_NAT_QUALIF_0_26_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_26_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_26_1' NAME='T_PERS_NAT_QUALIF_0_26_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_26_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_26_3' NAME='F_PERS_NAT_QUALIF_0_26_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_26_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_26_3' NAME='T_PERS_NAT_QUALIF_0_26_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_26_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_26_2' NAME='F_PERS_NAT_QUALIF_0_26_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_26_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_26_2' NAME='T_PERS_NAT_QUALIF_0_26_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_26_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_26_4' NAME='F_PERS_NAT_QUALIF_0_26_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_26_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_26_4' NAME='T_PERS_NAT_QUALIF_0_26_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_26_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 26, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[4]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_26'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[4][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_26";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_26'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[4][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_26";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_26' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >IPA III</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_27_1' NAME='F_PERS_NAT_QUALIF_0_27_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_27_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_27_1' NAME='T_PERS_NAT_QUALIF_0_27_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_27_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_27_3' NAME='F_PERS_NAT_QUALIF_0_27_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_27_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_27_3' NAME='T_PERS_NAT_QUALIF_0_27_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_27_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_27_2' NAME='F_PERS_NAT_QUALIF_0_27_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_27_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_27_2' NAME='T_PERS_NAT_QUALIF_0_27_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_27_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_27_4' NAME='F_PERS_NAT_QUALIF_0_27_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_27_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_27_4' NAME='T_PERS_NAT_QUALIF_0_27_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_27_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 27, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[5]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_27'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[5][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_27";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_27'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[5][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_27";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_27' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >IPA V</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_28_1' NAME='F_PERS_NAT_QUALIF_0_28_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_28_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_28_1' NAME='T_PERS_NAT_QUALIF_0_28_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_28_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_28_3' NAME='F_PERS_NAT_QUALIF_0_28_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_28_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_28_3' NAME='T_PERS_NAT_QUALIF_0_28_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_28_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_28_2' NAME='F_PERS_NAT_QUALIF_0_28_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_28_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_28_2' NAME='T_PERS_NAT_QUALIF_0_28_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_28_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_28_4' NAME='F_PERS_NAT_QUALIF_0_28_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_28_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_28_4' NAME='T_PERS_NAT_QUALIF_0_28_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_28_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 28, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[6]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_28'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[6][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_28";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_28'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[6][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_28";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_28' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >D6</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_4_1' NAME='F_PERS_NAT_QUALIF_0_4_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_4_1' NAME='T_PERS_NAT_QUALIF_0_4_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_4_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_4_3' NAME='F_PERS_NAT_QUALIF_0_4_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_4_3' NAME='T_PERS_NAT_QUALIF_0_4_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_4_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_4_2' NAME='F_PERS_NAT_QUALIF_0_4_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_4_2' NAME='T_PERS_NAT_QUALIF_0_4_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_4_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_4_4' NAME='F_PERS_NAT_QUALIF_0_4_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_4_4' NAME='T_PERS_NAT_QUALIF_0_4_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_4_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 4, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[7]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[7][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[7][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_4' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >D4 </TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_5_1' NAME='F_PERS_NAT_QUALIF_0_5_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_5_1' NAME='T_PERS_NAT_QUALIF_0_5_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_5_3' NAME='F_PERS_NAT_QUALIF_0_5_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_5_3' NAME='T_PERS_NAT_QUALIF_0_5_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_5_2' NAME='F_PERS_NAT_QUALIF_0_5_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_5_2' NAME='T_PERS_NAT_QUALIF_0_5_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_5_4' NAME='F_PERS_NAT_QUALIF_0_5_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_5_4' NAME='T_PERS_NAT_QUALIF_0_5_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 5, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[8]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[8][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[8][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_5' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >A2</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_18_1' NAME='F_PERS_NAT_QUALIF_0_18_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_18_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_18_1' NAME='T_PERS_NAT_QUALIF_0_18_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_18_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_18_3' NAME='F_PERS_NAT_QUALIF_0_18_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_18_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_18_3' NAME='T_PERS_NAT_QUALIF_0_18_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_18_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_18_2' NAME='F_PERS_NAT_QUALIF_0_18_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_18_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_18_2' NAME='T_PERS_NAT_QUALIF_0_18_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_18_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_18_4' NAME='F_PERS_NAT_QUALIF_0_18_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_18_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_18_4' NAME='T_PERS_NAT_QUALIF_0_18_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_18_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 18, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[9]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_18'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[9][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_18";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_18'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[9][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_18";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_18' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >A3</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_19_1' NAME='F_PERS_NAT_QUALIF_0_19_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_19_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_19_1' NAME='T_PERS_NAT_QUALIF_0_19_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_19_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_19_3' NAME='F_PERS_NAT_QUALIF_0_19_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_19_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_19_3' NAME='T_PERS_NAT_QUALIF_0_19_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_19_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_19_2' NAME='F_PERS_NAT_QUALIF_0_19_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_19_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_19_2' NAME='T_PERS_NAT_QUALIF_0_19_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_19_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_19_4' NAME='F_PERS_NAT_QUALIF_0_19_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_19_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_19_4' NAME='T_PERS_NAT_QUALIF_0_19_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_19_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 19, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[10]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[10][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[10][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_19' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >A4</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_20_1' NAME='F_PERS_NAT_QUALIF_0_20_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_20_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_20_1' NAME='T_PERS_NAT_QUALIF_0_20_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_20_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_20_3' NAME='F_PERS_NAT_QUALIF_0_20_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_20_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_20_3' NAME='T_PERS_NAT_QUALIF_0_20_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_20_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_20_2' NAME='F_PERS_NAT_QUALIF_0_20_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_20_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_20_2' NAME='T_PERS_NAT_QUALIF_0_20_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_20_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_20_4' NAME='F_PERS_NAT_QUALIF_0_20_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_20_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_20_4' NAME='T_PERS_NAT_QUALIF_0_20_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_20_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 20, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[11]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_20'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[11][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_20";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_20'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[11][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_20";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_20' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >LICENCIE</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_29_1' NAME='F_PERS_NAT_QUALIF_0_29_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_29_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_29_1' NAME='T_PERS_NAT_QUALIF_0_29_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_29_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_29_3' NAME='F_PERS_NAT_QUALIF_0_29_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_29_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_29_3' NAME='T_PERS_NAT_QUALIF_0_29_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_29_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_29_2' NAME='F_PERS_NAT_QUALIF_0_29_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_29_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_29_2' NAME='T_PERS_NAT_QUALIF_0_29_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_29_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_29_4' NAME='F_PERS_NAT_QUALIF_0_29_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_29_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_29_4' NAME='T_PERS_NAT_QUALIF_0_29_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_29_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 29, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[12]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_29'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[12][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_29";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_29'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[12][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_29";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_29' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >ING. TECHN.</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_30_1' NAME='F_PERS_NAT_QUALIF_0_30_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_30_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_30_1' NAME='T_PERS_NAT_QUALIF_0_30_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_30_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_30_3' NAME='F_PERS_NAT_QUALIF_0_30_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_30_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_30_3' NAME='T_PERS_NAT_QUALIF_0_30_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_30_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_30_2' NAME='F_PERS_NAT_QUALIF_0_30_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_30_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_30_2' NAME='T_PERS_NAT_QUALIF_0_30_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_30_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_30_4' NAME='F_PERS_NAT_QUALIF_0_30_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_30_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_30_4' NAME='T_PERS_NAT_QUALIF_0_30_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_30_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 30, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[13]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_30'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[13][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_30";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_30'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[13][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_30";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_30' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >ING. IND.</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_31_1' NAME='F_PERS_NAT_QUALIF_0_31_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_31_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_31_1' NAME='T_PERS_NAT_QUALIF_0_31_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_31_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_31_3' NAME='F_PERS_NAT_QUALIF_0_31_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_31_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_31_3' NAME='T_PERS_NAT_QUALIF_0_31_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_31_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_31_2' NAME='F_PERS_NAT_QUALIF_0_31_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_31_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_31_2' NAME='T_PERS_NAT_QUALIF_0_31_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_31_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_31_4' NAME='F_PERS_NAT_QUALIF_0_31_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_31_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_31_4' NAME='T_PERS_NAT_QUALIF_0_31_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_31_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 31, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[14]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_31'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[14][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_31";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_31'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[14][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_31";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_31' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >ING. CIVIL</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_32_1' NAME='F_PERS_NAT_QUALIF_0_32_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_32_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_32_1' NAME='T_PERS_NAT_QUALIF_0_32_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_32_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_32_3' NAME='F_PERS_NAT_QUALIF_0_32_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_32_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_32_3' NAME='T_PERS_NAT_QUALIF_0_32_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_32_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_32_2' NAME='F_PERS_NAT_QUALIF_0_32_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_32_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_32_2' NAME='T_PERS_NAT_QUALIF_0_32_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_32_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_32_4' NAME='F_PERS_NAT_QUALIF_0_32_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_32_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_32_4' NAME='T_PERS_NAT_QUALIF_0_32_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_32_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 32, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[15]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_32'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[15][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_32";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_32'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[15][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_32";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_32' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >MAITRISE / MASTER</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_33_1' NAME='F_PERS_NAT_QUALIF_0_33_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_33_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_33_1' NAME='T_PERS_NAT_QUALIF_0_33_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_33_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_33_3' NAME='F_PERS_NAT_QUALIF_0_33_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_33_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_33_3' NAME='T_PERS_NAT_QUALIF_0_33_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_33_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_33_2' NAME='F_PERS_NAT_QUALIF_0_33_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_33_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_33_2' NAME='T_PERS_NAT_QUALIF_0_33_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_33_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_33_4' NAME='F_PERS_NAT_QUALIF_0_33_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_33_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_33_4' NAME='T_PERS_NAT_QUALIF_0_33_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_33_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 33, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[16]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_33'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[16][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_33";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_33'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[16][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_33";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_33' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >DOCTEUR</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_34_1' NAME='F_PERS_NAT_QUALIF_0_34_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_34_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_34_1' NAME='T_PERS_NAT_QUALIF_0_34_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_34_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_34_3' NAME='F_PERS_NAT_QUALIF_0_34_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_34_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_34_3' NAME='T_PERS_NAT_QUALIF_0_34_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_34_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_34_2' NAME='F_PERS_NAT_QUALIF_0_34_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_34_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_34_2' NAME='T_PERS_NAT_QUALIF_0_34_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_34_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_34_4' NAME='F_PERS_NAT_QUALIF_0_34_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_34_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_34_4' NAME='T_PERS_NAT_QUALIF_0_34_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_34_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 34, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[17]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_34'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[17][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_34";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_34'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[17][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_34";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_34' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >AUTRE 1er CYCLE *</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_35_1' NAME='F_PERS_NAT_QUALIF_0_35_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_35_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_35_1' NAME='T_PERS_NAT_QUALIF_0_35_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_35_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_35_3' NAME='F_PERS_NAT_QUALIF_0_35_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_35_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_35_3' NAME='T_PERS_NAT_QUALIF_0_35_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_35_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_35_2' NAME='F_PERS_NAT_QUALIF_0_35_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_35_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_35_2' NAME='T_PERS_NAT_QUALIF_0_35_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_35_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_35_4' NAME='F_PERS_NAT_QUALIF_0_35_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_35_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_35_4' NAME='T_PERS_NAT_QUALIF_0_35_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_35_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 35, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[18]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_35'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[18][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_35";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_35'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[18][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_35";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_35' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >AUTRE 2ème CYCLE *</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_36_1' NAME='F_PERS_NAT_QUALIF_0_36_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_36_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_36_1' NAME='T_PERS_NAT_QUALIF_0_36_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_36_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_36_3' NAME='F_PERS_NAT_QUALIF_0_36_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_36_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_36_3' NAME='T_PERS_NAT_QUALIF_0_36_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_36_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_36_2' NAME='F_PERS_NAT_QUALIF_0_36_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_36_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_36_2' NAME='T_PERS_NAT_QUALIF_0_36_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_36_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_36_4' NAME='F_PERS_NAT_QUALIF_0_36_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_36_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_36_4' NAME='T_PERS_NAT_QUALIF_0_36_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_36_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 36, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[19]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_36'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[19][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_36";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_36'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[19][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_36";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_36' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >AUTRE 3ème CYCLE *</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_37_1' NAME='F_PERS_NAT_QUALIF_0_37_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_37_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_37_1' NAME='T_PERS_NAT_QUALIF_0_37_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_37_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_37_3' NAME='F_PERS_NAT_QUALIF_0_37_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_37_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_37_3' NAME='T_PERS_NAT_QUALIF_0_37_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_37_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_37_2' NAME='F_PERS_NAT_QUALIF_0_37_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_37_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_37_2' NAME='T_PERS_NAT_QUALIF_0_37_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_37_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_NAT_QUALIF_0_37_4' NAME='F_PERS_NAT_QUALIF_0_37_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_37_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_NAT_QUALIF_0_37_4' NAME='T_PERS_NAT_QUALIF_0_37_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_37_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 37, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[20]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_37'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[20][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_37";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_37'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[20][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_37";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_37' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >D7</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_3_1' NAME='F_PERS_NAT_QUALIF_0_3_1' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_3_1' NAME='T_PERS_NAT_QUALIF_0_3_1' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_3_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 1, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_3_3' NAME='F_PERS_NAT_QUALIF_0_3_3' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_3_3' NAME='T_PERS_NAT_QUALIF_0_3_3' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_3_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 3, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_3_2' NAME='F_PERS_NAT_QUALIF_0_3_2' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_3_2' NAME='T_PERS_NAT_QUALIF_0_3_2' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_3_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 2, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_NAT_QUALIF_0_3_4' NAME='F_PERS_NAT_QUALIF_0_3_4' TYPE='text' size=5 VALUE="$F_PERS_NAT_QUALIF_0_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'F_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_NAT_QUALIF_0_3_4' NAME='T_PERS_NAT_QUALIF_0_3_4' TYPE='text' size=5 VALUE="$T_PERS_NAT_QUALIF_0_3_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380014, 0, 'T_PERS_NAT_QUALIF', tab_ligne_380014, tab_col_380014, 3, 4, tab_mes_380014);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[21]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_3'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[21][1]	= "TOT_380014_F_PERS_NAT_QUALIF_LIGNE_0_3";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_3'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380014[21][2]	= "TOT_380014_T_PERS_NAT_QUALIF_LIGNE_0_3";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_LIGNE_0_3' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='2' bgcolor='#CCCCCC'><br>TOTAL</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_1'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[0][1]	= "TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_1";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_1'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[0][2]	= "TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_1";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_3'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[1][1]	= "TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_3";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_3'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[1][2]	= "TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_3";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_2'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[2][1]	= "TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_2";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_2'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[2][2]	= "TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_2";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[3][1]	= "TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380014[3][2]	= "TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0_4";
+</script>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_380014_F_PERS_NAT_QUALIF_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_380014_T_PERS_NAT_QUALIF_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380014_ALL_MES_0' size=5></TD>
+
+	</TR>
+
+	<TR>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380014_ALL_MES_COLONNE_0_1' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380014_ALL_MES_COLONNE_0_3' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380014_ALL_MES_COLONNE_0_2' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380014_ALL_MES_COLONNE_0_4' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR>5.4.  Personnels administratifs, d’encadrement et de maintenance par nationalité et par sexe <br></b><script language='javascript' type='text/javascript'>
+var expression_380016 	= "";
+var tot_mes_ligne_380016 	= new Array();
+var tot_mes_col_380016 	= new Array();
+var affich_vertic_mes_380016 	= 0;
+var affiche_sous_totaux_380016 	= 0;
+var tab_mes_380016 	= new Array ("F_PERS_FONC_NAT","T_PERS_FONC_NAT");
+var tab_ligne_380016	= new Array ("2","19","9","10","12","11","5","13","22","23","25","24","37","14","15","17","16");
+var tab_col_380016	= new Array ("1","3","2","4");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Burundais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Congolais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Rwandais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>Autres Nationalités</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN=3 >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>M+F</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>M+F</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>M+F</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>M+F</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>M+F</TD>
+		<TD  align='center'>F + M+F</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Directeur  </TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_2_1' NAME='F_PERS_FONC_NAT_0_2_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_2_1' NAME='T_PERS_FONC_NAT_0_2_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_2_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_2_3' NAME='F_PERS_FONC_NAT_0_2_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_2_3' NAME='T_PERS_FONC_NAT_0_2_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_2_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_2_2' NAME='F_PERS_FONC_NAT_0_2_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_2_2' NAME='T_PERS_FONC_NAT_0_2_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_2_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_2_4' NAME='F_PERS_FONC_NAT_0_2_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_2_4' NAME='T_PERS_FONC_NAT_0_2_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_2_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 2, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_2'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[0][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_2";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_2'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[0][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_2";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_2' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Directeur Technique</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_19_1' NAME='F_PERS_FONC_NAT_0_19_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_19_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_19_1' NAME='T_PERS_FONC_NAT_0_19_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_19_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_19_3' NAME='F_PERS_FONC_NAT_0_19_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_19_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_19_3' NAME='T_PERS_FONC_NAT_0_19_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_19_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_19_2' NAME='F_PERS_FONC_NAT_0_19_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_19_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_19_2' NAME='T_PERS_FONC_NAT_0_19_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_19_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_19_4' NAME='F_PERS_FONC_NAT_0_19_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_19_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_19_4' NAME='T_PERS_FONC_NAT_0_19_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_19_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 19, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[1][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[1][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_19' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Préfet des études</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_9_1' NAME='F_PERS_FONC_NAT_0_9_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_9_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_9_1' NAME='T_PERS_FONC_NAT_0_9_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_9_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_9_3' NAME='F_PERS_FONC_NAT_0_9_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_9_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_9_3' NAME='T_PERS_FONC_NAT_0_9_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_9_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_9_2' NAME='F_PERS_FONC_NAT_0_9_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_9_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_9_2' NAME='T_PERS_FONC_NAT_0_9_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_9_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_9_4' NAME='F_PERS_FONC_NAT_0_9_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_9_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_9_4' NAME='T_PERS_FONC_NAT_0_9_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_9_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 9, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[2][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[2][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_9' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Préfet de discipline</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_10_1' NAME='F_PERS_FONC_NAT_0_10_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_10_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_10_1' NAME='T_PERS_FONC_NAT_0_10_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_10_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_10_3' NAME='F_PERS_FONC_NAT_0_10_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_10_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_10_3' NAME='T_PERS_FONC_NAT_0_10_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_10_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_10_2' NAME='F_PERS_FONC_NAT_0_10_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_10_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_10_2' NAME='T_PERS_FONC_NAT_0_10_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_10_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_10_4' NAME='F_PERS_FONC_NAT_0_10_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_10_4' NAME='T_PERS_FONC_NAT_0_10_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 10, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[3][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[3][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_10' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Bibliothécaire</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_12_1' NAME='F_PERS_FONC_NAT_0_12_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_12_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_12_1' NAME='T_PERS_FONC_NAT_0_12_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_12_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_12_3' NAME='F_PERS_FONC_NAT_0_12_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_12_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_12_3' NAME='T_PERS_FONC_NAT_0_12_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_12_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_12_2' NAME='F_PERS_FONC_NAT_0_12_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_12_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_12_2' NAME='T_PERS_FONC_NAT_0_12_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_12_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_12_4' NAME='F_PERS_FONC_NAT_0_12_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_12_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_12_4' NAME='T_PERS_FONC_NAT_0_12_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_12_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 12, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[4]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[4][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[4][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_12' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Econome</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_11_1' NAME='F_PERS_FONC_NAT_0_11_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_11_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_11_1' NAME='T_PERS_FONC_NAT_0_11_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_11_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_11_3' NAME='F_PERS_FONC_NAT_0_11_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_11_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_11_3' NAME='T_PERS_FONC_NAT_0_11_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_11_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_11_2' NAME='F_PERS_FONC_NAT_0_11_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_11_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_11_2' NAME='T_PERS_FONC_NAT_0_11_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_11_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_11_4' NAME='F_PERS_FONC_NAT_0_11_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_11_4' NAME='T_PERS_FONC_NAT_0_11_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 11, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[5]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[5][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[5][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_11' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Secrétaire</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_5_1' NAME='F_PERS_FONC_NAT_0_5_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_5_1' NAME='T_PERS_FONC_NAT_0_5_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_5_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_5_3' NAME='F_PERS_FONC_NAT_0_5_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_5_3' NAME='T_PERS_FONC_NAT_0_5_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_5_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_5_2' NAME='F_PERS_FONC_NAT_0_5_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_5_2' NAME='T_PERS_FONC_NAT_0_5_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_5_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_5_4' NAME='F_PERS_FONC_NAT_0_5_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_5_4' NAME='T_PERS_FONC_NAT_0_5_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 5, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[6]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[6][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[6][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_5' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Encadreur</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_13_1' NAME='F_PERS_FONC_NAT_0_13_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_13_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_13_1' NAME='T_PERS_FONC_NAT_0_13_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_13_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_13_3' NAME='F_PERS_FONC_NAT_0_13_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_13_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_13_3' NAME='T_PERS_FONC_NAT_0_13_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_13_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_13_2' NAME='F_PERS_FONC_NAT_0_13_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_13_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_13_2' NAME='T_PERS_FONC_NAT_0_13_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_13_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_13_4' NAME='F_PERS_FONC_NAT_0_13_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_13_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_13_4' NAME='T_PERS_FONC_NAT_0_13_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_13_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 13, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[7]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[7][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[7][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_13' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Planton (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_22_1' NAME='F_PERS_FONC_NAT_0_22_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_22_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_22_1' NAME='T_PERS_FONC_NAT_0_22_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_22_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_22_3' NAME='F_PERS_FONC_NAT_0_22_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_22_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_22_3' NAME='T_PERS_FONC_NAT_0_22_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_22_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_22_2' NAME='F_PERS_FONC_NAT_0_22_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_22_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_22_2' NAME='T_PERS_FONC_NAT_0_22_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_22_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_22_4' NAME='F_PERS_FONC_NAT_0_22_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_22_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_22_4' NAME='T_PERS_FONC_NAT_0_22_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_22_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 22, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[8]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[8][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[8][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_22' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Veilleur (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_23_1' NAME='F_PERS_FONC_NAT_0_23_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_23_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_23_1' NAME='T_PERS_FONC_NAT_0_23_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_23_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_23_3' NAME='F_PERS_FONC_NAT_0_23_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_23_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_23_3' NAME='T_PERS_FONC_NAT_0_23_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_23_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_23_2' NAME='F_PERS_FONC_NAT_0_23_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_23_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_23_2' NAME='T_PERS_FONC_NAT_0_23_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_23_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_23_4' NAME='F_PERS_FONC_NAT_0_23_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_23_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_23_4' NAME='T_PERS_FONC_NAT_0_23_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_23_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 23, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[9]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[9][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[9][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_23' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Chauffeur (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_25_1' NAME='F_PERS_FONC_NAT_0_25_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_25_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_25_1' NAME='T_PERS_FONC_NAT_0_25_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_25_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_25_3' NAME='F_PERS_FONC_NAT_0_25_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_25_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_25_3' NAME='T_PERS_FONC_NAT_0_25_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_25_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_25_2' NAME='F_PERS_FONC_NAT_0_25_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_25_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_25_2' NAME='T_PERS_FONC_NAT_0_25_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_25_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_25_4' NAME='F_PERS_FONC_NAT_0_25_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_25_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_25_4' NAME='T_PERS_FONC_NAT_0_25_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_25_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 25, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[10]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[10][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[10][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_25' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Cuisinier (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_24_1' NAME='F_PERS_FONC_NAT_0_24_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_24_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_24_1' NAME='T_PERS_FONC_NAT_0_24_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_24_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_24_3' NAME='F_PERS_FONC_NAT_0_24_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_24_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_24_3' NAME='T_PERS_FONC_NAT_0_24_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_24_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_24_2' NAME='F_PERS_FONC_NAT_0_24_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_24_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_24_2' NAME='T_PERS_FONC_NAT_0_24_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_24_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_24_4' NAME='F_PERS_FONC_NAT_0_24_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_24_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_24_4' NAME='T_PERS_FONC_NAT_0_24_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_24_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 24, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[11]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[11][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[11][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_24' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Gardiens d’'animaux (école)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_37_1' NAME='F_PERS_FONC_NAT_0_37_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_37_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_37_1' NAME='T_PERS_FONC_NAT_0_37_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_37_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_37_3' NAME='F_PERS_FONC_NAT_0_37_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_37_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_37_3' NAME='T_PERS_FONC_NAT_0_37_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_37_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_37_2' NAME='F_PERS_FONC_NAT_0_37_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_37_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_37_2' NAME='T_PERS_FONC_NAT_0_37_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_37_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_37_4' NAME='F_PERS_FONC_NAT_0_37_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_37_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_37_4' NAME='T_PERS_FONC_NAT_0_37_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_37_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 37, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[12]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_37'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[12][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_37";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_37'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[12][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_37";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_37' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Planton (PFP)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_14_1' NAME='F_PERS_FONC_NAT_0_14_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_14_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_14_1' NAME='T_PERS_FONC_NAT_0_14_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_14_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_14_3' NAME='F_PERS_FONC_NAT_0_14_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_14_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_14_3' NAME='T_PERS_FONC_NAT_0_14_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_14_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_14_2' NAME='F_PERS_FONC_NAT_0_14_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_14_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_14_2' NAME='T_PERS_FONC_NAT_0_14_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_14_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_14_4' NAME='F_PERS_FONC_NAT_0_14_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_14_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_14_4' NAME='T_PERS_FONC_NAT_0_14_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_14_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 14, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[13]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[13][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[13][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_14' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Veilleur (PF</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_15_1' NAME='F_PERS_FONC_NAT_0_15_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_15_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_15_1' NAME='T_PERS_FONC_NAT_0_15_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_15_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_15_3' NAME='F_PERS_FONC_NAT_0_15_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_15_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_15_3' NAME='T_PERS_FONC_NAT_0_15_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_15_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_15_2' NAME='F_PERS_FONC_NAT_0_15_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_15_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_15_2' NAME='T_PERS_FONC_NAT_0_15_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_15_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_15_4' NAME='F_PERS_FONC_NAT_0_15_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_15_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_15_4' NAME='T_PERS_FONC_NAT_0_15_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_15_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 15, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[14]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[14][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[14][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_15' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Chauffeur (PFP)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_17_1' NAME='F_PERS_FONC_NAT_0_17_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_17_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_17_1' NAME='T_PERS_FONC_NAT_0_17_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_17_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_17_3' NAME='F_PERS_FONC_NAT_0_17_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_17_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_17_3' NAME='T_PERS_FONC_NAT_0_17_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_17_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_17_2' NAME='F_PERS_FONC_NAT_0_17_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_17_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_17_2' NAME='T_PERS_FONC_NAT_0_17_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_17_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='F_PERS_FONC_NAT_0_17_4' NAME='F_PERS_FONC_NAT_0_17_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_17_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='T_PERS_FONC_NAT_0_17_4' NAME='T_PERS_FONC_NAT_0_17_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_17_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 17, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[15]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_17'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[15][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_17";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_17'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[15][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_17";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_17' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Cuisinier P FP</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_16_1' NAME='F_PERS_FONC_NAT_0_16_1' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_16_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_16_1' NAME='T_PERS_FONC_NAT_0_16_1' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_16_1"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 1, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_16_3' NAME='F_PERS_FONC_NAT_0_16_3' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_16_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_16_3' NAME='T_PERS_FONC_NAT_0_16_3' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_16_3"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 3, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_16_2' NAME='F_PERS_FONC_NAT_0_16_2' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_16_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_16_2' NAME='T_PERS_FONC_NAT_0_16_2' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_16_2"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 2, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='F_PERS_FONC_NAT_0_16_4' NAME='F_PERS_FONC_NAT_0_16_4' TYPE='text' size=5 VALUE="$F_PERS_FONC_NAT_0_16_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'F_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='T_PERS_FONC_NAT_0_16_4' NAME='T_PERS_FONC_NAT_0_16_4' TYPE='text' size=5 VALUE="$T_PERS_FONC_NAT_0_16_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 380016, 0, 'T_PERS_FONC_NAT', tab_ligne_380016, tab_col_380016, 16, 4, tab_mes_380016);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[16]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[16][1]	= "TOT_380016_F_PERS_FONC_NAT_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_380016[16][2]	= "TOT_380016_T_PERS_FONC_NAT_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_LIGNE_0_16' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='2' bgcolor='#CCCCCC'><br>TOTAL</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_COLONNE_0_1'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[0][1]	= "TOT_380016_F_PERS_FONC_NAT_COLONNE_0_1";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_COLONNE_0_1'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[0][2]	= "TOT_380016_T_PERS_FONC_NAT_COLONNE_0_1";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_COLONNE_0_3'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[1][1]	= "TOT_380016_F_PERS_FONC_NAT_COLONNE_0_3";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_COLONNE_0_3'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[1][2]	= "TOT_380016_T_PERS_FONC_NAT_COLONNE_0_3";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_COLONNE_0_2'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[2][1]	= "TOT_380016_F_PERS_FONC_NAT_COLONNE_0_2";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_COLONNE_0_2'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[2][2]	= "TOT_380016_T_PERS_FONC_NAT_COLONNE_0_2";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_F_PERS_FONC_NAT_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[3][1]	= "TOT_380016_F_PERS_FONC_NAT_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_380016_T_PERS_FONC_NAT_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_380016[3][2]	= "TOT_380016_T_PERS_FONC_NAT_COLONNE_0_4";
+</script>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_380016_F_PERS_FONC_NAT_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_380016_T_PERS_FONC_NAT_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_380016_ALL_MES_0' size=5></TD>
+
+	</TR>
+
+	<TR>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380016_ALL_MES_COLONNE_0_1' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380016_ALL_MES_COLONNE_0_3' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380016_ALL_MES_COLONNE_0_2' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_380016_ALL_MES_COLONNE_0_4' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',380014, 0, tab_mes_380014, tab_ligne_380014, tab_col_380014);
+ set_TOTAL_MatFrml('form1',380016, 0, tab_mes_380016, tab_ligne_380016, tab_col_380016);
+</script>

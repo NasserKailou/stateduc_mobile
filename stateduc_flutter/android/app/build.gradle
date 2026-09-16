@@ -1,0 +1,109 @@
+// app/build.gradle — AGP 8.11.1 + Flutter 3.35.x compatible
+// Plugins déclarés via settings.gradle (new plugin DSL), pas de buildscript block.
+// fix(android): compileSdk 36 + flutter_secure_storage 10.x — build release fix
+//   compileSdk/targetSdk 34→36 (requis par path_provider, shared_prefs, sqflite, webview)
+//   Java 1.8→17 (requis par flutter_secure_storage ≥10.x)
+//   kotlin-stdlib-jdk8 retiré (Kotlin 2.2.20 embarque sa propre stdlib)
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
+if (flutterVersionCode == null) {
+    flutterVersionCode = "1"
+}
+
+def flutterVersionName = localProperties.getProperty("flutter.versionName")
+if (flutterVersionName == null) {
+    flutterVersionName = "1.0"
+}
+
+// ── Signature release ─────────────────────────────────────────────────────────
+// Lecture de android/key.properties (fichier confidentiel, non versionné dans Git).
+// Si key.properties est absent (ex: machine de CI sans la clé), le build release
+// retombe automatiquement sur la config debug — l'APK sera fonctionnel mais
+// affichera l'avertissement PlayProtect à l'installation.
+// Voir RELEASE_SIGNING.md pour la procédure complète.
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+def releaseSigningConfigured = keystorePropertiesFile.exists()
+if (releaseSigningConfigured) {
+    keystorePropertiesFile.withReader("UTF-8") { reader ->
+        keystoreProperties.load(reader)
+    }
+}
+
+android {
+    namespace "ark.android.stateduc"
+    compileSdk 36
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+
+    defaultConfig {
+        applicationId "ark.android.stateduc"
+        // flutter_secure_storage v10 requiert minSdk 23+
+        // telephony requiert minSdk 21+
+        // path_provider / shared_prefs / sqflite / webview requièrent targetSdk 36
+        minSdkVersion flutter.minSdkVersion
+        targetSdk 36
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    // ── Configuration de signature ─────────────────────────────────────────────
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            release {
+                keyAlias     keystoreProperties["keyAlias"]
+                keyPassword  keystoreProperties["keyPassword"]
+                storeFile    file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // Utilise la clé release si key.properties est présent,
+            // sinon retombe sur debug (comportement précédent, non recommandé).
+            signingConfig releaseSigningConfigured
+                ? signingConfigs.release
+                : signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+dependencies {
+    // kotlin-stdlib-jdk8 retiré : Kotlin 2.2.20 embarque sa propre stdlib (KGP 2.x)
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
+}

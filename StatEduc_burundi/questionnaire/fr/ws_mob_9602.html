@@ -1,0 +1,496 @@
+<style type='text/css'>
+/* session 33 : scoped to .se-mobile-frame — NO bleed to host page */
+.se-mobile-frame *, .se-mobile-frame *::before, .se-mobile-frame *::after { box-sizing: border-box; }
+.se-mobile-frame { margin: 0; padding: 2px 4px; font-size: 13px; font-family: Arial, sans-serif; }
+.se-mobile-frame .table-questionnaire { width: 100% !important; border-collapse: collapse; table-layout: fixed; }
+.se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { padding: 3px 5px !important; vertical-align: middle; word-wrap: break-word; }
+.se-mobile-frame tr.ligne-titre td, .se-mobile-frame tr.ligne-titre th { background: #dce6f1; font-weight: bold; font-size: 12px; padding: 4px 5px !important; }
+.se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select, .se-mobile-frame textarea { width: 100%; max-width: 100%; padding: 2px 4px; font-size: 12px; border: 1px solid #aaa; border-radius: 2px; }
+.se-mobile-frame input[type=radio], .se-mobile-frame input[type=checkbox] { transform: scale(1.2); margin: 2px 4px; cursor: pointer; }
+.se-mobile-frame label { font-size: 12px; margin-right: 4px; cursor: pointer; }
+.se-mobile-frame .bouton_valider, .se-mobile-frame input[type=submit], .se-mobile-frame button[type=submit] { display: block; width: 100%; padding: 9px 12px; font-size: 14px; font-weight: bold; margin: 6px 0 4px 0; border-radius: 4px; cursor: pointer; }
+.se-mobile-frame br { display: none; }
+.se-mobile-frame div[align=center], .se-mobile-frame div[align='center'] { padding: 0 !important; margin: 0 !important; }
+.se-mobile-frame table { margin: 0 !important; }
+@media (max-width: 600px) {
+  .se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { padding: 2px 3px !important; font-size: 11px; }
+  .se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select { font-size: 11px; padding: 2px; }
+  .se-mobile-frame .bouton_valider, .se-mobile-frame input[type=submit] { padding: 10px; font-size: 13px; }
+}
+/* === Mobile usability patch session 31 + 33 === */
+.se-mobile-frame {
+  --mobile-bg: #f5f7fb; --card-bg: #ffffff; --line: #d7deea;
+  --line-strong: #b7c4d8; --title-bg: #dce6f1; --title-fg: #183153;
+  --accent: #1f5fbf; --focus: #ffb200; --soft: #eef4ff;
+  --text: #1c2430; --muted: #5d6b82;
+  --radius: 14px; --shadow: 0 4px 18px rgba(17,37,63,.08);
+}
+.se-mobile-frame.mobile-ready { padding: 10px; }
+.se-mobile-frame div[align=center], .se-mobile-frame div[align='center'] { width: 100%; max-width: 100%; }
+.se-mobile-frame form[name='form1'] { width: 100%; max-width: 100%; }
+.se-mobile-frame .table-questionnaire { width: 100% !important; max-width: 100% !important; border-collapse: separate !important; border-spacing: 0 !important; table-layout: auto; background: var(--card-bg); }
+.se-mobile-frame .table-questionnaire td, .se-mobile-frame .table-questionnaire th { line-height: 1.35; border-color: var(--line) !important; }
+.se-mobile-frame tr.ligne-titre td, .se-mobile-frame tr.ligne-titre th, .se-mobile-frame .ligne-titre { background: var(--title-bg) !important; color: var(--title-fg); }
+.se-mobile-frame input[type=text], .se-mobile-frame input[type=number], .se-mobile-frame select, .se-mobile-frame textarea { min-height: 46px; width: 100% !important; max-width: 100% !important; padding: 10px 12px !important; font-size: 16px !important; line-height: 1.25; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; background: #fff; box-shadow: inset 0 1px 2px rgba(17,37,63,.04); }
+.se-mobile-frame input[readonly] { background: #eef1f5 !important; color: #334155; font-weight: 700; }
+.se-mobile-frame input[type=radio], .se-mobile-frame input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; min-height: 20px; accent-color: var(--accent); transform: none !important; margin: 0 !important; }
+.se-mobile-frame label { font-size: 14px !important; line-height: 1.35; margin: 0 !important; }
+.se-mobile-frame .option-chip { display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 8px; margin: 4px 6px 4px 0; padding: 8px 10px; min-height: 40px; border: 1px solid var(--line); border-radius: 999px; background: #fff; vertical-align: middle; }
+.se-mobile-frame .option-chip:hover { background: #f9fbff; }
+.se-mobile-frame .option-chip.is-checked { background: var(--soft); border-color: #96b3ea; }
+.se-mobile-frame .field-active { outline: 2px solid var(--focus); outline-offset: 2px; background: #fffef7 !important; }
+.se-mobile-frame .table-mobile-scroll { width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); margin: 8px 0 14px; }
+.se-mobile-frame .table-mobile-scroll > .table-questionnaire { min-width: 600px; border: 0 !important; }
+.se-mobile-frame .table-mobile-scroll::after { content: '\u21c6 Faites d\u00e9filer horizontalement'; display: block; padding: 8px 12px 10px; color: var(--muted); font-size: 12px; background: linear-gradient(180deg,rgba(255,255,255,0),rgba(245,247,251,1)); }
+.se-mobile-frame .table-mobile-scroll td:first-child, .se-mobile-frame .table-mobile-scroll th:first-child { position: sticky; left: 0; z-index: 2; background: inherit; box-shadow: 1px 0 0 var(--line); }
+.se-mobile-frame .mobile-card-table { border: 0 !important; background: transparent !important; }
+.se-mobile-frame .mobile-card-table > tbody > tr { display: block; margin: 0 0 12px; background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.se-mobile-frame .mobile-card-table > tbody > tr > td, .se-mobile-frame .mobile-card-table > tbody > tr > th { display: block; width: 100% !important; max-width: 100% !important; border-left: 0 !important; border-right: 0 !important; padding: 10px 12px !important; white-space: normal !important; }
+.se-mobile-frame .mobile-card-table .td_space_blanc { display: none !important; }
+.se-mobile-frame .mobile-card-table .police_gras, .se-mobile-frame .mobile-card-table tr.ligne-titre td, .se-mobile-frame .mobile-card-table tr.ligne-titre th { font-weight: 700; }
+.se-mobile-frame .mobile-card-table .td_right, .se-mobile-frame .mobile-card-table .td_left { text-align: left !important; }
+.se-mobile-frame .mobile-card-table > tbody > tr:nth-child(odd) { background: #ffffff; }
+.se-mobile-frame .mobile-card-table > tbody > tr:nth-child(even) { background: #fbfcfe; }
+.se-mobile-frame .mobile-card-table br { display: inline; }
+@media (max-width: 900px) { .se-mobile-frame br { display: inline; } .se-mobile-frame { font-size: 16px; } .se-mobile-frame.mobile-ready { padding: 8px; } }
+@media (max-width: 768px) { .se-mobile-frame .mobile-card-table > tbody > tr > td, .se-mobile-frame .mobile-card-table > tbody > tr > th { font-size: 14px !important; } .se-mobile-frame .table-mobile-scroll > .table-questionnaire { min-width: 480px; } }
+</style>
+<script>
+(function() {
+  // ── session 32 FIX 1 : Stubs pour les fonctions jQuery serveur-side ──────────────
+  if (typeof set_TOTAL_MatFrml_Champ === 'undefined') {
+    window.set_TOTAL_MatFrml_Champ = function() { /* stub — remplacé par computeMatrixTotals() */ };
+  }
+  if (typeof set_TOTAL_MatFrml === 'undefined') {
+    window.set_TOTAL_MatFrml = function() { /* stub — remplacé par computeMatrixTotals() */ };
+  }
+  if (typeof set_TOTAL_ThemeMat2D === 'undefined') {
+    window.set_TOTAL_ThemeMat2D = function() { /* stub */ };
+  }
+
+  // ── session 32 FIX 2 : Auto-totaux pure-JS pour matrices NB_/TOT_ ────────────
+  function computeMatrixTotals(changedInput) {
+    var scope = document.querySelector('.se-mobile-frame') || document;
+    var table = changedInput.closest('table.table-questionnaire');
+    if (!table) return;
+    var allNb = Array.prototype.slice.call(
+      table.querySelectorAll('input[type=text]:not([readonly])')
+    ).filter(function(el) { return /^NB_/i.test(el.name || ''); });
+    if (allNb.length === 0) return;
+    var lignes = {}; var cols = {}; var grandTotal = 0;
+    allNb.forEach(function(el) {
+      var m = el.name.match(/^(NB_[A-Z0-9_]+?)_(\d+)_(\d+)(?:_(\d+))?$/i);
+      if (!m) return;
+      var li = m[3]; var co = m[4];
+      var v = parseFloat(el.value) || 0;
+      grandTotal += v;
+      if (!lignes[li]) lignes[li] = 0; lignes[li] += v;
+      if (co !== undefined) { if (!cols[co]) cols[co] = 0; cols[co] += v; }
+    });
+    var allTot = Array.prototype.slice.call(table.querySelectorAll('input[readonly]'));
+    allTot.forEach(function(el) {
+      var n = el.name || '';
+      var mLi = n.match(/TOT_[^_]+_ALL_MES_LIGNE_\d+_(\d+)$/i);
+      if (mLi) { el.value = lignes[mLi[1]] || 0; return; }
+      var mCo = n.match(/TOT_[^_]+_ALL_MES_COLONNE_\d+_(\d+)$/i);
+      if (mCo) { el.value = cols[mCo[1]] || 0; return; }
+      if (/TOT_[^_]+_ALL_MES(?:_0)?$/i.test(n)) { el.value = grandTotal; }
+    });
+  }
+
+  function onReady(fn) {
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', fn); } else { fn(); }
+  }
+  onReady(function() {
+    // session 33 : scope au wrapper, pas sur document.body
+    var root = document.querySelector('.se-mobile-frame');
+    if (root) root.classList.add('mobile-ready');
+    var scope = root || document;
+
+    // ── session 32 FIX 3 : Classification tables ──────────────────────────────────
+    scope.querySelectorAll('table.table-questionnaire').forEach(function(table) {
+      var hasDataFields = table.querySelector('input[name^="NB_"], input[name^="nb_"], input[readonly]') !== null;
+      var rows = Array.prototype.slice.call(table.rows || []);
+      var maxCells = rows.reduce(function(max, row) { return Math.max(max, row.cells ? row.cells.length : 0); }, 0);
+      if (maxCells > 5 && !table.parentElement.classList.contains('table-mobile-scroll')) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'table-mobile-scroll';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
+    });
+
+    // ── session 32 FIX 4 : Câble les auto-totaux sur tous les inputs NB_ ──────────
+    scope.querySelectorAll('input[type=text]:not([readonly])').forEach(function(input) {
+      if (/^NB_/i.test(input.name || '')) {
+        input.addEventListener('input',  function() { computeMatrixTotals(input); });
+        input.addEventListener('change', function() { computeMatrixTotals(input); });
+      }
+    });
+    scope.querySelectorAll('table.table-questionnaire').forEach(function(table) {
+      var firstNb = table.querySelector('input[type=text]:not([readonly])');
+      if (firstNb && /^NB_/i.test(firstNb.name || '')) { computeMatrixTotals(firstNb); }
+    });
+
+    // ── inputmode numérique sur champs NB_/TOT_ ──────────────────────────────────
+    var numericRegex = /(^|_)(NB|TOT|SUPERFICIE|ANNEE|HEURES|MINITES|MINUTES|NOMBRE|TOTAL|ALL_MES|GP)(_|$)/i;
+    scope.querySelectorAll("input[type='text']").forEach(function(input) {
+      var signature = [input.name || '', input.id || '', input.getAttribute('name_base') || ''].join(' ');
+      if (numericRegex.test(signature)) {
+        input.setAttribute('inputmode', 'numeric');
+        input.setAttribute('pattern', '[0-9]*');
+        input.setAttribute('autocomplete', 'off');
+      }
+      input.setAttribute('autocapitalize', 'off');
+      input.setAttribute('spellcheck', 'false');
+    });
+    scope.querySelectorAll('textarea').forEach(function(el) {
+      el.setAttribute('spellcheck', 'false');
+      el.style.minHeight = '90px';
+    });
+
+    // ── Option-chip : wrapping radio+label ────────────────────────────────────────
+    scope.querySelectorAll('label[for]').forEach(function(label) {
+      var targetId = label.getAttribute('for');
+      var next = label.nextElementSibling;
+      if (!next || next.tagName !== 'INPUT' || next.id !== targetId) return;
+      if (label.parentElement && label.parentElement.classList.contains('option-chip')) return;
+      var wrap = document.createElement('span');
+      wrap.className = 'option-chip';
+      label.parentNode.insertBefore(wrap, label);
+      wrap.appendChild(label);
+      wrap.appendChild(next);
+    });
+    function refreshCheckedState() {
+      scope.querySelectorAll('.option-chip').forEach(function(chip) {
+        var input = chip.querySelector("input[type='radio'], input[type='checkbox']");
+        chip.classList.toggle('is-checked', !!(input && input.checked));
+      });
+    }
+    refreshCheckedState();
+    document.addEventListener('change', function(event) {
+      if (event.target && (event.target.matches("input[type='radio']") || event.target.matches("input[type='checkbox']"))){
+        refreshCheckedState();
+      }
+    });
+
+    // ── Field-active : highlight cellule active ───────────────────────────────────
+    scope.querySelectorAll('input, select, textarea').forEach(function(field) {
+      field.addEventListener('focus', function() { var td = field.closest('td, th'); if (td) td.classList.add('field-active'); });
+      field.addEventListener('blur',  function() { var td = field.closest('td, th'); if (td) td.classList.remove('field-active'); });
+    });
+  });
+})();
+</script>
+<div class="se-mobile-frame">
+<script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=9602' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>4.2.a Nouveaux inscrits en 1ère année<br></b><script language='javascript' type='text/javascript'>
+var expression_960014 	= "";
+var tot_mes_ligne_960014 	= new Array();
+var tot_mes_col_960014 	= new Array();
+var affich_vertic_mes_960014 	= 0;
+var affiche_sous_totaux_960014 	= 0;
+var tab_mes_960014 	= new Array ("FILLES_NV_INCRITES","TOTAL_NV_INCRITS");
+var tab_ligne_960014	= new Array ("8","5","6","9","10","11","12","13","14","15","16","17");
+var tab_col_960014	= new Array ("4");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>1ère année</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN=3 >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F + F+M</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' ></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_8_4' id='FILLES_NV_INCRITES_0_8_4' name='FILLES_NV_INCRITES_0_8_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_8_4' id='TOTAL_NV_INCRITS_0_8_4' name='TOTAL_NV_INCRITS_0_8_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[0][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[0][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_8' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >6ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_5_4' id='FILLES_NV_INCRITES_0_5_4' name='FILLES_NV_INCRITES_0_5_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_5_4' id='TOTAL_NV_INCRITS_0_5_4' name='TOTAL_NV_INCRITS_0_5_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[1][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[1][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_5' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >7ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_6_4' id='FILLES_NV_INCRITES_0_6_4' name='FILLES_NV_INCRITES_0_6_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_6_4' id='TOTAL_NV_INCRITS_0_6_4' name='TOTAL_NV_INCRITS_0_6_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[2][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[2][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_6' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >8ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_9_4' id='FILLES_NV_INCRITES_0_9_4' name='FILLES_NV_INCRITES_0_9_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_9_4' id='TOTAL_NV_INCRITS_0_9_4' name='TOTAL_NV_INCRITS_0_9_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[3][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[3][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_9' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >9ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_10_4' id='FILLES_NV_INCRITES_0_10_4' name='FILLES_NV_INCRITES_0_10_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_10_4' id='TOTAL_NV_INCRITS_0_10_4' name='TOTAL_NV_INCRITS_0_10_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[4]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[4][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[4][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_10' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >10ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_11_4' id='FILLES_NV_INCRITES_0_11_4' name='FILLES_NV_INCRITES_0_11_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_11_4' id='TOTAL_NV_INCRITS_0_11_4' name='TOTAL_NV_INCRITS_0_11_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[5]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[5][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[5][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_11' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >11ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_12_4' id='FILLES_NV_INCRITES_0_12_4' name='FILLES_NV_INCRITES_0_12_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_12_4' id='TOTAL_NV_INCRITS_0_12_4' name='TOTAL_NV_INCRITS_0_12_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[6]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[6][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[6][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_12' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >12ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_13_4' id='FILLES_NV_INCRITES_0_13_4' name='FILLES_NV_INCRITES_0_13_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_13_4' id='TOTAL_NV_INCRITS_0_13_4' name='TOTAL_NV_INCRITS_0_13_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[7]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[7][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[7][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_13' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >13ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_14_4' id='FILLES_NV_INCRITES_0_14_4' name='FILLES_NV_INCRITES_0_14_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_14_4' id='TOTAL_NV_INCRITS_0_14_4' name='TOTAL_NV_INCRITS_0_14_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[8]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[8][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[8][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_14' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >14ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_15_4' id='FILLES_NV_INCRITES_0_15_4' name='FILLES_NV_INCRITES_0_15_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_15_4' id='TOTAL_NV_INCRITS_0_15_4' name='TOTAL_NV_INCRITS_0_15_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[9]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[9][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[9][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_15' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire' >15ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_16_4' id='FILLES_NV_INCRITES_0_16_4' name='FILLES_NV_INCRITES_0_16_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-paire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_16_4' id='TOTAL_NV_INCRITS_0_16_4' name='TOTAL_NV_INCRITS_0_16_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[10]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[10][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[10][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_16' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire' >>15ans</TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='FILLES_NV_INCRITES_#_17_4' id='FILLES_NV_INCRITES_0_17_4' name='FILLES_NV_INCRITES_0_17_4' type='text' value=''></TD>
+		<TD nowrap='nowrap' align='center' valign='middle' CLASS='ligne-impaire'><div class='input_text'></div><input name_base='TOTAL_NV_INCRITS_#_17_4' id='TOTAL_NV_INCRITS_0_17_4' name='TOTAL_NV_INCRITS_0_17_4' type='text' value=''></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[11]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_LIGNE_0_17'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[11][1]	= "TOT_960014_FILLES_NV_INCRITES_LIGNE_0_17";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_17'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_960014[11][2]	= "TOT_960014_TOTAL_NV_INCRITS_LIGNE_0_17";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_LIGNE_0_17' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center'  bgcolor='#CCCCCC'>TOTAL</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_960014[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_FILLES_NV_INCRITES_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_960014[0][1]	= "TOT_960014_FILLES_NV_INCRITES_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_960014[0][2]	= "TOT_960014_TOTAL_NV_INCRITS_COLONNE_0_4";
+</script>
+		<td align='center'  bgcolor='#CCCCCC'  valign='middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_960014_FILLES_NV_INCRITES_COLONNE_0'></TD>
+		<td align='center'  bgcolor='#CCCCCC'  valign='middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_960014_TOTAL_NV_INCRITS_COLONNE_0'></TD>
+		<td align='center'  bgcolor='#CCCCCC'  valign='middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_960014_ALL_MES_0' size=5></TD>
+
+	</TR>
+
+	<TR>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_960014_ALL_MES_COLONNE_0_4' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE></FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',960014, 0, tab_mes_960014, tab_ligne_960014, tab_col_960014);
+</script>
+</div>

@@ -1,0 +1,5 @@
+2026/06/17 11:36:53;2;2;15702;38114;0;OKSAVE;
+2026/06/17 11:37:58;56:Recv failure: Connection was reset;http://192.168.1.162:8083/StatEduc_MEN_2025/questionnaire_ws.php?sector=2&theme=15702&code_etab=38114&type_ent_stat=2&annee=23&login=aicha&langue=fr&filtre=0;
+2026/06/17 11:38:29;56:Recv failure: Connection was reset;http://192.168.1.162:8083/StatEduc_MEN_2025/questionnaire_ws.php?sector=2&theme=15702&code_etab=38114&type_ent_stat=2&annee=23&login=aicha&langue=fr&filtre=0;
+2026/06/17 11:40:54;2;2;15702;38114;0;OKSAVE;
+2026/06/17 11:46:06;2;2;15702;38114;0;OKSAVE;

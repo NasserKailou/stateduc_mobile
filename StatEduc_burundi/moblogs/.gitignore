@@ -1,0 +1,5 @@
+# Ignorer tous les fichiers de log générés automatiquement
+*.log
+# Mais garder ce fichier et .gitkeep
+!.gitignore
+!.gitkeep

@@ -1,0 +1,411 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=9302' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>3.3 Manuels pour le maitrre :</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> <b>3.3. Manuels pour le maître :</b><br></b><TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD    CLASS='ligne-titre'>&nbsp</TD>
+		<TD   CLASS='ligne-titre' align='center'>1ère année</TD>
+		<TD   CLASS='ligne-titre' align='center'>2ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>3ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>4ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>5ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>6ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>7ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>8ème année</TD>
+		<TD   CLASS='ligne-titre' align='center'>9ème année</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Kirundi/Français/ Art dramatique : Ndashikiriza ivyiyumviro mu mvugo, mu nyandiko no mu bimenyetso</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_4' NAME='NB_MANUELS_MAITRE_0_35_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_5' NAME='NB_MANUELS_MAITRE_0_35_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_6' NAME='NB_MANUELS_MAITRE_0_35_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_7' NAME='NB_MANUELS_MAITRE_0_35_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_8' NAME='NB_MANUELS_MAITRE_0_35_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_9' NAME='NB_MANUELS_MAITRE_0_35_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_10' NAME='NB_MANUELS_MAITRE_0_35_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_11' NAME='NB_MANUELS_MAITRE_0_35_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_35_12' NAME='NB_MANUELS_MAITRE_0_35_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_35_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Maths et sciences d&#8217;observation : Ndakora ibiharuro, ndatahuza ibibera aho mbaye</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_4' NAME='NB_MANUELS_MAITRE_0_36_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_5' NAME='NB_MANUELS_MAITRE_0_36_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_6' NAME='NB_MANUELS_MAITRE_0_36_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_7' NAME='NB_MANUELS_MAITRE_0_36_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_8' NAME='NB_MANUELS_MAITRE_0_36_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_9' NAME='NB_MANUELS_MAITRE_0_36_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_10' NAME='NB_MANUELS_MAITRE_0_36_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_11' NAME='NB_MANUELS_MAITRE_0_36_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_36_12' NAME='NB_MANUELS_MAITRE_0_36_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_36_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >ST/SH/EPS/AP/Entrepreneuriat : Ndatahura ibibera aho mbaye</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_4' NAME='NB_MANUELS_MAITRE_0_37_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_5' NAME='NB_MANUELS_MAITRE_0_37_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_6' NAME='NB_MANUELS_MAITRE_0_37_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_7' NAME='NB_MANUELS_MAITRE_0_37_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_8' NAME='NB_MANUELS_MAITRE_0_37_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_9' NAME='NB_MANUELS_MAITRE_0_37_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_10' NAME='NB_MANUELS_MAITRE_0_37_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_11' NAME='NB_MANUELS_MAITRE_0_37_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_37_12' NAME='NB_MANUELS_MAITRE_0_37_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_37_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Maths</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_4' NAME='NB_MANUELS_MAITRE_0_24_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_5' NAME='NB_MANUELS_MAITRE_0_24_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_6' NAME='NB_MANUELS_MAITRE_0_24_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_7' NAME='NB_MANUELS_MAITRE_0_24_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_8' NAME='NB_MANUELS_MAITRE_0_24_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_9' NAME='NB_MANUELS_MAITRE_0_24_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_10' NAME='NB_MANUELS_MAITRE_0_24_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_11' NAME='NB_MANUELS_MAITRE_0_24_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_24_12' NAME='NB_MANUELS_MAITRE_0_24_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_24_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Langues : Langues,Guide du maître : Tome 1</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_4' NAME='NB_MANUELS_MAITRE_0_30_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_5' NAME='NB_MANUELS_MAITRE_0_30_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_6' NAME='NB_MANUELS_MAITRE_0_30_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_7' NAME='NB_MANUELS_MAITRE_0_30_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_8' NAME='NB_MANUELS_MAITRE_0_30_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_9' NAME='NB_MANUELS_MAITRE_0_30_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_10' NAME='NB_MANUELS_MAITRE_0_30_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_11' NAME='NB_MANUELS_MAITRE_0_30_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_30_12' NAME='NB_MANUELS_MAITRE_0_30_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_30_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Langues : Langues,Guide du maître : Tome 2</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_4' NAME='NB_MANUELS_MAITRE_0_31_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_5' NAME='NB_MANUELS_MAITRE_0_31_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_6' NAME='NB_MANUELS_MAITRE_0_31_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_7' NAME='NB_MANUELS_MAITRE_0_31_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_8' NAME='NB_MANUELS_MAITRE_0_31_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_9' NAME='NB_MANUELS_MAITRE_0_31_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_10' NAME='NB_MANUELS_MAITRE_0_31_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_11' NAME='NB_MANUELS_MAITRE_0_31_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_31_12' NAME='NB_MANUELS_MAITRE_0_31_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_31_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Langues : Langues,Guide du maître : Tome 3</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_4' NAME='NB_MANUELS_MAITRE_0_32_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_5' NAME='NB_MANUELS_MAITRE_0_32_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_6' NAME='NB_MANUELS_MAITRE_0_32_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_7' NAME='NB_MANUELS_MAITRE_0_32_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_8' NAME='NB_MANUELS_MAITRE_0_32_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_9' NAME='NB_MANUELS_MAITRE_0_32_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_10' NAME='NB_MANUELS_MAITRE_0_32_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_11' NAME='NB_MANUELS_MAITRE_0_32_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_32_12' NAME='NB_MANUELS_MAITRE_0_32_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_32_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Langues : Langues,Guide du maître</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_4' NAME='NB_MANUELS_MAITRE_0_34_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_5' NAME='NB_MANUELS_MAITRE_0_34_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_6' NAME='NB_MANUELS_MAITRE_0_34_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_7' NAME='NB_MANUELS_MAITRE_0_34_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_8' NAME='NB_MANUELS_MAITRE_0_34_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_9' NAME='NB_MANUELS_MAITRE_0_34_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_10' NAME='NB_MANUELS_MAITRE_0_34_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_11' NAME='NB_MANUELS_MAITRE_0_34_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_34_12' NAME='NB_MANUELS_MAITRE_0_34_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_34_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Sc. humaines: Guide du maître</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_4' NAME='NB_MANUELS_MAITRE_0_26_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_5' NAME='NB_MANUELS_MAITRE_0_26_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_6' NAME='NB_MANUELS_MAITRE_0_26_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_7' NAME='NB_MANUELS_MAITRE_0_26_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_8' NAME='NB_MANUELS_MAITRE_0_26_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_9' NAME='NB_MANUELS_MAITRE_0_26_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_10' NAME='NB_MANUELS_MAITRE_0_26_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_11' NAME='NB_MANUELS_MAITRE_0_26_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_26_12' NAME='NB_MANUELS_MAITRE_0_26_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_26_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Sc. & Tech: Guide du maître</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_4' NAME='NB_MANUELS_MAITRE_0_27_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_5' NAME='NB_MANUELS_MAITRE_0_27_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_6' NAME='NB_MANUELS_MAITRE_0_27_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_7' NAME='NB_MANUELS_MAITRE_0_27_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_8' NAME='NB_MANUELS_MAITRE_0_27_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_9' NAME='NB_MANUELS_MAITRE_0_27_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_10' NAME='NB_MANUELS_MAITRE_0_27_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_11' NAME='NB_MANUELS_MAITRE_0_27_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_27_12' NAME='NB_MANUELS_MAITRE_0_27_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_27_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Entreprenariat: Guide du maître</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_4' NAME='NB_MANUELS_MAITRE_0_28_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_5' NAME='NB_MANUELS_MAITRE_0_28_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_6' NAME='NB_MANUELS_MAITRE_0_28_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_7' NAME='NB_MANUELS_MAITRE_0_28_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_8' NAME='NB_MANUELS_MAITRE_0_28_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_9' NAME='NB_MANUELS_MAITRE_0_28_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_10' NAME='NB_MANUELS_MAITRE_0_28_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_11' NAME='NB_MANUELS_MAITRE_0_28_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_28_12' NAME='NB_MANUELS_MAITRE_0_28_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_28_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Arts et EPS: Guide du maître</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_4' NAME='NB_MANUELS_MAITRE_0_29_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_5' NAME='NB_MANUELS_MAITRE_0_29_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_6' NAME='NB_MANUELS_MAITRE_0_29_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_7' NAME='NB_MANUELS_MAITRE_0_29_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_8' NAME='NB_MANUELS_MAITRE_0_29_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_9' NAME='NB_MANUELS_MAITRE_0_29_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_10' NAME='NB_MANUELS_MAITRE_0_29_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_11' NAME='NB_MANUELS_MAITRE_0_29_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_29_12' NAME='NB_MANUELS_MAITRE_0_29_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_29_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >Autres : Inyigisho y’indero runtu no gukundisha igihugu</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_4' NAME='NB_MANUELS_MAITRE_0_20_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_5' NAME='NB_MANUELS_MAITRE_0_20_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_6' NAME='NB_MANUELS_MAITRE_0_20_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_7' NAME='NB_MANUELS_MAITRE_0_20_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_8' NAME='NB_MANUELS_MAITRE_0_20_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_9' NAME='NB_MANUELS_MAITRE_0_20_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_10' NAME='NB_MANUELS_MAITRE_0_20_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_11' NAME='NB_MANUELS_MAITRE_0_20_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='NB_MANUELS_MAITRE_0_20_12' NAME='NB_MANUELS_MAITRE_0_20_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_20_12"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >Autres : TPA</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_4' NAME='NB_MANUELS_MAITRE_0_33_4' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_4"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_5' NAME='NB_MANUELS_MAITRE_0_33_5' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_5"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_6' NAME='NB_MANUELS_MAITRE_0_33_6' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_6"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_7' NAME='NB_MANUELS_MAITRE_0_33_7' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_7"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_8' NAME='NB_MANUELS_MAITRE_0_33_8' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_8"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_9' NAME='NB_MANUELS_MAITRE_0_33_9' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_9"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_10' NAME='NB_MANUELS_MAITRE_0_33_10' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_10"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_11' NAME='NB_MANUELS_MAITRE_0_33_11' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_11"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='NB_MANUELS_MAITRE_0_33_12' NAME='NB_MANUELS_MAITRE_0_33_12' TYPE='text' size=3 VALUE="$NB_MANUELS_MAITRE_0_33_12"  tabindex=''>
+</TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>

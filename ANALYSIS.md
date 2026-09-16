@@ -1,7 +1,7 @@
 # ANALYSE TECHNIQUE — StatEduc Mobile
 
 > Document d'analyse approfondie du code source de l'application mobile **stateduc_mobile**  
-> Rédigé le : 2026-05-22
+> Auteur : Abdoul Nasser Kailou 
 
 ---
 

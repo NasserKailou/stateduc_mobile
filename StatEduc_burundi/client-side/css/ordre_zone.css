@@ -1,0 +1,23 @@
+/* CSS Document */
+
+.float_clear {
+	clear:both;
+}
+.float_left {
+	float:left;
+}
+#zone_container {
+	position:absolute; left: 16px; top: 150px; width: 720px;
+}
+#zone_container label {display:inline-block; font-size:11px; border-right:1px #747474 solid; line-height:25px;}
+.zone_id {width:69px; text-align:center; background:none #E8E8E8 !important;}
+.zone_champ_pere {width:212px; margin-left:3px; border-right:none !important; background:none #E8E8E8 !important;}
+.zone_libelle {width:286px; margin-left:3px; border-left:1px #747474 solid; background:none #E8E8E8 !important; padding-left: 5px;}
+.zone_ordre_affichage {width:43px; margin-left:3px; margin-right:5px; text-align:center; background-color:#FFF !important;}
+.zone_ordre_affichage_input {width:25px; vertical-align:top;}
+.zone_activer {width:50px;}
+.zone_activer_input {width:15px; vertical-align:top;}
+.ui-sortable .checker {vertical-align:top;}
+#sortable { list-style-type: none; margin: 0; padding: 0; }
+#sortable li { margin: 0; font-size: 1.4em; width: 717px; cursor:pointer;}
+#sortable li span.ui-icon { display:inline-block; margin-left:8px; vertical-align:middle; }

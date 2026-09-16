@@ -1,0 +1,1370 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=9502' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B>IV. INFORMATIONS RELATIVES AUX ELEVES</B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b><BR> 4.1. Répartition des élèves par âge, sexe et par année d’études<br></b><script language='javascript' type='text/javascript'>
+var expression_950007 	= "";
+var tot_mes_ligne_950007 	= new Array();
+var tot_mes_col_950007 	= new Array();
+var affich_vertic_mes_950007 	= 0;
+var affiche_sous_totaux_950007 	= 0;
+var tab_mes_950007 	= new Array ("FILLES_AGE_NIVEAU","TOTAL_AGE_NIVEAU");
+var tab_ligne_950007	= new Array ("8","5","6","9","10","11","12","13","14","15","16","18","19","20","21","22","23","24","25","26","27");
+var tab_col_950007	= new Array ("4","5","6","7","8","9","10","11","12");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>1ère année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>2ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>3ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>4ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>5ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>6ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>7ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>8ème année</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>9ème année</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN=3 >TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F</TD>
+		<TD  align='center'>F+M</TD>
+		<TD  align='center'>F + F+M</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' ><6ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_4' NAME='FILLES_AGE_NIVEAU_0_8_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_4' NAME='TOTAL_AGE_NIVEAU_0_8_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_5' NAME='FILLES_AGE_NIVEAU_0_8_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_5' NAME='TOTAL_AGE_NIVEAU_0_8_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_6' NAME='FILLES_AGE_NIVEAU_0_8_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_6' NAME='TOTAL_AGE_NIVEAU_0_8_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_7' NAME='FILLES_AGE_NIVEAU_0_8_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_7' NAME='TOTAL_AGE_NIVEAU_0_8_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_8' NAME='FILLES_AGE_NIVEAU_0_8_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_8' NAME='TOTAL_AGE_NIVEAU_0_8_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_9' NAME='FILLES_AGE_NIVEAU_0_8_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_9' NAME='TOTAL_AGE_NIVEAU_0_8_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_10' NAME='FILLES_AGE_NIVEAU_0_8_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_10' NAME='TOTAL_AGE_NIVEAU_0_8_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_11' NAME='FILLES_AGE_NIVEAU_0_8_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_11' NAME='TOTAL_AGE_NIVEAU_0_8_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_8_12' NAME='FILLES_AGE_NIVEAU_0_8_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_8_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_8_12' NAME='TOTAL_AGE_NIVEAU_0_8_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_8_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 8, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[0][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[0][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_8' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >6ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_4' NAME='FILLES_AGE_NIVEAU_0_5_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_4' NAME='TOTAL_AGE_NIVEAU_0_5_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_5' NAME='FILLES_AGE_NIVEAU_0_5_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_5' NAME='TOTAL_AGE_NIVEAU_0_5_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_6' NAME='FILLES_AGE_NIVEAU_0_5_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_6' NAME='TOTAL_AGE_NIVEAU_0_5_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_7' NAME='FILLES_AGE_NIVEAU_0_5_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_7' NAME='TOTAL_AGE_NIVEAU_0_5_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_8' NAME='FILLES_AGE_NIVEAU_0_5_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_8' NAME='TOTAL_AGE_NIVEAU_0_5_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_9' NAME='FILLES_AGE_NIVEAU_0_5_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_9' NAME='TOTAL_AGE_NIVEAU_0_5_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_10' NAME='FILLES_AGE_NIVEAU_0_5_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_10' NAME='TOTAL_AGE_NIVEAU_0_5_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_11' NAME='FILLES_AGE_NIVEAU_0_5_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_11' NAME='TOTAL_AGE_NIVEAU_0_5_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_5_12' NAME='FILLES_AGE_NIVEAU_0_5_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_5_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_5_12' NAME='TOTAL_AGE_NIVEAU_0_5_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_5_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 5, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[1][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[1][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_5' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >7ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_4' NAME='FILLES_AGE_NIVEAU_0_6_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_4' NAME='TOTAL_AGE_NIVEAU_0_6_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_5' NAME='FILLES_AGE_NIVEAU_0_6_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_5' NAME='TOTAL_AGE_NIVEAU_0_6_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_6' NAME='FILLES_AGE_NIVEAU_0_6_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_6' NAME='TOTAL_AGE_NIVEAU_0_6_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_7' NAME='FILLES_AGE_NIVEAU_0_6_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_7' NAME='TOTAL_AGE_NIVEAU_0_6_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_8' NAME='FILLES_AGE_NIVEAU_0_6_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_8' NAME='TOTAL_AGE_NIVEAU_0_6_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_9' NAME='FILLES_AGE_NIVEAU_0_6_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_9' NAME='TOTAL_AGE_NIVEAU_0_6_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_10' NAME='FILLES_AGE_NIVEAU_0_6_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_10' NAME='TOTAL_AGE_NIVEAU_0_6_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_11' NAME='FILLES_AGE_NIVEAU_0_6_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_11' NAME='TOTAL_AGE_NIVEAU_0_6_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_6_12' NAME='FILLES_AGE_NIVEAU_0_6_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_6_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_6_12' NAME='TOTAL_AGE_NIVEAU_0_6_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_6_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 6, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[2][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[2][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_6' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >8ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_4' NAME='FILLES_AGE_NIVEAU_0_9_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_4' NAME='TOTAL_AGE_NIVEAU_0_9_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_5' NAME='FILLES_AGE_NIVEAU_0_9_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_5' NAME='TOTAL_AGE_NIVEAU_0_9_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_6' NAME='FILLES_AGE_NIVEAU_0_9_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_6' NAME='TOTAL_AGE_NIVEAU_0_9_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_7' NAME='FILLES_AGE_NIVEAU_0_9_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_7' NAME='TOTAL_AGE_NIVEAU_0_9_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_8' NAME='FILLES_AGE_NIVEAU_0_9_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_8' NAME='TOTAL_AGE_NIVEAU_0_9_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_9' NAME='FILLES_AGE_NIVEAU_0_9_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_9' NAME='TOTAL_AGE_NIVEAU_0_9_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_10' NAME='FILLES_AGE_NIVEAU_0_9_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_10' NAME='TOTAL_AGE_NIVEAU_0_9_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_11' NAME='FILLES_AGE_NIVEAU_0_9_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_11' NAME='TOTAL_AGE_NIVEAU_0_9_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_9_12' NAME='FILLES_AGE_NIVEAU_0_9_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_9_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_9_12' NAME='TOTAL_AGE_NIVEAU_0_9_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_9_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 9, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[3][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[3][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_9' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >9ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_4' NAME='FILLES_AGE_NIVEAU_0_10_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_4' NAME='TOTAL_AGE_NIVEAU_0_10_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_5' NAME='FILLES_AGE_NIVEAU_0_10_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_5' NAME='TOTAL_AGE_NIVEAU_0_10_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_6' NAME='FILLES_AGE_NIVEAU_0_10_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_6' NAME='TOTAL_AGE_NIVEAU_0_10_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_7' NAME='FILLES_AGE_NIVEAU_0_10_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_7' NAME='TOTAL_AGE_NIVEAU_0_10_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_8' NAME='FILLES_AGE_NIVEAU_0_10_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_8' NAME='TOTAL_AGE_NIVEAU_0_10_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_9' NAME='FILLES_AGE_NIVEAU_0_10_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_9' NAME='TOTAL_AGE_NIVEAU_0_10_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_10' NAME='FILLES_AGE_NIVEAU_0_10_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_10' NAME='TOTAL_AGE_NIVEAU_0_10_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_11' NAME='FILLES_AGE_NIVEAU_0_10_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_11' NAME='TOTAL_AGE_NIVEAU_0_10_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_10_12' NAME='FILLES_AGE_NIVEAU_0_10_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_10_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_10_12' NAME='TOTAL_AGE_NIVEAU_0_10_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_10_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 10, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[4]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[4][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[4][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_10' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >10ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_4' NAME='FILLES_AGE_NIVEAU_0_11_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_4' NAME='TOTAL_AGE_NIVEAU_0_11_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_5' NAME='FILLES_AGE_NIVEAU_0_11_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_5' NAME='TOTAL_AGE_NIVEAU_0_11_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_6' NAME='FILLES_AGE_NIVEAU_0_11_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_6' NAME='TOTAL_AGE_NIVEAU_0_11_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_7' NAME='FILLES_AGE_NIVEAU_0_11_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_7' NAME='TOTAL_AGE_NIVEAU_0_11_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_8' NAME='FILLES_AGE_NIVEAU_0_11_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_8' NAME='TOTAL_AGE_NIVEAU_0_11_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_9' NAME='FILLES_AGE_NIVEAU_0_11_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_9' NAME='TOTAL_AGE_NIVEAU_0_11_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_10' NAME='FILLES_AGE_NIVEAU_0_11_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_10' NAME='TOTAL_AGE_NIVEAU_0_11_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_11' NAME='FILLES_AGE_NIVEAU_0_11_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_11' NAME='TOTAL_AGE_NIVEAU_0_11_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_11_12' NAME='FILLES_AGE_NIVEAU_0_11_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_11_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_11_12' NAME='TOTAL_AGE_NIVEAU_0_11_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_11_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 11, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[5]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[5][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[5][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_11' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >11ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_4' NAME='FILLES_AGE_NIVEAU_0_12_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_4' NAME='TOTAL_AGE_NIVEAU_0_12_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_5' NAME='FILLES_AGE_NIVEAU_0_12_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_5' NAME='TOTAL_AGE_NIVEAU_0_12_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_6' NAME='FILLES_AGE_NIVEAU_0_12_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_6' NAME='TOTAL_AGE_NIVEAU_0_12_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_7' NAME='FILLES_AGE_NIVEAU_0_12_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_7' NAME='TOTAL_AGE_NIVEAU_0_12_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_8' NAME='FILLES_AGE_NIVEAU_0_12_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_8' NAME='TOTAL_AGE_NIVEAU_0_12_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_9' NAME='FILLES_AGE_NIVEAU_0_12_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_9' NAME='TOTAL_AGE_NIVEAU_0_12_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_10' NAME='FILLES_AGE_NIVEAU_0_12_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_10' NAME='TOTAL_AGE_NIVEAU_0_12_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_11' NAME='FILLES_AGE_NIVEAU_0_12_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_11' NAME='TOTAL_AGE_NIVEAU_0_12_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_12_12' NAME='FILLES_AGE_NIVEAU_0_12_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_12_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_12_12' NAME='TOTAL_AGE_NIVEAU_0_12_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_12_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 12, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[6]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[6][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[6][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_12' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >12ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_4' NAME='FILLES_AGE_NIVEAU_0_13_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_4' NAME='TOTAL_AGE_NIVEAU_0_13_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_5' NAME='FILLES_AGE_NIVEAU_0_13_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_5' NAME='TOTAL_AGE_NIVEAU_0_13_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_6' NAME='FILLES_AGE_NIVEAU_0_13_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_6' NAME='TOTAL_AGE_NIVEAU_0_13_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_7' NAME='FILLES_AGE_NIVEAU_0_13_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_7' NAME='TOTAL_AGE_NIVEAU_0_13_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_8' NAME='FILLES_AGE_NIVEAU_0_13_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_8' NAME='TOTAL_AGE_NIVEAU_0_13_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_9' NAME='FILLES_AGE_NIVEAU_0_13_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_9' NAME='TOTAL_AGE_NIVEAU_0_13_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_10' NAME='FILLES_AGE_NIVEAU_0_13_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_10' NAME='TOTAL_AGE_NIVEAU_0_13_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_11' NAME='FILLES_AGE_NIVEAU_0_13_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_11' NAME='TOTAL_AGE_NIVEAU_0_13_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_13_12' NAME='FILLES_AGE_NIVEAU_0_13_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_13_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_13_12' NAME='TOTAL_AGE_NIVEAU_0_13_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_13_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 13, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[7]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[7][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_13'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[7][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_13";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_13' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >13ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_4' NAME='FILLES_AGE_NIVEAU_0_14_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_4' NAME='TOTAL_AGE_NIVEAU_0_14_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_5' NAME='FILLES_AGE_NIVEAU_0_14_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_5' NAME='TOTAL_AGE_NIVEAU_0_14_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_6' NAME='FILLES_AGE_NIVEAU_0_14_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_6' NAME='TOTAL_AGE_NIVEAU_0_14_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_7' NAME='FILLES_AGE_NIVEAU_0_14_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_7' NAME='TOTAL_AGE_NIVEAU_0_14_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_8' NAME='FILLES_AGE_NIVEAU_0_14_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_8' NAME='TOTAL_AGE_NIVEAU_0_14_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_9' NAME='FILLES_AGE_NIVEAU_0_14_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_9' NAME='TOTAL_AGE_NIVEAU_0_14_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_10' NAME='FILLES_AGE_NIVEAU_0_14_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_10' NAME='TOTAL_AGE_NIVEAU_0_14_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_11' NAME='FILLES_AGE_NIVEAU_0_14_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_11' NAME='TOTAL_AGE_NIVEAU_0_14_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_14_12' NAME='FILLES_AGE_NIVEAU_0_14_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_14_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_14_12' NAME='TOTAL_AGE_NIVEAU_0_14_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_14_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 14, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[8]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[8][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_14'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[8][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_14";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_14' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >14ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_4' NAME='FILLES_AGE_NIVEAU_0_15_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_4' NAME='TOTAL_AGE_NIVEAU_0_15_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_5' NAME='FILLES_AGE_NIVEAU_0_15_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_5' NAME='TOTAL_AGE_NIVEAU_0_15_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_6' NAME='FILLES_AGE_NIVEAU_0_15_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_6' NAME='TOTAL_AGE_NIVEAU_0_15_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_7' NAME='FILLES_AGE_NIVEAU_0_15_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_7' NAME='TOTAL_AGE_NIVEAU_0_15_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_8' NAME='FILLES_AGE_NIVEAU_0_15_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_8' NAME='TOTAL_AGE_NIVEAU_0_15_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_9' NAME='FILLES_AGE_NIVEAU_0_15_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_9' NAME='TOTAL_AGE_NIVEAU_0_15_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_10' NAME='FILLES_AGE_NIVEAU_0_15_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_10' NAME='TOTAL_AGE_NIVEAU_0_15_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_11' NAME='FILLES_AGE_NIVEAU_0_15_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_11' NAME='TOTAL_AGE_NIVEAU_0_15_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_15_12' NAME='FILLES_AGE_NIVEAU_0_15_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_15_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_15_12' NAME='TOTAL_AGE_NIVEAU_0_15_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_15_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 15, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[9]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[9][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_15'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[9][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_15";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_15' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >15ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_4' NAME='FILLES_AGE_NIVEAU_0_16_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_4' NAME='TOTAL_AGE_NIVEAU_0_16_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_5' NAME='FILLES_AGE_NIVEAU_0_16_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_5' NAME='TOTAL_AGE_NIVEAU_0_16_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_6' NAME='FILLES_AGE_NIVEAU_0_16_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_6' NAME='TOTAL_AGE_NIVEAU_0_16_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_7' NAME='FILLES_AGE_NIVEAU_0_16_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_7' NAME='TOTAL_AGE_NIVEAU_0_16_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_8' NAME='FILLES_AGE_NIVEAU_0_16_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_8' NAME='TOTAL_AGE_NIVEAU_0_16_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_9' NAME='FILLES_AGE_NIVEAU_0_16_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_9' NAME='TOTAL_AGE_NIVEAU_0_16_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_10' NAME='FILLES_AGE_NIVEAU_0_16_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_10' NAME='TOTAL_AGE_NIVEAU_0_16_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_11' NAME='FILLES_AGE_NIVEAU_0_16_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_11' NAME='TOTAL_AGE_NIVEAU_0_16_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_16_12' NAME='FILLES_AGE_NIVEAU_0_16_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_16_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_16_12' NAME='TOTAL_AGE_NIVEAU_0_16_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_16_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 16, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[10]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[10][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_16'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[10][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_16";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_16' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >16ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_4' NAME='FILLES_AGE_NIVEAU_0_18_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_4' NAME='TOTAL_AGE_NIVEAU_0_18_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_5' NAME='FILLES_AGE_NIVEAU_0_18_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_5' NAME='TOTAL_AGE_NIVEAU_0_18_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_6' NAME='FILLES_AGE_NIVEAU_0_18_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_6' NAME='TOTAL_AGE_NIVEAU_0_18_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_7' NAME='FILLES_AGE_NIVEAU_0_18_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_7' NAME='TOTAL_AGE_NIVEAU_0_18_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_8' NAME='FILLES_AGE_NIVEAU_0_18_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_8' NAME='TOTAL_AGE_NIVEAU_0_18_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_9' NAME='FILLES_AGE_NIVEAU_0_18_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_9' NAME='TOTAL_AGE_NIVEAU_0_18_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_10' NAME='FILLES_AGE_NIVEAU_0_18_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_10' NAME='TOTAL_AGE_NIVEAU_0_18_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_11' NAME='FILLES_AGE_NIVEAU_0_18_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_11' NAME='TOTAL_AGE_NIVEAU_0_18_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_18_12' NAME='FILLES_AGE_NIVEAU_0_18_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_18_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_18_12' NAME='TOTAL_AGE_NIVEAU_0_18_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_18_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 18, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[11]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_18'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[11][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_18";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_18'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[11][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_18";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_18' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >17ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_4' NAME='FILLES_AGE_NIVEAU_0_19_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_4' NAME='TOTAL_AGE_NIVEAU_0_19_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_5' NAME='FILLES_AGE_NIVEAU_0_19_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_5' NAME='TOTAL_AGE_NIVEAU_0_19_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_6' NAME='FILLES_AGE_NIVEAU_0_19_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_6' NAME='TOTAL_AGE_NIVEAU_0_19_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_7' NAME='FILLES_AGE_NIVEAU_0_19_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_7' NAME='TOTAL_AGE_NIVEAU_0_19_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_8' NAME='FILLES_AGE_NIVEAU_0_19_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_8' NAME='TOTAL_AGE_NIVEAU_0_19_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_9' NAME='FILLES_AGE_NIVEAU_0_19_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_9' NAME='TOTAL_AGE_NIVEAU_0_19_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_10' NAME='FILLES_AGE_NIVEAU_0_19_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_10' NAME='TOTAL_AGE_NIVEAU_0_19_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_11' NAME='FILLES_AGE_NIVEAU_0_19_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_11' NAME='TOTAL_AGE_NIVEAU_0_19_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_19_12' NAME='FILLES_AGE_NIVEAU_0_19_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_19_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_19_12' NAME='TOTAL_AGE_NIVEAU_0_19_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_19_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 19, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[12]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[12][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_19'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[12][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_19";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_19' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >18ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_4' NAME='FILLES_AGE_NIVEAU_0_20_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_4' NAME='TOTAL_AGE_NIVEAU_0_20_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_5' NAME='FILLES_AGE_NIVEAU_0_20_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_5' NAME='TOTAL_AGE_NIVEAU_0_20_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_6' NAME='FILLES_AGE_NIVEAU_0_20_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_6' NAME='TOTAL_AGE_NIVEAU_0_20_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_7' NAME='FILLES_AGE_NIVEAU_0_20_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_7' NAME='TOTAL_AGE_NIVEAU_0_20_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_8' NAME='FILLES_AGE_NIVEAU_0_20_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_8' NAME='TOTAL_AGE_NIVEAU_0_20_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_9' NAME='FILLES_AGE_NIVEAU_0_20_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_9' NAME='TOTAL_AGE_NIVEAU_0_20_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_10' NAME='FILLES_AGE_NIVEAU_0_20_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_10' NAME='TOTAL_AGE_NIVEAU_0_20_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_11' NAME='FILLES_AGE_NIVEAU_0_20_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_11' NAME='TOTAL_AGE_NIVEAU_0_20_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_20_12' NAME='FILLES_AGE_NIVEAU_0_20_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_20_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_20_12' NAME='TOTAL_AGE_NIVEAU_0_20_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_20_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 20, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[13]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_20'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[13][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_20";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_20'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[13][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_20";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_20' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >19ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_4' NAME='FILLES_AGE_NIVEAU_0_21_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_4' NAME='TOTAL_AGE_NIVEAU_0_21_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_5' NAME='FILLES_AGE_NIVEAU_0_21_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_5' NAME='TOTAL_AGE_NIVEAU_0_21_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_6' NAME='FILLES_AGE_NIVEAU_0_21_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_6' NAME='TOTAL_AGE_NIVEAU_0_21_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_7' NAME='FILLES_AGE_NIVEAU_0_21_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_7' NAME='TOTAL_AGE_NIVEAU_0_21_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_8' NAME='FILLES_AGE_NIVEAU_0_21_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_8' NAME='TOTAL_AGE_NIVEAU_0_21_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_9' NAME='FILLES_AGE_NIVEAU_0_21_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_9' NAME='TOTAL_AGE_NIVEAU_0_21_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_10' NAME='FILLES_AGE_NIVEAU_0_21_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_10' NAME='TOTAL_AGE_NIVEAU_0_21_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_11' NAME='FILLES_AGE_NIVEAU_0_21_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_11' NAME='TOTAL_AGE_NIVEAU_0_21_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_21_12' NAME='FILLES_AGE_NIVEAU_0_21_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_21_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_21_12' NAME='TOTAL_AGE_NIVEAU_0_21_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_21_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 21, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[14]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_21'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[14][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_21";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_21'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[14][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_21";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_21' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >20ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_4' NAME='FILLES_AGE_NIVEAU_0_22_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_4' NAME='TOTAL_AGE_NIVEAU_0_22_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_5' NAME='FILLES_AGE_NIVEAU_0_22_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_5' NAME='TOTAL_AGE_NIVEAU_0_22_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_6' NAME='FILLES_AGE_NIVEAU_0_22_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_6' NAME='TOTAL_AGE_NIVEAU_0_22_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_7' NAME='FILLES_AGE_NIVEAU_0_22_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_7' NAME='TOTAL_AGE_NIVEAU_0_22_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_8' NAME='FILLES_AGE_NIVEAU_0_22_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_8' NAME='TOTAL_AGE_NIVEAU_0_22_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_9' NAME='FILLES_AGE_NIVEAU_0_22_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_9' NAME='TOTAL_AGE_NIVEAU_0_22_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_10' NAME='FILLES_AGE_NIVEAU_0_22_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_10' NAME='TOTAL_AGE_NIVEAU_0_22_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_11' NAME='FILLES_AGE_NIVEAU_0_22_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_11' NAME='TOTAL_AGE_NIVEAU_0_22_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_22_12' NAME='FILLES_AGE_NIVEAU_0_22_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_22_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_22_12' NAME='TOTAL_AGE_NIVEAU_0_22_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_22_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 22, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[15]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[15][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_22'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[15][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_22";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_22' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >21ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_4' NAME='FILLES_AGE_NIVEAU_0_23_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_4' NAME='TOTAL_AGE_NIVEAU_0_23_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_5' NAME='FILLES_AGE_NIVEAU_0_23_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_5' NAME='TOTAL_AGE_NIVEAU_0_23_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_6' NAME='FILLES_AGE_NIVEAU_0_23_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_6' NAME='TOTAL_AGE_NIVEAU_0_23_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_7' NAME='FILLES_AGE_NIVEAU_0_23_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_7' NAME='TOTAL_AGE_NIVEAU_0_23_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_8' NAME='FILLES_AGE_NIVEAU_0_23_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_8' NAME='TOTAL_AGE_NIVEAU_0_23_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_9' NAME='FILLES_AGE_NIVEAU_0_23_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_9' NAME='TOTAL_AGE_NIVEAU_0_23_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_10' NAME='FILLES_AGE_NIVEAU_0_23_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_10' NAME='TOTAL_AGE_NIVEAU_0_23_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_11' NAME='FILLES_AGE_NIVEAU_0_23_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_11' NAME='TOTAL_AGE_NIVEAU_0_23_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_23_12' NAME='FILLES_AGE_NIVEAU_0_23_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_23_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_23_12' NAME='TOTAL_AGE_NIVEAU_0_23_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_23_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 23, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[16]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[16][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_23'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[16][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_23";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_23' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >22ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_4' NAME='FILLES_AGE_NIVEAU_0_24_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_4' NAME='TOTAL_AGE_NIVEAU_0_24_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_5' NAME='FILLES_AGE_NIVEAU_0_24_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_5' NAME='TOTAL_AGE_NIVEAU_0_24_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_6' NAME='FILLES_AGE_NIVEAU_0_24_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_6' NAME='TOTAL_AGE_NIVEAU_0_24_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_7' NAME='FILLES_AGE_NIVEAU_0_24_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_7' NAME='TOTAL_AGE_NIVEAU_0_24_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_8' NAME='FILLES_AGE_NIVEAU_0_24_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_8' NAME='TOTAL_AGE_NIVEAU_0_24_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_9' NAME='FILLES_AGE_NIVEAU_0_24_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_9' NAME='TOTAL_AGE_NIVEAU_0_24_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_10' NAME='FILLES_AGE_NIVEAU_0_24_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_10' NAME='TOTAL_AGE_NIVEAU_0_24_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_11' NAME='FILLES_AGE_NIVEAU_0_24_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_11' NAME='TOTAL_AGE_NIVEAU_0_24_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_24_12' NAME='FILLES_AGE_NIVEAU_0_24_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_24_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_24_12' NAME='TOTAL_AGE_NIVEAU_0_24_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_24_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 24, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[17]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[17][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_24'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[17][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_24";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_24' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >23ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_4' NAME='FILLES_AGE_NIVEAU_0_25_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_4' NAME='TOTAL_AGE_NIVEAU_0_25_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_5' NAME='FILLES_AGE_NIVEAU_0_25_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_5' NAME='TOTAL_AGE_NIVEAU_0_25_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_6' NAME='FILLES_AGE_NIVEAU_0_25_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_6' NAME='TOTAL_AGE_NIVEAU_0_25_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_7' NAME='FILLES_AGE_NIVEAU_0_25_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_7' NAME='TOTAL_AGE_NIVEAU_0_25_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_8' NAME='FILLES_AGE_NIVEAU_0_25_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_8' NAME='TOTAL_AGE_NIVEAU_0_25_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_9' NAME='FILLES_AGE_NIVEAU_0_25_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_9' NAME='TOTAL_AGE_NIVEAU_0_25_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_10' NAME='FILLES_AGE_NIVEAU_0_25_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_10' NAME='TOTAL_AGE_NIVEAU_0_25_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_11' NAME='FILLES_AGE_NIVEAU_0_25_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_11' NAME='TOTAL_AGE_NIVEAU_0_25_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_25_12' NAME='FILLES_AGE_NIVEAU_0_25_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_25_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_25_12' NAME='TOTAL_AGE_NIVEAU_0_25_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_25_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 25, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[18]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[18][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_25'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[18][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_25";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_25' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >24ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_4' NAME='FILLES_AGE_NIVEAU_0_26_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_4' NAME='TOTAL_AGE_NIVEAU_0_26_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_5' NAME='FILLES_AGE_NIVEAU_0_26_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_5' NAME='TOTAL_AGE_NIVEAU_0_26_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_6' NAME='FILLES_AGE_NIVEAU_0_26_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_6' NAME='TOTAL_AGE_NIVEAU_0_26_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_7' NAME='FILLES_AGE_NIVEAU_0_26_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_7' NAME='TOTAL_AGE_NIVEAU_0_26_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_8' NAME='FILLES_AGE_NIVEAU_0_26_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_8' NAME='TOTAL_AGE_NIVEAU_0_26_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_9' NAME='FILLES_AGE_NIVEAU_0_26_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_9' NAME='TOTAL_AGE_NIVEAU_0_26_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_10' NAME='FILLES_AGE_NIVEAU_0_26_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_10' NAME='TOTAL_AGE_NIVEAU_0_26_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_11' NAME='FILLES_AGE_NIVEAU_0_26_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_11' NAME='TOTAL_AGE_NIVEAU_0_26_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_AGE_NIVEAU_0_26_12' NAME='FILLES_AGE_NIVEAU_0_26_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_26_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_26_12' NAME='TOTAL_AGE_NIVEAU_0_26_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_26_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 26, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[19]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_26'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[19][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_26";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_26'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[19][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_26";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_26' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >>24ans</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_4' NAME='FILLES_AGE_NIVEAU_0_27_4' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_4' NAME='TOTAL_AGE_NIVEAU_0_27_4' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_4"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 4, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_5' NAME='FILLES_AGE_NIVEAU_0_27_5' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_5' NAME='TOTAL_AGE_NIVEAU_0_27_5' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_5"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 5, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_6' NAME='FILLES_AGE_NIVEAU_0_27_6' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_6' NAME='TOTAL_AGE_NIVEAU_0_27_6' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_6"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 6, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_7' NAME='FILLES_AGE_NIVEAU_0_27_7' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_7' NAME='TOTAL_AGE_NIVEAU_0_27_7' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_7"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 7, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_8' NAME='FILLES_AGE_NIVEAU_0_27_8' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_8' NAME='TOTAL_AGE_NIVEAU_0_27_8' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_8"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 8, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_9' NAME='FILLES_AGE_NIVEAU_0_27_9' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_9' NAME='TOTAL_AGE_NIVEAU_0_27_9' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_9"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 9, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_10' NAME='FILLES_AGE_NIVEAU_0_27_10' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_10' NAME='TOTAL_AGE_NIVEAU_0_27_10' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 10, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_11' NAME='FILLES_AGE_NIVEAU_0_27_11' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_11' NAME='TOTAL_AGE_NIVEAU_0_27_11' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 11, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_AGE_NIVEAU_0_27_12' NAME='FILLES_AGE_NIVEAU_0_27_12' TYPE='text' size=2 VALUE="$FILLES_AGE_NIVEAU_0_27_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'FILLES_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_AGE_NIVEAU_0_27_12' NAME='TOTAL_AGE_NIVEAU_0_27_12' TYPE='text' size=2 VALUE="$TOTAL_AGE_NIVEAU_0_27_12"  onchange="set_TOTAL_MatFrml_Champ('form1', 950007, 0, 'TOTAL_AGE_NIVEAU', tab_ligne_950007, tab_col_950007, 27, 12, tab_mes_950007);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[20]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_27'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[20][1]	= "TOT_950007_FILLES_AGE_NIVEAU_LIGNE_0_27";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_27'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_950007[20][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_LIGNE_0_27";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_LIGNE_0_27' size=2></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='2' bgcolor='#CCCCCC'><br>TOTAL</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[0][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_4";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_4'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[0][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_4";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[1][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_5";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_5'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[1][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_5";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[2][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_6";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_6'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[2][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_6";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[3]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_7'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[3][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_7";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_7'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[3][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_7";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[4]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[4][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_8";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_8'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[4][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_8";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[5]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[5][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_9";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_9'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[5][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_9";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[6]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[6][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[6][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_10";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[7]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[7][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[7][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_11";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[8]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[8][1]	= "TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0_12";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_12'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_950007[8][2]	= "TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0_12";
+</script>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=2 NAME='TOT_950007_FILLES_AGE_NIVEAU_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=2 NAME='TOT_950007_TOTAL_AGE_NIVEAU_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_950007_ALL_MES_0' size=2></TD>
+
+	</TR>
+
+	<TR>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_4' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_5' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_6' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_7' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_8' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_9' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_10' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_11' size=2></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_950007_ALL_MES_COLONNE_0_12' size=2></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',950007, 0, tab_mes_950007, tab_ligne_950007, tab_col_950007);
+</script>

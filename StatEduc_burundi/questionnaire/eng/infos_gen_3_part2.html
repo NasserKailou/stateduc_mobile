@@ -1,0 +1,429 @@
+<BR/><script language="javascript" type="text/javascript">
+				var ctrlSaisieLst = new Array();
+
+				var do_submit = true;
+				function do_post(form_name){
+					/*requiredInputs = $('input[required]:not(:disabled)');
+					for(var i= 0; i < requiredInputs.length; i++)
+					{
+						 var cinput = requiredInputs[i];
+						 if(!$(cinput).val()) {
+							 return false;
+						 }
+					}*/
+					ctrl_saisie();
+					if( do_submit == true ){			eval('document.'+form_name+'.submit();');
+					}
+				}
+				
+				$(function() {
+					$.each(ctrlSaisieLst, function(idx, ctrlSaisie) {
+						if (ctrlSaisie[3] == "si") {
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').click(function(index) {
+								desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							});
+							$("FORM").find('input[id^="'+ctrlSaisie[1]+'"]').each(function(index) {
+								if ($(this).is(":checked")) {
+									desactiver_zone($(this).val(), ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+								}
+							});
+							if($("FORM").find('input[id^="'+ctrlSaisie[1]+'"]:checked').length == 0) {
+								desactiver_zone('', ctrlSaisie[4].split(";")[0].split(","), ctrlSaisie[4].split(";")[1]);
+							}
+						}
+					});	
+				});
+				</script>
+<script language='javascript' type='text/javascript'>
+var tab_chps = new Array();
+</script>
+<div align=center>
+<FORM ACTION='questionnaire.php?theme_frame=2003' METHOD='POST' NAME='form1'>
+<TABLE class='table-questionnaire' border='1'>
+<CAPTION><B></B></CAPTION>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>(#)<br>4. 3  Elèves à besoins spécifiques d'éducation  par année d'étude et par sexe<br></b><script language='javascript' type='text/javascript'>
+var expression_200072 	= "";
+var tot_mes_ligne_200072 	= new Array();
+var tot_mes_col_200072 	= new Array();
+var affich_vertic_mes_200072 	= 0;
+var affiche_sous_totaux_200072 	= 0;
+var tab_mes_200072 	= new Array ("FILLES_HANDICAP","TOTAL_HANDICAP");
+var tab_ligne_200072	= new Array ("9","10","11","12","6","7","8","13");
+var tab_col_200072	= new Array ();
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  COLSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD CLASS='ligne-titre' align='center'>&nbsp;</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN='2' >(#)TOTAL</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >(#)Malvoyants</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[0]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_HANDICAP_0_9' NAME='FILLES_HANDICAP_0_9' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_9"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_9' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_HANDICAP_0_9' NAME='TOTAL_HANDICAP_0_9' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_9"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >(#)Aveugles</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[1]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_HANDICAP_0_10' NAME='FILLES_HANDICAP_0_10' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_10"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_10' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_HANDICAP_0_10' NAME='TOTAL_HANDICAP_0_10' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_10"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >(#)Malentendants</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[2]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_HANDICAP_0_11' NAME='FILLES_HANDICAP_0_11' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_11"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_11' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_HANDICAP_0_11' NAME='TOTAL_HANDICAP_0_11' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_11"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >(#)Sourds</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[3]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_HANDICAP_0_12' NAME='FILLES_HANDICAP_0_12' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_12"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_12' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_HANDICAP_0_12' NAME='TOTAL_HANDICAP_0_12' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_12"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >(#)Muets</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[4]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_HANDICAP_0_6' NAME='FILLES_HANDICAP_0_6' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_6"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_6' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_HANDICAP_0_6' NAME='TOTAL_HANDICAP_0_6' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_6"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >(#)Sourds-muets </TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[5]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_HANDICAP_0_7' NAME='FILLES_HANDICAP_0_7' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_7"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_7' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_HANDICAP_0_7' NAME='TOTAL_HANDICAP_0_7' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_7"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-paire' >(#)Infirmité Motrice Cérébrale(IMC) / Déficient mental</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[6]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_HANDICAP_0_8' NAME='FILLES_HANDICAP_0_8' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_8"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_8' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_HANDICAP_0_8' NAME='TOTAL_HANDICAP_0_8' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_8"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD  ROWSPAN=3  style='vertical-align:middle' CLASS='ligne-impaire' >(#)Albinos</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200072[7]	= new Array();
+</script>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_HANDICAP_0_13' NAME='FILLES_HANDICAP_0_13' TYPE='text' size=2 VALUE="$FILLES_HANDICAP_0_13"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+		<TD  ROWSPAN=2  align='center' bgcolor='#CCCCCC' style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_LIGNE_0_13' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'>(#)F+M</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_HANDICAP_0_13' NAME='TOTAL_HANDICAP_0_13' TYPE='text' size=2 VALUE="$TOTAL_HANDICAP_0_13"  onchange="set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);"  tabindex=''>
+</TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='3' style='vertical-align:middle' bgcolor='#CCCCCC'>(#)TOTAL</TD>
+		<TD  align='center' bgcolor='#CCCCCC'>(#)F</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_FILLES_HANDICAP_COLONNE_0' ></TD>
+		<td rowspan='3' align='center' bgcolor='#CCCCCC'  style='vertical-align:middle'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_ALL_MES_0' ></TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center' bgcolor='#CCCCCC'>(#)F+M</TD>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; width:50px; font-weight:bold;' NAME='TOT_200072_TOTAL_HANDICAP_COLONNE_0' ></TD>
+
+	</TR>
+
+	<TR>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>(#)<br><br><b>4.4 Elèves certifiés ou diplômés </b><br>(#)<br> 4.4.1. Elèves certifiés  à la fin du fondamental et les lauréats au concours national par sexe<br></b></TD>
+	</TR>
+	<TR class=''>
+		<TD colspan=4 valign='top'>&nbsp;<b>(#)<br>4.4.2 Diplômés/ Certifiés du post fondamental<br>(#)<br><b>a) Diplômés/Certifiés du post fondamental général <br>b) Diplômés de la section pédagogique/normale et classe à formation pédagogique </b><br></b><script language='javascript' type='text/javascript'>
+var expression_200065 	= "";
+var tot_mes_ligne_200065 	= new Array();
+var tot_mes_col_200065 	= new Array();
+var affich_vertic_mes_200065 	= 0;
+var affiche_sous_totaux_200065 	= 0;
+var tab_mes_200065 	= new Array ("FILLES_RESULTAT_EXAMEN_SEC_GP","TOTAL_RESULTAT_EXAMEN_SEC_GP");
+var tab_ligne_200065	= new Array ("133","134","135");
+var tab_col_200065	= new Array ("10","11");
+
+</script>
+<TABLE class='table-questionnaire' border=1>
+	<TR>
+		<TD  ROWSPAN=2   CLASS='ligne-titre'>&nbsp</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>(#)Ougandais</TD>
+		<TD  COLSPAN=2  CLASS='ligne-titre' align='center'>(#)Sud Soudan</TD>
+		<TD  CLASS='ligne-titre' align='center'  COLSPAN=3 >(#)TOTAL</TD>
+
+	</TR>
+
+	<TR>
+		<TD  align='center'>(#)F</TD>
+		<TD  align='center'>(#)F+M</TD>
+		<TD  align='center'>(#)F</TD>
+		<TD  align='center'>(#)F+M</TD>
+		<TD  align='center'>(#)F</TD>
+		<TD  align='center'>(#)F+M</TD>
+		<TD  align='center'>(#)F + (#)F+M</TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >(#)Inscrits à la fin de l&#8217;année - Maths-Statistique (MSTAT)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_133_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_133_10' TYPE='text' size=5 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_133_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 133, 10, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_133_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_133_10' TYPE='text' size=5 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_133_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 133, 10, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_133_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_133_11' TYPE='text' size=5 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_133_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 133, 11, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_133_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_133_11' TYPE='text' size=5 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_133_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 133, 11, tab_mes_200065);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_133'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[0][2]	= "TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_133";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_133'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[0][3]	= "TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_133";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_200065_ALL_MES_LIGNE_0_133' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-impaire-left' >(#)Certifiés à la fin de l&#8217;année (établissement) - Maths-Statistique (MSTAT)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_134_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_134_10' TYPE='text' size=5 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_134_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 134, 10, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_134_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_134_10' TYPE='text' size=5 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_134_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 134, 10, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_134_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_134_11' TYPE='text' size=5 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_134_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 134, 11, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-impaire'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_134_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_134_11' TYPE='text' size=5 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_134_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 134, 11, tab_mes_200065);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_134'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[1][2]	= "TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_134";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_134'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[1][3]	= "TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_134";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_200065_ALL_MES_LIGNE_0_134' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+		<TD CLASS='ligne-paire-left' >(#)Diplômés  à l&#8217;examen d&#8217;Etat - Maths-Statistique (MSTAT)</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_135_10' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_135_10' TYPE='text' size=5 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_135_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 135, 10, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_135_10' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_135_10' TYPE='text' size=5 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_135_10"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 135, 10, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='FILLES_RESULTAT_EXAMEN_SEC_GP_0_135_11' NAME='FILLES_RESULTAT_EXAMEN_SEC_GP_0_135_11' TYPE='text' size=5 VALUE="$FILLES_RESULTAT_EXAMEN_SEC_GP_0_135_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'FILLES_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 135, 11, tab_mes_200065);"  tabindex=''>
+</TD>
+		<TD nowrap='nowrap' align='center' style='vertical-align:middle' CLASS='ligne-paire'><INPUT  ID='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_135_11' NAME='TOTAL_RESULTAT_EXAMEN_SEC_GP_0_135_11' TYPE='text' size=5 VALUE="$TOTAL_RESULTAT_EXAMEN_SEC_GP_0_135_11"  onchange="set_TOTAL_MatFrml_Champ('form1', 200065, 0, 'TOTAL_RESULTAT_EXAMEN_SEC_GP', tab_ligne_200065, tab_col_200065, 135, 11, tab_mes_200065);"  tabindex=''>
+</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[2]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_135'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[2][2]	= "TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_135";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_135'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_ligne_200065[2][3]	= "TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_LIGNE_0_135";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_200065_ALL_MES_LIGNE_0_135' size=5></TD>
+
+	</TR>
+
+	<TR>
+
+	<TD align='center' rowspan='2' bgcolor='#CCCCCC'><br>(#)TOTAL</TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_200065[0]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_200065[0][2]	= "TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_10";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_10'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_200065[0][3]	= "TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_10";
+</script>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_200065[1]	= new Array();
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_200065[1][2]	= "TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_11";
+</script>
+		<TD  align='center' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' size=5 NAME='TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_11'></TD>
+<script language='javascript' type='text/javascript'>
+tot_mes_col_200065[1][3]	= "TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_COLONNE_0_11";
+</script>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_200065_FILLES_RESULTAT_EXAMEN_SEC_GP_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;'  size=5 NAME='TOT_200065_TOTAL_RESULTAT_EXAMEN_SEC_GP_COLONNE_0'></TD>
+		<td align='center' rowspan='2' bgcolor='#CCCCCC'  style='vertical-align:middle'><br><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold;' NAME='TOT_200065_ALL_MES_0' size=5></TD>
+
+	</TR>
+
+	<TR>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_200065_ALL_MES_COLONNE_0_10' size=5></TD>
+		<TD align='center' colspan='2' bgcolor='#CCCCCC'><INPUT TYPE= 'text' readonly='1' style='background-color:#CCCCCC; text-align: right; font-weight:bold' NAME='TOT_200065_ALL_MES_COLONNE_0_11' size=5></TD>
+
+	</TR>
+</TABLE></TD>
+	</TR>
+</TABLE>
+<BR />
+							<DIV align=center id="submit_actions">
+								<TABLE border="0">
+									<TR>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_prev" name="btn_save_and_prev" value="&nbsp;&nbsp;(#)<< Enregistrer & Précédant&nbsp;&nbsp;" onclick="Set_Element('save_and_prev', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+										<TD width="40%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_only" name="btn_save_only" value="&nbsp;&nbsp;(#)Enregistrer&nbsp;&nbsp;" onclick="javascript:changer_action(); do_post('form1')"/></TD>
+										<TD width="30%" align="center"><input style="width:98%; text-align:center;" type="button" id="btn_save_and_next" name="btn_save_and_next" value="&nbsp;&nbsp;(#)Enregistrer & Suivant >>&nbsp;&nbsp;" onclick="Set_Element('save_and_next', 'form1', 1); changer_action(); do_post('form1');"/></TD>
+									</TR>
+								</TABLE>
+							</DIV>
+							<INPUT type="hidden" name="switch_theme_id" id="switch_theme_id">
+							<INPUT type="hidden" name="save_and_prev" id="save_and_prev">
+							<INPUT type="hidden" name="save_and_next" id="save_and_next">
+							</FORM></div>
+<script language='javascript' type='text/javascript'>
+ set_TOTAL_MatFrml('form1',200072, 0, tab_mes_200072, tab_ligne_200072, tab_col_200072);
+ set_TOTAL_MatFrml('form1',200065, 0, tab_mes_200065, tab_ligne_200065, tab_col_200065);
+</script>

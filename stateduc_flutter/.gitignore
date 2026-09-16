@@ -1,0 +1,41 @@
+# ── Dart/Flutter ─────────────────────────────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+build/
+*.g.dart
+*.freezed.dart
+
+# ── Android ───────────────────────────────────────────────────────────────────
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/key.properties
+android/app/debug.keystore
+# Keystore release — NE JAMAIS versionner dans Git
+# Conserver une sauvegarde sécurisée séparément (voir RELEASE_SIGNING.md)
+android/app/*.jks
+android/app/*.keystore
+android/**/*.iml
+android/app/google-services.json
+
+# ── iOS ───────────────────────────────────────────────────────────────────────
+ios/Flutter/.last_build_id
+ios/Pods/
+ios/.symlinks/
+ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+coverage/
