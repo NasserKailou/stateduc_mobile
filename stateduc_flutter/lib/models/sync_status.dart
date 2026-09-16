@@ -227,18 +227,45 @@ class ServerAck {
 // Résultat typé d'un envoi (U06)
 // ═══════════════════════════════════════════════════════════════════════════
 
-enum SendOutcomeKind { ok, kosave, rejected, locked, networkError, noData, yearMismatch }
+enum SendOutcomeKind { ok, kosave, rejected, locked, networkError, noData, yearMismatch, skipped }
 
 class SendOutcome {
   final SendOutcomeKind kind;
+  final String idEtab;
+  final String idQst;
+  final String? idFilter;               // filtre local ('' ou null = aucun)
+  final String? libEtab;
+  final String? libQst;
   final String? message;
   final ServerAck? ack;
   final String? serverCode;             // se_code (YEAR_MISMATCH, ACCESS_DENIED, FORM_LOCKED, …)
   final Map<String, dynamic>? lockInfo; // se_lock
 
-  const SendOutcome(this.kind, {this.message, this.ack, this.serverCode, this.lockInfo});
+  const SendOutcome({
+    required this.kind,
+    this.idEtab = '',
+    this.idQst = '',
+    this.idFilter,
+    this.libEtab,
+    this.libQst,
+    this.message,
+    this.ack,
+    this.serverCode,
+    this.lockInfo,
+  });
+
+  /// Clé historique « etab_qst[_filtre] » (compat Map<String,bool>).
+  String get key => '${idEtab}_$idQst${(idFilter ?? '').isEmpty ? '' : '_$idFilter'}';
+  String get keyWithoutEtab => '$idQst${(idFilter ?? '').isEmpty ? '' : '_$idFilter'}';
 
   bool get isSuccess => kind == SendOutcomeKind.ok;
+
+  /// Vrai si le formulaire n'a PAS été enregistré côté serveur et mérite un
+  /// nouvel essai ou une action (noData/skipped ne sont pas des échecs).
+  bool get isFailure =>
+      kind != SendOutcomeKind.ok &&
+      kind != SendOutcomeKind.noData &&
+      kind != SendOutcomeKind.skipped;
 
   /// Compatibilité avec l'ancien contrat `bool` (true = reçu par le serveur).
   bool get asLegacyBool => kind == SendOutcomeKind.ok || kind == SendOutcomeKind.kosave;
@@ -251,7 +278,8 @@ class SendOutcome {
       case SendOutcomeKind.rejected:
       case SendOutcomeKind.yearMismatch: return SyncStatus.rejected;
       case SendOutcomeKind.networkError: return SyncStatus.failed;
-      case SendOutcomeKind.noData:       return null; // aucun changement d'état
+      case SendOutcomeKind.noData:
+      case SendOutcomeKind.skipped:      return null; // aucun changement d'état
     }
   }
 
@@ -264,7 +292,17 @@ class SendOutcome {
       case SendOutcomeKind.networkError: return 'Erreur réseau';
       case SendOutcomeKind.noData:       return 'Aucune donnée locale';
       case SendOutcomeKind.yearMismatch: return 'Année incohérente';
+      case SendOutcomeKind.skipped:      return 'Ignoré';
     }
+  }
+
+  /// Libellé nominatif pour le dialogue de résultat groupé (U06).
+  String describe() {
+    final e = (libEtab ?? '').isNotEmpty ? libEtab! : 'Étab. $idEtab';
+    final q = (libQst ?? '').isNotEmpty ? libQst! : 'Thème $idQst';
+    final f = (idFilter ?? '').isEmpty ? '' : ' [$idFilter]';
+    final m = (message ?? '').isEmpty ? '' : ' — $message';
+    return '$e › $q$f : $label$m';
   }
 }
 

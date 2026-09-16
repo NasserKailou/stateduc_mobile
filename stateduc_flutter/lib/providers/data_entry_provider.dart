@@ -1297,6 +1297,7 @@ class DataEntryProvider extends ChangeNotifier {
           return false;
 
         case SendOutcomeKind.rejected:
+        case SendOutcomeKind.yearMismatch:
         case SendOutcomeKind.networkError:
           _error = outcome.message ?? 'Échec de l\'envoi. Réessayez.';
           notifyListeners();
