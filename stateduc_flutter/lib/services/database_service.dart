@@ -10,6 +10,7 @@ import '../models/education_system.dart';
 import '../models/question.dart';
 import '../models/user.dart';
 import '../models/school_year.dart';
+import '../models/sync_status.dart';
 
 /// DatabaseService — Couche d'accès aux données SQLite de l'application StatEduc Mobile.
 ///
@@ -41,6 +42,10 @@ import '../models/school_year.dart';
 ///        Gestion pluriannuelle : chaque saisie est désormais indexée par l'année
 ///        active (CODE_TYPE_ANNEE). Migration des lignes existantes via id_year
 ///        de la table campaigns.
+///   v9 : AK-SYNC (ak_burundi) — tables form_sync_status (état de transmission par
+///        formulaire, U04) et sync_feedback (demandes de correction admin, U19).
+///        Purement additif : collected_data / is_sent inchangés. Les lignes
+///        existantes sont initialisées depuis is_sent (0 → pending, 1 → sent).
 ///
 /// TABLE CRITIQUE — coherence_rules :
 ///   Stocke les règles téléchargées depuis data_rules.php pour l'évaluation offline.
@@ -68,7 +73,7 @@ class DatabaseService {
     final path = join(dbPath, 'stateduc.db');
     return await openDatabase(
       path,
-      version: 8,
+      version: 9,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onOpen: (db) async {
@@ -183,6 +188,74 @@ class DatabaseService {
         debugPrint('[DBService] v8 migration: CREATE INDEX failed: $e');
       }
     }
+    if (oldVersion < 9) {
+      // v9 : AK-SYNC U04/U19 — nouvelles tables (IF NOT EXISTS, idempotent)
+      await _createSyncTables(db);
+      // Initialisation depuis l'état historique is_sent : un formulaire est 'sent'
+      // si TOUTES ses lignes sont is_sent=1, sinon 'pending'.
+      try {
+        await db.execute('''
+          INSERT OR IGNORE INTO form_sync_status
+            (code_type_annee, id_camp, id_etab, id_qst, id_filter, status, local_updated_at, attempts)
+          SELECT code_type_annee, id_camp, id_etab, id_qst, COALESCE(id_filter,''),
+                 CASE WHEN MIN(is_sent) = 1 THEN 'sent' ELSE 'pending' END,
+                 MAX(updated_at), 0
+          FROM collected_data
+          GROUP BY code_type_annee, id_camp, id_etab, id_qst, COALESCE(id_filter,'')
+        ''');
+      } catch (e) {
+        debugPrint('[DBService] v9 migration: init form_sync_status failed: $e');
+      }
+    }
+  }
+
+  // ── v9 : tables AK-SYNC ────────────────────────────────────────────────────
+  Future<void> _createSyncTables(Database db) async {
+    // form_sync_status — 1 ligne par formulaire (clé de soumission).
+    // Colonnes alignées sur models/sync_status.dart (FormSyncStatus) et _rowToSyncStatus().
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS form_sync_status (
+        code_type_annee   TEXT NOT NULL DEFAULT '',
+        id_camp           TEXT NOT NULL,
+        id_etab           TEXT NOT NULL,
+        id_qst            TEXT NOT NULL,
+        id_filter         TEXT NOT NULL DEFAULT '',
+        status            TEXT NOT NULL DEFAULT 'pending',
+        last_attempt_at   TEXT,
+        last_success_at   TEXT,
+        local_updated_at  TEXT,
+        last_error        TEXT,
+        attempts          INTEGER NOT NULL DEFAULT 0,
+        sync_id           TEXT,
+        server_ack        TEXT,
+        server_status     TEXT,
+        server_last_ok    TEXT,
+        admin_status      TEXT,
+        admin_comment     TEXT,
+        PRIMARY KEY (code_type_annee, id_camp, id_etab, id_qst, id_filter)
+      )
+    ''');
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_fss_camp_status
+        ON form_sync_status (id_camp, code_type_annee, status)
+    ''');
+    // sync_feedback — cache local des demandes de correction / verrous admin (U19).
+    // id_qst '' = tout l'établissement ; id_filter '' = toutes périodes.
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sync_feedback (
+        id_camp          TEXT NOT NULL,
+        code_type_annee  TEXT NOT NULL DEFAULT '',
+        id_etab          TEXT NOT NULL,
+        id_qst           TEXT NOT NULL DEFAULT '',
+        id_filter        TEXT NOT NULL DEFAULT '',
+        statut           TEXT NOT NULL,
+        commentaire      TEXT NOT NULL DEFAULT '',
+        admin            TEXT NOT NULL DEFAULT '',
+        date_statut      TEXT NOT NULL DEFAULT '',
+        fetched_at       TEXT NOT NULL,
+        PRIMARY KEY (id_camp, code_type_annee, id_etab, id_qst, id_filter)
+      )
+    ''');
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -382,6 +455,9 @@ class DatabaseService {
     // ─── Dico règles thème — moteur générique piloté par métadonnées ───────
     await _createDicoRegleThemeTable(db);
     await _createDicoRegleThemeAssocTable(db);
+
+    // ─── AK-SYNC v9 : état de synchronisation + feedback admin ─────────────
+    await _createSyncTables(db);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -1991,6 +2067,472 @@ class DatabaseService {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // AK-SYNC (ak_burundi) — FORM_SYNC_STATUS : état de transmission par formulaire
+  //
+  // Clé = (code_type_annee, id_camp, id_etab, id_qst, id_filter|'').
+  // `collected_data.is_sent` est TOUJOURS maintenu en parallèle (compatibilité :
+  // toutes les requêtes historiques continuent de fonctionner à l'identique).
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  static FormSyncStatus _rowToSyncStatus(Map<String, Object?> r) {
+    DateTime? d(Object? v) =>
+        v == null ? null : DateTime.tryParse(v.toString());
+    ServerAck? ack;
+    final rawAck = r['server_ack'] as String?;
+    if (rawAck != null && rawAck.isNotEmpty) {
+      try {
+        final j = jsonDecode(rawAck);
+        if (j is Map) ack = ServerAck.fromJson(Map<String, dynamic>.from(j));
+      } catch (_) {}
+    }
+    return FormSyncStatus(
+      codeTypeAnnee: (r['code_type_annee'] as String?) ?? '',
+      idCamp: r['id_camp'] as String,
+      idEtab: r['id_etab'] as String,
+      idQst: r['id_qst'] as String,
+      idFilter: (r['id_filter'] as String?) ?? '',
+      status: SyncStatusX.fromCode(r['status'] as String?),
+      lastAttemptAt: d(r['last_attempt_at']),
+      lastSuccessAt: d(r['last_success_at']),
+      localUpdatedAt: d(r['local_updated_at']),
+      lastError: r['last_error'] as String?,
+      attempts: (r['attempts'] as int?) ?? 0,
+      syncId: r['sync_id'] as String?,
+      serverAck: ack,
+      serverStatus: r['server_status'] as String?,
+      serverLastOk: d(r['server_last_ok']),
+      adminStatus: r['admin_status'] as String?,
+      adminComment: r['admin_comment'] as String?,
+    );
+  }
+
+  /// Lit l'état d'un formulaire (null si jamais saisi).
+  Future<FormSyncStatus?> getFormSyncStatus({
+    required String idCamp,
+    required String idEtab,
+    required String idQst,
+    String? idFilter,
+    String codeTypeAnnee = '',
+  }) async {
+    final db = await database;
+    final rows = await db.query(
+      'form_sync_status',
+      where:
+          'code_type_annee = ? AND id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?',
+      whereArgs: [codeTypeAnnee, idCamp, idEtab, idQst, idFilter ?? ''],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return _rowToSyncStatus(rows.first);
+  }
+
+  /// Tous les états d'un établissement (tous thèmes / périodes) pour l'année.
+  Future<List<FormSyncStatus>> getFormSyncStatusesForSchool({
+    required String idCamp,
+    required String idEtab,
+    String codeTypeAnnee = '',
+  }) async {
+    final db = await database;
+    final rows = await db.query(
+      'form_sync_status',
+      where: 'code_type_annee = ? AND id_camp = ? AND id_etab = ?',
+      whereArgs: [codeTypeAnnee, idCamp, idEtab],
+    );
+    return rows.map(_rowToSyncStatus).toList();
+  }
+
+  /// Marque le formulaire comme modifié localement (après saveLocally).
+  /// Un formulaire 'sent' repasse 'pending' ; les autres états conservent
+  /// leur statut (failed/kosave/rejected restent visibles) mais mettent à jour
+  /// local_updated_at. Un formulaire 'locked' reste 'locked' (lecture seule).
+  Future<void> markFormLocallyModified({
+    required String idCamp,
+    required String idEtab,
+    required String idQst,
+    String? idFilter,
+    String codeTypeAnnee = '',
+  }) async {
+    final db = await database;
+    final now = DateTime.now().toIso8601String();
+    final f = idFilter ?? '';
+    final updated = await db.rawUpdate(
+      '''
+      UPDATE form_sync_status
+         SET status = CASE WHEN status IN ('sent','rejected') THEN 'pending' ELSE status END,
+             local_updated_at = ?
+       WHERE code_type_annee = ? AND id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?
+      ''',
+      [now, codeTypeAnnee, idCamp, idEtab, idQst, f],
+    );
+    if (updated == 0) {
+      await db.insert(
+        'form_sync_status',
+        {
+          'code_type_annee': codeTypeAnnee,
+          'id_camp': idCamp,
+          'id_etab': idEtab,
+          'id_qst': idQst,
+          'id_filter': f,
+          'status': SyncStatus.pending.code,
+          'local_updated_at': now,
+          'attempts': 0,
+        },
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  /// Enregistre le résultat d'une tentative d'envoi.
+  ///
+  /// [status] : sent | failed | kosave | rejected | locked.
+  /// Met aussi à jour `collected_data.is_sent` (1 uniquement si sent) pour
+  /// conserver la compatibilité avec les requêtes historiques.
+  Future<void> recordSendAttempt({
+    required String idCamp,
+    required String idEtab,
+    required String idQst,
+    String? idFilter,
+    String codeTypeAnnee = '',
+    required SyncStatus status,
+    String? error,
+    String? syncId,
+    ServerAck? ack,
+    String? adminStatus,
+    String? adminComment,
+  }) async {
+    final db = await database;
+    final now = DateTime.now().toIso8601String();
+    final f = idFilter ?? '';
+    final ok = status == SyncStatus.sent;
+    await db.transaction((txn) async {
+      final rows = await txn.query(
+        'form_sync_status',
+        columns: ['attempts'],
+        where:
+            'code_type_annee = ? AND id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?',
+        whereArgs: [codeTypeAnnee, idCamp, idEtab, idQst, f],
+        limit: 1,
+      );
+      final attempts = rows.isEmpty ? 0 : ((rows.first['attempts'] as int?) ?? 0);
+      final values = <String, Object?>{
+        'code_type_annee': codeTypeAnnee,
+        'id_camp': idCamp,
+        'id_etab': idEtab,
+        'id_qst': idQst,
+        'id_filter': f,
+        'status': status.code,
+        'last_attempt_at': now,
+        'attempts': attempts + 1,
+        'last_error': ok ? null : error,
+        'sync_id': syncId,
+        if (ok) 'last_success_at': now,
+        if (ack != null) 'server_ack': jsonEncode(ack.toJson()),
+        if (adminStatus != null) 'admin_status': adminStatus,
+        if (adminComment != null) 'admin_comment': adminComment,
+        if (ok) 'server_status': 'OK',
+        if (ok) 'server_last_ok': now,
+      };
+      if (rows.isEmpty) {
+        values['local_updated_at'] = now;
+        await txn.insert('form_sync_status', values,
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      } else {
+        await txn.update(
+          'form_sync_status',
+          values,
+          where:
+              'code_type_annee = ? AND id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?',
+          whereArgs: [codeTypeAnnee, idCamp, idEtab, idQst, f],
+        );
+      }
+      // Compatibilité is_sent : 1 seulement si le serveur a confirmé OKSAVE.
+      final anneeClause = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+      final filterClause = idFilter == null ? 'id_filter IS NULL' : 'id_filter = ?';
+      final args = <Object?>[idCamp, idEtab, idQst];
+      if (idFilter != null) args.add(idFilter);
+      if (codeTypeAnnee.isNotEmpty) args.add(codeTypeAnnee);
+      await txn.update(
+        'collected_data',
+        {'is_sent': ok ? 1 : 0},
+        where: 'id_camp = ? AND id_etab = ? AND id_qst = ? AND $filterClause$anneeClause',
+        whereArgs: args,
+      );
+    });
+  }
+
+  /// Formulaires à (re)envoyer pour une campagne/année (U07) :
+  /// status ∈ {pending, failed, kosave} ∪ repli historique (lignes collected_data
+  /// is_sent=0 sans entrée dans form_sync_status).
+  Future<List<FormSyncStatus>> getPendingForms(
+    String idCamp, {
+    String codeTypeAnnee = '',
+    String? idEtab,
+  }) async {
+    final db = await database;
+    final anneeClause = codeTypeAnnee.isNotEmpty ? ' AND s.code_type_annee = ?' : '';
+    final etabClause = idEtab != null ? ' AND s.id_etab = ?' : '';
+    final args = <Object?>[idCamp];
+    if (codeTypeAnnee.isNotEmpty) args.add(codeTypeAnnee);
+    if (idEtab != null) args.add(idEtab);
+    final rows = await db.rawQuery(
+      '''
+      SELECT s.* FROM form_sync_status s
+       WHERE s.id_camp = ? AND s.status IN ('pending','failed','kosave')$anneeClause$etabClause
+       ORDER BY s.id_etab, s.id_qst, s.id_filter
+      ''',
+      args,
+    );
+    final result = rows.map(_rowToSyncStatus).toList();
+    final known = result.map((e) => e.key).toSet();
+
+    // Repli : données pré-v9 sans ligne de statut
+    final anneeClause2 = codeTypeAnnee.isNotEmpty ? ' AND c.code_type_annee = ?' : '';
+    final etabClause2 = idEtab != null ? ' AND c.id_etab = ?' : '';
+    final legacy = await db.rawQuery(
+      '''
+      SELECT DISTINCT c.code_type_annee, c.id_camp, c.id_etab, c.id_qst, COALESCE(c.id_filter,'') AS id_filter
+        FROM collected_data c
+       WHERE c.id_camp = ? AND c.is_sent = 0$anneeClause2$etabClause2
+      ''',
+      args,
+    );
+    for (final r in legacy) {
+      final fs = FormSyncStatus(
+        codeTypeAnnee: (r['code_type_annee'] as String?) ?? '',
+        idCamp: r['id_camp'] as String,
+        idEtab: r['id_etab'] as String,
+        idQst: r['id_qst'] as String,
+        idFilter: (r['id_filter'] as String?) ?? '',
+        status: SyncStatus.pending,
+      );
+      if (!known.contains(fs.key)) result.add(fs);
+    }
+    return result;
+  }
+
+  /// Tous les formulaires (avec données) d'une campagne — couples distincts
+  /// (etab, qst, filter) : remplace getDistinctEtabQstWithData pour les batchs (U03).
+  Future<List<Map<String, String>>> getDistinctFormsWithData(
+    String idCamp, {
+    String codeTypeAnnee = '',
+    String? idEtab,
+  }) async {
+    final db = await database;
+    final anneeClause = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+    final etabClause = idEtab != null ? ' AND id_etab = ?' : '';
+    final args = <Object?>[idCamp];
+    if (codeTypeAnnee.isNotEmpty) args.add(codeTypeAnnee);
+    if (idEtab != null) args.add(idEtab);
+    final rows = await db.rawQuery(
+      'SELECT DISTINCT id_etab, id_qst, COALESCE(id_filter,\'\') AS id_filter '
+      'FROM collected_data WHERE id_camp = ?$anneeClause$etabClause '
+      'ORDER BY id_etab, id_qst, id_filter',
+      args,
+    );
+    return rows
+        .map((r) => {
+              'id_etab': (r['id_etab'] as String?) ?? '',
+              'id_qst': (r['id_qst'] as String?) ?? '',
+              'id_filter': (r['id_filter'] as String?) ?? '',
+            })
+        .where((m) => m['id_etab']!.isNotEmpty && m['id_qst']!.isNotEmpty)
+        .toList();
+  }
+
+  /// Agrégat par établissement pour une campagne/année (U05).
+  /// Retourne Map<idEtab, SchoolSyncSummary>.
+  Future<Map<String, SchoolSyncSummary>> getSchoolSyncSummaries(
+    String idCamp, {
+    String codeTypeAnnee = '',
+  }) async {
+    final db = await database;
+    final anneeClause = codeTypeAnnee.isNotEmpty ? ' AND code_type_annee = ?' : '';
+    final args = <Object?>[idCamp];
+    if (codeTypeAnnee.isNotEmpty) args.add(codeTypeAnnee);
+    final rows = await db.rawQuery(
+      '''
+      SELECT id_etab,
+             COUNT(*) AS total,
+             SUM(CASE WHEN status='sent' THEN 1 ELSE 0 END) AS sent,
+             SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) AS pending,
+             SUM(CASE WHEN status IN ('failed','kosave','rejected') THEN 1 ELSE 0 END) AS failed,
+             SUM(CASE WHEN status='locked' OR admin_status IN ('VALIDE','VERROUILLE') THEN 1 ELSE 0 END) AS locked,
+             SUM(CASE WHEN admin_status='A_CORRIGER' THEN 1 ELSE 0 END) AS corr,
+             MAX(last_success_at) AS last_ok
+        FROM form_sync_status
+       WHERE id_camp = ?$anneeClause
+       GROUP BY id_etab
+      ''',
+      args,
+    );
+    final out = <String, SchoolSyncSummary>{};
+    for (final r in rows) {
+      final id = r['id_etab'] as String;
+      out[id] = SchoolSyncSummary(
+        idEtab: id,
+        total: (r['total'] as int?) ?? 0,
+        sent: (r['sent'] as int?) ?? 0,
+        pending: (r['pending'] as int?) ?? 0,
+        failed: (r['failed'] as int?) ?? 0,
+        locked: (r['locked'] as int?) ?? 0,
+        lastSuccessAt: r['last_ok'] == null
+            ? null
+            : DateTime.tryParse(r['last_ok'].toString()),
+        correctionRequested: ((r['corr'] as int?) ?? 0) > 0,
+      );
+    }
+    return out;
+  }
+
+  /// Nombre de formulaires en attente / en échec pour une campagne (bannière U05).
+  Future<int> countUnsentForms(String idCamp, {String codeTypeAnnee = ''}) async {
+    final pend = await getPendingForms(idCamp, codeTypeAnnee: codeTypeAnnee);
+    return pend.length;
+  }
+
+  /// U17 — Réconciliation avec la vérité serveur (sync_status_ws.php /camp).
+  /// [serverThemes] : pour un établissement, Map<idQst, {statut, date, adminStatus, adminComment}>.
+  /// Règle : si le serveur dit OK avec une date ≥ dernière modification locale ET que
+  /// le statut local est pending/failed/kosave → passe 'sent' (réponse perdue).
+  /// Si le serveur signale VALIDE/VERROUILLE → 'locked'. Sinon on ne touche pas.
+  Future<int> reconcileSchoolWithServer({
+    required String idCamp,
+    required String idEtab,
+    required String codeTypeAnnee,
+    required Map<String, Map<String, dynamic>> serverThemes,
+  }) async {
+    final db = await database;
+    int changed = 0;
+    final rows = await db.query(
+      'form_sync_status',
+      where: 'code_type_annee = ? AND id_camp = ? AND id_etab = ?',
+      whereArgs: [codeTypeAnnee, idCamp, idEtab],
+    );
+    for (final r in rows) {
+      final fs = _rowToSyncStatus(r);
+      final sv = serverThemes[fs.idQst];
+      if (sv == null) continue;
+      final srvStatus = sv['statut']?.toString();
+      final srvDateRaw = sv['date']?.toString();
+      DateTime? srvDate;
+      if (srvDateRaw != null && srvDateRaw.isNotEmpty) {
+        srvDate = DateTime.tryParse(srvDateRaw.replaceAll('/', '-'));
+      }
+      final adminStatus = sv['statut_admin']?.toString();
+      final adminComment = sv['commentaire']?.toString();
+      final values = <String, Object?>{
+        'server_status': srvStatus,
+        if (srvDate != null && (srvStatus == 'OK' || srvStatus == 'VIDE'))
+          'server_last_ok': srvDate.toIso8601String(),
+        'admin_status': adminStatus,
+        'admin_comment': adminComment,
+      };
+      String? newStatus;
+      if (adminStatus == 'VALIDE' || adminStatus == 'VERROUILLE') {
+        newStatus = SyncStatus.locked.code;
+      } else if (fs.status == SyncStatus.locked) {
+        // Verrou levé côté serveur → repasse en sent (les données sont celles du serveur)
+        newStatus = SyncStatus.sent.code;
+      } else if ((srvStatus == 'OK' || srvStatus == 'VIDE') &&
+          fs.status.needsSend &&
+          srvDate != null &&
+          (fs.localUpdatedAt == null || !srvDate.isBefore(fs.localUpdatedAt!))) {
+        newStatus = SyncStatus.sent.code;
+        values['last_success_at'] = srvDate.toIso8601String();
+        values['last_error'] = null;
+      }
+      if (newStatus != null) values['status'] = newStatus;
+      await db.update(
+        'form_sync_status',
+        values,
+        where:
+            'code_type_annee = ? AND id_camp = ? AND id_etab = ? AND id_qst = ? AND id_filter = ?',
+        whereArgs: [fs.codeTypeAnnee, fs.idCamp, fs.idEtab, fs.idQst, fs.idFilter],
+      );
+      if (newStatus == SyncStatus.sent.code) {
+        // is_sent compat
+        await db.rawUpdate(
+          'UPDATE collected_data SET is_sent = 1 WHERE code_type_annee = ? AND id_camp = ? AND id_etab = ? AND id_qst = ? AND COALESCE(id_filter,\'\') = ?',
+          [fs.codeTypeAnnee, fs.idCamp, fs.idEtab, fs.idQst, fs.idFilter],
+        );
+      }
+      if (newStatus != null) changed++;
+    }
+    return changed;
+  }
+
+  // ─── sync_feedback (U19) ────────────────────────────────────────────────────
+
+  /// Remplace les feedbacks d'une campagne/année par ceux reçus du serveur.
+  Future<void> replaceSyncFeedback(
+    String idCamp,
+    String codeTypeAnnee,
+    List<SyncFeedback> items,
+  ) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete(
+        'sync_feedback',
+        where: 'id_camp = ? AND code_type_annee = ?',
+        whereArgs: [idCamp, codeTypeAnnee],
+      );
+      for (final f in items) {
+        await txn.insert(
+          'sync_feedback',
+          {
+            'id_camp': f.idCamp,
+            'code_type_annee': f.codeTypeAnnee,
+            'id_etab': f.idEtab,
+            'id_qst': f.idQst ?? '',
+            'id_filter': f.idFilter ?? '',
+            'statut': f.statut,
+            'commentaire': f.commentaire,
+            'admin': f.admin,
+            'date_statut': f.date,
+            'fetched_at': f.fetchedAt.toIso8601String(),
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+  }
+
+  Future<List<SyncFeedback>> getSyncFeedback(
+    String idCamp, {
+    String codeTypeAnnee = '',
+    String? idEtab,
+  }) async {
+    final db = await database;
+    final where = StringBuffer('id_camp = ? AND code_type_annee = ?');
+    final args = <Object?>[idCamp, codeTypeAnnee];
+    if (idEtab != null) {
+      where.write(' AND id_etab = ?');
+      args.add(idEtab);
+    }
+    final rows = await db.query('sync_feedback',
+        where: where.toString(), whereArgs: args);
+    return rows
+        .map((r) => SyncFeedback(
+              idCamp: r['id_camp'] as String,
+              codeTypeAnnee: (r['code_type_annee'] as String?) ?? '',
+              idEtab: r['id_etab'] as String,
+              idQst: ((r['id_qst'] as String?) ?? '').isEmpty
+                  ? null
+                  : r['id_qst'] as String,
+              idFilter: ((r['id_filter'] as String?) ?? '').isEmpty
+                  ? null
+                  : r['id_filter'] as String,
+              statut: r['statut'] as String,
+              commentaire: (r['commentaire'] as String?) ?? '',
+              admin: (r['admin'] as String?) ?? '',
+              date: (r['date_statut'] as String?) ?? '',
+              fetchedAt: DateTime.tryParse(r['fetched_at'].toString()) ??
+                  DateTime.now(),
+            ))
+        .toList();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // COHERENCE RULES — CRUD for offline evaluation
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -2105,6 +2647,8 @@ class DatabaseService {
     final db = await database;
     await db.transaction((txn) async {
       for (final table in [
+        'sync_feedback',       // AK-SYNC v9
+        'form_sync_status',    // AK-SYNC v9
         'dico_regle_theme_assoc',
         'dico_regle_theme',
         'coherence_rules',
