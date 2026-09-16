@@ -2461,6 +2461,53 @@ class DatabaseService {
     return changed;
   }
 
+  /// U19/U21 — Applique les feedbacks admin (A_CORRIGER / VALIDE / VERROUILLE) aux
+  /// lignes form_sync_status de la campagne : admin_status/admin_comment, et
+  /// status='locked' pour VALIDE/VERROUILLE. Les formulaires précédemment 'locked'
+  /// dont le verrou a disparu repassent 'sent' (données = serveur).
+  /// Un feedback sans id_qst s'applique à tous les thèmes de l'établissement.
+  Future<void> applyFeedbackToSyncStatus(
+    String idCamp,
+    String codeTypeAnnee,
+    List<SyncFeedback> items,
+  ) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      // 1. Réinitialise les marqueurs admin de la campagne (le serveur est source de vérité)
+      await txn.rawUpdate(
+        "UPDATE form_sync_status SET admin_status = NULL, admin_comment = NULL, "
+        "status = CASE WHEN status = 'locked' THEN 'sent' ELSE status END "
+        "WHERE id_camp = ? AND code_type_annee = ?",
+        [idCamp, codeTypeAnnee],
+      );
+      // 2. Applique chaque feedback (les plus spécifiques — avec id_qst — en dernier)
+      final sorted = List<SyncFeedback>.from(items)
+        ..sort((a, b) => (a.idQst == null ? 0 : 1).compareTo(b.idQst == null ? 0 : 1));
+      for (final f in sorted) {
+        final where = StringBuffer('id_camp = ? AND code_type_annee = ? AND id_etab = ?');
+        final args = <Object?>[idCamp, codeTypeAnnee, f.idEtab];
+        if (f.idQst != null) { where.write(' AND id_qst = ?'); args.add(f.idQst); }
+        if (f.idFilter != null) { where.write(' AND id_filter = ?'); args.add(f.idFilter); }
+        final values = <String, Object?>{
+          'admin_status': f.statut,
+          'admin_comment': f.commentaire,
+          if (f.isLock) 'status': SyncStatus.locked.code,
+        };
+        final n = await txn.update('form_sync_status', values, where: where.toString(), whereArgs: args);
+        // Formulaire jamais saisi localement mais verrouillé/à corriger côté serveur :
+        // créer la ligne pour que le badge apparaisse quand même.
+        if (n == 0 && f.idQst != null) {
+          await txn.insert('form_sync_status', {
+            'code_type_annee': codeTypeAnnee, 'id_camp': idCamp, 'id_etab': f.idEtab,
+            'id_qst': f.idQst, 'id_filter': f.idFilter ?? '',
+            'status': f.isLock ? SyncStatus.locked.code : SyncStatus.sent.code,
+            'admin_status': f.statut, 'admin_comment': f.commentaire, 'attempts': 0,
+          }, conflictAlgorithm: ConflictAlgorithm.ignore);
+        }
+      }
+    });
+  }
+
   // ─── sync_feedback (U19) ────────────────────────────────────────────────────
 
   /// Remplace les feedbacks d'une campagne/année par ceux reçus du serveur.
