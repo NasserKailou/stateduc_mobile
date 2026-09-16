@@ -90,3 +90,28 @@ BEGIN
         DATE_HIST          VARCHAR(19)  NOT NULL
     );
 END;
+
+-- ---------------------------------------------------------------------------
+-- U14 / U26 : entrees de menu (DICO_MENU + DICO_TRADUCTION + ADMIN_DROITS)
+-- Les fichiers client-side/js/menus/*/_menu_princ.js ont ete mis a jour directement ;
+-- ces INSERT garantissent que « Generation Menus » (administration.php?val=genmenu)
+-- conserve les entrees. Pere = 30605 (« Suivi Saisie Donnees »), precedent = 30625.
+-- Colonnes supposees d'apres menu.class.php : ID, PERE, PRECEDENT, ACTION_MENU, TAILLE, TYPE_MENU.
+-- Adapter si DICO_MENU possede des colonnes NOT NULL supplementaires.
+-- ---------------------------------------------------------------------------
+IF NOT EXISTS (SELECT 1 FROM DICO_MENU WHERE ID = 30626)
+BEGIN
+    INSERT INTO DICO_MENU (ID, PERE, PRECEDENT, ACTION_MENU, TAILLE, TYPE_MENU) VALUES (30626, 30605, 30625, 'administration.php?val=suivi_sync_mobile', 145, 1);
+    INSERT INTO DICO_TRADUCTION (CODE_NOMENCLATURE, NOM_TABLE, CODE_LANGUE, LIBELLE) VALUES (30626, 'DICO_MENU', 'fr',  'Suivi Synchronisation Mobile');
+    INSERT INTO DICO_TRADUCTION (CODE_NOMENCLATURE, NOM_TABLE, CODE_LANGUE, LIBELLE) VALUES (30626, 'DICO_MENU', 'eng', 'Mobile Sync Monitoring');
+    INSERT INTO ADMIN_DROITS (ID_MENU, CODE_GROUPE) VALUES (30626, 1);
+END;
+IF NOT EXISTS (SELECT 1 FROM DICO_MENU WHERE ID = 30627)
+BEGIN
+    INSERT INTO DICO_MENU (ID, PERE, PRECEDENT, ACTION_MENU, TAILLE, TYPE_MENU) VALUES (30627, 30605, 30626, 'administration.php?val=feedbacks', 145, 1);
+    INSERT INTO DICO_TRADUCTION (CODE_NOMENCLATURE, NOM_TABLE, CODE_LANGUE, LIBELLE) VALUES (30627, 'DICO_MENU', 'fr',  'Retours aux Collecteurs (mail)');
+    INSERT INTO DICO_TRADUCTION (CODE_NOMENCLATURE, NOM_TABLE, CODE_LANGUE, LIBELLE) VALUES (30627, 'DICO_MENU', 'eng', 'Collectors Feedbacks (mail)');
+    INSERT INTO ADMIN_DROITS (ID_MENU, CODE_GROUPE) VALUES (30627, 1);
+END;
+-- Mettre a jour le chainage : l'ancien suivant de 30625 (30615) doit maintenant suivre 30627
+UPDATE DICO_MENU SET PRECEDENT = 30627 WHERE ID = 30615 AND PRECEDENT = 30625;
