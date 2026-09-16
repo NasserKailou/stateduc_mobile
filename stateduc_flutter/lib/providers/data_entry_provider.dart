@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/question.dart';
 import '../models/user.dart';
+import '../models/sync_status.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 import '../services/coherence_evaluator.dart';
@@ -118,6 +119,22 @@ class DataEntryProvider extends ChangeNotifier {
   // Évite d'évaluer la cohérence à chaque frappe — attend 800 ms d'inactivité.
   Timer? _coherenceDebounce;
 
+  // ─── AK-SYNC (ak_burundi) — état de synchronisation ─────────────────────────
+  /// U25 — verrou global : un seul envoi à la fois (unitaire OU global), tous écrans.
+  static bool _globalSendLock = false;
+  static bool get isAnySendRunning => _globalSendLock;
+
+  /// U04/U05 — état de sync par formulaire de l'établissement courant (clé = FormSyncStatus.key).
+  Map<String, FormSyncStatus> _syncStatuses = {};
+  /// État du formulaire courant (thème + période sélectionnés).
+  FormSyncStatus? _currentSyncStatus;
+  /// U06 — résultats détaillés du dernier envoi global.
+  List<SendOutcome> _lastBatchOutcomes = [];
+  /// U19 — feedbacks admin (corrections / verrous) de l'établissement courant.
+  List<SyncFeedback> _feedbacks = [];
+  /// U08 — dernier accusé de réception serveur.
+  ServerAck? _lastAck;
+
   // ─── Questions conditionnelles (Fix #5) ─────────────────────────────────────
   // Règles extraites du HTML du formulaire courant lors de selectQuestion().
   // Réévaluées à chaque updateField() pour les champs sources.
@@ -171,6 +188,69 @@ class DataEntryProvider extends ChangeNotifier {
   /// Ensemble des noms de champs actuellement désactivés (Fix #5 — questions conditionnelles).
   /// Mis à jour à chaque appel de updateField() sur un champ source.
   Set<String> get disabledFields => Set.unmodifiable(_disabledFields);
+
+  // ─── AK-SYNC getters ────────────────────────────────────────────────────────
+  FormSyncStatus? get currentSyncStatus => _currentSyncStatus;
+  List<SendOutcome> get lastBatchOutcomes => List.unmodifiable(_lastBatchOutcomes);
+  List<SyncFeedback> get feedbacks => List.unmodifiable(_feedbacks);
+  ServerAck? get lastAck => _lastAck;
+
+  /// Statut de sync d'un thème (toutes périodes confondues) pour les chips (U05).
+  /// Priorité d'affichage : locked > failed/kosave/rejected > pending > sent > null (jamais saisi).
+  SyncStatus? syncStatusForQuestion(String idQst) {
+    SyncStatus? best;
+    int rank(SyncStatus s) {
+      switch (s) {
+        case SyncStatus.locked: return 5;
+        case SyncStatus.kosave:
+        case SyncStatus.failed:
+        case SyncStatus.rejected: return 4;
+        case SyncStatus.pending: return 3;
+        case SyncStatus.sent: return 1;
+      }
+    }
+    for (final s in _syncStatuses.values) {
+      if (s.idQst != idQst) continue;
+      if (best == null || rank(s.status) > rank(best)) best = s.status;
+    }
+    return best;
+  }
+
+  /// Le formulaire courant est-il verrouillé par l'administration (U20/U21) ?
+  bool get isCurrentFormLocked {
+    if (_currentSyncStatus?.isLocked == true) return true;
+    final q = _selectedQuestion?.idQst;
+    if (q == null) return false;
+    return _feedbacks.any((f) => f.isLock && f.appliesTo(q, _selectedFilter?.idFilter));
+  }
+
+  /// Demande de correction admin applicable au formulaire courant (U19), sinon null.
+  SyncFeedback? get currentCorrectionRequest {
+    final q = _selectedQuestion?.idQst;
+    if (q == null) return null;
+    for (final f in _feedbacks) {
+      if (f.isCorrection && f.appliesTo(q, _selectedFilter?.idFilter)) return f;
+    }
+    return null;
+  }
+
+  /// Recharge l'état de sync de l'établissement courant depuis SQLite.
+  Future<void> refreshSyncStatuses() async {
+    if (_idCamp == null || _idEtab == null) return;
+    final list = await _db.getFormSyncStatusesForSchool(
+      idCamp: _idCamp!, idEtab: _idEtab!, codeTypeAnnee: _codeyear ?? '');
+    _syncStatuses = {for (final s in list) s.key: s};
+    _feedbacks = await _db.getSyncFeedback(_idCamp!, codeTypeAnnee: _codeyear ?? '', idEtab: _idEtab!);
+    _refreshCurrentSyncStatus();
+    notifyListeners();
+  }
+
+  void _refreshCurrentSyncStatus() {
+    final q = _selectedQuestion?.idQst;
+    if (q == null || _idCamp == null || _idEtab == null) { _currentSyncStatus = null; return; }
+    final key = '${_codeyear ?? ''}|$_idCamp|$_idEtab|$q|${_selectedFilter?.idFilter ?? ''}';
+    _currentSyncStatus = _syncStatuses[key];
+  }
 
   // SESSION 58 — FIX KOSAVE 10502 : filtre effectif côté serveur
   //
