@@ -64,6 +64,46 @@ Voir `docs/session_sync/GUIDE_DEPLOIEMENT_AK_BURUNDI.md` (ordre : sauvegarde →
 
 ---
 
+## [v1.5.0] — 2026-09-16 — Synchronisation mobile traçable, idempotence, ACK enrichi, suivi admin (branche `ak_burundi`, U08–U11, U13–U16, U18–U20, U22–U27)
+
+### Contexte
+
+Implémentation des recommandations validées du diagnostic `docs/session_sync/DIAGNOSTIC_SYNCHRONISATION_TRACABILITE.md`.
+PHP 7.3 natif, Slim 2, ADODB (SQL Server / Access). **Rétro-compatible avec l'APK actuel** : tout nouveau
+comportement est soit additif (`se_ack`, `se_code`), soit désactivé par défaut via `params.php`.
+
+### Base de données (U09, U18) — `server-side/sql/migration_sync_tracabilite_{sqlserver,access}.sql`
+- `DATA_SAVING_LOGS` : `SYNC_ID`, `SYNC_HASH`, `NB_INSERT/UPDATE/DELETE/UNCHANGED`, `MESSAGE_ERREUR`, `APP_VERSION`, `IP_CLIENT` + index. Additif, idempotent (SQL Server).
+- Tables `SYNC_ETAB_STATUT` (RECU / A_CORRIGER / VALIDE / VERROUILLE) et `SYNC_ETAB_STATUT_HIST` ; entrées `DICO_MENU` 30626 / 30627.
+
+### Réception mobile — `data_save.php`, `sync_lib.php` (nouveau), `grille.class.php`, `questionnaire_ws.php`
+- **U08** ACK enrichi `se_ack` (sync_id, server_time, clé, compteurs I/U/D/= issus de `comparer()`/`maj_bdd()` via `MAJ_STATS=`, duplicate, warning).
+- **U10** rejets journalisés avec motif : `REJET_ANNEE`, `REJET_ACCES`, `REJET_CAMP_FERMEE`, `REJET_VERROU`, `DUPLICATE` ; `se_code` machine (`YEAR_MISMATCH`, `ACCESS_DENIED`, `SURVEY_CLOSED`, `FORM_LOCKED`, `INTERNAL_CURL_ERROR`).
+- **U11/U22** idempotence : en-tête `X-Sync-Id` (ou `_sync_id`) + empreinte `SYNC_HASH` sha1 du POST dans la fenêtre `MOBILE_DUPLICATE_WINDOW_MIN` ⇒ `OKSAVE duplicate=true` **sans** re-sauvegarde.
+- **U20** rejet `FORM_LOCKED` si le formulaire est `VALIDE`/`VERROUILLE` (`MOBILE_ENFORCE_LOCK`) ; **U18** passage automatique `A_CORRIGER → RECU` après OKSAVE.
+- **U23** `MOBILE_CHECK_SURVEY_STATUS` (défaut `false`) ; **U24** `MOBILE_NO_DELETE_ON_PARTIAL` (défaut `false`) : D→R sur POST mobile partiel, compteur `g` dans l'ACK.
+- **U13** `data_reload.php` : route additionnelle `/theme_data/…/:id_annee` (route historique conservée), polyfills PHP 8 gardés.
+
+### Web services de lecture (U16, U19) — `sync_status_ws.php` (nouveau)
+- `/etab`, `/camp`, `/feedback` (HttpAuth) : statut serveur par établissement × thème, verrous et demandes de correction. Fail-safe si la migration n'est pas appliquée.
+
+### Administration (U14, U15, U18) — `suivi_sync_mobile.php`, `suivi_sync_mobile_service.php`, `administration.php`, menus JS
+- Écran **Suivi synchronisation mobile** : matrice établissements × thèmes (COMPLET / PARTIEL / ERREUR / VIDE / AUCUN), filtres campagne / année / chaîne, drill-down, détail historique par formulaire, export CSV.
+- Actions : Demander correction (commentaire), Valider, Verrouiller, Rouvrir — historisées dans `SYNC_ETAB_STATUT_HIST`.
+
+### Divers
+- **U26** `remind_collectors.php` : SMTP externalisé dans `params.php` (`MAIL_HOST/PORT/USER/PASSWORD/SECURE`), plus de secret en dur, relance ignorée si `MAIL_HOST` vide.
+- **U27** `suivi_saisie_list_etabs.php`, `ctrl_collectors_feedbacks.php`, `remind_collectors.php`, `sms_sync.php` : `(CODE_PERIODE = ? OR CODE_PERIODE IS NULL)` — les thèmes sans période ne sont plus comptés comme manquants.
+
+### Paramètres ajoutés (`params.php`, défauts = comportement actuel)
+`MOBILE_CHECK_SURVEY_STATUS=false`, `MOBILE_NO_DELETE_ON_PARTIAL=false`, `MOBILE_DUPLICATE_WINDOW_MIN=30`, `MOBILE_ENFORCE_LOCK=true`, `MOBILE_CODE_GROUPE=4`, `MAIL_SECURE=""`.
+
+### Vérification
+- `php -l` OK sur tous les fichiers modifiés/créés (`sms_sync.php` : erreur PHP 8 préexistante non liée, syntaxe PHP 7.3 valide).
+- Guide de déploiement : `docs/session_sync/GUIDE_DEPLOIEMENT_AK_BURUNDI.md`.
+
+---
+
 ## [v1.4.0] — 2026-07 — Correctif définitif : 127.0.0.1:PORT_LOCAL + Host header (bypass Fortinet/NAT)
 
 ### Topologie réelle expliquée par l'utilisateur
