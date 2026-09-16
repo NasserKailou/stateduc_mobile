@@ -2064,10 +2064,15 @@ class FormLockedException implements Exception {
   });
 
   @override
-  String toString() =>
-      'Formulaire $statut par l\'administration'
-      '${admin.isNotEmpty ? ' ($admin' : ''}${date.isNotEmpty ? (admin.isNotEmpty ? ', $date)' : ' ($date)') : (admin.isNotEmpty ? ')' : '')}'
-      '${commentaire.isNotEmpty ? ' : $commentaire' : ''}';
+  String toString() {
+    final who = <String>[];
+    if (admin.isNotEmpty) who.add(admin);
+    if (date.isNotEmpty) who.add(date);
+    final buf = StringBuffer('Formulaire $statut par l\'administration');
+    if (who.isNotEmpty) buf.write(' [${who.join(', ')}]');
+    if (commentaire.isNotEmpty) buf.write(' : $commentaire');
+    return buf.toString();
+  }
 }
 
 /// SESSION 53 — Exception levée quand le serveur retourne KOSAVE.
