@@ -287,15 +287,19 @@ $app->get('/revision_zip/:user_login/:rev_num', function ($user_login, $rev_num)
 
 $app->run();
  
+if (!function_exists('str_starts_with')) { // AK-SYNC : polyfill garde (PHP 8 fournit deja la fonction)
 function str_starts_with($haystack, $needle)
 {
     return substr_compare($haystack, $needle, 0, strlen($needle)) 
            === 0;
 }
+}
+if (!function_exists('str_ends_with')) { // AK-SYNC : polyfill garde (PHP 8 fournit deja la fonction)
 function str_ends_with($haystack, $needle)
 {
     return substr_compare($haystack, $needle, -strlen($needle)) 
            === 0;
+}
 }
 
 function sendList($liste) {
