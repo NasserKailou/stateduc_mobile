@@ -1713,6 +1713,11 @@ class DataEntryProvider extends ChangeNotifier {
     // Regroupement des écoles (LOC_REG_0) — lu une fois
     final schools = await _db.getSchools(idCamp);
     final regroupByEtab = {for (final s in schools) s.idEtab: s.idRegroup};
+    // Libellés nominatifs pour le dialogue de résultat (U06)
+    final libEtabById = {for (final s in schools) s.idEtab: s.libEtab};
+    final libQstById  = {for (final q in questions) q.idQst: q.libQst};
+    SendOutcome labeled(SendOutcome o) =>
+        o.withLabels(libEtab: libEtabById[o.idEtab], libQst: libQstById[o.idQst]);
 
     final total = forms.length;
     int done = 0;
@@ -1732,8 +1737,8 @@ class DataEntryProvider extends ChangeNotifier {
         // Verrou admin connu localement → on n'envoie pas (évite REJET_VERROU)
         final locked = feedbacks.any((fb) => fb.idEtab == etabId && fb.isLock && fb.appliesTo(qstId, localFilter));
         if (locked) {
-          outcomes.add(SendOutcome(kind: SendOutcomeKind.locked, idEtab: etabId, idQst: qstId,
-              idFilter: localFilter, message: 'Verrouillé par l\'administration'));
+          outcomes.add(labeled(SendOutcome(kind: SendOutcomeKind.locked, idEtab: etabId, idQst: qstId,
+              idFilter: localFilter, message: 'Verrouillé par l\'administration')));
           done++; onProgress?.call(done, total); continue;
         }
 
@@ -1741,7 +1746,7 @@ class DataEntryProvider extends ChangeNotifier {
           idCamp: idCamp, idEtab: etabId, idQst: qstId, idFilter: localFilter,
           codeTypeAnnee: _codeyear ?? '');
         if (data.isEmpty) {
-          outcomes.add(SendOutcome(kind: SendOutcomeKind.noData, idEtab: etabId, idQst: qstId, idFilter: localFilter));
+          outcomes.add(labeled(SendOutcome(kind: SendOutcomeKind.noData, idEtab: etabId, idQst: qstId, idFilter: localFilter)));
           done++; onProgress?.call(done, total); continue;
         }
         final outcome = await _sendOneForm(
@@ -1756,7 +1761,7 @@ class DataEntryProvider extends ChangeNotifier {
           etabRegroupId:   regroupByEtab[etabId],
           isFirstQuestion: firstQst != null && firstQst == qstId,
         );
-        outcomes.add(outcome);
+        outcomes.add(labeled(outcome));
         done++; onProgress?.call(done, total);
       }
       _lastBatchOutcomes = outcomes;

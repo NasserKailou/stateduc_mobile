@@ -9,6 +9,7 @@ import '../../widgets/dynamic_form/dynamic_form_widget.dart';
 import '../../widgets/common/loading_overlay.dart';
 import '../../models/user.dart';  // FilterPeriod
 import '../../models/sync_status.dart';  // AK-SYNC : SyncStatus, SendOutcome, SyncFeedback
+import '../../widgets/sync/sync_widgets.dart';  // AK-SYNC : couleurs/icônes, dialogue résultat
 import '../../services/coherence_evaluator.dart';  // OfflineCoherenceError
 import '../../services/theme_rule_engine.dart';     // ThemeCoherenceError
 
@@ -802,88 +803,23 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   }
 
   /// AK-SYNC U06 : dialogue de résultat d'un envoi groupé, avec la liste
-  /// nominative des formulaires en échec et un bouton « Réessayer les échecs ».
+  /// nominative des formulaires en échec et un bouton « Réessayer les échecs »
+  /// (widget partagé : widgets/sync/sync_widgets.dart).
   Future<void> _showBatchResult(BuildContext context, AuthProvider auth,
       DataEntryProvider entry, List<SendOutcome> outcomes) async {
-    final okCount   = outcomes.where((o) => o.isSuccess).length;
-    final failures  = outcomes.where((o) => o.isFailure).toList();
-    final skipped   = outcomes.where((o) => !o.isSuccess && !o.isFailure).length;
-    final retryable = failures.where((o) => o.kind != SendOutcomeKind.locked).isNotEmpty;
-    final hasError  = entry.error != null;
-
-    final action = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(children: [
-          Icon(
-            hasError || failures.isNotEmpty ? Icons.warning_amber_rounded : Icons.check_circle_outline,
-            color: hasError || failures.isNotEmpty ? Colors.orange : Colors.green,
-          ),
-          const SizedBox(width: 8),
-          const Text('Résultat de l\'envoi'),
-        ]),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('✅  $okCount formulaire(s) envoyé(s) avec succès'),
-              if (skipped > 0) Text('ℹ️  $skipped formulaire(s) ignoré(s) (aucune donnée locale)'),
-              if (failures.isNotEmpty) ...[
-                Text('⚠️  ${failures.length} formulaire(s) non envoyé(s) :',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 6),
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: failures.map((o) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3),
-                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Icon(
-                          o.kind == SendOutcomeKind.locked ? Icons.lock_outline : Icons.error_outline,
-                          size: 16,
-                          color: o.kind == SendOutcomeKind.locked ? Colors.deepPurple : Colors.red,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            _describeOutcome(entry, o),
-                            style: const TextStyle(fontSize: 12.5),
-                          ),
-                        ),
-                      ]),
-                    )).toList(),
-                  ),
-                ),
-              ],
-              if (hasError) ...[
-                const SizedBox(height: 8),
-                Text(entry.error ?? '',
-                    style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13)),
-              ],
-            ],
-          ),
-        ),
-        actions: [
-          if (retryable)
-            OutlinedButton.icon(
-              onPressed: () => Navigator.pop(ctx, 'retry'),
-              icon: const Icon(Icons.replay),
-              label: const Text('Réessayer les échecs'),
-            ),
-          ElevatedButton(onPressed: () => Navigator.pop(ctx, 'close'), child: const Text('Fermer')),
-        ],
-      ),
+    await showBatchResultDialog(
+      context,
+      outcomes: outcomes,
+      providerError: entry.error,
+      describe: (o) => _describeOutcome(entry, o),
+      onRetry: auth.user == null
+          ? null
+          : () => entry.retryFailedOutcomes(
+                user: auth.user!,
+                idCamp: widget.campaign.idCamp,
+                idSystem: widget.idSystem,
+              ),
     );
-    if (action == 'retry' && mounted && auth.user != null) {
-      final again = await entry.retryFailedOutcomes(
-        user: auth.user!,
-        idCamp: widget.campaign.idCamp,
-        idSystem: widget.idSystem,
-      );
-      if (mounted) await _showBatchResult(context, auth, entry, again);
-    }
   }
 
   /// Libellé nominatif d'un résultat (thème résolu via la liste des questions).
@@ -1763,37 +1699,6 @@ class _OfflineCoherenceBanner extends StatelessWidget {
   }
 }
 
-// ─── AK-SYNC — helpers visuels d'état de synchronisation (U05) ───────────────
-/// Couleur associée à un état de synchronisation.
-Color syncStatusColor(SyncStatus s) {
-  switch (s) {
-    case SyncStatus.sent:     return const Color(0xFF2E7D32); // vert
-    case SyncStatus.pending:  return const Color(0xFFF9A825); // jaune/orangé
-    case SyncStatus.failed:   return const Color(0xFFC62828); // rouge
-    case SyncStatus.kosave:   return const Color(0xFFEF6C00); // orange
-    case SyncStatus.rejected: return const Color(0xFFC62828); // rouge
-    case SyncStatus.locked:   return const Color(0xFF6A1B9A); // violet
-  }
-}
-
-/// Icône associée à un état de synchronisation.
-IconData syncStatusIcon(SyncStatus s) {
-  switch (s) {
-    case SyncStatus.sent:     return Icons.cloud_done_rounded;
-    case SyncStatus.pending:  return Icons.schedule_rounded;
-    case SyncStatus.failed:   return Icons.cloud_off_rounded;
-    case SyncStatus.kosave:   return Icons.report_problem_rounded;
-    case SyncStatus.rejected: return Icons.block_rounded;
-    case SyncStatus.locked:   return Icons.lock_rounded;
-  }
-}
-
-String _fmtDateTime(DateTime? d) {
-  if (d == null) return '—';
-  String two(int n) => n < 10 ? '0$n' : '$n';
-  return '${two(d.day)}/${two(d.month)}/${d.year} ${two(d.hour)}:${two(d.minute)}';
-}
-
 // ─── AK-SYNC U05/U08 — Ligne d'état de synchronisation du formulaire courant ──
 /// Affiche sous le bandeau : état (pastille + libellé), dernier envoi réussi,
 /// dernière erreur, et le contenu du dernier accusé de réception serveur
@@ -1823,7 +1728,7 @@ class _SyncStatusLine extends StatelessWidget {
     final status = st?.status ?? SyncStatus.sent;
     final color  = syncStatusColor(status);
     final parts = <String>[];
-    if (st?.lastSuccessAt != null) parts.add('dernier envoi OK : ${_fmtDateTime(st!.lastSuccessAt)}');
+    if (st?.lastSuccessAt != null) parts.add('dernier envoi OK : ${fmtSyncDate(st!.lastSuccessAt)}');
     if (st != null && st.attempts > 0 && status.needsSend) parts.add('${st.attempts} tentative(s)');
     if (st?.adminStatus != null && st!.adminStatus!.isNotEmpty && st.adminStatus != 'RECU') {
       parts.add('admin : ${st.adminStatus}');

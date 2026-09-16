@@ -254,6 +254,13 @@ class SendOutcome {
     this.lockInfo,
   });
 
+  /// Copie avec libellés nominatifs (établissement / thème) pour l'affichage (U06).
+  SendOutcome withLabels({String? libEtab, String? libQst}) => SendOutcome(
+        kind: kind, idEtab: idEtab, idQst: idQst, idFilter: idFilter,
+        libEtab: libEtab ?? this.libEtab, libQst: libQst ?? this.libQst,
+        message: message, ack: ack, serverCode: serverCode, lockInfo: lockInfo,
+      );
+
   /// Clé historique « etab_qst[_filtre] » (compat Map<String,bool>).
   String get key => '${idEtab}_$idQst${(idFilter ?? '').isEmpty ? '' : '_$idFilter'}';
   String get keyWithoutEtab => '$idQst${(idFilter ?? '').isEmpty ? '' : '_$idFilter'}';
