@@ -141,6 +141,31 @@
 	$GLOBALS['PARAM']['MAIL_PORT']			        			=	"";
 	$GLOBALS['PARAM']['MAIL_USERNAME']			        		=	"";
 	$GLOBALS['PARAM']['MAIL_PASSWORD']			        		=	"";
+	// U26 : SMTP securise (TLS/SSL) — utilise par remind_collectors.php. Vide = 'tls' par defaut.
+	$GLOBALS['PARAM']['MAIL_SECURE']			        		=	"";
+	$GLOBALS['PARAM']['MAIL_SUBJECT_REMINDER']	        		=	"StatEduc - Rappel envoi de donnees";
+
+	// ---------------------------------------------------------------------------
+	// AK-SYNC (ak_burundi) — Parametres synchronisation / tracabilite mobile
+	// Tous ces parametres ont une VALEUR PAR DEFAUT QUI PRESERVE LE COMPORTEMENT ACTUEL.
+	// ---------------------------------------------------------------------------
+	// U23 : controle du statut de campagne (RECENSEMENT_STATUT) avant sauvegarde mobile.
+	//       false = comportement historique ($survey_curr_status force a 2, jamais bloque).
+	$GLOBALS['PARAM']['MOBILE_CHECK_SURVEY_STATUS']				=	false;
+	// U24 : garde anti-suppression — pour les POST mobiles, si la matrice recue contient
+	//       moins de lignes que la base pour une table mere, les 'D' sont convertis en 'R'
+	//       (aucune suppression). false = comportement SISED historique (suppression).
+	$GLOBALS['PARAM']['MOBILE_NO_DELETE_ON_PARTIAL']				=	false;
+	// U11/U22 : idempotence. Fenetre (minutes) pendant laquelle un meme SYNC_ID ou un meme
+	//       SYNC_HASH deja OKSAVE renvoie immediatement OKSAVE duplicate=true sans re-sauvegarder.
+	//       0 = desactive le court-circuit par hash (le court-circuit par SYNC_ID reste actif).
+	$GLOBALS['PARAM']['MOBILE_DUPLICATE_WINDOW_MIN']			=	30;
+	// U20 : rejet FORM_LOCKED quand SYNC_ETAB_STATUT = VALIDE|VERROUILLE. true recommande.
+	//       Ne bloque que si un administrateur a explicitement verrouille/valide.
+	$GLOBALS['PARAM']['MOBILE_ENFORCE_LOCK']					=	true;
+	// Groupe ADMIN_USERS des agents mobiles (decision C10 : 4).
+	$GLOBALS['PARAM']['MOBILE_CODE_GROUPE']						=	4;
+
 	$GLOBALS['PARAM']['SMS_GATEWAY_URL']			        	=	"http://192.168.100.4:8766/";
 	$GLOBALS['PARAM']['SMS_GATEWAY_KEY']			        	=	"918273";
 ?>
