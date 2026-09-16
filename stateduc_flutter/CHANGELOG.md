@@ -2,9 +2,113 @@
 
 **Auteur :** Abdoul Nasser Kailou  
 **Projet :** PAQABU / UNESCO — MEN Burundi  
-**Branche :** ak_secure
+**Branche :** ak_burundi (issue de ak_secure)
 
 Historique complet des modifications apportées à l'application Flutter StatEduc Mobile.
+
+---
+
+## [v1.3.0] — 2026-09-16 — Synchronisation traçable : états par formulaire, ACK serveur, envoi ciblé, verrous & corrections admin (branche `ak_burundi`, U01–U25)
+
+### Contexte
+Mise en œuvre des upgrades mobiles validés dans `docs/session_sync/DIAGNOSTIC_SYNCHRONISATION_TRACABILITE.md`.
+Objectif : l'agent sait **exactement** ce qui a été reçu par le serveur, ce qui reste à envoyer,
+et pourquoi un envoi a échoué ; plus aucun formulaire n'est marqué « envoyé » à tort.
+Rétro-compatible avec un serveur non mis à jour (fail-open sur tous les nouveaux WS).
+
+### Données (U04) — `services/database_service.dart` (SQLite **v9**), `models/sync_status.dart`
+- Nouvelles tables `form_sync_status` (état par année/campagne/école/thème/période : `pending | sent |
+  failed | kosave | rejected | locked`, tentatives, dernière erreur, `sync_id`, ACK, statut admin) et
+  `sync_feedback` (demandes de correction / verrous admin en cache). Initialisation depuis `is_sent`
+  existant ; `is_sent` reste maintenu en parallèle.
+- API : `getFormSyncStatus(es)`, `markFormLocallyModified`, `recordSendAttempt`, `getPendingForms`
+  (+ repli `is_sent=0`), `getDistinctFormsWithData`, `getSchoolSyncSummaries`, `countUnsentForms`,
+  `reconcileSchoolWithServer`, `replaceSyncFeedback`, `applyFeedbackToSyncStatus`, `getSyncFeedback`.
+
+### Réseau (U01, U08, U11, U13, U16, U19) — `services/api_service.dart`
+- **U01** réponse vide / non‑JSON / `se_data` inattendu ⇒ `ApiException` (plus jamais un faux succès).
+- **U08** accusé de réception `se_ack` parsé (`lastAck` : compteurs ajouts/MAJ/suppr/inchangées,
+  doublon, garde anti-suppression, correction levée).
+- **U11** idempotence : `X-Sync-Id` (UUID v4, identique sur les retries Dio) + `X-App-Version`.
+- **U13** `reloadData(yearCode:)` ⇒ route `/theme_data/.../:id_annee` (année explicite).
+- **U16/U19** `fetchServerSyncStatus`, `fetchSyncFeedback` (fail-open) ; `FormLockedException`,
+  `KosaveException.hint`, `ApiException.code` (`YEAR_MISMATCH`, `ACCESS_DENIED`, `SURVEY_CLOSED`, `FORM_LOCKED`).
+
+### Provider (U02, U03, U06, U07, U12, U17, U21, U25) — `providers/data_entry_provider.dart`
+- **U02** primitive unique `_sendOneForm()` : chaque issue est enregistrée (`sent`, `kosave`, `rejected`,
+  `locked`, `failed`). **KOSAVE n'est plus marqué envoyé.**
+- **U03/U07** moteur batch `_sendForms()` (période, `LOC_REG_0`, 1re question), `sendPendingForms()`,
+  `retryFailedOutcomes()`, `countPendingForms()`, `listPendingForms()` ; anciennes signatures conservées.
+- **U06** résultats typés `SendOutcome` nominatifs (`lastBatchOutcomes`).
+- **U12** auto-rechargement : ne remplace plus des saisies locales en attente d'envoi.
+- **U17** `reconcileWithServer()` : aligne les statuts locaux sur la vérité serveur + feedbacks admin.
+- **U21** `detectServerConflict()` ; `isCurrentFormLocked`, `currentCorrectionRequest`.
+- **U25** verrou global statique : un seul envoi à la fois, tous écrans.
+
+### UI (U05, U06, U07, U19, U21)
+- `screens/data_entry/school_data_screen.dart` : pastille d'état sur chaque chip de thème ; ligne
+  d'état (statut, dernier envoi OK, tentatives, statut admin, **accusé serveur**) ; bannière rouge
+  « Correction demandée » ; bannière violette « Verrouillé » + bouton Envoyer désactivé + « Recharger » ;
+  dialogue **Conflit de version** (Recharger / Écraser / Annuler) ; menu « Envoyer les formulaires en
+  attente » et « Actualiser l'état de synchronisation » ; résultat d'envoi groupé nominatif avec
+  « Réessayer les échecs ».
+- `screens/schools/campaign_detail_screen.dart` : bannière « N formulaires en attente » réelle
+  (Voir / Envoyer), badges agrégés par établissement (`SchoolSyncBadge`), bouton ⟳ réconciliation,
+  réconciliation automatique à l'ouverture de la liste des écoles, rafraîchi au retour de saisie.
+- Nouveau `screens/schools/pending_forms_screen.dart` : liste nominative des formulaires à envoyer,
+  groupée par établissement, envoi global ou par école.
+- Nouveau `widgets/sync/sync_widgets.dart` : couleurs/icônes d'état, `SchoolSyncBadge`,
+  `showBatchResultDialog()`.
+
+### Tests
+- `test/sync_status_test.dart` : modèles de synchronisation (statuts, conflit, ACK, résultats,
+  parsing dates serveur, portée des feedbacks, agrégats).
+
+### Déploiement
+Voir `docs/session_sync/GUIDE_DEPLOIEMENT_AK_BURUNDI.md` (build : `flutter analyze && flutter test`).
+
+---
+
+## [v1.3.0] — 2026-09-16 — Synchronisation traçable : statuts par formulaire, envoi ciblé, accusé serveur, verrous/corrections admin (branche `ak_burundi`, U01–U27)
+
+### Contexte
+
+Suite au diagnostic `docs/session_sync/DIAGNOSTIC_SYNCHRONISATION_TRACABILITE.md` (validation U01–U27, C1–C10).
+Le mobile ne distinguait pas « envoyé », « reçu mais non enregistré (KOSAVE) » et « jamais envoyé » ;
+un envoi groupé renvoyait un simple compteur ; aucun retour de l'administration n'était visible.
+Toutes les nouveautés sont **fail-open** : avec un ancien serveur, l'application se comporte comme `ak_secure`.
+
+### Données (U04) — `services/database_service.dart` v9, `models/sync_status.dart`
+- Tables `form_sync_status` (statut `pending|sent|failed|kosave|rejected|locked`, tentatives, dernier ACK, statut admin) et `sync_feedback` (demandes de correction / verrous).
+- Migration v8→v9 initialisée depuis `is_sent` ; `is_sent` **maintenu en parallèle** (aucune régression des écrans existants).
+- `recordSendAttempt`, `getPendingForms` (+ repli `is_sent=0`), `getDistinctFormsWithData` (avec période), `getSchoolSyncSummaries`, `countUnsentForms`, `reconcileSchoolWithServer`, `applyFeedbackToSyncStatus`, `replaceSyncFeedback`, `getSyncFeedback`.
+
+### Réseau (U01, U08, U11, U13, U16, U19) — `services/api_service.dart`
+- Réponse vide / non-JSON / `se_data` inattendu ⇒ `ApiException` (plus jamais interprétée comme succès).
+- En-têtes `X-Sync-Id` (UUID v4, identique sur les retries Dio) et `X-App-Version` ⇒ idempotence serveur.
+- `lastAck` (`ServerAck`) parsé depuis `se_ack` : compteurs I/U/D/=, doublon, garde anti-suppression, correction levée.
+- `FormLockedException` (`se_code=FORM_LOCKED`), `KosaveException.hint`, `ApiException.code`.
+- `reloadData(yearCode:)` ⇒ route `/theme_data/…/:id_annee` ; `fetchServerSyncStatus`, `fetchSyncFeedback` (fail-open).
+
+### Provider (U02, U03, U06, U07, U12, U17, U21, U25) — `providers/data_entry_provider.dart`
+- `_sendOneForm()` primitive unique : chaque issue est tracée dans `form_sync_status` ; **KOSAVE n'est plus marqué envoyé**.
+- Moteur batch unifié `_sendForms()` (période, `LOC_REG_0` de chaque école, première question) ; `sendPendingForms()`, `retryFailedOutcomes()`, `countPendingForms()`, `listPendingForms()` ; anciennes signatures `Map<String,bool>` conservées.
+- `SendOutcome` typé et nominatif (établissement › thème [période] : motif).
+- Rechargement automatique : ne remplace plus une saisie locale en attente d'envoi (U12) ; année explicite (U13).
+- `reconcileWithServer()` (statuts serveur + feedbacks admin) et `detectServerConflict()` (U21).
+- Verrou global `_globalSendLock` : un seul envoi à la fois, tous écrans (U25).
+
+### Interface (U05, U06, U07, U19, U21)
+- `school_data_screen.dart` : pastille d'état sur chaque chip de thème ; ligne d'état (statut, dernier envoi OK, tentatives, statut admin, **résumé de l'accusé serveur**) ; bannière rouge « Correction demandée » ; formulaire verrouillé ⇒ Envoyer désactivé + bannière violette + « Recharger » ; dialogue **Conflit de version** (Recharger / Écraser / Annuler) ; menu « Envoyer les formulaires en attente » et « Actualiser l'état de synchronisation » ; résultat d'envoi groupé nominatif + « Réessayer les échecs ».
+- `campaign_detail_screen.dart` : bannière réelle « N formulaire(s) non transmis ou en échec » ; badge agrégé + drapeau correction sur chaque établissement ; bouton « Envoyer uniquement les formulaires en attente » ; réconciliation serveur à l'ouverture, ⟳ et pull-to-refresh.
+- Nouveau `screens/schools/pending_forms_screen.dart` : liste nominative des formulaires en attente groupée par établissement, envoi global ou ciblé.
+- Nouveau `widgets/sync/sync_widgets.dart` : couleurs/icônes d'état, `showBatchResultDialog`, `SchoolSyncBadge`.
+
+### Tests
+- `test/sync_status_test.dart` : modèles de sync (statuts, clé composite, conflit, ACK, outcomes, agrégats, `appliesTo`, `parseServerTime`).
+
+### Déploiement
+- Voir `docs/session_sync/GUIDE_DEPLOIEMENT_AK_BURUNDI.md` (ordre serveur → APK, plan de test de non-régression, retour arrière : pas de rétrogradation SQLite v9→v8 à chaud).
 
 ---
 

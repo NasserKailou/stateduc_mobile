@@ -7,7 +7,11 @@ import '../../models/campaign.dart';
 import '../../models/regroup.dart';
 import '../../models/school.dart';
 import '../../models/education_system.dart';
+import '../../models/sync_status.dart';
+import '../../services/database_service.dart';
+import '../../widgets/sync/sync_widgets.dart';
 import '../data_entry/school_data_screen.dart';
+import 'pending_forms_screen.dart';
 
 /// CampaignDetailScreen — sélecteur de système éducatif + navigation hiérarchique
 /// dans les regroupements + liste des établissements.
@@ -26,7 +30,7 @@ import '../data_entry/school_data_screen.dart';
 ///   [_SystemChip]      — puce de sélection d'un système éducatif
 ///   [_RegroupTile]     — tuile de navigation dans un regroupement
 ///   [_SchoolTile]      — tuile représentant un établissement
-///   [_UnsentDataBanner] — bannière d'alerte données non envoyées (placeholder)
+///   [_UnsentDataBanner] — bannière « N formulaires en attente » + envoi ciblé (AK-SYNC U05/U07)
 class CampaignDetailScreen extends StatefulWidget {
   const CampaignDetailScreen({super.key, required this.campaign});
   final Campaign campaign;
@@ -37,6 +41,76 @@ class CampaignDetailScreen extends StatefulWidget {
 
 class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
   Campaign get campaign => widget.campaign;
+
+  // ─── AK-SYNC (U05/U07/U17/U19) — état de synchronisation agrégé ────────────
+  /// Résumés par établissement (lecture SQLite form_sync_status).
+  Map<String, SchoolSyncSummary> _summaries = {};
+  /// Établissements avec une demande de correction admin active (U19).
+  Set<String> _correctionEtabs = {};
+  /// Nombre total de formulaires en attente / en échec pour la campagne.
+  int _pendingCount = 0;
+  /// Système pour lequel la réconciliation serveur a déjà été faite (1 fois/ouverture).
+  String? _reconciledForSystem;
+  bool _syncRefreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshSyncState());
+  }
+
+  /// Recharge les agrégats locaux (rapide, SQLite). Appelé à l'ouverture,
+  /// au retour d'un écran de saisie et après chaque envoi groupé.
+  Future<void> _refreshSyncState() async {
+    if (!mounted) return;
+    final entry = context.read<DataEntryProvider>();
+    final auth  = context.read<AuthProvider>();
+    final annee = auth.effectiveYearCode.isNotEmpty
+        ? auth.effectiveYearCode
+        : (auth.user?.codeyear ?? campaign.idYear ?? '');
+    try {
+      final db = DatabaseService();
+      final sums = await db.getSchoolSyncSummaries(campaign.idCamp, codeTypeAnnee: annee);
+      final fbs  = await db.getSyncFeedback(campaign.idCamp, codeTypeAnnee: annee);
+      final pend = await entry.countPendingForms(campaign.idCamp);
+      if (!mounted) return;
+      setState(() {
+        _summaries = sums;
+        _correctionEtabs = fbs.where((f) => f.isCorrection).map((f) => f.idEtab).toSet();
+        _pendingCount = pend;
+      });
+    } catch (e) {
+      debugPrint('[CampaignDetail] _refreshSyncState: $e');
+    }
+  }
+
+  /// U17 : réconciliation avec le serveur (fail-open, silencieuse) — une fois
+  /// par système sélectionné, puis à la demande via le bouton « Actualiser ».
+  Future<void> _reconcile(String idSystem, {bool force = false}) async {
+    if (!mounted) return;
+    if (!force && _reconciledForSystem == idSystem) return;
+    _reconciledForSystem = idSystem;
+    final auth  = context.read<AuthProvider>();
+    final entry = context.read<DataEntryProvider>();
+    if (auth.user == null) return;
+    setState(() => _syncRefreshing = true);
+    int changed = 0;
+    try {
+      changed = await entry.reconcileWithServer(
+          user: auth.user!, idCamp: campaign.idCamp, idSystem: idSystem);
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() => _syncRefreshing = false);
+    await _refreshSyncState();
+    if (force && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(changed > 0
+            ? 'État de synchronisation actualisé ($changed formulaire(s) mis à jour)'
+            : 'État de synchronisation actualisé'),
+        duration: const Duration(seconds: 2),
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +178,11 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
     }
     // Système sélectionné, plus de regroupements, des établissements disponibles → liste
     if (camps.currentRegroups.isEmpty && camps.currentSchools.isNotEmpty) {
+      // AK-SYNC U17 : réconciliation serveur (1 fois par système, hors build)
+      final sysId = camps.selectedSystem!.idSystem;
+      if (_reconciledForSystem != sysId) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _reconcile(sysId));
+      }
       return _buildSchoolList(context, camps);
     }
     // Les deux listes vides après navigation → état vide/erreur (pas de spinner infini)
@@ -217,31 +296,59 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
           child: Consumer<DataEntryProvider>(
-            builder: (ctx, entry, _) => OutlinedButton.icon(
-              onPressed: entry.isSending
-                  ? null
-                  : () => _sendAllCampaignForms(context, camps, idSystem),
-              icon: entry.isSending
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.cloud_sync_outlined),
-              label: Text(entry.isSending
-                  ? 'Envoi en cours…'
-                  : 'Envoyer tous les établissements'),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size.fromHeight(44),
-              ),
+            builder: (ctx, entry, _) => Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: entry.isSending
+                        ? null
+                        : () => _sendAllCampaignForms(context, camps, idSystem),
+                    icon: entry.isSending
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.cloud_sync_outlined),
+                    label: Text(entry.isSending
+                        ? 'Envoi en cours…'
+                        : 'Envoyer tous les établissements'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // AK-SYNC U17 : actualiser l'état de sync depuis le serveur
+                Tooltip(
+                  message: 'Actualiser l\'état de synchronisation (serveur)',
+                  child: SizedBox(
+                    height: 44,
+                    child: OutlinedButton(
+                      onPressed: (entry.isSending || _syncRefreshing)
+                          ? null
+                          : () => _reconcile(idSystem, force: true),
+                      style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10)),
+                      child: _syncRefreshing
+                          ? const SizedBox(
+                              width: 16, height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.sync),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
         const SizedBox(height: 4),
-        // Bannière de données non envoyées (placeholder — voir _UnsentDataBanner)
+        // AK-SYNC U05/U07 : bannière « N formulaires en attente » + envoi ciblé
         _UnsentDataBanner(
-          idCamp: campaign.idCamp,
-          idSystem: idSystem,
+          pendingCount: _pendingCount,
+          isSending: context.watch<DataEntryProvider>().isSending,
+          onSendPending: () => _sendPendingCampaignForms(context, idSystem),
+          onShowList: () => _openPendingList(context, camps, idSystem),
         ),
         Expanded(
           child: ListView.builder(
@@ -251,6 +358,8 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
               final s = camps.currentSchools[i];
               return _SchoolTile(
                 school: s,
+                summary: _summaries[s.idEtab],
+                correctionRequested: _correctionEtabs.contains(s.idEtab),
                 onTap: () => _openSchool(context, camps, s),
               );
             },
@@ -336,7 +445,7 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
     );
 
     // Lancement de l'envoi global campagne
-    final results = await entry.sendAllFormsForCampaign(
+    await entry.sendAllFormsForCampaign(
       user:     auth.user!,
       idCamp:   campaign.idCamp,
       idSystem: idSystem,
@@ -350,56 +459,108 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
     progressNotifier.dispose();
     if (!mounted) return;
 
-    // Résumé
-    final okCount   = results.values.where((v) => v).length;
-    final failCount = results.values.where((v) => !v).length;
-    final hasError  = entry.error != null;
+    // AK-SYNC U06 : résumé nominatif (établissement › thème : motif) + « Réessayer les échecs »
+    await showBatchResultDialog(
+      context,
+      outcomes: entry.lastBatchOutcomes,
+      providerError: entry.error,
+      onRetry: () => entry.retryFailedOutcomes(
+          user: auth.user!, idCamp: campaign.idCamp, idSystem: idSystem),
+    );
+    if (mounted) await _refreshSyncState();
+  }
 
-    showDialog(
+  // ═══════════════════════════════════════════════════════════════════════════
+  /// AK-SYNC U07 — Envoie UNIQUEMENT les formulaires en attente / en échec de
+  /// la campagne (tous établissements), sans retoucher ceux déjà transmis.
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<void> _sendPendingCampaignForms(BuildContext context, String idSystem) async {
+    final auth  = context.read<AuthProvider>();
+    final entry = context.read<DataEntryProvider>();
+    if (auth.user == null) return;
+    if (DataEntryProvider.isAnySendRunning) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Un envoi est déjà en cours. Patientez puis réessayez.')));
+      return;
+    }
+    final total = _pendingCount;
+    if (total == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Aucun formulaire en attente d\'envoi')));
+      return;
+    }
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(
-              hasError || failCount > 0
-                  ? Icons.warning_amber_rounded
-                  : Icons.check_circle_outline,
-              color: hasError || failCount > 0
-                  ? Colors.orange
-                  : Colors.green,
-            ),
-            const SizedBox(width: 8),
-            const Text('Résultat de l\'envoi'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('✅  $okCount formulaire(s) envoyé(s) avec succès'),
-            if (failCount > 0)
-              Text('⚠️  $failCount formulaire(s) non envoyé(s)'),
-            if (hasError) ...[  
-              const SizedBox(height: 8),
-              Text(
-                entry.error ?? '',
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                    fontSize: 13),
-              ),
-            ],
-            if (results.isEmpty)
-              const Text('Aucune donnée locale trouvée pour cette campagne.'),
-          ],
+        title: const Row(children: [
+          Icon(Icons.outbox_outlined),
+          SizedBox(width: 8),
+          Text('Formulaires en attente'),
+        ]),
+        content: Text(
+          'Envoyer uniquement les $total formulaire(s) en attente ou en échec '
+          'de cette campagne ?\n\nLes formulaires déjà transmis ne seront pas renvoyés.',
         ),
         actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Fermer'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
+          ElevatedButton.icon(
+              onPressed: () => Navigator.pop(ctx, true),
+              icon: const Icon(Icons.cloud_upload_outlined),
+              label: const Text('Envoyer')),
         ],
       ),
     );
+    if (confirm != true || !mounted) return;
+
+    final progressNotifier = ValueNotifier<int>(0);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ValueListenableBuilder<int>(
+        valueListenable: progressNotifier,
+        builder: (_, p, __) => AlertDialog(
+          title: const Text('Envoi en cours…'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            LinearProgressIndicator(value: total > 0 ? p / total : null),
+            const SizedBox(height: 12),
+            Text('$p / $total formulaire(s)'),
+          ]),
+        ),
+      ),
+    );
+    final outcomes = await entry.sendPendingForms(
+      user: auth.user!,
+      idCamp: campaign.idCamp,
+      idSystem: idSystem,
+      onProgress: (sent, _) => progressNotifier.value = sent,
+    );
+    if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    progressNotifier.dispose();
+    if (!mounted) return;
+    await showBatchResultDialog(
+      context,
+      outcomes: outcomes,
+      providerError: entry.error,
+      onRetry: () => entry.retryFailedOutcomes(
+          user: auth.user!, idCamp: campaign.idCamp, idSystem: idSystem),
+    );
+    if (mounted) await _refreshSyncState();
+  }
+
+  /// AK-SYNC U05 : ouvre l'écran listant nominativement les formulaires en attente.
+  Future<void> _openPendingList(
+      BuildContext context, CampaignProvider camps, String idSystem) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PendingFormsScreen(
+          campaign: campaign,
+          idSystem: idSystem,
+          libSystem: camps.selectedSystem?.libSystem,
+        ),
+      ),
+    );
+    if (mounted) await _refreshSyncState();
   }
 
   /// Ouvre l'écran de saisie [SchoolDataScreen] pour un établissement.
@@ -453,7 +614,10 @@ class _CampaignDetailScreenState extends State<CampaignDetailScreen> {
           libSystem: camps.selectedSystem?.libSystem,
         ),
       ),
-    );
+    ).then((_) {
+      // AK-SYNC U05 : au retour de la saisie, rafraîchit les badges d'état
+      if (mounted) _refreshSyncState();
+    });
   }
 
   /// Revient à la sélection de système éducatif (réinitialise la navigation).
@@ -589,27 +753,56 @@ class _RegroupTile extends StatelessWidget {
 /// Tuile représentant un établissement scolaire dans la liste.
 /// Affiche le nom et le statut (Public/Privé/Communautaire) si disponible.
 /// Le tap ouvre l'écran de saisie [SchoolDataScreen] via [_openSchool].
+///
+/// AK-SYNC U05/U07/U19 : affiche sous le nom un badge agrégé d'état de
+/// synchronisation (« 5/5 envoyés », « 2 à envoyer », « 1 échec »,
+/// « verrouillé », « correction demandée ») et colore l'avatar en conséquence.
 class _SchoolTile extends StatelessWidget {
-  const _SchoolTile({required this.school, required this.onTap});
+  const _SchoolTile({
+    required this.school,
+    required this.onTap,
+    this.summary,
+    this.correctionRequested = false,
+  });
   final School school;
   final VoidCallback onTap;
+  final SchoolSyncSummary? summary;
+  final bool correctionRequested;
+
+  Color? _avatarColor() {
+    final s = summary;
+    if (correctionRequested) return const Color(0xFFB71C1C);
+    if (s == null || s.total == 0) return null;
+    if (s.failed > 0) return syncStatusColor(SyncStatus.failed);
+    if (s.pending > 0) return syncStatusColor(SyncStatus.pending);
+    if (s.locked == s.total) return syncStatusColor(SyncStatus.locked);
+    if (s.allSent || (s.sent + s.locked) == s.total) return syncStatusColor(SyncStatus.sent);
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final c = _avatarColor();
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor:
-              Theme.of(context).colorScheme.secondaryContainer,
+          backgroundColor: c != null
+              ? c.withOpacity(0.15)
+              : Theme.of(context).colorScheme.secondaryContainer,
           child: Icon(Icons.business_outlined,
-              color:
-                  Theme.of(context).colorScheme.onSecondaryContainer),
+              color: c ?? Theme.of(context).colorScheme.onSecondaryContainer),
         ),
         title: Text(school.libEtab),
-        subtitle: school.idStatus != null
-            ? Text('Statut : ${school.idStatus}')
-            : null,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (school.idStatus != null) Text('Statut : ${school.idStatus}'),
+            SchoolSyncBadge(summary: summary, hasFeedback: correctionRequested),
+          ],
+        ),
+        isThreeLine: school.idStatus != null &&
+            ((summary?.total ?? 0) > 0 || correctionRequested),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
@@ -617,24 +810,61 @@ class _SchoolTile extends StatelessWidget {
   }
 }
 
-// ─── Bannière données non envoyées ──────────────────────────────────────────
-/// Bannière affichée au-dessus de la liste des établissements lorsque des
-/// données collectées n'ont pas encore été envoyées au serveur.
+// ─── Bannière données non envoyées (AK-SYNC U05/U07) ─────────────────────────
+/// Bannière orange affichée au-dessus de la liste des établissements lorsque
+/// des formulaires collectés n'ont pas encore été transmis (statut pending /
+/// failed / kosave dans `form_sync_status`, ou repli `is_sent = 0`).
 ///
-/// PLACEHOLDER : dans l'implémentation complète, ce widget interrogerait
-/// la table [collected_data] de SQLite pour compter les lignes avec
-/// is_sent = 0 pour la campagne et le système donnés, puis afficherait
-/// une bannière d'alerte orange avec le nombre d'établissements concernés.
+/// Actions : « Voir » (liste nominative) et « Envoyer » (envoi ciblé U07).
+/// Masquée s'il n'y a rien à envoyer.
 class _UnsentDataBanner extends StatelessWidget {
-  const _UnsentDataBanner(
-      {required this.idCamp, required this.idSystem});
-  final String idCamp;
-  final String idSystem;
+  const _UnsentDataBanner({
+    required this.pendingCount,
+    required this.isSending,
+    required this.onSendPending,
+    required this.onShowList,
+  });
+  final int pendingCount;
+  final bool isSending;
+  final VoidCallback onSendPending;
+  final VoidCallback onShowList;
 
   @override
   Widget build(BuildContext context) {
-    // Placeholder — dans une vraie implémentation, vérifier la DB pour les données non envoyées
-    // et afficher une bannière si is_sent=0 pour (idCamp, idSystem)
-    return const SizedBox.shrink();
+    if (pendingCount <= 0) return const SizedBox.shrink();
+    const Color bg = Color(0xFFFFF3E0);
+    const Color fg = Color(0xFFE65100);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: fg.withOpacity(0.4)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_upload_outlined, color: fg),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              '$pendingCount formulaire${pendingCount > 1 ? 's' : ''} '
+              'en attente d\'envoi ou en échec',
+              style: const TextStyle(color: fg, fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+          ),
+          TextButton(
+            onPressed: onShowList,
+            child: const Text('Voir', style: TextStyle(color: fg)),
+          ),
+          FilledButton.tonalIcon(
+            onPressed: isSending ? null : onSendPending,
+            icon: const Icon(Icons.send_outlined, size: 16),
+            label: const Text('Envoyer', style: TextStyle(fontSize: 12.5)),
+          ),
+        ],
+      ),
+    );
   }
 }

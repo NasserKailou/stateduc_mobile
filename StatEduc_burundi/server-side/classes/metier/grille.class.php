@@ -5711,9 +5711,25 @@ class grille {
 		print_r($matr1);
 		echo '<br><br>matr2<pre>';
 		print_r($matr2);*/
+		// AK-SYNC U08 : compteurs de comparaison (R = lignes identiques, non ecrites en base)
+		if(!isset($GLOBALS['maj_stats']) || !is_array($GLOBALS['maj_stats'])){
+			$GLOBALS['maj_stats'] = array('i'=>0,'u'=>0,'d'=>0,'r'=>0,'g'=>0);
+		}
+		// AK-SYNC U24 : garde anti-suppression pour les POST mobiles (curl interne) uniquement.
+		//   Active si PARAM['MOBILE_NO_DELETE_ON_PARTIAL'] = true ET appel mobile (ne_pas_verifier_session).
+		//   Defaut false = comportement SISED historique (les lignes absentes du POST sont supprimees).
+		$ak_no_delete_guard = (isset($GLOBALS['PARAM']['MOBILE_NO_DELETE_ON_PARTIAL']) && $GLOBALS['PARAM']['MOBILE_NO_DELETE_ON_PARTIAL']
+			&& isset($GLOBALS['ne_pas_verifier_session']) && $GLOBALS['ne_pas_verifier_session']);
 		foreach($this->nomtableliee as $nomtableliee){ // pour chaque Table mére
 			$result 	=	array();
 			$i = 0;
+			// AK-SYNC U24 : POST partiel = strictement moins de lignes recues que presentes en base pour cette table
+			$ak_partial = false;
+			if($ak_no_delete_guard && isset($matr1[$nomtableliee]) && is_array($matr1[$nomtableliee])){
+				$nb_bd   = count($matr1[$nomtableliee]);
+				$nb_post = (isset($matr2[$nomtableliee]) && is_array($matr2[$nomtableliee])) ? count($matr2[$nomtableliee]) : 0;
+				$ak_partial = ($nb_post < $nb_bd);
+			}
 
 			if(is_array($matr2[$nomtableliee]))
 				foreach ($matr2[$nomtableliee] as $elt){ // On parcours la marice de sortie
@@ -5725,6 +5741,7 @@ class grille {
 					$tmp		=	array();				
 					$action		=	$this->existe_element_grille_action($keys_vals, $elt, $matr1[$nomtableliee], $nomtableliee);		
 					//echo $action. '<br />';
+					if($action == 'R') $GLOBALS['maj_stats']['r']++; // AK-SYNC U08
 					switch ($action)
 					{
 						case 'I':
@@ -5767,6 +5784,8 @@ class grille {
 							switch ($action)
 							{
 								case 'I':
+									// AK-SYNC U24 : ligne en base absente du POST mobile partiel -> conservee (pas de DELETE)
+									if($ak_partial){ $GLOBALS['maj_stats']['g']++; break; }
 									
 									$action		=	'D'	;				
 									for ($i=0;$i<count($elt);$i++){
@@ -5931,6 +5950,8 @@ class grille {
 							if ($this->conn->Execute($sql) === false){
 								$GLOBALS['theme_data_MAJ_ok'] 	= false;
 								print ' <br> error deleting :<br>'.$sql.'<br>';
+							}else{
+								if(isset($GLOBALS['maj_stats'])) $GLOBALS['maj_stats']['d']++; // AK-SYNC U08
 							}
 						}
 					}else{
@@ -5949,6 +5970,8 @@ class grille {
 							if ($this->conn->Execute($sql) === false){
 								$GLOBALS['theme_data_MAJ_ok'] 	= false;
 								print ' <br> error deleting :<br>'.$sql.'<br>';
+							}else{
+								if(isset($GLOBALS['maj_stats'])) $GLOBALS['maj_stats']['d']++; // AK-SYNC U08
 							}
 						}
 					}
@@ -6040,6 +6063,8 @@ class grille {
                             if( ($this->new_etab == true) or ($nomtable == $GLOBALS['PARAM']['ETABLISSEMENT'])){
                                 $GLOBALS['pb_new_etab'] = true;
                             }
+                        }else{
+                            if(isset($GLOBALS['maj_stats'])) $GLOBALS['maj_stats']['i']++; // AK-SYNC U08
                         }
 						if($GLOBALS['theme_data_MAJ_ok']==true && (isset($GLOBALS['PARAM']['DATA_ENTRY_TRACE']) && $GLOBALS['PARAM']['DATA_ENTRY_TRACE'])){
 							//MAJ DICO_TRACE
@@ -6135,6 +6160,8 @@ class grille {
 						if ($this->conn->Execute($sql) === false){
 							$GLOBALS['theme_data_MAJ_ok'] 	= false;
 							print ' <br> error updating :<br> --- '.$sql.' --- <br>'; 
+						}else{
+							if(isset($GLOBALS['maj_stats'])) $GLOBALS['maj_stats']['u']++; // AK-SYNC U08
 						}
 						if($GLOBALS['theme_data_MAJ_ok']==true && (isset($GLOBALS['PARAM']['DATA_ENTRY_TRACE']) && $GLOBALS['PARAM']['DATA_ENTRY_TRACE'])){
 							if($nomtable == $GLOBALS['PARAM']['DONNEES_ETABLISSEMENT'] && $action == 'D') $action = 'U';

@@ -19,7 +19,7 @@
   function get_etab_log($id_camp, $id_year, $id_period) {
      $requete = "SELECT DISTINCT CODE_ECOLE as code_etab 
                 FROM DATA_SAVING_LOGS 
-                WHERE CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND CODE_PERIODE=".$id_period.";";
+                WHERE CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND (CODE_PERIODE=".$id_period." OR CODE_PERIODE IS NULL);";
      $list_etab =  $GLOBALS['conn_dico']->GetAll($requete);
      
      return $list_etab;          
@@ -40,7 +40,7 @@
   function get_etab_themes_log($id_etab, $id_camp, $id_year, $id_period) {
       $requete = "SELECT DISTINCT ID_THEME_SYSTEME as id_theme 
                 FROM DATA_SAVING_LOGS 
-                WHERE CODE_ECOLE=".$id_etab." AND CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND CODE_PERIODE=".$id_period." AND STATUT_OPERATION='OKSAVE';";
+                WHERE CODE_ECOLE=".$id_etab." AND CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND (CODE_PERIODE=".$id_period." OR CODE_PERIODE IS NULL) AND STATUT_OPERATION='OKSAVE';";
       $list_theme =  $GLOBALS['conn_dico']->GetAll($requete);
      
       return $list_theme;
@@ -179,11 +179,17 @@
     $message_html = "<html><head></head><body><b>Salut à tous</b>, voici un e-mail envoyé par un <i>script PHP</i>.</body></html>";
     //==========
                 
-    $from = "StatEduc2 <stateduc2@mail.kn>";
-    $host = "ssl0.ovh.net"; 
-    $port = "587";
-    $username = "kafarsi@ardive.net"; 
-    $password = "qaz123LOG";
+    // AK-SYNC U26 : identifiants SMTP externalises dans params.php (plus aucun secret en dur).
+    //   Si MAIL_HOST est vide, l'envoi est ignore proprement (message a l'ecran) -> aucune exception PEAR.
+    $from     = isset($GLOBALS['PARAM']['MAIL_FROM'])     ? $GLOBALS['PARAM']['MAIL_FROM']     : "StatEduc <noreply@localhost>";
+    $host     = isset($GLOBALS['PARAM']['MAIL_HOST'])     ? $GLOBALS['PARAM']['MAIL_HOST']     : "";
+    $port     = isset($GLOBALS['PARAM']['MAIL_PORT'])     ? $GLOBALS['PARAM']['MAIL_PORT']     : "587";
+    $username = isset($GLOBALS['PARAM']['MAIL_USERNAME']) ? $GLOBALS['PARAM']['MAIL_USERNAME'] : "";
+    $password = isset($GLOBALS['PARAM']['MAIL_PASSWORD']) ? $GLOBALS['PARAM']['MAIL_PASSWORD'] : "";
+    if (trim($host) === "") {
+      echo("<p style='color:#c62828'>SMTP non configure (PARAM['MAIL_HOST'] vide) : e-mail non envoye a " . htmlentities($destinataire) . ".</p>");
+      return;
+    }
      
     //=====Création de la boundary
     $boundary = "-----=".md5(rand());

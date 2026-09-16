@@ -459,6 +459,23 @@ if (isset($_GET['val'])) {
             require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
         break;
 		
+		// AK-SYNC (ak_burundi) U14 : ecran Suivi synchronisation mobile
+		case 'suivi_sync_mobile' :
+			$GLOBALS['lancer_theme_manager'] = true;
+            require_once 'common.php';
+            require_once $GLOBALS['SISED_PATH_INC'] . 'header.php';
+            require_once $GLOBALS['SISED_PATH_INC'] . 'administration/suivi_sync_mobile.php';
+            require_once $GLOBALS['SISED_PATH_INC'] . 'footer.php';
+        break;
+
+		// AK-SYNC U14 : service AJAX JSON / CSV de l'ecran (pas de header/footer HTML)
+		case 'suivi_sync_mobile_svc' :
+			$GLOBALS['lancer_theme_manager'] = true;
+			$GLOBALS['cacher_interface'] = true;
+            require_once 'common.php';
+            require_once $GLOBALS['SISED_PATH_INC'] . 'administration/suivi_sync_mobile_service.php';
+        break;
+
 		case 'suivi_list_etabs' :
 			$GLOBALS['lancer_theme_manager'] = true;
             require_once 'common.php';

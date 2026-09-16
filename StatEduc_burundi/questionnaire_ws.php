@@ -1437,6 +1437,12 @@ if(file_exists($curfile) and $nom_theme != '') {
 //                             (b) POST vide ou curobj_instance absent → pas de save du tout
 if(isset($_POST) && count($_POST)>0) {
     echo ($GLOBALS['theme_data_MAJ_ok'] ? "MAJ_OK=true" : "MAJ_OK=false");
+    // AK-SYNC U08 : compteurs I/U/D/R (+ g = suppressions evitees par la garde U24) pour l'ACK enrichi.
+    // Emis sous forme d'un marqueur parsable par data_save.php (ak_sync_parse_maj_stats).
+    if(isset($GLOBALS['maj_stats']) && is_array($GLOBALS['maj_stats'])) {
+        $_ms = $GLOBALS['maj_stats'];
+        echo "MAJ_STATS={\"i\":".(int)$_ms['i'].",\"u\":".(int)$_ms['u'].",\"d\":".(int)$_ms['d'].",\"r\":".(int)$_ms['r'].",\"g\":".(int)$_ms['g']."}";
+    }
 }
 //Gestion data entry by user
 if(isset($_POST) && count($_POST)>0 && $GLOBALS['theme_data_MAJ_ok']== true){

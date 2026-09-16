@@ -41,6 +41,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -52,6 +53,7 @@ import '../models/regroup.dart';
 import '../models/education_system.dart';
 import '../models/question.dart';
 import '../models/school_year.dart';
+import '../models/sync_status.dart';
 
 class ApiService {
   late Dio _dio;
@@ -1077,6 +1079,22 @@ class ApiService {
     }
   }
 
+  // AK-SYNC : dernier accusé de réception enrichi reçu (U08). Lu par le provider
+  // juste après saveData() ; null si le serveur (ancien) n'envoie pas se_ack.
+  ServerAck? lastAck;
+  // AK-SYNC : version APK transmise au serveur (X-App-Version) pour le journal.
+  static const String appVersion = '2.1.0-ak_burundi';
+
+  /// AK-SYNC U11 — génère un identifiant d'idempotence (UUID v4) sans dépendance.
+  static String newSyncId() {
+    final r = Random.secure();
+    final b = List<int>.generate(16, (_) => r.nextInt(256));
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    String h(int i) => b[i].toRadixString(16).padLeft(2, '0');
+    return '${h(0)}${h(1)}${h(2)}${h(3)}-${h(4)}${h(5)}-${h(6)}${h(7)}-${h(8)}${h(9)}-${h(10)}${h(11)}${h(12)}${h(13)}${h(14)}${h(15)}';
+  }
+
   Future<bool> saveData({
     required String login,     // login de l'utilisateur (currentUser.login)
     required String campId,    // ID de la campagne (stmCamp.id)
@@ -1090,9 +1108,14 @@ class ApiService {
     bool isLastPage = true,
     String yearCode = '',      // code année scolaire (user.codeyear) — contournement session PHP
     void Function(int attempt)? onRetry, // callback appelé avant chaque re-tentative
+    String? syncId,            // AK-SYNC U11 : identifiant d'idempotence (même valeur sur les retries)
   }) async {
     // Délègue à _withRetry pour réessayer automatiquement en cas d'erreur transitoire.
     // onRetry est transmis pour que DataEntryProvider puisse afficher "Tentative 2/3…".
+    // Le même syncId est réutilisé à chaque tentative : si la 1ère a été traitée par le
+    // serveur mais la réponse perdue, la 2ème reçoit OKSAVE duplicate=true (pas de re-écriture).
+    final sid = syncId ?? newSyncId();
+    lastAck = null;
     return _withRetry(
       () => _saveDataOnce(
         login:           login,
@@ -1106,6 +1129,7 @@ class ApiService {
         isFirstQuestion: isFirstQuestion,
         isLastPage:      isLastPage,
         yearCode:        yearCode,
+        syncId:          sid,
       ),
       onRetry: onRetry,
     );
@@ -1124,6 +1148,7 @@ class ApiService {
     bool isFirstQuestion = false,
     bool isLastPage = true,
     String yearCode = '',
+    String? syncId,
   }) async {
     // SESSION 59 FIX — KOSAVE thèmes 10502/10602/10702 :
     // Avant : filterParam='0' pour les thèmes sans filtre (filter==null|empty).
@@ -1216,6 +1241,12 @@ class ApiService {
         options: Options(
           contentType: 'application/x-www-form-urlencoded',
           responseType: ResponseType.plain,
+          // AK-SYNC U11 : idempotence + version APK pour le journal serveur.
+          // Un ancien serveur ignore simplement ces en-têtes.
+          headers: {
+            if (syncId != null && syncId.isNotEmpty) 'X-Sync-Id': syncId,
+            'X-App-Version': appVersion,
+          },
         ),
       );
       final statusCode = response.statusCode ?? 0;
@@ -1223,26 +1254,50 @@ class ApiService {
       if (statusCode == 404) throw ApiException('Endpoint introuvable (404)');
 
       final responseStr = response.data?.toString().trim() ?? '';
-      debugPrint('[ApiService] saveData ← HTTP $statusCode body=$responseStr');
+      debugPrint('[ApiService] saveData ← HTTP $statusCode body=${responseStr.length > 400 ? responseStr.substring(0, 400) : responseStr}');
 
-      // Server may return empty body on success — treat as OKSAVE
-      if (responseStr.isEmpty) return true;
-
-      // Try to parse JSON — if it fails, treat non-empty response as success
+      // AK-SYNC U01 — DURCISSEMENT : data_save.php renvoie TOUJOURS un JSON
+      // (echo json_encode dans success/error et tous les retours anticipés).
+      // Une réponse vide ou non-JSON = page d'erreur PHP/Apache, proxy, etc.
+      // Avant : traitée comme succès (faux « envoyé »). Désormais : erreur explicite,
+      // les données restent en attente et pourront être renvoyées.
+      if (responseStr.isEmpty) {
+        throw ApiException(
+            'Réponse vide du serveur (HTTP $statusCode). '
+            'Les données restent en attente d\'envoi.');
+      }
       dynamic result;
       try {
         result = json.decode(responseStr);
       } catch (_) {
-        // Non-JSON response — server accepted the data
-        debugPrint('[ApiService] saveData: non-JSON response, assuming success');
-        return true;
+        final snippet = responseStr.replaceAll(RegExp(r'<[^>]+>'), ' ')
+            .replaceAll(RegExp(r'\s+'), ' ').trim();
+        throw ApiException(
+            'Réponse serveur invalide (non JSON, HTTP $statusCode) : '
+            '${snippet.length > 160 ? snippet.substring(0, 160) + '…' : snippet}');
       }
 
       if (result is Map) {
+        // AK-SYNC U08 : accusé de réception enrichi (absent sur ancien serveur)
+        final rawAck = result['se_ack'];
+        if (rawAck is Map) {
+          try { lastAck = ServerAck.fromJson(Map<String, dynamic>.from(rawAck)); } catch (_) {}
+        }
         if (result['se_status'] == 400) {
           final errMsg = result['se_data']?.toString() ?? 'Erreur serveur (400)';
+          // AK-SYNC U20 : verrou administratif
+          if (errMsg == 'FORM_LOCKED' || result['se_code'] == 'FORM_LOCKED') {
+            final lock = result['se_lock'];
+            throw FormLockedException(
+              themeId: qstId,
+              statut: lock is Map ? (lock['statut']?.toString() ?? 'VERROUILLE') : 'VERROUILLE',
+              commentaire: lock is Map ? (lock['commentaire']?.toString() ?? '') : '',
+              admin: lock is Map ? (lock['admin']?.toString() ?? '') : '',
+              date: lock is Map ? (lock['date']?.toString() ?? '') : '',
+            );
+          }
           debugPrint('[ApiService] saveData: server rejected → $errMsg');
-          throw ApiException(errMsg);
+          throw ApiException(errMsg, code: result['se_code']?.toString());
         }
         if (result['se_data'] == 'OKSAVE') return true;
         if (result['se_data'] == 'KOSAVE') {
@@ -1250,14 +1305,12 @@ class ApiService {
           // pour que l'UI affiche un avertissement visible à l'utilisateur.
           // La sauvegarde locale est déjà faite avant l'appel → données sûres.
           debugPrint('[ApiService] saveData: KOSAVE — données reçues mais non enregistrées en DB serveur');
-          throw KosaveException(themeId: qstId);
+          throw KosaveException(themeId: qstId, hint: lastAck?.errorHint);
         }
-        if (result['se_status'] != null && result['se_status'] != 400) return true;
-        debugPrint('[ApiService] saveData: unexpected result → $result');
-        return false;
+        // se_status 200 mais se_data inattendu → on ne présume plus le succès (U01)
+        throw ApiException('Réponse serveur inattendue : ${result['se_data']}');
       }
-      // Any non-Map non-error response = success
-      return statusCode < 300;
+      throw ApiException('Réponse serveur inattendue (HTTP $statusCode)');
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) throw ApiException('Accès refusé');
       if (e.response?.statusCode == 404) {
@@ -1321,13 +1374,17 @@ class ApiService {
     required String campId, // ID de la campagne
     required String etabId, // ID de l'établissement
     required String? filter, // période filtre (ou null)
+    String yearCode = '',    // AK-SYNC U13 : année explicite (route /:id_annee)
   }) async {
     final filterParam = (filter == null || filter.isEmpty) ? 'null' : filter;
     // SESSION 53 FIX: encoder le login pour éviter HTTP 400 sur les logins avec espaces
     final encodedLogin = Uri.encodeComponent(login);
+    // AK-SYNC U13 : segment année optionnel — la route historique (sans année) reste
+    // utilisée si yearCode est vide, ce qui conserve la compatibilité ancien serveur.
+    final anneeSegment = (yearCode.isNotEmpty && yearCode != '0') ? '/$yearCode' : '';
     try {
       final response = await _dio.get(
-        'data_reload.php/theme_data/$encodedLogin/$sysId/$qstId/$campId/$etabId/$filterParam',
+        'data_reload.php/theme_data/$encodedLogin/$sysId/$qstId/$campId/$etabId/$filterParam$anneeSegment',
         options: Options(responseType: ResponseType.plain),
       );
       final responseStr = response.data.toString().trim();
@@ -1633,6 +1690,116 @@ class ApiService {
   // Utilisé par toutes les méthodes de lecture (getSchools, getCampaigns, etc.)
   // ═══════════════════════════════════════════════════════════════════════════
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AK-SYNC — sync_status_ws.php (lecture seule, FAIL-OPEN)
+  //   GET /camp/:login/:id_camp/:id_sector/:id_annee      → synthèse serveur par école (U16/U17)
+  //   GET /feedback/:login/:id_camp/:id_annee              → demandes de correction / verrous (U19)
+  // Un serveur non migré renvoie 404 → on retourne null / [] sans lever d'erreur :
+  // la réconciliation et le feedback sont des compléments, jamais bloquants.
+  // Timeout court dédié (10 s) : ne doit pas ralentir l'ouverture d'une campagne.
+  // ═══════════════════════════════════════════════════════════════════════════
+  static const Duration _kSyncWsTimeout = Duration(seconds: 10);
+
+  Future<Map<String, dynamic>?> _getSyncWs(String path) async {
+    try {
+      final response = await _dio
+          .get(path, options: Options(responseType: ResponseType.plain))
+          .timeout(_kSyncWsTimeout);
+      final status = response.statusCode ?? 0;
+      if (status != 200) {
+        debugPrint('[ApiService] sync_status_ws HTTP $status → ignoré (fail-open)');
+        return null;
+      }
+      final raw = response.data?.toString().trim() ?? '';
+      if (raw.isEmpty) return null;
+      final parsed = json.decode(raw);
+      if (parsed is Map && parsed['se_status'] == 200 && parsed['se_data'] is Map) {
+        return Map<String, dynamic>.from(parsed['se_data'] as Map);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('[ApiService] sync_status_ws indisponible → fail-open : $e');
+      return null;
+    }
+  }
+
+  /// U16/U17 — Statut serveur par établissement pour une campagne.
+  /// Retourne Map<codeEtab, {statut, derniere_reception, statut_admin, commentaire_admin,
+  /// themes: Map<idTheme, {statut, date, nb_rows}>}> ; null si WS indisponible.
+  Future<Map<String, Map<String, dynamic>>?> fetchServerSyncStatus({
+    required String login,
+    required String campId,
+    required String sysId,
+    required String yearCode,
+  }) async {
+    final data = await _getSyncWs(
+        'sync_status_ws.php/camp/${Uri.encodeComponent(login)}/$campId/$sysId/${yearCode.isEmpty ? '0' : yearCode}');
+    if (data == null) return null;
+    final out = <String, Map<String, dynamic>>{};
+    final etabs = data['etabs'];
+    if (etabs is List) {
+      for (final e in etabs) {
+        if (e is! Map) continue;
+        final themes = <String, Map<String, dynamic>>{};
+        final th = e['themes'];
+        if (th is List) {
+          for (final t in th) {
+            if (t is Map) {
+              themes[t['id_theme'].toString()] = {
+                'statut': t['statut'],
+                'date': t['date'],
+                'nb_rows': t['nb_rows'],
+                'statut_admin': e['statut_admin'],
+                'commentaire': e['commentaire_admin'],
+              };
+            }
+          }
+        }
+        out[e['code_etab'].toString()] = {
+          'statut': e['statut'],
+          'derniere_reception': e['derniere_reception'],
+          'statut_admin': e['statut_admin'],
+          'commentaire_admin': e['commentaire_admin'],
+          'themes': themes,
+        };
+      }
+    }
+    return out;
+  }
+
+  /// U19 — Demandes de correction / verrous actifs pour l'agent.
+  /// Retourne [] si le WS est indisponible (fail-open), null jamais.
+  Future<List<SyncFeedback>?> fetchSyncFeedback({
+    required String login,
+    required String campId,
+    required String yearCode,
+  }) async {
+    final data = await _getSyncWs(
+        'sync_status_ws.php/feedback/${Uri.encodeComponent(login)}/$campId/${yearCode.isEmpty ? '0' : yearCode}');
+    if (data == null) return null;
+    final now = DateTime.now();
+    final out = <SyncFeedback>[];
+    final items = data['items'];
+    if (items is List) {
+      for (final it in items) {
+        if (it is! Map) continue;
+        out.add(SyncFeedback(
+          idCamp: campId,
+          codeTypeAnnee: yearCode,
+          idEtab: it['code_etab'].toString(),
+          idQst: it['id_theme'] == null ? null : it['id_theme'].toString(),
+          idFilter: it['code_filtre'] == null ? null : it['code_filtre'].toString(),
+          statut: (it['statut'] ?? '').toString(),
+          commentaire: (it['commentaire'] ?? '').toString(),
+          admin: (it['admin'] ?? '').toString(),
+          date: (it['date'] ?? '').toString(),
+          fetchedAt: now,
+        ));
+      }
+    }
+    return out;
+  }
+
   Future<dynamic> _get(String path) async {
     try {
       final response = await _dio.get(
@@ -1872,10 +2039,40 @@ class CoherenceRule {
 
 class ApiException implements Exception {
   final String message;
-  ApiException(this.message);
+  /// AK-SYNC : code métier serveur optionnel (YEAR_MISMATCH, ACCESS_DENIED, SURVEY_CLOSED…)
+  final String? code;
+  ApiException(this.message, {this.code});
 
   @override
   String toString() => message;
+}
+
+/// AK-SYNC U20 — Le serveur refuse la soumission : formulaire VALIDE / VERROUILLE
+/// par l'administration (SYNC_ETAB_STATUT). Les données locales sont conservées.
+class FormLockedException implements Exception {
+  final String themeId;
+  final String statut;
+  final String commentaire;
+  final String admin;
+  final String date;
+  FormLockedException({
+    required this.themeId,
+    required this.statut,
+    this.commentaire = '',
+    this.admin = '',
+    this.date = '',
+  });
+
+  @override
+  String toString() {
+    final who = <String>[];
+    if (admin.isNotEmpty) who.add(admin);
+    if (date.isNotEmpty) who.add(date);
+    final buf = StringBuffer('Formulaire $statut par l\'administration');
+    if (who.isNotEmpty) buf.write(' [${who.join(', ')}]');
+    if (commentaire.isNotEmpty) buf.write(' : $commentaire');
+    return buf.toString();
+  }
 }
 
 /// SESSION 53 — Exception levée quand le serveur retourne KOSAVE.
@@ -1893,10 +2090,13 @@ class ApiException implements Exception {
 class KosaveException implements Exception {
   final String themeId;
   final String message;
-  KosaveException({required this.themeId, this.message = 'KOSAVE'});
+  /// AK-SYNC U08 : indication d'erreur SQL extraite par le serveur (se_ack.error_hint)
+  final String? hint;
+  KosaveException({required this.themeId, this.message = 'KOSAVE', this.hint});
 
   @override
-  String toString() => 'KOSAVE (thème $themeId) : données reçues mais non enregistrées en base';
+  String toString() => 'KOSAVE (thème $themeId) : données reçues mais non enregistrées en base'
+      '${hint != null && hint!.isNotEmpty ? ' — $hint' : ''}';
 }
 
 /// CoherenceError — Violation de cohérence retournée par data_controle.php.

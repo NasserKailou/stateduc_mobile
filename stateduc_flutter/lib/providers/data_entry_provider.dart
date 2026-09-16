@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/question.dart';
 import '../models/user.dart';
+import '../models/sync_status.dart';
 import '../services/api_service.dart';
 import '../services/database_service.dart';
 import '../services/coherence_evaluator.dart';
@@ -118,6 +119,22 @@ class DataEntryProvider extends ChangeNotifier {
   // Évite d'évaluer la cohérence à chaque frappe — attend 800 ms d'inactivité.
   Timer? _coherenceDebounce;
 
+  // ─── AK-SYNC (ak_burundi) — état de synchronisation ─────────────────────────
+  /// U25 — verrou global : un seul envoi à la fois (unitaire OU global), tous écrans.
+  static bool _globalSendLock = false;
+  static bool get isAnySendRunning => _globalSendLock;
+
+  /// U04/U05 — état de sync par formulaire de l'établissement courant (clé = FormSyncStatus.key).
+  Map<String, FormSyncStatus> _syncStatuses = {};
+  /// État du formulaire courant (thème + période sélectionnés).
+  FormSyncStatus? _currentSyncStatus;
+  /// U06 — résultats détaillés du dernier envoi global.
+  List<SendOutcome> _lastBatchOutcomes = [];
+  /// U19 — feedbacks admin (corrections / verrous) de l'établissement courant.
+  List<SyncFeedback> _feedbacks = [];
+  /// U08 — dernier accusé de réception serveur.
+  ServerAck? _lastAck;
+
   // ─── Questions conditionnelles (Fix #5) ─────────────────────────────────────
   // Règles extraites du HTML du formulaire courant lors de selectQuestion().
   // Réévaluées à chaque updateField() pour les champs sources.
@@ -171,6 +188,69 @@ class DataEntryProvider extends ChangeNotifier {
   /// Ensemble des noms de champs actuellement désactivés (Fix #5 — questions conditionnelles).
   /// Mis à jour à chaque appel de updateField() sur un champ source.
   Set<String> get disabledFields => Set.unmodifiable(_disabledFields);
+
+  // ─── AK-SYNC getters ────────────────────────────────────────────────────────
+  FormSyncStatus? get currentSyncStatus => _currentSyncStatus;
+  List<SendOutcome> get lastBatchOutcomes => List.unmodifiable(_lastBatchOutcomes);
+  List<SyncFeedback> get feedbacks => List.unmodifiable(_feedbacks);
+  ServerAck? get lastAck => _lastAck;
+
+  /// Statut de sync d'un thème (toutes périodes confondues) pour les chips (U05).
+  /// Priorité d'affichage : locked > failed/kosave/rejected > pending > sent > null (jamais saisi).
+  SyncStatus? syncStatusForQuestion(String idQst) {
+    SyncStatus? best;
+    int rank(SyncStatus s) {
+      switch (s) {
+        case SyncStatus.locked: return 5;
+        case SyncStatus.kosave:
+        case SyncStatus.failed:
+        case SyncStatus.rejected: return 4;
+        case SyncStatus.pending: return 3;
+        case SyncStatus.sent: return 1;
+      }
+    }
+    for (final s in _syncStatuses.values) {
+      if (s.idQst != idQst) continue;
+      if (best == null || rank(s.status) > rank(best)) best = s.status;
+    }
+    return best;
+  }
+
+  /// Le formulaire courant est-il verrouillé par l'administration (U20/U21) ?
+  bool get isCurrentFormLocked {
+    if (_currentSyncStatus?.isLocked == true) return true;
+    final q = _selectedQuestion?.idQst;
+    if (q == null) return false;
+    return _feedbacks.any((f) => f.isLock && f.appliesTo(q, _selectedFilter?.idFilter));
+  }
+
+  /// Demande de correction admin applicable au formulaire courant (U19), sinon null.
+  SyncFeedback? get currentCorrectionRequest {
+    final q = _selectedQuestion?.idQst;
+    if (q == null) return null;
+    for (final f in _feedbacks) {
+      if (f.isCorrection && f.appliesTo(q, _selectedFilter?.idFilter)) return f;
+    }
+    return null;
+  }
+
+  /// Recharge l'état de sync de l'établissement courant depuis SQLite.
+  Future<void> refreshSyncStatuses() async {
+    if (_idCamp == null || _idEtab == null) return;
+    final list = await _db.getFormSyncStatusesForSchool(
+      idCamp: _idCamp!, idEtab: _idEtab!, codeTypeAnnee: _codeyear ?? '');
+    _syncStatuses = {for (final s in list) s.key: s};
+    _feedbacks = await _db.getSyncFeedback(_idCamp!, codeTypeAnnee: _codeyear ?? '', idEtab: _idEtab!);
+    _refreshCurrentSyncStatus();
+    notifyListeners();
+  }
+
+  void _refreshCurrentSyncStatus() {
+    final q = _selectedQuestion?.idQst;
+    if (q == null || _idCamp == null || _idEtab == null) { _currentSyncStatus = null; return; }
+    final key = '${_codeyear ?? ''}|$_idCamp|$_idEtab|$q|${_selectedFilter?.idFilter ?? ''}';
+    _currentSyncStatus = _syncStatuses[key];
+  }
 
   // SESSION 58 — FIX KOSAVE 10502 : filtre effectif côté serveur
   //
@@ -258,6 +338,10 @@ class DataEntryProvider extends ChangeNotifier {
     _isFirstQuestion = false;
     _conditionalRules = [];       // Fix #5 — réinitialisation à chaque école
     _disabledFields   = {};       // Fix #5
+    _syncStatuses      = {};      // AK-SYNC
+    _currentSyncStatus = null;
+    _feedbacks         = [];
+    _lastAck           = null;
     _isLoading      = true;
     notifyListeners();
 
@@ -265,6 +349,11 @@ class DataEntryProvider extends ChangeNotifier {
       // Charge les questions et les périodes de filtre depuis SQLite
       _questions     = await _db.getQuestions(idCamp, idSystem);
       _filterPeriods = await _db.getFilterPeriods(idCamp);
+      // AK-SYNC : état de synchronisation + feedbacks admin (SQLite, hors ligne OK)
+      final list = await _db.getFormSyncStatusesForSchool(
+        idCamp: idCamp, idEtab: idEtab, codeTypeAnnee: codeyear ?? '');
+      _syncStatuses = {for (final s in list) s.key: s};
+      _feedbacks = await _db.getSyncFeedback(idCamp, codeTypeAnnee: codeyear ?? '', idEtab: idEtab);
     } catch (e) {
       _error = 'Erreur chargement questions : ${e.toString()}';
     } finally {
@@ -477,6 +566,7 @@ class DataEntryProvider extends ChangeNotifier {
       _rules    = await _db.getValidationRules(_idCamp!, question.idQst);
       // Charge les valeurs de champs sauvegardées depuis SQLite
       await _loadFormData(idFilter: null);
+      _refreshCurrentSyncStatus();   // AK-SYNC
 
       // Pré-remplissage des champs d'identification.
       // Le formulaire d'identification (thème d'identification) contient des champs
@@ -576,8 +666,21 @@ class DataEntryProvider extends ChangeNotifier {
           campId:  idCamp,
           etabId:  idEtab,
           filter:  idFilter,
+          yearCode: _codeyear ?? '',  // AK-SYNC U13 : année explicite (pluriannuel)
         );
         if (serverFields == null || serverFields.isEmpty) return;
+
+        // AK-SYNC U12 — PROTECTION DES SAISIES LOCALES NON ENVOYÉES :
+        // Avant, saveCollectedData(serverStr) remettait is_sent=0 et écrasait en SQLite
+        // des champs modifiés localement (formulaire d'identification, forceOverwrite).
+        // Désormais :
+        //   • si le formulaire a des données locales EN ATTENTE (pending/failed/kosave),
+        //     on ne touche PAS à SQLite — on ne fait que compléter en mémoire les champs vides ;
+        //   • sinon (jamais saisi ou déjà synchronisé), on persiste les valeurs serveur
+        //     et on les marque comme synchronisées (is_sent=1, statut 'sent') car
+        //     elles SONT la vérité serveur.
+        final syncKey = '${_codeyear ?? ''}|$idCamp|$idEtab|${question.idQst}|${_selectedFilter?.idFilter ?? ''}';
+        final localPending = _syncStatuses[syncKey]?.status.needsSend == true;
 
         // Convertit les valeurs serveur en Map<String, String>
         // Le serveur retourne des tableaux [valeur, type] ex: [5, "text"] ou ["CODE_0_6","radio"]
@@ -601,24 +704,48 @@ class DataEntryProvider extends ChangeNotifier {
           }
           serverStr[k] = strVal;
         });
-        // Sauvegarde en SQLite pour utilisation hors ligne
-        await _db.saveCollectedData(
-          idCamp:         idCamp,
-          idEtab:         idEtab,
-          idQst:          question.idQst,
-          idFilter:       idFilter,
-          data:           serverStr,
-          codeTypeAnnee:  _codeyear ?? '',  // AK-YEAR-MULTI-01
-        );
+        // Sauvegarde en SQLite pour utilisation hors ligne — UNIQUEMENT si aucune
+        // saisie locale n'attend d'être envoyée (U12). Les lignes écrites viennent du
+        // serveur : elles sont marquées synchronisées (is_sent=1 / statut 'sent').
+        // NOTE : la clé SQLite reste _selectedFilter?.idFilter (pas le filtre serveur
+        // effectif) pour ne pas fragmenter les données locales — voir _effectiveServerFilter.
+        if (!localPending) {
+          final localFilter = _selectedFilter?.idFilter;
+          await _db.saveCollectedData(
+            idCamp:         idCamp,
+            idEtab:         idEtab,
+            idQst:          question.idQst,
+            idFilter:       localFilter,
+            data:           serverStr,
+            codeTypeAnnee:  _codeyear ?? '',  // AK-YEAR-MULTI-01
+          );
+          await _db.markCollectedDataSent(
+            idCamp: idCamp, idEtab: idEtab, idQst: question.idQst,
+            idFilter: localFilter, codeTypeAnnee: _codeyear ?? '');
+          final existing = _syncStatuses[syncKey];
+          if (existing == null || existing.status == SyncStatus.sent) {
+            await _db.recordSendAttempt(
+              idCamp: idCamp, idEtab: idEtab, idQst: question.idQst,
+              idFilter: localFilter, codeTypeAnnee: _codeyear ?? '',
+              status: SyncStatus.sent, error: null);
+            // recordSendAttempt incrémente attempts : acceptable (trace d'un rechargement).
+          }
+          await refreshSyncStatuses();
+        } else {
+          debugPrint('[DataEntry] _autoReloadFromServerBackground: saisies locales en attente '
+              'pour qst=${question.idQst} → SQLite non écrasé (U12)');
+        }
         // Met à jour en mémoire uniquement si la même question est toujours affichée
         if (_selectedQuestion?.idQst == question.idQst) {
           // Stratégie de fusion :
           // - Si les données locales étaient vides : remplissage complet (rechargement total)
           // - Si les données locales étaient présentes (formulaire d'identification) :
           //   ne remplit que les champs vides/manquants pour préserver les saisies
+          // - U12 : si des saisies locales sont en attente, on ne remplit QUE les vides
+          //   (jamais d'écrasement complet).
           bool changed = false;
           for (final entry in serverStr.entries) {
-            if (localWasEmpty) {
+            if (localWasEmpty && !localPending) {
               // Écrasement complet — pas de saisies à protéger
               _formData[entry.key] = entry.value;
               changed = true;
@@ -633,7 +760,7 @@ class DataEntryProvider extends ChangeNotifier {
               }
             }
           }
-          if (localWasEmpty) {
+          if (localWasEmpty && !localPending) {
             _hasUnsavedChanges = false;
           }
           if (changed) {
@@ -737,6 +864,7 @@ class DataEntryProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await _loadFormData(idFilter: filter?.idFilter);
+      _refreshCurrentSyncStatus();   // AK-SYNC
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -933,6 +1061,15 @@ class DataEntryProvider extends ChangeNotifier {
         data:          _formData,
         codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
+      // AK-SYNC U04 : le formulaire (re)passe en attente d'envoi
+      await _db.markFormLocallyModified(
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        codeTypeAnnee: _codeyear ?? '',
+      );
+      await refreshSyncStatuses();
       _hasUnsavedChanges = false;
       _successMessage    = 'Données sauvegardées localement';
       notifyListeners();
@@ -1051,6 +1188,19 @@ class DataEntryProvider extends ChangeNotifier {
         _selectedQuestion == null) {
       return false;
     }
+    // AK-SYNC U25 : un seul envoi à la fois, tous écrans confondus
+    if (_globalSendLock) {
+      _error = 'Un envoi est déjà en cours. Patientez puis réessayez.';
+      notifyListeners();
+      return false;
+    }
+    // AK-SYNC U20/U21 : formulaire verrouillé par l'administration → pas d'envoi
+    if (isCurrentFormLocked) {
+      _error = 'Ce formulaire a été validé/verrouillé par l\'administration. '
+               'Rechargez-le depuis le serveur pour consulter les données officielles.';
+      notifyListeners();
+      return false;
+    }
 
     // AK-YEAR-MULTI-02 : vérification cohérence année avant tout envoi
     if (!await _checkYearConsistency(user)) return false;
@@ -1058,16 +1208,16 @@ class DataEntryProvider extends ChangeNotifier {
     // Sauvegarde locale d'abord (assure la persistance même si l'envoi échoue)
     await saveLocally();
 
+    _globalSendLock   = true;
     _isSending        = true;
     _sendAttempt      = 1;  // première tentative
     _error            = null;
     _successMessage   = null;
     _warningMessage   = null;  // SESSION 53 : réinitialise l'avertissement KOSAVE
+    _lastAck          = null;
     notifyListeners();
 
     try {
-      // saveData() utilise _withRetry() en interne — le retry est transparent ici.
-      // _sendAttempt sera mis à jour via le callback onRetry si le retry se déclenche.
       // SESSION 58 — FIX KOSAVE 10502 : utilise _effectiveServerFilter
       // au lieu de _selectedFilter?.idFilter pour éviter que PHP utilise
       // une valeur résiduelle de $_SESSION['filtre'] (voir getter doc).
@@ -1075,96 +1225,204 @@ class DataEntryProvider extends ChangeNotifier {
       debugPrint('[DataEntry] sendToServer: selectedFilter=${_selectedFilter?.idFilter} '
           'effectiveServerFilter=$serverFilter '
           '(filterPeriods=${_filterPeriods.length})');
-      final ok = await _api.saveData(
-        login:            user.login,         // ← utilise login, pas idUser !
-        campId:           _idCamp!,
-        sysId:            _idSystem!,
-        qstId:            _selectedQuestion!.idQst,
-        etabId:           _idEtab!,
-        filter:           serverFilter,       // SESSION 58: filtre effectif serveur
-        formData:         _formData,
-        etabRegroupId:    _idRegroupEtab,     // pour LOC_REG_0 (première question)
-        isFirstQuestion:  _isFirstQuestion,
-        yearCode:         _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
+
+      final outcome = await _sendOneForm(
+        user:           user,
+        idCamp:         _idCamp!,
+        idSystem:       _idSystem!,
+        idQst:          _selectedQuestion!.idQst,
+        idEtab:         _idEtab!,
+        localFilter:    _selectedFilter?.idFilter,
+        serverFilter:   serverFilter,
+        formData:       _formData,
+        etabRegroupId:  _idRegroupEtab,
+        isFirstQuestion: _isFirstQuestion,
         onRetry: (attempt) {
-          // Callback appelé par _withRetry avant chaque nouvelle tentative
           _sendAttempt = attempt + 1;
           notifyListeners();
         },
       );
-      if (ok) {
-        // Marque les données comme envoyées dans SQLite
-        await _db.markCollectedDataSent(
-          idCamp:        _idCamp!,
-          idEtab:        _idEtab!,
-          idQst:         _selectedQuestion!.idQst,
-          idFilter:      _selectedFilter?.idFilter,
-          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-        );
-        _successMessage = 'Données envoyées avec succès';
-        notifyListeners();
+      _lastAck = outcome.ack;
+      await refreshSyncStatuses();
 
-        // ── Contrôle de cohérence serveur (non bloquant) ────────────────
-        // S'exécute automatiquement après chaque envoi réussi.
-        // controle_theme_batch.class.php exécute les règles SQL sur les
-        // données nouvellement sauvegardées en DB et retourne les violations.
-        _isCheckingCoherence = true;
-        _coherenceErrors     = [];
-        notifyListeners();
-        try {
-          _coherenceErrors = await _api.checkCoherence(
-            login:    user.login,
-            campId:   _idCamp!,
-            sysId:    _idSystem!,
-            qstId:    _selectedQuestion!.idQst,
-            etabId:   _idEtab!,
-            filter:   serverFilter,   // SESSION 58: filtre effectif serveur
-            yearCode: _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
-          );
-        } catch (_) {
-          _coherenceErrors = []; // Non fatal — ignoré silencieusement
-        } finally {
-          _isCheckingCoherence = false;
+      switch (outcome.kind) {
+        case SendOutcomeKind.ok:
+          final ack = outcome.ack;
+          _successMessage = 'Données envoyées avec succès'
+              '${ack != null && ack.duplicate ? ' (déjà reçues par le serveur)' : ''}'
+              '${ack != null && ack.summary.isNotEmpty ? ' — ${ack.summary}' : ''}';
+          if (ack?.correctionCleared == true) {
+            _successMessage = '$_successMessage\nLa demande de correction a été levée.';
+          }
+          if (ack?.warning == 'NO_DELETE_GUARD') {
+            _warningMessage = '⚠ Le serveur a conservé ${ack!.nbDeletePrevented ?? 0} ligne(s) '
+                'absente(s) de votre envoi (protection anti-suppression).';
+          }
           notifyListeners();
-        }
-      } else {
-        _error = 'Échec de l\'envoi. Réessayez.';
+
+          // ── Contrôle de cohérence serveur (non bloquant) ────────────────
+          _isCheckingCoherence = true;
+          _coherenceErrors     = [];
+          notifyListeners();
+          try {
+            _coherenceErrors = await _api.checkCoherence(
+              login:    user.login,
+              campId:   _idCamp!,
+              sysId:    _idSystem!,
+              qstId:    _selectedQuestion!.idQst,
+              etabId:   _idEtab!,
+              filter:   serverFilter,
+              yearCode: _codeyear ?? user.codeyear,
+            );
+          } catch (_) {
+            _coherenceErrors = [];
+          } finally {
+            _isCheckingCoherence = false;
+            notifyListeners();
+          }
+          return true;
+
+        case SendOutcomeKind.kosave:
+          // AK-SYNC U02 : KOSAVE n'est PLUS marqué comme envoyé. Le formulaire reste
+          // en attente (statut 'kosave') et sera proposé au renvoi.
+          _warningMessage = '⚠ Données reçues par le serveur mais NON enregistrées '
+              '(thème ${outcome.idQst}). Elles restent en attente d\'envoi.'
+              '${outcome.message != null && outcome.message!.isNotEmpty ? '\nDétail : ${outcome.message}' : ''}';
+          notifyListeners();
+          return false;
+
+        case SendOutcomeKind.locked:
+          _error = outcome.message ?? 'Formulaire verrouillé par l\'administration.';
+          notifyListeners();
+          return false;
+
+        case SendOutcomeKind.rejected:
+        case SendOutcomeKind.yearMismatch:
+        case SendOutcomeKind.networkError:
+          _error = outcome.message ?? 'Échec de l\'envoi. Réessayez.';
+          notifyListeners();
+          return false;
+
+        case SendOutcomeKind.noData:
+        case SendOutcomeKind.skipped:
+          _error = 'Aucune donnée à envoyer.';
+          notifyListeners();
+          return false;
       }
-      notifyListeners();
-      return ok;
-    } on KosaveException catch (e) {
-      // SESSION 53 — KOSAVE : données reçues par le serveur mais non enregistrées
-      // en base. La sauvegarde locale est déjà faite → pas de perte de données.
-      // On marque quand même comme "envoyé" en local pour éviter les renvois
-      // répétés, et on affiche un avertissement orange à l'utilisateur.
-      debugPrint('[DataEntry] KOSAVE pour thème ${e.themeId} : ${e.toString()}');
-      try {
-        await _db.markCollectedDataSent(
-          idCamp:        _idCamp!,
-          idEtab:        _idEtab!,
-          idQst:         _selectedQuestion!.idQst,
-          idFilter:      _selectedFilter?.idFilter,
-          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-        );
-      } catch (_) { /* non fatal */ }
-      _warningMessage = '⚠ Données envoyées mais non enregistrées sur le serveur '
-          '(thème ${e.themeId}). Vérifiez avec l\'administrateur si les données '
-          'apparaissent côté serveur.';
-      notifyListeners();
-      return true;  // Retourne true : l'envoi a techniquement réussi (KOSAVE ≠ échec réseau)
-    } on ApiException catch (e) {
-      _error = e.message;
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _error = 'Erreur envoi : ${e.toString()}';
-      notifyListeners();
-      return false;
     } finally {
-      _isSending   = false;
-      _sendAttempt = 0;   // remet à zéro : overlay "Tentative N/3" disparaît
+      _isSending      = false;
+      _sendAttempt    = 0;   // remet à zéro : overlay "Tentative N/3" disparaît
+      _globalSendLock = false;
       notifyListeners();
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AK-SYNC — PRIMITIVE D'ENVOI D'UN FORMULAIRE (U02, U06, U11, U20)
+  //
+  // Point unique d'appel de ApiService.saveData() pour TOUS les chemins d'envoi
+  // (unitaire, école, campagne, « en attente »). Garantit :
+  //   • un sync_id d'idempotence par tentative logique (conservé sur les retries) ;
+  //   • l'enregistrement systématique du résultat dans form_sync_status
+  //     (sent / failed / kosave / rejected / locked) + is_sent compat ;
+  //   • KOSAVE ≠ envoyé (U02) ;
+  //   • un résultat typé (SendOutcome) au lieu d'un bool (U06).
+  //
+  // [localFilter]  : clé SQLite (période sélectionnée ou null)
+  // [serverFilter] : filtre transmis au serveur (peut différer — cf. _effectiveServerFilter)
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<SendOutcome> _sendOneForm({
+    required User user,
+    required String idCamp,
+    required String idSystem,
+    required String idQst,
+    required String idEtab,
+    required String? localFilter,
+    required String? serverFilter,
+    required Map<String, String> formData,
+    String? etabRegroupId,
+    bool isFirstQuestion = false,
+    void Function(int attempt)? onRetry,
+  }) async {
+    final annee = _codeyear ?? '';
+    if (formData.isEmpty) {
+      return SendOutcome(kind: SendOutcomeKind.noData, idEtab: idEtab, idQst: idQst, idFilter: localFilter);
+    }
+    final syncId = ApiService.newSyncId();
+    try {
+      final ok = await _api.saveData(
+        login:           user.login,
+        campId:          idCamp,
+        sysId:           idSystem,
+        qstId:           idQst,
+        etabId:          idEtab,
+        filter:          serverFilter,
+        formData:        formData,
+        etabRegroupId:   etabRegroupId,
+        isFirstQuestion: isFirstQuestion,
+        yearCode:        annee.isNotEmpty ? annee : user.codeyear,
+        onRetry:         onRetry,
+        syncId:          syncId,
+      );
+      final ack = _api.lastAck;
+      if (ok) {
+        await _db.recordSendAttempt(
+          idCamp: idCamp, idEtab: idEtab, idQst: idQst, idFilter: localFilter,
+          codeTypeAnnee: annee, status: SyncStatus.sent, syncId: syncId, ack: ack,
+          adminStatus: ack?.correctionCleared == true ? 'RECU' : null);
+        return SendOutcome(kind: SendOutcomeKind.ok, idEtab: idEtab, idQst: idQst, idFilter: localFilter, ack: ack);
+      }
+      // saveData() ne retourne plus false silencieusement (U01) — sécurité :
+      await _db.recordSendAttempt(
+        idCamp: idCamp, idEtab: idEtab, idQst: idQst, idFilter: localFilter,
+        codeTypeAnnee: annee, status: SyncStatus.failed, syncId: syncId,
+        error: 'Réponse serveur inattendue');
+      return SendOutcome(kind: SendOutcomeKind.networkError, idEtab: idEtab, idQst: idQst,
+          idFilter: localFilter, message: 'Réponse serveur inattendue');
+    } on KosaveException catch (e) {
+      final ack = _api.lastAck;
+      await _db.recordSendAttempt(
+        idCamp: idCamp, idEtab: idEtab, idQst: idQst, idFilter: localFilter,
+        codeTypeAnnee: annee, status: SyncStatus.kosave, syncId: syncId, ack: ack,
+        error: e.hint ?? 'KOSAVE');
+      return SendOutcome(kind: SendOutcomeKind.kosave, idEtab: idEtab, idQst: idQst,
+          idFilter: localFilter, message: e.hint, ack: ack);
+    } on FormLockedException catch (e) {
+      await _db.recordSendAttempt(
+        idCamp: idCamp, idEtab: idEtab, idQst: idQst, idFilter: localFilter,
+        codeTypeAnnee: annee, status: SyncStatus.locked, syncId: syncId,
+        error: e.toString(), adminStatus: e.statut, adminComment: e.commentaire);
+      return SendOutcome(kind: SendOutcomeKind.locked, idEtab: idEtab, idQst: idQst,
+          idFilter: localFilter, message: e.toString());
+    } on ApiException catch (e) {
+      // Rejet métier (400 : année, accès, campagne) → 'rejected' ; réseau/timeout → 'failed'
+      final isReject = e.code != null ||
+          e.message.contains('Annee incorrecte') ||
+          e.message.contains('acc') && e.message.contains('campagne') ||
+          e.message.contains('pas ouverte');
+      await _db.recordSendAttempt(
+        idCamp: idCamp, idEtab: idEtab, idQst: idQst, idFilter: localFilter,
+        codeTypeAnnee: annee, status: isReject ? SyncStatus.rejected : SyncStatus.failed,
+        syncId: syncId, error: e.message);
+      return SendOutcome(kind: isReject ? SendOutcomeKind.rejected : SendOutcomeKind.networkError,
+          idEtab: idEtab, idQst: idQst, idFilter: localFilter, message: e.message);
+    } catch (e) {
+      await _db.recordSendAttempt(
+        idCamp: idCamp, idEtab: idEtab, idQst: idQst, idFilter: localFilter,
+        codeTypeAnnee: annee, status: SyncStatus.failed, syncId: syncId, error: e.toString());
+      return SendOutcome(kind: SendOutcomeKind.networkError, idEtab: idEtab, idQst: idQst,
+          idFilter: localFilter, message: e.toString());
+    }
+  }
+
+  /// Filtre serveur effectif pour un formulaire donné en batch (mirror de
+  /// _effectiveServerFilter) : période locale si présente, sinon première période
+  /// de la campagne si la question est périodique, sinon null.
+  String? _serverFilterFor(String? localFilter, {required bool hasFilter}) {
+    if (localFilter != null && localFilter.isNotEmpty) return localFilter;
+    if (_filterPeriods.isNotEmpty && hasFilter) return _filterPeriods.first.idFilter;
+    if (_filterPeriods.isNotEmpty) return _filterPeriods.first.idFilter; // même règle que _effectiveServerFilter
+    return null;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -1324,6 +1582,7 @@ class DataEntryProvider extends ChangeNotifier {
         campId:   _idCamp!,
         etabId:   _idEtab!,
         filter:   _selectedFilter?.idFilter,
+        yearCode: _codeyear ?? '',  // AK-SYNC U13 : année explicite (pluriannuel)
       );
 
       if (serverFields == null) {
@@ -1378,6 +1637,18 @@ class DataEntryProvider extends ChangeNotifier {
         idFilter:      _selectedFilter?.idFilter,
         codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
       );
+      // AK-SYNC U04/U17 : le formulaire local = copie du serveur → statut 'sent'
+      // (lève aussi un éventuel statut kosave/failed local, mais PAS un verrou admin :
+      //  recordSendAttempt ne touche pas admin_status quand adminStatus est null).
+      await _db.recordSendAttempt(
+        idCamp:        _idCamp!,
+        idEtab:        _idEtab!,
+        idQst:         _selectedQuestion!.idQst,
+        idFilter:      _selectedFilter?.idFilter,
+        codeTypeAnnee: _codeyear ?? '',
+        status:        SyncStatus.sent,
+      );
+      await refreshSyncStatuses();
 
       _formData          = serverFieldsStr;
       _hasUnsavedChanges = false;
@@ -1399,24 +1670,135 @@ class DataEntryProvider extends ChangeNotifier {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // ENVOYER TOUS LES FORMULAIRES D'UN ÉTABLISSEMENT (envoi global établissement)
+  // AK-SYNC — MOTEUR D'ENVOI GLOBAL (U03, U06, U07)
   //
-  // Envoie toutes les questions/formulaires de l'établissement COURANT en une
-  // seule opération. C'est l'équivalent de cliquer sur "Envoyer" pour chaque
-  // formulaire individuellement, mais en une seule action.
+  // Un seul moteur pour « Envoyer tous les formulaires » (école / campagne) et
+  // « Envoyer uniquement les formulaires en attente ». Corrige les défauts des
+  // anciens batchs :
+  //   • itère sur (etab, qst, id_filter) → les thèmes PÉRIODIQUES sont inclus (U03) ;
+  //   • transmet filter / etabRegroupId / isFirstQuestion comme sendToServer() ;
+  //   • passe par _sendOneForm() → statut persistant, KOSAVE ≠ envoyé, sync_id ;
+  //   • retourne une liste typée SendOutcome (U06) en plus de la Map<String,bool>
+  //     historique (compatibilité des écrans existants).
   //
-  // Retourne une Map<idQst, bool> indiquant le résultat pour chaque formulaire.
-  // Le callback [onProgress] est appelé après chaque envoi pour mettre à jour
-  // une éventuelle barre de progression dans l'interface.
-  //
-  // Contrairement à sendToServer() qui n'envoie que le formulaire courant,
-  // cette méthode itère sur TOUTES les questions de l'établissement actuel.
+  // [forms]      : liste de {id_etab, id_qst, id_filter('' si aucune)}
+  // [onProgress] : (envoyés, total)
   // ═══════════════════════════════════════════════════════════════════════════
+  Future<List<SendOutcome>> _sendForms({
+    required User user,
+    required String idCamp,
+    required String idSystem,
+    required List<Map<String, String>> forms,
+    void Function(int sent, int total)? onProgress,
+  }) async {
+    final outcomes = <SendOutcome>[];
+    if (forms.isEmpty) return outcomes;
+    if (_globalSendLock) {
+      _error = 'Un envoi est déjà en cours. Patientez puis réessayez.';
+      notifyListeners();
+      return outcomes;
+    }
+    // Métadonnées des questions (hasFilter, première question) pour ce système
+    List<Question> questions = _questions;
+    if (questions.isEmpty || _idSystem != idSystem || _idCamp != idCamp) {
+      try { questions = await _db.getQuestions(idCamp, idSystem); } catch (_) {}
+    }
+    if (_filterPeriods.isEmpty) {
+      try { _filterPeriods = await _db.getFilterPeriods(idCamp); } catch (_) {}
+    }
+    final firstQst = questions.isNotEmpty ? questions.first.idQst : null;
+    final hasFilterByQst = {for (final q in questions) q.idQst: q.hasFilter};
+    // Feedbacks (verrous) de la campagne pour éviter des rejets inutiles
+    final feedbacks = await _db.getSyncFeedback(idCamp, codeTypeAnnee: _codeyear ?? '');
+    // Regroupement des écoles (LOC_REG_0) — lu une fois
+    final schools = await _db.getSchools(idCamp);
+    final regroupByEtab = {for (final s in schools) s.idEtab: s.idRegroup};
+    // Libellés nominatifs pour le dialogue de résultat (U06)
+    final libEtabById = {for (final s in schools) s.idEtab: s.libEtab};
+    final libQstById  = {for (final q in questions) q.idQst: q.libQst};
+    SendOutcome labeled(SendOutcome o) =>
+        o.withLabels(libEtab: libEtabById[o.idEtab], libQst: libQstById[o.idQst]);
 
-  /// Envoie tous les formulaires de l'établissement courant vers le serveur.
-  ///
-  /// [user] : utilisateur connecté (login + yearCode).
-  /// [onProgress] : callback optionnel appelé après chaque envoi avec (index, total).
+    final total = forms.length;
+    int done = 0;
+    _globalSendLock = true;
+    _isSending      = true;
+    _error          = null;
+    _successMessage = null;
+    _warningMessage = null;
+    notifyListeners();
+    try {
+      for (final f in forms) {
+        final etabId  = f['id_etab']!;
+        final qstId   = f['id_qst']!;
+        final rawF    = f['id_filter'] ?? '';
+        final localFilter = rawF.isEmpty ? null : rawF;
+
+        // Verrou admin connu localement → on n'envoie pas (évite REJET_VERROU)
+        final locked = feedbacks.any((fb) => fb.idEtab == etabId && fb.isLock && fb.appliesTo(qstId, localFilter));
+        if (locked) {
+          outcomes.add(labeled(SendOutcome(kind: SendOutcomeKind.locked, idEtab: etabId, idQst: qstId,
+              idFilter: localFilter, message: 'Verrouillé par l\'administration')));
+          done++; onProgress?.call(done, total); continue;
+        }
+
+        final data = await _db.getCollectedData(
+          idCamp: idCamp, idEtab: etabId, idQst: qstId, idFilter: localFilter,
+          codeTypeAnnee: _codeyear ?? '');
+        if (data.isEmpty) {
+          outcomes.add(labeled(SendOutcome(kind: SendOutcomeKind.noData, idEtab: etabId, idQst: qstId, idFilter: localFilter)));
+          done++; onProgress?.call(done, total); continue;
+        }
+        final outcome = await _sendOneForm(
+          user:            user,
+          idCamp:          idCamp,
+          idSystem:        idSystem,
+          idQst:           qstId,
+          idEtab:          etabId,
+          localFilter:     localFilter,
+          serverFilter:    _serverFilterFor(localFilter, hasFilter: hasFilterByQst[qstId] ?? false),
+          formData:        data,
+          etabRegroupId:   regroupByEtab[etabId],
+          isFirstQuestion: firstQst != null && firstQst == qstId,
+        );
+        outcomes.add(labeled(outcome));
+        done++; onProgress?.call(done, total);
+      }
+      _lastBatchOutcomes = outcomes;
+      final ok   = outcomes.where((o) => o.isSuccess).length;
+      final ko   = outcomes.where((o) => o.isFailure).length;
+      final skip = outcomes.where((o) => o.kind == SendOutcomeKind.noData || o.kind == SendOutcomeKind.skipped).length;
+      _successMessage = '$ok formulaire(s) envoyé(s) avec succès'
+          '${ko > 0 ? ', $ko en échec' : ''}${skip > 0 ? ', $skip sans données' : ''}.';
+      notifyListeners();
+      return outcomes;
+    } catch (e) {
+      _error = 'Erreur envoi global : ${e.toString()}';
+      _lastBatchOutcomes = outcomes;
+      notifyListeners();
+      return outcomes;
+    } finally {
+      _isSending      = false;
+      _globalSendLock = false;
+      if (_idCamp == idCamp && _idEtab != null) { await refreshSyncStatuses(); }
+      notifyListeners();
+    }
+  }
+
+  static Map<String, bool> _outcomesToLegacyMap(List<SendOutcome> outcomes, {bool withEtab = true}) {
+    final m = <String, bool>{};
+    for (final o in outcomes) {
+      final suffix = (o.idFilter != null && o.idFilter!.isNotEmpty) ? '_${o.idFilter}' : '';
+      final key = withEtab ? '${o.idEtab}_${o.idQst}$suffix' : '${o.idQst}$suffix';
+      m[key] = o.isSuccess;
+    }
+    return m;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ENVOYER TOUS LES FORMULAIRES D'UN ÉTABLISSEMENT (envoi global établissement)
+  // Signature historique conservée (Map<idQst[_filtre], bool>).
+  // ═══════════════════════════════════════════════════════════════════════════
   Future<Map<String, bool>> sendAllFormsForSchool({
     required User user,
     void Function(int sent, int total)? onProgress,
@@ -1426,234 +1808,76 @@ class DataEntryProvider extends ChangeNotifier {
       notifyListeners();
       return {};
     }
-
-    final results = <String, bool>{};
-    final questionsToSend = List<Question>.from(_questions);
-    final total = questionsToSend.length;
-    int sent = 0;
-
-    _isSending = true;
-    _error     = null;
-    _successMessage = null;
-    notifyListeners();
-
-    try {
-      for (int i = 0; i < questionsToSend.length; i++) {
-        final q = questionsToSend[i];
-        // Charge les données collectées pour cette question depuis SQLite
-        final data = await _db.getCollectedData(
-          idCamp:        _idCamp!,
-          idEtab:        _idEtab!,
-          idQst:         q.idQst,
-          idFilter:      null,
-          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-        );
-        if (data.isEmpty) {
-          // Aucune donnée locale pour ce formulaire → ignore
-          results[q.idQst] = false;
-          sent++;
-          onProgress?.call(sent, total);
-          continue;
-        }
-
-        final isFirst = _questions.isNotEmpty && _questions.first.idQst == q.idQst;
-        try {
-          final ok = await _api.saveData(
-            login:           user.login,
-            campId:          _idCamp!,
-            sysId:           _idSystem!,
-            qstId:           q.idQst,
-            etabId:          _idEtab!,
-            filter:          null,
-            formData:        data,
-            etabRegroupId:   _idRegroupEtab,
-            isFirstQuestion: isFirst,
-            yearCode:        _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
-          );
-          results[q.idQst] = ok;
-          if (ok) {
-            await _db.markCollectedDataSent(
-              idCamp:        _idCamp!,
-              idEtab:        _idEtab!,
-              idQst:         q.idQst,
-              idFilter:      null,
-              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-            );
-          }
-        } on KosaveException catch (e) {
-          // SESSION 53 — KOSAVE en envoi batch : marquer comme envoyé en local,
-          // avertir mais ne pas bloquer les autres formulaires.
-          debugPrint('[DataEntry] sendAllFormsForSchool KOSAVE qst=${q.idQst}: $e');
-          results[q.idQst] = true;  // Compté comme envoyé (reçu par le serveur)
-          try {
-            await _db.markCollectedDataSent(
-              idCamp:        _idCamp!,
-              idEtab:        _idEtab!,
-              idQst:         q.idQst,
-              idFilter:      null,
-              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-            );
-          } catch (_) { /* non fatal */ }
-          _warningMessage = (_warningMessage == null ? '' : '$_warningMessage\n') +
-              '⚠ Thème ${q.idQst} : reçu mais non enregistré côté serveur (KOSAVE)';
-        } on ApiException catch (e) {
-          results[q.idQst] = false;
-          debugPrint('[DataEntry] sendAllFormsForSchool: '
-              'ApiException for qst=${q.idQst}: ${e.message}');
-        } catch (e) {
-          results[q.idQst] = false;
-          debugPrint('[DataEntry] sendAllFormsForSchool: '
-              'error for qst=${q.idQst}: $e');
-        }
-        sent++;
-        onProgress?.call(sent, total);
-      }
-
-      // Résumé
-      final okCount   = results.values.where((v) => v).length;
-      final skipCount = results.values.where((v) => !v).length;
-      _successMessage = '$okCount formulaire(s) envoyé(s) avec succès'
-          '${skipCount > 0 ? ', $skipCount ignoré(s) (données manquantes ou erreur)' : ''}.';
-      notifyListeners();
-      return results;
-    } catch (e) {
-      _error = 'Erreur envoi global : ${e.toString()}';
-      notifyListeners();
-      return results;
-    } finally {
-      _isSending = false;
-      notifyListeners();
-    }
+    final forms = await _db.getDistinctFormsWithData(_idCamp!, codeTypeAnnee: _codeyear ?? '', idEtab: _idEtab!);
+    final outcomes = await _sendForms(user: user, idCamp: _idCamp!, idSystem: _idSystem!, forms: forms, onProgress: onProgress);
+    return _outcomesToLegacyMap(outcomes, withEtab: false);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // ENVOYER TOUS LES FORMULAIRES DE TOUS LES ÉTABLISSEMENTS (envoi global campagne)
-  //
-  // Envoie TOUTES les données collectées pour TOUS les établissements de la
-  // campagne courante. Utilise getDistinctEtabQstWithData() pour trouver tous
-  // les couples (id_etab, id_qst) qui ont des données, sans se limiter à
-  // l'établissement actuellement affiché.
-  //
-  // Le callback [onProgress] est appelé après chaque envoi pour mettre à jour
-  // une barre de progression dans l'interface.
-  //
-  // Retourne Map<"${idEtab}_${idQst}", bool> pour le résumé de l'opération.
+  // Signature historique conservée (Map<"etab_qst[_filtre]", bool>).
   // ═══════════════════════════════════════════════════════════════════════════
-
-  /// Envoie tous les formulaires de tous les établissements de la campagne.
-  ///
-  /// [user] : utilisateur connecté (login + codeyear + yearCode).
-  /// [idCamp] : identifiant de la campagne à synchroniser.
-  /// [idSystem] : identifiant du système éducatif.
-  /// [onProgress] : callback optionnel appelé après chaque envoi (index, total).
   Future<Map<String, bool>> sendAllFormsForCampaign({
     required User user,
     required String idCamp,
     required String idSystem,
     void Function(int sent, int total)? onProgress,
   }) async {
-    final results = <String, bool>{};
-
-    // Récupère tous les couples (etab, qst) qui ont des données pour la campagne
-    final etabQstList = await _db.getDistinctEtabQstWithData(
-      idCamp,
-      codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-    );
-    if (etabQstList.isEmpty) {
+    final forms = await _db.getDistinctFormsWithData(idCamp, codeTypeAnnee: _codeyear ?? '');
+    if (forms.isEmpty) {
       _successMessage = 'Aucune donnée locale à envoyer pour cette campagne.';
       notifyListeners();
       return {};
     }
-
-    final total = etabQstList.length;
-    int sent = 0;
-
-    _isSending      = true;
-    _error          = null;
-    _successMessage = null;
-    notifyListeners();
-
-    try {
-      for (int i = 0; i < etabQstList.length; i++) {
-        final pair    = etabQstList[i];
-        final etabId  = pair['id_etab']!;
-        final qstId   = pair['id_qst']!;
-        final key     = '${etabId}_$qstId';
-
-        // Charge les données pour ce couple (etab, qst)
-        final data = await _db.getCollectedData(
-          idCamp:        idCamp,
-          idEtab:        etabId,
-          idQst:         qstId,
-          idFilter:      null,
-          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-        );
-        if (data.isEmpty) {
-          results[key] = false;
-          sent++;
-          onProgress?.call(sent, total);
-          continue;
-        }
-
-        try {
-          final ok = await _api.saveData(
-            login:    user.login,
-            campId:   idCamp,
-            sysId:    idSystem,
-            qstId:    qstId,
-            etabId:   etabId,
-            filter:   null,
-            formData: data,
-            yearCode: _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
-          );
-          results[key] = ok;
-          if (ok) {
-            await _db.markCollectedDataSent(
-              idCamp:        idCamp,
-              idEtab:        etabId,
-              idQst:         qstId,
-              idFilter:      null,
-              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-            );
-          }
-        } on ApiException catch (e) {
-          results[key] = false;
-          debugPrint('[DataEntry] sendAllFormsForCampaign: '
-              'ApiException for $key: ${e.message}');
-        } catch (e) {
-          results[key] = false;
-          debugPrint('[DataEntry] sendAllFormsForCampaign: error for $key: $e');
-        }
-        sent++;
-        onProgress?.call(sent, total);
-      }
-
-      final okCount   = results.values.where((v) => v).length;
-      final failCount = results.values.where((v) => !v).length;
-      _successMessage = '$okCount formulaire(s) envoyé(s) avec succès'
-          '${failCount > 0 ? ', $failCount ignoré(s)' : ''}.';
-      notifyListeners();
-      return results;
-    } catch (e) {
-      _error = 'Erreur envoi global campagne : ${e.toString()}';
-      notifyListeners();
-      return results;
-    } finally {
-      _isSending = false;
-      notifyListeners();
-    }
+    final outcomes = await _sendForms(user: user, idCamp: idCamp, idSystem: idSystem, forms: forms, onProgress: onProgress);
+    return _outcomesToLegacyMap(outcomes);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // ENVOYER TOUTES LES DONNÉES D'UNE CAMPAGNE (page_camp.js sendAllData)
-  //
-  // Envoie toutes les données collectées pour tous les établissements et
-  // toutes les questions d'une campagne. Retourne un dictionnaire de résultats
-  // indexé par "${idEtab}_${idQst}" (vrai = envoyé, faux = échec).
-  //
-  // Utilisé pour la synchronisation globale depuis l'écran de campagne.
+  // AK-SYNC U07 — ENVOYER UNIQUEMENT LES FORMULAIRES EN ATTENTE
+  // (statut pending / failed / kosave + repli is_sent=0). [idEtab] optionnel
+  // restreint à un établissement. Retourne les résultats typés.
   // ═══════════════════════════════════════════════════════════════════════════
+  Future<List<SendOutcome>> sendPendingForms({
+    required User user,
+    required String idCamp,
+    required String idSystem,
+    String? idEtab,
+    void Function(int sent, int total)? onProgress,
+  }) async {
+    final pending = await _db.getPendingForms(idCamp, codeTypeAnnee: _codeyear ?? '', idEtab: idEtab);
+    if (pending.isEmpty) {
+      _successMessage = 'Aucun formulaire en attente d\'envoi.';
+      notifyListeners();
+      return [];
+    }
+    final forms = pending.map((p) => {'id_etab': p.idEtab, 'id_qst': p.idQst, 'id_filter': p.idFilter}).toList();
+    return _sendForms(user: user, idCamp: idCamp, idSystem: idSystem, forms: forms, onProgress: onProgress);
+  }
 
+  /// U06 — Réessaie uniquement les formulaires en échec du dernier envoi global.
+  Future<List<SendOutcome>> retryFailedOutcomes({
+    required User user,
+    required String idCamp,
+    required String idSystem,
+    void Function(int sent, int total)? onProgress,
+  }) async {
+    final forms = _lastBatchOutcomes
+        .where((o) => o.isFailure && o.kind != SendOutcomeKind.locked)
+        .map((o) => {'id_etab': o.idEtab, 'id_qst': o.idQst, 'id_filter': o.idFilter ?? ''})
+        .toList();
+    return _sendForms(user: user, idCamp: idCamp, idSystem: idSystem, forms: forms, onProgress: onProgress);
+  }
+
+  /// Nombre de formulaires en attente pour la campagne (bannière U05).
+  Future<int> countPendingForms(String idCamp) =>
+      _db.countUnsentForms(idCamp, codeTypeAnnee: _codeyear ?? '');
+
+  /// Liste détaillée des formulaires en attente (écran « Formulaires en attente »).
+  Future<List<FormSyncStatus>> listPendingForms(String idCamp, {String? idEtab}) =>
+      _db.getPendingForms(idCamp, codeTypeAnnee: _codeyear ?? '', idEtab: idEtab);
+
+  /// Compat : ancienne API (page_camp.js sendAllData) — délègue au moteur unique.
   Future<Map<String, bool>> sendAllCampaignData({
     required User user,
     required String idCamp,
@@ -1661,48 +1885,85 @@ class DataEntryProvider extends ChangeNotifier {
     required List<String> etabIds,
     required List<String> qstIds,
   }) async {
-    final results = <String, bool>{};
-    for (final etabId in etabIds) {
-      for (final qstId in qstIds) {
-        // Récupère les données collectées pour (campagne, établissement, question)
-        final data = await _db.getCollectedData(
-          idCamp:        idCamp,
-          idEtab:        etabId,
-          idQst:         qstId,
-          codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
-        );
-        if (data.isEmpty) continue;  // pas de données → ignore
+    final all = await _db.getDistinctFormsWithData(idCamp, codeTypeAnnee: _codeyear ?? '');
+    final forms = all.where((f) => etabIds.contains(f['id_etab']) && qstIds.contains(f['id_qst'])).toList();
+    final outcomes = await _sendForms(user: user, idCamp: idCamp, idSystem: idSystem, forms: forms);
+    return _outcomesToLegacyMap(outcomes);
+  }
 
-        // Détermine si c'est la première question (pour LOC_REG_0)
-        final isFirst = qstIds.isNotEmpty && qstIds.first == qstId;
-
-        try {
-          final ok = await _api.saveData(
-            login:           user.login,    // ← utilise login !
-            campId:          idCamp,
-            sysId:           idSystem,
-            qstId:           qstId,
-            etabId:          etabId,
-            filter:          null,
-            formData:        data,
-            isFirstQuestion: isFirst,
-            yearCode:        _codeyear ?? user.codeyear,  // AK-YEAR-MULTI-01
-          );
-          results['${etabId}_$qstId'] = ok;
-          if (ok) {
-            await _db.markCollectedDataSent(
-              idCamp:        idCamp,
-              idEtab:        etabId,
-              idQst:         qstId,
-              codeTypeAnnee: _codeyear ?? '',  // AK-YEAR-MULTI-01
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AK-SYNC U17 / U19 / U21 — RÉCONCILIATION AVEC LE SERVEUR (fail-open)
+  //
+  // À appeler à l'ouverture d'une campagne (et via « Actualiser ») :
+  //   1. sync_status_ws.php/camp → pour chaque école : formulaires 'sent' si le
+  //      serveur confirme OKSAVE plus récent que la dernière modif locale ;
+  //      'locked' si VALIDE/VERROUILLE (U17/U21).
+  //   2. sync_status_ws.php/feedback → demandes de correction / verrous en cache
+  //      local (U19) + application aux statuts.
+  // Silencieux si le serveur ne dispose pas du WS (ancien serveur) ou hors ligne.
+  // Retourne le nombre de formulaires dont le statut local a changé.
+  // ═══════════════════════════════════════════════════════════════════════════
+  Future<int> reconcileWithServer({
+    required User user,
+    required String idCamp,
+    required String idSystem,
+  }) async {
+    final annee = _codeyear ?? user.codeyear;
+    int changed = 0;
+    try {
+      final server = await _api.fetchServerSyncStatus(
+          login: user.login, campId: idCamp, sysId: idSystem, yearCode: annee);
+      if (server != null) {
+        for (final entry in server.entries) {
+          final themes = entry.value['themes'];
+          if (themes is Map) {
+            changed += await _db.reconcileSchoolWithServer(
+              idCamp: idCamp, idEtab: entry.key, codeTypeAnnee: annee,
+              serverThemes: Map<String, Map<String, dynamic>>.from(
+                  themes.map((k, v) => MapEntry(k.toString(), Map<String, dynamic>.from(v as Map)))),
             );
           }
-        } catch (_) {
-          results['${etabId}_$qstId'] = false;
         }
       }
+      final fb = await _api.fetchSyncFeedback(login: user.login, campId: idCamp, yearCode: annee);
+      if (fb != null) {
+        await _db.replaceSyncFeedback(idCamp, annee, fb);
+        await _db.applyFeedbackToSyncStatus(idCamp, annee, fb);
+      }
+    } catch (e) {
+      debugPrint('[DataEntry] reconcileWithServer: ignoré (fail-open) : $e');
     }
-    return results;
+    if (_idCamp == idCamp && _idEtab != null) await refreshSyncStatuses();
+    return changed;
+  }
+
+  /// U21 — Détection de conflit avant envoi : le serveur a-t-il reçu une version
+  /// plus récente que le dernier envoi local, alors que des modifs locales existent ?
+  /// Retourne la date serveur si conflit, sinon null. Fail-open (null si WS absent).
+  Future<DateTime?> detectServerConflict({required User user}) async {
+    if (_idCamp == null || _idEtab == null || _idSystem == null || _selectedQuestion == null) return null;
+    final st = _currentSyncStatus;
+    if (st == null || !st.status.needsSend) return null; // rien à envoyer → pas de conflit
+    try {
+      final server = await _api.fetchServerSyncStatus(
+          login: user.login, campId: _idCamp!, sysId: _idSystem!, yearCode: _codeyear ?? user.codeyear);
+      final etab = server?[_idEtab!];
+      final themes = etab?['themes'];
+      if (themes is! Map) return null;
+      final t = themes[_selectedQuestion!.idQst];
+      if (t is! Map) return null;
+      final raw = t['date']?.toString();
+      if (raw == null || raw.isEmpty || (t['statut'] != 'OK' && t['statut'] != 'VIDE')) return null;
+      final srv = DateTime.tryParse(raw.replaceAll('/', '-'));
+      if (srv == null) return null;
+      final lastLocalOk = st.lastSuccessAt ?? st.serverLastOk;
+      // Conflit = le serveur a un OKSAVE postérieur à notre dernier envoi réussi
+      // (donc écrit par quelqu'un d'autre : web admin ou autre appareil).
+      if (lastLocalOk == null || srv.isAfter(lastLocalOk.add(const Duration(seconds: 5)))) return srv;
+      return null;
+    } catch (_) {
+      return null;
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

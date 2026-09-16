@@ -16,6 +16,8 @@
  *          directement dans le code avec des commentaires en francais.
  */
 require_once 'common_ws.php';
+// AK-SYNC (ak_burundi) : bibliotheque tracabilite / idempotence / verrou
+require_once 'sync_lib.php';
 
 require_once $GLOBALS['SISED_PATH_LIB'] . 'adodb_xml/class.ADODB_XML.php';
 require $GLOBALS['SISED_PATH_LIB'] . 'Curl/Curl.php';
@@ -279,8 +281,12 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 				$lib_message => $GLOBALS['PARAM_WS']['KO'],
 				$lib_data    => 'Annee incorrecte : votre application utilise l\'annee '
 					. $lib_annee_mobile . ' mais le serveur est sur l\'annee ' . $lib_annee_serveur
-					. '. Veuillez vous reconnecter pour mettre a jour l\'annee active.'
+					. '. Veuillez vous reconnecter pour mettre a jour l\'annee active.',
+				'se_code'    => 'YEAR_MISMATCH'
 			);
+			// U10 : journaliser le rejet (invisible auparavant)
+			ak_sync_log($user, ak_sync_now(), $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, AK_SYNC_OP_REJET_ANNEE, (int)$id_annee,
+				array_merge(ak_sync_request_meta(), array('message' => 'mobile=' . $lib_annee_mobile . ' serveur=' . $lib_annee_serveur)));
 			echo json_encode($rps);
 			return;
 		}
@@ -319,17 +325,66 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 	}
 
   if (!$access_ok) {
-		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"L'utilisateur '".$user."' n'a pas acc�s � cette campagne");
+		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"L'utilisateur '".$user."' n'a pas acc�s � cette campagne", 'se_code'=>'ACCESS_DENIED');
+		// U10 : journaliser le rejet
+		ak_sync_log($user, ak_sync_now(), $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, AK_SYNC_OP_REJET_ACCES, (int)$id_year, ak_sync_request_meta());
 		echo json_encode($rps);
 		return;
 	}
   
 	$data_to_send = $app->request->post();
-  
-  $survey_curr_status = getSurveyStatus($id_camp, $id_year);
-  $survey_curr_status = 2;
+
+	// --- AK-SYNC : metadonnees de la requete (U09/U11/U22) ---
+	$sync_meta = ak_sync_request_meta($data_to_send);
+	$sync_id   = $sync_meta['sync_id'];
+	$sync_hash = ak_sync_hash($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $data_to_send);
+	$sync_meta['sync_hash'] = $sync_hash;
+	// Retirer les cles techniques du POST relaye a questionnaire_ws.php (jamais des champs metier)
+	unset($data_to_send['_sync_id'], $data_to_send['_app_version']);
+
+	// U23 : controle statut campagne — parametre, defaut = comportement historique (jamais bloque)
+	$survey_curr_status = 2;
+	if (isset($GLOBALS['PARAM']['MOBILE_CHECK_SURVEY_STATUS']) && $GLOBALS['PARAM']['MOBILE_CHECK_SURVEY_STATUS']) {
+		$survey_curr_status = getSurveyStatus($id_camp, $id_year);
+	}
 	if ($survey_curr_status != 2) {
-		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"Cette campagne n'est pas ouverte!");
+		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko, $lib_data=>"Cette campagne n'est pas ouverte!", 'se_code'=>'SURVEY_CLOSED');
+		ak_sync_log($user, ak_sync_now(), $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, AK_SYNC_OP_REJET_CAMP, (int)$id_year,
+			array_merge($sync_meta, array('message' => 'statut campagne=' . $survey_curr_status)));
+		echo json_encode($rps);
+		return;
+	}
+
+	// U20 : verrou administratif (SYNC_ETAB_STATUT = VALIDE | VERROUILLE)
+	$lock_row = null;
+	if (ak_sync_is_locked($id_year, $id_camp, $id_etab, $id_theme, $id_filter, $lock_row)) {
+		$rps = array($lib_status=>$status_ko, $lib_message=>$msg_ko,
+			$lib_data=>'FORM_LOCKED',
+			'se_code'=>'FORM_LOCKED',
+			'se_lock'=>array(
+				'statut'      => $lock_row['STATUT'],
+				'commentaire' => ak_sync_utf8((string)$lock_row['COMMENTAIRE']),
+				'date'        => $lock_row['DATE_STATUT'],
+				'admin'       => $lock_row['CODE_USER_ADMIN'],
+			));
+		ak_sync_log($user, ak_sync_now(), $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, AK_SYNC_OP_REJET_VERROU, (int)$id_year,
+			array_merge($sync_meta, array('message' => 'statut admin=' . $lock_row['STATUT'])));
+		echo json_encode($rps);
+		return;
+	}
+
+	// U11 / U22 : idempotence — meme SYNC_ID ou meme empreinte deja OKSAVE -> ACK immediat, aucune re-sauvegarde
+	$dup = ak_sync_find_duplicate($sync_id, $sync_hash, $id_camp, $id_theme, $id_etab, $id_year);
+	if ($dup !== null) {
+		$ack = ak_sync_build_ack($sync_id, $id_year, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, array(
+			'nb_insert'    => isset($dup['NB_INSERT']) ? (int)$dup['NB_INSERT'] : 0,
+			'nb_update'    => isset($dup['NB_UPDATE']) ? (int)$dup['NB_UPDATE'] : 0,
+			'nb_delete'    => isset($dup['NB_DELETE']) ? (int)$dup['NB_DELETE'] : 0,
+			'nb_unchanged' => isset($dup['NB_UNCHANGED']) ? (int)$dup['NB_UNCHANGED'] : 0,
+		), true, isset($dup['LOG_DATE_TIME']) ? $dup['LOG_DATE_TIME'] : null);
+		$rps = array($lib_status=>$status_ok, $lib_message=>$msg_ok, $lib_data=>'OKSAVE', 'se_ack'=>$ack);
+		ak_sync_log($user, ak_sync_now(), $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, AK_SYNC_OP_DUPLICATE, (int)$id_year,
+			array_merge($sync_meta, array('message' => 'doublon de ' . (isset($dup['LOG_DATE_TIME']) ? $dup['LOG_DATE_TIME'] : '?'))));
 		echo json_encode($rps);
 		return;
 	}
@@ -352,13 +407,19 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 	}
   
  //echo "<pre>"; print_r($data_to_send);   //return;
-	$curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko) {
+	$curl->success(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $msg_ok, $status_ok, $status_ko, $sync_id, $sync_meta) {
 		if (strpos($instance->response, "ISOKSAVEINDATABASE") !== FALSE) {
   			$statut_save = "OKSAVE";
 		} else {
 			$statut_save = "KOSAVE";
 		}
-		$rps = array($lib_status=>$status_ok, $lib_message=>$msg_ok, $lib_data=>$statut_save);
+		// U08 : compteurs I/U/D/R emis par questionnaire_ws.php (MAJ_STATS=) + ACK enrichi retro-compatible
+		$stats = ak_sync_parse_maj_stats($instance->response);
+		$ack   = ak_sync_build_ack($sync_id, $id_year, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $stats, false, null);
+		if ($statut_save === "KOSAVE") {
+			$ack['error_hint'] = ak_sync_extract_sql_error($instance->response);
+		}
+		$rps = array($lib_status=>$status_ok, $lib_message=>$msg_ok, $lib_data=>$statut_save, 'se_ack'=>$ack);
     	$date_time = date('Y/m/d H:i:s');
 		$string = $date_time;
 		$string .= ";".$id_camp;
@@ -405,13 +466,24 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 		$fh = fopen($myFile, 'a');
 		@fwrite($fh, $string);
 		@fclose($fh);	 
-    	saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut_save, $id_year);
+		// U09 : journal enrichi (compteurs, sync_id, hash, version, IP) — fallback 10 colonnes si migration absente
+		$extra = $sync_meta;
+		if (is_array($stats)) $extra = array_merge($extra, $stats);
+		if ($statut_save === "KOSAVE") $extra['message'] = isset($ack['error_hint']) ? $ack['error_hint'] : 'KOSAVE';
+    	ak_sync_log($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut_save, $id_year, $extra);
+		// U20 : un renvoi reussi leve automatiquement une demande de correction (A_CORRIGER -> RECU)
+		if ($statut_save === "OKSAVE") {
+			$auto = ak_sync_auto_recu_after_save($id_year, $id_camp, $id_etab, $id_theme, $id_filter, $user);
+			if ($auto) $rps['se_ack']['correction_cleared'] = true;
+		}
 		echo json_encode($rps);
 		//echo 'call to "' . $instance->url . '" was successful. response was' . "<br/>";
 		//echo $instance->response . "\n";
 	});
-	$curl->error(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko) {
-		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>$instance->error_code." : ".$instance->error_message);
+	$curl->error(function($instance) use ($user, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $id_year, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $sync_id, $sync_meta) {
+		$rps = array($lib_status=>$status_ko,$lib_message=>$status_ko,$lib_data=>$instance->error_code." : ".$instance->error_message,
+			'se_code'=>'INTERNAL_CURL_ERROR',
+			'se_ack'=>ak_sync_build_ack($sync_id, $id_year, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, null, false, null));
 		$date_time_err = date('Y/m/d H:i:s');
 		$string = $date_time_err;
 		$string .= ";".$instance->error_code.":".$instance->error_message;
@@ -422,7 +494,8 @@ function theme_save_handler($user, $id_camp, $id_sector, $id_theme, $id_etab, $i
 		$fh = fopen($myFile, 'a');
 		@fwrite($fh, $string);
 		@fclose($fh);
-		saveLogInfo($user, $date_time_err, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, "KO", $id_year);
+		ak_sync_log($user, $date_time_err, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, "KO", $id_year,
+			array_merge($sync_meta, array('message' => $instance->error_code . ' : ' . $instance->error_message)));
 		echo json_encode($rps);
 	});
 	$curl->complete(function($instance) {
@@ -593,11 +666,66 @@ function in_array_r($needle, $haystack, $strict = false) {
     return false;
 }
 
+// AK-SYNC : saveLogInfo() conservee pour compatibilite (appels historiques) — delegue a ak_sync_log()
 function saveLogInfo($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut, $id_annee = 0) {
-  $req = "INSERT INTO DATA_SAVING_LOGS (CODE_USER, LOG_DATE_TIME, ID_THEME_SYSTEME, CODE_ANNEE, CODE_PERIODE, CODE_CAMPAGNE".
-         ", CODE_SECTEUR, CODE_ECOLE, CODE_FILTRE, STATUT_OPERATION) VALUES ('".$user."','".$date_time."',".$id_theme.",".
-         $id_annee.",".$id_filter.",".$id_camp.",".$id_sector.",".$id_etab.",".$id_filter.",'".$statut."')";
-  return $GLOBALS['conn_dico']->Execute($req);        
+  return ak_sync_log($user, $date_time, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $statut, $id_annee);
+}
+
+/**
+ * AK-SYNC : metadonnees de la requete mobile (U09/U11).
+ *   sync_id     : en-tete X-Sync-Id ou champ POST _sync_id (UUID v4, sinon '')
+ *   app_version : en-tete X-App-Version ou champ POST _app_version
+ *   ip          : IP client
+ */
+function ak_sync_request_meta($post = null) {
+  $sid = ak_sync_header('X-Sync-Id');
+  if ($sid === '' && is_array($post) && isset($post['_sync_id'])) $sid = trim((string)$post['_sync_id']);
+  if (!ak_sync_is_uuid($sid)) $sid = '';
+  $ver = ak_sync_header('X-App-Version');
+  if ($ver === '' && is_array($post) && isset($post['_app_version'])) $ver = trim((string)$post['_app_version']);
+  return array('sync_id' => $sid, 'app_version' => $ver, 'ip' => ak_sync_client_ip());
+}
+
+/**
+ * AK-SYNC (U08) : construit l'accuse de reception enrichi.
+ * Ajoute a la reponse sous la cle 'se_ack' — les anciens clients l'ignorent.
+ */
+function ak_sync_build_ack($sync_id, $id_annee, $id_camp, $id_sector, $id_theme, $id_etab, $id_filter, $stats, $duplicate, $original_time) {
+  $ack = array(
+    'sync_id'      => $sync_id,
+    'server_time'  => ak_sync_now_iso(),
+    'code_annee'   => (int)$id_annee,
+    'id_camp'      => (int)$id_camp,
+    'id_sector'    => (int)$id_sector,
+    'id_theme'     => (int)$id_theme,
+    'code_etab'    => (int)$id_etab,
+    'code_filtre'  => ak_sync_norm_filter($id_filter),
+    'duplicate'    => (bool)$duplicate,
+    'nb_insert'    => null, 'nb_update' => null, 'nb_delete' => null, 'nb_unchanged' => null,
+  );
+  if (is_array($stats)) {
+    foreach (array('nb_insert', 'nb_update', 'nb_delete', 'nb_unchanged') as $k) {
+      if (isset($stats[$k])) $ack[$k] = (int)$stats[$k];
+    }
+    if (isset($stats['no_delete_guard']) && $stats['no_delete_guard'] > 0) {
+      $ack['warning'] = 'NO_DELETE_GUARD';
+      $ack['nb_delete_prevented'] = (int)$stats['no_delete_guard'];
+    }
+  }
+  if ($duplicate && $original_time) $ack['original_time'] = $original_time;
+  return $ack;
+}
+
+/** AK-SYNC : extrait une indication d'erreur SQL de la reponse questionnaire_ws.php (KOSAVE). */
+function ak_sync_extract_sql_error($response) {
+  $flat = preg_replace('/\s+/', ' ', (string)$response);
+  foreach (array('error inserting', 'error deleting', 'error updating') as $pat) {
+    $p = stripos($flat, $pat);
+    if ($p !== false) return substr(strip_tags(substr($flat, $p, 400)), 0, 250);
+  }
+  if (strpos($flat, 'MAJ_OK=false') !== false) return 'MAJ_OK=false (erreur SQL non identifiee)';
+  if (strpos($flat, 'MAJ_OK=') === false) return 'Aucune sauvegarde executee (POST vide ou instance absente)';
+  return 'KOSAVE';
 }
 
 /**

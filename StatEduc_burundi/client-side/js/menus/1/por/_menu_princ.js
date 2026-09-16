@@ -45,6 +45,8 @@ oCMenu.makeMenu('2020','0','(#)Contrôle / Validation','','','135');
 oCMenu.makeMenu('30350','2020','(#)Controle Cohérences','administration.php?val=controle','','140');
 oCMenu.makeMenu('30605','2020','(#)Suivi Saisie Données','','','140');
 oCMenu.makeMenu('30625','30605','(#)Suivi Operateurs Saisie','administration.php?val=suivi_saisie','','145');
+oCMenu.makeMenu('30626','30605','(#)Suivi Synchronisation Mobile','administration.php?val=suivi_sync_mobile','','145');
+oCMenu.makeMenu('30627','30605','(#)Retours aux Collecteurs','administration.php?val=feedbacks','','145');
 oCMenu.makeMenu('30615','30605','(#)Critères Evaluation Operateur','administration.php?val=GestRegSuivi','','145');
 oCMenu.makeMenu('30635','30605','(#)Vider Traces par Année','administration.php?val=ViderTraces','','145');
 oCMenu.makeMenu('2050','0','Outils Intégrés','','','110');
