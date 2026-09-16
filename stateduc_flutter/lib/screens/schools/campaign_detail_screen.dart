@@ -798,7 +798,7 @@ class _SchoolTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (school.idStatus != null) Text('Statut : ${school.idStatus}'),
-            SchoolSyncBadge(summary: summary, correctionRequested: correctionRequested),
+            SchoolSyncBadge(summary: summary, hasFeedback: correctionRequested),
           ],
         ),
         isThreeLine: school.idStatus != null &&
