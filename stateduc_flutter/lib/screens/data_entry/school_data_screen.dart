@@ -8,6 +8,7 @@ import '../../models/question.dart';
 import '../../widgets/dynamic_form/dynamic_form_widget.dart';
 import '../../widgets/common/loading_overlay.dart';
 import '../../models/user.dart';  // FilterPeriod
+import '../../models/sync_status.dart';  // AK-SYNC : SyncStatus, SendOutcome, SyncFeedback
 import '../../services/coherence_evaluator.dart';  // OfflineCoherenceError
 import '../../services/theme_rule_engine.dart';     // ThemeCoherenceError
 
@@ -181,6 +182,8 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     final bool saving  = entry.isSaving;
     final bool sending = entry.isSending;
     final bool unsaved = entry.hasUnsavedChanges;
+    // AK-SYNC U21 : formulaire validé/verrouillé par l'administration → envoi impossible
+    final bool locked  = entry.isCurrentFormLocked;
 
     return [
       // ── Bouton Sauvegarder localement ─────────────────────────────────
@@ -231,10 +234,14 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
         child: Tooltip(
           message: sending
               ? 'Envoi en cours…'
-              : 'Envoyer les données au serveur',
+              : (locked
+                  ? 'Formulaire verrouillé par l\'administration — envoi impossible'
+                  : 'Envoyer les données au serveur'),
           child: ElevatedButton.icon(
             icon: Icon(
-              sending ? Icons.hourglass_top_rounded : Icons.cloud_upload_rounded,
+              sending
+                  ? Icons.hourglass_top_rounded
+                  : (locked ? Icons.lock_outline : Icons.cloud_upload_rounded),
               size: 18,
               color: Colors.white,
             ),
@@ -247,7 +254,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: sending ? disabledBg : sendBg,
+              backgroundColor: (sending || locked) ? disabledBg : sendBg,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               minimumSize: const Size(80, 36),
@@ -256,7 +263,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
               ),
               elevation: 4,
             ),
-            onPressed: sending
+            onPressed: (sending || locked)
                 ? null
                 : () => _sendToServer(context, auth, entry),
           ),
@@ -288,6 +295,22 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
                 title: Text('Envoyer tous les formulaires'),
                 subtitle: Text('Tous les formulaires de cet établissement'),
               )),
+          // ── AK-SYNC U07 : envoi ciblé des formulaires en attente / en échec ──
+          const PopupMenuItem(
+              value: 'send_pending',
+              child: ListTile(
+                leading: Icon(Icons.outbox_outlined),
+                title: Text('Envoyer les formulaires en attente'),
+                subtitle: Text('Uniquement non envoyés ou en échec'),
+              )),
+          // ── AK-SYNC U17 : rafraîchir l'état de sync depuis le serveur ──
+          const PopupMenuItem(
+              value: 'sync_refresh',
+              child: ListTile(
+                leading: Icon(Icons.sync_outlined),
+                title: Text('Actualiser l\'état de synchronisation'),
+                subtitle: Text('Statuts serveur, verrous, corrections'),
+              )),
         ],
       ),
     ];
@@ -307,6 +330,18 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
           school: widget.school,
           libSystem: widget.libSystem,
         ),
+        // ── AK-SYNC U05/U08 : état de synchronisation du formulaire courant ──
+        if (entry.selectedQuestion != null)
+          _SyncStatusLine(entry: entry),
+        // ── AK-SYNC U19 : demande de correction de l'administration ─────
+        if (entry.currentCorrectionRequest != null)
+          _CorrectionBanner(feedback: entry.currentCorrectionRequest!),
+        // ── AK-SYNC U21 : formulaire verrouillé / validé ─────────────────
+        if (entry.selectedQuestion != null && entry.isCurrentFormLocked)
+          _LockedBanner(
+            status: entry.currentSyncStatus,
+            onReload: () => _reloadFromServer(context, auth, entry),
+          ),
         // ── Messages d'erreur / succès ───────────────────────────────────
         if (entry.error != null)
           _MessageBanner(
@@ -347,6 +382,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
             questions: entry.questions,
             selected: entry.selectedQuestion,
             onSelect: entry.selectQuestion,
+            statusOf: entry.syncStatusForQuestion,  // AK-SYNC U05 : pastille d'état
           ),
         // ── FIX SESSION 66 issue #9 — Barre navigation Précédent / Suivant ─
         if (entry.questions.isNotEmpty && entry.selectedQuestion != null)
@@ -469,8 +505,74 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
   Future<void> _sendToServer(BuildContext context, AuthProvider auth,
       DataEntryProvider entry) async {
     if (auth.user == null) return;
+    // AK-SYNC U21 : formulaire verrouillé → on n'envoie pas, on propose le rechargement
+    if (entry.isCurrentFormLocked) {
+      final reload = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Row(children: [
+            Icon(Icons.lock_outline, color: Colors.deepPurple),
+            SizedBox(width: 8),
+            Text('Formulaire verrouillé'),
+          ]),
+          content: const Text(
+              'Ce formulaire a été validé/verrouillé par l\'administration. '
+              'Il ne peut plus être modifié depuis l\'application.\n\n'
+              'Voulez-vous recharger les données officielles du serveur ?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Fermer')),
+            ElevatedButton.icon(
+                onPressed: () => Navigator.pop(ctx, true),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Recharger')),
+          ],
+        ),
+      );
+      if (reload == true && mounted) await entry.reloadFromServer(user: auth.user!);
+      return;
+    }
     // Validation — ne bloque pas l'envoi (comme dans l'application originale)
     entry.validateAll();
+
+    // AK-SYNC U21 : détection de conflit (le serveur a une version plus récente
+    // que notre dernier envoi, écrite depuis le web ou un autre appareil).
+    // Fail-open : null si WS absent / hors ligne → envoi normal.
+    final conflictAt = await entry.detectServerConflict(user: auth.user!);
+    if (!mounted) return;
+    if (conflictAt != null) {
+      final choice = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Row(children: [
+            Icon(Icons.merge_type, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Conflit de version'),
+          ]),
+          content: Text(
+              'Le serveur a reçu une version plus récente de ce formulaire '
+              '(${_fmtDate(conflictAt)}), postérieure à votre dernier envoi.\n\n'
+              '• Recharger : remplace vos données locales par celles du serveur.\n'
+              '• Écraser : envoie vos données locales et remplace celles du serveur.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, 'cancel'), child: const Text('Annuler')),
+            OutlinedButton.icon(
+                onPressed: () => Navigator.pop(ctx, 'reload'),
+                icon: const Icon(Icons.download_outlined),
+                label: const Text('Recharger')),
+            ElevatedButton.icon(
+                onPressed: () => Navigator.pop(ctx, 'overwrite'),
+                icon: const Icon(Icons.cloud_upload_outlined),
+                label: const Text('Écraser')),
+          ],
+        ),
+      );
+      if (!mounted || choice == null || choice == 'cancel') return;
+      if (choice == 'reload') {
+        await entry.reloadFromServer(user: auth.user!);
+        return;
+      }
+      // 'overwrite' → on poursuit l'envoi normalement
+    }
 
     final ok = await entry.sendToServer(user: auth.user!);
     if (!mounted) return;
@@ -583,7 +685,221 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
       entry.checkCoherenceOffline();
     } else if (value == 'send_all') {
       _sendAllForms(context, auth, entry);
+    } else if (value == 'send_pending') {
+      _sendPendingForms(context, auth, entry);
+    } else if (value == 'sync_refresh') {
+      _refreshSyncFromServer(context, auth, entry);
     }
+  }
+
+  /// AK-SYNC U17 : réconciliation manuelle avec le serveur (fail-open).
+  Future<void> _refreshSyncFromServer(BuildContext context, AuthProvider auth,
+      DataEntryProvider entry) async {
+    if (auth.user == null) return;
+    final changed = await entry.reconcileWithServer(
+      user: auth.user!,
+      idCamp: widget.campaign.idCamp,
+      idSystem: widget.idSystem,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(changed > 0
+          ? 'État de synchronisation actualisé ($changed formulaire(s) mis à jour)'
+          : 'État de synchronisation actualisé'),
+    ));
+  }
+
+  /// AK-SYNC U07 : envoie uniquement les formulaires en attente / en échec
+  /// de cet établissement, puis affiche le résultat nominatif (U06).
+  Future<void> _sendPendingForms(BuildContext context, AuthProvider auth,
+      DataEntryProvider entry) async {
+    if (auth.user == null) return;
+    final pending = await entry.listPendingForms(widget.campaign.idCamp,
+        idEtab: widget.school.idEtab);
+    if (!mounted) return;
+    if (pending.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Aucun formulaire en attente d\'envoi pour cet établissement')));
+      return;
+    }
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(children: [
+          Icon(Icons.outbox_outlined),
+          SizedBox(width: 8),
+          Text('Formulaires en attente'),
+        ]),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${pending.length} formulaire(s) à envoyer :',
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: pending.map((f) {
+                    final q = entry.questions.where((x) => x.idQst == f.idQst).toList();
+                    final lib = q.isNotEmpty ? q.first.libQst : 'Thème ${f.idQst}';
+                    return ListTile(
+                      dense: true,
+                      leading: Icon(syncStatusIcon(f.status), color: syncStatusColor(f.status), size: 18),
+                      title: Text(lib + (f.idFilter.isEmpty ? '' : ' [${f.idFilter}]'),
+                          style: const TextStyle(fontSize: 13)),
+                      subtitle: f.lastError == null ? null
+                          : Text(f.lastError!, style: const TextStyle(fontSize: 11), maxLines: 2,
+                              overflow: TextOverflow.ellipsis),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
+          ElevatedButton.icon(
+              onPressed: () => Navigator.pop(ctx, true),
+              icon: const Icon(Icons.cloud_upload_outlined),
+              label: const Text('Envoyer')),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+
+    final total = pending.length;
+    final progressNotifier = ValueNotifier<int>(0);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => ValueListenableBuilder<int>(
+        valueListenable: progressNotifier,
+        builder: (_, progress, __) => AlertDialog(
+          title: const Text('Envoi en cours…'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            LinearProgressIndicator(value: total > 0 ? progress / total : 0),
+            const SizedBox(height: 12),
+            Text('$progress / $total formulaire(s)'),
+          ]),
+        ),
+      ),
+    );
+    final outcomes = await entry.sendPendingForms(
+      user: auth.user!,
+      idCamp: widget.campaign.idCamp,
+      idSystem: widget.idSystem,
+      idEtab: widget.school.idEtab,
+      onProgress: (sent, _) => progressNotifier.value = sent,
+    );
+    if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    progressNotifier.dispose();
+    if (!mounted) return;
+    await _showBatchResult(context, auth, entry, outcomes);
+  }
+
+  /// AK-SYNC U06 : dialogue de résultat d'un envoi groupé, avec la liste
+  /// nominative des formulaires en échec et un bouton « Réessayer les échecs ».
+  Future<void> _showBatchResult(BuildContext context, AuthProvider auth,
+      DataEntryProvider entry, List<SendOutcome> outcomes) async {
+    final okCount   = outcomes.where((o) => o.isSuccess).length;
+    final failures  = outcomes.where((o) => o.isFailure).toList();
+    final skipped   = outcomes.where((o) => !o.isSuccess && !o.isFailure).length;
+    final retryable = failures.where((o) => o.kind != SendOutcomeKind.locked).isNotEmpty;
+    final hasError  = entry.error != null;
+
+    final action = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(children: [
+          Icon(
+            hasError || failures.isNotEmpty ? Icons.warning_amber_rounded : Icons.check_circle_outline,
+            color: hasError || failures.isNotEmpty ? Colors.orange : Colors.green,
+          ),
+          const SizedBox(width: 8),
+          const Text('Résultat de l\'envoi'),
+        ]),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('✅  $okCount formulaire(s) envoyé(s) avec succès'),
+              if (skipped > 0) Text('ℹ️  $skipped formulaire(s) ignoré(s) (aucune donnée locale)'),
+              if (failures.isNotEmpty) ...[
+                Text('⚠️  ${failures.length} formulaire(s) non envoyé(s) :',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: failures.map((o) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Icon(
+                          o.kind == SendOutcomeKind.locked ? Icons.lock_outline : Icons.error_outline,
+                          size: 16,
+                          color: o.kind == SendOutcomeKind.locked ? Colors.deepPurple : Colors.red,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            _describeOutcome(entry, o),
+                            style: const TextStyle(fontSize: 12.5),
+                          ),
+                        ),
+                      ]),
+                    )).toList(),
+                  ),
+                ),
+              ],
+              if (hasError) ...[
+                const SizedBox(height: 8),
+                Text(entry.error ?? '',
+                    style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13)),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          if (retryable)
+            OutlinedButton.icon(
+              onPressed: () => Navigator.pop(ctx, 'retry'),
+              icon: const Icon(Icons.replay),
+              label: const Text('Réessayer les échecs'),
+            ),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, 'close'), child: const Text('Fermer')),
+        ],
+      ),
+    );
+    if (action == 'retry' && mounted && auth.user != null) {
+      final again = await entry.retryFailedOutcomes(
+        user: auth.user!,
+        idCamp: widget.campaign.idCamp,
+        idSystem: widget.idSystem,
+      );
+      if (mounted) await _showBatchResult(context, auth, entry, again);
+    }
+  }
+
+  /// Libellé nominatif d'un résultat (thème résolu via la liste des questions).
+  String _describeOutcome(DataEntryProvider entry, SendOutcome o) {
+    final q = entry.questions.where((x) => x.idQst == o.idQst).toList();
+    final lib = (o.libQst ?? '').isNotEmpty
+        ? o.libQst!
+        : (q.isNotEmpty ? q.first.libQst : 'Thème ${o.idQst}');
+    final f = (o.idFilter ?? '').isEmpty ? '' : ' [${o.idFilter}]';
+    final m = (o.message ?? '').isEmpty ? '' : ' — ${o.message}';
+    return '$lib$f : ${o.label}$m';
+  }
+
+  static String _fmtDate(DateTime d) {
+    String two(int n) => n < 10 ? '0$n' : '$n';
+    return '${two(d.day)}/${two(d.month)}/${d.year} ${two(d.hour)}:${two(d.minute)}';
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -662,7 +978,7 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
     );
 
     // Lancement de l'envoi global
-    final results = await entry.sendAllFormsForSchool(
+    await entry.sendAllFormsForSchool(
       user: auth.user!,
       onProgress: (sent, tot) {
         progressNotifier.value = sent;
@@ -675,55 +991,8 @@ class _SchoolDataScreenState extends State<SchoolDataScreen> {
 
     if (!mounted) return;
 
-    // Résumé
-    final okCount   = results.values.where((v) => v).length;
-    final failCount = results.values.where((v) => !v).length;
-    final hasError  = entry.error != null;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(
-              hasError || failCount > 0
-                  ? Icons.warning_amber_rounded
-                  : Icons.check_circle_outline,
-              color: hasError || failCount > 0
-                  ? Colors.orange
-                  : Colors.green,
-            ),
-            const SizedBox(width: 8),
-            const Text('Résultat de l\'envoi'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('✅  $okCount formulaire(s) envoyé(s) avec succès'),
-            if (failCount > 0)
-              Text('⚠️  $failCount formulaire(s) non envoyé(s) '  
-                   '(données manquantes ou erreur serveur)'),
-            if (hasError) ...[  
-              const SizedBox(height: 8),
-              Text(
-                entry.error ?? '',
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                    fontSize: 13),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Fermer'),
-          ),
-        ],
-      ),
-    );
+    // AK-SYNC U06 : résumé nominatif + « Réessayer les échecs »
+    await _showBatchResult(context, auth, entry, entry.lastBatchOutcomes);
   }
 
   /// Appelé par [DynamicFormWidget] quand l'utilisateur ajoute une ligne
@@ -1066,10 +1335,13 @@ class _QuestionSelector extends StatefulWidget {
     required this.questions,
     required this.selected,
     required this.onSelect,
+    this.statusOf,
   });
   final List<Question> questions;
   final Question? selected;
   final Future<void> Function(Question) onSelect;
+  /// AK-SYNC U05 : état de sync par thème (null = jamais saisi → pas de pastille).
+  final SyncStatus? Function(String idQst)? statusOf;
 
   @override
   State<_QuestionSelector> createState() => _QuestionSelectorState();
@@ -1164,11 +1436,19 @@ class _QuestionSelectorState extends State<_QuestionSelector> {
           children: List.generate(widget.questions.length, (i) {
             final q = widget.questions[i];
             final isSelected = widget.selected?.idQst == q.idQst;
+            final SyncStatus? st = widget.statusOf?.call(q.idQst);
             return Padding(
               // GlobalKey sur chaque chip pour ensureVisible (Fix #4)
               key: _chipKeys[i],
               padding: const EdgeInsets.only(right: 6),
               child: ChoiceChip(
+                // AK-SYNC U05 : pastille colorée = état de synchronisation du thème
+                avatar: st == null
+                    ? null
+                    : Tooltip(
+                        message: st.label,
+                        child: Icon(syncStatusIcon(st), size: 16, color: syncStatusColor(st)),
+                      ),
                 label: Text(
                   q.libQst,
                   style: TextStyle(
@@ -1477,6 +1757,218 @@ class _OfflineCoherenceBanner extends StatelessWidget {
                 ),
               )),
           const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── AK-SYNC — helpers visuels d'état de synchronisation (U05) ───────────────
+/// Couleur associée à un état de synchronisation.
+Color syncStatusColor(SyncStatus s) {
+  switch (s) {
+    case SyncStatus.sent:     return const Color(0xFF2E7D32); // vert
+    case SyncStatus.pending:  return const Color(0xFFF9A825); // jaune/orangé
+    case SyncStatus.failed:   return const Color(0xFFC62828); // rouge
+    case SyncStatus.kosave:   return const Color(0xFFEF6C00); // orange
+    case SyncStatus.rejected: return const Color(0xFFC62828); // rouge
+    case SyncStatus.locked:   return const Color(0xFF6A1B9A); // violet
+  }
+}
+
+/// Icône associée à un état de synchronisation.
+IconData syncStatusIcon(SyncStatus s) {
+  switch (s) {
+    case SyncStatus.sent:     return Icons.cloud_done_rounded;
+    case SyncStatus.pending:  return Icons.schedule_rounded;
+    case SyncStatus.failed:   return Icons.cloud_off_rounded;
+    case SyncStatus.kosave:   return Icons.report_problem_rounded;
+    case SyncStatus.rejected: return Icons.block_rounded;
+    case SyncStatus.locked:   return Icons.lock_rounded;
+  }
+}
+
+String _fmtDateTime(DateTime? d) {
+  if (d == null) return '—';
+  String two(int n) => n < 10 ? '0$n' : '$n';
+  return '${two(d.day)}/${two(d.month)}/${d.year} ${two(d.hour)}:${two(d.minute)}';
+}
+
+// ─── AK-SYNC U05/U08 — Ligne d'état de synchronisation du formulaire courant ──
+/// Affiche sous le bandeau : état (pastille + libellé), dernier envoi réussi,
+/// dernière erreur, et le contenu du dernier accusé de réception serveur
+/// (compteurs I/U/D/=, doublon ignoré, garde anti-suppression…).
+class _SyncStatusLine extends StatelessWidget {
+  const _SyncStatusLine({required this.entry});
+  final DataEntryProvider entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final st  = entry.currentSyncStatus;
+    final ack = entry.lastAck;
+    if (st == null && ack == null) {
+      // Jamais sauvegardé / envoyé : ligne discrète
+      return Container(
+        width: double.infinity,
+        color: Colors.grey.shade100,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Row(children: const [
+          Icon(Icons.radio_button_unchecked, size: 14, color: Colors.grey),
+          SizedBox(width: 6),
+          Text('Aucune donnée synchronisée pour ce formulaire',
+              style: TextStyle(fontSize: 11.5, color: Colors.grey)),
+        ]),
+      );
+    }
+    final status = st?.status ?? SyncStatus.sent;
+    final color  = syncStatusColor(status);
+    final parts = <String>[];
+    if (st?.lastSuccessAt != null) parts.add('dernier envoi OK : ${_fmtDateTime(st!.lastSuccessAt)}');
+    if (st != null && st.attempts > 0 && status.needsSend) parts.add('${st.attempts} tentative(s)');
+    if (st?.adminStatus != null && st!.adminStatus!.isNotEmpty && st.adminStatus != 'RECU') {
+      parts.add('admin : ${st.adminStatus}');
+    }
+    final ackText = ack != null ? ack.summary() : null;
+    final err = st?.lastError;
+
+    return Container(
+      width: double.infinity,
+      color: color.withOpacity(0.08),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(syncStatusIcon(status), size: 15, color: color),
+            const SizedBox(width: 6),
+            Text(status.label,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
+            if (parts.isNotEmpty) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(parts.join(' · '),
+                    style: const TextStyle(fontSize: 11, color: Colors.black54),
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ]),
+          if (ackText != null && ackText.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 2, left: 21),
+              child: Text('Serveur : $ackText',
+                  style: const TextStyle(fontSize: 11, color: Colors.black87)),
+            ),
+          if (err != null && err.isNotEmpty && status.isProblem)
+            Padding(
+              padding: const EdgeInsets.only(top: 2, left: 21),
+              child: Text(err,
+                  style: TextStyle(fontSize: 11, color: color),
+                  maxLines: 2, overflow: TextOverflow.ellipsis),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── AK-SYNC U19 — Bannière « demande de correction » de l'administration ─────
+class _CorrectionBanner extends StatelessWidget {
+  const _CorrectionBanner({required this.feedback});
+  final SyncFeedback feedback;
+
+  @override
+  Widget build(BuildContext context) {
+    const Color bg = Color(0xFFFFEBEE);
+    const Color fg = Color(0xFFB71C1C);
+    return Container(
+      width: double.infinity,
+      color: bg,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.assignment_late_outlined, color: fg, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Correction demandée par l\'administration',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: fg, fontSize: 13)),
+                if (feedback.commentaire.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(feedback.commentaire,
+                        style: const TextStyle(color: fg, fontSize: 12.5)),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    '${feedback.admin.isNotEmpty ? feedback.admin : 'admin'} · ${feedback.date}'
+                    '${feedback.idQst == null ? ' · tout l\'établissement' : ''}',
+                    style: const TextStyle(color: Colors.black54, fontSize: 11),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: Text('Corrigez la saisie puis renvoyez le formulaire : la demande sera levée automatiquement.',
+                      style: TextStyle(color: Colors.black87, fontSize: 11.5)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── AK-SYNC U21 — Bannière « formulaire verrouillé / validé » ────────────────
+class _LockedBanner extends StatelessWidget {
+  const _LockedBanner({required this.status, required this.onReload});
+  final FormSyncStatus? status;
+  final VoidCallback onReload;
+
+  @override
+  Widget build(BuildContext context) {
+    const Color bg = Color(0xFFEDE7F6);
+    const Color fg = Color(0xFF4A148C);
+    final admin = status?.adminStatus;
+    final comment = status?.adminComment;
+    return Container(
+      width: double.infinity,
+      color: bg,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Icon(Icons.lock_outline, color: fg, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  admin == 'VALIDE'
+                      ? 'Formulaire validé par l\'administration'
+                      : 'Formulaire verrouillé par l\'administration',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: fg, fontSize: 13),
+                ),
+                Text(
+                  (comment != null && comment.isNotEmpty)
+                      ? comment
+                      : 'Les modifications locales ne peuvent plus être envoyées. '
+                        'Rechargez les données officielles du serveur.',
+                  style: const TextStyle(color: Colors.black87, fontSize: 11.5),
+                ),
+              ],
+            ),
+          ),
+          TextButton.icon(
+            onPressed: onReload,
+            icon: const Icon(Icons.refresh, size: 16, color: fg),
+            label: const Text('Recharger', style: TextStyle(color: fg, fontSize: 12)),
+          ),
         ],
       ),
     );
