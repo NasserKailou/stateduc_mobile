@@ -102,10 +102,21 @@ $app = new \Slim\Slim();
 });*/
 
  // renvoie les th�mes pour une campagne
+// AK-SYNC U13 : route etendue (app mobile) avec id_annee explicite -> coherence pluriannuelle.
+// La route historique (sans id_annee) est conservee intacte pour le web et les anciens APK.
+$app->get('/theme_data/:user/:id_sector/:id_theme/:id_camp/:id_etab/:id_filter/:id_annee', function ($user, $id_sector, $id_theme, $id_camp, $id_etab, $id_filter, $id_annee) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl) {
+	theme_data_handler($user, $id_sector, $id_theme, $id_camp, $id_etab, $id_filter, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl);
+});
+
 $app->get('/theme_data/:user/:id_sector/:id_theme/:id_camp/:id_etab/:id_filter', function ($user, $id_sector, $id_theme, $id_camp, $id_etab, $id_filter) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl) {
+	theme_data_handler($user, $id_sector, $id_theme, $id_camp, $id_etab, $id_filter, '', $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl);
+});
+
+function theme_data_handler($user, $id_sector, $id_theme, $id_camp, $id_etab, $id_filter, $id_annee, $lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl) {
 	$msg_ko = $GLOBALS['PARAM_WS']['KO'];
 	
-	$id_year = $_SESSION['annee'];
+	// AK-SYNC U13 : annee = parametre mobile (prioritaire) sinon session (comportement historique)
+	$id_year = ($id_annee !== '' && $id_annee !== '0' && $id_annee !== null) ? $id_annee : (isset($_SESSION['annee']) ? $_SESSION['annee'] : '');
 	
 	$period_query = "";
 	if ($id_filter != "null") {
@@ -152,7 +163,7 @@ $app->get('/theme_data/:user/:id_sector/:id_theme/:id_camp/:id_etab/:id_filter',
 	//echo $urlBase;
 	$curl->get($urlBase);	
 	
-});
+}
 
 // Recup�ration de la liste des filtres
 $app->post('/school_data/:user/:id_sector/:id_camp/:id_year/:id_period', function ($user, $id_sector, $id_camp, $id_year, $id_period) use ($lib_status, $lib_message, $lib_data, $status_ok, $status_ko, $curl, $app) {

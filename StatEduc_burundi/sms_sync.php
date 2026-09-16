@@ -318,7 +318,7 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
   function get_etab_themes_log($id_etab, $id_camp, $id_year, $id_period) {
       $requete = "SELECT DISTINCT ID_THEME_SYSTEME as id_theme 
                 FROM DATA_SAVING_LOGS 
-                WHERE CODE_ECOLE=".$id_etab." AND CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND CODE_PERIODE=".$id_period." AND STATUT_OPERATION='OKSAVE';";
+                WHERE CODE_ECOLE=".$id_etab." AND CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND (CODE_PERIODE=".$id_period." OR CODE_PERIODE IS NULL) AND STATUT_OPERATION='OKSAVE';";
       $list_theme =  $GLOBALS['conn_dico']->GetAll($requete);
      
       return $list_theme;
@@ -327,7 +327,7 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
   function get_etab_log($id_camp, $id_year, $id_period) {
      $requete = "SELECT DISTINCT CODE_ECOLE as code_etab 
                 FROM DATA_SAVING_LOGS 
-                WHERE CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND CODE_PERIODE=".$id_period.";";
+                WHERE CODE_CAMPAGNE=".$id_camp." AND CODE_ANNEE=".$id_year." AND (CODE_PERIODE=".$id_period." OR CODE_PERIODE IS NULL);";
      $list_etab =  $GLOBALS['conn_dico']->GetAll($requete);
      
      return $list_etab;          
@@ -348,7 +348,7 @@ $curl->setHeader('Content-Type', 'application/x-www-form-urlencoded');
   function get_collect_users($id_school, $id_year, $id_period, $id_camp) {
   	$requete = "SELECT DISTINCT DSL.CODE_USER as user_login, AU.EMAIL_USER 
                 FROM DATA_SAVING_LOGS DSL, ADMIN_USERS AU
-                WHERE DSL.CODE_USER=AU.NOM_USER AND DSL.CODE_ECOLE=".$id_school." AND DSL.CODE_ANNEE=".$id_year." AND DSL.CODE_PERIODE=".$id_period." AND DSL.CODE_CAMPAGNE=".$id_camp.";";
+                WHERE DSL.CODE_USER=AU.NOM_USER AND DSL.CODE_ECOLE=".$id_school." AND DSL.CODE_ANNEE=".$id_year." AND (DSL.CODE_PERIODE=".$id_period." OR DSL.CODE_PERIODE IS NULL) AND DSL.CODE_CAMPAGNE=".$id_camp.";";
      $list_users =  $GLOBALS['conn_dico']->GetAll($requete);
 	 
 	 return $list_users;
