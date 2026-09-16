@@ -32,19 +32,32 @@
 | U13 | `api_service.dart` | `reloadData(yearCode:)` → route `/:id_annee` |
 | U16/U19 | `api_service.dart` | `fetchServerSyncStatus`, `fetchSyncFeedback` (fail-open) ; `FormLockedException`, `KosaveException.hint`, `ApiException.code` |
 
-## ⏳ Mobile — RESTE À FAIRE (provider + UI) — non commencé, aucun risque de régression en l'état
+## ✅ Mobile — provider & UI TERMINÉS (syntax_check OK, tests unitaires ajoutés)
 
-Le code actuel de `data_entry_provider.dart` et des écrans est **identique à `ak_secure`** ; l'APK se comporte donc exactement comme avant, avec en plus le durcissement U01, l'idempotence U11 et la migration v9 (transparents).
-
-| U | À implémenter | Points d'accroche déjà prêts |
+| U | Fichier | Contenu |
 |---|---|---|
-| U02 | `sendToServer` : `on KosaveException` → `recordSendAttempt(status: SyncStatus.kosave)` au lieu de `markCollectedDataSent` | `DatabaseService.recordSendAttempt` |
-| U03/U07 | Réécrire `sendAllFormsForSchool/Campaign` sur `getDistinctFormsWithData` (avec `id_filter`, `etabRegroupId`, `isFirstQuestion`) ; nouvelle `sendPendingForms()` sur `getPendingForms` | méthodes DB prêtes |
-| U06 | Retourner `List<BatchItemResult>` (typé `SendOutcome`) ; dialogue nominatif + « Réessayer les échecs » | `models/sync_status.dart` |
-| U12 | `_autoReloadFromServerBackground` : ne pas écraser les champs `is_sent=0` modifiés ; marquer les lignes serveur `is_sent=1` | — |
-| U17 | À l'ouverture campagne : `fetchServerSyncStatus` → `reconcileSchoolWithServer` ; `fetchSyncFeedback` → `replaceSyncFeedback` + `applyFeedbackToSyncStatus` | API + DB prêtes |
-| U21 | Avant envoi : si `FormSyncStatus.hasServerConflict` → dialogue Recharger / Écraser / Annuler ; `on FormLockedException` → statut `locked` + proposition de rechargement | modèle prêt |
-| U25 | `static bool _sendLock` global dans le provider (un seul envoi à la fois) | — |
-| U05 | `school_data_screen.dart` : pastille statut sur chips (`getFormSyncStatusesForSchool`), bannière ACK ; `campaign_detail_screen.dart` : remplacer `_UnsentDataBanner` placeholder par `countUnsentForms`, agrégat `getSchoolSyncSummaries` sur `_SchoolTile`, bouton « Envoyer les formulaires en attente », badge « Correction demandée » | DB prêtes |
+| U02 | `data_entry_provider.dart` | `_sendOneForm()` primitive unique ; `KosaveException` ⇒ `recordSendAttempt(status: kosave)` (plus jamais marqué envoyé) ; `FormLockedException` ⇒ `locked` ; `ApiException` ⇒ `rejected` (YEAR_MISMATCH/ACCESS_DENIED/SURVEY_CLOSED) ; réseau ⇒ `failed` |
+| U03/U07 | `data_entry_provider.dart` | Moteur batch `_sendForms()` sur `getDistinctFormsWithData` (période, regroupement `LOC_REG_0`, 1re question), `sendPendingForms()` sur `getPendingForms`, `retryFailedOutcomes()`, `countPendingForms()`, `listPendingForms()` ; anciennes signatures `Map<String,bool>` conservées (compat) |
+| U06 | `models/sync_status.dart`, `widgets/sync/sync_widgets.dart` | `SendOutcome` nominatif (`withLabels`, `describe`) ; `showBatchResultDialog()` partagé : succès / ignorés / échecs nominatifs « Étab › Thème [période] : motif » + « Réessayer les échecs » |
+| U12 | `data_entry_provider.dart` | `_autoReloadFromServerBackground` : si `form_sync_status` en attente (saisies locales non envoyées) ⇒ pas d'écrasement, avertissement ; sinon rechargement + `sent` |
+| U13 | `data_entry_provider.dart` | `reloadFromServer`/auto-reload passent `yearCode` explicite ⇒ route `/:id_annee` |
+| U17 | `data_entry_provider.dart`, `campaign_detail_screen.dart` | `reconcileWithServer()` (fail-open) appelé 1× par système à l'ouverture de la liste des écoles + bouton ⟳ « Actualiser » ; menu « Actualiser l'état de synchronisation » sur l'écran de saisie |
+| U19 | `school_data_screen.dart`, `campaign_detail_screen.dart` | Bannière rouge « Correction demandée par l'administration » (commentaire, admin, date) sur le formulaire concerné ; badge « correction demandée » sur la tuile école |
+| U21 | `school_data_screen.dart`, `data_entry_provider.dart` | `detectServerConflict()` avant envoi ⇒ dialogue **Recharger / Écraser / Annuler** ; formulaire verrouillé ⇒ bouton Envoyer désactivé (cadenas), bannière violette + « Recharger » |
+| U25 | `data_entry_provider.dart` | `static _globalSendLock` : un seul envoi à la fois (unitaire ou groupé, tous écrans) ; `isAnySendRunning` |
+| U05 | `school_data_screen.dart` | Pastille colorée sur chaque chip de thème (`syncStatusForQuestion`) ; ligne d'état sous le bandeau (statut, dernier envoi OK, tentatives, statut admin, **accusé serveur** : ajouts/MAJ/suppr/inchangées, doublon, garde anti-suppression) |
+| U05 | `campaign_detail_screen.dart` | `_UnsentDataBanner` réel (« N formulaires en attente d'envoi ou en échec » + **Voir** / **Envoyer**) ; `_SchoolTile` avec `SchoolSyncBadge` (x/y envoyés, à envoyer, échecs, verrouillé, correction) et avatar coloré ; rafraîchi au retour de saisie |
+| U05/U07 | `screens/schools/pending_forms_screen.dart` (nouveau) | Écran « Formulaires en attente » : liste nominative groupée par établissement (statut, tentatives, dernière erreur), envoi global ou par établissement |
+| Tests | `test/sync_status_test.dart` | 30+ tests unitaires des modèles (SyncStatus, FormSyncStatus.hasServerConflict, ServerAck, SendOutcome, ServerFormStatus.parseServerTime, SyncFeedback.appliesTo, SchoolSyncSummary) |
 
-Estimation : ~1 journée de développement Flutter + tests sur appareil.
+### Vérifications effectuées
+- `php -l` OK sur tous les fichiers PHP modifiés/créés (PHP 7.3 natif ; `sms_sync.php` a une erreur PHP 8 **préexistante** non liée, non touchée).
+- `syntax_check.py` ✅ sur tous les fichiers Dart modifiés/créés ; vérification croisée automatique que chaque méthode appelée par l'UI existe dans le provider / DatabaseService / ApiService / modèles.
+- Pas de SDK Flutter dans le bac à sable : `flutter analyze` et `flutter test` **à exécuter sur le poste de build** avant de générer l'APK (voir `GUIDE_DEPLOIEMENT_AK_BURUNDI.md`).
+
+### Rétro-compatibilité (revue statique)
+- Envoi unitaire : même endpoint, mêmes paramètres, même filtre effectif (SESSION 58) ; seuls s'ajoutent les en-têtes `X-Sync-Id` / `X-App-Version` (ignorés par un ancien serveur).
+- Ancien serveur (sans `sync_status_ws.php`, sans `se_ack`) : réconciliation/feedback ignorés silencieusement (fail-open) ; ligne d'état sans détail serveur.
+- `is_sent` maintenu en parallèle de `form_sync_status` (migration v9 initialisée depuis `is_sent`) ⇒ aucun formulaire « perdu ».
+- Hors ligne : aucun appel bloquant ; badges/bannières calculés depuis SQLite uniquement.
+- Vérification année (fail-open) et CODE_TYPE_ANNEE pluriannuel inchangés.
