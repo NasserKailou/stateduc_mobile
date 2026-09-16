@@ -1,140 +1,118 @@
-# Guide de déploiement — branche `ak_burundi` (synchronisation & traçabilité U01–U27)
+# Guide de déploiement — branche `ak_burundi` (synchronisation, traçabilité, suivi admin — U01–U27)
 
-Ce guide décrit l'ordre de mise en production des évolutions de la branche `ak_burundi`
-(serveur PHP `StatEduc_burundi` + application mobile `stateduc_flutter`), les points de
-rétro-compatibilité et la procédure de retour arrière. `ak_secure` reste la branche de
-référence stable : elle n'a **pas** été modifiée.
-
----
-
-## 1. Ordre recommandé
-
-| Étape | Quoi | Rétro-compatible ? |
-|---|---|---|
-| 1 | Sauvegarde base **dico** (SQL Server ou Access) | — |
-| 2 | Migration SQL additive | ✅ n'altère aucune colonne existante |
-| 3 | Fichiers PHP / JS serveur | ✅ l'APK **actuel** continue de fonctionner |
-| 4 | Paramétrage `params.php` (valeurs par défaut = comportement historique) | ✅ |
-| 5 | Vérifications serveur (§4) | — |
-| 6 | Build & déploiement APK (`flutter analyze` + `flutter test` d'abord) | ✅ fonctionne aussi face à un **ancien** serveur (fail-open) |
-
-> Le serveur peut être déployé **avant** l'APK, et l'APK peut être déployé **avant** le serveur :
-> chaque côté détecte l'absence de l'autre (WS `sync_status_ws.php` absent ⇒ silence côté mobile ;
-> en-têtes `X-Sync-Id` absents ⇒ traitement classique côté serveur).
+**Projet :** PAQABU / UNESCO — MEN Burundi  
+**Branche :** `ak_burundi` (créée depuis `ak_secure` — `ak_secure` reste intacte et constitue le point de retour)  
+**Périmètre :** serveur PHP `StatEduc_burundi` + application `stateduc_flutter`
 
 ---
 
-## 2. Serveur — migration SQL (U09 / U18 / U14)
+## 1. Ordre de déploiement recommandé
 
-Fichiers : `StatEduc_burundi/server-side/sql/`
-- `migration_sync_tracabilite_sqlserver.sql` (SQL Server, idempotent : `IF NOT EXISTS`)
-- `migration_sync_tracabilite_access.sql` (Access : exécuter bloc par bloc, ignorer les erreurs
-  « colonne existe déjà »)
+```
+1. Sauvegarde base (dico + données)          ← obligatoire
+2. Migration SQL (additive, rejouable)        ← serveur
+3. Copie des fichiers PHP / JS                ← serveur
+4. Ajustement params.php (optionnel)          ← serveur
+5. Vérification serveur (section 4)
+6. flutter analyze + flutter test             ← poste de build
+7. Build APK et déploiement progressif        ← mobile
+```
 
-Contenu (100 % **additif**) :
-1. `DATA_SAVING_LOGS` : colonnes `SYNC_ID VARCHAR(36)`, `SYNC_HASH VARCHAR(40)`, `NB_INSERT`,
-   `NB_UPDATE`, `NB_DELETE`, `NB_UNCHANGED INT`, `MESSAGE_ERREUR VARCHAR(500)`,
-   `APP_VERSION VARCHAR(20)`, `IP_CLIENT VARCHAR(45)` + index (établissement/thème/date, sync_id).
-2. Table `SYNC_ETAB_STATUT` (statut administratif courant par formulaire :
-   `RECU / A_CORRIGER / VALIDE / VERROUILLE`) et `SYNC_ETAB_STATUT_HIST` (historique).
-3. (SQL Server uniquement) entrées `DICO_MENU` / `DICO_TRADUCTION` / `ADMIN_DROITS` pour le
-   nouvel écran **Administration › Suivi synchronisation mobile** (ids 30636/30637). Sur Access,
-   créer ces lignes via l'interface d'administration des menus si besoin.
+> Le serveur `ak_burundi` est **rétro-compatible avec l'APK actuel** (`ak_secure`) et l'APK `ak_burundi` est **rétro-compatible avec l'ancien serveur** (tous les nouveaux appels sont *fail-open*). L'ordre ci-dessus est néanmoins celui qui active toutes les fonctionnalités dès le premier envoi.
 
-Toutes les fonctions PHP de `sync_lib.php` et `sync_status_ws.php` sont **fail-safe** : si la
-migration n'est pas passée, elles retournent vide / `false` sans erreur SQL bloquante.
+---
+
+## 2. Serveur — migration SQL (U09 / U18)
+
+| SGBD | Script |
+|---|---|
+| SQL Server | `StatEduc_burundi/server-side/sql/migration_sync_tracabilite_sqlserver.sql` |
+| Access | `StatEduc_burundi/server-side/sql/migration_sync_tracabilite_access.sql` (exécuter chaque instruction séparément dans l'éditeur de requêtes Access ; ignorer l'erreur si la colonne/table existe déjà) |
+
+Contenu (100 % additif, aucune donnée existante modifiée) :
+
+- `DATA_SAVING_LOGS` : colonnes `SYNC_ID`, `SYNC_HASH`, `NB_INSERT`, `NB_UPDATE`, `NB_DELETE`, `NB_UNCHANGED`, `MESSAGE_ERREUR`, `APP_VERSION`, `IP_CLIENT` (toutes `NULL`) + index `IX_DSL_SUIVI`, `IX_DSL_SYNC_ID`, `IX_DSL_SYNC_HASH`.
+- Tables `SYNC_ETAB_STATUT` (statut courant par établissement/thème/période : `RECU`, `A_CORRIGER`, `VALIDE`, `VERROUILLE`) et `SYNC_ETAB_STATUT_HIST` (historique).
+- `DICO_MENU` : entrées `30626` (suivi_sync_mobile) et `30627` (feedbacks) sous le menu Administration (`30605`). Adapter les identifiants si votre `DICO_MENU` utilise déjà ces ID.
+
+Le script SQL Server est **idempotent** (`IF NOT EXISTS` sur chaque objet). Le code PHP fonctionne aussi **sans** la migration (colonnes absentes ⇒ journalisation historique, WS de statut renvoient des listes vides) — la migration reste nécessaire pour l'idempotence, l'ACK détaillé et l'écran admin.
 
 ---
 
 ## 3. Serveur — fichiers à copier
 
-```
-StatEduc_burundi/
-  params.php                                  (nouveaux PARAM — voir §4)
-  sync_lib.php                                (nouveau, racine)
-  sync_status_ws.php                          (nouveau — WS lecture /etab /camp /feedback)
-  data_save.php                               (ACK, idempotence, rejets journalisés, verrou)
-  data_reload.php                             (route /theme_data/.../:id_annee)
-  questionnaire_ws.php                        (MAJ_STATS)
-  administration.php                          (2 nouveaux cas)
-  sms_sync.php                                (U27)
-  server-side/classes/metier/grille.class.php (compteurs + garde anti-suppression)
-  server-side/include/administration/
-      suivi_sync_mobile.php                   (nouveau — écran)
-      suivi_sync_mobile_service.php           (nouveau — AJAX)
-      remind_collectors.php                   (SMTP externalisé, U27)
-      suivi_saisie_list_etabs.php             (U27)
-      ctrl_collectors_feedbacks.php           (U27)
-  client-side/js/menus/1/{fr,eng,por}/_menu_princ.js, 0/por/_menu_princ.js
-```
+**Nouveaux**
+- `StatEduc_burundi/sync_lib.php`
+- `StatEduc_burundi/sync_status_ws.php`
+- `StatEduc_burundi/server-side/include/administration/suivi_sync_mobile.php`
+- `StatEduc_burundi/server-side/include/administration/suivi_sync_mobile_service.php`
+- `StatEduc_burundi/server-side/sql/migration_sync_tracabilite_{sqlserver,access}.sql`
 
-Syntaxe **PHP 7.3 native** conservée (pas de `match`, pas de types union, pas de `str_starts_with`
-non gardé).
+**Modifiés**
+- `data_save.php`, `data_reload.php`, `questionnaire_ws.php`, `administration.php`, `params.php`, `sms_sync.php`
+- `server-side/classes/metier/grille.class.php`
+- `server-side/include/administration/remind_collectors.php`, `suivi_saisie_list_etabs.php`, `ctrl_collectors_feedbacks.php`
+- `client-side/js/menus/1/{fr,eng,por}/_menu_princ.js`, `client-side/js/menus/0/por/_menu_princ.js`
+
+### Paramètres (`params.php`) — défauts = comportement actuel
+
+| Paramètre | Défaut | Rôle |
+|---|---|---|
+| `MOBILE_CHECK_SURVEY_STATUS` | `false` | U23 — refuser l'envoi si la campagne est fermée (`SURVEY_CLOSED`) |
+| `MOBILE_NO_DELETE_ON_PARTIAL` | `false` | U24 — ne pas supprimer en base les lignes absentes d'un POST mobile partiel (D→R, compteur `g` dans l'ACK) |
+| `MOBILE_DUPLICATE_WINDOW_MIN` | `30` | U11/U22 — fenêtre (minutes) de détection des doublons `X-Sync-Id` / `SYNC_HASH` |
+| `MOBILE_ENFORCE_LOCK` | `true` | U20 — rejeter (`FORM_LOCKED`) un envoi sur un formulaire `VALIDE`/`VERROUILLE` |
+| `MOBILE_CODE_GROUPE` | `4` | Groupe utilisateur des agents mobiles (listes de l'écran admin) |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USER`, `MAIL_PASSWORD`, `MAIL_SECURE` | `""` | U26 — SMTP des relances (plus de secret en dur ; relance ignorée si `MAIL_HOST` vide) |
 
 ---
 
-## 4. Paramètres (`params.php`) — défauts = comportement historique
+## 4. Vérification serveur (5 minutes)
 
-| Paramètre | Défaut | Rôle | Quand le changer |
-|---|---|---|---|
-| `MOBILE_CHECK_SURVEY_STATUS` | `false` | Refuse (`SURVEY_CLOSED`) l'envoi sur une campagne fermée | Après validation métier |
-| `MOBILE_NO_DELETE_ON_PARTIAL` | `false` | Un POST mobile partiel ne supprime plus les lignes absentes (D→R, compteur `g` dans l'ACK) | Si des pertes de lignes sont constatées |
-| `MOBILE_DUPLICATE_WINDOW_MIN` | `30` | Fenêtre (min) de détection des doublons `X-Sync-Id`/`SYNC_HASH` ⇒ `OKSAVE duplicate=true` | Rarement |
-| `MOBILE_ENFORCE_LOCK` | `true` | Rejette (`FORM_LOCKED`) l'envoi d'un formulaire `VALIDE`/`VERROUILLE` | `false` pour désactiver le verrou |
-| `MAIL_HOST/PORT/USERNAME/PASSWORD/SECURE` | vides | SMTP des rappels (`remind_collectors.php`) ; vide ⇒ envoi désactivé | Renseigner en prod |
-
-### Vérifications serveur après déploiement
 1. `php -l` sur chaque fichier copié (PHP 7.3).
-2. Ouvrir **Administration › Suivi synchronisation mobile** : la matrice établissement × thème
-   s'affiche (vide si aucune donnée).
-3. `GET sync_status_ws.php/camp/<login>/<camp>/<sys>/<annee>` (HttpAuth) ⇒ JSON `{"ok":true,...}`.
-4. Envoyer un formulaire depuis l'APK actuel ⇒ `DATA_SAVING_LOGS` renseigne `NB_*`
-   (colonnes `SYNC_ID` vides tant que le nouvel APK n'est pas déployé : normal).
+2. Connexion admin → menu **Administration › Suivi synchronisation mobile** : la matrice établissements × thèmes s'affiche, filtres par campagne / année / chaîne fonctionnent, export CSV OK.
+3. `GET sync_status_ws.php/camp/<login>/<camp>/<sys>/<annee>` (avec l'authentification HTTP habituelle) ⇒ JSON `{ "ok": true, ... }`.
+4. Envoi d'un formulaire depuis l'APK actuel ⇒ `DATA_SAVING_LOGS` : ligne `OKSAVE` avec `NB_*` renseignés ; renvoyer le même formulaire deux fois rapidement ⇒ seconde ligne `DUPLICATE` (si `X-Sync-Id` présent) ou `OKSAVE` avec `nb_unchanged` = total.
+5. Depuis l'écran admin : « Demander correction » sur un formulaire ⇒ `SYNC_ETAB_STATUT.STATUT = 'A_CORRIGER'` ; l'agent renvoie ⇒ statut repasse `RECU` automatiquement.
+6. « Valider » puis tenter un envoi mobile ⇒ HTTP 400 `se_code = FORM_LOCKED`, ligne `REJET_VERROU` dans les logs.
 
 ---
 
-## 5. Mobile — build
+## 5. Mobile — avant build
 
 ```bash
 cd stateduc_flutter
 flutter pub get
-flutter analyze              # doit être vierge (aucun SDK Flutter dans le bac à sable de dev)
-flutter test                 # sql_translator_test.dart + sync_status_test.dart
+flutter analyze
+flutter test                     # inclut test/sync_status_test.dart et test/sql_translator_test.dart
 flutter build apk --release
 ```
 
-- Base SQLite passe en **v9** : tables `form_sync_status` et `sync_feedback` créées au premier
-  lancement ; les états initiaux sont dérivés de `is_sent` existant (aucune perte de données locales).
-  `is_sent` continue d'être maintenu en parallèle (compatibilité des écrans non modifiés).
-- Face à un **ancien serveur** : `se_ack` absent ⇒ pas d'accusé détaillé ; `sync_status_ws.php`
-  absent ⇒ réconciliation/feedback ignorés silencieusement ; route `/:id_annee` absente ⇒
-  `reloadData` retombe sur la route historique.
+- SQLite passe en **version 9** (`form_sync_status`, `sync_feedback`) ; la migration initialise les statuts depuis `is_sent` existant — aucune ré-installation nécessaire, aucune donnée perdue.
+- `is_sent` reste maintenu en parallèle de `form_sync_status` : les écrans et l'envoi historiques continuent de fonctionner sur la même source de vérité.
+- ⚠️ **Retour arrière APK** : l'APK `ak_secure` (SQLite v8) ne définit pas `onDowngrade` ; il ne peut pas ouvrir une base déjà migrée en v9. Avant de réinstaller un APK plus ancien, envoyer toutes les données en attente puis vider les données de l'application (ou désinstaller) et re-télécharger la campagne.
 
-### Scénarios de recette (appareil)
-| # | Scénario | Attendu |
+---
+
+## 6. Plan de test de non-régression sur appareil
+
+| # | Scénario | Résultat attendu |
 |---|---|---|
-| 1 | Envoi unitaire OK | Pastille verte sur le chip, ligne « Envoyé · dernier envoi OK … · Serveur : n ajout(s)… » |
-| 2 | Coupure réseau pendant l'envoi | Statut « Échec d'envoi », formulaire listé dans « Formulaires en attente », bannière campagne « N formulaires en attente » |
-| 3 | Double tap Envoyer / retry Dio | Un seul enregistrement serveur ; 2e requête ⇒ `duplicate=true` (« déjà reçu le … ») |
-| 4 | Serveur renvoie KOSAVE | Statut orange « Reçu, non enregistré (KOSAVE) », **non** marqué envoyé, ré-essayable |
-| 5 | Admin met `A_CORRIGER` | Après « Actualiser » : bannière rouge sur le formulaire + badge sur l'école ; renvoi ⇒ statut repasse `RECU`, bannière disparaît |
-| 6 | Admin met `VALIDE`/`VERROUILLE` | Bouton Envoyer grisé (cadenas), bannière violette, « Recharger » propose les données officielles ; envoi forcé ⇒ `FORM_LOCKED` |
-| 7 | Modif web après envoi mobile puis modif mobile | Dialogue « Conflit de version » : Recharger / Écraser / Annuler |
-| 8 | Envoi global campagne avec 1 échec | Dialogue nominatif « École › Thème : motif » + « Réessayer les échecs » ne renvoie que l'échec |
-| 9 | Changement d'année dans Paramètres | Statuts/pastilles filtrés par `code_type_annee` ; rechargement sur la bonne année |
+| 1 | Saisie + « Envoyer » d'un formulaire (serveur à jour) | Ligne d'état verte « Envoyé », résumé ACK (« N ajout(s), N mise(s) à jour… ») ; pastille verte sur le chip |
+| 2 | Même envoi renvoyé sans modification | ACK « déjà reçu le … » (duplicate) ou `nb_unchanged` = total ; pas de doublon en base |
+| 3 | Envoi hors ligne | Statut « Échec d'envoi » (rouge), bannière « N formulaire(s) en attente » sur la campagne ; le bouton « Envoyer uniquement les formulaires en attente » les renvoie dès le retour réseau |
+| 4 | KOSAVE forcé (ex. contrainte SQL) | Statut « Reçu, non enregistré (KOSAVE) » orange ; **non** marqué envoyé ; réapparaît dans « Formulaires en attente » |
+| 5 | Envoi global école / campagne avec un échec | Dialogue résultat nominatif « Étab › Thème : motif » + « Réessayer les échecs » ne renvoie que les échecs |
+| 6 | Admin « Demander correction » puis ouverture du formulaire (⟳ Actualiser) | Bannière rouge avec le commentaire ; renvoi ⇒ bannière disparaît, statut admin `RECU` |
+| 7 | Admin « Valider » puis tentative d'envoi | Bouton Envoyer grisé (cadenas), bannière violette, proposition « Recharger » ; aucun POST |
+| 8 | Modification web du même formulaire après envoi mobile, puis modif locale + Envoyer | Dialogue « Conflit de version » : Recharger / Écraser / Annuler |
+| 9 | Ancien serveur (sans migration ni WS) | Envoi unitaire et global identiques à `ak_secure` ; aucun message d'erreur lié au statut ; réconciliation silencieuse |
+| 10 | Changement d'année dans Paramètres, envoi et rechargement | Données de l'année active uniquement (route `/:id_annee`), vérification année fail-open inchangée |
+| 11 | Import Excel utilisateurs, pluriannuel `CODE_TYPE_ANNEE` | Inchangés (aucune modification de ces modules) |
 
 ---
 
-## 6. Retour arrière
+## 7. Retour arrière
 
-- **Serveur** : recopier les fichiers de `ak_secure` ; les colonnes/tables ajoutées peuvent rester
-  (inutilisées, sans effet). Remettre `MOBILE_*` n'est pas nécessaire (ignorés par l'ancien code).
-- **Mobile** : réinstaller l'APK `ak_secure`. La base SQLite v9 reste lisible (tables
-  supplémentaires ignorées ; `is_sent` est à jour). Aucune migration descendante requise.
-
----
-
-## 7. Références
-- Diagnostic initial : `DIAGNOSTIC_SYNCHRONISATION_TRACABILITE.md` (U01–U27, C1–C10)
-- État d'implémentation détaillé : `ETAT_IMPLEMENTATION_AK_BURUNDI.md`
-- Journaux : `StatEduc_burundi/CHANGELOG.md`, `stateduc_flutter/CHANGELOG.md`
+- **Serveur** : recopier les fichiers de `ak_secure`. La migration SQL peut rester en place (colonnes `NULL`, tables non lues par l'ancien code). Supprimer les deux entrées `DICO_MENU` si besoin.
+- **Mobile** : envoyer d'abord tous les formulaires en attente (écran « Formulaires en attente »), puis désinstaller / vider les données de l'application avant de réinstaller l'APK `ak_secure` (voir avertissement section 5 : pas de rétrogradation SQLite v9 → v8 à chaud).
