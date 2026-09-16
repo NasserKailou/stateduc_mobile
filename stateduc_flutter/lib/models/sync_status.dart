@@ -412,6 +412,16 @@ class SyncFeedback {
   bool get isCorrection => statut == 'A_CORRIGER';
   bool get isLock => statut == 'VALIDE' || statut == 'VERROUILLE';
 
+  /// Le feedback s'applique-t-il au formulaire (thème [idQst], période [idFilter]) ?
+  ///   - idQst null côté feedback   → tout l'établissement (tous thèmes)
+  ///   - idFilter null côté feedback → toutes les périodes du thème
+  ///   - sinon égalité stricte (filtre '' et null équivalents).
+  bool appliesTo(String idQst, String? idFilter) {
+    if (this.idQst != null && this.idQst != idQst) return false;
+    if (this.idFilter == null || this.idFilter!.isEmpty) return true;
+    return this.idFilter == (idFilter ?? '');
+  }
+
   factory SyncFeedback.fromJson(Map<String, dynamic> j,
       {required String idCamp, required String codeTypeAnnee, DateTime? fetchedAt}) {
     String? nz(dynamic v) {
